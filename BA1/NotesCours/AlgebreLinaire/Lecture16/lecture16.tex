@@ -1,0 +1,234 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-15 at 13:18:58.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Lundi 15 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{16}{2021-11-15}{Équation caractéristique et matrices semblables}{
+\begin{itemize}[left=0pt]
+    \item Explication que des vecteurs propres sont linéairement indépendants si leurs valeurs propres associées sont distinctes.
+    \item Définition de l'équation caractéristique d'une matrice, et donc de son polynôme caractéristique. Démonstration que ce polynôme est toujours de degré $n$.
+    \item Définition de la multiplicité algébrique d'une valeur propre.
+    \item Définition des matrices semblables.
+    \item Démonstration que deux matrices semblables ont le même polynôme caractéristique.
+    \item Définition des matrices diagonalisable.
+\end{itemize}
+
+}
+
+\parag{Observation}{
+    Dans l'exemple de Fibonacci, on a observé que les vecteurs propres de $A$ pour les deux valeurs propres distinctes étaient linéairement indépendantes, ce qui nous a permis d'exprimer le vecteur initial comme combinaison linéaire de ceux-ci. Ce n'était pas un accident.
+}
+
+\parag{Théorème}{
+    Soit $A$ une matrice $n\times n$ et $\bvec{v}_1, \ldots, \bvec{v}_r$ des vecteurs propres de $A$ associés à des valeurs propres \textit{distinctes} $\lambda_1$, \ldots, $\lambda_r$. Ces vecteurs propres sont linéairement indépendants.
+}
+
+\parag{Exemple}{
+    La matrice suivante est de taille $3\times 3$: 
+    \[A = \begin{bmatrix} 1 & 8 & 9 \\ 0 & 2 & 7 \\ 0 & 0 & 3 \end{bmatrix} \]
+    
+    Elle a 3 valeurs propres, $\lambda_1 = 1$, $\lambda_2 = 2$, $\lambda_3 = 3$ (les valeurs sur la diagonale puisque la matrice est triangulaire), qui sont distinctes. Donc, si $\bvec{v}_1, \bvec{v}_2, \bvec{v}_3$ sont des vecteurs propres associés à $\lambda_1, \lambda_2, \lambda_3$, ils sont linéairement indépendants et forment une base de $\mathbb{R}^3$.
+}
+
+\parag{Multiplication des valeurs propres}{
+    Si les vecteurs propres de $A$ sont $\lambda_1, \ldots, \lambda_p$ et qu'elles sont associées à des vecteurs propres $\bvec{v}_1, \ldots, \bvec{v}_p$. On se demande ce qu'on peut dire des valeurs propres et des vecteurs propres $B = 2A$:
+    \[A \bvec{v}_1 = \lambda_1 \bvec{v}_1 \implies B \bvec{v}_1 = \left(2A\right)\bvec{v}_1 = 2\left(A \bvec{v}_1\right) = 2\left(\lambda_1 \bvec{v}_1\right) = \left(2\lambda_1\right)\bvec{v}_1\]
+    
+    Donc, les vecteurs propres restent les mêmes, et les valeurs propres doublent.
+}
+
+\subsection{Équation caractéristique}
+\parag{Équation caractéristique}{
+    Soit $A$ une matrice carré de taille $n \times n$. On a défini qu'un scalaire $\lambda$ est valeur propre de $A$ si et seulement si $A \bvec{x} = \bvec{x}$ admet une solution $\bvec{x} \neq \bvec{0}$. On a déduit de cette définition que $\lambda$ est valeur propre de $A$ exactement si: 
+    \[\det\left(A - \lambda I_n\right) = 0\]
+    
+    On appelle ceci \important{l'équation caractéristique de $A$}. Dans tous nos exemples, le membre de gauche était un polynôme de degré $n$ en $\lambda$. C'est toujours le cas.
+
+    On appelle $p_A$ le \important{polynôme caractéristique de $A$} défini par: 
+    \[p_A\left(\lambda\right) = \det\left(A - \lambda I_n\right)\]
+    
+    Pour voir que c'est un polynôme de degré $n$, regardons des petites valeurs de $n$. Si $n = 1$: 
+    \[A = \begin{bmatrix} a_{11} \end{bmatrix} \implies A - \lambda I_1 = \begin{bmatrix} a_{11} - \lambda \end{bmatrix} \implies p_A\left(\lambda\right) = \det\left(A - \lambda I_1\right) = a_{11} - \lambda\]
+
+    Si $n = 2$: 
+    \[A = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} \implies A - \lambda I_2 = \begin{bmatrix} a_{11} - \lambda & a_{12} \\ a_{21} & a_{22} - \lambda \end{bmatrix}\]
+
+    Le polynôme caractéristique de cette matrice est donc: 
+    \[p_A\left(\lambda\right) = \left(a_{11} - \lambda\right)\left(a_{22} - \lambda\right) - a_{12}a_{21} = \lambda^2 - \left(a_{11} + a_{22}\right)\lambda + a_{11}a_{22} - a_{12} a_{21}\]
+    
+    
+    En faisant la même chose pour $n = 3$, on obtient: 
+    \begin{multiequality}
+        p_A\left(\lambda\right) =\ & \det\left(A - \lambda I_3\right)  \\
+        =\ & \left(a_{11} - \lambda\right)\left(a_{22} - \lambda\right)\left(a_{33} - \lambda\right) + a_{12}a_{23}a_{31} + a_{13}a_{21}a_{32} \\
+        & - \left(a_{11} - \lambda\right)a_{23}a_{32} - a_{12}a_{21}\left(a_{33} - \lambda\right) - a_{13} a_{31}\left(a_{22} - \lambda\right)  \\
+        =\ & -\lambda^3 + \ldots\lambda^2 + \ldots\lambda + \det\left(A\right) 
+    \end{multiequality}
+    
+    Ce n'est pas très important, mais on remarque que le terme indépendant (la constante) est toujours le déterminant de la matrice. En effet, si on évalue $p_A\left(0\right) = \det\left(A\right)$ dans la définition du polynôme caractéristique, donc la constante doit bien être égale au déterminant.
+}
+
+\parag{Généralisation}{
+    En regardant la définition du déterminant, on voit que $\det\left(A - \lambda I_n\right)$ est une somme de très nombreux termes ; chacun d'entre eux est un produit de $n$ coefficients de la matrice $A - \lambda I_n$. 
+
+    Comme les coefficients de $A - \lambda I_n$ sont des polynômes de degré $\leq 1$, chaque terme de la somme est de degré $\leq n$. De plus, un terme de degré $n$ vient du produit des coefficients diagonaux.
+}
+
+\parag{Théorème}{
+    Les valeurs propres de $A \in \mathbb{R}^{n \times n}$ sont les racines du polynôme caractéristique: 
+    \[p_A\left(\lambda\right) = \det\left(A - \lambda I_n\right)\]
+    
+    Ce polynôme est exactement de degré $n$.
+
+    \subparag{Implication}{
+        On sait qu'un polynôme de degré $n$ a exactement $n$ racines, si on compte leur multiplicités et qu'on admet les racines complexes.
+
+        Donc, toute matrice $A \in \mathbb{R}^{n \times n}$ a exactement $n$ valeurs propres $\lambda_1, \ldots, \lambda_n \in \mathbb{C}$, en répétant chaque racine selon sa multiplicité (on l'appelle la \important{multiplicité algébrique} de la valeur propre; on verra un autre type de multiplicité plus tard). On a donc: 
+        \[p_A\left(\lambda\right) = \left(\lambda_1 - \lambda\right)\left(\lambda_2 - \lambda\right)\cdots\left(\lambda_n - \lambda\right)\]
+    }
+}
+
+\parag{Exemple 1}{
+    Soit la matrice suivante: 
+    \[A = \begin{bmatrix} 3 & 9 & 3 & 1 \\ 0 & 6 & -2 & 0 \\ 0 & 0 & 0 & -2 \\ 0 & 0 & 0 & 6 \end{bmatrix} \implies A - \lambda I_4 = \begin{bmatrix} 3-\lambda & 9 & 3 & 1 \\ 0 & 6-\lambda & -2 & 0 \\ 0 & 0 & 0-\lambda & -2 \\ 0 & 0 & 0 & 6-\lambda \end{bmatrix}\]
+
+    Son polynôme caractéristique est donné par:
+    \[p_A\left(\lambda\right) = \det\left(A - \lambda I_4\right) = \left(3 - \lambda\right)\left(6 - \lambda\right)\left(0 - \lambda\right)\left(6 - \lambda\right) = \left(0 - \lambda\right)\left(3 - \lambda\right)\left(6 - \lambda\right)^2\]
+
+    Ainsi, les valeurs propres de $A$ sont $0, 3, 6$ et leur multiplicité algébrique sont $1, 1, 2$ respectivement. $A$ est de taille $4\times 4$ et la somme des multiplicités algébriques et $1 + 1 + 2 = 4$, comme attendu.
+}
+
+\parag{Exemple 2}{
+    Soit la matrice suivante (qui n'est pas triangulaire!): 
+    \[A = \begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix} \implies A - \lambda I_2 = \begin{bmatrix} -\lambda & -1 \\ 1 & -\lambda \end{bmatrix} \]
+    
+    On a: 
+    \[p_A\left(\lambda\right) = \det\left(A - \lambda I_2\right) = \left(-\lambda\right)^2 + 1 = \lambda^2 + 1 = \lambda^2 - i^2 = \left(\lambda + i\right)\left(\lambda - i\right)\]
+    
+    Les valeurs propres de $A$ sont donc $i$ et $-i$, et leur multiplicité algébrique sont $1$ et $1$. 
+
+    Géométriquement, on se rend compte que $\bvec{x} \mapsto A \bvec{x}$ est une rotation (on peut voir son comportement en l'appliquant sur $\bvec{e}_1$ et $\bvec{e}_2$). Ainsi, s'il y avait une valeur propre réelle, alors cela voudrait dire qu'il existerait un vecteur $\bvec{x}$ tel que quand on fait tourner $\bvec{x}$ de $\frac{\pi}{2}$, alors cela donnerait un multiple de ce vecteur.
+
+}
+
+\subsection{Matrices semblables}
+
+
+\parag{Définition des matrices semblables}{
+    Soient $A$ et $B$ deux matrices de taille $n \times n$.
+
+    On dit que $A$ est \important{semblable} à $B$ s'il existe $P$ inversible de taille $n \times n$ telle que: 
+    \[B = P^{-1} A P\]
+
+    \subparag{Observation}{
+        $B = P^{-1} A P$ est équivalent à: 
+        \[A = PBP^{-1}\]
+    }
+
+    \subparag{Remarque}{
+        Ceci définit une relation d'équivalence sur les matrices de taille $n \times n$. En effet, selon cette définition on peut montrer que:
+        \begin{itemize}
+            \item $A$ est semblable à $A$ (réflexivité).
+            \item Si $A$ est semblable à $B$, alors $B$ est semblable à $A$ (symétrie).
+            \item Si $A$ est semblable à $B$ et $B$ est semblable à $C$, alors $A$ est semblable à $C$ (transitivité).
+        \end{itemize}
+
+        Par exemple, pour le point $\left(2\right)$. Puisque $A$ est semblable à $B$, il existe $Q$ inversible telle que $B = Q^{-1} A Q$. Ainsi, en prenant $P = Q^{-1}$: 
+        \[B = Q^{-1} A Q \implies A = QBQ^{-1} = P^{-1}BP\]
+
+        Il faut noter que, puisque si $A$ est semblable à $B$ implique que $B$ est semblable à $A$, on dit donc que ``$A$ et $B$ sont semblables'', et non pas ``$A$ est semblable à $B$''.
+    }
+}
+
+\parag{Théorème}{
+    Si $A$ et $B$ sont semblables, alors $p_A = p_B$.
+
+    En particulier, $A$ et $B$ ont donc les mêmes valeurs propres, avec les mêmes multiplicités algébriques.
+
+    \subparag{Preuve}{
+        Comme $A$ et $B$ sont semblables, il existe $P$ inversible telle que:
+        \[B = P^{-1} AP\]
+        
+        De plus, on remarque que: 
+        \[I_n = P^{-1} P = P^{-1} I_n P\]
+
+        Ainsi, on en déduit que: 
+        \[B - \lambda I_n = P^{-1} A P - \lambda P^{-1} I_n P\]
+
+        Cependant, puisque $\lambda$ est un scalaire, on obtient que c'est égal à: 
+        \[B - \lambda I_n = P^{-1} A P - P^{-1}\left(\lambda I_n\right)P = P^{-1}\left(A - \lambda I_n\right)P\]
+
+        À partir de là, on peut calculer le polynôme caractéristique: 
+        \[p_B\left(\lambda\right) = \det\left(B - \lambda I_n\right) = \det\left(P^{-1}\left(A - \lambda I_n\right)P\right)\]
+
+        On sait que le déterminant est multiplicatif, donc:
+        \[p_B\left(\lambda\right) = \det\left(P^{-1}\right)\det\left(A - \lambda I_n\right)\det\left(P\right) = \det\left(P^{-1}\right)\det\left(P\right)\det\left(A - \lambda I_n\right)\]
+        
+        De plus, on remarque que: 
+        \[\det\left(P^{-1}\right)\det\left(P\right) = \det\left(P^{-1} P\right) = \det\left(I_n\right) = 1\]
+
+        On peut donc en déduire que:
+        \[p_B\left(\lambda\right) = \det\left(A - \lambda I_n\right) = p_A\left(\lambda\right)\]
+    }
+
+    \subparag{Remarque}{
+        La réciproque de ce théorème n'est pas vraie. En effet, prenons les matrices suivantes: 
+        \[A = \begin{bmatrix} 3 & 2 \\ 0 & 3 \end{bmatrix}, \mathspace B = \begin{bmatrix} 3 & 0 \\ 0 & 3 \end{bmatrix} \]
+
+        Leur polynômes caractéristiques sont égaux, ils sont les deux $\left(3 - \lambda\right)^2$. Cependant, elle ne sont pas semblables. 
+
+        Supposons par l'absurde qu'elles sont semblables, donc qu'il existe $P$ inversible telle que: 
+        \[B = P^{-1} A P \iff A = P B P^{-1}\]
+        
+        Mais, $B = 3 I_2$, donc: 
+        \[A = P\left(3I_2\right)P^{-1} = 3\cdot P I_2 P^{-1} = 3I_2\]
+        
+        Cependant, $A \neq 3I_2$, donc c'est une contradiction.
+    }
+}
+
+\parag{Utilité des matrices semblables}{
+    On se demande d'où pourraient apparaître des matrices semblables. Une des réponses est les changements de base (on verra d'autres réponses).
+
+    Soit $T : \mathbb{R}^3 \mapsto \mathbb{R}^3$, une application linéaire. On sait qu'il existe $A \in \mathbb{R}^{3 \times 3}$ telle que: 
+    \[T\left(\bvec{x}\right) = A \bvec{x}, \mathspace \forall \bvec{x} \in \mathbb{R}^3\]
+    
+    Disons maintenant que nous avons envie d'exprimer $T$ par rapport à une base $\mathcal{B} = \left(\bvec{b}_1, \bvec{b}_2, \bvec{b}_3\right)$. Soit la matrice de passage suivante: 
+    \[P = \begin{bmatrix}  &  &  \\ \bvec{b}_1 & \bvec{b}_2 & \bvec{b}_3 \\  &  &  \end{bmatrix} \in \mathbb{R}^{3\times 3} \implies \bvec{v} = P\left[\bvec{v}\right]_{\mathcal{B}} \text{ et } \left[\bvec{v}\right]_{\mathcal{B}} = P^{-1} \bvec{v} \mathspace \forall \bvec{v} \in \mathbb{R}^3\]
+
+    Ainsi, on peut changer notre transformation linéaire de base:
+    \[\left[T\left(\bvec{x}\right)\right]_{\mathcal{B}} = P^{-1} T\left(\bvec{x}\right) = P^{-1}A \bvec{x} = P^{-1}AP \left[\bvec{v}\right]_{\mathcal{B}}\]
+
+    On a donc trouvé que la matrice de $T$ par rapport à $\mathcal{B}$ est $P^{-1}AP$, qui est semblable à $A$.
+
+    On se demande maintenant s'il existe une base ``spéciale'' qui rend la matrice ``simple''.
+}
+
+\subsection{Diagonalisation}
+\parag{Définition}{
+    Soit $A \in \mathbb{R}^{n\times n}$. On dit que $A$ est \important{diagonalisable} si elle est semblable à une matrice diagonale. C'est-à-dire s'il existe $D$ diagonale et $P$ inversible telles que: 
+    \[A = PDP^{-1} \iff P^{-1} A P = D \iff AP = PD\]
+}
+
+\parag{Exemple}{
+    Soient les matrices suivantes: 
+    \[A = \begin{bmatrix} 7 & 2 \\ -4 & 1 \end{bmatrix}, \mathspace P = \begin{bmatrix} 1 & 1 \\ -1 & -2 \end{bmatrix}, \mathspace D = \begin{bmatrix} 5 & 0 \\ 0 & 3 \end{bmatrix} \]
+
+    On peut vérifier facilement que $A = PDP^{-1}$, donc $A$ est diagonalisable. En effet, $\det\left(P\right) = -1 \neq 0$, donc $P$ est inversible. De plus, on n'a pas besoin de calculer $P^{-1}$:
+    \[A = PDP^{-1} \iff AP = PD\]
+    
+    Ce qu'on peut vérifier: 
+    \[AP = \begin{bmatrix} 5 & 3 \\ -5 & -6 \end{bmatrix}, \mathspace PD = \begin{bmatrix} 5 & 3 \\ -5 & -6 \end{bmatrix} \]
+    
+    
+}
+
+\end{document}

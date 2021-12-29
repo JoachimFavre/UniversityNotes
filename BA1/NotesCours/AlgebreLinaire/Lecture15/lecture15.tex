@@ -1,0 +1,240 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-11 at 08:32:42.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Jeudi 11 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{15}{2021-11-11}{Monsieur propre}{
+\begin{itemize}[left=0pt]
+    \item Définition des valeurs et des vecteurs propres.
+    \item Explication de la méthode pour trouver les valeurs et les vecteurs propres d'une matrice.
+    \item Beaucoup d'exemples, y comprit un méthode qui utilise des vecteurs propres pour trouver la formule explicite de la suite de Fibonacci.
+\end{itemize}
+
+}
+
+\section{Valeurs propres et vecteurs propres}
+
+\parag{Introduction}{
+    Considérons la matrice suivante: 
+    \[A = \begin{bmatrix} 3 & -2 \\ 1 & 0 \end{bmatrix} \]
+    
+    L'application linéaire $\bvec{x} \mapsto A \bvec{x}$ de $\mathbb{R}^2$ vers $\mathbb{R}^2$ a \textit{parfois} un effet très simple à décrire. En effet: 
+    \[A \bvec{e}_1 = \begin{bmatrix} 3 & -2 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 3 \\ 1 \end{bmatrix}, \mathspace A \bvec{e}_2 = \begin{bmatrix} 3 & -2 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} 0 \\ 1 \end{bmatrix} = \begin{bmatrix} -2 \\ 0 \end{bmatrix} \]
+    
+    Jusque là, rien de spécial, mais regardons les vecteurs suivants: 
+    \[\bvec{u} = \begin{bmatrix} 2 \\ 1 \end{bmatrix} \implies A \bvec{u} = \begin{bmatrix} 3 & -2 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} 2 \\ 1 \end{bmatrix} = \begin{bmatrix} 4 \\ 2 \end{bmatrix} = 2\bvec{u} \]
+    \[\bvec{v} = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \implies A \bvec{u} = \begin{bmatrix} 3 & -2 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} 1 \\ 1 \end{bmatrix} = \begin{bmatrix} 1 \\ 1 \end{bmatrix} = \bvec{v} \]
+
+    Maintenant, si nous voulons appliquer 17 fois $A$ au vecteurs $\bvec{e}_1$, cela serait très compliqué, cependant si on essaie de le faire sur le vecteur $\bvec{u}$ on obtient: 
+    \[A^{17} \bvec{u} = 2A^{16} \bvec{u} = \ldots = 2^{17} \bvec{u}\]
+    
+    De la même manière, si on le fait sur $\bvec{v}$: 
+    \[A^{17} \bvec{v} = A^{16} \bvec{v} = \ldots = \bvec{v}\]
+
+    Cela nous motive donc à creuser les vecteurs non-nuls (sinon l'équation est triviale) tels que, avec un scalaire $\lambda$: 
+    \[A \bvec{x} = \lambda \bvec{x}\]
+}
+
+\parag{Définition des vecteurs et valeurs propres}{
+    Soit $A$ une matrice $n \times n$ (on travaille uniquement avec des matrices carrées). On appelle \important{vecteur propre} de $A$ tout vecteur non nul $\bvec{x}$ tel que $A \bvec{x} = \lambda \bvec{x}$ pour un certain scalaire $\lambda$.
+
+    Un scalaire $\lambda$ est appelé \important{valeur propre} de $A$ si l'équation $A \bvec{x} = \lambda \bvec{x}$ admet au moins une solution non triviale $\bvec{x}$ ; un tel vecteur $\bvec{x}$ est appelé \important{vecteur propre associé à $\lambda$}.
+
+}
+
+\parag{Exemple 1}{
+    Soit la matrice et le vecteur suivants:
+    \[A = \begin{bmatrix} 1 & 6 \\ 5 & 2 \end{bmatrix}, \mathspace \bvec{u} = \begin{bmatrix} 6 \\ -5 \end{bmatrix} \]
+
+    On veut savoir si $\bvec{u}$ est un vecteur propre de $A$. On a: 
+    \[A \bvec{u} = \begin{bmatrix} 1 & 6 \\ 5 & 2 \end{bmatrix} \begin{bmatrix} 6 \\ -5 \end{bmatrix} = \begin{bmatrix} -24 \\ 20 \end{bmatrix} = -4\bvec{u}\]
+    
+    Donc, $\bvec{u}$ est bien un vecteur propre de $A$, et sa valeur propre associée est $-4$. Regardons maintenant si le vecteur suivant est un vecteur propre de $A$: 
+    \[\bvec{v} = \begin{bmatrix} 3 \\ 2 \end{bmatrix} \implies A \bvec{v} = \begin{bmatrix} 1 & 6 \\ 5 & 2 \end{bmatrix} \begin{bmatrix} 3 \\ -2 \end{bmatrix} = \begin{bmatrix} -9 \\ 11 \end{bmatrix} \]
+    
+    On en déduit que $\bvec{v}$ n'est pas un vecteur propre de $A$.
+}
+
+\parag{Exemple 2}{
+    Soit la matrice suivante: 
+    \[A = \begin{bmatrix} 1 & 6 \\ 5 & 2 \end{bmatrix} \]
+    
+    On veut savoir si 7 est une valeur propre de $A$. Si c'est le cas, on veut trouver les vecteurs propres associés. Pour répondre à ceci, on doit déterminer l'équation suivante: 
+    \[A \bvec{x} = 7\bvec{x}\]
+
+    On remarque que cette équation est linéaire, et on peut mettre le $\bvec{x}$ à gauche : 
+    \[A \bvec{x} - 7\bvec{x} = \bvec{0} \iff A \bvec{x} - 7I_2\bvec{x} = 0 \iff \left(A - 7I_2\right)\bvec{x} = \bvec{0}\]
+    
+    En d'autres mots, on cherche le noyau de la matrice $A - 7I_2$, on veut savoir s'il existe un $\bvec{x}$ non nul qui satisfait cette équation (dans la définition des vecteurs propres, $\bvec{x}$ ne peut pas être nul). On a: 
+    \[A - 7I_2 = \begin{bmatrix} 1 & 6 \\ 5 & 2 \end{bmatrix} - \begin{bmatrix} 7 & 0 \\ 0 & 7 \end{bmatrix} = \begin{bmatrix} -6 & 6 \\ 5 & -5 \end{bmatrix} \]
+    
+    Par échelonnement, on trouve que l'ensemble des solutions $\bvec{x}$ est :
+    \[\vect\left\{\begin{bmatrix} 1 \\ 1 \end{bmatrix} \right\}\]
+    
+    Puisque le kernel n'est pas vide, on en déduit que $7$ est une valeur propre de $A$, et le vecteur suivant est un vecteur propre associé: 
+    \[\bvec{x} = \begin{bmatrix} 1 \\ 1 \end{bmatrix}\]
+}
+
+\parag{Cas général}{
+    Pour une matrice $A \in \mathbb{R}^{n \times n}$ et un scalaire $\lambda$, les affirmations suivantes sont équivalentes:
+    \begin{itemize}
+        \item $\lambda$ est une valeur propre de $A$
+        \item $A \bvec{x} = \lambda \bvec{x}$ a une solution non-nulle, par définition
+        \item $A \bvec{x} - \lambda \bvec{x} = \bvec{0}$ a une solution non-nulle
+        \item $A \bvec{x} - \lambda I_n\bvec{x} = \bvec{0}$ a une solution non-nulle
+        \item $\left(A - \lambda I_n\right)\bvec{x} = \bvec{0}$ a une solution non-nulle
+        \item $A - \lambda I_n$ n'est pas inversible puisque son noyau n'est pas de dimension $0$
+        \item $\det\left(A - \lambda I_n\right) = 0$
+    \end{itemize}
+}
+
+\parag{Observation 1}{
+    Les valeurs propres de $A$ sont exactement les solutions de l'équation scalaire (non linéaire) suivante:
+    \[\det\left(A - \lambda I_n\right) = 0\]
+
+    On appelle cette équation l'équation caractéristique, et le polynôme qui en découle (ce sera toujours un polynôme), le polynôme caractéristique. 
+
+    \subparag{Exemple}{
+        Prenons la matrice suivante: 
+        \[A = \begin{bmatrix} 1 & 6 \\ 5 & 2 \end{bmatrix} \]
+
+        On peut calculer $A - \lambda I_2$:
+        \[A - \lambda I_2 = \begin{bmatrix} 1 & 6 \\ 5 & 2 \end{bmatrix} - \begin{bmatrix} \lambda & 0 \\ 0 & \lambda \end{bmatrix} = \begin{bmatrix} 1 - \lambda & 6 \\ 5 & 2 - \lambda \end{bmatrix} \]
+        
+        Calculons maintenant son déterminant: 
+        \[\det\left(A - \lambda I_2\right) = \det\begin{bmatrix} 1 - \lambda & 6 \\ 5 & 2 - \lambda \end{bmatrix} = \left(1 - \lambda\right)\left(2 - \lambda\right) - 30\]
+
+        Ce qu'on peut simplifier: 
+        \[\det\left(A - \lambda I_2\right) = \lambda^2 - 3\lambda - 28 = \left(\lambda - 7\right)\left(\lambda + 4\right)\]
+        
+        Les racines de ce polynôme sont $7$ et $-4$ ; ce sont les valeurs propres de $A$. Pour trouver les vecteurs propres associés à ces valeurs propres, on peut calculer le kernel de $A - 7I_2$ et $A + 4I_2$.
+    }
+}
+
+\parag{Observation 2}{
+    Si $\lambda$ est valeur propre de $A$, alors tous les vecteurs propres $\bvec{x}$ associés à $\lambda$ sont solution de $\left(A - \lambda I_n\right) \bvec{x} = \bvec{0}$. L'ensemble solution de cette équation est un sous-espace de $\mathbb{R}^{n}$ appelé \important{sous-espace propre} de $A$ associé à la valeur propre $\lambda$.
+
+    \subparag{Remarque}{
+        On peut justifier cette remarque en montrant qu'on cherche le kernel d'une matrice $A - \lambda I_n$, qui est un sous-espace.
+    }
+    
+}
+
+\parag{Exemple 1}{
+    Nous voulons trouver les valeurs propres de la matrice suivantes: 
+    \[A = \begin{bmatrix} 4 & -1 & 6 \\ 2 & 1 & 6 \\ 2 & -1 & 8 \end{bmatrix} \]
+    
+    Calculons $A - \lambda I_3$: 
+    \[A - \lambda I_3 = \begin{bmatrix} 4 & -1 & 6 \\ 2 & 1 & 6 \\ 2 & -1 & 8 \end{bmatrix} - \begin{bmatrix} \lambda & 0 & 0 \\ 0 & \lambda & 0 \\ 0 & 0 & \lambda \end{bmatrix} = \begin{bmatrix} 4 - \lambda & -1 & 6 \\ 2 & 1 - \lambda & 6 \\ 2 & -1 & 8 - \lambda \end{bmatrix} \]
+
+    Calculons son déterminant maintenant: 
+    \[\det\left(A - \lambda I_3\right) = \left(4 - \lambda\right)\left(1 - \lambda\right)\left(8- \lambda\right) -12 - 12 + 6\left(4 - \lambda\right) + 2\left(8 -\lambda\right) - 12\left(1 - \lambda\right)\]
+    Simplifions le polynôme caractéristique de $A$:
+    \[\det\left(A - \lambda I_3\right) = -\lambda^3 + 13\lambda^2 - 40\lambda + 36 = -\left(\lambda - 9\right)\left(\lambda - 2\right)^2\]
+
+    Ainsi, on en déduit que les valeurs propres de $A$ sont 9 et 2.
+
+    Cherchons maintenant l'espace proper de $A$ associé à la valeur propre $\lambda = 2$. C'est l'ensemble solution de $A \bvec{x} = 2 \bvec{x}$, c'est-à-dire celui de $\left(A - 2I_2\right)\bvec{x} = \bvec{0}$: 
+    \[\left(\begin{bmatrix} 4 & -1 & 6 \\ 2 & 1 & 6 \\ 2 & -1 & 8 \end{bmatrix} - \begin{bmatrix} 2 & 0 & 0 \\ 0 & 2 & 0 \\ 0 & 0 & 2 \end{bmatrix} \right) \bvec{x} = \bvec{0} \implies \begin{bmatrix} 2 & -1 & 6 \\ 2 & -1 & 6 \\ 2 & -1 & 6 \end{bmatrix} \bvec{x} = \bvec{0}\]
+    
+    Puisque les colonnes sont toutes égales, le rang de cette matrice est 1, on en déduit que la dimension de son noyau est 2, et on devine la base suivante (on aurait aussi pu la trouver par échelonnement): 
+    \[\left\{\begin{bmatrix} 1 \\ 2 \\ 0 \end{bmatrix}, \begin{bmatrix} 3 \\ 0 \\ 1 \end{bmatrix} \right\}\]
+
+    Donc, l'espace propre de $A$ associé à $\lambda = 2$ est un plan dans $\mathbb{R}^3$ est donné par: 
+    \[\vect\left\{\begin{bmatrix} 1 \\ 2 \\ 0 \end{bmatrix}, \begin{bmatrix} 3 \\ 0 \\ -1 \end{bmatrix} \right\}\]
+    
+    Pour tout $\bvec{x}$ dans ce sous-espace, on a $A \bvec{x} = 2 \bvec{x}$. 
+}
+
+\parag{Exemple 2}{
+    Nous voulons trouver les valeurs propres de la matrice suivante: 
+    \[A = \begin{bmatrix} 1 & 4 & 6 \\ 0 & 3 & 9 \\ 0 & 0 & 8 \end{bmatrix} \]
+    
+    Ainsi, on trouve: 
+    \[A - \lambda I_3 = \begin{bmatrix} 1 - \lambda & 4 & 6 \\ 0 & 3-\lambda & 9 \\ 0 & 0 & 8-\lambda \end{bmatrix} \]
+    
+
+    On se rend compte que $A$ est une matrice triangulaire, et que $A - \lambda I_3$ reste triangulaire (puisqu'on soustrait juste une matrice diagonale). Donc, le déterminant est très simple à calculer:
+    \[\det\left(A - \lambda I_3\right) = \left(1 - \lambda\right)\left(3 - \lambda\right)\left(8 - \lambda\right)\]
+    
+    On en déduit que les valeurs propres de $A$ sont $1, 3, 8$, les éléments sur sa diagonale.
+}
+
+\parag{Théorème}{
+    Si $A \in \mathbb{R}^{n \times n}$ est triangulaire (inférieure, supérieure ou diagonale), alors ses valeurs propres sont ses entités diagonales: $a_{11}, a_{22}, \ldots, a_{nn}$.
+
+    \subparag{Remarque}{
+        Attention, il est important de noter qu'échelonner une matrice ne permet pas de trouver ses valeurs propres, puisqu'un échelonnement modifie les valeurs propres.
+    }
+}
+
+\parag{Exemple 1}{
+    Soit la matrice suivante: 
+    \[A = \begin{bmatrix} -5 & 2 & 3 \\ 3 & -4 & 1 \\ 1 & 2 & -3 \end{bmatrix} \implies \det\left(A - \lambda I\right) = -\lambda\left(\lambda + 6\right)^2\]
+    
+    On en déduit que les valeurs propres de cette matrice sont $-6$ et $0$. Puisque $0$ est une valeur propre nulle, cela veut dire qu'il existe un $\bvec{x}$ non-nul tel que $A\bvec{x} = \lambda \bvec{x} = \bvec{0}$. Donc, $A$ n'est pas inversible.
+}
+
+\parag{Exemple 2: Fibonacci}{
+    Nous souhaitons trouver une formule explicite à la suite de Fibonacci en utilisant des matrices.
+
+    On défini cette suite tel que $f_0 = 1$, $f_1 = 1$, et $f_{k+1} = f_k + f_{k-1}$ (notez que le professeur a utilisé la notation $n^k = f_k$, mais je préfère mettre l'index en indice plutôt qu'en exposant). Ainsi, on trouve que 
+    \[f_2 = 2, \mathspace f_3 = 3, \mathspace f_4 = 5, \mathspace \ldots\]
+
+    On se rend compte que $f_{k+1} = f_k + f_{k-1}$ ressemble fortement à une relation linéaire, donc on la met sous forme matricielle: 
+    \[\begin{bmatrix} f_1 \\ f_2 \end{bmatrix} = \begin{bmatrix} f_1 \\ f_1 + f_0 \end{bmatrix} = \underbrace{\begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix}}_{A} \begin{bmatrix} f_0 \\ f_1 \end{bmatrix} = A \begin{bmatrix} f_0 \\ f_1 \end{bmatrix} \]
+    
+    De la même manière: 
+    \[\begin{bmatrix} f_2 \\ f_3 \end{bmatrix} = \begin{bmatrix} f_2 \\ f_2 + f_1 \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} f_1 \\ f_2 \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix}^2 \begin{bmatrix} f_0 \\ f_1 \end{bmatrix} = A^2 \begin{bmatrix} f_0 \\ f_1 \end{bmatrix} \]
+    
+    Ainsi, de manière générale: 
+    \[\begin{bmatrix} f_k \\ f_{k+1} \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} f_{k-1} \\ f_{k} \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix}^2 \begin{bmatrix} f_{k-2} \\ f_{k-1} \end{bmatrix} = \ldots = \begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix}^{k} \begin{bmatrix} f_0 \\ f_1 \end{bmatrix} = A^{k} \begin{bmatrix} 1 \\ 1 \end{bmatrix} \]
+    
+    On a besoin d'obtenir la puissance $k$-ème de $A$. On peut y arriver en étudiant ses valeurs propres et ses vecteurs propres: 
+    \[A - \lambda I_2 = \begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix} - \begin{bmatrix} \lambda & 0 \\ 0 & \lambda \end{bmatrix} = \begin{bmatrix} -\lambda & 1 \\ 1 & 1 - \lambda \end{bmatrix}  \]
+
+    On peut maintenant trouver le polynôme caractéristique: 
+    \[\det\left(A - \lambda I_2\right) = -\lambda\left(1 - \lambda\right) -1 = \lambda^2 - \lambda - 1\]
+    
+    On trouve donc que les deux valeurs propres sont: 
+    \[\lambda_1 = \frac{1 + \sqrt{5}}{2} = \phi, \mathspace \lambda_2 = \frac{1 - \sqrt{5}}{2} = -\frac{1}{\phi} = \bar{\phi}\]
+    
+    Les vecteurs propres associés sont (les trouver est laissé en exercice au lecteur): 
+    \[\bvec{v}_1 = \begin{bmatrix} 1 \\ \phi \end{bmatrix}, \mathspace \bvec{v}_2 = \begin{bmatrix} -\phi \\ 1 \end{bmatrix} \]
+    car $A \bvec{v}_1 = \lambda_1 \bvec{v}_1$ et $A \bvec{v}_2 = \lambda_2 \bvec{v}_2$.
+
+    On remarque que $\bvec{v}_1$ et $\bvec{v}_2$ sont linéairement indépendants, donc ils forment une base de $\mathbb{R}^2$. Ainsi, le vecteur initial peut s'écrire comme une combinaison linéaire de $\bvec{v}_1$ et $\bvec{v}_2$: 
+    \[c_1 \bvec{v}_1 + c_2 \bvec{v}_2 = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \implies \begin{bmatrix} 1 & -\phi \\ \phi & 1 \end{bmatrix} \begin{bmatrix} c_1 \\ c_2 \end{bmatrix} = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \]
+
+    En résolvant ce système, on trouve:
+    \[c_1 = \frac{1 + \phi}{1 + \phi^2}, \mathspace c_2 = \frac{1 - \phi}{1 + \phi^2}\]
+    
+    Ceci nous permet d'écrire la séquence de Fibonacci comme suit: 
+    \[\begin{bmatrix} f_{k} \\ f_{k-1} \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix}^{k} \begin{bmatrix} 1 \\ 1 \end{bmatrix} = A^k\left(c_1 \bvec{v}_1 + c_2 \bvec{v}_2\right) = c_1 A^{k} \bvec{v}_1 + c_2 A^{k} \bvec{v}_2\]
+    
+    Or, puisque ce sont des vecteurs propres: 
+    \[A^{k} \bvec{v}_1 = \lambda_1^{k} \bvec{v}_1 = \phi^k \begin{bmatrix} 1 \\ \phi \end{bmatrix}, \mathspace A^k \bvec{v}_2 = \lambda_2^k \bvec{v}_2 = \bar{\phi}^{k} \begin{bmatrix} -\phi \\ 1 \end{bmatrix} \]
+
+    Donc, en mettant tout en semble: 
+    \[\begin{bmatrix} f_{k} \\ f_{k+1} \end{bmatrix} = c_1 A^{k} \bvec{v}_1 + c_2 A^{k} \bvec{v}_2 = \frac{1 + \phi}{1 + \phi^2} \phi^{k} \begin{bmatrix} 1 \\ \phi \end{bmatrix} + \frac{1 - \phi}{1 + \phi^2} \left(\frac{-1}{\phi}\right)^{k} \begin{bmatrix} -\phi \\ 1 \end{bmatrix} \]
+    
+    En prenant la première composante, ceci nous donne la formule directe suivante: 
+    \[f_k = \frac{1 + \phi}{1 + \phi^2} \phi^k + \frac{1 - \phi}{1 + \phi^2}\left(\frac{-1}{\phi}\right)^{k} \left(-\phi\right)\]
+     
+    On peut se rendre compte des simplifications suivantes: 
+    \[\frac{1 + \phi}{1 + \phi^2} \cdot \frac{1}{\phi} = \frac{1}{\sqrt{5}}, \mathspace \frac{1 - \phi}{1 + \phi^2} \left(-\phi\right) \frac{1}{-\frac{1}{\phi}} = -\frac{1}{\sqrt{5}}\]
+    
+    Ainsi, on trouve que: 
+    \[f_k = \frac{1}{\sqrt{5}} \phi^{k+1} - \frac{1}{\sqrt{5}} \left(-\frac{1}{\phi}\right)^{k+1} = \frac{\phi^{k+1} - \bar{\phi}^{k+1}}{\sqrt{5}}\]
+    qui est une formule qui se trouve dans le passage sous le métro de l'arrêt EPFL (et accessoirement une formule que je trouve, personnellement, très belle).
+}
+
+\end{document}

@@ -1,0 +1,292 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-10-11 at 10:04:35.
+
+\usepackage{../../style}
+
+\title{Analyse I}
+\author{Joachim Favre}
+\date{Lundi 11 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2021-10-11}{Débuts des suites et de leur limite}{
+\begin{itemize}[left=0pt]
+    \item Définition des suites, et exemples comme la suite de Fibonacci, la suite arithmétique et la suite géométrique.
+    \item Définition de suite minorée, majorée, croissante, décroissante, monotone, strictement croissante, strictement décroissante et strictement monotone.
+    \item Explication de la preuve par récurrence, et explication d'une généralisation possible.
+    \item Définition de limite convergente, et de la limite d'une suite.
+\end{itemize}
+
+}
+
+\section{Suites de nombres réels}
+\subsection{Exemples de suites, raisonnement par récurrence}
+
+\parag{Définition de suite}{
+    Une \important{suite de nombres réels} est une application $f: \mathbb{N} \mapsto \mathbb{R}$ définie pour tout nombre naturel (ou pour tout $n \geq n_0$, avec $n_0 \in \mathbb{N}$). 
+    
+On utilise la notation suivante: $\left(a_n\right)$ pour une suite où $a_n = f\left(n\right)$. Ou alors:
+\[\left(a_n\right)_{n\geq0} = \overbrace{\left\{a_0, a_1, \ldots\right\}}^{\text{ensemble ordonné}} = \left\{a_n, n \in \mathbb{N}\right\} \subset \mathbb{R}\]
+}
+
+\parag{Exemples}{
+    \begin{enumerate}[left=0pt]
+        \item $a_n = n = \left\{0, 1, 2, \ldots\right\}$
+        \item $a_n = \frac{1}{n+1} = \left\{1, \frac{1}{2}, \frac{1}{3}, \ldots\right\}$
+        \item $a_n = \left(-1\right)^n = \left\{1, -1, 1, -1, \ldots\right\}$
+        \item Les nombres de Fibonacci: $f_0 = 1 = f_1$ et $f_{n+2} = f_n + f_{n+1},\ \forall n \in \mathbb{N}$ qui est donc définie par récurrence. Voici les premiers éléments de la suite: 
+        \[\left\{1, 1, 2, 3, 4, 8, \ldots\right\}\]
+        
+        \imagehere{LAPIN.png}
+
+    \item \important{Suite arithmétique}: $a_n = an + b$, avec $a, b \in \mathbb{R}$ et $a \neq 0$
+    \item \important{Suite géométrique}: $a_n = ar^n$, avec $a, r \in \mathbb{R}$, $a \neq 0, r\neq 0$ et $r\neq \pm 1$
+    \end{enumerate}
+}
+
+\parag{Définition de minorant}{
+    Une suite est \important{minorée} s'il existe un nombre $m$ réel tel que que $a_n \geq m \ \forall n \in \mathbb{N}$. On appelle $m$ un minorant.
+}
+
+\parag{Définition de majorant}{
+    Une suite est \important{majorée} s'il existe un nombre $M$ réel tel que que $a_n \leq M \ \forall n \in \mathbb{N}$. On appelle $M$ un majorant.
+}
+
+\parag{Définition de la valeur absolue}{
+    On définit
+    \begin{functionbypart}{\left|x\right|}
+    x\text{, si } x \geq 0 \\
+    -x\text{, si } x \leq 0
+    \end{functionbypart}
+}
+
+
+\parag{Définition de suite bornée}{
+    On dit qu'une suite est \important{bornée} si elle est majorée et minorée.
+
+    \subparag{Remarque}{
+        On voit que $\left(a_n\right)$ est bornée si et seulement si 
+        \[\exists x \geq 0 \telque \left|a_n\right| \leq x \mathspace \forall n \in \mathbb{N}\]
+
+        En effet, puisque la suite est bornée, alors
+        \[\exists A, B \telque A \leq a_n \leq B \mathspace \forall n \in \mathbb{N}\]
+
+        Donc, si on prend $x = \max\left(\left|A\right|, \left|B\right|\right)$, on a bien que 
+        \[\left|a_n\right| \leq x \mathspace \forall n \in \mathbb{N}\]
+    }
+}
+
+\parag{Définition de suite monotone}{
+    Une suite $\left(a_n\right)$ est \important{croissante} si pour tout $n \in \mathbb{N}$, on a $a_{n + 1} \geq a_n$.
+
+    Une suite $\left(a_n\right)$ est \important{décroissante} si pour tout $n \in \mathbb{N}$, on a $a_{n + 1} \leq a_n$.
+
+    Une suite est dite \important{monotone} si elle est croissante ou décroissante.
+}
+
+\parag{Définition de suite strictement monotone}{
+    Une suite dite \important{strictement croissante} ou \important{strictement décroissante} est définie de la même manière, mais en prenant $>$ à la place de $\geq$ et $<$ à la place de $\leq$.
+
+    Une suite dite \important{strictement monotone} est donc strictement croissante ou strictement décroissante. 
+}
+
+\parag{Retour aux exemples}{
+   \begin{enumerate}[left=0pt]
+       \item $a_n = n$ est strictement croissante car 
+       \[a_{n + 1} = n + 1 > n = a_{n} \mathspace \forall n \in \mathbb{N}\]
+
+       Elle n'est pas majorée car $\mathbb{N}$ n'est pas majoré ($\forall S > 0, \exists n \in \mathbb{N} \telque n > S$). Cependant, elle est minorée par 0. 
+       \item $a_n = \frac{1}{n+1}$ est strictement décroissante puisque 
+       \[a_{n + 1} = \frac{1}{n+2} < \frac{1}{n+1} = a_n \mathspace \forall n \in \mathbb{N}\]
+
+       De plus elle est bornée par $0 < \frac{1}{n+1} \leq 1$, $\forall n \in \mathbb{N}$
+
+       \item $a_n = \left(-1\right)^{n}$ n'est pas monotone, mais elle bornée: 
+       \[-1 \leq a_n \leq 1\mathspace\forall n \in \mathbb{N}\]
+
+       \item $f_0 = f_1 = 1$ et $f_{n + 2} = f_{n+1} + f_n$ est croissante puisque: 
+       \[f_{n+2} - f_{n+1} = f_n \geq 1 \mathspace \forall n \in \mathbb{N}\]
+       
+       On sait donc que $\left(f_n\right)$ n'est pas majorée, puisque on sait que 
+       \[f_{n + 2} - f_{n + 1} \geq 1,\ f_{n + 1} - f_{n} \geq 1,\ \ldots,\ f_2 - f_1 \geq 1,\ f_1 \geq 1\]
+
+       En ajoutant toutes ces équations, on a une somme télescopique et on se retrouve donc avec: 
+       \[f_{n + 2} \geq n + 2\]
+
+       On peut donc en conclure que $\left(f_n\right)$ n'est pas majorée, puisque $\mathbb{N}$ n'est pas majoré. Cependant, elle est bien minorée.
+
+       \item $a_n = an + b$ est strictement croissante si $a > 0$, et strictement décroissante si $a < 0$. En effet: 
+       \[a_{n + 1 } - a_n = a\left(n+1\right) + b - \left(an + b\right) = a\]
+
+   Par Archimède, on sait que si $a > 0$, alors, $\forall S > 0, \forall b \in \mathbb{R}$: 
+   \[\exists n \in \mathbb{N} \telque an > S - b \iff an + b > S\]
+
+       Ainsi, $\left(a_n\right)$ n'est pas majorée (mais elle est minorée). 
+
+       De manière symétrique, si $a < 0$, alors $\left(a_n\right)$ n'est pas minorée (mais elle est majorée).
+       \item Trop de cas pour la suite géométrique.
+   \end{enumerate}
+}
+
+\parag{Raisonnement par récurrence}{
+    Soit $P\left(n\right)$ une proposition dépendant d'un entier naturel $n$ tel que:
+    \begin{enumerate}
+        \item \important{L'initialisation}: $P\left(n_0\right)$ est vraie
+        \item \important{L'hérédité}: $\forall n \geq n_0$, on a $P\left(n\right) \implies P\left(n +  1\right)$
+    \end{enumerate}
+
+    Alors $P\left(n\right)$ est vraie pour tout $n \geq n_0$.
+
+    \subparag{Intuition}{
+        Si on a une ligne de domino, et qu'on veut démontrer qu'ils tombent tous, il nous suffit de démontrer que le premier domino tombe, et que si un domino tombe, alors le suivant tombe aussi.
+
+        Il semble clair qu'il faut absolument démontrer les deux parties de l'argument, l'initialisation et l'hérédité.
+    }
+
+    \subparag{Contre exemple 1}{
+        \important{Hypothèse:} tout nombre naturel est égal au nombre naturel suivant. Démontrons le en faisant une preuve par récurrence (mais en oubliant \textit{malencontreusement} l'initialisation). 
+
+        \vspace{1em}
+        \important{Hérédité:} Supposons que $P\left(n\right)$ soit vraie, i.e. $n = n+1$. Alors, en ajoutant $1$ à l'égalité on obtient $n+1 = n + 2 \implies P\left(n + 1\right)$ est vrai. 
+
+        \vspace{1em}
+        \important{Erreur:} On a oublié l'initialisation (c'est bête quand même), mais $0 \neq 1$, donc l'hypothèse n'a pas été démontrée.
+    }
+    
+
+    \subparag{Contre exemple 2}{
+        \important{Hypothèse:} ``Tous les crayons sont de la même couleur dans n'importe quel ensemble de $n\geq 1$ crayons''. 
+
+        \vspace{1em}
+
+        \important{Initialisation :} Dans un ensemble d'un seul crayon, tous les crayons sont de la même couleur. Donc $P\left(1\right)$ et vrai.
+
+        \vspace{1em}
+
+        \important{Hérédité :} On suppose que tout ensemble de $n$ crayons contient seulement des crayons de la même couleur. 
+
+        Soit $\left\{c_1, c_2, \ldots, c_{n+1}\right\}$ un ensemble arbitraire de $n+1$ crayons. Alors $\left\{c_1, \ldots, c_n\right\}$ et $\left\{c_2, \ldots, c_{n+1}\right\}$ sont de la même couleur par supposition. Donc, $c_1$ et $c_{n+1}$ sont de la même couleur que les autres, ce qui implique que $\left\{c_1, \ldots, c_{n+1}\right\}$ sont de la même couleur, donc que $P\left(n+1\right)$ est vraie.
+       
+        \vspace{1em}
+        \important{La faute :} L'hérédité $P\left(n\right) \implies P\left(n+1\right)$ ne marche que pour $n \geq 2$, puisque sinon les deux ensembles de crayons ont une intersection vide. On a donc que $P\left(1\right) \centernot\implies P\left(2\right)$ mais que l'initialisation est uniquement vérifiée pour $P\left(1\right)$.
+    }
+}
+
+\parag{Proposition (exemple de preuve par récurrence)}{
+    La suite de Fibonacci a la propriété suivante:
+    \[\sum_{i=0}^{n} f_i = f_{n+2} - 1\mathspace\forall n \in \mathbb{N}\]
+
+    \subparag{Démonstration}{
+        \important{Initialisation:} Prenons $n = n_0 = 0$: 
+        \[f_0 = 1 = 2 - 1 = f_2 - 1\]
+        
+        \vspace{1em}
+        \important{Hérédité:} Supposons que $\sum_{i=0}^{n} f_i = f_{n + 2} - 1$ est vraie pour $n \in \mathbb{N}$ donné. Il nous faut démontrer que $\sum_{i=0}^{n+1} f_i = f_{n+3} - 1$. En partant du côté gauche, on a:
+
+        \[\sum_{i=0}^{n+1} f_i = \underbrace{\sum_{i=0}^{n} f_i}_{\text{supposition}} + f_{n+1} = f_{n+2} - 1 + f_{n+1} = \underbrace{f_{n+1} + f_{n+2} }_{f_{n+3}} - 1 = f_{n+3} - 1\]
+
+        \vspace{1em}
+        \important{Conclusion} Par récurrence on a donc bien démontré que 
+        \[\sum_{i=0}^{n} f_i = f_{n+2} - 1\]
+
+        \qed
+    }
+}
+
+\parag{Exemple 2}{
+    On veut trouver la somme des $n$ premiers nombres impairs naturels. On a besoin de commencer par trouver une hypothèse. On a $S_1 = 1$, $S_2 = 1 + 3 = 4$, $S_3 = 1 + 3 + 5 = 9$, $S_4 = 1 + 3 + 5 + 7 = 16$. Il semble donc raisonnable de prendre comme hypothèse que 
+    \[S_n = 1 + 3 + \ldots + \left(2n - 1\right) = n^2\]
+    
+    \subparag{Démonstration par récurrence}{
+        \important{Initialisation:} $P\left(n\right)$ a déjà été démontrée ci-dessus pour $n = 1, 2, 3, 4$.
+
+        \vspace{1em}
+
+        \important{Hérédité:} Supposons que $S_n = n^2$. Il faut en déduire que $S_{n+1} = \left(n+1\right)^2$. En partant du côté gauche: 
+        \[S_{n+1} = \underbrace{1 + 3 + \ldots + \left(2n - 1\right)}_{\text{supposition}} + \left(2n + 1\right) = n^2 + 2n + 1 = \left(n + 1\right)^2\]
+
+        \vspace{1em}
+        \important{Conclusion} Par récurrence, on a démontré que 
+        \[\sum_{k=1}^{n} \left(2k - 1\right) = n^2 \mathspace \forall n \in \mathbb{N}^*\]
+        
+        \qed
+    }
+}
+
+
+\parag{Généralisation de la méthode de récurrence}{
+    Il y a plusieurs manières de généraliser cette méthode, en voici une. Soit $P\left(n\right)$ une proposition pour $n \in \mathbb{N}$ telle que:
+    \begin{enumerate}
+        \item $P\left(n_0\right), P\left(n_0 + 1\right), \ldots, P\left(n_0 + k\right)$ avec k fixé, sont vraies 
+        \item $\left\{P\left(n\right), P\left(n+1\right), \ldots, P\left(n+k\right)\right\} \implies P\left(n + k + 1\right)$, $\forall n \geq 0$
+    \end{enumerate}
+
+    Alors $P\left(n\right)$ est vraie $\forall n \geq n_0$.
+    
+    
+}
+
+\subsection{Limites de suites}
+\parag{Définition de suite convergente et de limite}{
+    On dit que la suite $\left(x_n\right)$ est \important{convergente} et admet pour \important{limite} le nombre réel $\ell \in \mathbb{R}$ si pour tout $\epsilon > 0$, il existe $n_0 \in \mathbb{N}$ tel que pour tout $n \geq n_0$, on a $\left|x_n - \ell\right| \leq \epsilon$.
+
+    On note la limite: 
+    \[\lim_{n \to \infty} x_n = \ell\]
+
+    \subparag{Remarque}{
+        Si on regarde plus précisément $\left|x_n - \ell\right| \leq \epsilon$: 
+        \[\left|x_n - \ell\right| \leq \epsilon \iff -\epsilon \leq x_n - \ell \leq \epsilon \iff \ell - \epsilon \leq x_n \leq \ell + \epsilon\]
+
+        En d'autres mots, on peut trouver une frontière après laquelle tous les éléments de la suite est arbitrairement proche de la limite, ceci pour tout $\epsilon > 0$, donc pour n'importe quelle distance positive. 
+
+        Avec les mots de la professeure: quel que soit $\epsilon > 0$, si on considère l'intervalle $\left[\ell - \epsilon, \ell + \epsilon\right]$ autour de $\ell$, alors on peut trouver $n_0 \in \mathbb{N}$ tel que tous les termes de la suite $\left(x_n\right)$ après $n = n_0$ se trouvent dans cet intervalle.
+    }
+}
+
+\parag{Définition de suite divergente}{
+    Une suite qui n'est pas convergente est dite \important{divergente} (la suite peut partir vers l'infini positif ou négatif, ou osciller (enfin il faudrait démontrer ça, c'est juste une conjecture que je pose là)).
+}
+
+\parag{Exemple}{
+    La suite $\left(a_n\right)$, $a_n = \frac{1}{n+1}$ est convergente, avec
+    \[\lim_{n \to \infty} \frac{1}{n+1} = 0\]
+
+    \subparag{Démonstration}{
+        Soit $\epsilon > 0$. Il nous faut démontrer l'existence de $n_0 \in \mathbb{N}$ (qui peut dépendre de $\epsilon$) tel que $\forall n \geq n_0$, on a $\left|a_n - 0\right| \leq \epsilon$, i.e. que $\frac{1}{n+1} \leq \epsilon$ (on peut enlever la valeur absolue puisque c'est toujours positif). On a donc 
+        \[\frac{1}{n+1} \leq \epsilon \iff n+1 \geq \frac{1}{\epsilon} \iff n \geq \frac{1}{\epsilon} - 1\]
+        
+        Puisque $\mathbb{N}$ n'est pas majoré, on sait que 
+        \[\exists n_0 \in \mathbb{N} \telque n_0 \geq \frac{1}{\epsilon} - 1\]
+        
+        Et donc que $\forall n \geq n_0$: 
+        \[n \geq n_0 \geq \frac{1}{\epsilon} - 1\]
+        
+
+        En conclusion, on a démontré que 
+        \[\lim_{n \to \infty} \frac{1}{n+1} = 0\]
+
+        \qed
+    }
+    
+    \subparag{Remarque}{
+        Une autre manière de démontrer l'existence de $n_0$ aurait été de le trouver explicitement. Dans notre cas, on peut prendre 
+        \[n_0 = \left\lfloor \frac{1}{\epsilon} \right\rfloor \implies n_0 + 1 = \left\lfloor \frac{1}{\epsilon} \right\rfloor + 1 > \frac{1}{\epsilon}\]
+
+        Or, si $n \geq n_0$ on a donc: 
+        \[n \geq n_0 \implies n + 1 \geq n_0 + 1 > \frac{1}{\epsilon} \iff \frac{1}{n+1} < \epsilon \mathspace \forall n \geq n_0\]
+        
+        On a donc trouvé un $n_0 = \left\lfloor \frac{1}{\epsilon} \right\rfloor \in \mathbb{N}$ tel que $\forall n \geq n_0$: 
+        \[\left|a_n - \ell\right| = \left|\frac{1}{n+1} - 0\right| = \frac{1}{n+1} \leq \frac{1}{n_0 + 1} < \epsilon \]
+        
+        \qed
+    }
+}
+
+
+
+
+
+
+\end{document}

@@ -1,0 +1,195 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-18 at 08:22:38.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Jeudi 18 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{17}{2021-11-18}{Diagonalisation}{
+    \begin{itemize}[left=0pt]
+        \item Explication d'une méthode pour trouver les matrices permettant de diagonaliser une matrice $A$.
+        \item Étude des propriétés d'une matrice qui font qu'elle est diagonalisable ou non. 
+        \item Définition de la multiplicité géométrique d'une valuer propre.
+    \end{itemize}
+    
+}
+
+\parag{Propriété de la diagonalisation}{
+    Si $A = PDP^{-1}$, où: 
+    \[D = \begin{bmatrix} \lambda_1 & & \\ & \ddots & \\ &  & \lambda_n \end{bmatrix} \]
+    
+    Alors, on a: 
+    \[A^2 = A\cdot A = PDP^{-1} \cdot PDP^{-1} = PDDP^{-1}= PD^2 P^{-1} \]
+    
+    Calculer $D^2$ est très facile: 
+    \[D^2 = \begin{bmatrix} \lambda_1^2 &  &  \\  & \ddots &  \\  &  & \lambda_n^2 \end{bmatrix} \]
+    
+    De manière très générale: 
+    \[A^k = A\cdot A^{k-1} = P D P^{-1} \cdot PD^{k-1}P^{-1} = PD^{k}P^{-1}\]
+    
+    Ce n'est pas très important, mais on voit que le comportement de $A^k$ pour $k$ grand est déterminé par ses valeurs propres (si leur valeur absolue est strictement plus petite que 0, alors $\lambda^k$ tend vers 0). 
+} 
+
+\parag{Exemple}{
+    Soient les matrices suivantes: 
+    \[A = \begin{bmatrix} 7 & 2 \\ -4 & 1 \end{bmatrix}, \mathspace P = \begin{bmatrix} 1 & 1 \\ -1 & -2 \end{bmatrix}, \mathspace D = \begin{bmatrix} 5 & 0 \\ 0 & 3 \end{bmatrix} \]
+    
+    On a déjà vérifié que $A = PDP^{-1}$. Donc: 
+    \[A^k = PD^k P^{-1} = P \begin{bmatrix} 5^k & 0 \\ 0 & 3^k \end{bmatrix} P^{-1}\]
+}
+
+\parag{Observation}{
+    On observe quelque chose de plus dans l'exemple ci-dessus. Les colonnes de $P$ sont des vecteurs propres de $A$, et les entrées diagonales de $D$ sont les vecteurs propres associés: 
+    \[AP = A\begin{bmatrix} 1 & 1 \\ -1 & -2 \end{bmatrix} = \begin{bmatrix} A \begin{bmatrix} 1 \\ -1 \end{bmatrix} & A \begin{bmatrix} 1 \\ -2 \end{bmatrix} \end{bmatrix} \]
+    
+    De plus: 
+    \[PD = \begin{bmatrix} 1 & 1 \\ -1 & -2 \end{bmatrix} \begin{bmatrix} 5 & 0 \\ 0 & 3 \end{bmatrix} = \begin{bmatrix} 5 \begin{bmatrix} 1 \\ -1 \end{bmatrix} & 3 \begin{bmatrix} 1 \\ -2 \end{bmatrix}  \end{bmatrix} \]
+
+    Or, puisque $AP = PD$, cela veut dire que les deux matrices sont égales. Ainsi: 
+    \[A \begin{bmatrix} 1 \\ -1 \end{bmatrix} = 5\begin{bmatrix} 1 \\ -1 \end{bmatrix}, \mathspace A \begin{bmatrix} 1 \\ -2 \end{bmatrix} = 3\begin{bmatrix} 1 \\ -2 \end{bmatrix} \]
+    
+    On trouve donc que, par définition, $3$ et $5$ sont les valeurs propres de $A$, et les vecteurs sont des vecteurs propres associés à ces valeurs propres.
+}
+
+\parag{Théorème}{
+    $A \in \mathbb{R}^{n \times n}$ est diagonalisable si et seulement si elle a $n$ vecteurs propres $\bvec{v}_1, \ldots, \bvec{v}_n$ linéairement indépendants.
+
+    Dans ce cas, on peut choisir: 
+    \[P = \begin{bmatrix} & &  \\ \bvec{v}_1 & \ldots & \bvec{v}_n \\  &  &  \end{bmatrix}, \mathspace D = \begin{bmatrix} \lambda_1 &  &  \\  & \ddots &  \\  &  & \lambda_n \end{bmatrix} \]
+    où $A \bvec{v}_i = \lambda_i \bvec{v}_i$.
+    
+    On appelle $\left(\bvec{v}_1, \ldots, \bvec{v}_n\right)$ une \important{base de vecteurs propres de $A$}.
+
+    \subparag{Idée de preuve}{
+        Si les vecteurs  $\bvec{v}_1, \ldots, \bvec{v}_n$ --- associés aux valeurs propres $\lambda_1, \ldots, \lambda_n$ respectivement --- existent, alors: 
+        \[AP = A\begin{bmatrix}  &  &  \\ \bvec{v}_1 & \ldots & \bvec{v}_n \\  &  &  \end{bmatrix} = \begin{bmatrix}  &  &  \\ A \bvec{v}_1 & \ldots & A \bvec{v}_n \\  &  &  \end{bmatrix}\]
+
+        Or, puisque ce sont des vecteurs propres, c'est égal à:
+        \[\begin{bmatrix}  &  &  \\ \lambda_1 \bvec{v}_1 & \ldots & \lambda_n \bvec{v}_n \\  &  &  \end{bmatrix} = \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \ldots & \bvec{v}_n \\  &  &  \end{bmatrix} \begin{bmatrix} \lambda_1 &  &  \\  & \ddots &  \\  &  & \lambda_n \end{bmatrix} = PD\]
+         
+        De plus, nous avons besoin que $P$ soit inversible, donc ses colonnes, les vecteurs propres de $A$, doivent être linéairement indépendantes.
+    }
+}
+
+\parag{Théorème}{
+    Tout matrice $n \times n$ admettant $n$ valeurs propres \textit{distinctes} est diagonalisable.
+
+    \subparag{Preuve}{
+       Ce théorème découle directement du théorème ci-dessus, et de celui qu'on a vu plus tôt, juste après l'exemple de Fibonacci, qui nous dit que si nous avons $n$ valeurs propres distinctes, alors leurs vecteurs propres associés sont linéairement indépendants.
+    }
+    
+    \subparag{Remarque}{
+        Ceci est une condition suffisante, mais non pas nécessaire.
+    }
+}
+
+\parag{Exemple 1}{
+    Soit la matrice suivante: 
+    \[A = \begin{bmatrix} -1 & 7 & 9 \\ 0 & 2 & -2 \\ 0 & 0 & 0 \end{bmatrix} \]
+
+    On remarque rapidement que la matrice est triangulaire, donc que ses valeurs propres sont sur sa diagonale, et ainsi que ses valeurs propres sont $-1$, $2$ et $0$. Puisqu'elles sont distinctes, on en déduit que cette matrice est diagonalisable.
+}
+
+\parag{Exemple 2}{
+    Soit la matrice suivante: 
+    \[A = \begin{bmatrix} 1 & 3 & 3 \\ -3 & -5 & -3 \\ 3 & 3 & 1 \end{bmatrix} \]
+    
+    On se demande si elle est diagonalisable. Commençons par trouver ses valeurs propres. Avec un peu de travail, on trouve que: 
+    \[p_A\left(\lambda\right) = -\lambda^3 - 3\lambda^2 + 4 = \left(1 - \lambda\right)\left(2 + \lambda\right)^2\]
+    
+    Donc, les valeurs propres de $A$ sont $\lambda_1 = 1$ et $\lambda_2 = -2$, et leur multiplicité algébrique sont 1 et 2, respectivement. Si elles étaient distinctes on aurait gagné, mais on doit aller un peu plus loin.
+
+    Cherchons les vecteurs propres associés à $\lambda_1 = 1$. 
+    \[\ker\left(A - \lambda_1 I_3\right) = \ker\begin{bmatrix} 0 & 3 & 3 \\ -3 & -6 & -3 \\ 3 & 3 & 0 \end{bmatrix} = \vect\left\{\begin{bmatrix} -1 \\ 1 \\ -1 \end{bmatrix} \right\}\]
+    qui est le sous-espace propre de $A$ associé à $\lambda_1$. Étudions maintenant les vecteurs propres associés à $\lambda_2 = -2$: 
+    \[\ker\left(A - \lambda_2 I_3\right) = \ker\begin{bmatrix} 3 & 3 & 3 \\ -3 & -3 & -3 \\ 3 & 3 & 3 \end{bmatrix} = \vect\left\{\begin{bmatrix} 1 \\ -1 \\ 0 \end{bmatrix}, \begin{bmatrix} 0 \\ 1 \\ -1 \end{bmatrix} \right\}\]
+    
+    On peut vérifier notre résultat en multipliant $A$ par nos trois vecteurs. 
+
+    On remarque que les vecteurs propres sont linéairement indépendants (il n'y a pas beaucoup de surprise puisque des vecteurs associés à des valeurs propres distinctes sont différents, et nous avons choisi les vecteurs du kernel de manière à ce qu'ils soient linéairement indépendants):
+    \[\bvec{v}_1 = \begin{bmatrix} -1 \\ 1 \\ -1 \end{bmatrix}, \mathspace \bvec{v}_2 = \begin{bmatrix} 1 \\ -1 \\ 0 \end{bmatrix}, \mathspace \bvec{v}_3 = \begin{bmatrix} 0 \\ 1 \\ -1 \end{bmatrix} \]
+    
+    Ainsi, ces vecteurs forment une base de vecteurs propres de $A$.  On peut en déduire que $A$ est diagonalisable, et que $A = PDP^{-1}$, où: 
+    \[P = \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \bvec{v}_2 & \bvec{v}_3 \\  &  &  \end{bmatrix} = \begin{bmatrix} -1 & 1 & 0 \\ 1 & -1 & 1 \\ -1 & 0 & -1 \end{bmatrix}, \mathspace D = \begin{bmatrix} \lambda_1 & 0 & 0 \\ 0 & \lambda_2 & 0 \\ 0 & 0 & \lambda_2 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -2 & 0 \\ 0 & 0 & -2 \end{bmatrix} \]
+    
+}
+
+\parag{Exemple 3}{
+    Soit la matrice suivante: 
+    \[A = \begin{bmatrix} 2 & 4 & 3 \\ -4 & -6 & -3 \\ 3 & 3 & 1 \end{bmatrix} \]
+    
+    On se pose la même question, on se demande si elle est diagonalisable. Premièrement, trouvons les valeurs propres de $A$: 
+    \[p_A\left(\lambda\right) = \det\left(A - \lambda I_3\right) = -\lambda^3 - 3\lambda^2 + 4 = \left(1 - \lambda\right)\left(2 + \lambda\right)^2\]
+    
+    On remarque c'est le même polynôme caractéristique que dans l'exemple ci-dessus. Ainsi, on en déduit que les valeurs propres de $A$ sont $\lambda_1 = 1$ et $\lambda_2 = -2$, avec, comme multiplicité algébrique, 1 et 2 respectivement.
+
+    Cherchons maintenant les vecteurs propres associés à ces valeurs propres. On trouve: 
+    \[\ker\left(A - \lambda_1 I_3\right) = \ker\begin{bmatrix} 1 & 4 & 3 \\ -4 & -7 & -3 \\ 3 & 3 & 0 \end{bmatrix} = \vect\left\{\begin{bmatrix} 1 \\ -1 \\ 1 \end{bmatrix} \right\}\]
+    \[\ker\left(A - \lambda_2 I_3\right) = \ker\begin{bmatrix} 4 & 4 & 3 \\ -4 & -4 & -3 \\ 3 & 3 & 3 \end{bmatrix} = \vect\left\{\begin{bmatrix} 1 \\ -1 \\ 0 \end{bmatrix} \right\}\]
+    
+    On a donc seulement deux vecteurs propres linéairement indépendants pour $A$, et il est impossible d'en trouver 3. Ainsi, on peut en déduire que $A$ n'est pas diagonalisable.
+}
+
+\parag{Généralisation}{
+    On se demande maintenant ce qu'il faut pour qu'une matrice $A \in \mathbb{R}^{n \times n}$ soit diagonalisable. Par notre théorème, on sait qu'il nous faut $n$ vecteurs propres linéairement indépendants.
+
+    Si $\lambda$ est une valeur propre de $A$, on se demande donc combien de vecteurs propres associés à $\lambda$ qui sont linéairement indépendants on peut trouver. Tous les vecteurs propres associés à $\lambda$ sont dans l'espace associé à $\lambda$, qui est donné par $\ker\left(A - \lambda I_n\right)$. Or, on sait qu'on peut choisir au maximum 
+    \[\dim\ker\left(A - \lambda I_n\right)\]
+    vecteurs dans ce sous espace. On appelle ceci la \important{multiplicité géométrique} de $\lambda$ (à ne pas confondre avec la multiplicité algébrique).
+
+    Soit $\lambda_1, \ldots, \lambda_p$ les valeurs propres distinctes de $A \in \mathbb{R}^{n \times n}$. On sait que $\lambda_1$ nous donne $\dim\ker\left(A - \lambda_1 I_n\right)$ vecteurs propres linéaire indépendants. De la même manière, $\lambda_2$ nous donne $\dim\ker\left(A - \lambda_2 I_n\right)$ vecteurs propres linéairement indépendants. De plus, puisque $\lambda_1 \neq \lambda_2$, on en déduit qu'ils sont aussi linéairement indépendants une fois mis ensemble. On a donc déjà trouvé 
+    \[\dim\ker\left(A - \lambda_1 I_n\right) + \dim\ker\left(A - \lambda_2 I_n\right)\]
+    vecteurs propres linéairement indépendants.
+
+    On continue avec $\lambda_3, \ldots, \lambda_p$. Au total, on a trouvé exactement la somme des multiplicité géométrique
+    \[\dim\ker\left(A - \lambda_1 I_n\right) + \ldots + \dim\ker\left(A - \lambda_p I_{n}\right)\]
+    vecteurs propres linéairement indépendants pour $A$.
+
+    On remarque que la multiplicité d'une valeur propre $\lambda$ est nécessairement inférieure ou égale à sa multiplicité algébrique (et plus grande ou égale à 1, par définition des valeurs propres la dimension de l'espace propre associé est toujours au moins 1). Une justification de ce fait (qui est hors de la matière du cours) peut être vue dans le paragraphe suivant.
+
+     Donc, pour une matrice $A \in \mathbb{R}^{n \times n}$ avec $p$ valeurs propres distinctes, on a: 
+    \[\left[\text{somme des $p$ multiplicités géométriques}\right] \leq \left[\text{somme des $p$ multiplicités algébriques}\right] = n\]
+
+    Or, pour avoir $n$ vecteurs propres linéairement indépendants, il nous faut que la somme des $p$ multiplicités géométriques soit $n$, et la seule possibilité pour que ce soit possible c'est que la multiplicité géométrique soit toujours égale à la multiplicité algébrique. On peut donc conclure que $A$ est diagonalisable si et seulement si les multiplicités algébriques et géométriques sont toutes égales.
+        
+}
+
+\parag{Théorème (hors de la matière du cours)}{
+    La multiplicité géométrique d'une valeur propre est toujours plus petite ou égale à sa multiplicité algébrique.
+
+    \subparag{Preuve (toujours hors cours, ça change pas)}{
+        Supposons que $\lambda$ a une multiplicité géométrique de $p$. Donc, on a $p$ vecteurs propres $\bvec{v}_1, \ldots, \bvec{v}_p$ linéairement indépendants associés à cette valeur propre. On peut compléter cette famille de vecteurs, avec des vecteurs quelconques () de $\mathbb{R}^n$ (qui ne sont pas forcément des vecteurs propres) de manière à créer une base de $\mathbb{R}^n$. Appelons ces vecteurs $\bvec{v}_{p+1}, \ldots, \bvec{v}_{n}$. Ainsi, on peut prendre la matrice suivante: 
+        \[P = \begin{bmatrix}  &  &  &  & & \\ \bvec{v}_1 & \ldots & \bvec{v}_p & \bvec{v}_{p+1} & \ldots & \bvec{v}_{n} \\  &  &  &  & & \end{bmatrix} \]
+
+        On sait que $P$ est inversible puisque ses colonnes forment une base de $\mathbb{R}^n$. Prenons $B = P^{-1} A P$. Cette matrice est semblable à $A$, donc: 
+        \[p_B\left(\lambda\right) = p_A\left(\lambda\right)\]
+        
+        De plus, puisque $P^{-1} P = I_n$, on voit que: 
+        \[P^{-1} \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \ldots & \bvec{v}_n \\  &  &  \end{bmatrix} = \begin{bmatrix}  &  &  \\ \bvec{e}_1 & \ldots & \bvec{e}_n \\  &  &  \end{bmatrix} \]
+        
+        Ainsi: 
+        \begin{multiequality}
+        B & = P^{-1} A P \\
+          & = P^{-1} \begin{bmatrix}  &  &  &  &  &  \\ A\bvec{v}_1 & \ldots & A\bvec{v}_p & A\bvec{v}_{p+1} & \ldots & A\bvec{v}_n \\  &  &  &  &  &  \end{bmatrix}    \\
+          & = P^{-1} \begin{bmatrix}  &  &  &  &  &  \\ \lambda\bvec{v}_1 & \ldots & \lambda\bvec{v}_p & A\bvec{v}_{p+1} & \ldots & A\bvec{v}_n \\  &  &  &  &  &  \end{bmatrix} \\
+          & = \begin{bmatrix}  &  &  &  &  &  \\ \lambda\bvec{e}_1 & \ldots & \lambda\bvec{e}_p & A\bvec{e}_{p+1} & \ldots & A\bvec{e}_n \\  &  &  &  &  &  \end{bmatrix}  \\
+          & = \begin{bmatrix} \lambda & \cdots & 0 &  &  &  \\ \vdots & \ddots & \vdots &  &  &  \\ 0 & \cdots & \lambda & A\bvec{e}_{p+1} & \cdots & A\bvec{e}_n \\ \vdots &  & \vdots &  &  &  \\ 0 & \cdots & 0 &  &  &  \end{bmatrix}  
+        \end{multiequality}
+
+        On remarque que les $p$ premières colonnes de $B$ sont diagonales. Donc, en calculant le polynôme caractéristique de $B$ --- qui est le même que celui de $A$ puisque ces matrices sont semblables --- on aura: 
+        \[p_A\left(x\right) = p_B\left(x\right) = \det\left(B - xI_n\right) = \left(\lambda - x\right)^p \left(\ldots\right)\]
+        
+        Ainsi, $\lambda$ a une multiplicité algébrique de, au moins, $p$.
+
+        \qed
+    }
+}
+
+
+\end{document}

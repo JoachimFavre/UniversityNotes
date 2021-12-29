@@ -1,0 +1,335 @@
+\documentclass{article}
+
+% Expanded on 2021-09-29 at 15:13:32.
+
+\usepackage{../../style}
+
+\title{AICC-1}
+\author{Joachim Favre}
+\date{Mercredi 29 septembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2021-09-29}{Nested quantifiers, and negating them}{
+\begin{itemize}[left=0pt]
+    \item Explanation on how to negate quantifiers, using the De Morgan's Laws for quantifiers.
+    \item Explanation on how to have nested quantifiers.
+    \item Explanation of the argument form.
+    \item Summary of the different methods we have to build knowledge.
+\end{itemize}
+}
+
+\parag{De Morgan's Laws for Quantifiers}{
+    We have the following equivalences: 
+    \[\lnot \forall P\left(x\right) = \exists x \lnot P\left(x\right)\]
+    \[\lnot \exists P\left(x\right) = \forall x \lnot P\left(x\right)\]
+    
+    \subparag{Proof of the first one}{
+        We know that $\lnot \forall x P\left(x\right)$ is true if and only if $\forall x P\left(x\right)$ is false. This is equivalent to the existence of an element $a$ such that $P\left(a\right)$ is false, and thus $\lnot P\left(a\right)$ is true. From that, we can deduce that $\exists x \lnot P\left(x\right)$ is true.
+    }
+    
+    \subparag{Justification of the name}{
+        Those laws are in fact the equivalents of De Morgan's Laws for infinite set. Indeed, if we have $U = \left\{1, 2, 3\right\}$, then: 
+        \[\exists x\ P\left(x\right) = P\left(1\right) \lor P\left(2\right) \lor P\left(3\right) \]
+
+        Thus, negating both side and applying de Morgan's Laws: 
+        \[\lnot \left(\exists x\ P\left(x\right)\right) = \lnot P\left(1\right) \land \lnot P\left(2\right) \land \lnot P\left(3\right) = \forall x \lnot P\left(x\right)\]
+    }
+    
+}
+
+\parag{Exercise}{
+    Let the following statements: 
+    \begin{enumerate}
+        \item $\exists!x P\left(x\right) \to \exists x P\left(x\right)$
+        \item $\forall x P\left(x\right) \to \exists!x P\left(x\right)$
+        \item $\exists!x \lnot P\left(x\right) \to \lnot \forall x P\left(x\right)$
+    \end{enumerate}
+    
+    We wonder what are their truth values.
+
+    \begin{enumerate}
+        \item It is valid, since if there exists exactly one, then there exists at least one.
+        \item It is satisfiable, when there is exactly one element in the domain.
+        \item Using De Morgan's law, we see that it is equivalent to
+        \[\exists! x \lnot P\left(x\right) \to \exists x \lnot P\left(x\right)\]
+        which is equivalent to the first one, so it is valid.
+    \end{enumerate}
+    
+    Now, let's consider what happens when we have an empty domain:
+    \begin{enumerate}
+        \item It is also valid.
+        \item It is unsatisfiable since we have $T \to F$.
+        \item It is also valid, since it is equivalent to the first one.
+    \end{enumerate}
+}
+
+\subsection{Nested quantifiers}
+\parag{Nested quantifiers}{
+    \important{Nested quantifiers} are often necessary to express the meaning of sentences in natural language as well as important concepts in computer science and mathematics.
+
+    \subparag{Example}{
+        We can translate ``every real number has an inverse'' as: 
+        \[\forall x \exists y\left(x + y = 0\right)\]
+        where the domains for both $x$ and $y$ are real numbers.
+    }
+
+    We can draw the following diagram, by linking two points if and only if $P\left(x, y\right)$ is true:
+    \imagehere[0.7]{NestedQuantifiersDiagram.png}
+}
+
+\parag{Nested propositional functions}{
+    We can also take \important{nested propositional functions}.
+
+    For example, $\forall x \exists y \left(x + y = 0\right)$ can be viewed as $\forall x Q\left(x\right)$, where: 
+    \[Q\left(x\right) := \exists y P\left(x, y\right), \mathspace P\left(x, y\right) := \left(x + y = 0\right)\]
+    
+    Note that $\exists y P\left(x, y\right)$ has an unbound variable.
+}
+
+\parag{Order of quantifiers}{
+    The order of quantifiers is really important. 
+
+    For example, let's take $U$ to be the real numbers, and $P\left(x, y\right) := \left(x + y = 0\right)$. Then, $\forall x \exists y P\left(x, y\right)$ is true (for all number, there does exist an inverse), but $\exists y \forall x P\left(x, y\right)$ is false (there does not exist any real number which is an inverse for every number).
+
+    We see that it is not always the case. Indeed, if we have $Q\left(x\right) := \left(x + y = y + x\right)$, then both $\forall x \forall y P\left(x, y\right)$ and $\forall y \forall x P\left(x, y\right)$ are true (addition is indeed commutative).
+
+    In fact, we can always switch the order of the quantifiers whenever we only have universal quantifiers or only existential quantifiers: 
+    \[\forall x \forall y P\left(x, y\right) \equiv \forall y \forall x P\left(x, y\right)\]
+    \[\exists x \exists y P\left(x, y\right) \equiv \exists y \exists x P\left(x, y\right)\]
+}
+
+\parag{Translation to natural language}{
+    Let $F\left(x, y\right) := $ ``$x$ and $y$ are friends'' and students as the domain. Let's say we want to translate: 
+    \[\exists x \forall y \forall z\left(F\left(x, y\right) \land F\left(x, z\right) \land y \neq z \to \lnot F\left(y, z\right)\right)\]
+    When translated into natural language, we find: ``there exists a student, such that for all of his friends that are different, it is the case that they not friends.''
+
+    It shows that it is not always evident to convert back and forth, and that our language has a huge flexibility and shortcuts.
+}
+
+
+\parag{Translation from maths}{
+    Let's say we want to translate ``the sum of two positive integers is always positive'' into a logical expression.
+
+    First, let's rewrite this statement to make the implied quantifiers and domains and domains explicit: ``for every two integers, if these integers are both positive, then the sum of these integers is positive''.
+
+    Second, let's introduce the variables: ``for every two integers $x$ and $y$, if $x$ is positive and $y$ is positive, then $x+y$ is positive''.
+
+    Third, we can translate it to predicate logic: 
+    \[\forall x \forall y\left(x > 0 \land y > 0 \to x + y > 0\right)\]
+}
+
+
+\parag{Translation from natural language}{
+    Let $L\left(x, y\right) := $ ``$x$ loves $y$''.
+
+    Let's translate the following sentences:
+    \begin{enumerate}
+        \item ``Everybody loves somebody.''
+        \item ``There is someone how is loved by everyone.''
+        \item ``There is someone who loves someone.''
+        \item ``Everyone loves himself.''
+    \end{enumerate}
+
+    We have:
+    \begin{enumerate}
+        \item $\forall x \exists y L\left(x, y\right)$
+        \item $\exists x \forall y L\left(y, x\right)$
+        \item $\exists x \exists y L\left(x, y\right)$
+        \item $\forall x L\left(x, x\right)$
+    \end{enumerate}
+   
+    \subparag{Personal remark}{
+        I truly hope that $\forall x \exists y \left(L\left(x, y\right) \land L\left(y, x\right)\right)$.
+    }
+}
+
+\parag{Example}{
+    Let's determine the truth values of the following statements, where the domain is the real numbers:
+    \begin{enumerate}
+        \item $\forall x \exists y\left(x^2 = y\right)$
+        \item $\forall x \exists y \left(x = y^2\right)$
+        \item $\exists x \forall y\left(xy = 0\right)$
+        \item $\exists x \exists y\left(x + y \neq y + x\right)$
+    \end{enumerate}
+    
+    We have:
+    \begin{enumerate}
+        \item It is true, we can choose $y = x^2$.
+        \item It is false, we can pick $x = -1$.
+        \item It is true, we can choose $x = 0$.
+        \item It is false, since we know that $\forall x \forall y\left(x + y = y + x\right)$ (the addition is commutative), and this is the exact negation.
+    \end{enumerate}
+    
+}
+
+\parag{Prenex Normal Form (not in exams I think)}{
+    We say that a statement is in Prenex Normal Form (PNF) if and only if it is of the form: 
+    \[Q_1 x_1 Q_2 x_2 \ldots Q_k x_k P\left(x_1, x_2, \ldots, x_k\right)\]
+    where each $Q_i$ is either the existential quantification or the universal quantifier, and $P\left(x_1, \ldots, x_k\right)$ is a predicate involving no quantifier.
+
+    \subparag{Example}{
+        Let's say we have the following proposition: 
+        \[\exists x P\left(x\right) \to \exists x Q\left(x\right)\]
+        
+        By doing some tricks (such as introducing another variable for clarity), we see that it is equivalent to: 
+        \[\forall x \lnot P\left(x\right) \lor \exists y Q\left(y\right) \equiv \forall x \exists y\left(\lnot P\left(x\right) \lor Q\left(y\right)\right)\]
+
+        The last one is the PNF.
+    }
+    
+}
+
+\section{Proofs (deriving knowledge)}
+\subsection{Valid arguments}
+
+\parag{Deriving knowledge}{
+    Let's say we know something, let's say $p$ ($p$ is true). Then, we may want to extend this knowledge to other facts. We have already seen equivalence proofs, that show that: 
+    \[p \leftrightarrow p'\]
+    
+    However, we may also want to derive knowledge, which only goes in one way (we are thus going to have something less general). If $p \to q$, then we can deduce that $q$ is true. However, if $q$ is true we cannot deduce that $p$ is true. Those are arguments.
+}
+
+\parag{Definitions}{
+    An \important{argument} in propositional logic is a sequence of propositions. All but the final proposition are called \important{premises}, and the last statement is the \important{conclusion}. The argument is valid if the premises imply the conclusion.
+
+    An \important{argument form} is an argument that is valid no matter what propositions are substituted into its propositional variables. \important{Inference rules} are simple arguments forms that will be used to construct more complex argument forms.
+}
+
+\parag{Modus Ponens}{
+    We can note:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $p \to q$ \\
+        & $p$ \\
+        \hline
+        $\therefore$ & $q$
+    \end{tabular}
+    \end{center}
+    
+    In other words, if we know that $p\to q$ and $p$ are true, then we can deduce $q$. Note that $\therefore$ means ``therefore'' (it must not be confused with $\because$ which means ``because''). 
+    
+    We call this the \important{Modus Ponens}, it is a valid argument form.
+
+    \subparag{Example}{
+        Let's say that we know that ``if I have passed AICC, then I can advance to year 2 of the studies'' ($p \to q$) and ``I have passed AICC'' ($p$). Then we can conclude that ``I can advance to year 2 of the studies'' ($q$). 
+
+        This is a valid argument.
+    }
+    
+    \subparag{Validity}{
+        We know that the following proposition is a tautology:
+        \[\left(p \land p \to q\right) \to q\]
+
+        So, if we know that $p$ and $p \to q$ are true, then $q$ must necessarily be true (else, the proposition would not be a tautology). Thus, the Modus Ponens is indeed a valid argument form.
+    }
+    
+}
+
+\parag{Valid argument}{
+    As mentioned earlier, a valid argument is a sequence of statements, where each statement is either a premise or follows from previous statements by inference rules. It takes the following form:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $p_1$ \\
+        & $\vdots$  \\
+        & $p_n$ \\
+        \hline
+        $\therefore$ & $q$
+    \end{tabular}
+    \end{center}
+
+    We can use the same reasoning as for the Modus Ponens to derive inference rules out of any tautology of the form: 
+    \[\left(p_1 \land p_2 \land \ldots \land p_n\right) \to q\]
+}
+
+\parag{Example 1}{
+    We know the following inference rule (which is Modus Ponens):
+    \begin{center}
+    \begin{tabular}{rl}
+        & $p$ \\
+        & $p \to q$ \\
+        \hline
+        $\therefore$ & $q$
+    \end{tabular}
+    \end{center}
+
+    So, applying it to some specific propositions, we get the following argument form: 
+    \begin{center}
+    \begin{tabular}{rl}
+        & $r \land s$ \\
+        & $\left(r \land s\right) \to q$ \\
+        \hline
+        $\therefore$ & $q$
+    \end{tabular}
+    \end{center}
+
+    Thus, we can derive the following argument:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $p$ \\
+        & $p \to \left(r \land s\right)$ \\
+        & $\left(r \land s\right) \to q$ \\
+        & $r \land s$ \\
+        \hline
+        $\therefore$ & $q$
+    \end{tabular}
+    \end{center}
+
+    Where the 3 first propositions are premises, and $r \land s$ is found using Modus Ponens.
+}
+
+\parag{Usefulness}{
+    Let's say we know that ``If I have passed AICC, Analysis 1, Linear Algebra, etc., then I can advance to year 2 of the studies'', and ``I have passed AICC'', ``I have passed Analysis 1'', ``I have passed Linear Algebra'', ... 
+
+    Then, it seems clear we can deduce that ``I can advance to year 2 of the studies''. However, we need to show that this argument is valid.
+
+    \subparag{Truth table}{
+        Let's say we wanted to prove this using a truth table. If we had 20 school subjects, then we would have $2^{20} = 1\,048\,576$ rows, which is not very practical. 
+    }
+
+    \subparag{Arguments}{
+        To show this using arguments, we first need to introduce another inference rule, conjunction: 
+        \begin{center}
+        \begin{tabular}{rl}
+            & $p$  \\
+            & $q$  \\
+            \hline
+            $\therefore$ & $p \land q$
+        \end{tabular}
+        \end{center}
+        
+        This is based on the following tautology: 
+        \[p \land q \to p \land q\]
+
+        We can now use this to find the following argument form:
+        \begin{center}
+        \begin{tabular}{rl}
+            & $\left(p_1 \land \ldots \land p_n\right) \to q$ \\
+            & $p_1$   \\
+            & $\vdots$ \\
+            & $p_n$  \\
+            & $p_1 \land \ldots \land p_n$ \\
+            \hline
+            $\therefore$ & $q$
+        \end{tabular}
+        \end{center}
+        
+        Thus, our argument was indeed valid!
+    }
+}
+
+\parag{Example: logic programming}{
+    There are some langages based on logic, for example \textit{Prolog}.
+
+    We have predicates, such as \texttt{lecturer(L, C)} (at a course) and \texttt{student(S, C)}.
+
+    Then we can add facts: \texttt{lecturer(Karl, CS101)}, \texttt{student(Frank, CS101)}, \texttt{student(Cléa, CS101)}, \ldots
+
+    We can also add rules: \texttt{teaches(L, S) :- lecturer(L, C), student(S, C)}. Such a rule will be true if the lecturer and the student have the same class, \texttt{C}.
+
+    We can then make queries: \texttt{teaches(Karl, Frank)} which will say True. Or, we can also get a list using \texttt{teaches(Karl, X)}.
+}
+
+
+\end{document}

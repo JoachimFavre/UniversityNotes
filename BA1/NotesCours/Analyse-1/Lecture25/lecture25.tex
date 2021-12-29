@@ -1,0 +1,337 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-20 at 10:17:20.
+
+\usepackage{../../style}
+
+\title{Analyse}
+\author{Joachim Favre}
+\date{Lundi 20 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{25}{2021-12-20}{Intégrales généralisées}{
+\begin{itemize}[left=0pt]
+    \item Définition des intégrales généralisées sur un intervalle borné.
+    \item Démonstration du critère de comparaison pour ces intégrales généralisées, et démonstration d'un corollaire à ce critère. 
+    \item Définition des intégrales généralisàe sur un intervalle non-borné.
+    \item Explication du critère de comparaison pour ces intégrales généralisées, et explication d'un corollaire à ce critère.
+\end{itemize}
+}
+
+\subsection{Intégrales généralisées}
+\subsubsection{Intégrales généralisées sur un intervalle borné}
+\parag{Définition}{
+    Soient $a < b$  et $f: \left[a, b\right[  \mapsto \mathbb{R}$ une fonction continue. Alors, on définit l'intégrale généralisée par la limite: 
+    \[\int_{a}^{b^-} f\left(t\right)dt \over{=}{déf} \lim_{x \to b^-} \int_{a}^{x} f\left(t\right)dt\]
+    si cette limite existe. Si elle n'existe pas, alors $\int_{a}^{b^-} f\left(t\right)dt$ est divergente.
+    
+    De la même manière soient $a < b$  et $f: {\color{red}\left]a, b\right]}  \mapsto \mathbb{R}$ une fonction continue. Alors, on définit l'intégrale généralisée par la limite:
+    \[\int_{{\color{red}a^+}}^{b} f\left(t\right)dt \over{=}{déf} \lim_{x \to {\color{red}a^+}} \int_{x}^{b} f\left(t\right)dt\]
+    si cette limite existe. Si elle n'existe pas, alors $\int_{a^+}^{b} f\left(t\right)dt$ est divergente.
+}
+
+\parag{Exemple 1}{
+    Calculons l'aire sous la courbe de $y = \frac{1}{\sqrt{x}}$, où $x \in \left]0, 1\right] $. Ceci est donné par une intégrale généralisée: 
+    \[\int_{0^+}^{1} \frac{dx}{\sqrt{x}} = \lim_{h \to 0^+} \int_{h}^{1} x^{-\frac{1}{2}} dx = \lim_{h \to 0^+} \frac{1}{\frac{1}{2}} x^{\frac{1}{2}} \eval_{h}^{1} = \lim_{h \to 0^+} 2\underbrace{\left(1 - \sqrt{h}\right)}_{\to 1} = 2\]
+}
+
+\parag{Exemple 2}{
+    Calculons l'aire sous la courbe de $y = \frac{1}{x}$, où $x \in \left]0, 1\right] $:
+    \[\int_{0^+}^{1} \frac{dx}{x} = \lim_{t \to 0^+} \int_{t}^{1} \frac{dx}{x} = \lim_{t \to 0^+} \left(\log\left(1\right) - \underbrace{\log\left(t\right)}_{\to -\infty}\right) = +\infty\]
+
+    L'intégrale généralisée $\int_{0^+}^{1} \frac{dx}{x}$ est donc divergente.
+
+    On remarque donc, qu'aux premiers abords, sans faire de calcul, il n'est pas facile de dire si une intégrale généralisée va converger ou diverger.
+}
+
+\parag{Proposition: Critère de comparaison}{
+    Soient $f, g : \left[a, b\right[ $ deux fonctions continues telles qu'il existe $c \in \left[a, b\right[ $ tel que:
+    \[0 \leq f\left(x\right) \leq g\left(x\right), \mathspace \forall x \in \left[c, b\right[ \]
+
+    Alors:
+    \[\int_{a}^{b^-} g\left(x\right)dx \text{ converge} \implies \int_{a}^{b^-} f\left(x\right)dx \text{ converge} \]
+    \[\int_{a}^{b^-} f\left(x\right)dx \text{ diverge} \implies \int_{a}^{b^-} g\left(x\right)dx \text{ diverge} \]
+
+    Il existe un critère similaire pour $f, g : \left]a, b\right] \mapsto \mathbb{R}$ continues.
+}
+
+\parag{Exemple}{
+    Calculons l'intégrale suivante: 
+    \[\int_{a}^{b^-} \frac{dt}{\left(b - t\right)^{\alpha}}, \mathspace a < b, \alpha \neq 1\]
+    
+    Prenons le changement de variable $u = b -t \implies du = -dt$. De plus, on remarque que $t = a \implies u = b - a$ et $t = b^- \implies u = 0^+$. On trouve donc:
+    \[\int_{a}^{b^-} \frac{dt}{\left(b - t\right)^{\alpha}} = -\int_{b - a}^{0^+} \frac{du}{u^{\alpha}} = \lim_{x \to 0^+} \int_{x}^{b-a} \frac{du}{u^{\alpha}} = \lim_{x \to 0^+} \frac{1}{-\alpha + 1}u^{-\alpha + 1} \eval_{x}^{b-a}\]
+
+    Ce qui nous donne la limite suivante: 
+    \[\lim_{x \to 0^+} \frac{1}{1 - \alpha} \left(\left(b - a\right)^{1 - \alpha} - x^{1 - \alpha}\right)\]
+    
+
+    Cette limite dépend de $\alpha$. Si $1 - \alpha > 0$, alors la limite de $x^{1 - \alpha}$ est 0, sinon elle diverge: 
+
+    \begin{functionbypart}{\int_{a}^{b^-} \frac{dt}{\left(b - t\right)^{\alpha}}}
+        \frac{1}{1 - \alpha} \left(b - a\right)^{1 - \alpha}, \mathspace \alpha < 1  \\
+        \text{divergente}, \mathspace \alpha > 1
+    \end{functionbypart}
+    
+    Étudions maintenant le cas où $\alpha = 1$: 
+    \[\int_{a}^{b^-} \frac{dt}{b - t} = -\lim_{x \to b^-} \left(\underbrace{\log\left(b - x\right)}_{\to -\infty} - \log\left(b - a\right)\right) = +\infty\]
+    
+    Ainsi, pour résumer:
+    \begin{functionbypart}{\int_{a}^{b^-} \frac{dt}{\left(b - t\right)^{\alpha}}}
+        \frac{1}{1 - \alpha} \left(b - a\right)^{1 - \alpha}, \mathspace \alpha < 1  \\
+        \text{divergente}, \mathspace \alpha \geq 1
+    \end{functionbypart}
+
+    C'est une formule qu'il faut connaitre, car elle est très pratique pour le critère de comparaison.
+}
+
+\parag{Corollaire}{
+    Soit $f : \left[a, b\right[ \mapsto \mathbb{R}$ une fonction continue. Supposons qu'il existe $\alpha \in \mathbb{R}$ tel que: 
+    \[\lim_{x \to b^-} f\left(x\right)\left(b - x\right)^{\alpha} = \ell \in \mathbb{R}^* \mathspace \text{(donc $\ell \neq 0$)}\]
+
+    Alors, l'intégrale généralisée: 
+    \begin{functionbypart}{\int_{a}^{b^-} f\left(t\right)dt}
+    \text{converge }, \mathspace \alpha < 1 \\
+    \text{diverge }, \mathspace \alpha \geq 1
+    \end{functionbypart}
+    
+    D'une façon similaire, soit $f : {\color{red}\left]a, b\right]} \mapsto \mathbb{R}$ une fonction continue. Supposons qu'il existe $\alpha \in \mathbb{R}$ tel que: 
+    \[\lim_{{\color{red}x \to a^+}} f\left(x\right){\color{red}\left(x - a\right)^{\alpha}} = \ell \in \mathbb{R}^*\]
+    
+    Alors, l'intégrale généralisée:
+    \begin{functionbypart}{{\color{red}\int_{a^+}^{b}} f\left(t\right)dt}
+    \text{converge }, \mathspace \alpha < 1 \\
+    \text{diverge }, \mathspace \alpha \geq 1
+    \end{functionbypart}
+
+    \subparag{Preuve du premier point}{
+        Soit $\ell > 0$. On sait que $\lim_{x \to b^-} \left(x - b\right)^{\alpha}f\left(x\right) = \ell$, donc: 
+        \[\exists x \in \left[a, b\right[ \telque \forall x \in \left[c, b\right[ \text{ on a } \frac{1}{2}\ell \leq \underbrace{\left(b - x\right)^{\alpha}}_{> 0} f\left(x\right) \leq \frac{3}{2} \ell\]
+        
+        On trouve donc que: 
+        \[\frac{\ell}{2} \cdot \frac{1}{\left(b - x\right)^{\alpha}} \leq f\left(x\right) \leq \frac{3}{2} \cdot \frac{1}{\left(b - x\right)^{\alpha}}\]
+        
+        On peut utiliser le critère de convergence dans les deux cas (pour le cas de la convergence et celui de la divergence).
+
+        \qed
+    }
+
+    \subparag{Note personnelle}{
+        On choisit $b - x$ et $x - a$ de manière à ce que ce soit toujours positif. En effet, on n'aurait pas envie d'avoir à prendre la racinée carrée d'un nombre négatif.
+    }
+}
+
+\parag{Exemple}{
+    On se demande si l'intégrale généralisée suivante converge: 
+    \[\int_{0}^{1^-} \frac{dt}{\sqrt{1 - t^3}}\]
+    
+    Il est impossible d'exprimer la primitive en terme de fonctions élémentaires, nous devons donc utiliser notre théorème ci-dessus. On voit que $\sqrt{1 - t^3} = \sqrt{\left(1 - t\right)\left(1 + t + t^2\right)}$, ainsi:
+    \[\lim_{x \to 1^-}  \frac{\left(1 - x\right)^{\alpha}}{\sqrt{1 - x^3}} \over{=}{$\alpha \neq \frac{1}{2}$ } \lim_{x \to 1^-} \frac{\left(1 - x\right)^{\frac{1}{2}}}{\left(1 - x\right)^{\frac{1}{2}} \left(1 + x + x^2\right)^{\frac{1}{2}}} = \lim_{x \to 1^-} \frac{1}{\left(1 + x + x^2\right)^{\frac{1}{2}}} = \frac{1}{\sqrt{3}} \neq 0\]
+    
+    Puisque $\alpha = \frac{1}{2} < 1$, on sait par notre corollaire que $\int_{0}^{1^-} \frac{dt}{\sqrt{1 - t^3}}$ est convergente.
+}
+
+\parag{Définition}{
+    Soient $a < b$, $f : \left]a, b\right[  \mapsto \mathbb{R}$ continue, et $c \in \left]a ,b\right[ $ arbitraire.
+
+    Alors, l'intégrale généralisée: 
+    \[\int_{a^+}^{b^-} f\left(t\right)dt \over{=}{déf} \int_{a^+}^{c} f\left(t\right)dt + \int_{c}^{b^-} f\left(t\right)dt\]
+
+    Elle converge si et seulement si les deux intégrales généralisées convergent.
+
+    \subparag{Choix du $c$}{
+        La définition ne dépend pas du choix de $c$. En effet, prenons un autre nombre $d \in \left]a, b\right[ $. Supposons que $d > c$ (la preuve est similaire si $d < c$). Alors: 
+        \begin{multiequality}
+        \int_{a^+}^{b^-} f\left(t\right)dt =\ & \int_{a^+}^d f\left(t\right)dt + \int_{d}^{b^-} f\left(t\right)dt  \\
+        =\ & \int_{a^+}^{c} f\left(t\right)dt + \int_{c}^{d} f\left(t\right)dt + \int_{d}^{b^-} f\left(t\right)dt  \\
+        =\ & \int_{a^+}^{c} f\left(t\right)dt + \int_{c}^{b^-} f\left(t\right)dt  
+        \end{multiequality}
+
+        \textit{(Ce paragraphe a été pris en note à partir d'une explication orale de la Professeure. Il est probable qu'il y ait une erreur, mais l'idée est là.)}        
+    }
+}
+
+\parag{Exemple}{
+    Nous voulons savoir si l'intégrale généralisée suivante converge:
+    \[\int_{0^+}^{1^-} \frac{dx}{x^r \left(1 - x\right)^s} = \int_{0^+}^{\frac{1}{2}} \frac{dx}{x^r \left(1 - x\right)^s} + \int_{\frac{1}{2}}^{1^-} \frac{dx}{x^r \left(1 - x\right)^s}\]
+    
+    Pour la première intégrale, on cherche un $\alpha \in\mathbb{R}$ tel que: 
+    \[\lim_{x \to 0^+} f\left(x\right)x^{\alpha} = \lim_{x \to 0^+}  \frac{x^{\alpha}}{x^r\left(1 - x\right)^s} = \ell \neq 0 \text{ et } \neq\infty\]
+    
+    On se rend compte qu'il faut prendre $\alpha = r$: 
+    \[\lim_{x \to 0^+} f\left(x\right)x^{\alpha} = \lim_{x \to 0^+} \frac{x^r}{x^r\left(1 - x\right)^s} = \lim_{x \to 0^+} \frac{1}{\left(1 - x\right)^s} = 1\]
+    
+    On en déduit que $\int_{0^+}^{\frac{1}{2}} \frac{dx}{x^r \left(1 - x\right)^s}$ converge si et seulement si $r < 1$. 
+
+    On cherche maintenant un $\alpha \in \mathbb{R}$ similaire pour la deuxième intégrale: 
+    \[\lim_{x \to 1} f\left(x\right)\left(1 - x\right)^{\alpha} = \lim_{x \to 1^-}  \frac{\left(1 - x\right)^{\alpha}}{x^r \left(1 - x\right)^s} = \ell \neq 0 \text{ et } \neq \infty\]
+    
+    On peut voir que $\alpha = s$ fonctionne: 
+    \[\lim_{x \to 1} \frac{\left(1 - x\right)^s}{x^r\left(1 - x\right)^s} = \lim_{x \to 1^-} \frac{1}{x^r} = 1\]
+    
+    Ainsi, $\int_{\frac{1}{2}}^{1^-} \frac{dx}{x^r\left(1- x\right)^s}$ converge si et seulement si $s < 1$.
+
+    On en déduit que notre intégrale originelle, $\int_{0^+}^{1^-} \frac{dx}{x^r \left(1 - x\right)^s}$, converge si et seulement si $r < 1$ \textit{et} $s < 1$.
+}
+
+\subsubsection{Intégrales généralisées sur un intervalle non-borné}
+\parag{Définition}{
+    Soit $f : \left[a, +\infty\right[ \mapsto \mathbb{R}$ une fonction continue. Alors, l'intégrale généralisée 
+    \[\int_{a}^{\infty} f\left(t\right)dt \over{=}{déf} \lim_{x \to +\infty} \int_{a}^{x} f\left(t\right)dt\]
+    si la limite existe. Si la limite n'existe pas, alors l'intégrale généralisée $\int_{a}^{\infty} f\left(t\right)dt$ est divergente.
+
+    De la même manière, soit $f : {\color{red}\left]-\infty, b\right]} \mapsto \mathbb{R}$ une fonction continue. Alors, l'intégrale généralisée 
+    \[{\color{red}\int_{-\infty}^{b}} f\left(t\right)dt \over{=}{déf} \lim_{{\color{red}x \to -\infty}} {\color{red}\int_{x}^{b}} f\left(t\right)dt\]
+    si la limite existe. Si la limite n'existe pas, alors l'intégrale généralisée $\int_{-\infty}^{b} f\left(t\right)dt$ est divergente.
+}
+
+\parag{Exemple 1}{
+    Calculons l'aire sous la courbe de $f\left(x\right) = \frac{1}{x\log\left(x\right)}$, où $x \in \left[e, +\infty\right[ $: 
+    \[\int_{e}^{+\infty} \frac{dt}{t\log\left(t\right)} = \lim_{x \to \infty} \int_{e}^{x} \frac{dt}{t\log\left(t\right)}\]
+    
+    Prenons le changement de variable $u = \log\left(t\right) \implies du = \frac{dt}{t}$. On remarque que $\log\left(e\right) = 1$ et $y = \log\left(x\right) \over{\to}{$x\to\infty$} \infty$: 
+    \[\lim_{y \to \infty} \int_{1}^{y} \frac{du}{u} = \lim_{y \to \infty} \log\left|u\right| \eval_{1}^{y} = \lim_{y \to \infty} \left(\log\left(y\right) - \log\left(1\right)\right) = \infty\]
+
+    Donc, $\int_{e}^{\infty} \frac{dt}{t\log\left(t\right)}$ diverge.
+}
+
+\parag{Exemple 2}{
+    Calculons l'aire sous la courbe de $f\left(x\right) = \frac{1}{x\left(\log\left(x\right)\right)^2}$, où $x \in \left[e, \infty\right[ $: 
+        \[\int_{e}^{\infty} \frac{dt}{t\left(\log\left(t\right)\right)^2} = \lim_{x \to \infty} \int_{e}^{x} \frac{dt}{t\left(\log\left(t\right)\right)^2}\]
+
+    Faisons le même changement de variable que celui dans l'exemple ci-dessus:
+    \[\lim_{y \to \infty} \int_{1}^{y} \frac{du}{u^2} = \lim_{y \to \infty} \left(\frac{-1}{u}\right)\eval_{1}^{y} = \lim_{y \to \infty} \left(- \frac{1}{y} + 1\right) = 1\]
+}
+
+\parag{Critère de comparaison}{
+    Si $0 \leq f\left(x\right) \leq g\left(x\right)$ pour tout $x > c$ pour un certain $c > a$, alors: 
+    \[\int_{a}^{\infty} g\left(x\right)dx \text{ converge} \implies \int_{a}^{\infty} f\left(x\right)dx \text{ converge}\]
+    \[\int_{a}^{\infty} f\left(x\right)dx \text{ diverge} \implies \int_{a}^{\infty} g\left(x\right)dx \text{ diverge}\]
+}
+
+\parag{Exemple}{
+    Soit $\beta \neq 1$. Calculons l'intégrale généralisée suivante: 
+    \[\int_{1}^{\infty} \frac{dx}{x^{\beta}} = \lim_{R \to \infty} \int_{1}^{R} \frac{dx}{x^{\beta}} = \lim_{R \to \infty} \frac{1}{1 - \beta} x^{1 - \beta} \eval_{1}^{R} = \lim_{R \to \infty} \frac{1}{1 - \beta} \left(R^{1 - \beta} - 1\right)\]
+    
+    Qui ne converge que si $\beta > 1$. Étudions aussi $\beta = 1$: 
+    \[\int_{1}^{\infty} \frac{dx}{x} = \lim_{R \to \infty} \int_{1}^{R} \frac{dx}{x} = \lim_{R \to \infty} \left(\log\left(R\right) - \log\left(1\right)\right) = \infty\]
+    qui est divergente.
+
+    Ceci nous permet de conclure que: 
+    \begin{functionbypart}{\int_{1}^{\infty} \frac{dx}{x^{\beta}}}
+    \frac{1}{\beta - 1}, \mathspace \beta > 1 \\
+    \text{diverge }, \mathspace \beta \leq 1
+    \end{functionbypart}
+
+    \subparag{Comparaison}{
+        On peut comparer ce résultat avec celui qu'on a obtenu plut tôt: 
+        \begin{functionbypart}{\int_{0^+}^{1} \frac{dx}{x^{\alpha}}}
+        \frac{1}{1 - \alpha}, \mathspace \alpha < 1  \\
+        \text{diverge}, \mathspace \alpha \geq 1
+        \end{functionbypart}
+    }
+
+    \subparag{Note personnelle: intuition}{
+        Quand on intègre de telles fonctions, on diminue la puissance au dénominateur de 1. On remarque qu'il faut avoir quelque chose sous la forme $\frac{1}{x^c}$, $c > 0$ pour que la limite quand $x \to \infty$ converge ($x^c$ diverge clairement); et il faut avoir quelque chose sous la forme $x^c$, $c > 0$ pour que la limite quand $x \to 0$ converge ($\frac{1}{x^c}$ diverge clairement). 
+    }
+    
+}
+
+\parag{Corollaire}{
+    Soient $f : \left[a, +\infty\right[ \mapsto \mathbb{R}$ une fonction continue et $\beta \in \mathbb{R}$ tel que 
+    \[\lim_{x \to \infty} f\left(x\right) x^{\beta} = \ell \in \mathbb{R}^* \text{(donc $\ell \neq 0$)}\]
+
+
+    Alors, $\int_{a}^{\infty} f\left(t\right)dt$ converge si et seulement si $\beta > 1$, et diverge si et seulement si $\beta \leq 1$.
+    Alors, l'intégrale généralisée: 
+    \begin{functionbypart}{\int_{a}^{+\infty} f\left(t\right)dt}
+    \text{converge }, \mathspace \beta > 1 \\
+    \text{diverge }, \mathspace \beta \leq 1
+    \end{functionbypart}
+
+    \subparag{Comparaison}{
+        On peut comparer ce résultat avec celui qu'on avait obtenu plus tôt:
+        \begin{functionbypart}{\int_{a}^{b^-} f\left(t\right)dt}
+        \text{converge }, \mathspace \alpha < 1 \\
+        \text{diverge }, \mathspace \alpha \geq 1
+        \end{functionbypart}
+    }
+    
+    \subparag{Note personnelle: mnémotechnie}{
+        Pour retrouver si notre constante doit être plus grande que 1 ou plus petite que 1 pour que notre intégrale converge, il nous suffit de regarder une fonction simple, telle que $\frac{1}{x^2}$. En effet: 
+        \[\int_{0^+}^{1} \frac{1}{x^2} \text{ diverge} \implies \alpha < 1 \text{ pour la convergence}\]
+        \[\int_{1}^{+\infty} \frac{1}{x^2} \text{ converge} \implies \beta > 1 \text{ pour la convergence}\]
+        
+        Il nous suffit de se souvenir que le point important est 1, qui ne converge jamais.
+    }
+    
+}
+
+\parag{Exemple}{
+    Nous nous demandons si l'intégrale généralisée suivante converge: 
+    \[\int_{1}^{\infty} \frac{dx}{\sqrt{x^3 + 1}}\]
+
+    Notez que, à nouveau, la primitive ne peut pas être exprimée à l'aide de fonctions élémentaires. Utilisons notre corollaire ci-dessus: 
+    \[\lim_{x \to \infty} \frac{x^{\beta}}{\sqrt{x^3 + 1}} = \lim_{x \to \infty} \frac{x^{\beta}}{x^{\frac{3}{2}} \sqrt{1 + \frac{1}{x^3}}} \over{=}{$\beta = \frac{3}{2}$} \lim_{x \to \infty} \frac{x^{\frac{3}{2}}}{x^{\frac{3}{2}} \sqrt{1 + \frac{1}{x^3}}} = 1 \neq 0 \text{ et } \neq \infty\]
+    
+    Or, $\beta = \frac{3}{2} > 1$, donc l'intégrale converge.
+}
+
+\parag{Définition}{
+    Soit $f$ une fonction continue sur $\left]a, +\infty\right] $. Alors l'intégrale généralisée 
+    \[\int_{a^+}^{\infty} f\left(t\right)dt \over{=}{déf} \int_{a^+}^{c} f\left(t\right)dt + \int_{c}^{\infty} f\left(t\right)dt, \mathspace \text{pour un } c \in \left]a, \infty\right] \]
+    converge si et seulement si les deux intégrales généralisées convergent.
+
+    La définition ne dépend pas du choix du $c$.
+}
+
+\parag{Définition}{
+    Soit $f : \mathbb{R}\mapsto  \mathbb{R}$ une fonction continue. Alors, on peut aussi considérer l'intégrale généralisée:
+    \[\int_{-\infty}^{\infty} \over{=}{déf} \int_{-\infty}^{c} f\left(t\right)dt + \int_{c}^{\infty} f\left(t\right)dt, \mathspace c \in \mathbb{R}\]
+    qui est convergente si et seulement si les deux intégrales convergent.
+
+    La définition ne dépend pas du choix du $c$.
+}
+
+\parag{Exemple 1}{
+    On se demande si l'intégrale généralisée suivante est convergente: 
+    \[\int_{0^+}^{\pi / 2} \frac{dx}{\sin^2\left(x\right)}\]
+    
+    Utilisons notre corollaire ci-dessus: 
+    \[\lim_{x \to 0^+} \frac{x^{\alpha}}{\sin^2\left(x\right)} \over{=}{$\alpha = 2$} \lim_{x \to 0^+} \frac{x^2}{\sin^2\left(x\right)} = 1\]
+    
+    Or, $\alpha = 2 > 1$, donc on sait que cette intégrale diverge.
+
+    Nous aurions aussi pu utiliser que la primitive de $\frac{1}{\sin^2\left(x\right)}$ est $-\cot\left(x\right)$: 
+    \[\int_{0^+}^{\pi / 2} \frac{dx}{\sin^2\left(x\right)} = \lim_{\epsilon \to 0^+} \int_{\epsilon}^{\pi / 2} \frac{dx}{\sin^2\left(x\right)} = \lim_{\epsilon \to 0^+} \left(-\cot\left(x\right)\right) \eval_{\epsilon}^{\pi / 2}\]
+
+    Ce qui nous donne:
+    \[\lim_{\epsilon \to 0^+} \left(-\underbrace{\left(\cot\left(\frac{\pi}{2}\right)\right)}_{= 0} + \underbrace{\cot\left(\epsilon\right)}_{\to \infty}\right) = \infty\]
+}
+
+\parag{Exemple 2}{
+    Nous volons calculer l'intégrale généralisée suivante, si elle converge: 
+    \[\int_{-\infty}^{\infty} \frac{dx}{x^2 + 4x + 9}\]
+    
+    Utilisons le critère de comparaison: 
+    \[\lim_{x \to \pm\infty} \frac{x^{\beta}}{x^2 + 4x + 9} \over{=}{$\beta = 2$} \lim_{x \to \pm\infty} \frac{x^2}{x^2 + 4x + 9} = 1 \in \mathbb{R} \text{ et } \neq 0\]
+    
+    Puisque $\beta = 2 > 1$, alors $\int_{-\infty}^{\infty} \frac{dx}{x^2 + 4x + 9}$ converge.
+
+    Calculons maintenant la valeur de cette intégrale. On remarque que c'est une fonction rationnelle, et que son dénominateur a un discriminant négatif. Ainsi, nous devons utiliser la complétion du carré:
+    \[\int_{-\infty}^{\infty} \frac{dx}{x^2 + 4x + 9} = \int_{-\infty}^{\infty} \frac{dx}{\left(x + 2\right)^2 + 5} = \int_{-\infty}^{-2} \frac{dx}{\left(x + 2\right)^2 + 5} + \int_{-2}^{\infty} \frac{dx}{\left(x + 2\right)^2 + 5}\]
+
+    Prenons le changement de variable $u = \frac{x + 2}{\sqrt{5}} \implies du = \frac{1}{\sqrt{5}} dx$. On remarque que $x = -2 \implies u= 0$, $x \to +\infty \implies u \to +\infty$ et $x \to -\infty \implies u \to -\infty$. Ainsi, notre intégrale est égale à: 
+    \[\lim_{R \to -\infty} \int_{R}^{0} \frac{\sqrt{5} du}{5u^2 + 5} + \lim_{R \to \infty} \int_{0}^{R} \frac{\sqrt{5}du}{5u^2 + 5} = \lim_{R \to -\infty} \frac{1}{\sqrt{5}}\int_{R}^{0} \frac{du}{u^2 + 1} + \lim_{R \to \infty} \frac{1}{\sqrt{5}} \int_{0}^{R} \frac{du}{u^2 + 1}\]
+   
+    On voit la dérivée de $\arctan\left(x\right)$, donc:
+    \[\lim_{R \to -\infty} \frac{1}{\sqrt{5}} \arctan\left(u\right) \eval_{R}^{0} + \lim_{R \to \infty} \frac{1}{\sqrt{5}} \arctan\left(u\right) \eval_{0}^{R}\]
+
+    Ce qu'on peut simplifier en:
+    \[\lim_{R \to -\infty} \left(0 - \frac{1}{\sqrt{5}} \underbrace{\arctan\left(R\right)}_{\to - \frac{\pi}{2}}\right) + \lim_{R \to \infty} \left(\frac{1}{\sqrt{5}} \underbrace{\arctan\left(R\right)}_{\to \frac{\pi}{2}} - 0\right) = \frac{\pi}{2\sqrt{5}} + \frac{\pi}{2\sqrt{5}}  = \frac{\pi}{\sqrt{5}}\]
+    
+}
+
+\end{document}

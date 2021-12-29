@@ -1,0 +1,415 @@
+\documentclass{article}
+
+% Expanded on 2021-09-21 at 22:59:41.
+
+\usepackage{../../style}
+
+\title{Advanced information, computation, communication I}
+\author{Joachim Favre}
+\date{Mercredi 22 septembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2021-09-22}{Logical equivalences and normal forms}{
+\begin{itemize}[left=0pt]
+    \item Definition of satisfiability (tautology, contingency, contradiction, satisfiable, unsatisfiable).
+    \item Definition of logical equivalences.
+    \item Explanation of the most important logical equivalences and of equivalence proofs.
+    \item Definition of normal forms and explanation of the DNF (Disjunctive Normal Form) and the CNF (Conjuctive Normal Form).
+\end{itemize}
+
+}
+
+\parag{Truth tables for compound proposition}{
+    To construct a truth table, we make a row for every possible combination of values for the atomic propositions. We then make a column for the truth values of each sub-expression that occurs in the compound proposition. Finally, we make a column for the compound proposition.
+
+    For example, we can find the truth table of $\left(p \lor \lnot q\right) \to \left(p \land q\right)$:
+    \begin{center}
+        \begin{tabular}{cc|c|c|c|c}
+            $p$ & $q$ & $\lnot q$ & $p \lor \lnot q$ & $p \land q$ & $\left(p \lor \lnot q\right) \to \left(p \land q\right)$ \\
+            \hline
+            T & T & F & T & T & T \\
+            T & F & T & T & F & F \\
+            F & T & F & F & F & T \\
+            F & F & T & T & F & F \\
+        \end{tabular}
+    \end{center}
+}
+
+\parag{Satisfiability}{
+    Depending on the values the compound expression can take, we define the concept of \important{tautology}, \important{contingency}, \important{contradiction}, \important{satisfiable} and \important{unsatisfiable}:
+
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+       \hline
+       \textbf{Compound expression} & \textbf{Called} & \textbf{Example} & \textbf{Satisfiability} \\
+       \hline
+       All true & Tautology & $p \lor \lnot p$ & \multirow{2}{*}{Satisfiable}\\
+       \cline{1-3}
+       True or false, depending on the row & Contingency & $p$ & \\
+       \hline
+       All false & Contradiction & $p \land \lnot p$ & Unsatisfiable  \\
+       \hline
+    \end{tabular}
+    \end{center}
+
+    For the contingencies, we also, rarely, say that the expression is ``contingent on the values''.
+}
+
+\parag{Example}{
+    Let's say we want to determine the satisfiability of the following compound proposition: 
+    \[\left(p \lor \lnot q\right) \land \left(q \lor \lnot r\right) \land \left(r \lor \lnot p\right)\]
+    
+    We see that with $p \equiv T$, $q \equiv T$ and $r \equiv T$, this proposition is true. Thus, it is satisfiable.
+
+    Let's now determine whether the following expression is satisfiable: 
+    \[\left(p \lor q \lor r\right) \land \left(\lnot p \lor \lnot q \lor \lnot r\right)\]
+    
+    We can take $p \equiv T$ and $q \equiv F$ ($r$ does not matter) to make this expression true. This implies that this expression is satisfiable.
+
+    We see that we do not need to make a truth table to prove that an expression is satisfiable (we may need one to prove that it is unsatisfiable, however).
+}
+
+\parag{Boolean queries}{
+    An example of utility for proposition logic can be useful is boolean queries, for Google for instance. When we write ``Lausanne university'', Google will translate it to ``the document contain `Lausanne AND university'{}''. Similarly, if we write ``Lausanne university|studying -UNIL'', Google will translate it to ``Lausanne AND (university OR studying) and NOT UNIL''.
+}
+
+\subsection{Logical equivalences}
+\parag{Definition of logical equivalence}{
+    Two compound propositions $p$ and $q$ are \important{logically equivalent} if $p \leftrightarrow q$ is a tautology. We write $p \equiv q$.
+
+    \subparag{Intuition}{
+        Two compound propositions $p$ and $q$ are equivalent if and only if the columns in a truth table are the same.
+    }
+}
+
+\parag{Example}{
+    We can show that $\lnot p \lor q \equiv p \to q$ using a truth table:
+
+    \begin{center}
+    \begin{tabular}{c|c|c|c|c}
+        $p$ & $q$ & $\lnot p$ & $\lnot p \lor q$ & $p \to q$ \\
+        \hline
+        T & T & F & T & T \\
+        T & F & F & F & F \\
+        F & T & T & T & T \\
+        F & F & T & T & T \\
+    \end{tabular}
+    \end{center}
+
+    This means that we actually do not need the implication symbol.
+}
+
+\parag{De Morgan's Laws}{
+    \important{De Morgan's Laws} state that: 
+    \[\lnot\left(p \land q\right) \equiv \lnot p \lor \lnot q\]
+    \[\lnot\left(p \lor q\right) \equiv \lnot p \land \lnot q\]
+
+    \subparag{Proof of the first law}{
+        we can make a truth table:
+
+        \begin{center}
+        \begin{tabular}{c|c|c|c|c|c|c}
+            $p$ & $q$ & $\lnot p$ & $\lnot q$ & $p \land q$ & $\lnot p \lor \lnot q$ & $\lnot\left(p \land q\right)$\\
+            \hline
+            T & T & F & F & T & F & F \\
+            T & F & F & T & F & T & T \\
+            F & T & T & F & F & T & T \\
+            F & F & T & T & F & T & T \\
+        \end{tabular}
+        \end{center}
+    }
+}
+
+\parag{Equivalences with basic connectives}{
+    The following equivalences using only $\land$ and $\lor$ are really important and useful:
+    \begin{center}
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Equivalence} & \textbf{Name} \\
+        \hline
+        \hline
+        $p \land T \equiv p$ & \multirow{2}{*}{Identity laws} \\
+        $p \lor F \equiv p$ & \\
+        \hline
+        $p \lor T \equiv T$ & \multirow{2}{*}{Domination laws} \\
+        $p \land F \equiv F$ & \\
+        \hline
+        $p \lor p \equiv p$ & \multirow{2}{*}{Idempotent laws} \\
+        $p \land p \equiv p$ & \\
+        \hline
+        $\lnot\left(\lnot p\right)$ & Double negation law \\
+        \hline
+        \hline
+        $p \lor \left(p \land q\right) \equiv p$ & \multirow{2}{*}{Absorption laws} \\
+        $p \land \left(p \lor q\right) \equiv p$ & \\
+        \hline
+        $p \lor \lnot p \equiv T$ & \multirow{2}{*}{Negation laws} \\
+        $p \land \lnot p \equiv F$ & \\
+        \hline
+        \hline
+        $p \lor q \equiv q \lor p$ & \multirow{2}{*}{Commutative laws} \\
+        $p \land q \equiv q \land p$ & \\
+        \hline
+        $\left(p \lor q\right) \lor r \equiv p \lor \left(q \lor r\right)$ & \multirow{2}{*}{Associative laws} \\
+        $\left(p \land q\right) \land r \equiv p \land \left(q \land r\right)$ & \\
+        \hline
+        $p \lor \left(q \land r\right) \equiv \left(p \lor q\right) \land \left(p \lor r\right)$ & \multirow{2}{*}{Distributive laws} \\
+        $p \land \left(q \lor r\right) \equiv \left(p \land q\right) \lor \left(p \land r\right)$ & \\
+        \hline
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Equivalences with implications}{
+    The following equivalences using implications are less important, but still it is interesting to see them:
+    \begin{center}
+    \begin{tabular}{|c|}
+        \hline
+        $p \to q \equiv \lnot p \lor q$ \\
+        $p \to q \equiv \lnot q \to \lnot p$ \\
+        \hline
+        $p \lor q \equiv \lnot p \to q$ \\
+        $p \land q \equiv \lnot\left(p \to \lnot q\right)$ \\
+        $\lnot\left(p \to q\right) \equiv p \land \lnot q$ \\
+        \hline
+        $\left(p \to q\right) \land\left(p \to r\right) \equiv p \to \left(q \land r\right)$ \\
+        $\left(p \to r\right) \land \left(q \to r\right) \equiv \left(p \lor q\right) \to r$ \\
+        $\left(p \to q\right) \lor \left(p \to r\right) \equiv p \to \left(q \lor r\right)$ \\
+        $\left(p \to r\right) \lor \left(q \to r\right) \equiv \left(p \land q\right) \to r$ \\
+        \hline
+    \end{tabular}
+    \hspace{2em}
+    \begin{tabular}{|c|}
+        \hline
+        $p \leftrightarrow q \equiv \left(p \to q\right) \land \left(q \to p\right)$ \\
+        $p \leftrightarrow q \equiv \lnot p \leftrightarrow \lnot q$ \\
+        $p \leftrightarrow q \equiv \left(p \land q\right) \lor \left(\lnot p \land\lnot q\right)$ \\
+        $\lnot\left(p \leftrightarrow q\right) \equiv p \leftrightarrow \lnot q$ \\
+        \hline
+    \end{tabular}
+    \end{center}
+    
+
+    They can be found easily using the equivalences from the last paragraph, and from: 
+    \[p \leftrightarrow q \equiv \left(p \to q\right) \land \left(q \to p\right)\]
+    \[p \to q \equiv \lnot p \land q\]
+}
+
+\parag{Contrapositive, converse and inverse}{
+    We say that $\lnot q \to \lnot p$ is the \important{contrapositive} of $p \to q$. We have the following equivalence: 
+    \[p\to q \equiv \lnot q \to \lnot p\]
+    
+    We also define that $q \to p$ is the \important{converse} of $p \to q$, and $\lnot q \to \lnot p$ is the \important{inverse} of $p \to q$ (and the contrapositive of $q \to p$; in other words, the contrapositive of the converse is called the inverse). The converse and the inverse are equivalent, but they are not equivalent to $p \to q$ (this is a common fallacy politicians use).
+}
+
+\parag{Applying logical equivalences}{
+    The proposition in a known equivalence can be replaced by any compound proposition.
+
+    For example, we know that: 
+    \[p \to q \equiv \lnot q \to \lnot p\]
+    
+    Then, picking $p \equiv \left(p_1 \lor p_2\right)$ and $q \equiv \left(q_1 \land q_2\right)$: 
+    \[\left(p_1 \lor p_2\right) \to \left(q_1 \land q_2\right) \equiv \lnot \left(q_1 \land q_2\right) \to \lnot\left(p_1 \lor p_2\right)\]
+}
+
+\parag{Constructing new logical equivalences}{
+    We know that the logical equivalence is transitive. In other word, we can show that two expressions are logically equivalent by developing a series of logically equivalent statements; to prove $A \equiv B$ we make such a series, beginning with $A$ and ending with $B$:
+    \[A \equiv A_1, A_1 \equiv A_2, \ldots, A_n = B \implies A \equiv B\]
+
+    This is called an \important{equivalence proof}, and it is much more efficient than using truth tables. However, it cannot be done automatically, we need inspiration.
+}
+
+\parag{Example 1}{
+    Let's say we want to show the following equivalence: 
+    \[\lnot\left(p \lor \left(\lnot p \land q\right)\right) \equiv \lnot p \land \lnot q\]
+    
+    We can use the following steps:
+    \begin{multiequality}
+         \lnot\left(p \lor \left(\lnot p \land q\right)\right) & \over{\equiv}{\text{De Morgan}}  \lnot p \land \lnot\left(\lnot p \land q\right) \\
+         & \over{\equiv}{\text{De Morgan}} \lnot p \land \left(p \lor \lnot q\right) \\
+         &  \over{\equiv}{\text{Distributivity}} \left(\lnot p \land p\right) \lor\left(\lnot p \land\lnot q\right)   \\
+         & \equiv F \lor \left(\lnot p \land \lnot q\right) \\
+         & \equiv \lnot p \land\lnot q
+    \end{multiequality}
+}
+
+\parag{Example 2}{
+    Let's say we want to show that $\left(p \land q\right) \to \left(p \lor q\right)$ is a tautology:
+   \begin{multiequality}
+       \left(p \land q\right) \to \left(p \lor q\right) & \equiv \lnot\left(p \land q \right) \lor \left(p \lor q\right) \\
+                                                       & \equiv \left(\lnot p \lor \lnot q\right)\lor \left(p \lor q\right)  \\
+                                                       & \equiv \left(\lnot p \lor p \right) \lor \left(\lnot q \lor q\right)  \\
+                                                       & \equiv T \lor T  \\
+                                                       & \equiv T
+   \end{multiequality}
+}
+
+\parag{Example 3}{
+    We want to show that $\left(p \to r\right) \land \left(q \to r\right) \equiv \left(p \lor q\right) \to r$:
+
+    \begin{multiequality}
+        \left(p \to r\right) \land \left(q \to r\right) & \equiv \left(\lnot p \lor r\right) \land \left(\lnot q \lor r\right)  \\
+                                                        & \equiv \left(\lnot p \land \lnot q\right) \lor r  \\
+                                                        & \equiv \lnot\left(p \lor q\right) \lor r \\
+                                                        & \equiv \left(p \lor q\right) \to r
+    \end{multiequality}
+
+}
+
+\parag{Example 4}{
+    We wonder if $\oplus$ is distributive (with xor, we always use parenthesis, since there exists no clear precedence rule):
+    \begin{enumerate}
+        \item $p \land \left(q \oplus r\right) \equiv \left(p \land q\right) \oplus \left(p \land r\right)$
+        \item $p \lor \left(q \oplus r\right) \equiv \left(p \lor q\right) \oplus \left(p \lor q\right)$
+    \end{enumerate}
+
+    We can prove that the first one holds, but the second one is wrong: we can let $p \equiv T, q \equiv T, r \equiv T$. On the left hand side, we get:
+    \[T \lor \left(T \oplus T\right) \equiv T \lor F \equiv T\]
+
+    On the right hand side, we get:
+    \[\left(T \lor T\right) \oplus \left(T \lor T\right) \equiv T \oplus T \equiv F\]
+}
+
+\subsection{Normal forms}
+\parag{Introduction}{
+    We use normal forms to convert arbitrary propositional statements into canonical form; if two propositions are equivalent then they have the same normal form.
+
+    This is useful for the automated proofing of theorems (we can put both expressions in their normal forms and see if they are equal). This is also the basis for the formulation of some of the most central problems of complexity theory, and it finds some applications for circuit design. Those applications will be further discussed in other courses.
+}
+
+\parag{Definition of the Disjunctive Normal Form}{
+    A propositional formula is in \important{Disjunctive Normal Form (DNF)} if it only consists of a disjunction of compound expressions, where each compound expression consists of a conjunction of a set of propositional variables or their negation.
+}
+
+\parag{Example}{
+    For example, the following expressions are in DNF: 
+    \[\left(p \land \lnot q\right) \lor \left(\lnot p \land q\right), \mathspace p \lor \left(\lnot p \land q\right), \mathspace \left(p \land \lnot q \land \lnot r\right) \lor \left(\lnot p \land q \land r\right)\]
+    
+    The following expressions are \textit{not} in DNF:
+    \[\left(p \land\lnot q\right) \lor \lnot\left(\lnot p \land q\right), \mathspace \left(p \lor q\right) \land \left(\lnot p \land q\right), \mathspace \lnot\left(\lnot p \lor q\right)\]
+}
+
+\parag{Construction of DNF}{
+    Every compound proposition can be put in DNF using the following procedure: 
+    \begin{enumerate}
+        \item Construct the truth table for the proposition.
+        \item Select the rows that evaluate to $T$.
+        \item For each of the propositional variables in the selected rows, add a conjunction which includes the positive form of the propositional if the variable is assigned $T$ in that row, or the negated form if the variable is assigned $F$ in that row.
+    \end{enumerate}
+    
+    We can then simplify further the resulting proposition using the following equivalence: 
+    \[\left(p \land q\right) \lor \left(p \land \lnot q\right) \equiv p\]
+}
+
+\parag{Example}{
+    Let's say we want to find the DNF of the following expression 
+    \[\left(p \lor q\right) \to \lnot r\]
+
+    First, we make its truth table:
+
+    \begin{center}
+    \begin{tabular}{c|c|c|c|c|c}
+        $p$ & $q$ & $r$ & $\lnot r$ & $p \lor q$ & $\left(p \lor q\right) \to \lnot r$ \\
+        \hline
+        T & T & T & F & T & F \\
+        T & T & F & T & T & \textcolor{red}{T} \\
+        T & F & T & F & T & F \\
+        T & F & F & T & T & \textcolor{red}{T} \\
+        F & T & T & T & T & F \\
+        F & T & F & F & T & \textcolor{red}{T} \\
+        F & F & T & T & F & \textcolor{red}{T} \\
+        F & F & F & F & F & \textcolor{red}{T} \\
+    \end{tabular}
+    \end{center}
+
+    So, its DNF is given by:
+    \[\left(p \land q \land\lnot r\right) \lor \left(p \land \lnot q \land \lnot r\right) \lor \left(\lnot p \land q \land\lnot r\right) \lor \left(\lnot p \land \lnot q \land r\right) \lor \left(\lnot p \land \lnot q \land \lnot r\right)\]
+
+    We can turn it back to its ``simplified form''. Let's first see the following simplification:
+    \[\underbrace{\left(p \land q \land\lnot r\right) \lor \left(p \land \lnot q \land \lnot r\right)}_{\equiv p \land \lnot r} \lor \left(\lnot p \land q \land\lnot r\right) \lor \left(\lnot p \land \lnot q \land r\right) \lor \left(\lnot p \land \lnot q \land \lnot r\right)\]
+
+    We can do another simplification than the one written as an underbrace. We know that $p \lor p \equiv p$, so if we look at the three last terms, we know they are equivalent to:
+    \[\overbrace{\underbrace{\left(\lnot p \land q \land\lnot r\right) \lor \color{red}\left(\lnot p \land \lnot q \land \lnot r\right)}_{\equiv \lnot p \land \lnot r} \color{black} \lor \underbrace{\left(\lnot p \land \lnot q \land r\right) \lor \color{red}\left(\lnot p \land \lnot q \land \lnot r\right)}_{\equiv \lnot p \land \lnot q}}^{\equiv \left(\lnot p \land q \land\lnot r\right) \lor \left(\lnot p \land \lnot q \land r\right) \lor \left(\lnot p \land \lnot q \land \lnot r\right)}\]
+
+    We can then simplify our original proposition to:
+    \[\left(p \land\lnot r\right) \lor\left(\lnot p \land\lnot r\right) \lor \left(\lnot p \lor\lnot q\right) \equiv \lnot r \lor \left(\lnot p \land \lnot q\right) \equiv \left(p \lor q\right) \to \lnot r\]
+}
+
+\parag{Definition of the Conjunctive Normal Form}{
+    We say that a compound proposition is in \important{Conjunctive Normal Form (CNF)} if it consists of a conjunction of compound expressions, where each compound expression consists of a disjunction of a set of propositional variables or their negations.
+}
+
+\parag{Example}{
+    The following expressions are in CNF: 
+    \[\left(p \lor q\right) \land \left(\lnot p \lor q\right), \mathspace \left(p \lor q \lor \lnot r\right) \land\left(\lnot p \lor \lnot q \lor \lnot r\right)\]
+
+    The following expressions are \textit{not} in CNF:
+    \[\left(p \land \lnot q\right) \lor \left(\lnot p \land q\right), \mathspace p \lor \left(\lnot p \land q\right), \mathspace \left(p \land\lnot q\right) \lor \lnot\left(\lnot p \land q\right), \mathspace \lnot\left(\lnot p \lor q\right)\]
+    
+}
+
+\parag{Construction of the CNF}{
+    One of the ways to construct a CNF, is to:
+    \begin{enumerate}
+        \item Eliminate implications.
+        \item Move negations inward.
+        \item Use distributive and associative laws.
+    \end{enumerate}
+    
+    Another way is to see that $p \equiv \lnot\left(\lnot p\right)$ and that the negation of a DNF is a CNF (but of the negated expression, they are not equivalent) by De Morgan's Laws. Thus we can find the DNF of $\lnot p$, meaning doing the exact same thing on the truth table, but on the rows where $p$ is false, and then take the negation on it. 
+}
+
+\parag{Example}{
+    Let's say that we want to find the CNF of the following expression: 
+    \[\lnot\left(p \to q\right) \lor \left(r \to p\right)\]
+
+    For the first method, we can use the fact that $\left(a \land b\right) \lor c \equiv \left(a \lor c\right) \land \left(b \lor c\right)$:
+    \begin{multiequality}
+        \lnot\left(p \to q\right) \lor \left(r \to p\right) & \equiv \lnot \left(\lnot p \lor q \right) \lor \left(\lnot r \lor p\right) \\
+     & \equiv\left(p \land \lnot q\right) \lor \left(\lnot r \lor p\right) \\
+     & \equiv \left(p \lor \lnot r \lor p\right) \land \left(\lnot q \lor \lnot r \lor p\right)  \\
+     & \equiv\left(\lnot r \lor p\right) \land \left(\lnot q \lor \lnot r \lor p\right)  \\
+     & \equiv \left(p \lor \lnot r\right) \land \left(p \lor \lnot q \lor \lnot r\right)
+    \end{multiequality}
+
+    For the second method, we need to draw its truth table:
+    \begin{center}
+    \begin{tabular}{c|c|c|c}
+        $p$ & $q$ & $r$ & $\lnot\left(p \to q\right) \lor \left(r \to p\right)$ \\
+        \hline
+        T & T & T & T \\
+        T & T & F & T \\
+        T & F & T & T \\
+        T & F & F & T \\
+        F & T & T & F \\
+        F & T & F & T \\
+        F & F & T & F \\
+        F & F & F & T \\
+    \end{tabular}
+    \end{center}
+    
+
+    So, picking only the raws where the expression is negative, we get: 
+    \[\lnot\left(\left(\lnot p \land q \land r\right) \lor \left(\lnot p \land\lnot q \land r\right)\right) \equiv \lnot \left(\lnot p \land r\right) \equiv \left(p \lor \lnot r\right)\]
+    
+}
+
+\parag{Complexity of DNF and CNF}{
+    We realise that both DNF and CNF can be much larger than the original proposition. More precisely, there exist cases of propositions with $n$ clauses for which the DNF has $2^n$ clauses, and similarly for CNF. 
+
+    We can create very complicated scenarios by concatenating $\land \left(p_{n+1} \lor q_{n+1}\right)$ at the end of a DNF: if we want decide to turn it to a CNF, this will be very complicated: we will end up with twice the number of starting elements. We can do it again to reach more and more complicated expressions, having always twice as many clauses as the one before.
+}
+
+\parag{Example of application of propositional logic}{
+    Let's say that on an island there are knights who always tell the truth and knaves who always lie. We meet A and B. A says that B is a knight, and B says that both of them are of opposite type.
+
+    Let's pick $p$ := A is a knight (tells the truth) and $q$ := B is a knight (lies).
+
+    Assume A is a knight, so $p$ is true. Then B is a knight, according to what A says, so $q$ is T. What B says is that $p \oplus q$ is T. This is a contradiction.
+
+    Let's now assume that A is a knave, so $p$ is F. Thus, $q$ is F, and what B says works.
+}
+
+\end{document}

@@ -1,0 +1,332 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-03 at 10:13:00.
+
+\usepackage{../../style}
+
+\title{Analyse}
+\author{Joachim Favre}
+\date{Mercredi 03 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2021-11-03}{Définition epsilon-delta des limites}{
+    \begin{itemize}[left=0pt]
+        \item Définition de la composition de fonctions.
+        \item Définition du voisinage et des limites de fonctions réelles.
+        \item Explication et démonstration de la caractérisation de la limite d'une fonction à partir des suites.
+        \item Démonstration de propriété des limites de fonctions (opérations algébriques, limites de polynômes et théorème des deux gendarmes pour les fonctions).
+    \end{itemize}
+
+}
+
+\parag{Composition de fonctions}{
+    Soient $f: E \mapsto F$ et $g : G \mapsto H$, où $E, F, G, H \subset \mathbb{R}$.
+
+    Si $f\left(E\right) \subset G$, alors on peut définir la fonction composée:
+    \[g \circ f\left(x\right) = g\left(f\left(x\right)\right) : E \mapsto H\]
+
+    Si $f\left(G\right) \subset E$, alors on peut définir la fonction composée, avec l'autre ordre de composition:
+    \[f \circ g\left(x\right) = f\left(g\left(x\right)\right) : G \mapsto F\]
+
+    L'ordre de composition est important.
+}
+
+\parag{Exemple}{
+    Soient les fonctions suivantes:
+    \[\begin{split}
+        f: \mathbb{R} &\longmapsto \left[-1, 1\right]  \\
+        x &\longmapsto \sin x
+    \end{split}
+    \mathspace
+    \mathspace
+    \begin{split}
+        g: \mathbb{R} &\longmapsto \left[-1, +\infty\right[  \\
+            x &\longmapsto \sqrt{x^2 + 1}
+        \end{split}
+    \]
+
+    Puisque leur domaine de définition est $\mathbb{R}$, on n'a rien besoin de vérifier. On a donc:
+    \[f \circ g\left(x\right) = f\left(\sqrt{x^2 + 1}\right) = \sin\left(\sqrt{x^2 + 1}\right) : \mathbb{R} \mapsto \left[-1, 1\right]\]
+
+    De plus:
+    \[g \circ f\left(x\right) = g\left(\sin x\right) = \sqrt{\sin^2 x + 1} : \mathbb{R} \mapsto \left[1, +\infty\right[ \]
+    }
+
+    \parag{Remarque}{
+        Si $f : E\mapsto F$ est bijective, alors il existe une fonction réciproque $f^{-1} : F \mapsto E$. Les conditions sont remplies pour avoir une fonction composée des deux côtés. Pour rappel, la fonction réciproque a comme définition:
+        \[f^{-1}\left(y\right) = x \iff f\left(x\right) = y\]
+
+        On a donc:
+        \[f^{-1} \circ f\left(x\right) = f^{-1}\left(f\left(x\right)\right) = f^{-1}\left(y\right) = x \implies f^{-1} \circ f\left(x\right) = x \mathspace \forall x \in E\]
+
+        De plus:
+        \[f \circ f^{-1}\left(y\right) = f\left(f^{-1}\left(y\right)\right) = f\left(x\right) = y \implies f \circ f^{-1}\left(y\right) = y \mathspace \forall y \in F\]
+    }
+
+    \subsection{Limite d'une fonction}
+    \parag{Définition du voisinage}{
+        Une fonction $f : E \mapsto F$ est définie au \important{voisinage} de $x_0 \in \mathbb{R}$ s'il existe $\delta > 0$ tel que
+        \[\left\{x \in \mathbb{R} : 0 < \left|x - x_0\right| < \delta\right\} \subset E\]
+
+        \subparag{Remarque}{
+            En d'autres mots, elle est définie partout autour de $x_0$ (mais peut ou peut ne pas être définie à $x_0$).
+        }
+    }
+
+    \parag{Exemple}{
+        La fonction suivante est définie au voisinage de $x_0 = 0$, mais pas en $x_0$:
+        \[f\left(x\right) = \frac{\sin x}{x}\]
+
+    }
+
+    \parag{Définition de la limite}{
+        Une fonction $f: E \mapsto F$ définie au voisinage de $x_0$ admet pour \important{limite} le nombre réel $\ell$ lorsque $x$ tend vers $x_0$, si pour tout $\epsilon > 0$ il existe $\delta > 0$ tel que pour tout $x \in E$ tels que $0 < \left|x - x_0\right| \leq \delta$, on a :
+        \[\left|f\left(x\right) - \ell\right| \leq \epsilon\]
+
+        On dit que $x$ et $x_0$ sont $\delta$-proches, et que $f\left(x\right)$ et $\ell$ sont $\epsilon$-proches.
+
+        \subparag{Notation}{
+            On écrit:
+            \[\lim_{x \to x_0} f\left(x\right) = \ell\]
+        }
+
+        \subparag{Intuition}{
+            Ce que cette définition veut dire c'est que pour n'importe quel écart vertical à la valeur de la limite, $\epsilon$, alors il existe un ensemble centré sur $x_0$ tel que toutes les images de ces $x$ soit dans l'écart vertical.
+
+            \imagehere[0.5]{DefinitionLimite.png}
+
+            Il y a une très bonne vidéo de 3Blue1Brown qui parle de l'intuition derrière cette définition :
+            \begin{center}
+                \url{https://www.youtube.com/watch?v=kfF40MiS7zA}.
+            \end{center}
+        }
+    }
+
+    \parag{Exemple}{
+        Soit la fonction $f\left(x\right) = 3x - 1$, avec $x_0 = 1$. On veut démontrer que
+        \[\lim_{x \to 1} \left(3x - 1\right) = 2\]
+
+        Soit $\epsilon > 0$. Il nous faut trouver $\delta > 0$ tel que:
+        \[0 < \left|x - 1\right| \leq \delta \implies \left|f\left(x\right) - 2\right| \leq \epsilon\]
+
+        Étudions l'inégalité suivante:
+        \[\left|f\left(x\right) - 2\right| = \left|3x - 1 - 2\right| = \left|3x - 3\right| = 3\left|x -  1\right| \leq 3\delta\]
+
+        Or, on veut que $\left|f\left(x\right) - 2\right| \leq \epsilon$. On peut donc prendre $\delta = \frac{\epsilon}{3}$:
+        \[\left|x - 1\right| \leq \delta = \frac{\epsilon}{3} \implies \left|f\left(x\right) - 2\right| = 3\left|x - 1\right| \leq 3\delta = 3 \frac{\epsilon}{3} = \epsilon\]
+
+        Donc, en d'autres mots, $\forall \epsilon > 0$ on a trouvé $\delta = \frac{\epsilon}{3}$ tel que la définition de la limite $\lim_{x \to 1} f\left(x\right) = 2$ est satisfaite. On a donc démontré que:
+        \[\lim_{x \to 1} \left(3x - 1\right) = 2\]
+
+        \qed
+
+    }
+
+    \parag{Proposition (Caractérisation de la limite d'une fonction à partir des suites)}{
+        Soit $f : E \mapsto F$, et $A$ l'ensemble des suites $\left(a_n\right) \subset E \setminus \left\{x_0\right\}$ telles que $\lim_{n \to \infty} a_n = x_0$. On a :
+
+        \[\lim_{x \to x_0} f\left(x\right) = \ell \iff \forall \left(a_n\right) \in A, \lim_{n \to \infty} f\left(a_n\right) = \ell\]
+
+        \subparag{Preuve si}{
+            Soit $\epsilon > 0$. On sait que $\exists \delta$ tel que, pour tout $x$:
+            \[0 < \left|x - x_0\right| \leq \delta \implies \left|f\left(x\right) - \ell\right| \leq \epsilon\]
+
+            Soit $\left(a_n\right)$, une suite dont la limite est $x_0$, et telle que $a_n \neq x_0$ pour tout $n$. Puisqu'on sait que sa limite est $x_0$, on sait que $\exists n_0 \in \mathbb{N}$ tel que $\forall n \geq n_0$:
+            \[\left|a_n - x_0\right| \leq \delta\]
+
+            En prenant $x = a_n$, cela implique donc par la première inégalité ci-dessus que
+            \[\forall n \geq n_0,\ \left|f\left(a_n\right) - \ell\right| \leq \epsilon \over{\implies}{déf} \lim_{n \to \infty} f\left(a_n\right) = \ell\]
+        }
+
+        \subparag{Seulement si}{
+            Nous allons faire une preuve par la contraposée. Nous supposons donc que $\lim_{x \to x_0} f\left(x\right) \neq \ell$, et nous voulons montrer qu'il existe une suite $\left(a_n\right) \in A$ telle que $\lim_{n \to \infty} f\left(a_n\right) \neq \ell$.
+
+            La fonction n'admet pas pour limite $\ell$ lorsque $x$ tend vers $x_0$, donc $\exists \epsilon > 0$ tel que $\forall \delta > 0$ il existe un $x$ pour lequel:
+            \[0 < \left|x - x_0\right| \leq \delta \mathspace \text{et} \mathspace \left|f\left(x\right) - \ell\right| > \epsilon\]
+
+            Alors, on va construire une suite $\left(a_n\right) \subset E \setminus \left\{x_0\right\}$ telle que $\lim_{n \to \infty} a_n = x_0$, mais $\lim_{n \to \infty} f\left(a_n\right) \neq \ell$.
+
+            Prenons le $\epsilon > 0$ dont on connait l'existence. Puisque l'inégalité ci-dessus est vraie pour tout $\delta > 0$, on peut construire la suite suivante :
+            \[\delta = 1 \implies \exists a_1 \in E \telque 0 < \left|a_1 - x_0\right| \leq 1 \text{ et } \left|f\left(a_1\right) - \ell\right| > \epsilon\]
+            \[\delta = \frac{1}{2} \implies \exists a_2 \in E \telque 0 < \left|a_2 - x_0\right| \leq \frac{1}{2} \text{ et } \left|f\left(a_2\right) - \ell\right| > \epsilon\]
+
+            On continue comme ça jusqu'à l'infini. Ainsi, le $n$-ème terme de notre suite est donné par:
+            \[\delta = \frac{1}{2^{n-1}} \implies \exists a_n \in E \telque 0 < \left|a_n - x_0\right| \leq \frac{1}{2^{n-1}}\]
+
+            Ainsi on voit que, pour n'importe quel $\epsilon' > 0$, on peut trouver un $n_0$ tel que pour tout $n \geq n_0$, alors $\left|a_n - x_0\right| \leq \epsilon'$. Donc, par la définition de la limite:
+            \[\lim_{n \to \infty} a_n = x_0\]
+
+            Or, pour tout $n \in \mathbb{N}$, on avait trouvé que $\left|f\left(a_n\right) - \ell\right| > \epsilon$. Donc, nécessairement:
+            \[\lim_{n \to \infty} f\left(a_n\right) \neq \ell\]
+
+        }
+    }
+
+    \parag{Remarque}{
+        ``Toute suite'' dans la définition est très important.
+
+        En effet, soit la fonction suivante:
+        \begin{functionbypart}{f\left(x\right)}
+            1, \mathspace \text{si } x = \frac{1}{n}, n \in \mathbb{N}^* \\
+            0, \mathspace \text{sinon}
+        \end{functionbypart}
+
+        On remarque que $\lim_{x \to 0} f\left(x\right)$ n'existe pas. Cependant, la suite $\left(a_n = \frac{1}{n}, n \in \mathbb{N}^*\right)$ est telle que:
+        \[\lim_{n \to \infty} f\left(a_n\right) = \lim_{n \to \infty} f\left(\frac{1}{n}\right) = 1 \mathspace \text{et} \mathspace \lim_{n \to \infty} a_n = \lim_{n \to \infty} \frac{1}{n} = 0\]
+    }
+
+    \parag{Corollaire}{
+        Soit $f  : E \mapsto F$ définie au voisinage de $x_0$. Supposons que pour toute suite $\left(a_n\right) \subset E \setminus \left\{x_0\right\}$ telle que $\lim_{n \to \infty} a_n = x_0$, la suite $\left(f\left(a_n\right)\right)$ converge.
+
+        Alors, $\lim_{x \to x_0} f\left(x\right)$ existe.
+
+        \subparag{Preuve}{
+            Supposons par l'absurde que $\lim_{x \to x_0} f\left(x\right)$ n'existe pas. En d'autres mots, on sait par la caractérisation des suites qu'il existe deux suites $\left(a_n\right), \left(b_n\right) \subset E \setminus \left\{x_0\right\}$ telles que $\lim_{n \to \infty} a_n = \lim_{n \to \infty} b_n = x_0$, mais:
+            \[\lim_{n \to \infty} f\left(a_n\right) \neq \lim_{n \to \infty} f\left(b_n\right)\]
+
+            Soit la suite suivante:
+            \begin{functionbypart}{c_n}
+                a_{n/2}, \mathspace n \text{ pair} \\
+                b_{\left(n-1\right)/2}, \mathspace n \text{ impair}
+            \end{functionbypart}
+
+            On remarque que $\lim_{n \to \infty} c_n = x_0$, puisque toutes ses sous-suites convergent vers $x_0$. De plus, par notre hypothèse:
+            \[\lim_{n \to \infty} f\left(c_{2n}\right) = \lim_{n \to \infty} f\left(a_{n}\right) \neq \lim_{n \to \infty} f\left(b_n\right) = \lim_{n \to \infty} f\left(c_{2n + 1}\right)\]
+
+            Cependant, cela veut donc dire que:
+            \[\lim_{n \to \infty} f\left(c_{2n}\right) \neq \lim_{n \to \infty} f\left(c_{2n + 1}\right)\]
+
+            Or, par la contraposée du théorème de la convergence des sous-suites, cela veut dire que $c_n$ ne converge pas, ce qui est une contradiction puisqu'on sait qu'elle converge vers $x_0$.
+
+            \qed
+        }
+    }
+
+    \parag{Exemple}{
+        Soit la fonction $f\left(x\right) = x^{p}$ où $p \in \mathbb{N}^*$. On veut montrer que
+        \[\lim_{x \to x_0} x^{p} = x_0^p \mathspace \forall x_0 \in \mathbb{R}\]
+
+        Soit $\left(x_n\right)$ une suite arbitraire convergente vers $x_0$ où $x_n \neq x_0$ pour tout $n \in \mathbb{N}$. Soit $a_n = x_n - x_0$ pour tout $n \in \mathbb{N}$. On a donc:
+        \[\lim_{n \to \infty} a_n = \lim_{n \to \infty} \left(x_n - x_0\right) = \lim_{n \to \infty} x_n - x_0 = x_0 - x_0 = 0\]
+
+        Donc:
+        \begin{multiequality}
+            \lim_{n \to \infty} f\left(x_n\right) & = \lim_{n \to \infty} f\left(x_0 + a_n\right)  \\
+                                                  & = \lim_{n \to \infty} \left(x_0 + a_n\right)^{p}  \\
+                                                  & = \lim_{n \to \infty} \left(x_0^p + \underbrace{\binom{p}{1}x_0^{p-1}a_n}_{\to 0} + \ldots + \underbrace{\binom{p}{p}a_n^{p}}_{\to0}\right)  \\
+                                                  & = x_0^p
+        \end{multiequality}
+
+
+        On en déduit que, par la caractérisation:
+        \[\lim_{x \to x_0} x^{p} = x_0^p\]
+
+    }
+
+    \parag{Proposition (unicité de la limite)}{
+        Si $\lim_{x \to x_0} f\left(x\right) = \ell_1$ et $\lim_{x \to x_0} f\left(x\right) = \ell_2$, alors:
+        \[\ell_1 = \ell_2\]
+
+        \subparag{Preuve}{
+            Supposons que:
+            \[\lim_{x \to x_0} f\left(x\right) = \ell_1 \mathspace \text{ et } \mathspace \lim_{x \to x_0} f\left(x\right) = \ell_2\]
+
+            Donc, par la caractérisation des suites, on sait que toutes suites $\left(a_n\right) \subset E \setminus \left\{x_0\right\}$ convergentes vers $x_0$, on a:
+            \[\lim_{n \to \infty} f\left(a_n\right) = \ell_1 \mathspace \text{ et } \mathspace \lim_{n \to \infty} f\left(a_n\right) = \ell_2\]
+
+            Par l'unicité de la limite d'une suite, on a $\ell_1 = \ell_2$.
+
+            \qed
+        }
+    }
+
+    \parag{Proposition (Critère de Cauchy pour les fonctions)}{
+        $\exists \lim_{x \to x_0} f\left(x\right)$ si et seulement si pour tout $\epsilon > 0$, il existe $\delta > 0$ tels que
+        \[\forall x_1, x_2 \in \left\{x \in E \telque 0 < \left|x - x_0\right| \leq \delta\right\} \implies \left|f\left(x_1\right) - f\left(x_2\right)\right| \leq \epsilon\]
+
+        \subparag{Autre formulation}{
+            En d'autres mots, pour tout écart vertical arbitraire à la limite, il existe un écart horizontal à $x_0$, tel que pour toute paire de nombres $x_1$ et $x_2$ $\delta$-proche de $x_0$, alors elles leur image sont $\epsilon$-proches.
+        }
+    }
+
+    \parag{Proposition (opérations algébriques sur les limites)}{
+        Soient $f: E\mapsto \mathbb{R}$ et $g: E \mapsto \mathbb{R}$ telles que:
+        \[\lim_{x \to x_0} f\left(x\right) = \ell_1 \in \mathbb{R} \mathspace \text{ et } \mathspace \lim_{x \to x_0} g\left(x\right) = \ell_2 \in \mathbb{R}\]
+
+        Alors:
+        \begin{itemize}
+            \item $\lim\limits_{x \to x_0} \left(\alpha f\left(x\right) + \beta g\left(x\right)\right) = \alpha \ell_1 + \beta \ell_2$
+            \item $\lim\limits_{x \to x_0} \left(f\left(x\right)g\left(x\right)\right) = \ell_1 \ell_2$
+            \item $\lim\limits_{x \to x_0} \left(\frac{f\left(x\right)}{g\left(x\right)}\right) = \frac{\ell_1}{\ell_2}$ si $\ell_2 \neq 0$ et $g\left(x\right) \neq 0$ au voisinage de $x_0$.
+        \end{itemize}
+
+        \subparag{Preuve}{
+            On peut utiliser la caractérisation à partir des suites.
+        }
+
+    }
+
+    \parag{Limite de polynômes}{
+        Pour tout polynôme et fonction rationnelle,
+        \[\lim_{x \to x_0} f\left(x\right) = f\left(x_0\right) \]
+        pour tout $x_0 \in \mathbb{R}$ sauf les zéros du dénominateur de $f\left(x\right)$.
+
+        \subparag{Idée de preuve}{
+            On a démontré que
+            \[\lim_{x \to x_0} x^{p} = x_0^p \mathspace \forall p \in \mathbb{N}^*, \forall x_0 \in \mathbb{R}\]
+
+            On peut utiliser ce fait avec les opération algébriques.
+        }
+
+        \subparag{Exemple}{
+            \[\lim_{x \to 2} \frac{3x - 4}{x^2 + 2x + 5} = \frac{3\left(2\right) - 4}{\left(2\right)^2 + 2\left(2\right) + 5} = \frac{2}{13}\]
+        }
+
+        \subparag{Continuité}{
+            Ce fait implique que ces fonctions sont continues partout sauf aux zéros de leur dénominateur.
+        }
+    }
+
+    \parag{Théorème des deux gendarmes pour les fonctions}{
+        Soient $f,g,h : E \mapsto F$ telles que:
+        \begin{enumerate}
+            \item $\lim\limits_{x \to x_0} f\left(x\right) = \lim\limits_{x \to x_0} g\left(x\right) = \ell$
+            \item $\exists \alpha > 0$ tel que $\forall x \in \left\{x \in E \telque 0 < \left|x - x_0\right| \leq \alpha\right\}$ on a:
+                \[f\left(x\right) \leq h\left(x\right) \leq g\left(x\right)\]
+
+                En d'autres mots, il existe un $\alpha$ tels que pour tout $x$ $\alpha$-proche de $x_0$, la relation d'ordre ci-dessus est tenue.
+        \end{enumerate}
+
+        Alors, si ces deux propriétés sont tenues,
+        \[\lim_{x \to x_0} h\left(x\right) = \ell\]
+
+        \imagehere[0.5]{Theoreme2GendarmesFonctions.png}
+
+        \subparag{Preuve}{
+            Soit la suite arbitraire suivante:
+            \[\left(a_n\right) \subset E \setminus \left\{x_0\right\}, \mathspace \lim_{n \to \infty} a_n = x_0\]
+
+            Par la définition de la limite des suites, en prenant $\epsilon = \alpha$, on sait qu'il existe $m \in \mathbb{N}$ tel que:
+            \[\left|a_n - x_0\right| \leq \alpha, \mathspace \forall n \geq m\]
+
+            Ainsi, puisque $a_n$ est $\alpha$-proche de $x_0$ pour tout $n \geq m$, on peut en déduire par notre deuxième hypothèse:
+            \[f\left(a_n\right) \leq h\left(a_n\right) \leq g\left(a_n\right) \mathspace \forall n \geq m\]
+
+            Puisque $\lim_{x \to x_0} f\left(x\right) = \lim_{x \to x_0} g\left(x\right) = \ell$, on a par la caractérisation à partir des suites que:
+            \[\lim_{n \to \infty} f\left(a_n\right) = \lim_{n \to \infty} g\left(a_n\right) = \ell\]
+
+            On peut en déduire par les deux gendarmes pour les suites que:
+            \[\lim_{n \to \infty} h\left(a_n\right) = \ell\]
+
+            Or, puisqu'on a pris une suite $\left(a_n\right) \subset E \setminus \left\{x_0\right\}$ telle que $\lim_{n \to \infty} a_n = x_0$ quelconque, on sait que c'est vrai pour tout suite $\left(a_n\right)$ suivant ces hypothèses. Ainsi, par la caractérisation à partir des suites:
+            \[\lim_{x \to x_0} h\left(x\right) = \ell\]
+
+            \qed
+        }
+
+    }
+
+
+    \end{document}

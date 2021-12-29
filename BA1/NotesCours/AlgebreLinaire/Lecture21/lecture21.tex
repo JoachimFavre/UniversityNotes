@@ -1,0 +1,265 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-02 at 08:19:11.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Jeudi 02 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{21}{2021-12-02}{Projections et matrices orthogonales}{
+\begin{itemize}
+    \item Explication du calcul de projections orthogonales sur des bases orthogonales.
+    \item Définition de base orthonormée. 
+    \item Démonstration que $U^T U = I$ pour les bases orthogonales et que $UU^T$ est la matrice de projection pour les bases orthonormales. 
+    \item Définition de matrice orthogonale.
+\end{itemize}
+
+}
+
+\parag{En 3D}{
+    Nous nous posons la même question avec un plan $W = \vect\left\{\bvec{u}_1, \bvec{u}_2\right\}$ et un point $\bvec{y} \in \mathbb{R}^3$.
+
+    Puisqu'on veut $\bvec{\hat{y}} \in W$, alors on peut écrire $\bvec{\hat{y}} = c_1 \bvec{u}_1 + c_2 \bvec{u}_2 \in W$. Prenons aussi $\bvec{z} = \bvec{y} - \bvec{\hat{y}}$. Par le même raisonnement qu'en 2D, $\bvec{z}$ doit être orthogonal à $W$. Or, un vecteur est orthogonal à un espace vectoriel si et seulement s'il est orthogonal à tous les vecteurs d'une base qui engendre l'espace (ici $\bvec{u}_1$ et $\bvec{u}_2$):
+    \[\bvec{z} \dotprod \bvec{u}_1 = 0, \mathspace \bvec{z} \dotprod \bvec{u}_2 = 0\]
+
+    Développons la première équation:
+    \[0 = \bvec{z} \dotprod \bvec{u}_1 = \left(\bvec{y} - \bvec{\hat{y}}\right) \dotprod \bvec{u}_1 = \bvec{y} \dotprod \bvec{u}_1 - \bvec{\hat{y}} \dotprod \bvec{u}_1 = \bvec{y} \dotprod \bvec{u}_1 - c_1 \bvec{u}_1 \dotprod \bvec{u}_1 - c_2 \bvec{u}_2 \dotprod \bvec{u}_1\]
+
+    On voit que c'est une équation linéaire en $c_1$ et $c_2$: 
+    \[c_1 \bvec{u}_1 \dotprod \bvec{u}_1 + c_2 \bvec{u}_2 \dotprod \bvec{u}_1 = \bvec{y} \dotprod \bvec{u}_1\]
+    
+    En faisant le même raisonnement avec la deuxième équation, on obtient:
+    
+    \[c_1 \bvec{u}_1 \dotprod \bvec{u}_2 + c_2 \bvec{u}_2 \dotprod \bvec{u}_2 = \bvec{y} \dotprod \bvec{u}_2\]
+
+    On a donc un système de deux équations à deux inconnues, qu'on peut mettre en forme matricielle: 
+    \[\begin{bmatrix} \bvec{u}_1 \dotprod \bvec{u}_1 & \bvec{u}_2 \dotprod \bvec{u}_1 \\ \bvec{u}_1 \dotprod \bvec{u}_2 & \bvec{u}_2 \dotprod \bvec{u}_2 \end{bmatrix} \begin{bmatrix} c_1 \\ c_2 \end{bmatrix} = \begin{bmatrix} \bvec{y} \dotprod \bvec{u}_1 \\ \bvec{y} \dotprod \bvec{u}_2 \end{bmatrix}  \]
+
+    On se rend compte qu'il est plus facile de résoudre ce système si on a une base orthogonale, puisque ça nous donnerait une matrice diagonale.
+}
+
+\parag{Théorème de projection orthogonale}{
+    Soit $W$, un sous-espace vectoriel de $\mathbb{R}^n$.
+
+    Tout vecteur $\bvec{y}$ de $\mathbb{R}^n$ s'écrit de façon \textit{unique} sous la forme: 
+    \[\bvec{y} = \bvec{\hat{y}} + \bvec{z}, \mathspace \bvec{\hat{y}} \in W, \bvec{z} \in W^\perp\]
+
+    De façon plus précise, si $\left(\bvec{u}_1 \ldots, \bvec{u}_p\right)$ est une base orthogonale quelconque de $W$, alors: 
+    \[\bvec{\hat{y}} = \frac{\bvec{y} \dotprod \bvec{u}_1}{\bvec{u}_1 \cdot \bvec{u}_1} \bvec{u}_1 + \ldots + \frac{\bvec{y} \dotprod \bvec{u}_p}{\bvec{u}_p \dotprod \bvec{u}_p} \bvec{u}_p, \mathspace \bvec{z} = \bvec{y} - \bvec{\hat{y}}\]
+    
+    \subparag{Terminologie}{
+        On appelle $\bvec{\hat{y}}$ la \important{projection orthogonale} de $\bvec{y}$ sur $W$, notée $\proj_W \bvec{y}$.
+    }
+    
+
+    \subparag{Preuve}{
+        Soit $\bvec{y} \in \mathbb{R}^n$ quelconque. On cherche à écrire $\bvec{y} = \bvec{\hat{y}} + \bvec{z}$ avec $\bvec{y} \in W$ et $\bvec{z} \in W^\perp$, donc: 
+        \[\bvec{\hat{y}} = c_1 \bvec{u}_1 + \ldots + c_p \bvec{u}_p, \mathspace \bvec{u}_1 \dotprod \bvec{z} = \ldots = \bvec{u}_p \dotprod \bvec{z} = 0\]
+
+        Prenons le produit scalaire entre $\bvec{u_i}$, un vecteur de la base, et $\bvec{z}$: 
+        \[0 = \bvec{u}_i \dotprod \bvec{z} = \bvec{u}_i \dotprod \left(\bvec{y} - \bvec{\hat{y}}\right) = \bvec{u}_i \dotprod \bvec{y} - \bvec{u}_i \dotprod \bvec{\hat{y}}\]
+        
+        On peut remplacer $\hat{\bvec{y}}$ par sa forme:
+        \[0 = \bvec{u}_i \dotprod \bvec{y} - \bvec{u}_i \dotprod \left(c_1 \bvec{u}_1 + \ldots + c_p \bvec{u}_p\right) = \bvec{u}_i \dotprod \bvec{y} - c_i \bvec{u}_i \dotprod \bvec{u}_i\]
+        
+        En effet, la base est orthogonale, donc le produit scalaire entre deux vecteurs de la base différents donne zéro. Ainsi, on peut résoudre cette équation: 
+        \[c_1 \bvec{u}_i \dotprod \bvec{u}_i = \bvec{u}_i \dotprod \bvec{y} \implies c_i = \frac{\bvec{u}_i \dotprod \bvec{y}}{\bvec{u}_i \dotprod \bvec{u}_i}\]
+        
+        Donc, non seulement il est possible de trouver de coefficients $c_i$, mais aussi ils sont uniques puisqu'on n'a jamais dû faire de choix dans notre raisonnement. 
+
+        Ainsi, on peut écrire: 
+        \[\bvec{\hat{y}} = \frac{\bvec{y} \dotprod \bvec{u}_1}{\bvec{u}_1 \cdot \bvec{u}_1} \bvec{u}_1 + \ldots + \frac{\bvec{y} \dotprod \bvec{u}_p}{\bvec{u}_p \dotprod \bvec{u}_p} \bvec{u}_p\]
+
+        \qed
+    }
+
+    \subparag{Interprétation géométrique}{
+        On fait la projection sur les lignes données par les vecteurs de la base, puis on en fait la combinaison linéaire:
+        \imagehere[0.7]{ProjectionOrthogonaleInterpretationGraphique.png}
+    }
+    
+}
+
+\parag{Théorème de meilleure approximation (quadratique)}{
+    Soit $W$ un sous-espace vectoriel de $\mathbb{R}^n$, $\bvec{y} \in \mathbb{R}^n$ et $\bvec{\hat{y}} = \proj_W \bvec{y}$.
+
+    Alors, $\bvec{\hat{y}}$ est le point de $W$ le plus proche de $\bvec{y}$, c'est-à-dire: 
+    \[\left\|\bvec{y} - \bvec{\hat{y}}\right\| < \left\|\bvec{y} - \bvec{v}\right\|, \mathspace \forall \bvec{v} \in W, \bvec{v} \neq \bvec{\hat{y}}\]
+
+    \subparag{Preuve}{
+        Soit $\bvec{v}$ un vecteur quelconque de $W$. Regardons la distance entre $\bvec{y}$ et $\bvec{v}$: 
+        \[\left\|\bvec{y} - \bvec{v}\right\|^2 = \left\|\bvec{y} - \bvec{\hat{y}} + \bvec{\hat{y}} - \bvec{v}\right\|^2\]
+        
+        Or, on sait que $\bvec{y} - \bvec{\hat{y}} = \bvec{z} \in W^\perp$, et $\bvec{\hat{y}} - \bvec{v} \in W$ puisque $\bvec{\hat{y}}$ et $\bvec{v}$ sont dans $W$. Ainsi, les deux différences de vecteurs sont orthogonales, on peut donc utiliser Pythagore: 
+        \[\left\|\bvec{y} - \bvec{v}\right\|^2 = \left\|\bvec{y} - \bvec{\hat{y}}\right\|^2 + \underbrace{\left\|\bvec{\hat{y}} - \bvec{v}\right\|^2}_{> 0} > \left\|\bvec{y} - \bvec{\hat{y}}\right\|^2\]
+        puisque $\bvec{\hat{y}} \neq \bvec{v}$.
+
+        \qed
+    }
+}
+
+\parag{Observations}{
+    On voit que les cas suivants sont un peu spéciaux:
+    \begin{itemize}
+        \item Si $\bvec{y} \in W$, alors $\proj_W \bvec{y} = \bvec{y}$.
+        \item Si $\bvec{y} \in W^\perp$, alors $\proj_W \bvec{y} = \bvec{0}$.
+    \end{itemize}
+    
+    De plus, on peut voire que, si on connait la projection dans $W$, alors on peut facilement calculer la projection dans $W^\perp$: 
+    \[\proj_{W^\perp}\bvec{y} = \bvec{y} - \proj_W \bvec{y}\]
+    
+    Ainsi, pour projeter sur un plan dans $\mathbb{R}^3$, on peut projeter sur la droite orthogonale, puis calculer cette différence.
+}
+
+\parag{Définition}{
+    On dit qu'une base $\mathcal{B} = \left(\bvec{u}_1, \ldots, \bvec{u}_p\right)$ d'un sous-espace $W$ est \important{orthonormé} si: 
+    \begin{functionbypart}{\bvec{u}_i \dotprod \bvec{u}_j}
+    1 \mathspace \text{si } i = j  \\
+    0 \mathspace \text{si } i \neq j
+    \end{functionbypart}
+    
+    \subparag{Utilité}{
+        Dans une base orthonormée, la formule de projection est très simple: 
+        \[\proj_W \bvec{y} = \left(\bvec{y} \dotprod \bvec{u}_1\right) \bvec{u}_1 + \ldots + \left(\bvec{y} \dotprod \bvec{u}_p\right) \bvec{u}_p\]
+    }
+    
+    \subparag{Exemple}{
+        $\mathbb{R}^n$ est une base orthonormée.
+    }
+}
+
+\parag{Observation}{
+    Soit $\mathcal{U} = \left\{\bvec{u}_1, \bvec{u}_2, \bvec{u}_3\right\}$ une base d'un sous-espace de $\mathbb{R}^4$.
+
+    On peut construire la matrice suivante: 
+    \[U = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \bvec{u}_2 & \bvec{u}_3 \\  &  &  \end{bmatrix} \in \mathbb{R}^{4 \times 3}\]
+    
+    Trouvons $U^T$: 
+    \[U^T = \begin{bmatrix}  & \bvec{u}_1^T &  \\  & \bvec{u}_2^T &  \\  & \bvec{u}_3^T &  \end{bmatrix} \in \mathbb{R}^{3 \times 3}\]
+
+    Par definition du produit matriciel, chaque entrée de $U^T U$ est le produit entre une ligne de $U^T$ et une colonne de $U$: 
+    \[U^T U = \begin{bmatrix} \bvec{u}_1^T \bvec{u}_1 & \bvec{u}_1^T \bvec{u}_2 & \bvec{u}_1^T \bvec{u}_3 \\ \bvec{u}_2^T \bvec{u}_1 & \bvec{u}_2^T \bvec{u}_2 & \bvec{u}_2^T \bvec{u}_3 \\ \bvec{u}_3^T \bvec{u}_1 & \bvec{u}_3^T \bvec{u}_2 & \bvec{u}_3^T \bvec{u}_3 \end{bmatrix} = \begin{bmatrix} \bvec{u}_1 \dotprod \bvec{u}_1 & \bvec{u}_1 \dotprod \bvec{u}_2 & \bvec{u}_1 \dotprod \bvec{u}_3 \\ \bvec{u}_2 \dotprod \bvec{u}_1 & \bvec{u}_2 \dotprod \bvec{u}_2 & \bvec{u}_2 \dotprod \bvec{u}_3 \\ \bvec{u}_3 \dotprod \bvec{u}_1 & \bvec{u}_3 \dotprod \bvec{u}_2 & \bvec{u}_3 \dotprod \bvec{u}_3 \end{bmatrix}  \]
+    
+    Dons, si $\mathcal{U}$ est orthogonale, alors $U^T U$ est diagonale. Si $\mathcal{U}$ est orthonormée, alors $U^T U = I$.
+}
+
+\parag{Théorème}{
+    Les colonnes d'une matrice $U \in \mathbb{R}^{m \times n}$ sont orthonormées \textit{si et seulement si} 
+    \[U^T U = I\]
+}
+
+\parag{Exemple}{
+    Soient les trois vecteurs de $\mathbb{R}^4$ suivants: 
+    \[\bvec{u}_1 = \begin{bmatrix} 1 \\ 1 \\ 1 \\ 0 \end{bmatrix}, \mathspace \bvec{u}_2 = \begin{bmatrix} 1 \\ 0 \\ -1 \\ 2 \end{bmatrix}, \mathspace \bvec{u}_3 = \begin{bmatrix} 1 \\ -1 \\ 0 \\ -1 / 2 \end{bmatrix} \]
+    
+    Pour un vecteur $\bvec{y} \in \vect\left\{\bvec{u}_1, \bvec{u}_2, \bvec{u}_3\right\}$, on cherche les coordonnées $\left[\bvec{y}\right]_{\mathcal{U}}$ telles que: 
+    \[\bvec{y} = c_1 \bvec{u}_1 + c_2 \bvec{u}_3 + c_3 \bvec{u}_3 = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \bvec{u}_2 & \bvec{u}_3 \\  &  &  \end{bmatrix} \begin{bmatrix} c_1 \\ c_2 \\ c_3 \end{bmatrix} \]
+    
+    Donc, on veut résoudre le système $U \left[\bvec{y}\right]_{\mathcal{U}} = \bvec{y}$ où: 
+    \[U = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 0 & -1 \\ 1 & -1 & 0 \\ 0 & 2 & -1 / 2 \end{bmatrix} \]
+    
+    On remarque que $\mathcal{U}$ est une base orthogonale: 
+    \[U^T U = \begin{bmatrix} 1 & 1 & 1 & 0 \\ 1 & 0 & -1 & 2 \\ 1 & -1 & 0 & -1 / 2 \end{bmatrix} \begin{bmatrix} 1 & 1 & 1 \\ 1 & 0 & -1 \\ 1 & -1 & 0 \\ 0 & 2 & -1 / 2 \end{bmatrix} = \begin{bmatrix} 3 & 0 & 0 \\ 0 & 6 & 0 \\ 0 & 0 & 9 / 4 \end{bmatrix} \]
+    
+    Donc: 
+    \[U \left[\bvec{y}\right]_{\mathcal{U}} = \bvec{y} \implies U^T U \left[\bvec{y}\right]_{\mathcal{U}} = U^T \bvec{y}\]
+    
+    Ainsi, on a que: 
+    \[\begin{bmatrix} 3 & 0 & 0 \\ 0 & 6 & 0 \\ 0 & 0 & 9 / 4 \end{bmatrix} \begin{bmatrix} c_1 \\ c_2 \\ c_3 \end{bmatrix} = \begin{bmatrix} 1 & 1 & 1 & 0 \\ 1 & 0 & -1 & 2 \\ 1 & -1 & 0 & -1 / 2 \end{bmatrix} \begin{bmatrix} y_1 \\ y_2 \\ y_3 \\ y_4 \end{bmatrix} = \begin{bmatrix} \bvec{u}_1 \dotprod \bvec{y} \\ \bvec{u}_2 \dotprod\bvec{y} \\ \bvec{u}_3 \dotprod \bvec{y} \end{bmatrix} \]
+
+    Donc on peut en déduire que: 
+    \begin{systemofequations}{}
+    &\ c_1 = \frac{1}{3} \bvec{u}_1 \dotprod \bvec{y} \\
+    &\ c_2 = \frac{1}{6} \bvec{u}_2 \dotprod \bvec{y} \\
+    &\ c_3 = \frac{4}{9} \bvec{u}_3 \dotprod \bvec{y}
+    \end{systemofequations}
+}
+
+\parag{Théorème}{
+    Soit $U$ une matrice $m \times n$ dont les colonnes sont orthonormées, et $\bvec{x}$ et $\bvec{y}$ deux vecteurs de $\mathbb{R}^n$. Alors:
+    \begin{enumerate}
+        \item $\left\|U \bvec{x}\right\| = \left\|\bvec{x}\right\|$
+        \item $\left(U \bvec{x}\right) \dotprod \left(U \bvec{y}\right) = \bvec{x} \dotprod \bvec{y}$
+        \item $\left(U \bvec{x}\right) \dotprod \left(U \bvec{y}\right) = 0$ si et seulement si $\bvec{x} \dotprod \bvec{y} = 0$
+    \end{enumerate}
+
+    \subparag{Preuve}{
+        La preuve est laissée en exercice au lecteur.
+
+        Voici une idée de comment démontrer le premier point: 
+        \[\left\|U \bvec{x}\right\|^2 = \left(U \bvec{x}\right) \dotprod \left(U \bvec{x}\right) = \left(U \bvec{x}\right)^T \left(U \bvec{x}\right) = \bvec{x}^T U^T U \bvec{x} \]
+
+        Et donc, puisque $U^T U = I$:
+        \[\left\|U \bvec{x}\right\|^2 = \bvec{x}^T \bvec{x} = \bvec{x} \dotprod \bvec{x} = \left\|\bvec{x}\right\|^2\]
+        
+        Ainsi: 
+        \[\left\|U \bvec{x}\right\| = \left\|\bvec{x}\right\|\]
+    }
+}
+
+\parag{Théorème}{
+    Soient $\left(\bvec{u}_1, \ldots, \bvec{u}_p\right)$ une base orthonormée d'un sous espace vectoriel $W$ de $\mathbb{R}^n$, et $\bvec{y} \in \mathbb{R}^n$.
+
+    La projection de $\bvec{y}$ sur $W$ est donnée par: 
+    \[\proj_W \bvec{y} = \left(y \dotprod \bvec{u}_1\right) \bvec{u}_1 + \ldots + \left(\bvec{y} \dotprod \bvec{u}_p\right)\bvec{u}_p\]
+
+    De plus: 
+    \[\proj_W \bvec{y} = U U^T \bvec{y}, \mathspace \text{où } U = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_p \\  &  &  \end{bmatrix} \]
+    
+
+    \subparag{Preuve}{
+        On a déjà démontré que pour n'importe quelle base orthogonale:
+        \[\proj_W \bvec{y} = \frac{\left(y \dotprod \bvec{u}_1\right)}{\bvec{u}_1 \dotprod \bvec{u}_1} \bvec{u}_1 + \ldots + \frac{\left(\bvec{y} \dotprod \bvec{u}_p\right)}{\bvec{u}_p \dotprod \bvec{u}_p}\bvec{u}_p\]
+
+        Ainsi, puisque notre base est en plus orthonormée, alors:
+        \[\bvec{u}_1 \dotprod \bvec{u}_1 = \ldots = \bvec{u}_p \dotprod \bvec{u}_p = 1\]
+
+        On peut donc simplifier notre résultat:
+        \[\proj_W \bvec{y} = \left(y \dotprod \bvec{u}_1\right) \bvec{u}_1 + \ldots + \left(\bvec{y} \dotprod \bvec{u}_p\right)\bvec{u}_p\]
+
+        De plus, on se rend compte qu'on peut écrire ça sous forme matricielle: 
+        \begin{multiequality}\label{eq:label}
+        U U^T \bvec{y} =\ & \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_p \\  &  &  \end{bmatrix} \begin{bmatrix}  & \bvec{u}_1^T &  \\  & \vdots &  \\  & \bvec{u}_p^T &  \end{bmatrix} \bvec{y} \\
+        =\ & \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_p \\  &  &  \end{bmatrix} \begin{bmatrix} \bvec{u}_1^T \bvec{y} \\ \vdots \\ \bvec{u}_p^T \bvec{y} \end{bmatrix} \\
+        =\ & \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_p \\  &  &  \end{bmatrix} \begin{bmatrix} \bvec{u}_1 \dotprod \bvec{y} \\ \vdots \\ \bvec{u}_p \dotprod \bvec{y} \end{bmatrix} \\
+        =\ & \left(\bvec{u}_1 \dotprod \bvec{y}\right) \bvec{u}_1 + \ldots + \left(\bvec{u}_p \dotprod \bvec{y}\right) \bvec{u}_p 
+        \end{multiequality}
+
+        \qed
+    }
+
+    \subparag{Observation}{
+        On peut voir que, de manière générale, $U^T U = I$, mais $U U^T \neq I$.
+    }
+
+    \subparag{Remarque}{
+        Puisque $\proj_W \bvec{y} = U U^T \bvec{y}$ est sous la forme $T\left(\bvec{x}\right) = A \bvec{x}$, on en déduit que $\proj_W$ est une application linéaire. On peut aussi démontrer ce résultat pour n'importe quel base orthogonale.
+
+        De plus, puisque la projection ne dépend pas de la base, $U U^T$ sera toujours le même pour un sous-ensemble, peu importe la base.
+    }
+}
+
+\parag{Définition}{
+    Si $U \in \mathbb{R}^{n\times n}$ est \textit{carrée} et $U^T U = I_n$ (c'est-à-dire que ses colonnes sont orthonormées), alors on dit que la matrice $U$ est \important{orthogonale}.
+
+    \subparag{Remarque}{
+        Dans ce cas là, $U^{-1} = U^T$, donc: 
+        \[U^T U = UU^T = I_n\]
+    }
+
+    \subparag{Terminologie}{
+        Il faut faire attention au fait que les colonnes sont orthonormées, mais qu'on dit que la matrice est orthogonale.
+    }
+    
+    
+}
+
+
+
+
+\end{document}

@@ -1,0 +1,282 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-25 at 08:15:36.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Jeudi 25 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{19}{2021-11-25}{Norme et orthogonalité}{
+\begin{itemize}[left=0pt]
+    \item Définition de la norme d'un vecteur, de la normalisation d'un vecteur et de la distance entre deux vecteurs.
+    \item Définition de vecteurs orthogonaux et preuve du théorème de Pythagore pour les vecteurs.
+    \item Définition de complément orthogonal, et preuve que c'est un sous-espace vectoriel de $\mathbb{R}^n$.
+\end{itemize}
+
+}
+
+\parag{Propriétés}{
+    Soient $\bvec{u}, \bvec{v}, \bvec{w} \in \mathbb{R}^n$ et $c \in \mathbb{R}$. On a:
+    \begin{enumerate}
+        \item $\bvec{u} \dotprod\bvec{v} = \bvec{v}\dotprod \bvec{u}$
+        \item $\left(\bvec{u} + \bvec{v}\right)\dotprod\bvec{w} = \bvec{u}\dotprod \bvec{w} + \bvec{v} \dotprod \bvec{w}$
+        \item $c\left(\bvec{u}\right)\dotprod \bvec{v} = c\left(\bvec{u} \dotprod \bvec{v}\right) = \bvec{u}\dotprod\left(c \bvec{v}\right)$
+        \item $\bvec{u} \dotprod \bvec{u} \geq 0$
+        \item $\bvec{u} \dotprod \bvec{u} = 0 \iff\bvec{u} = \bvec{0}$.
+    \end{enumerate}
+}
+ 
+\parag{Exemple}{
+    Soient $\bvec{u}_1, \bvec{u}_2, \bvec{u}_3, \bvec{w} \in \mathbb{R}^n$. Alors: 
+    \begin{multiequality}
+        \left(7\bvec{u}_1 - 2\bvec{u}_2 + 4\bvec{u}_3\right) \dotprod \bvec{w} \over{=}{(2)}\ &  \left(7\bvec{u}_1 - 2\bvec{u}_2\right)\dotprod \bvec{w} + \left(4\bvec{u}_3\right)\dotprod \bvec{w} \\
+        \over{=}{(2)}\ & \left(7\bvec{u}_1\right)\dotprod \bvec{w} + \left(-2 \bvec{u}\right)\dotprod \bvec{w} + \left(4\bvec{u}_3\right)\dotprod \bvec{w} \\
+        \over{=}{(3)}\ & 7\left(\bvec{u}_1 \dotprod \bvec{w}\right) + \left(-2\right)\left(\bvec{u}_2 \dotprod \bvec{w}\right) + 4\left(\bvec{u}_3 \dotprod \bvec{w}\right) 
+    \end{multiequality}
+    
+    
+    Très généralement, on trouve: 
+    \[\left(c_1 \bvec{u}_1 + \ldots + c_p \bvec{u}_p\right)\dotprod \bvec{w} = c_1\left(\bvec{u}_1 \dotprod \bvec{w}\right) + \ldots + c_p\left(\bvec{u}_p \dotprod \bvec{w}\right)\]
+}
+
+\parag{Définition de norme}{
+    Soit $\bvec{v}$ un vecteur de $\mathbb{R}^{n}$.
+
+    La \important{norme} (ou longueur) de $\bvec{v}$ est le scalaire positif ou nul noté $\left\|\bvec{v}\right\|$ défini par: 
+    \[\left\|\bvec{v}\right\| = \sqrt{\bvec{v} \dotprod \bvec{v}} = \sqrt{v_1^2 + v_2^2 + \ldots + v_n^2}\]
+    
+    \subparag{Observation}{
+        On sait que $\bvec{v} \dotprod \bvec{v}$ est toujours positif pour tout $\bvec{v}$, on ne devra donc jamais calculer la racine carrée d'un nombre négatif. Ainsi, la norme est toujours un nombre réel positif.
+    }
+}
+
+\parag{Exemple}{
+    Soit le vecteur suivant: 
+    \[\bvec{v} = \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} 3 \\ 2 \end{bmatrix} \in \mathbb{R}^2\]
+    
+    On peut calculer sa norme: 
+    \[\left\|\bvec{v}\right\|^2 = \bvec{v} \dotprod \bvec{v} = 3^2 + 2^2 = 13 \implies \left\|\bvec{v}\right\| = \sqrt{13}\]
+}
+
+\parag{Observation}{
+    Soit $\bvec{v} \in \mathbb{R}^{n}$ et $c \in \mathbb{R}$ quelconques. 
+
+    Regardons le carré de la norme de $c \bvec{v}$: 
+    \[\left\|c \bvec{v}\right\|^2 = \left(c \bvec{v}\right)\dotprod\left(c \bvec{v}\right) = c\left(\bvec{v} \dotprod \left(c \bvec{v}\right)\right) = c^2 \left(\bvec{v} \dotprod \bvec{v}\right) = c^2 \left\|\bvec{v}\right\|^2\]
+    
+    On en déduit donc que: 
+    \[\left\|c \bvec{v}\right\| = \left|c\right| \left\|\bvec{v}\right\|\]
+}
+
+\parag{Normalisation}{
+    Si $\left\|\bvec{u}\right\| = 1$, on dit que $\bvec{u}$ est un \important{vecteur unitaire}.
+
+    Pour $\bvec{v}$ non-nul, on peut toujours prend le vecteur $\bvec{u}$ suivant, de sorte que $\bvec{u}$ est unitaire et pointe dans la même direction que $\bvec{v}$: 
+    \[\bvec{u} = \frac{1}{\left\|\bvec{v}\right\|}\bvec{v}\]
+    
+    En effet, puisque $\frac{1}{\left\|\bvec{v}\right\|} > 0$, alors $\bvec{u}$ pointe bien dans la même direction que $\bvec{v}$. De plus:
+    \[\left\|\bvec{u}\right\| = \left\|\frac{1}{\left\|\bvec{v}\right\|} \bvec{v}\right\| = \left|\frac{1}{\left\|\bvec{v}\right\|}\right| \left\|\bvec{v}\right\| = \frac{\left\|\bvec{v}\right\|}{\left\|\bvec{v}\right\|} = 1\]
+
+
+    On appelle cela la \important{normalisation} de $\bvec{v}$.
+}
+
+\parag{Exemple}{
+    Soit le vecteur suivant: 
+    \[\bvec{v} = \begin{bmatrix} 5 \\ 3 \end{bmatrix} \]
+
+    Calculons sa norme: 
+    \[\left\|\bvec{v}\right\|^2 = \bvec{v} \dotprod \bvec{v} = 5^2+ 3^2 = 34 \implies \left\|\bvec{v}\right\| = \sqrt{34}\]
+    
+    Ainsi, par normalisation, on obtient: 
+    \[\bvec{u} = \frac{1}{\left\|\bvec{v}\right\|}\bvec{v} = \frac{1}{\sqrt{34}} \begin{bmatrix} 5 \\ 3 \end{bmatrix} = \begin{bmatrix} 5 / \sqrt{34} \\ 3 / \sqrt{34} \end{bmatrix} \]
+    
+    \imagehere[0.5]{InterpretationGeometriqueNormalisation.png}
+}
+
+\parag{Définition de distance}{
+    Soient $\bvec{u}$ et $\bvec{v}$ deux vecteurs de $\mathbb{R}^n$. 
+
+    On définit la \important{distance} entre $\bvec{u}$ et $\bvec{v}$ comme: 
+    \[\dist\left(\bvec{u}, \bvec{v}\right) = \left\|\bvec{v} - \bvec{u}\right\|\]
+    
+    \subparag{Observation}{
+        On peut voir que: 
+        \[\dist\left(\bvec{u}, \bvec{v}\right) = \dist\left(\bvec{v}, \bvec{u}\right) = \left\|\bvec{u} - \bvec{v}\right\| = \left\|\bvec{v} - \bvec{u}\right\|\]
+    }
+   
+    \subparag{Interprétation géométrique}{
+        \imagehere{interpretationGeometriqueDistance.png}
+    }
+}
+
+\parag{Dans $\mathbb{R}^3$}{
+    Soient les vecteurs $\bvec{u}, \bvec{v} \in \mathbb{R}^3$: 
+    \[\bvec{u} = \begin{bmatrix} u_1 \\ u_2 \\ u_3 \end{bmatrix}, \mathspace \bvec{v} = \begin{bmatrix} v_1 \\ v_2 \\ v_3 \end{bmatrix} \]
+
+    On peut calculer leur distance: 
+    \begin{multiequality}
+    \dist\left(\bvec{u}, \bvec{v}\right) =\ & \left\|\bvec{u} - \bvec{v}\right\| \\
+    =\ & \sqrt{\left(\bvec{v} - \bvec{u}\right) \dotprod \left(\bvec{v} - \bvec{u}\right)}  \\
+    =\ & \sqrt{\left(v_1 - u_1\right)^2 + \left(v_2 - u_2\right)^2 + \left(v_3 - u_3\right)^2} 
+    \end{multiequality}
+}
+
+\parag{Définition d'orthogonalité}{
+    On dit que deux vecteurs $\bvec{u}, \bvec{v} \in \mathbb{R}^n$ sont \important{orthogonaux} (l'un à l'autre) si: 
+    \[\bvec{u} \dotprod \bvec{v} = \bvec{0}\]
+    
+    \subparag{Observation}{
+        On remarque que $\bvec{0}$ est orthogonal avec n'importe quel vecteur puisque: 
+        \[\bvec{0} \dotprod \bvec{v} = 0\cdot v_1 + \ldots + 0\cdot v_n = 0\]
+    }
+}
+
+\parag{Théorème de Pythagore}{
+    $\bvec{u}, \bvec{v} \in \mathbb{R}^{n}$ sont orthogonaux si et seulement si: 
+    \[\left\|\bvec{u} + \bvec{v}\right\|^2 = \left\|\bvec{u}\right\|^2 + \left\|\bvec{v}\right\|^2\]
+    
+    \subparag{Remarque}{
+        On dit que l'orthogonalité capture la perpendicularité (ou les ``angles droits'') parce qu'elle nous donne ce théorème dans $\mathbb{R}^{n}$
+    }
+
+    \subparag{Preuve}{
+        \begin{multiequality}
+            & \left\|\bvec{u} + \bvec{v}\right\|^2 - \left\|\bvec{u}\right\|^2 - \left\|\bvec{v}\right\|^2  \\
+            =\ & \left(\bvec{u} + \bvec{v}\right)\dotprod\left(\bvec{u} + \bvec{v}\right) - \bvec{u}\dotprod \bvec{u} - \bvec{v}\dotprod \bvec{v} \\
+            =\ & \bvec{u}\dotprod \bvec{u} + \bvec{u}\dotprod \bvec{v} + \bvec{v} \dotprod \bvec{u} + \bvec{v}\dotprod \bvec{v} + \bvec{v} \dotprod \bvec{v} - \bvec{u}\dotprod \bvec{u} - \bvec{v} \dotprod \bvec{v} \\
+            =\ & 2 \bvec{u} \dotprod \bvec{v} 
+        \end{multiequality}
+        
+        Et ceci est nul si et seulement si $\bvec{u} \dotprod \bvec{v} = 0$, c'est-à-dire, si et seulement si $\bvec{u}$ et $\bvec{v}$ sont orthogonaux.
+
+        \qed
+    }
+}
+
+\parag{Exemple}{
+    Soient les deux vecteurs suivants: 
+    \[\bvec{u} = \begin{bmatrix} 2 \\ 1 \end{bmatrix}, \mathspace \bvec{v} = \begin{bmatrix} -1 \\ 2 \end{bmatrix} \]
+    
+    On remarque qu'ils sont orthogonaux. En effet: 
+    \[\bvec{u} \dotprod \bvec{v} = 2\left(-1\right) + 1\left(2\right) = 0\]
+  
+    Calculons le carré de leur norme: 
+    \[\left\|\bvec{u}\right\|^2 = 2^2 + 1^2 = 5, \mathspace \left\|\bvec{v}\right\|^2 = \left(-1\right)^2 + 2^2 = 5, \mathspace \left\|\bvec{u} + \bvec{v}\right\|^2 = 1^2 + 3^2 = 10\]
+    
+    Or, puisque $5 + 5 = 10$, notre théorème est correct (et heureusement)!
+}
+
+
+\subsection{Orthogonalité à tout un sous-espace vectoriel}
+
+
+\parag{Observation}{
+    Si $\bvec{u}$ est orthogonal à $\bvec{v}$, alors $\bvec{u}$ est orthogonal à tous les vecteurs dans $\vect\left\{\bvec{v}\right\}$.
+
+    En effet, si $\bvec{w} \in \vect\left\{\bvec{v}\right\}$, alors $\bvec{w} = c \bvec{v}$ pour un certain scalaire $c$. Ainsi: 
+    \[\bvec{u} \dotprod \bvec{w} = \bvec{u} \dotprod \left(c \bvec{v}\right) = c\left(\bvec{u} \dotprod \bvec{v}\right) = c\cdot 0 = 0\]
+    
+    Puisque $\bvec{u}$ et $\bvec{v}$ sont orthogonaux par hypothèse.
+
+    \subparag{Généralisation}{
+        On se demande alors: étant donné un sous-espace $W$ de $\mathbb{R}^n$, est-ce qu'il existe des vecteurs orthogonaux à tous les vecteurs de $W$?
+    }
+    
+}
+
+\parag{Définition}{
+    Soit $W$ un sous-espace vectoriel de $\mathbb{R}^{n}$.
+
+    On note $W^{\perp}$ l'ensemble des vecteurs de $\mathbb{R}^{n}$ qui sont orthogonaux à \textit{tous} les vecteurs de $W$. On appelle $W^{\perp}$ le \important{complément orthogonal de $W$} (ou ``l'orthogonal de $W$'')
+}
+
+\parag{Exemple}{
+    Par exemple, le complément orthogonal à une droite dans $\mathbb{R}^2$, c'est une droite.
+
+    De la même manière, le complètement orthogonal à un plan dans $\mathbb{R}^3$, c'est aussi une droite.
+
+    On peut voir ces exemples graphiquement:
+    \imagehere[0.7]{SousEspaceVectorielOrthogonal.png}
+}
+
+\parag{Théorème}{
+    $W^{\perp}$ est un sous-espace vectoriel de $\mathbb{R}^n$.
+
+    \subparag{Preuve}{
+        On doit vérifier les trois propriétés suivantes:
+        \begin{enumerate}
+            \item $\bvec{0} \in W^{\perp}$
+            \item $\bvec{u}, \bvec{v} \in W^{\perp} \implies \bvec{u} + \bvec{v} \in W^{\perp}$
+            \item $\bvec{u} \in W^{\perp}, c \text{ un scalaire} \implies c \bvec{u} \in W^{\perp}$
+        \end{enumerate}
+        
+        Pour rappel, même si la première propriété découle de la troisième, on en a quand même besoin pour s'assurer que l'ensemble n'est pas vide.
+
+        On peut démontrer ces propriétés de la manière suivante:
+        \begin{enumerate}
+            \item Soit $\bvec{w} \in W$ quelconque. 
+
+            On remarque que $\bvec{0} \dotprod \bvec{w} = \bvec{0}$, donc $\bvec{0}$ est bien orthogonal $\bvec{w}$, et donc à tous les vecteurs de $W$.
+            
+            \item Soient $\bvec{u}, \bvec{v} \in W^{\perp}$, et soit $\bvec{w} \in W$ quelconque. On a : 
+            \[\left(\bvec{u} + \bvec{v}\right) \dotprod \bvec{w} = \bvec{u} \dotprod \bvec{w} + \bvec{v} \dotprod \bvec{w}  = 0 + 0 = 0\]
+            puisque $\bvec{u}$ et $\bvec{v}$ appartiennent à $W^{\perp}$.
+
+            Ainsi, on en déduit que $\bvec{u} + \bvec{v}$ est orthogonal à $\bvec{w}$, donc $\bvec{u} + \bvec{v} \in W^{\perp}$
+                
+        \item Soit $\bvec{u} \in W^{\perp}$ et $c$ un scalaire quelconque. Donc: 
+                \[\left(c \bvec{u}\right) \dotprod \bvec{w} = c \bvec{u} \dotprod \bvec{w} = 0\]
+            On en déduit que $c \bvec{u}$ est orthogonal à $\bvec{w}$ quelconque dans $W$, donc que $c \bvec{u} \in W^{\perp}$.
+        \end{enumerate}
+
+        \qed
+    }
+}
+
+\parag{Théorème}{
+    \[\left(W^{\perp}\right)^{\perp} = W\]
+
+    \subparag{Preuve}{
+        Laissée en exercice au lecteur.
+
+        Indice: pour montrer que deux ensembles $A$ et $B$ sont égaux, il est souvent plus simple de montrer que $A \subset B$ et $B \subset A$.
+    }
+}
+
+\parag{Théorème}{
+    Si $W = \vect\left\{\bvec{w}_1, \ldots, \bvec{w}_p\right\}$, alors $\bvec{u} \in W^{\perp}$ si et seulement si: 
+    \[\bvec{u} \dotprod \bvec{w}_i = 0, \mathspace \forall i = 1, \ldots, p\]
+
+    \subparag{Preuve}{
+        Si $\bvec{u} \in W^{\perp}$, alors en particulier $\bvec{u} \dotprod \bvec{w}_i = 0$ pour tout $i$. Donc, ce sens de l'implication est tenu.
+
+        \vspace{1em}
+
+        Supposons maintenant que $\bvec{u}$ est orthogonal à $\bvec{w}_1, \ldots, \bvec{w}_p$. On veut montrer que $\bvec{u}$ est orthogonal à tous les vecteurs de $W$. Soit $\bvec{w} \in W$ quelconque . Alors: 
+        \[\bvec{w} = c_1 \bvec{w}_1 + \ldots + c_p \bvec{w}_p\]
+        
+        Calculons leur produit scalaire: 
+        \begin{multiequality}
+        \bvec{w} \dotprod \bvec{u} =\ & \left(c_1 \bvec{w}_1 + \ldots + c_p \bvec{w}_p\right) \dotprod \bvec{u}  \\
+        =\ & c_1 \bvec{w}_1 \dotprod \bvec{u} + \ldots + c_p \bvec{w}_p \dotprod \bvec{u}  \\
+        =\ & c_1 \cdot 0 + \ldots + c_p \cdot 0  \\
+        =\ & 0 
+        \end{multiequality}
+        
+        Donc $\bvec{u} \in W^{\perp}$.
+        
+        \qed
+        
+    }
+    
+    
+}
+
+
+\end{document}

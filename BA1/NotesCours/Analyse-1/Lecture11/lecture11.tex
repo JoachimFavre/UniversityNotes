@@ -1,0 +1,377 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-10-27 at 10:07:19.
+
+\usepackage{../../style}
+
+\title{Analyse 1}
+\author{Joachim Favre}
+\date{Mercredi 27 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2021-10-27}{Cratères de convergence lunaires}{
+    \begin{itemize}[left=0pt]
+        \item Commentaire hors cours sur la fonction zêta de Riemann.
+        \item Définition de la convergence absolue, et preuve qu'une série absolument convergente est convergente.
+        \item Explication et preuve de la condition nécessaire (``test for divergence''), du critère de Leibnitz pour les séries alternées, du critère de comparaison pour les séries à termes non-négatifs, du critère de d'Alembert et du critère de Cauchy.
+    \end{itemize}
+
+}
+
+\parag{Exemple 3}{
+    La série suivante est convergente:
+    \[\sum_{n=1}^{\infty} \frac{1}{n^2} \]
+
+    \subparag{Preuve}{
+        Soit la suites des séries partielles:
+        \[S_n = \sum_{k=1}^{n} \frac{1}{k^2} = 1 + \underbrace{\frac{1}{2^2} + \frac{1}{3^2}}_{< 2\cdot \frac{1}{2^2}} + \underbrace{\frac{1}{4^2} + \frac{1}{5^2}}_{< 2\cdot\frac{1}{4^2}} + \underbrace{\frac{1}{6^2} + \frac{1}{7^2}}_{< 2\cdot \frac{1}{6^2}} + \ldots + \frac{1}{n^2}\]
+
+        Donc:
+        \[S_n < 1 + 2 \sum_{k = 1}^{n} \frac{1}{\left(2k\right)^2} = 1 + 2 \sum_{k = 1}^{n} \frac{1}{4} \frac{1}{k^2} = 1 + \frac{1}{2} \sum_{k = 1}^{n} \frac{1}{k^2}\]
+
+        En d'autres mots:
+        \[S_n < 1 + \frac{1}{2}S_n \implies \frac{1}{2}S_n < 1 \implies S_n < 2, \mathspace \forall n \geq 2\]
+
+        Donc $\left(S_n\right)$ est majorée par 2. De plus,
+        \[S_{n+1} - S_n = \frac{1}{\left(n+1\right)^2} > 0\]
+        ce qui veut dire que $\left(S_n\right)\uparrow$. Puisqu'elle est aussi majorée, elle converge donc.
+
+        On peut en conclure que la série $\sum_{n=1}^{\infty} \frac{1}{n^2}$ est convergente.
+
+    }
+
+    \subparag{Remarque 1}{
+        La série
+        \[\sum_{n=1}^{\infty} \frac{1}{n^{p}}\]
+        est convergente pour tout $p > 1$. (La preuve est dans la série 7.)
+    }
+
+    \subparag{Remarque 2}{
+        On a que
+        \[\sum_{n=1}^{\infty} \frac{1}{n^2} = \zeta\left(2\right) = \frac{\pi^2}{6}\]
+
+        La preuve de cette égalité est dans un fichier sur Moodle.
+    }
+}
+
+\parag{La fonction zêta de Riemann}{
+    La fonction zêta de Riemann est définie telle que
+    \[\zeta\left(s\right) = \sum_{n=1}^{\infty} \frac{1}{n^{s}}, \mathspace s > 1\]
+
+    \subparag{Valeurs connues}{
+        \begin{itemize}[left=0pt]
+            \item $\zeta\left(2\right) = \frac{\pi^2}{6}$
+            \item $\zeta\left(2k\right) = C_k \pi^{2k}$, où $C_k \in \mathbb{Q}$.
+
+                On sait que $\zeta\left(2k\right)$ est transcendant pour tout $k \in \mathbb{N}^*$
+
+            \item $\zeta\left(3\right)$ est transcendant.
+            \item Au moins une valeur entre $\zeta\left(5\right)$, $\zeta\left(7\right)$, $\zeta\left(9\right)$ et $\zeta\left(11\right)$ est irrationnelle.
+        \end{itemize}
+
+        Une hypothèse dit que $\zeta\left(n\right)$ est transcendant pour tous $n \geq 2$ naturels.
+    }
+
+    \subparag{Hypothèse de Riemann}{
+        Riemann a permis d'étendre cette fonction pour tous le nombres complexes $z \neq 1$. Son hypothèse dit que tous les zéros non-triviaux de cette fonction ont comme partie réelle $\frac{1}{2}$.
+    }
+
+    \subparag{Exercice (hors du cours)}{
+        Démontrer que pour tout $s \geq 2$ naturel:
+        \[\left(\prod_{p \text{ premier}}^{} \left(1 - \frac{1}{p^{s}}\right)\right)\zeta\left(s\right) = 1\]
+
+        Astuce, calculer:
+        \[\frac{1}{2^{s}}\zeta\left(s\right)\]
+
+        Pour voir une preuve complète, il y a un fichier sur Moodle pour voir cette preuve.
+
+    }
+
+    \subparag{Remarque}{
+        La fonction zêta de Riemann n'est pas au champ pour l'examen.
+    }
+}
+
+
+\parag{Définition (Convergence absolue)}{
+    Une série $\sum_{n = 1}^{\infty} a_n$ est dite \important{absolument convergente} si la série
+    \[\sum_{n = 1}^{\infty} \left|a_n\right| \]
+    est convergente.
+}
+
+\parag{Proposition}{
+    Une série absolument convergente est convergente.
+
+    \subparag{Preuve}{
+        Soit les suite des sommes partielles suivantes:
+        \[S_n = \sum_{k=1}^{n} a_k, \mathspace P_n = \sum_{k=1}^{n} \left|a_k\right|\]
+
+        Par hypothèse, $\left(P_n\right)$ converge. C'est donc une suite de Cauchy. Pour tout $m, n \geq n_0$ (on prend $m > n$ sans perte de généralité (spdg)), on en déduit que:
+        \[\left|S_m - S_n\right| = \left|\sum_{k=n+1}^{m} a_k\right| \leq \sum_{k=n+1}^{m} \left|a_k\right| = \left|P_m  - P_n\right| \leq \epsilon\]
+        puisque $\left(P_n\right)$ est une suite de Cauchy. On sait donc que $\left(S_n\right)$ est aussi une suite de Cauchy (puisque pour tout $\epsilon > 0$, il existe $n_0$ tel que pour tout $m \geq n \geq n_0$, alors $\left|S_m - S_n < \epsilon\right|$).
+
+        On en déduit donc que $\left(S_n\right)$ converge.
+
+        \qed
+
+    }
+
+}
+
+\parag{Proposition (condition nécessaire)}{
+    Si la série $\sum_{n=1}^{\infty} a_n$ converge, alors
+    \[\lim_{n \to \infty} a_n = 0\]
+
+    \subparag{Preuve}{
+        On sait que $S_n = \sum_{k=1}^{n} a_k$ est une suite de Cauchy. Donc, pour tout $\epsilon > 0$, il existe $n_0 \in \mathbb{N}$ tel que pour tout $m, n \geq n_0$:
+        \[\left|S_m - S_n\right| \leq \epsilon\]
+
+        En particulier,
+        \[\left|a_{n+1}\right| = \left|S_{n+1} - S_n\right| \leq \epsilon\]
+
+        On sait donc que, par la définition de la limite :
+        \[\lim_{n \to \infty} a_n = 0\]
+
+    }
+
+    \subparag{Remarque}{
+        Attention, la contraposée n'est pas vraie ; si la limite est 0, alors la série ne converge pas forcément.
+
+        Par exemple, la série harmonique, i.e:
+        \[\sum_{n = 1}^{\infty} \frac{1}{n}\]
+
+    }
+
+}
+
+
+\parag{Exemple}{
+    Si on a
+    \[\sum_{n=0}^{\infty} \frac{\left(-1\right)^{n}}{2} \implies \lim_{n \to \infty} \frac{\left(-1\right)^{n}}{2} \text{ n'existe pas}\]
+
+    On sait donc que cette série ne converge pas, par la contraposée du théorème ci-dessus.
+
+}
+
+\subsection{Critères de convergence}
+
+\parag{Proposition (Critère de Leibnitz pour les séries alternées)}{
+    Soit $\left(a_n\right)$ une suite telle que:
+    \begin{enumerate}
+        \item Il existe $p \in \mathbb{N}$ tel que pour tout $n \geq p$ on a:
+            \[\left|a_{n+1}\right| \leq \left|a_n\right|\]
+
+            En d'autres mots, la suite est décroissante en valeur absolue.
+        \item Il existe $p \in \mathbb{N}$ tel que pour tout $n \geq p$ on a:
+            \[a_{n+1}\cdot a_n \leq 0\]
+
+            En d'autres mots, la série est alternée.
+        \item On a :
+            \[\lim_{n \to \infty} a_n = 0\]
+
+    \end{enumerate}
+
+    Alors, la série $\sum_{n=1}^{\infty} a_n$ est convergente.
+
+
+    \subparag{Preuve}{
+        Pour tout $n \geq p$ et pour tout $k \in \mathbb{N}$, avec \important{$k > 1$ pair}, on a :
+        \[S_{n+k} - S_{n-1} = a_n + a_{n+1} + \ldots + a_{n+k}\]
+
+        Puisque $k$ est pair, on a un nombre impair de termes. On peut les regrouper par deux de deux manières différentes:
+        \[a_n + \left(a_{n+1} + a_{n+2}\right) + \ldots + \left(a_{n + k -1} + a_{n + k}\right) = \left(a_{n} + a_{n+1}\right) + \ldots + a_{n+k}\]
+
+
+        \important{Si $a_n > 0$:} Puisque les termes deviennent de plus en plus petit en valeur absolue, et qu'ils sont alternés:
+        \[\overbrace{\underbrace{a_n}_{> 0} + \underbrace{\left(a_{n+1} + a_{n+2}\right)}_{\leq 0} + \ldots + \underbrace{\left(a_{n + k -1} + a_{n + k}\right)}_{\leq 0}}^{\leq a_n} = \underbrace{\left(a_{n} + a_{n+1}\right)}_{\geq 0} + \ldots + \underbrace{a_{n+k}}_{> 0} \geq 0\]
+
+        On a donc que
+        \[0 \leq a_n + a_{n+1} + \ldots + a_{n+k} \leq a_n\]
+
+        \important{Si $a_n < 0$} On trouve avec le même raisonnement que:
+        \[a_n \leq a_n + \ldots + a_{n+k} \leq 0\]
+
+        Donc, \important{de manière générale}, on a que:
+        \[\underbrace{\left|a_n + \ldots + a_{n+k}\right|}_{\left|S_{n+k} - S_{n-1}\right|} \leq \left|a_n\right|\]
+
+        Cependant, la $\lim_{n \to \infty} \left|a_n\right| = 0$. Donc, par la définition de la limites, on sait que pour tout $\epsilon > 0$, il existe $n_0 \in \mathbb{N}$ tel que pour tout $n \geq n_0$, alors $\left|a_k\right| \leq \epsilon$. On a donc que:
+        \[\left|S_{n + k} - S_{n-1}\right| = \left|a_n\right| \leq \epsilon\]
+
+
+        \important{Si $k$ est impair}, alors, par le même argument, on a que :
+        \[\left|S_{n+k} - S_{n-1}\right| \leq \epsilon\]
+
+        Dans les deux cas, $\left(S_n\right)$ est une suite de Cauchy. Donc,
+        \[\sum_{n=0}^{\infty} a_n\]
+        est convergente.
+
+
+    }
+
+}
+
+\parag{Série harmonique alternée}{
+    Prenons la série
+    \[\sum_{n = 1}^{\infty} \left(-1\right)^{n} \frac{1}{n}\]
+
+    Elles est convergente par le critère de Leibninz.
+
+    \subparag{Remarque}{
+        On verra plus tard que
+        \[\sum_{n = 1}^{\infty} \left(-1\right)^{n} \frac{1}{n} = \ln\left(2\right)\]
+    }
+}
+
+\parag{Proposition (critère de comparaison pour les séries à termes non-négatifs)}{
+    Soit $\left(a_n\right)$ et $\left(b_n\right)$ deux suites telles que $\exists k \in \mathbb{N}$ tel que $0 \leq a_n \leq b_n$ pour tout $n \geq k$.
+
+    Si $\sum_{n=0}^{\infty} b_n$ converge, alors $\sum_{n=0}^{\infty} a_n$ converge.
+
+    Si $\sum_{n=0}^{\infty} a_n$ diverge, alors $\sum_{n=0}^{\infty} b_n$ diverge.
+
+    \subparag{Preuve}{
+        Soit les suites de sommes partielles suivantes:
+        \[S_n = \sum_{i=0}^{n} a_i, \mathspace P_n = \sum_{i=0}^{n} b_i\]
+
+        Puisque pour tout $i \geq k$ on a $0 \leq a_i \leq b_i$, on peut appliquer une somme sur cette inégalité :
+        \[\sum_{i=n+1}^{m} a_i \leq \sum_{i=n+1}^{m} b_i \implies 0 \leq S_m - S_n \leq P_m - P_n, \mathspace \forall m > n \geq k\]
+
+        Si $\left(P_n\right)$ est une suite de Cauchy, alors $\left(S_n\right)$ l'est aussi. Donc, si $\sum_{n=0}^{\infty} b_n$ converge, alors $\sum_{n=0}^{\infty} a_n$ converge.
+
+
+        Si $\left(S_n\right)$ est divergente, alors $\lim_{n \to \infty} S_n = \infty$. Donc, puisque $a_n \leq b_n$ pour tout $n \geq k$, alors $\lim_{n \to \infty} P_n = \infty$ et donc $\sum_{n=0}^{\infty} b_n$ est divergente.
+
+        \qed
+    }
+}
+
+
+\parag{Exemple}{
+    Prenons la série suivante :
+    \[\sum_{n=0}^{\infty} \frac{\cos\left(n!\right)}{\left(n+1\right)^2}\]
+
+    Considérons la série des valeurs absolues:
+    \[\sum_{n=0}^{\infty} \left|\frac{\cos\left(n!\right)}{\left(n+1\right)^2}\right|\]
+
+    Or,
+    \[\left|\frac{\cos\left(n!\right)}{\left(n+1\right)^2}\right| \leq \frac{1}{\left(n+1\right)^2}\]
+
+    Mais, cette série est convergente:
+    \[\sum_{k=0}^{\infty} \frac{1}{\left(k+1\right)^2} = \sum_{k=1}^{\infty} \frac{1}{k^2}\]
+
+    Donc, $\left|\frac{\cos\left(n!\right)}{\left(n+1\right)^2}\right|$ converge par le critère de comparaison. Ainsi, $\sum_{n=0}^{\infty} \frac{\cos\left(n!\right)}{\left(n+1\right)^2}$ est absolument convergente et donc convergente.
+
+}
+
+\parag{Remarque}{
+    Si $\sum_{n=0}^{\infty} a_n$ ne possède que des termes positifs, et la suite des sommes partielles est majorée, alors la série est convergente par définition.
+
+    De la même manière, si $\sum_{n=0}^{\infty} a_n$ ne possède que des termes négatifs, et la suite des sommes partielles est minorée, alors la série est convergente par définition.
+}
+
+\parag{Proposition (Critère de d'Alembert)}{
+    Soit $\left(a_n\right)$ une suite telle que $a_n \neq 0$ pour tout $n \in \mathbb{N}$ et telle que
+    \[\lim_{n \to \infty} \left|\frac{a_{n+1}}{a_n}\right| = \rho \in \mathbb{R}\]
+
+    Alors, si $\rho < 1$, la série $\sum_{n=0}^{\infty} a_n$ est absolument convergente.
+
+    Si $\rho < 1$, alors la série $\sum_{n=0}^{\infty} \left|a_n\right|$ diverge.
+
+    \subparag{Idée de preuve}{
+        Faire une comparaison avec une série géométrique. La preuve est faite en exercice dans la série 7.
+    }
+
+}
+
+\parag{Proposition (Critère de Cauchy (de la racine))}{
+    Soit $\left(a_n\right)$ une suite telle que la limite existe, et:
+    \[\lim_{n \to \infty} \left|a_n\right|^{\frac{1}{n}} = \rho \in \mathbb{R}\]
+
+    Alors, si $\rho < 1$, la série $\sum_{n=0}^{\infty} a_n$ est absolument convergente.
+
+    Si $\rho > 1$, alors la série $\sum_{n=0}^{\infty} a_n$ diverge.
+
+    \subparag{Idée de preuve}{
+        Faire une comparaison avec une série géométrique. La preuve est faite en exercice dans la série 7.
+    }
+
+}
+
+\parag{Remarques}{
+    \begin{enumerate}[left=0pt]
+        \item Si $\lim_{n \to \infty} \left|\frac{a_{n+1}}{a_n}\right| = r$ et $\lim_{n \to \infty} \left|a_n\right|^{\frac{1}{n}} = \ell$. Alors, nécessairement $ r = \ell$.
+        \item Parfois, $\lim_{n \to \infty} \sqrt[n]{\left|a_n\right|}$ existe, mais $\lim_{n \to \infty} \left|\frac{a_{n+1}}{a_n}\right|$ n'existe pas.
+
+            Donc, le critère de Cauchy est plus fort que le critère de d'Alembert.
+        \item Si $\lim_{n \to \infty} \left|\frac{a_{n+1}}{a_n}\right| = 1$ ou $\lim_{n \to \infty} \sqrt[n]{\left|a_n\right|} = 1$, alors on ne peut pas faire de conclusion sur la convergence de la série.
+    \end{enumerate}
+
+    \subparag{Exemple du point (3)}{
+        La série suivante diverge:
+        \[\sum_{n = 1}^{\infty} \frac{1}{k} \implies \lim_{n \to \infty} \left|\frac{\frac{1}{n+1}}{\frac{1}{n}}\right| = \lim_{n \to \infty} \frac{n}{n+1} = 1\]
+
+        Alors que la série suivante converge:
+        \[\sum_{n = 1}^{\infty} \frac{1}{n^2} \implies \lim_{n \to \infty} \left|\frac{\frac{1}{\left(n+1\right)^2}}{\frac{1}{n^2}}\right| = \lim_{n \to \infty} \frac{n^2}{\left(n+1\right)^2} = 1\]
+    }
+}
+
+\parag{Exemple 1}{
+    Prenons la série
+    \[\sum_{n=1}^{\infty} \frac{5^{n}}{n!}\]
+
+    Le critère de d'Alembert a l'air le plus simple à utiliser:
+    \[\lim_{n \to \infty} \left|\frac{a_{n+1}}{a_n}\right| = \lim_{n \to \infty} \frac{5^{n+1}}{\left(n+1\right)!} \frac{n!}{5^{n}} = \lim_{n \to \infty} \frac{5}{n+1} = 0 < 1\]
+
+    Donc, la série est convergente.
+
+    Puisque cette série converge, alors, par la condition nécessaire :
+    \[\lim_{n \to \infty} \frac{5^{n}}{n!} = 0\]
+}
+
+\parag{Exemple 2}{
+    Prenons la série avec paramètre suivante:
+    \[\sum_{k=0}^{\infty} \frac{x^{k}}{k!}, \mathspace x \in \mathbb{R}\]
+
+    Par le critère de d'Alembert:
+    \[\lim_{k \to \infty} \frac{\left|x\right|^{k+1}}{\left(k+1\right)!} \frac{k!}{\left|x\right|^{k}} = \lim_{k \to \infty} \frac{\left|x\right|}{k+1} = 0 < 1\]
+
+    Donc $\sum_{k=0}^{\infty} \frac{x^{k}}{k!}$ converge absolument pour tout $x \in \mathbb{R}$.
+
+    \subparag{Remarque}{
+        On verra plus tard que
+        \[\sum_{k=0}^{\infty} \frac{x^{k}}{k!} = e^x, \mathspace x \in \mathbb{R}\]
+    }
+}
+
+\parag{Exemple 3}{
+    Prenons la série
+    \[\sum_{n = 1}^{\infty} \left(\frac{nx}{3n - 1}\right)^{2n - 1}, \mathspace x \in \mathbb{R}\]
+
+    Par le critère de Cauchy:
+    \[\lim_{n \to \infty} \left|\frac{nx}{3n - 1}\right|^{\frac{2n - 1}{n}} = \lim_{n \to \infty} \left|\frac{x}{3 - \frac{1}{n}}\right|^{2 - \frac{1}{n}} = \left|\frac{x}{3}\right|^2 = \rho\]
+
+    Si $\left|x\right| < 3$, alors la série converge absolument. Si $\left|x\right|> 3$ la série diverge.
+
+    Considérons maintenant le cas où $x = 3$, on peut regarder la condition nécessaire:
+    \[\lim_{n \to \infty} \left(\frac{3n}{3n - 1}\right)^{2n - 1} = \lim_{n \to \infty} \frac{1}{\left(\frac{3n - 1}{3n}\right)^{2n - 1}} = \lim_{n \to \infty} \frac{\left(1 - \frac{1}{3n}\right)}{\left(1 - \frac{1}{3n}\right)^{2n}}\]
+
+    On peut manipuler cette égalité pour trouver la limite vers $\frac{1}{e}$:
+    \[\lim_{n \to \infty} \frac{\left(1 - \frac{1}{3n}\right)}{\left(1 - \frac{1}{3n}\right)^{3n \cdot \frac{2}{3}}} = \frac{1}{e^{-\frac{2}{3}}} \neq 0\]
+    Donc ça diverge.
+
+
+    Maintenant, prenons $x = -3$. On a donc:
+    \[\sum_{n = 1}^{\infty} \left(\frac{-3n}{3n -1}\right)^{2n - 1} = \sum_{n = 1}^{\infty} \underbrace{\left(-1\right)^{2n - 1}}_{= -1} \left(\frac{3n}{3n-1}\right)^{2n - 1} = -\sum_{n = 1}^{\infty} \underbrace{\left(\frac{3n}{3n - 1}\right)^{2n - 1}}_{\to e^{\frac{2}{3}} \neq 0}\]
+
+    
+
+    Pour conclusion la série $\sum_{n = 1}^{\infty} \left(\frac{nx}{3n - 1}\right)^{2n - 1}$ converge absolument si $\left|x\right| < 3$ et diverge si $\left|x\right| \geq 3$.
+
+}
+
+
+
+
+\end{document}

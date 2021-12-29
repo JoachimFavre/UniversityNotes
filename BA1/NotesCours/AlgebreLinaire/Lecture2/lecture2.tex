@@ -1,0 +1,353 @@
+\documentclass{article}
+
+% Expanded on 2021-09-26 at 22:53:05.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Lundi 27 septembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2021-09-27}{Matrices échelonnées et vecteurs}{
+\begin{itemize}[left=0pt]
+    \item Construction des définitions de matrice échelonnée et matrice échelonnée réduite.
+    \item Définition des vecteurs et de leurs opérations.
+    \item Définition des combinaisons linéaires.
+\end{itemize}
+}
+
+\parag{Suite de l'exemple}{
+    Nous avons la matrice augmentée
+    \[\begin{bmatrix} 1 & 1 & -3 & -7 \\ 0 & -5 & 11 & 22 \\ 0 & 0 & 24 & 48 \end{bmatrix}\]
+
+    Nous voudrions essayer d'aller plus loin, en rendant la matrice diagonale. On ne veut pas ``casser'' les zéros en dessous de la diagonale, cependant on voudrait faire apparaître des zéros au dessus. On peut utiliser la dernière ligne pour réduire les coefficients de la troisième colonne à zéro. Donc on peut prendre $\left(b\right) \leftarrow \left(b\right) - \frac{11}{24}\left(c\right)$ et $\left(a\right) \leftarrow \left(a\right) + \frac{3}{24}\left(c\right)$:
+    \[\begin{bmatrix} 1 & 1 & 0 & -1 \\ 0 & -5 & 0 & 0 \\ 0 & 0 & 24 & 48 \end{bmatrix} \]
+
+    On peut maintenant prendre $\left(a\right) \leftarrow \left(a\right) + \frac{1}{5}\left(b\right)$:
+    \[\begin{bmatrix} 1 & 0 & 0 & -1 \\ 0 & -5 & 0 & 0 \\ 0 & 0 & 24 & 48 \end{bmatrix}\]
+
+    Maintenant on peut rendre les coefficients de la diagonale égaux à 1, en prenant $\left(a\right) \leftarrow \left(a\right)$, $\left(b\right) \leftarrow \frac{-1}{5}\left(b\right)$ et $\left(c\right) \leftarrow \frac{1}{24}\left(c\right)$:
+    \[\begin{bmatrix} 1 & 0 & 0 & -1 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 2 \end{bmatrix} \]
+
+    Ce qui est équivalent au système suivant
+    \begin{systemofequations}{}
+    &\ x_1 = -1 \\
+    &\ x_2 = 0 \\
+    &\ x_3 = 2
+    \end{systemofequations}
+
+    On ne peut plus simplifier notre matrice, puisqu'on a toutes nos solutions. En l'occurrence, nous avons une solution unique. Cependant, comme nous l'avons vu, il peut y en avoir aucune, ou en avoir une infinité.
+
+}
+
+\parag{Exemple avec une conclusion différente}{
+   Soit le système
+   \begin{systemofequations}{}
+   &\ x_2 - 4x_3 = 8 \\
+   &\ 2x_1 - 3x_2 + 2x_3 = 1 \\
+   &\ 4x_1 - 8x_2 + 12x_3 = 1
+   \end{systemofequations}
+
+   En le transformant en matrice augmentée et en faisant les étapes usuelles, on obtient la matrice suivante
+   \[\begin{bmatrix} 2 & -3 & 2 & 1 \\ 0 & 1 & -4 & 8 \\ 0 & 0 & 0 & 15 \end{bmatrix} \]
+
+   On a donc un zéro de plus que d'habitude sur la dernière ligne (et le coefficient n'est pas nul). On s'est donc retrouvé avec le système d'équations suivant:
+  \begin{systemofequations}{}
+  &\ 2x_1 - 3x_2 + 2x_3 = 1 \\
+  &\ x_2 - 4x_3 = 8 \\
+  &\ 0 = 15
+  \end{systemofequations}
+
+  Ce qui veut dire que ce système n'a aucune solution.
+
+  Géométriquement, on cherche l'intersection entre trois plans, mais avec un plan parallèle à l'intersection des deux autres.
+}
+
+\parag{Exemple avec encore une autre conclusion}{
+    En prenant le même système, mais en changeant le dernier coefficient:
+   \begin{systemofequations}{}
+   &\ x_2 - 4x_3 = 8 \\
+   &\ 2x_1 - 3x_2 + 2x_3 = 1 \\
+   &\ 4x_1 - 8x_2 + 12x_3 = -14
+   \end{systemofequations}
+
+   De nouveau, on peut transformer ce système en matrice augmentée, appliquer les opérations élémentaires sur les lignes, et on obtient
+   \[\begin{bmatrix} 2 & -3 & 2 & 1 \\ 0 & 1 & -4 & 8 \\ 0 & 0 & 0 & 0 \end{bmatrix} \]
+
+   Elle ressemble fortement à la matrice qu'on a obtenue dans l'exemple juste avant, sauf que le dernier coefficient est $0$ et non $15$. C'est donc équivalent au système suivant:
+    \begin{systemofequations}{}
+    &\ 2x_1 - 3x_2 + 2x_3 = 1 \\
+    &\ x_2 - 4x_3 = 8 \\
+    &\ 0 = 0
+    \end{systemofequations}
+
+    Cette dernière équation ne nous apporte rien, on peut donc l'enlever. Nous avons donc une infinité de solutions. Pour les écrire, nous allons simplement écrire toutes nos équations en fonction de $x_3$ (qu'on peut choisir comme on veut): $x_2 = 8 + 4x_3$ et
+    \[2x_1 = 1 + 3x_3 - 2x_3 1 + 3\left(8 + 4x_3\right) - 2x_3 = 25 + 10x_3 \iff x_1 = \frac{25}{2} + 5x_3\]
+
+    Donc,
+    \begin{systemofequations}{}
+    &\ x_1 = \frac{25}{2} + 5x_3 \\
+    &\ x_2 = 8 + 4x_3 \\
+    &\ x_3 \text{ est libre}
+    \end{systemofequations}
+
+    On aurait pu choisir une autre variable libre, mais cela aurait été équivalent.
+
+    Géométriquement, on a l'intersection entre trois plans, qui forme une droite.
+}
+
+\parag{L'exemple précédent, sans bidouiller}{
+    On avait:
+   \[\begin{bmatrix} 2 & -3 & 2 & 1 \\ 0 & 1 & -4 & 8 \\ 0 & 0 & 0 & 0 \end{bmatrix} \]
+
+   On veut continuer à travailler sur cette matrice. On peut choisir d'enlever le deuxième coefficient de la première ligne, ou le troisième. On va choisir le premier, pour avoir quelque chose qui ressemble à une matrice diagonale sur les deux premières colonnes. On prend $\left(a\right) \leftarrow \left(a\right) + 3\left(b\right)$:
+   \[\begin{bmatrix} 2 & 0 & -10 & 25 \\ 0 & 1 & -4 & 8 \\ 0 & 0 & 0 & 0 \end{bmatrix} \]
+
+   Maintenant, on peut mettre des $1$ sur la diagonale:
+   \[\begin{bmatrix} 1 & 0 & -5 & \frac{25}{2} \\ 0 & 1 & -4 & 8 \\ 0 & 0 & 0 & 0 \end{bmatrix} \]
+
+   En repassant sur une notation de système:
+   \begin{systemofequations}{}
+   &\ x_1 - 5x_3 = \frac{25}{2} \\
+   &\ x_2 - 4x_3 = 8  \\
+   &\ 0 = 0
+   \end{systemofequations}
+
+   Ce qui est équivalent au système qu'on a trouvé en bidouillant. Si on avait choisit de mettre le 0 dans l'autre entier, on aurait simplement eu une autre variable libre (mais l'ensemble solution aurait été le même, décrit différemment). Par convention, on fait comme ce qu'on a fait dans cet exemple.
+}
+
+\subsection{Matrice échelonnée (réduite)}
+
+\imagehere{EchelonneeEchelonneeReduite.png}
+
+\parag{Définition de coefficient principal}{
+    Pour une matrice de taille $m \times n$, on appelle \important{coefficient principal} d'une ligne non-nulle le coefficient non-nul le plus à gauche dans la ligne. Dans le cas ou la ligne est complètement nulle, alors il n'y a pas de coefficient principal.
+
+    Ce sont les carrés et les 1 dans le dessin.
+}
+
+\parag{Définition de forme échelonnée}{
+    Une matrice est sous \important{forme échelonnée} (``aussi triangulaire que possible'') si
+    \begin{enumerate}
+        \item Toutes les lignes nulles (s'il y en a) sous tout en bas.
+        \item Le coefficient principal d'une ligne se trouve à droite du coefficient principal sur la line au dessus d'elle (les coefficients principals ``descendent en escalier'', en général, toutes les ``marches'' ne font pas la même longueur).
+        \item Tous les coefficients d'une colonne sous un coefficient principal sont nuls.
+    \end{enumerate}
+
+}
+
+\parag{Définition de forme échelonnée réduite}{
+    Une matrice sous formée échelonnée qui satisfait en plus les deux conditions ci-dessous est sous \important{forme échelonnée réduite}  (``aussi diagonale que possible et avec des 1 sur la diagonale'')
+    \begin{enumerate}
+        \setcounter{enumi}{3}
+        \item Le coefficient principal de chaque ligne non nul vaut $1$.
+        \item Les coefficients principaux sont les seuls éléments non-nuls de leur colonne.
+    \end{enumerate}
+
+}
+
+\parag{Exemples}{
+
+    Les matrices suivantes ne sont pas échelonnées:
+    \[\begin{bmatrix} 0 & 4 & 3 \\ 0 & 1 & 1 \end{bmatrix}, \mathspace \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix} \]
+
+
+    Les matrices suivantes sont échelonnées:
+    \[\begin{bmatrix} 0 & 4 & 3 \\ 0 & 0 & 0 \end{bmatrix}, \mathspace \begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix} \]
+
+    Les matrices suivantes sont échelonnées réduites:
+    \[\begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix}, \mathspace \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}, \mathspace \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix} \]
+}
+
+
+\parag{Définition d'équivalence par les lignes}{
+    Deux matrices sont \important{équivalentes par les lignes} si on peut obtenir l'une à partir de l'autre via une séquence d'opérations élémentaires sur les lignes.
+
+    \subparag{Remarque}{
+        Toute matrice non-nulle est équivalent par les lignes avec au moins une matrice échelonnée, mais cette réduction n'est pas unique:
+        \[\begin{bmatrix} 2 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} \text{ et } \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} \]
+        sont échelonnées, et équivalentes.
+    }
+
+    Cependant:
+
+    \subparag{Théorème}{
+        Toute matrice est équivalente par les lignes à exactement une matrice échelonnée réduite.
+    }
+
+}
+
+
+\parag{Définition de position de pivot}{
+    Une matrice $A$ a une (unique) forme échelonnée réduite ; les emplacements de ses coefficients principaux sont les \important{positions de pivot} de $A$.
+}
+
+\parag{Définition de colonne pivot}{
+    Une colonne de $A$ qui contient une position de pivot est une \important{colonne pivot}.
+}
+
+\parag{Observation}{
+    Toutes les formes échelonnées de $A$ ont leur coefficient au même endroit. Donc, pour trouver les positions de pivot, il est suffisant de trouver une forme échelonnée, pas besoin de trouver la ``réduite''. Cela peut être compris de manière intuitive, en voyant qu'on passe par une matrice échelonnée pour obtenir une matrice échelonnée réduite.
+}
+
+\parag{Exemple}{
+    Les trois matrices suivantes sont équivalentes par les lignes
+    \[\begin{bmatrix} 0 & -3 & -6 & 4 & 9 \\ -1 & -2 & -1 & 3 & 1 \\ -2 & -3 & 0 & 3 & -1 \\ 1 & 4 & 5 & -9 & -7 \end{bmatrix} \mathspace \begin{bmatrix} \color{red}{1} & 4 & 5 & -9 & -7 \\ 0 & \color{red}{2} & 4 & -6 & -6 \\ 0 & 0 & 0 & \color{red}{-5} & 0 \\ 0 & 0 & 0 & 0 & 0 \end{bmatrix} \mathspace \begin{bmatrix}\color{red}{1} & 0 & -3 & 0 & 5 \\ 0 & \color{red}{1} & 2 & 0 & -3 \\ 0 & 0 & 0 & \color{red}{1} & 0 \\ 0 & 0 & 0 & 0 & 0 \end{bmatrix}\]
+
+    On peut bien voir que les coefficients principaux sont au même endroit pour la matrice échelonnée (qui n'est pas unique) que pour la matrice échelonnée réduite, qui est unique.
+}
+
+\parag{Remarque}{
+    Si on met tant d'emphase sur la forme échelonnée réduite et les pivots, c'est parce que cela nous donne une description complète des solutions d'un système. Par exemple, la matrice
+    \[\begin{bmatrix} \color{red}{1} & 0 & -3 & 0 & 5 \\ 0 & \color{red}{1} & 2 & 0 & -3 \\ 0 & 0 & 0 & \color{red}{1} & 0 \\ 0 & 0 & 0 & 0 & 0 \end{bmatrix} \]
+
+    Est équivalente au système:
+    \begin{systemofequations}{}
+    &\ x_1 - 3x_3 = 5 \\
+    &\ x_2 + 2x_3 = -3 \\
+    &\ x_4 = 0 \\
+    &\ 0 = 0
+    \end{systemofequations}
+
+    On peut voir que les colonnes pivot, les colonnes 1, 2 et 4, nous montrent quels variables n'apparaissent qu'une fois ($x_1$, $x_2$, $x_4$ n'apparaissent qu'une fois). On peut donc résoudre pour ces variables. Donc,
+    \begin{systemofequations}{}
+    &\ x_1 = 5 + 3x_3 \\
+    &\ x_2 = -3 - 2x_3 \\
+    &\ x_3 \text{ est libre} \\
+    &\ x_4 = 0
+    \end{systemofequations}
+}
+
+\parag{Solutions à partir de la forme échelonnée réduite}{
+    Toutes les variables qui correspondent à une colonne pivot apparaissent dans exactement une équation, avec le coefficient 1. On appelle ces variables les \important{variables de bases} ou \important{variables liées}.
+
+    Les autres variables sont \important{les variables libres} : on peut leur donner n'importe quelle valeur, et il est alors facile de choisir les valeurs des variables liée pour obtenir une des solutions du système.
+}
+
+\parag{Résumé pour résoudre un système}{
+    La méthode qu'on utilise s'appelle le \important{pivot de Gauss}:
+    \begin{enumerate}
+        \item Écrire la matrice augmentée du système.
+        \item Appliquer la méthode du pivot (en utilisant les opérations élémentaires sur les lignes) pour obtenir une matrice complète équivalente sous forme échelonnée. Déterminer si le système est compatible (regarder s'il y a des équations qui disent que $1 = 0$). S'il n'y a pas de solution c'est terminé ; sinon aller à l'étape suivante.
+        \item Continuer la méthode du pivot pour obtenir la forme échelonnée réduite.
+        \item Repasser sur le système d'équations correspondant à la matrice obtenue.
+        \item Réécrire chaque équation non nulle, de manière à exprimer les variables liées en fonctions des variables libres.
+    \end{enumerate}
+
+}
+
+\subsection{Équations vectorielles}
+\subsubsection{Définition et opérations}
+
+\parag{Définition de vecteur}{
+    $\mathbb{R}^n$ désigne l'ensemble des matrices de taille $n \times 1$; des matrices sous la forme:
+    \[\begin{bmatrix} x_1 \\ \vdots \\ x_n \end{bmatrix} \]
+
+    On appelle un élément de $\mathbb{R}^n$, un \important{vecteur de $\mathbb{R}^n$}.
+
+    Les coefficients du vecteur s'appellent aussi ses composantes.
+}
+
+\parag{Exemples}{
+    On a
+    \[\mathbb{R}^2 = \left\{\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \telque x_1, x_2 \in \mathbb{R} \right\}\]
+
+    On peut identifier chaque vecteur avec le point de coordonnées $\left(x_1, x_2\right)$ dans le plan avec un repère cartésien. De ce point de vue, $\mathbb{R}^2$ correspond au plan, et $\mathbb{R}^3$ correspond à l'espace cartésien en 3D.
+}
+
+\parag{Remarque}{
+    On appelle aussi cela un vecteur colonne; on aurait pu choisir de travailler avec des matrices de taille $1 \times n$m qu'on appelle vecteur ligne. Cela va juste être plus simple pour nous avec les vecteurs colonnes.
+}
+
+\parag{Opérations sur les vecteurs}{
+    Soient $\bvec{u}$ et $\bvec{v}$ deux vecteurs de $\mathbb{R}^n$, on écrit $\bvec{u}, \bvec{v} \in \mathbb{R}^n$ et on désigne leur composantes par
+    \[\bvec{u} = \begin{bmatrix} u_1 \\ \vdots \\ u_n \end{bmatrix} \text{ et } \bvec{v} = \begin{bmatrix} u_1 \\ \vdots \\ u_n \end{bmatrix} \]
+
+    La somme de $\bvec{u}$ et $\bvec{v}$ est
+    \[\bvec{u} + \bvec{v} = \begin{bmatrix} u_1 \\ \vdots \\ u_n \end{bmatrix} + \begin{bmatrix} v_1 \\ \vdots \\ v_n \end{bmatrix} = \begin{bmatrix} u_1 + v_1 \\ \vdots \\ u_n + v_n \end{bmatrix} \]
+
+}
+
+\parag{Exemple}{
+    Si on a
+    \[\bvec{u} = \begin{bmatrix} 3 \\ 1 \end{bmatrix} , \bvec{v} = \begin{bmatrix} 2 \\ 2 \end{bmatrix} \]
+
+    Alors,
+    \[\bvec{u} + \bvec{v} = \begin{bmatrix} 3 \\ 1 \end{bmatrix} + \begin{bmatrix} 2 \\ 2 \end{bmatrix} = \begin{bmatrix} 3 + 2 \\ 1 + 2 \end{bmatrix} = \begin{bmatrix} 5 \\ 3 \end{bmatrix} \]
+
+    \imagehere{SommeVecteurs.png}
+}
+
+\parag{Définition du produit par un scalaire}{
+    Le produit de $\bvec{u}$ par un scalaire $c \in \mathbb{R}$ est
+    \[c \bvec{u} = c\cdot \begin{bmatrix} u_1 \\ \vdots \\ u_n \end{bmatrix} = \begin{bmatrix} cu_1 \\ \vdots \\ cu_n \end{bmatrix}  \]
+}
+
+\parag{Exemple}{
+    Si on a
+    \[\bvec{u} = \begin{bmatrix} 3 \\ 1 \end{bmatrix} \]
+
+    Alors,
+    \[2 \bvec{u} = \begin{bmatrix} 6 \\ 2 \end{bmatrix}, -1 \bvec{u} = \begin{bmatrix} -3 \\ -1 \end{bmatrix}, \frac{1}{2} \bvec{u} = \begin{bmatrix} \frac{3}{2} \\ \frac{1}{2} \end{bmatrix} \]
+
+    \imagehere{ProduitVecteurs.png}
+}
+
+\parag{Observation}{
+    On remarque que si $\bvec{u}$ n'est pas nul, alors tous les vecteurs de la forme $c \bvec{u}$ pour $c \in \mathbb{R}$ sont sur une droite qui passe par l'origine (puisque $0 \bvec{u} = \bvec{0}$).
+
+    On écrit $\bvec{0}$, le vecteur nul:
+    \[\begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix} \]
+}
+
+\parag{Définition de la colinéarité}{
+    On dit que deux vecteurs $\bvec{u}$ et $\bvec{v}$ sont \important{colinéaires} s'il existe $c \in \mathbb{R}$ tel que $\bvec{u} = c \bvec{v}$
+}
+
+\parag{Définition de la soustraction}{
+    La soustraction de $\bvec{u}$ et $\bvec{v}$ est
+    \[\bvec{u} - \bvec{v} = \begin{bmatrix} u_1 - v_1 \\ \vdots \\ u_n - v_n \end{bmatrix} \]
+
+    On remarque que
+    \[\bvec{u} - \bvec{v} = \bvec{u} + \left(-1\right) \bvec{v}\]
+}
+
+\parag{Exemple}{
+    Si on a
+    \[\bvec{u} = \begin{bmatrix} -2 \\ 1 \end{bmatrix} \text{ et } \bvec{v} = \begin{bmatrix} -4 \\ -1 \end{bmatrix} \]
+
+    Alors,
+    \[\bvec{u} - \bvec{v} = \begin{bmatrix} -2 - \left(-4\right) \\ 1 - \left(-1\right) \end{bmatrix} = \begin{bmatrix} 2 \\ 2 \end{bmatrix} \]
+}
+
+\parag{Propriétés algébriques de $\mathbb{R}^n$}{
+    Pour tout $\bvec{u}, \bvec{v}, \bvec{w} \in \mathbb{R}^n$ et tout $a,b \in\mathbb{R}$:
+    \begin{itemize}
+        \item $\bvec{u} + \bvec{v} = \bvec{v} + \bvec{u}$
+        \item $\left(\bvec{u} + \bvec{v}\right) + \bvec{w} = \bvec{u} + \left(\bvec{v} + \bvec{w}\right)$
+        \item $\bvec{u} + \bvec{0} = \bvec{0} + \bvec{u} = \bvec{u}$
+        \item $\bvec{u} + \left(-\bvec{u}\right) = -\bvec{u} + \bvec{u} = \bvec{0}$, où $-\bvec{u}$ désigne $\left(-1\right) \bvec{u}$
+        \item $a\left(\bvec{u} + \bvec{v}\right) = a \bvec{u} + a \bvec{v}$
+        \item $\left(a + b\right)\bvec{u} = a \bvec{u} + b \bvec{u}$
+        \item $a\left(b \bvec{u}\right) = \left(ab\right) \bvec{u}$
+        \item $1 \bvec{u} = \bvec{u}$
+    \end{itemize}
+}
+
+\subsubsection{Combinaisons linéaires}
+\parag{Définition de combinaison linéaire}{
+    Étant donnés $p$ vecteurs $\bvec{v_1}, \ldots, \bvec{v_p} \in \mathbb{R}^n$ et $p$ scalaires $c_1, \ldots, c_p \in \mathbb{R}$, on appelle $\bvec{y} = c_1 \bvec{v_1} + \ldots + c_p \bvec{v_p}$ une \important{combinaison linéaire} de $\bvec{v_1}, \ldots, \bvec{v_p}$ avec les coefficients ou poids $c_1, \ldots, c_p$.
+}
+
+\parag{Exemple 1}{
+    Si on a
+    \[\bvec{v}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \mathspace \bvec{v}_2 = \begin{bmatrix} 0 \\ 1 \end{bmatrix} \]
+
+    On remarque que tous vecteur de $\mathbb{R}^2$ peut être écrit sous la forme d'une combinaison de ces deux vecteurs.
+}
+
+
+\end{document}

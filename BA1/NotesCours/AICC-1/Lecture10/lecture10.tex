@@ -1,0 +1,283 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-10-20 at 15:04:30.
+
+\usepackage{../../style}
+
+\title{AICC 1}
+\author{Joachim Favre}
+\date{Mercredi 20 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2021-10-20}{Sequences and countable infinities}{
+\begin{itemize}[left=0pt]
+    \item Definition of least upper, greatest lower bound and lattices.
+    \item Definition of lexicographic ordering.
+    \item Definition of sequences, and explanation of the most important ones (arithmetic progression, geometric progression and recurrence relations).
+    \item Explanation on how to compute sums and products.
+    \item Definition of set cardinality, and of countable sets.
+    \item Proof that $\mathbb{N}$ and $\mathbb{Q}$ are countable, but $\mathbb{R}$ is not.
+\end{itemize}
+ 
+}
+
+\parag{Example}{
+    Let's draw the following Hasse diagram:
+    \imagehere[0.25]{HasseDiagramUpperLowerBounds.png}
+
+    Then, we can see that $h$ is an upper bound for $\left\{a, e, d\right\}$; $f$ is a least upper bound for $\left\{a, e, d\right\}$ and $\left\{j, h\right\}$ has no upper bound.
+}
+
+\parag{Definition: Lattices}{
+    A partially ordered set in which every pair of elements has booth a least upper bound and a greatest lower bound is called a lattice.
+
+    \subparag{Example}{
+        $\left(\mathcal{P}\left(S\right), \subseteq\right)$ is a lattice. Indeed, the least upper bound of two subsets is $A \cup B$ and the greatest lower bound is $A \cap B$.
+    }
+}
+
+\parag{Definition: Lexicographic ordering}{
+    Given two posets $\left(A_1, \preccurlyeq_1\right)$ and $\left(A_2, \preccurlyeq_2\right)$, the \important{lexicographic ordering} on $A_1 \times A_2$ is defined by saying that $\left(a_1, a_2\right)\preccurlyeq \left(b_1, b_2\right)$ if: 
+    \[a_1 \preccurlyeq b_1 \lor \left(a_1 = b_1 \land a_2 \preccurlyeq_2 b_2\right)\]
+    
+    This definition can easily be extended to a lexicographic ordering on a $n$-ary Cartesian product.
+
+    \subparag{Motivation}{
+        This is basically the generalised idea of alphabetical order.
+    }
+
+    \subparag{Example}{
+        Let's consider $\left(\mathbb{Z} \times \mathbb{Z}, \leq\right)$. All ordered pairs less than $\left(3, 4\right)$ are:
+        \imagehere[0.7]{LexicographicOrdering.png}
+    }
+}
+
+\subsection{Sequences}
+\parag{Definition: Sequences}{
+    A \important{sequence} is a function from a subset of the integers --- usually $\mathbb{Z}_+$ or $\mathbb{N}$ --- to a set $S$. 
+
+    Let $f : \mathbb{Z}_+ \mapsto S$ be the function that defines a sequence. We write $a_n$ to denote the image $f\left(n\right)$ of integer $n$. We call $a_n$ a \important{term} of the sequence.
+
+    \subparag{Intuition}{
+        Sequences are basically ordered lists of elements of a set.
+    }
+    
+    \subparag{Example}{
+        Let $\left(a_n\right)$ denote the sequence that is defined by $a_n = \frac{1}{n}, n \geq 1$. Then: 
+        \[a_1 = 1, \mathspace a_2 = \frac{1}{2}, \mathspace a_3 = \frac{1}{3}, \mathspace, \ldots\]
+    }
+}
+
+\parag{Types of sequences}{
+    We can give name to the following sequences:
+    \begin{description}
+        \item[Arithmetic Progression:] $a_n = a + n\cdot d$, where $a$ and $d$ are given constants. For example, a car going at constant speed.
+        \item[Geometric Progression:] $a_n = ar^{n}$. For example, interest rates.
+        \item[Recurrence Relations:] $a_n = g\left(a_{n-1}, a_{n-2}, \ldots, a_{n-k}\right)$ with $k$ initial conditions. 
+    \end{description}
+
+    \subparag{Remark}{
+        Note that the arithmetic progression can be defined recursively as $a_n = a_{n-1} + d$ and $a_0 = a$. Similarly, the geometric progression can be defined recursively as $a_n = ra_{n-1}$ and $a_0 = a$.
+    }
+}
+
+\parag{Sum}{
+    We define 
+    \[s_n = \sum_{j=1}^{n} a_j = a_1 + \ldots + a_n\]
+
+    \subparag{Important sums}{
+        If we have $a_j = d$, then: 
+        \[s_n = \sum_{j=1}^{n} d = nd\]
+        
+        Else, if we have $a_j = j$, then (Gauss is too strong, he found it when was in Elementary School when his teacher asked his class to sum numbers from 1 to 100, in order to have some peace): 
+        \[s_n = \sum_{j=1}^{n} j = \frac{n\left(n+1\right)}{2} \]
+    }
+}
+
+\parag{Product}{
+    Concerning products, we define: 
+    \[p_n = \prod_{j=1}^{n} a_j = a_1 a_2 \cdots a_n\]
+    
+    \subparag{Important products}{
+        If we have $a_j = r$, then:
+        \[p_n = \prod_{j=1}^{n} r = r^{n}\]
+        
+        If $a_j = j$, then we have:
+        \[p_n = \prod_{j=1}^{n} j = n\left(n-1\right)\ldots1 = n!\]
+    }
+}
+
+\parag{Telescoping series}{
+    Given $a_0, \ldots, a_n$, then: 
+    \[\sum_{j=0}^{n} \left(a_j - a_{j-1}\right) = a_n - a_0\]
+    
+    \subparag{Proof}{
+        \begin{multiequality}
+            \sum_{j=1}^{n} \left(a_j - a_{j-1}\right) & = \sum_{j=1}^{n} a_j - \sum_{j=1}^{n} a_{j-1} \\
+            & = \sum_{j=1}^{n-1} a_j + a_n - \sum_{j=0}^{n-1} a_j \\
+            & = \sum_{j=1}^{n-1} a_j + a_n - \sum_{j=1}^{n-1} a_j - a_0 \\
+            & = a_n - a_0  
+        \end{multiequality}
+    }
+
+    \subparag{Example}{
+        We see that, if we pick $a_j = j^2$, then:
+        \[a_j - a_{j-1} = j^2 - \left(j-1\right)^2 = 2j - 1\]
+        
+        So:
+        \[\sum_{j=0}^{n} \left(2j - 1\right) = n^2 - 0^2 = n^2\]
+    }
+}
+
+\parag{Definition: String}{
+    A \important{string} is a finite sequence of characters from a finite set $A$ (an alphabet). 
+
+    \subparag{Example}{
+        The \important{empty string} is represented by $\lambda$. The string $abcde$ has length 5.
+    }
+}
+
+\parag{Lexicographic ordering on strings}{
+    A lexicographic ordering of strings can be defined using the ordering letters in the alphabet. This is the same ordering as that used in dictionaries.
+
+    We can note that strings with lexicographic ordering are well-ordered sets.
+}
+
+\subsection{Countable sets}
+\parag{Cardinality comparison}{
+    The cardinality of a set $A$ is equal to the cardinality of a set $B$, denoted by $\left|A\right| = \left|B\right|$ if and only if there is a bijection from $A$ to $B$ (we could draw a line going from each element of $a$ to each element of $b$, exactly one).
+
+    If there is an injection of from $A$ to $b$, the cardinality of $A$ is less than or equal to the cardinality of $B$, denoted $\left|A\right| \leq \left|B\right|$.
+
+    When $\left|A\right| \leq \left|B\right|$ and $A$ and $B$ have different cardinality, we say that the cardinality of $A$ is less than the cardinality of $B$, denoted $\left|A\right| < \left|B\right|$.
+}
+
+\parag{Definition}{
+    A set that is either finite or has the same cardinality as the set of positive integers, $\mathbb{Z}_+$, is called \important{countable}. Else, it is \important{uncountable}.
+
+    When a set is finitely countable, then its cardinality is its number of of elements. If it is countably infinite, its cardinality is $\aleph_0$.
+
+    \subparag{Remark}{
+        Note that $\aleph$ is read ``aleph''; it is the first letter of the Hebrew alphabet.
+    }
+}
+
+\parag{Example 1}{
+    Let's show that the set of positive integers $E$ is a countable set.
+
+    Indeed, let $f: \mathbb{Z}_+ \mapsto E$, $f\left(x\right) = 2x$. This want to show that $f$ is a bijection.
+
+    \subparag{Injective}{
+        Suppose that $f\left(n\right) = f\left(m\right)$. Then: 
+        \[2n = 2m \implies n = m\]
+        
+        Therefore, $f$ is injective.
+    }
+
+    \subparag{Surjective}{
+        Let $t$ be an arbitrary even positive integer. We know that $t = 2k$ or some positive integer $k$. Thus, $f\left(k\right) = t$, so $f$ is surjective.
+    }
+
+    Since $f$ is bijective, we deduce that the $E$ is a countable set.
+
+    \subparag{Generalisation}{
+        More generally, an infinite subset of a countable subset is countable.
+    }
+}
+
+\parag{Example 2: cardinality of power sets}{
+    Let $S$ be a set.
+
+    Then there exists no surjective function $f : S \mapsto \mathcal{P}\left(S\right)$. In other words, $\left|S\right| < \left|\mathcal{P}\left(S\right)\right|$.
+
+    \subparag{Proof}{
+        Let's assume for contradiction that such an $f$ exists. Let's consider the following set: 
+        \[T = \left\{s \in S | s \not\in f\left(s\right)\right\}\]
+
+        Since $T \subseteq S$, we know that $T \in \mathcal{P}\left(S\right)$, and thus, since $f$ is surjective, there exists $s_0 \in S$ such that $f\left(s_0\right) = T$. 
+
+        If $s_0 \in T$, then $s_0 \not\in f\left(s_0\right) = T$, which is a contradiction.
+
+        If $s_0 \not\in T = f\left(s_0\right)$, then $s_0 \in T$ by definition of $T$, which is also a contradiction.
+
+        \qed
+    }
+}
+
+\parag{Theorem: Showing countability}{
+    An infinite set $S$ is countable if and only if it is possible to list the elements of the set in a sequence indexed by positive integers.
+
+    \subparag{Poof $\implies$}{
+        Since $S$ is countable, there exists a bijection $f : \mathbb{Z}_+ \mapsto T$. Therefore, we can form the sequence $a_1, \ldots, a_n, \ldots$ where: 
+        \[a_1 = f\left(1\right), \ldots, a_n = f\left(n\right), \mathspace, \ldots\]
+    }
+
+    \subparag{Proof $\impliedby$}{
+        Since we can list the set in a sequence $\left(a_n\right)$ indexed by the positive integers, then we can define the function $f\left(n\right) = a_n$, which is a bijection.
+    }
+}
+
+\parag{Example}{
+    Let's show that the set of integers $\mathbb{Z}$ is countable. We can list its elements in a sequence: 
+    \[0, 1, -1, 2, -2, 3, -3, \mathspace\]
+    
+    Thus, $\mathbb{Z}$ is countable.
+}
+
+\parag{Hilbert's Grand Hotel}{
+    Hilbert's Grand Hotel has an infinite number of rooms, each occupied by a guest. However, we can always accommodate a new guest at this hotel.
+
+    Indeed, since the Grand Hotel is countable, we can list rooms: Room 1, Room 2, and so on. When a new guest arrives, we move the guest in Room $n$ to Room $n+1$ for all positive integers $n$. This frees up Room 1, which we assign to the new guest, and all the current guests still have rooms.
+}
+
+\parag{Cardinality of rational numbers}{
+    We want to show that rational numbers, $\mathbb{Q}$, are countable.
+
+    We can arrange them in a table, as $\frac{x}{y}$ in the $x$\Th row and $y$\Th column. We can follow a path that goes through all of them, and skip the ones we get multiple times ($\frac{1}{2}$ and $\frac{2}{4}$, for example).
+
+    \begin{center}
+        \imagehere[0.3]{CountabilityRationalNumbers.png}
+    \end{center}
+}
+
+\parag{Theorem}{
+    The union of a countable number of countable sets is countable. 
+
+    \subparag{Proof}{
+        We can again put them in a table and follow a path that goes through all of them.
+    }
+}
+
+\parag{Set of finite strings}{
+    The set of finite strings $s$ over a finite alphabet $A$ is countably infiniite.
+
+    Indeed, we can show that by listing all the strings. First, we list all the strings of length 0 in lexicographic order. Then, we list all the string of length 1 in lexicographic order. And we continue similarly.
+}
+
+\parag{Theorem: Real numbers}{
+    The set of real numbers $\mathbb{R}$ is uncountable.
+
+    \subparag{Proof}{
+        Let us take $\left[0,1\right]  \subseteq R$. Let's assume for contradiction that it is countable. Thus, we have a first irrational number that can be written as 
+        \[r_1 = 0.d_{11} d_{12} d_{13} d_{14} \ldots\]
+        
+        Using its decimal expansion. We can do the same for $r_2, \ldots, r_i$. So, generally, 
+        \[r_i = 0.d_{i1} d_{i2} \ldots d_{ii} \ldots\]
+        
+        Let us now take the number 
+        \[r = 0. d_1 d_2 d_3 \ldots\]
+        where $d_i$ is defined as followed:
+        \begin{functionbypart}{d_i}
+        3 \text{ if } d_{ii} \neq 3 \\
+        4 \text{ if } d_{ii} = 3
+        \end{functionbypart}
+
+        If $r$ were in the list, then $r = r_i$. However, it would then mean that if $d_{ii} \neq 3$ then $d_i = 3$, and if $d_{ii} = 3$, then $d_i \neq 3$, which is a contradiction. Thus, $r$ is not in the list and we have our contradiction.
+        
+        \qed
+    }
+}
+
+\end{document}

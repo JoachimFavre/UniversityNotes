@@ -1,0 +1,283 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-07 at 08:34:20.
+
+\usepackage{../../style}
+
+\title{AICC}
+\author{Joachim Favre}
+\date{Mardi 07 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{23}{2021-12-07}{Alienating sets, and \textit{désolé pour le dérangement}}{
+\begin{itemize}
+    \item Explanation on how to use generating functions to compute combinations, combinations with repetitions, and some more generalised cases. 
+    \item Definition of the extended binomial coefficients, and explanation of the extended binomial theorem.
+    \item Explanation of the principle of Inclusion-Exclusion.
+    \item Definition of derangements, and explanation on how to compute them.
+\end{itemize}
+}
+
+\parag{Fibonacci using generating function}{
+    As a recall, Fibonacci is given by: 
+    \[f_n = f_{n-1} + f_{n-2}, \mathspace f_0 = 1, \mathspace f_1 = 1\]
+    
+    Let's take a look at the generating function:
+    \begin{multiequality}
+        G\left(x\right) =\ & \sum_{k=0}^{\infty} f_k x^k  \\
+        =\ & f_0 + f_1 x + \sum_{k=2}^{\infty}  f_k x^k \\
+        =\ & f_0 + f_1 x + \sum_{k=2}^{\infty} \left(f_{k-1} + f_{k-2}\right)x^k \\
+        =\ & f_0 + f_1 x + \sum_{k=2}^{\infty} f_{k-1}  x^k + \sum_{k=2}^{\infty} f_{k-2}x^k  \\
+        =\ & 1 + x + x \sum_{k=2}^{\infty} f_{k-1} x^{k-1} + x^2 \sum_{k=2}^{\infty} f_{k-2}x^{k-2} \\
+        =\ & 1 + x + x \sum_{k=1}^{\infty} f_k x^k + x^2 x^2 \sum_{k=0}^{\infty} f_k x^k \\
+        =\ & 1 + x + x \left(G\left(x\right) - f_0\right) + x^2 G\left(x\right)  \\
+        =\ & 1 + x + x \left(G\left(x\right) - 1\right) + x^2 G\left(x\right)  \\
+    \end{multiequality}
+    
+    Solving this equation, we find: 
+    \[G\left(x\right) = \frac{1}{1 - x - x^2} = \frac{1}{-\left(x - r_1\right)\left(x - r_2\right)}, \mathspace r_1 = \frac{-1 - \sqrt{5}}{2} = -\phi, r_2 = \frac{\sqrt{5} - 1}{2} = -\bar{\phi}\]
+    
+    Let's use partial fractions: 
+    \[G\left(x\right) = \frac{1}{1 - x - x^2} = \frac{a}{x - r_1} + \frac{b}{x - r_1} \implies a\left(x - r_2\right) + b\left(x - r_1\right) = 1\]
+
+    Solving this equation, we get $a = \frac{1}{\sqrt{5}}$ and $b = -\frac{1}{\sqrt{5}}$. So: 
+    \[G\left(x\right) = \frac{1}{\sqrt{5}} \frac{1}{x - r_1} - \frac{1}{\sqrt{5}} \frac{1}{x - r_2} = \frac{-1}{\sqrt{5}r_1} \frac{1}{1 - \frac{x}{r_1}} + \frac{1}{r_2 \sqrt{5}} \frac{1}{1 - \frac{x}{r_2}}\]
+  
+    Using remarkable generating functions:
+    \[G\left(x\right) = -\frac{1}{r_1\sqrt{5}} \sum_{k=0}^{\infty} \frac{1}{r_1^k} x^k + \frac{1}{r_2\sqrt{5}} \sum_{k=0}^{\infty} \frac{1}{r_2^k} x^k\]
+
+    So, we get that: 
+    \[f_n = \frac{\frac{-1}{r_1^{k+1}} + \frac{1}{r_2^{k+1}}}{\sqrt{5}} = \frac{\phi^{k+1} - \bar{\phi}^{k+1}}{\sqrt{5}}\]
+}
+
+\subsection{More on generating functions}
+\parag{Combinations using generating functions}{
+    We want to distribute 2 cookies to 3 children such that no child receives more than 1 cookie, and we wonder in how many ways it can be done.
+
+    The first way of reasoning is that we want to choose two children to which we give the cookie, so we have $C\left(3, 2\right)$.
+
+    The second way of reasoning is considering children as the polynomial $\left(1 + x\right)$: the power of the $x$ tells how many cookies this kid has. Considering all three children together, we have to expand the following polynomial:
+    \[\left(1 + x\right)^3 = 1 + 3x + 3x^2 + x^3\]
+
+    Then, reading off the coefficient of $x^2$, we see that the result is $3$. It basically states that $x^2$ can be formed as: 
+    \[x\cdot x\cdot 1 = x^2, \mathspace x\cdot 1\cdot x = x^2, \mathspace 1\cdot x\cdot x = x^2\]
+    where each child is either represented by a 1 or a $x$: if they have a 1 they do not get a cookie, if they have a $x$ they receive a cookie.
+
+    \subparag{Personal note}{
+        Meanwhile, the poor Cookie Monster has zero cookie:
+        \begin{center}
+        \url{https://www.youtube.com/watch?v=1ZoIP4aoM0g}
+        \end{center}
+    }
+}
+
+\parag{Combinations}{
+    We want to find the number of $k$-combinations with $n$ elements using generating functions.
+
+    The number of $k$-combinations is the coefficient of $x^k$ in the following generating function: 
+    \[f\left(x\right) = \left(1 + x\right)^n = \sum_{k=0}^{n} \binom{n}{k} x^k\]
+    
+    Thus, the number of $k$-combinations is $\binom{n}{k}$, as expected.
+}
+
+\parag{Definition (extended binomial coefficients)}{
+    Let $u$ be a real number, and $k$ be a nonnegative integer. The \important{extended binomial coefficient} is defined as:
+    \begin{functionbypart}{\binom{u}{k}}
+        \frac{u\left(u-1\right)\cdots\left(u - k + 1\right)}{k!}, \mathspace \text{if } k > 0 \\
+        1, \mathspace \text{if } k = 0
+    \end{functionbypart}
+
+    \subparag{Example}{
+        For, example: 
+        \[\binom{-2}{3} = \frac{\left(-2\right)\left(-3\right)\left(-4\right)}{3!} = -4\]
+        
+        \[\binom{1 / 2}{2} = \frac{\left(\frac{1}{2}\right)\left(- \frac{1}{2}\right)}{2!} = -\frac{1}{8}\]
+    }
+}
+
+\parag{Theorem (extended binomial theorem)}{
+    Let $x$ and $u$ be real numbers, with $\left|x\right| < 1$. Then: 
+    \[\left(1 + x\right)^u = \sum_{k=0}^{\infty} \binom{u}{k} x^k\]
+
+    \subparag{Observation}{
+        Let's look at what happens when $u$ is an integer, and $k$ is greater than $u$. For example: 
+        \[\binom{n}{n+1} = \frac{n\left(n-1\right) \cdots \left(n-n\right)}{\left(n+1\right)!} = 0\]
+
+        Thus, we are adding infinitely many zeroes when we only have integers. This is why, in the ``regular'' binomial theorem, we are only summing until $n$.
+    }
+}
+
+\parag{Combination with repetitions using generating functions}{
+    We want to distribute 2 cookies to 3 children, and we wonder in how many ways it can be done.
+
+    Now, we can give each child 0, 1 or 2 cookies. This is a combination with repetition, so the number is given by: 
+    \[C\left(3 + 2 - 1, 2\right) = C\left(4, 2\right) = 6\]
+    
+    Let's also consider this problem using generating functions. Again, let's consider that each child is a polynomial, $\left(1 + x + x^2\right)$, where the power of $x$ is the number of cookies we give to them. So, again, we need to read off the coefficient of $x^2$ in 
+    \[\left(1 + x + x^2\right)^3\]
+}
+
+\parag{Combinations with repetition}{
+    We want to find the number of $k$-combinations of a set with $n$ elements, where repetition is allowed, using generating functions.
+
+    The number of $k$-combinations is the coefficient of $x^k$ in the generating function: 
+    \[f\left(x\right) = \left(1 + x + x^2 + \ldots\right)^n\]
+
+    As long as $\left|x\right| < 1$, we get: 
+    \[f\left(x\right) = \frac{1}{\left(1 + \left(-x\right)\right)^n} = \left(1 - x\right)^{-n} = \sum_{k=0}^{\infty} \binom{-n}{k} \left(-x\right)^k = \sum_{k=0}^{\infty} \binom{-n}{k} \left(-1\right)^k \left(x\right)^k \]
+    
+    So, the coefficient of $x^k$ is $\binom{-n}{k} \left(-1\right)^k$, let's simplify it: 
+    \begin{multiequality}
+        \left(-1\right)^k \binom{-n}{k} =\ & \left(-1\right)^k \frac{-n\left(-n-1\right) \cdots \left(-n - k + 1\right)}{k!}  \\
+    =\ & \left(-1\right)^k \frac{\left(-1\right)^k n\left(n+1\right)\cdots \left(n + k -1\right)}{k!}  \\
+    =\ & \left(-1\right)^{2k} \binom{n + k -1}{k} \\
+    =\ & \binom{n + k -1}{k} 
+    \end{multiequality}
+    as expected.
+}
+
+\parag{Example of generalisation 1}{
+    Let's now say that we want to distribute 8 cookies to 3 children, where each children receives 2, 3 or 4 cookies, and we wonder in how many ways it can be done.
+
+    We can translate it to a generating function, and we would only need to read off the coefficient of $x^8$ in:
+    \[\left(x^2 + x^3 + x^4\right)^3\]
+}
+
+\parag{Example of generalisation 2}{
+    Let's say we want to find the number of solutions of $e_1 + e_2 + e_3 = 17$, where $e_1, e_2, e_3$ are nonnegative integers with $2 \leq e_1 \leq 5$, $3 \leq e_2 \leq 6$ and $4 \leq e_3 \leq 7$. Translating this to a generating function would help us: 
+    \[\left(x^2 + x^3 + x^4 + x^5\right)\left(x^3 + x^4 + x^5 + x^6\right)\left(x^4 + x^5 + x^6 + x^7\right)\]
+    
+
+    Note that this still is not very efficient since, computationally we are not far from counting every possible ways. We don't need to use generating functions; thinking a little bit about this problem is sufficient (we can for example see that each child must have at least 2 cookies, so we can diminish all our constraints by 2, and have $e_1 + e_2 + e_3 = 17 - 6 = 11$).
+}
+
+
+\subsection{Principle of Inclusion-Exclusion}
+\parag{Three finite sets}{
+    If we have three sets, we have: 
+    \[\left|A \cup B \cup C\right| = \left|A\right| + \left|B\right| + \left|C\right| - \left|A \cap B\right| - \left|A \cap C\right| - \left|B \cap C\right| + \left|A \cap B \cap C\right|\]
+    
+    \imagehere{PrincipleOfInclusionExclusionOnThreeSets.png}
+
+    We could also derive it by expanding $\left|A \cup B \cup C\right|$ knowing that $\left|X \cup Y\right| = \left|X\right| + \left|Y\right| - \left|X \cap Y\right|$ (we have already proven that).
+}
+
+\parag{Example}{
+    Let's say we wonder how many positive integers less that or equal to 1000 are divisible by 5, 7, or 11.
+
+    We can see that there are $\left\lfloor \frac{1000}{n} \right\rfloor $ integers less than or equal to 1000 divisible by $n$. Thus, the number we are looking for is given by: 
+    \[\left\lfloor \frac{1000}{5} \right\rfloor + \left\lfloor \frac{1000}{7} \right\rfloor + \left\lfloor \frac{1000}{11} \right\rfloor - \left\lfloor \frac{1000}{5\cdot 7} \right\rfloor - \left\lfloor \frac{1000}{5\cdot 11} \right\rfloor - \left\lfloor \frac{1000}{7\cdot 11} \right\rfloor + \left\lfloor \frac{1000}{5\cdot 7\cdot 11} \right\rfloor = 372\]
+}
+
+\parag{Theorem: Principle of Inclusion-Exclusion}{
+    Let $A_1, \ldots, A_n$ be fine sets. Then $\left|A_1 \cup \ldots \cup A_n\right|$ is given by:
+    \[\sum_{1 \leq i \leq n}^{} \left|A_i\right| - \sum_{i \leq i < k \leq n}^{} \left|A_i \cap A_k\right| + \sum_{1 \leq i < j < k \leq n}^{} \left|A_i \cap A_j \cap A_k\right| - \ldots + \left(-1\right)^{n+1} \left|\bigcap_{1 \leq i \leq n} A_i\right|\]
+
+    \subparag{Proof}{
+        Let's assume that an element $a$ belongs to $r$ sets, where $1 \leq r \leq n$. 
+
+        \begin{center}
+        \begin{tabular}{|c|c|}
+            \hline
+            When computing & $a$ is counted \_ times  \\
+            \hline
+            $\displaystyle \sum_{}^{} \left|A_i\right|$ & $\displaystyle r = C\left(r, 1\right)$  \\
+            \hline
+            $\displaystyle \sum_{}^{} \left|A_i \cap A_j\right|$ & $\displaystyle C\left(r, 2\right)$  \\
+            \hline
+            $\displaystyle \sum_{}^{} \underbrace{\left|A_i \cap \ldots \cap A_j\right|}_{m \text{ sets}}$ & $\displaystyle C\left(r, m\right)$  \\
+            \hline
+        \end{tabular}
+        \end{center}
+
+        So, the total number of times $a$ is counted is given by: 
+        \[C\left(r, 1\right) - C\left(r,2\right) + \ldots + \left(-1\right)^{i+1} C\left(r, r\right) = \sum_{i=1}^{r} \left(-1\right)^{i+1} C\left(r, i\right)\]
+
+        Moreover, we can notice that:
+        \begin{multiequality}
+        0 =\ & \left(1 + \left(-1\right)\right)^i  \\
+        =\ & \sum_{i=0}^{r} \left(-1\right)^i C\left(r, r - i\right)  \\
+        =\ & - \sum_{i=0}^{r} \left(-1\right)^{i+1} C\left(r, i\right)  \\
+        =\ & -\left(-1\right)^{0+1} - \sum_{i=1}^{r} \left(-1\right)^{i+1} C\left(r, i\right)  \\
+        =\ & 1 - \sum_{i=1}^{r} \left(-1\right)^{i+1} C\left(r, i\right) 
+        \end{multiequality}
+        
+        From this equation, we deduce that:
+        \[\sum_{i=1}^{r} \left(-1\right)^{i+1} C\left(r, i\right) = 1\]
+        which was the number we got, giving how many times $a$ is counted. Each element is thus indeed counted exactly 1 time.
+
+        \qed
+    }
+}
+
+\parag{Definition: derangement}{
+    A \important{derangement} is a permutation of objects that leaves no object in the original position.
+
+    \subparag{Example}{
+        The permutation of $21453$ is a derangement of $12345$. However, $215{\color{red}4}3$ is not a derangement of $123{\color{red}4}5$.
+    }
+
+    \subparag{Personal note}{
+        Derangements could for example be used to count the number of ways a Secret Santa can be organised. Indeed, we give everybody someone's name for whom they must buy a gift, but if someone must offer a gift to themself it is a bit sad.
+    }
+    
+    
+}
+
+\parag{Theorem}{
+    The number of derangements of a set with $n$ elements is given by: 
+    \[D_n = n! \left(1 - \frac{1}{1!} + \frac{1}{2!} - \frac{1}{3!} + \ldots + \left(-1\right)^n \frac{1}{n!}\right)\]
+
+    \subparag{Note}{
+        This theorem is much less important than its proof. It is more important to be able to find this formula, rather than knowing the result by heart.
+    }
+
+    \subparag{Proof}{
+        $P_i$ are the permutations that fix element $i$, where $i = 1, \ldots, n$.
+
+        The set of permutations that fix at least one element is: 
+        \[P_1 \cup P_2 \cup \ldots \cup P_n\]
+        
+        From that, we get that the total number of derangements is given by:
+        \[D_n = n! - \left|P_1 \cup \ldots \cup P_n\right|\]
+        
+        Using the principle of inclusion-exclusion: 
+        \[\left|P_1 \cup \ldots \cup P_n\right| = \sum_{}^{} \left|P_i\right| - \sum_{i \neq j}^{} \left|P_i \cap P_j\right| + \ldots + \left(-1\right)^{n+1} \left|P_1 \cap \ldots \cap P_n\right|\]
+        
+        To compute $\sum_{}^{} \left|P_i\right|$, we see that we choose one element out of the $n$ that we fix, and compute the permutations of the others: 
+        \[C\left(n, 1\right)\left(n - 1\right)!\]
+        
+        Similarly, to compute $\sum_{i\neq j}^{} P_i \cap P_j$, we can choose two elements that we fix, and then compute the permutations of the others: 
+        \[C\left(n, 2\right)\left(n-2\right)!\]
+        
+        The pattern appears, so we can compute what we were looking for: 
+        \begin{multiequality} 
+        & \left|P_1 \cup \ldots \cup P_n\right|  \\
+        =\ & \frac{n!}{\left(n-1\right)!1}\left(n-1\right)! - \ldots + \left(-1\right)^{n+1} \frac{n!}{\left(n-n\right)!n!} \left(n - n\right)!  \\
+        =\ & n! - \frac{n!}{2} + \ldots + \left(-1\right)^{n+1} \frac{n!}{n!} \\
+        =\ & n!\left(\frac{1}{1!} - \frac{1}{2!} + \ldots + \left(-1\right)^{n+1} \frac{1}{n!}\right)
+        \end{multiequality}
+        
+        So, we do get that: 
+        \[D_n = n! - \left|P_1 \cup \ldots \cup P_n\right| = n!\left(1 - \frac{1}{1!} + \frac{1}{2!} - \ldots + \left(-1\right)^{n} \frac{1}{n!}\right)\]
+
+        \qed
+    }
+}
+
+\parag{Example}{
+    In the Hatcheck problem, a new employee checks the hats of $n$ people at a restaurant, forgetting to put claim check numbers on the hat. When customers return for their hats, the checker gives them back hat chosen at random from the remaining hats. We wonder what is the chance that no one receives the correct hat.
+
+    This probability is given by: 
+    \[\frac{D_n}{n!} = 1 - \frac{1}{1!} + \ldots + \left(-1\right)^n \frac{1}{n!}\]
+    
+    \subparag{Personal note}{
+        It is interesting to see that, as $n \to \infty$, this probability tends towards $e^{-1}$ ($\frac{D_n}{n!}$ is the power series of $e^x$ evaluated at $x = -1$).
+    }
+    
+}
+
+
+\end{document}

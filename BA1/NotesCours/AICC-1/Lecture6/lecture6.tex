@@ -1,0 +1,371 @@
+\documentclass{article}
+
+% Expanded on 2021-10-06 at 15:14:02.
+
+\usepackage{../../style}
+
+\title{AICC-1}
+\author{Joachim Favre}
+\date{Mercredi 06 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2021-10-06}{The end of proofs and the beginning of sets}{
+\begin{itemize}[left=0pt]
+    \item Examples of different proofs (direct, by contraposition and by contradiction).
+    \item Explanation of other proof methods, for biconditional statements, proofs by case, proof by counterexample and existence proofs (constructive or non-constructive).
+    \item Examples of some mistakes (or voluntary ``mistakes'') that can append in proofs.
+    \item Definition of the concept of sets, and of the most important ones (sets of numbers, intervals, universal and empty sets). 
+\end{itemize}
+}
+
+\parag{Definition: Rational number}{
+    The real number $r$ is \important{rational} if there exist integers $p$ and $q$, with $q \neq 0$, such that: 
+    \[r = \frac{p}{q}\]
+}
+
+\parag{Theorem: Rational sum}{
+    The sum of two rational number is rational.
+
+    \subparag{Proof}{
+        Let $r_1$, $r_2$ be rational numbers. Therefore, $r_1 = \frac{p_1}{q_1}$ and $r_2 = \frac{p_2}{q_2}$ where $p_1, q_1, p_2, q_2$ are integers, and $q_1, q_2 \neq 0$. So: 
+        \[r_1 + r_2 = \frac{p_1}{q_1} + \frac{p_2}{q_2} = \frac{p_1 q_2 + p_2 q_1}{q_1 q_2}\]
+        
+        Let $p' = p_1 q_2 + p_2 q_1 \in \mathbb{N}$ and $q' = q_1 q_2 \in \mathbb{N}$. Since both $q_1$ and $q_2$ are non zero, then $q'$ is not as well. So, 
+        \[r_1 + r_2 = \frac{p'}{q'}\]
+        which is rational.
+
+        \qed
+    }
+}
+
+\parag{Theorem (proof by contraposition)}{
+    Let $n$ be an integer. If $3n + 2$ us odd, then $n$ is odd.
+
+    \subparag{Proof}{
+        Let's do a proof by contraposition. The contrapositive of our sentence --- thus what we are trying to show --- is ``if $n$ is even (not odd), then $3n + 2$ is even (not odd).''
+
+        Let $n$ be even, meaning there exists a $k$ such that $n = 2k$ (by definition). So, 
+        \[3n + 2 = 3\left(2k\right) + 2 = 6k + 2 = 2\left(3k + 1\right)\]
+
+        By letting $k' = 3k + 1$, we have $3n + 2 = 2k'$, so $3n + 2$ is even.
+
+        \qed
+    }
+}
+
+\parag{Theorem (proof by contraposition)}{
+    Let $n$ be an integer. If $n^2$ is odd, then $n$ is odd.
+
+    \subparag{Proof}{
+        Again, let's prove this theorem by contraposition. The contrapositive of our sentence is ``if $n$ is even, then $n^2$ is even''.
+
+        Let $n$ be an even number, i.e. $n = 2k$ for some integer $k$. So, 
+        \[n^2 = \left(2k\right)^2 = 4k^2 = 2\overbrace{\left(2k^2\right)}^{k'} = 2k'\]
+        
+        So, $n^2 = 2k'$, which means it is even.
+
+        \qed
+    }
+}
+
+
+\parag{Pigeon-hole principle (proof by contradiction)}{
+    If more than $N$ items are distributed in any manner over $N$ bins, there must be a bin containing at least two items.
+    
+    \subparag{Remark}{
+        We will come back much later to this theorem; we will use it in counting.
+    }
+
+    \subparag{Proof}{
+        The proposition $p$ is ``more than $N$ items are distributed over $N$ bins'', and $q$ is ``one bin contains at least 2 items''. Thus, the negation of $q$ --- $\lnot q$ --- is ``all bins contain at most 1 item''. 
+
+        Since it is a proof by contradiction, we suppose $p$ and $\lnot q$. $\lnot q$ implies that there are at most $N$ items, but it is a contradiction with $p$. In other words, $\lnot p \land p \equiv F$. 
+
+        \qed
+    }
+}
+
+\parag{Contraposition versus contradiction}{
+    We can realise that the last proof could also have been done with a proof by contraposition.
+
+    More generally, any proof by contradiction can be formulated as a proof by contradiction, but the reciprocal is not always true. Indeed, for a proof by contraposition, we show that: 
+    \[\lnot q \to \lnot p\]
+    
+    Thus, if we have a direct proof for $\lnot q \to \lnot p$, we can also do a proof by contradiction. Indeed, since we assumed $\lnot q$, we get $\lnot p$, which is a contradiction when put together with out other assumption, $p$: 
+    \[\left(p \land \lnot q\right) \to \left(p \land\lnot p\right)\]
+    
+    Generally, proofs by contradiction are stronger, since they allow us to show that: 
+    \[\left(p \land\lnot q\right) \to \left(r \land\lnot r\right)\]
+}
+
+\parag{Theorem (genuine proof by contradiction)}{
+    $\sqrt{2}$ is irrational.
+
+    \subparag{Proof}{
+        Let's suppose for contradiction that $\sqrt{2}$ is rational ($\lnot q$).
+
+        So, it means that there exist integers $a, b$, $b \neq 0$ such that $\sqrt{2} = \frac{a}{b}$ where $a$ and $b$ have no common factors ($r$). Then, 
+        \[2 = \frac{a^2}{b^2} \implies 2b^2 = a^2 \implies a^2 \text{ even } \implies a \text{ even}\]
+
+        We can thus write $a = 2c$. So, 
+        \[2b^2 = a^2 = 4c^2 \implies b^2 = 2c^2 \implies b^2 \text{ even} \implies b \text{ even}\]
+        
+        Therefore, we can write $b = 2d$. However, since $a$ and $b$ are both even, it implies that have a common factor, 2 ($\lnot r$). We thus have our contradiction. 
+
+        \qed
+        }
+}
+
+\subsection{Other proof methods}
+\parag{Proof for Biconditional Statements}{
+    To prove a theorem which is a biconditional statement, i.e of the form $p \leftrightarrow q$, we show that $p \to q$ and $q \to p$ are both true.
+
+    This is based on: 
+    \[p \leftrightarrow q \equiv p\to q \land q \to p\]
+    
+
+    \subparag{Example}{
+        Let's say we want to show that, with $n$ an integer, $n$ is odd if and only if $n^2$ is odd. To do that, we would need that $n$ is odd implies that $n^2$ is odd, and that if $n^2$ is odd then $n$ is odd. Since we have already proven both, we have proven our theorem.
+
+        \qed
+    }
+    
+}
+
+\parag{Proof by cases}{
+    We can see the following equivalence: 
+    \[\left(p_1 \lor \ldots \lor p_n\right) \to q \equiv \left(p_1 \to q\right) \land\ldots \land \left(p_n \to q\right)\]
+    
+    Thus, to prove a theorem of the form $\left(p_1 \lor \ldots \lor p_n\right) \to q$, we only have to prove every $p_i \to q$ --- called a case --- separately.
+
+    \subparag{Example}{
+        Let's say we want to show that if $n$ is an integer, then we have $n^2 \geq n$. 
+
+        Let's check when $n = 0$: 
+        \[0^2 \geq 0 \implies n^2 \geq n\]
+        
+        When $n \geq 1$: 
+        \[n \geq 1 \over{\implies}{$\cdot n$} n^2 \geq n\]
+
+        When $n \leq -1$: 
+        \[n \leq -1 \leq 0 \text{ and } n^2 > 0 \implies n^2 > 0 \geq n\]
+        
+        \qed
+    }
+    
+    \subparag{WLOG}{
+        In the context of a proof by case, there may be a case that follows trivially from another (for example, by swapping roles of variables). In such a scenario, we can use the word ``WLOG'' --- ``Without Loss Of Generality''. Note that in French, we say ``SPDG'' --- ``Sans Perte De Généralité''.
+
+        For example, let's say we want to show that if $x, y$ are integers and both $xy$ and $x + y$ are even, then both $x$ and $y$ are even. If we want to prove this problem by contrapositive, we will have $x$ or $y$ is odd. We can take WLOG that $x$ is odd. Indeed, if $y$ is odd the problem is completely symmetrical, and the proof would be the exact same.
+    }
+}
+
+\parag{Proof by counterexample}{
+    To establish that $\forall x P\left(x\right)$ is false, i.e. that $\lnot \forall x P\left(x\right)$ is true, we only need to find a $c$ such that $\lnot P\left(c\right)$ is true. Indeed: 
+    \[\lnot \forall x P\left(x\right) = \exists x \lnot P\left(x\right)\]
+    
+    In this case, $c$ is called a \important{counterexample} to the assertion $\forall x P\left(x\right)$.
+
+    \subparag{Example}{
+        Let's say we  want to show that ``every positive integer is the sum of the square of 2 integers'' is false.
+
+        We notice that $1 = 1^2 + 0^2$, $2 = 1^2 + 1^2$. However, $3 = 3 + 0 = 2 + 1$, so $3$ is a counterexample.
+    }
+}
+
+\parag{Existence proof}{
+    To show that $\exists x P\left(x\right)$, we have two possibilities: 
+    \begin{itemize}[left=0pt]
+        \item \important{Constructive Proof:} Find a $c$ such that $P\left(c\right)$ is true. 
+        \item \important{Non-constructive proof:} Find $c_1, c_2$ such that $P\left(c_1\right) \lor P\left(c_2\right)$ is true. Indeed:
+            \[\left(P\left(c_1\right) \to \exists x P\left(x\right)\right) \land \left(P\left(c_2\right) \to \exists x P\left(x\right)\right) \equiv \left(P\left(c_1\right) \lor P\left(c_2\right)\right) \to \exists x P\left(x\right)\]
+        
+       This is called ``non-constructive'', because we do not know if it is $c_1$ or $c_2$ which satisfies this property.
+    \end{itemize}
+
+
+    \subparag{Example of constructive proof}{
+        There exists a positive integer that can be written as a sub of cubes in two ways: 
+        \[1729 = 10^3 + 9^3 = 12^3 + 1^3\]
+        
+        Note that I knew this number and impressed the professor and the whole class! \smiley This is the Hardy-Ramanujan constant, and it has a great history.
+    }
+
+    \subparag{Example of non-constructive proof}{
+        We want to show that there exists irrational numbers $x$ and $y$ such that $x^{y}$ is rational. 
+
+        Let's consider $\sqrt{2}^{\sqrt{2}}$. If it is rational, then $x_1 = \sqrt{2}$ and $y_1 = \sqrt{2}$ are such that $x_1^{y_1}$ is rational. Else, if $\sqrt{2}^{\sqrt{2}}$ is irrational, we have:
+        \[\left(\sqrt{2}^{\sqrt{2}}\right)^{\sqrt{2}} = \sqrt{2}^{\sqrt{2} \cdot \sqrt{2}} = \sqrt{2}^2 = 2\]
+
+        In other words, in this second case, we have found $x_2 = \sqrt{2}^{\sqrt{2}}$, $y_2 = \sqrt{2}$, which are both irrational, such that  $x_2^{y_2}$ is rational.
+
+        \qed
+    }
+    
+    
+}
+
+\subsection{Misteaks in proofs}
+\parag{Example 1}{
+    Let's consider the following proof:
+    \begin{center}
+    \begin{tabular}{r@{\,}c@{\,}l@{\,}|l}
+        $-1$ & $=$ & $\left(-1\right)^1$ & \textit{Step 1}  \\
+             & $=$ & $\left(-1\right)^{\frac{2}{2}}$ & \textit{Step 2} \\
+             & $=$ & $\left(\left(-1\right)^2\right)^{\frac{1}{2}}$ & \textit{Step 3} \\
+             & $=$ & $1^{\frac{1}{2}}$ & \textit{Step 4} \\
+             & $=$ & 1 & \textit{Step 5}
+    \end{tabular}
+    \end{center}
+    
+    This proof is definitely wrong since $-1 \neq 1$. We can see that, actually, in the third step, we are abusing the following law:
+    \[\forall x \geq 0, \mathspace \left(x^a\right)^b = x^{ab} \]
+}
+
+\parag{Example 2}{
+    We are looking for a solution of $\sqrt{2x^2 - 1} = x$:
+    \begin{center}
+    \begin{tabular}{r@{\,}r@{\,}c@{\,}l@{\,}|l}
+        & $\sqrt{2x^2 - 1}$ & $=$ & $x$ & \\
+        $\iff$ & $2x^2 - 1$ & $=$ & $x^2$ & \textit{Step 1} \\
+        $\iff$ & $x^2 - 1$ & $=$ & $0$ & \textit{Step 2}  \\
+        $\iff$ & $\left(x - 1\right)\left(x + 1\right)$ & $=$ & $0$ & \textit{Step 3}  \\
+        $\iff$ & \multicolumn{3}{c|}{$x = 1 \lor x = -1$} & \textit{Step 4} \\
+    \end{tabular}
+    \end{center}
+
+    However, $x = -1$ is not a solution, so there is a mistake in our reasoning.
+
+    The error is the first step. Indeed, it is true that $\forall x \forall y\left(x = y \to x^2 = y^2\right)$, but not $\forall x \forall y \left(x = y \leftarrow x^2 = y^2\right)$. We have thus introduced an extraneous solution.
+}
+
+\parag{Example 3}{
+    Let's consider the following reasoning:
+    \begin{center}
+    \begin{tabular}{l|l}
+        $\left(p \to q\right) \lor \left(q \to p\right)$ is a tautology. & \textit{Step 1} \\
+        Let $p :=$ ``$n$ is odd'' and $q :=$ ``$n$ is prime''. & \textit{Step 2} \\
+        However, neither $\left(\text{odd} \to \text{prime}\right)$ nor $\left(\text{prime} \to \text{odd}\right)$ is true. & \textit{Step 3}
+    \end{tabular}
+    \end{center}
+    
+    There is a contradiction, so this reasoning must be wrong.
+
+    Here, we are abusing the distribution of quantifier. Indeed, we know that the following proposition is a tautology: 
+    \[\forall n\left(p\left(n\right) \to q\left(n\right) \lor q\left(n\right) \to p\left(n\right)\right) \]
+    
+    And we are saying that this is a contradiction since the following proposition is wrong:
+    \[\forall n\left(p\left(n\right) \to q\left(n\right)\right) \lor \forall n\left(q\left(n\right) \to p\left(n\right)\right)\]
+
+    However, those two propositions are not equal; we cannot distribute the universal quantifier.
+}
+
+\section{Sets and functions}
+\subsection{Introduction to sets}
+\parag{Short History}{
+    Most of the set theory was developed between the nineteenth and the twentieth century.
+
+    Cantor, the founder of this theory, discovered uncountable sets. Peano introduces notations (such as $\in$, $\cup$, $\cap$) and axioms for natural numbers. Zermelo and Fraenkel developed the currently widely accepted axioms for set theory. Bertrand Russell (known for his participation to the CND) wrote Principia Mathematica, deriving all mathematics from primitive axioms; he is known for his antimony on set theory.
+}
+
+\parag{Introduction}{
+    Sets are one of the basic building blocks in discrete mathematics. They are the basis for counting, functions, relations, and so on. Many programming language have set operations, and databases are sets of discrete objects.
+
+    Set theory is an important branch of mathematics. Many different systems of axioms have been used to develop set theory. In our context, we are not interested by formal set of axioms, we will use what is called \important{naïve set theory}.
+    
+    Note that sets are basic and important abstractions in mathematics and computer science. Indeed, many data structures are constructed from the abstractions we will develop. For example, unordered collections are similar to sets, ordered collections are similar to sequences, network and graphs are similar to relations, databases are similar to relations, and so on. Moreover, many computing models are made using these abstractions. For example, finite state machines are similar to relations, programs are decomposed into functions, and costs of programs are expressed as functions.
+}
+
+\parag{Definition}{
+    A \important{set} is an unordered collection of objects. The objects in a set are called the \important{elements} of the set. A set is said to \important{contain} its elements. 
+
+    The notation $a \in A$ denotes that mka  is an element of the set $A$. If $a$ is not an element of $A$, we write $a \not\in A \equiv \lnot\left(a \in A\right)$
+}
+
+\parag{Roster method}{
+    To describe a set, we can use what is called the \important{Roster method}. Basically, we list all elements: 
+    \[S = \left\{a, b, c, d\right\}\]
+    
+    We are basically saying 
+    \[\forall x \left(x \in S \leftrightarrow \left(x = a \lor x = b \lor x = c \lor x = d\right)\right)\]
+
+    If we can continue the set in a logical way, we can use ellipses: 
+    \[T = \left\{0, 1, 2, 3, 4, \ldots\right\}\]
+
+    \subparag{Order}{
+        Note that sets are unordered, so the order is not important: 
+        \[S = \left\{a, b, c, d\right\} \equiv \left\{b, c, a, d\right\}\]
+    }
+}
+
+\parag{Example}{
+    For example, the set of all vowels in the English alphabet is:
+    \[\left\{a, e, i, o, u, y\right\}\]
+
+    The set of all odd positive integers less than 10 is: 
+    \[\left\{1, 3, 5, 7, 9\right\}\]
+    
+    The set of all positive integers less than 100 is: 
+    \[\left\{1, 2, \ldots, 99\right\}\]
+    
+    The set of all integers less than 0 is: 
+    \[\left\{-1, -2, \ldots\right\}\]
+}
+
+\parag{Sets of number}{
+    The following sets of numbers are really important:
+    \begin{center}
+    \begin{tabular}{lll}
+        $\mathbb{N}$ & Natural numbers & $\left\{0, 1, 2, 3, \ldots\right\}$ \\
+        $\mathbb{Z}$ & Integers & $\left\{\ldots, -2, -1, 0, 1, 2, \ldots\right\}$ \\
+        $\mathbb{Z}_+$ & Positive integers & $\left\{1, 2, 3, \ldots\right\}$ \\
+        $\mathbb{Q}$ & Rational numbers & \\
+        $\mathbb{R}$ & Real numbers &  \\
+        $\mathbb{R}_+$ & Positive real numbers & \\
+        $\mathbb{C}$ & Complex numbers & 
+    \end{tabular}
+    \end{center}
+    
+    Note that \textit{\important{0 is NOT positive, this is really important for tests!}}
+}
+
+\parag{Set-builder notation}{
+    We can specify the property or properties that all members satisfy: 
+    \[S = \left\{x | P\left(x\right)\right\}\]
+    
+    $P\left(x\right)$ might be expressed in natural language or predicate logic.
+
+    \subparag{Examples}{
+        We can construct the following sets: 
+        \[S = \left\{x | x \text{ is a positive integer less than 100}\right\}\]
+        \[\mathbb{Q} = \left\{x \in \mathbb{R} | \exists p, q \in \mathbb{N} \text{ such that } x = \frac{p}{q}\right\}\]
+    }
+}
+
+\parag{Interval notation}{
+    For sets of number we can use the following notations: 
+    \[\left[a, b\right]  = \left\{x | a \leq x \leq b\right\}, \mathspace \left[a, b\right) = \left\{x | a \leq x < b\right\}\]
+    \[\left(a, b\right]  = \left\{x | a < x \leq b\right\}, \mathspace \left(a, b\right) = \left\{x | a < x < b\right\}\]
+    
+    Note that we call $\left[a, b\right]$ a \important{closed interval}, and $\left(a, b\right)$ an \important{open interval}. Sometimes, we also note: 
+    \[\left(a, b\right) = \left]a, b\right[ \]
+}
+
+\parag{Important sets}{
+    The \important{universal set}, $U$, is the set containing everything currently under consideration. It depends on the context. Note that it is very dangerous, because it is often implicit.
+
+    The \important{empty set} is the set with no element. It can be noted as $\o$ or $\left\{\right\}$.
+
+    \subparag{Important remark}{
+        Note that sets can e elements of sets. For example, the following set is valid:
+        \[\left\{\left\{1, 2, 3\right\}, a, \left\{b, c\right\}\right\}\]
+        
+        Thus, the empty set is different from a set containing the empty set: 
+        \[\o \neq \left\{\o\right\}\]
+        
+    }
+}
+
+\end{document}

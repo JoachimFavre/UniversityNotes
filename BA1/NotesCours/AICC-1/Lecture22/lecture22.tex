@@ -1,0 +1,307 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-01 at 15:14:59.
+
+\usepackage{../../style}
+
+\title{AICC 1}
+\author{Joachim Favre}
+\date{Mercredi 01 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{22}{2021-12-01}{Closed forms of recurrence relations}{
+\begin{itemize}[left=0pt]
+    \item Explanation on how to solve linear homogeneous recurrence relation of degree $k$ with constant coefficients, and definition of its characteristic equation.
+    \item Definition of generating functions.
+    \item Explanation on how to solve recurrence relations using generating functions.
+\end{itemize}
+   
+}
+
+\subsection{Solving recurrence relations}
+\subsubsection{Linear homogeneous recurrence relations with constant coefficients}
+\parag{Definition}{
+    A \important{linear homogeneous recurrence relation of degree $k$ with constant coefficients} is a recurrence relation of the form 
+    \[a_n = c_1 a_{n-1} + c_2 a_{n-2} + \ldots + c_k a_{n-k}\]
+    where $c_1, \ldots, c_k$ are real numbers and $c_k \neq 0$.
+
+    \subparag{Observation}{
+        By strong induction, a sequence satisfying such a recurrence relation is uniquely determined by the recurrence relation and the $k$ initial conditions $a_0 = C_1, \ldots a_k = C_k$.
+    }
+
+    \subparag{Terminology}{
+        \begin{itemize}[left=0pt]
+            \item It is \important{linear} since the right-hand side is a sum of the previous term of the sequence each multiplied by a function of $n$.
+            \item It is \important{homogeneous} because no terms occur that are not multiple of the $a_j$s (there is no constant).
+            \item It has \important{constant coefficients} $c_1, \ldots, c_k$.
+            \item The \important{degree} is $k$ because $a_n$ is expressed in terms of the previous $k$ terms of the sequence (the term ``degree'' will take all its sense with the characteristic equation).
+        \end{itemize}
+    }
+    
+    \subparag{Examples}{
+        \begin{itemize}[left=0pt]
+            \item $P_n = 1.11 P_{n-1}$ is a linear homogeneous recurrence relation of degree one.
+            \item $f_n = f_{n-1} + f_{n-2}$ is a linear homogeneous recurrence relation of degree two.
+            \item $a_n = a_{n-1} + a_{n-2}^2$ is not linear.
+            \item $H_n = 2H_{n-1} + 1$ is not homogeneous.
+            \item $B_n = nB_{n-1}$ does not have constant coefficients.
+        \end{itemize}
+    }
+}
+
+\parag{Characteristic equation}{
+    Let's say we have the relation $a_n = c_1 a_{n_1} + \ldots + c_k a_{n-k}$. Then, we can guess that the solution is $a_n = r^{n}$, $r \in \mathbb{R}^*$, and see what happens: 
+    \[r^{n} = c_1 r^{n-1} + c_2 r^{n-2} + \ldots + c_k r^{n-k} \implies r^{n} - c_1 r^{n-1} - c_2 r^{n-2} - \ldots - c_k r^{n-k} = 0\]
+
+    Dividing by $r^{n-k}$, since it is non-zero (unless $a_n = 0$ for all $n$): 
+    \[r^k - c_1 r^{k-1} - c_2 r^{k-2} - \ldots c_k = 0\]
+
+    We call this the characteristic equation, and we can see that the sequence $\left\{r^{n}\right\}$ is a solution if and only if $r$ is a solution to the characteristic equation. 
+
+    The solutions to the characteristic equations are called the \important{characteristics roots} of the recurrence relation. The roots can be used to give a \important{closed formula} for the recurrence relation.
+}
+
+\parag{Theorem}{
+    Let $c_1$ and $c_2$ be real numbers. Moreover, let's suppose that $r^2 - c_1r - c_2$ has two \textit{distinct} roots $r_1$ and $r_2$.
+
+    The sequence $\left\{a_n\right\}$ is a solution to the recurrence relation $a_n = c_1 a_{n-1} + c_2 a_{n-2}$ if and only if: 
+    \[a_n = \alpha_1 r_1^{n} + \alpha_2 r_2^{n}, \mathspace n = 0, 1, 2, \ldots\]
+    where $\alpha_1$ and $\alpha_2$ are constants.
+
+    \subparag{Proof}{
+        We want to show that $\alpha_1 r_1^n + \alpha_2 r_2^n$ is a solution of $a_n = c_1 a_{n-1} + c_2 a_{n-2}$: 
+        \[\alpha_1 r_1^{n} + \alpha_2 r_2^{n} = c_1 \left(\alpha r_1^{n-1} + \alpha_2 r_2^{n-2}\right) + c_2\left(\alpha_2 r_1^{n-2} + \alpha_2 r_2^{n-2}\right)\]
+        
+        Putting everything on the same side and grouping things, we get something which we want to prove that it is equal to 0:
+        \[\left(\alpha_1 r_1^{n} + c_1 \alpha_1 r_1^{n-1} - c_2 \alpha_1 r_1^{n-2}\right) + \left(\alpha_2 r_2^{n} - c_1 \alpha_2 r_2^{n-1} - c_2 a_2 r_2^{n-2}\right)\]
+        
+        Thus, factoring: 
+        \[\alpha_1 r_1^{n-2} \underbrace{\left(r_1^2 - c_1 r_1 - c_2\right)}_{=0} + \alpha_2 r_2^{n-2}\underbrace{\left(r_2^2 - c_1 r_2 - c_2\right)}_{=0} = 0\]
+        as required.
+    }
+
+    \subparag{Note}{
+        $\alpha_1$ and $\alpha_2$ depend on the initial conditions.
+    }
+    
+}
+
+\parag{Example 1}{
+    Let's say we want to find the solution to the recurrence relation $a_n = a_{n-1} + 2 a_{n-2}$, with $a_0 = 2$ and $a_1 = 7$.
+
+    Let's get the characteristic equation by substituting $a_n = r^{n+2}$: 
+    \[r^{n+2} = r^{n+1} + 2r^{n} \implies r^2 - r - 2 = 0 \implies \left(r + 1\right)\left(r - 2\right) = 0\]
+    
+    Our roots are thus $r = -1$ and $r = 2$. Therefore, we know that solutions are of the form $a_n = \alpha_1 2^n + \alpha_2 \left(-1\right)^n$. We know that $a_0 = 2$ and $a_1 = 7$, thus: 
+    \begin{systemofequations}{}
+    &\ 2 = a_0 = \alpha_1 + \alpha_2 \\
+    &\ 7 = a_1 = \alpha_1 \cdot 2 + \alpha_2 \left(-1\right) = 2\alpha_1 - \alpha_2
+    \end{systemofequations}
+
+    This is a system of linear equations, which we can solve (using regular linear algebra methods), and which will give us: 
+    \[\alpha_1 = 3, \mathspace \alpha_2 = -1\]
+    
+    As a result, we get our closed form: 
+    \[a_n = 3\cdot 2^n  - \left(-1\right)^{n}\]
+}
+
+\parag{Example 2}{
+    The sequence of Fibonacci numbers satisfies the recurrence relation $f_n = f_{n-1} + f_{n-2}$, with the initial conditions $f_0 = 0$ and $f_1 = 1$. 
+
+    This sequence has the following characteristic equation: 
+    \[r^2 - r - 1 = 0 \implies r_1 = \frac{1 + \sqrt{5}}{2} = \phi, r_2 = \frac{1 - \sqrt{5}}{2} = \bar{\phi}\]
+    
+    Substituting the initial conditions we get: 
+    
+    \begin{systemofequations}{}
+    &\ 0 = f_0 = \alpha_1 + \alpha_2 \implies \alpha_1 = -\alpha_2 \\
+    &\ 1 = f_1 = \alpha_1 \left(\frac{1 + \sqrt{5}}{2}\right) + \alpha_2 \left(\frac{1 - \sqrt{5}}{2}\right)
+    \end{systemofequations}
+
+    Solving this system, we get: 
+    \[\alpha_1 = \frac{1}{\sqrt{5}}, \mathspace \alpha_2 = -\frac{1}{\sqrt{5}}\]
+
+    Finally, we can put everything together: 
+    \[f_n = \frac{1}{\sqrt{5}} \left(\frac{1 + \sqrt{5}}{2}\right)^n - \frac{1}{\sqrt{5}} \left(\frac{1 - \sqrt{5}}{2}\right)^n = \frac{\phi^n - \bar{\phi}^n}{\sqrt{5}}\]
+}
+
+\parag{Theorem (degree 2 with repeated roots)}{
+    Let $c_1$ and $c_2$ be real numbers with $c_2 \neq 0$. Suppose that $r^2 - c_1 r - c_2 = 0$ has one repeated root $r_0$.
+
+    The sequence $\left\{a_n\right\}$ is a solution to the recurrence relation $a_n = c_1 a_{n-1} + c_2 a_{n-2}$ if and only if: 
+    \[a_n = \alpha_1 r_0^{n} + \alpha_2 n r_0^{n} \]
+    where $\alpha_1$ and $\alpha_2$ are constants.
+}
+
+\parag{Example}{
+    Let's say we want to find the solution to the recurrence relation $a_n = 6 a_{n-1} - 9a_{n-2}$ with $a_0 = 1$ and $a_1 = 6$.
+
+    Its characteristic equation is given by: 
+    \[r^2 - 6r + 9 = \left(r - 3\right)^2 \implies r_0 = 3\]
+
+    Thus, our solution is of the form: 
+    \[a_n = \alpha_1 3^n + \alpha_2 n 3^{n}\]
+    
+    Using our initial conditions, we get: 
+    \begin{systemofequations}{}
+    &\ 1 = a_0 = \alpha_1 + \alpha_2 \cdot 0 = \alpha_1 \\
+    &\ 6 = a_1 = \alpha_1 \cdot 3 + \alpha_2 \cdot 1 \cdot 3^1 = 3\alpha_1 + 3\alpha_2
+    \end{systemofequations}
+
+    Solving it, we get: 
+    \[\alpha_1 = 1, \mathspace \alpha_2 = 1\]
+
+    Thus: 
+    \[a_n = 3^n + n3^n\]
+}
+
+\parag{Theorem}{
+    Let $c_1, \ldots, c_k$ be real numbers. Let's suppose that the characteristic equation $r^k - c_1 r^{k-1} - \ldots - c_k = 0$ has $k$ distinct roots $r_1, \ldots, r_k$.
+
+    Then, a sequence $\left\{a_n\right\}$ is a solution of the recurrence relation $a_n = c_1 a_{n-1} + \ldots + c_k a_{n-k}$ if and only if $a_n$ is of the form: 
+    \[a_n = \alpha_1 r_1^n + \alpha_2 r_2^n + \ldots + \alpha_k r_k^n, \mathspace n = 0, 1, 2, \ldots\]
+    where $\alpha_1, \ldots, \alpha_k$ are constants.
+}
+
+\parag{Theorem}{
+    Let $c_1, \ldots, c_k$ be real numbers. Let's suppose that the characteristic equation $r^k - c_1 r^{k-1} - \ldots - c_k = 0$ has $t$ distinct roots $r_1, \ldots, r_t$, with multiplicities $m_1, \ldots, m_t$ respectively.
+
+    Then, a sequence $\left\{a_n\right\}$ is a solution of the recurrence relation $a_n = c_1 a_{n-1} + \ldots + c_k a_{n-k}$ if and only if $a_n$ is of the form:
+
+    \begin{multiequality}
+        a_n =\ & \left(\alpha_{1, 0} + a_{1,1}n + \ldots + \alpha_{1,m_1 - 1}n^{m_1 - 1}\right)r_1^n \\
+        & + \left(\alpha_{2, 0} + a_{2,1}n + \ldots + \alpha_{2,m_2 - 1}n^{m_2 - 1}\right)r_2^n \\
+        & + \ldots \\
+        & + \left(\alpha_{t, 0} + a_{t,1}n + \ldots + \alpha_{t,m_t - 1}n^{m_t - 1}\right)r_t^n
+    \end{multiequality}
+    
+
+    \subparag{Personal note}{
+        This formula is not hard to learn when you understood it. We are basically generalising what we saw with degree 2.
+
+        However, you can still note that using matrices simplifies the notation (this is more some ``pretty'' mathematical stuff than a useful notation): 
+        \[a_n = \begin{bmatrix} r_1^n \\ \vdots \\ r_t^n \end{bmatrix} \dotprod \left(\begin{bmatrix} \alpha_1 & \ldots & \alpha_{1, m-1} \\ \vdots &  & \vdots \\ \alpha_{t, 0} & \ldots & \alpha_{t, m-1} \end{bmatrix} \begin{bmatrix} 1 \\ n \\ \vdots \\ n^{m-1} \end{bmatrix}\right)\]
+        where $m = \max\left(m_1, \ldots, m_t\right)$ and $\alpha_{p, q}$ is 0 if $q \geq m_p$ (we had to increase the number of coefficients because a matrix has the same number of coefficients on each row, but it's like setting all the unnecessary ones to 0).
+
+        
+    }
+    
+}
+
+\parag{Exemple}{
+    Let's say we want to solve the recurrence relation $a_n = -3a_{n-1} - 3a_{n-2} - a_{n-3}$, with $a_0 = 1$, $a_1 = -2$ and $a_2 = -1$.
+
+    Its characteristic equation is given by: 
+    \[r^3 + 3r^2 + 3r + 1 = 0 \iff \left(r + 1\right)^3 = 0 \implies r_0 = -1\]
+    
+    So, $a_n$ is of the form: 
+    \[\alpha_1 \left(-1\right)^n + \alpha_2 n \left(-1\right)^n + \alpha_3 n^2 \left(-1\right)^n\]
+
+    With our initial conditions, we get: 
+    \begin{systemofequations}{eq:label}
+    &\ 1 = a_0 = \alpha_1 \\
+    &\ -2 = a_1 = \alpha_1 \left(-1\right)^1 + \alpha_2 \cdot 1 \cdot \left(-1\right)^1 + \alpha_3 \cdot 1^2 \left(-1\right) = -\alpha_1 - \alpha_2 - \alpha_3 \\
+    &\ -1 = a_2 = \alpha_1 \left(-1\right)^2 + \alpha_2 \cdot 2 \cdot \left(-1\right)^2 + \alpha_3 \cdot 2^2 \cdot \left(-1\right)^2 = \alpha_1 + 2\alpha_2 + 4\alpha_3^2
+    \end{systemofequations}
+
+    Solving the system, we get: 
+    \[\alpha_1 = 1, \mathspace \alpha_2 = 3, \mathspace \alpha_3 = -2\]
+    
+    So, the closed form of our sequence is given by: 
+    \[a_n = \left(-1\right)^n + 3n\left(-1\right)^n - 2n^2 \left(-1\right)^n\]
+}
+
+\subsubsection{Generating functions}
+\parag{Definition}{
+    The \important{generating function} for the infinite sequence $a_0, \ldots, a_k, \ldots$ of real numbers is the infinite series 
+    \[G\left(x\right) = a_0 + a_1 x + \ldots + a_k x^k + \ldots = \sum_{k=0}^{\infty} a_k x^k\]
+
+    \subparag{Examples}{
+        The sequence $\left\{a_k\right\}$ with $a_k = k+1$ has the generating function: 
+        \[\sum_{k=0}^{\infty} \left(k+1\right)x^k\]
+        
+        Similarly, if $a_k = 2^k$, then the generating function is given by: 
+        \[\sum_{k=0}^{\infty} 2^k x^k\]
+    }
+}
+
+\parag{Remarkable generating functions}{
+    We know the closed form of the following generating functions: 
+
+    \begin{center}
+    \begin{tabular}{|c|c|}
+        \hline
+        \fullbf{$a_k$} & \fullbf{Its generating function} \\
+        \hline
+        $\displaystyle C\left(n, k\right)$ & $\displaystyle G\left(x\right) = \left(1 + x\right)^n = \sum_{k=0}^{\infty} \binom{n}{k} x^k$ \\
+        \hline
+        $\displaystyle a^n$ & $\displaystyle G\left(x\right) = \frac{1}{1 - ax} = \sum_{k=0}^{\infty} a^k x^k$ \\
+        \hline
+        $\displaystyle C\left(n + k - 1, k\right)$ & $\displaystyle \displaystyle G\left(x\right) = \frac{1}{\left(1 - x\right)^n} = \sum_{k=0}^{\infty} \binom{n+k-1}{k} x^k$ \\
+        \hline
+    \end{tabular}
+    \end{center}
+
+    We'll generalise binomial coefficients in the next lesson, we only need to know that $C\left(n, r\right) = 0$ when $r \geq n$.
+    
+}
+
+\parag{Using generating functions}{
+    Let's say we want to solve the recurrence relation $a_k = 3a_{k-1}$ with initial condition $a_0 = 2$, using generating functions.
+
+    We have: 
+    \[G\left(x\right) = \sum_{k=0}^{\infty} a_k x^k = a_0 + \sum_{k=1}^{\infty} a_k x^k = a_0 + \sum_{k=1}^{\infty} 3a_{k-1}x^k =a_0 + 3x\sum_{k=1}^{\infty} a_{k-1}x^{k-1}\]
+    
+    Changing the index, taking $k-1 \to k$, we get:
+    \[G\left(x\right) = a_0 + 3x \sum_{k=0}^{\infty} a_k x^k = a_0 + 3xG\left(x\right)\]
+
+    So, we can solve the equation: 
+    \[G\left(x\right) = a_0 + 3xG\left(x\right) \iff G\left(x\right) = \frac{2}{1 - 3x} = 2\cdot \sum_{k=0}^{\infty} 3^k x^k = \sum_{k=0}^{\infty} 2\cdot 3^k x^k\]
+    
+    We can see that, in the generating function, we have $a_k = 2\cdot 3^k$. We could have solved this much simpler by ``seeing it'', or by using the method previously explained, but the point is that, now, we know how it works.
+}
+
+\parag{Solving Hanoi Tower}{
+    When we wanted to solve our Hanoi Tower problem, we had found $H_n = 2H_{n-1} + 1$ and $H_0 = 0$. This is not homogeneous, so let's use generating functions: 
+    \[G\left(x\right) = \sum_{k=0}^{\infty} H_k x^k = \underbrace{H_0}_{=0} + \sum_{k=1}^{\infty} H_{k} x^k = \sum_{k=1}^{\infty} \left(2 H_{k - 1} + 1\right)x^k \]
+
+    Let us split this function and then do the regular ``factoring out-change of index trick'': 
+    \[G\left(x\right) = \sum_{k=1}^{\infty} 2H_{k-1} x^k + \sum_{k=1}^{\infty} x^k = 2x \sum_{k=1}^{\infty} H_{k-1} x^{k-1} + x \sum_{k=1}^{\infty} x^{k-1} = 2x \sum_{k=0}^{\infty} H_k x^k + x\sum_{k = 0}^{\infty} x^k\]
+
+    We can now recognise our generating function, and one of the remarkable ones: 
+    \[G\left(x\right) = 2x G\left(x\right) + x \frac{1}{1-x} \implies G\left(x\right) = \frac{x}{\left(1 - 2x\right)\left(1 - x\right)}\]
+
+    Let us use partial fractions to split this fraction: 
+    \[G\left(x\right) = \frac{x}{\left(1 - 2x\right)\left(1 - x\right)} = \frac{a}{1 - 2x} + \frac{b}{1 - x} = \frac{a\left(1 - x\right) + b\left(1 - 2x\right)}{\left(1 - 2x\right)\left(1 - x\right)}\]
+    
+    So, we need to solve the following equation: 
+    \[x = a\left(1 -x\right) + b\left(1 - 2x\right) = a - ax + b - 2bx \iff \left(a + b\right) + x\left(-1 - a - b\right) = 0\]
+    
+    Thus we have the following system to solve: 
+    \begin{systemofequations}{}
+    &\ a + b = 0 \\
+    &\ -1 - a - b = 0
+    \end{systemofequations}
+
+    Solving it, we find: 
+    \[a = 1, \mathspace b = -1\]
+    
+    Coming back to our generating function, we have: 
+    \[G\left(x\right) = \frac{a}{1 - 2x} + \frac{b}{1 - x} = \frac{1}{1-2x} - \frac{1}{1-x} = \sum_{k=0}^{\infty} 2^k x^k - \sum_{k=0}^{\infty} x^k = \sum_{k=0}^{\infty} \left(2^k -  1\right)x^k\]
+    
+    So, we have found $a_n = 2^n - 1$
+}
+
+\parag{General method}{
+    \begin{itemize}[left=0pt]
+        \item Define the generating function $G\left(x\right)$.
+        \item Use the recurrence relation to derive an alternative expression for $G\left(x\right)$ (using the ``factoring out-change of index'' trick).
+        \item Solve the equation for $G\left(x\right)$. 
+        \item If it is a fraction of polynomial, use partial fractions to split it as a sum of terms of the form $\frac{c_i}{x - r_i}$ (it is always possible if the degree of the numerator is less than the one of the denominator). 
+        \item Determine the power expansion of $G\left(x\right)$, using remarkable generating functions or Taylor series (we have never used Taylor series and we will probably never use them, but I put them here because it would be a valid method if one forgot the remarkable generating functions).
+    \end{itemize}
+}
+
+\end{document}

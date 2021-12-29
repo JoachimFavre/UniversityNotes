@@ -1,0 +1,398 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-23 at 08:27:37.
+
+\usepackage{../../style}
+
+\title{AICC}
+\author{Joachim Favre}
+\date{Mardi 23 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{19}{2021-11-23}{Euclid is the best, and we learn to count}{
+\begin{itemize}[left=0pt]
+    \item Definition of GCD and LCM.
+    \item Explanation of the Euclidean algorithm, and of the link between the GCD and the LCM of two numbers.
+    \item Explanation of some facts about number theory, which will not be at the exam.
+    \item Explanation of the product, addition and soustraction rules. 
+    \item Definition of permutations and combinations.
+\end{itemize}
+}
+
+\subsection{GCD and LCM}
+\parag{Definition of GCD}{
+    Let $a$ and $b$ be integers, not both zero. The largest integer $d$ such that $d \divides a$ and $d \divides b$ is called the \important{greatest common divisor} (GCD) of $a$ and $b$. It is denoted by $\gcd\left(a, b\right)$.
+}
+
+\parag{Example}{
+    We have: 
+    \[\gcd\left(24, 36\right) = 12, \mathspace \gcd\left(17, 22\right) = 1\]
+}
+
+\parag{Definition of relatively prime}{
+    The integers $a$ and $b$ are \important{relatively prime} if $\gcd\left(a, b\right) = 1$.
+
+    The integers $a_1, \ldots, a_n$ are \important{pairwise relatively prime} if $\gcd\left(a_i, a_j\right) = 1$ for $1 \leq i < j \leq n$.
+}
+
+\parag{Example}{
+    We can verify that $10, 17$ and $21$ are pairwise relatively prime: 
+    \[\gcd\left(10, 17\right) = 1, \mathspace \gcd\left(10, 21\right) = 1, \mathspace \gcd\left(17, 21\right) = 1\]
+    
+    However, 10, 19 and 24 are not pairwise relatively prime since: 
+    \[\gcd\left(10, 24\right) = 2 \neq 1\]
+}
+
+\parag{Finding the GCD}{
+    Let's write $a$ and $b$ as their prime factorisation: 
+    \[a = p_1^{a_1}\cdot p_2^{a_2}\cdot\ldots\cdot p_n^{a_n}, \mathspace b = p_1^{b_1}\cdot p_2^{b_2}\cdot\ldots\cdot p_n^{b_n}\]
+    where each exponent is a nonnegative integer. We can compute the GCD the following way:
+    \[\gcd\left(a, b\right) = p_1^{\min\left(a_1, b_1\right)} p_2^{\min\left(a_2, b_2\right)} \cdot\ldots\cdot p_n^{\min\left(a_n, b_n\right)}\]
+    
+    However, finding the prime factorisation of a number is a very complicated problem. It is not polynomial (and this is the basis of many cryptography algorithm).
+}
+
+\parag{Definition of LCM}{
+    The \important{least common multiple} (LCM) of two positive integers $a$ and $b$ is the smallest positive integer that is divisible by both $a$ and $b$. It is denoted by $\lcm\left(a, b\right)$.
+
+    We can also find it using prime factorisations: 
+    \[\lcm\left(a, b\right) = p_1^{\max\left(a_1, b_1\right)} \cdot p_2^{\max\left(a_2, b_2\right)} \cdot \ldots \cdot p_n^{\max\left(a_n, b_n\right)}\]
+}
+
+\parag{Example}{
+    Let's find the prime factorisation of 120 and 500: 
+    \[120 = 2^3 \cdot 3 \cdot 5 = 2^3 \cdot 3^1 \cdot 5^1, \mathspace 500 = 2^2 \cdot 5^3 = 2^2 \cdot 3^0 \cdot 5^3\]
+    
+    Then: 
+    \[\gcd\left(120, 500\right) = 2^2 \cdot 3^0 \cdot 5^1 = 4\cdot 5 = 20\]
+    \[\lcm\left(120, 500\right) = 2^3 \cdot 3^1 \cdot 5^3 = 8\cdot 3\cdot 125 = 3000\]
+}
+
+
+\parag{Theorem}{
+    Let $a$ and $b$ be positive integers. Then: 
+    \[a\cdot b = \gcd\left(a, b\right) \cdot \lcm\left(a, b\right)\]
+    
+    \subparag{Proof}{
+        This proof relies on the fact that: 
+        \[a + b = \max\left(a, b\right) + \min\left(a, b\right)\]
+        
+        Thus: 
+        \begin{multiequality}
+         & \gcd\left(a, b\right)\lcm\left(a,b\right)  \\
+         =\ & \left(p_1^{\min\left(a_1, b_1\right)}\cdot\ldots\cdot p_n^{\min\left(a_n, b_n\right)}\right)\left(p_1^{\max\left(a_1, b_1\right)}\cdot\ldots\cdot p_n^{\max\left(a_n, b_n\right)}\right)  \\
+         =\ & p_1^{\min\left(a_1, b_1\right)} p_1^{\max\left(a_1, b_1\right)} \cdot \ldots \cdot p_n^{\min\left(a_n, b_n\right)}p_n^{\max\left(a_n, b_n\right)} \\
+         =\ & p_1^{\min\left(a_1, b_1\right) + \max\left(a_1, b_1\right)} \cdot \ldots \cdot p_n^{\min\left(a_n, b_n\right) + \max\left(a_n, b_n\right)}  \\
+         =\ & p_1^{a_1 + b_1} \cdot \ldots p_n^{a_n + b_n} \\
+         =\ & p_1^{a_1} \cdot p_1^{b_1} \cdot \ldots \cdot p_n^{a_n}\cdot p_n^{a_n} \\
+         =\ & p_1^{a_1} \cdot \ldots \cdot p_n^{a_n} \cdot p_1^{b_1} \cdot \ldots \cdot p_n^{b_n} \\
+         =\ & a \cdot b    
+        \end{multiequality}
+        
+    }
+}
+
+\parag{Observation}{
+    If we have $a > b$ and $r = a \Mod b$, then: 
+    \[\gcd\left(a, b\right) = \gcd\left(r, b\right)\]
+    
+    Indeed, we know that $r = a \Mod b$ is equivalent to $a = q\cdot b + r$. We want to show that: 
+    \[d \divides a \text{ and } d \divides b \iff d \divides b \text{ and } d \divides r\]
+    
+    First, let's suppose that $d \divides a$ and $d \divides b$. Divisibility preserves addition, so 
+    \[d \divides a - qb = r \implies d \divides r\]
+
+    Now, let's suppose that if $d \divides r$ and $d \divides b$: 
+    \[d \divides q \cdot b + r = a \implies d \divides a\]
+    
+    So, we have indeed shown that: 
+    \[d \divides a \text{ and } d \divides b \iff d \divides b \text{ and } d \divides r\]
+}
+
+\parag{Example}{
+    Let's say we want to compute $\gcd\left(287, 91\right)$: 
+    \[\gcd\left(287, 91\right) = \gcd\left(14, 91\right) = \gcd\left(91, 14\right) = \gcd\left(7, 14\right) = \gcd\left(14, 7\right) = \gcd\left(0, 7\right) = 7\]
+    
+    Indeed, using long division we can see that: 
+    \[287 = 3\cdot 91 + 14\]
+    \[91 = 6\cdot 14 + 7\]
+    \[7 = 2\cdot 7 + 0\]
+    
+}
+
+\begin{filecontents*}[overwrite]{euclideanAlgorithmIterative.code}
+procedure gcd_iterative(a > b: positive integers)
+    x := a
+    y := b
+    while y != 0
+        r := x mod y
+        x := y
+        y := r
+    return x
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{euclideanAlgorithmRecursive.code}
+procedure gcd_recursive(a > b: positive integers)
+    if b == 0 then return a
+    else return gcd(b, a mod b)
+\end{filecontents*}
+
+
+\parag{Euclidean algorithm}{
+    This algorithm is called the Euclidean algorithm (it was invented by Euclid). Iteratively, it is written:
+    \importcode{euclideanAlgorithmIterative.code}{pseudo}
+    
+    Recursively, it looks much simpler:
+    \importcode{euclideanAlgorithmRecursive.code}{pseudo}
+
+    \subparag{Proof}{
+        Let's say we want to compute $\gcd\left(a, b\right)$. So, we can take $r_0 = a$ and $r_1 = b$. 
+
+        Then, we perform a division and we get $r_2 = r_0 \Mod r_1$. Clearly, $r_1 > r_2 \geq 0$.
+
+        Similarly, taking $r_3 = r_1 \Mod r_2$, then $r_2 > r_3 \geq 0$.
+
+        Since $r_i > r_{i+1} \geq 0$, then $r$ decreases at least by 1 at each step, so there must be a step at which it is equal to 0. Let's call this $r_{n+1} = r_{n-1} \Mod r_n$, where $r_{n+1} = 0$. Then: 
+        \[\gcd\left(a, b\right) = \gcd\left(r_0, r_1\right) = \ldots = \gcd\left(r_{n-1}, r_{n}\right) = \gcd\left(r_n, 0\right) = r_n\]
+    }
+}
+
+\parag{Lamé's theorem}{
+    Let $a$ and $b$ be positive integers with $a \geq b$. 
+
+    The number of divisions used by the Eucliden algorithm to find $\gcd\left(a, b\right)$ is less than or equal to five times the number of decimal digits in $b$. 
+
+    In other words, the Euclidean algorithm has a complexity of $O\left(\log b\right)$ (careful, it is a big-$O$, not a big-$\Theta$).
+}
+
+\subsection{More facts about number theory (not in the exam)}
+
+\parag{Distribution of primes}{
+    Let's define $\pi\left(x\right)$ be the number of primes not exceeding $x$.
+
+    The prime number theorem states that the following function approaches 1 as $x$ tends toward infinity:
+    \[\frac{\pi\left(x\right)}{\mathspace \frac{x}{\ln\left(x\right)} \mathspace}.\]
+
+    This implies that the odds that a random positive integer less than $n$ is prime are approximately of:
+    \[\frac{1}{\ln\left(x\right)}.\]
+}
+
+\parag{Primes and arithmetic progressions}{
+    We wonder if there are long arithmetic progressions made up entirely of primes. For example, the following one consists of five primes: 
+    \[5, 11, 16, 23, 29\]
+
+    We can also find one of ten primes: 
+    \[199, 409, 619, 820, 1039, 1249, 1459, 1669, 1879, 2089\]
+    
+    In the 1930s, Paul Erdös conjectured that for every positive integer $n > 1$, there is an arithmetic progression of length $n$ made up entirely of primes. This was proven 70 years later, in 2006, by Ben Green and Terrence Tau.
+}
+
+\parag{Mersene primes}{
+    Prime numbers of the forme $2^p - 1$, where $p$ is prime, are called Mersene primes.
+
+    For example, the following numbers are Mersene primes. 
+    \[2^2 - 1 = 3, \mathspace 2^3 - 1 = 7, \mathspace 2^5 - 1 = 37, \mathspace 2^7 - 1 = 127\]
+    
+    However, all numbers of this form are not primes, for example the following number isn't prime (so it isn't a Mersene prime):
+    \[2^{11} - 1 = 2047 = 23\cdot 89\]
+
+    The advantage of such primes is that there exists a very efficient way to verify whether numbers of the form $2^p - 1$ are primes. Thus, the largest primes nowadays are Mersene primes. In mid 2018, the largest known prime --- which has 25 million decimal digits --- was: 
+    \[2^{82\,589\,933} - 1\]
+}
+
+\parag{Goldbach's Conjecture}{
+    In 1742 Goldbach conjectured that every even integer $n > 2$ is the sum of two primes.
+
+    It has been verified by computer for all positive integers up to $1.6 \cdot 10^{18}$, but no one has found a proof yet. 
+}
+
+\parag{The Twin Prime Conjecture}{
+    We define twin primes to be a pair of primes that differ by 2. For example: 
+    \[3,5 \mathspace 5,7 \mathspace 11, 13 \mathspace\]
+    
+    It is conjectured that there are infinitely twin primes.
+
+    In 2018, the largest twin primes we found --- which have $388\,342$ decimal digits --- are: 
+    \[2\,996\,863\,034\,895 \cdot 2^{1\,290\,000} \pm 1\]
+    
+}
+
+
+\section{Counting}
+\subsection{Basic rules}
+\parag{Introduction}{
+    We are asking ourselves some of the following questions:
+    \begin{itemize}
+        \item How many different passwords exists?
+        \item How many outcomes does an experiment have?
+        \item How many steps an algorithm performs?
+        \item How many moves are possible in a game?
+    \end{itemize}
+
+    Counting is  the subject of the mathematical discipline of \important{combinatorics}.
+}
+
+\parag{Short history}{
+    Mahavira (850 AD) provided formulas for permutations and combinations. Pascal (\nth{17} century) developed Pascal's triangle. Euler (\nth{18} century) was the first to use generating functions.
+}
+
+\parag{Product rule}{
+    Let $A$ and $B$ be two tasks, with respectively $n_1$ and $n_2$ ways to do them.
+
+    There are $n_1 \cdot n_2$ ways to do both tasks.
+}
+
+\parag{Example}{
+    When rolling two d-6 (dices with 6 faces), there is a total of $6\cdot 6 = 36$ possible pairs.
+}
+
+\parag{Counting Cartesian product}{
+    Let $A_1, A_2, \ldots, A_m$ be finite sets. 
+
+    We have that:
+    \[\left|A_1 \times A_2 \times \ldots \times A_n\right| = \left|A_1\right|\cdot \left|A_2\right| \cdot \ldots \cdot \left|A_n\right|\] 
+
+    \subparag{Proof}{
+        The task of choosing an element in the Cartesian product is done by choosing an element in $A_1$, an element in $A_2$ and so on until an element in $A_m$. This theorem then follows from the product rule.
+ 
+        \qed
+    }
+}
+
+\parag{Example 1}{
+    We wonder how many different license plate can be made if each plate contains a sequence of 2 uppercase letters followed by 5 digits.
+
+    Since there are 26 different letters and 10 different digits, then this number is given by: 
+    \[26^2 \cdot 10^5 = 67\,600\,000\]
+}
+
+\parag{Example 2}{
+    We wonder how many functions there are from a set with $m$ elements to a set with $n$ elements. For each of the $m$ elements of the input, we have $n$ possibilities in the other set. So, this number is given by: 
+    \[n\cdot n\cdot \ldots \cdot n = n^m\]
+}
+
+\parag{Example 3}{
+    Let's say we now want to know how many one-to-one functions there are from a set with $m$ elements to one with $n$ elements. For the first element, we have $n$ possibilities. Then, for the second one, we only have $n-1$ possibilities, since we want our function to be injective. And, so on until we have $n - \left(m - 1\right)$ possibilities for the last element. Thus, this number is given by:
+    \[n\left(n-1\right)\cdot\ldots\cdot\left(n - m + 1\right) = \frac{n!}{\left(n - m\right)!}\]
+}
+
+\parag{Example 4}{
+    We wonder what is the number of different subsets of a finite set $S$, $\left|P\left(S\right)\right|$.
+
+    Let $T$ be any subset of $S$. We can make a sequence of 0s and 1s to say for each element of $S$ if it is in $T$. Since there are 2 possibilities for each element (either it is in the set or not), we find by the product rule: 
+    \[\left|P\left(S\right)\right| = 2\cdot 2\cdot \ldots \cdot 2 =  2^n\]
+}
+
+\parag{Sum rule}{
+    Let $A$ and $B$ be two tasks, with respectively $n_1$ and $n_2$ ways to do them.
+
+    If none of the set of $n_1$ ways is the same as any of the set of $n_2$ ways, then there are $n_1 + n_2$ ways to do task $A$ or $B$.
+}
+
+\parag{Example}{
+    Le't say that a student can choose a semester project from one of three laboratories. The three laboratories offer 5, 3 and 7 possible projects, respectively. No project is offered by several laboratories. 
+
+    We know by the sum rule that there are $5 + 3 + 7 = 15$ ways to choose a project.
+}
+
+\parag{Sum rule in terms of set}{
+    Let $A$ and $B$ be sets. If $A$ and $B$ are disjoint sets, meaning $A \cap B = \o$, then we know that:    \[\left|A \cup B\right| = \left|A\right| + \left|B\right|\]
+
+    This is the sum rule can be phrased in term of sets.
+
+    More generally, if we have $n$ sets $A_1, \ldots, A_n$ such that $A_i \cap A_j = \o$ for all $i, j$, then: 
+    \[\left|A_1 \cup \ldots \cup A_n\right| = \left|A_1\right| + \ldots + \left|A_n\right|\]
+    
+}
+
+\parag{Example 1}{
+    Suppose variable names in a programming language can be either a single letter or a letter followed by a digit. We want to find the number of possible names. We have $26$ possibilities for the single letter, and $26\cdot 10$ for the letter followed by a digit. Thus, the number of variable names is given by: 
+    \[26 + 26\cdot 10 = 286\]
+}
+
+\parag{Example 2}{
+    Let's say that each user on a computer system has a password, which is 6 to 8 characters long, where each character is an uppercase letter or a digit. Each password must contains at least one digit. 
+
+    By the sum rule, the number of passwords is given by: 
+    \[P = P_6 + P_7 + P_8\]
+    
+    For $P_6$, by the product rule, we have $\left(26 + 10\right)^6$ such passwords containing 6 upper case letters or digits. However, we to remove the passwords consisting of only letter. Thus, we get that: 
+    \[P_6 = \left(26 + 10\right)^6 - 26^6\]
+
+    Doing the same reasoning for $P_7$ and $P_8$, we get: 
+    \[P = P_6 + P_7 + P_8 = \left(36^6 - 26^6\right) + \left(36^7 - 26^7\right) + \left(36^8 - 26^8\right) = 2\,483\,687\,808\,960\]
+}
+
+\parag{Subtraction rule}{
+    If a task can be done either in one of $n_1$ ways or in one of $n_2$ ways, then the total number of ways to do the task in $n_1 + n_2$ minus the number of ways to do the task that are common to the two different ways.
+
+    This is also known as the \important{principle of inclusion-exclusion}:
+    \[\left|A \cup B\right| = \left|A\right| + \left|B\right| - \left|A \cap B\right|\]
+}
+
+\parag{Example}{
+    We wonder how many bit strings of length 8 either start with a 1 bit or end with the two bits 00.
+
+    Let $A$ be the set of 8-bit bitstrings starting with 1, and $B$ be the set of 8-bit bistrings ending with 00. We know that $\left|A\right| = 2^7$ since we fixed the first position and we have 7 other free positions. Using the same reasoning, we find that $\left|B\right| = 2^6$.
+
+    We still need to find the intersection. We know that $A \cap B = 2^5$ since there are 3 positions fixed (the bitstring begins with 1 and ends with 00) and 5 free positions.
+
+    So: 
+    \[\left|A \cup B\right| = \left|A\right| + \left|B\right| - \left|A \cap B\right| = 2^7 + 2^6 - 2^5 = 160\]
+}
+
+\subsection{Permutations and combinations}
+\parag{Definition of permutations}{
+    A \important{permutation} of a set of $n$ distinct objects is an \textit{ordered} arrangement of these objects. An ordered arrangement or $r$ elements of a set is called an \important{$r$-permutation}. We note this $P\left(n, r\right)$.
+}
+
+\parag{Example}{
+    Let $S = \left\{1, 2, 3\right\}$. Then $3, 1, 2$ is an permutation of $S$. $3, 2$ is a 2-permutation of $S$.
+}
+
+\parag{Theorem (counting the number of permutations)}{
+    Let $n$ be a positive integer and $r$ be an integer, where $1 \leq r \leq n$.
+
+    The number of $r$-permutations of a set with $n$ distinct elements is given by: 
+    \[P\left(n, r\right) = n\left(n-1\right)\cdot\ldots\cdot\left(n - r + 1\right)\]
+    
+    \subparag{Proof}{
+        The first element can be chosen in $n$ ways, the second in $n-1$ ways, and so on until the last element, which there are $m - \left(r - 1\right)$ ways to choose.
+
+        So, by the product rule: 
+        \[P\left(n, r\right) = n\left(n-1\right)\ldots\left(n-r+1\right)\]
+
+        Moreover, $P\left(n, 0\right) = 1$ since there is only one way to order zero elements.
+    }
+
+    \subparag{Corollary}{
+        We have that: 
+        \[P\left(n, r\right) =  n\cdot\ldots\cdot\left(n - r + 1\right) = \frac{n!}{\left(n - r\right)!}\]
+        
+    }
+    
+    
+}
+
+\parag{Example}{
+    We wonder how many ways are there to select a first-prize winner, a second prize winner and a third-prize winner from 100 different different people who have entered a contest. 
+
+    This is number is given by: 
+    \[P\left(100, 3\right) = \frac{100!}{\left(100 - 3\right)!} = \frac{100!}{97!} = 970\,200\]
+    
+}
+
+\parag{Definition of combinations}{
+    An \important{$r$-combination} of elements of a set (which contains $n$ elements) is an \textit{unordered} selection of $r$ elements from the set. Thus, an $r$-combination is simply a subset of the set with $r$ elements. This number is denoted: 
+    \[C\left(n, r\right) \text{ or } \binom{n}{r}\]
+    
+    We read the second one ``$n$ choose $r$''.
+}
+
+\parag{Example}{
+    Let $S$ be the set $\left\{a, b, c, d\right\}$. Then, $\left\{a, c, d\right\}$ is a 3-combination from $S$. It is the same as $\left\{d, c, a\right\}$ since order does not matter.
+}
+
+\end{document}

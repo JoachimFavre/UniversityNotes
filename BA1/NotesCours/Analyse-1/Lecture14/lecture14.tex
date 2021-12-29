@@ -1,0 +1,358 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-08 at 10:12:45.
+
+\usepackage{../../style}
+
+\title{Analyse 1}
+\author{Joachim Favre}
+\date{Lundi 08 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2021-11-08}{Limites vers l'infini, de tous genres}{
+    \begin{itemize}[left=0pt]
+        \item Démonstration du théorème de la composée de deux fonctions, suivie de beaucoup d'exemples.
+        \item Démonstration des limites remarquables suivantes:
+            \[\lim_{x \to 0} \frac{\sin\left(x\right)}{x} = 1 \mathspace \text{et} \mathspace \lim_{x \to x_0} \sqrt{x} = x_0\]
+
+        \item Définition des différents types de limites infinies, et de limites quand $x$ tend vers l'infini.
+        \item Explication des formes indéterminées.
+    \end{itemize}
+}
+
+\parag{Exemple (important)}{
+    On veut calculer la limite suivante:
+    \[\lim_{x \to 0} \frac{\sin x}{x} \]
+
+    \imagehere[0.5]{InegaliteSinxSurX.png}
+
+    En regardant le dessin, on remarque géométriquement que :
+    \[\left|\sin x\right| \leq \left|x\right| \leq \left|\tan x\right|, \mathspace -\frac{\pi}{2} < x < \frac{\pi}{2}, x \neq 0\]
+
+    Donc, en divisant par $\left|\sin x\right|$
+    \[1 \leq \frac{\left|x\right|}{\left|\sin x\right|} \leq \left|\frac{1}{\cos x}\right|\]
+
+    Or, sur l'intervalle ci-dessus, on sait que $x$ et $\sin\left(x\right)$ ont toujours le même signe, et on sait que $\cos x$ est positif. Donc:
+    \[1 \leq \frac{x}{\sin x} \leq \frac{1}{\cos x}\]
+
+    On veut maintenant calculer la limite suivante:
+    \[\lim_{x \to 0} \frac{1}{\cos x}\]
+
+    Ce serait très simple si on avait déjà défini la continuité, mais on ne l'a pas encore vue. On remarque que:
+    \[\cos\left(2\alpha\right) = \cos^2\left(\alpha\right) - \sin^2\left(\alpha\right) = 1 - 2\sin^2\left(\alpha\right) \implies 1 - \cos\left(2\alpha\right) = 2\sin^2\left(\alpha\right)\]
+
+    On a donc:
+    \[\left|1 - \cos x\right| = 2 \left|\sin^2\left(\frac{x}{2}\right)\right| = 2\sin^2\left(\frac{x}{2}\right) \leq 2\left(\frac{x}{2}\right)^2\]
+
+    On peut utiliser les deux gendarmes:
+    \[0 \leq \left|1 - \cos x\right| \leq \underbrace{2\left(\frac{x}{2}\right)^2}_{\to 0} \implies \lim_{x \to 0} \left(1 - \cos x\right) = 0 \implies \lim_{x \to 0} \cos x = 1 \implies \lim_{x \to 0} \frac{1}{\cos x} = 1\]
+
+    On peut maintenant utiliser les deux gendarmes sur notre résultat obtenu plus tôt :
+    \[1 \leq \frac{x}{\sin x} \leq \underbrace{\frac{1}{\cos x}}_{\to 1} \implies \lim_{x \to 0} \frac{x}{\sin x} = 1 \implies \lim_{x \to 0} \frac{\sin x}{x} = 1 \]
+
+    \qed
+
+    \subparag{Remarque}{
+        Cette limite est très importante, nous l'utiliserons même pour démontrer la dérivée du sinus et du cosinus.
+
+        Notez qu'une méthode d'ingénieur pour s'en souvenir c'est que $\sin\left(x\right) = x$ pour les petits angles. Ainsi, puisqu'on fait tendre l'angle vers 0, le ratio tend vers: 
+        \[\lim_{x \to 0} \frac{\sin\left(x\right)}{x} = \lim_{x \to 0} \frac{x}{x} = 1\]
+
+        Notez que ceci est tout sauf une démonstration formelle de cette égalité, c'est plus un moyen mnémotechnique. De toutes façons, l'approximation qu'on fait en physique vient des polynômes de Taylor et donc de la dérivée du sinus. Puisqu'on aura besoin de cette limite pour démontrer cette dérivée, on ne pourrait même pas utiliser cette approximation pour démontrer cette limite, même de manière informelle.
+    }
+    
+}
+
+\parag{Théorème (limite de la composée de deux fonctions)}{
+    Soit $f: E \mapsto F$ et $g : G \mapsto H$ telles que:
+    \[\lim_{x \to x_0}  f\left(x\right) = y_0 \mathspace \text{ et } \mathspace \lim_{y \to y_0} g\left(y\right) = \ell\]
+
+    De plus, supposons que $f\left(E\right) \subset G$ et $\exists\alpha > 0$ tel que
+    \[0 < \left|x - x_0\right| < \alpha \implies f\left(x\right) \neq y_0\]
+
+    Alors, on sait que:
+    \[\lim_{x \to x_0} \left(g\circ f\right)\left(x\right) = \lim_{x \to x_0} g\left(f\left(x\right)\right) = \ell\]
+
+    \subparag{Remarque}{
+        On a besoin de la deuxième supposition, parce que potentiellement $g\left(y\right)$ n'est pas définie en $y_0$.
+    }
+
+    \subparag{Preuve}{
+        Puisqu'on sait que $\lim_{y \to y_0} g\left(y\right) = \ell$, on sait que pour tout $\epsilon > 0$, il existe un $\delta_1 > 0$ tel que:
+        \[0 < \left|y - y_0\right| \leq \delta_1 \implies \left|g\left(y\right) - \ell\right| \leq \epsilon\]
+
+        Aussi, on sait que $\lim_{x \to x_0} f\left(x\right) = y_0$. On peut prendre $\epsilon_2 = \delta_1$ dans la définition de la limite (puisque c'est vrai pour tout $\epsilon_2$, ça l'est aussi pour un $\epsilon$ précis) : on sait que pour $\delta_1 > 0$, il existe $\delta_2 > 0$ tel que:
+        \[0 < \left|x - x_0\right| \leq \delta_2 \implies \left|f\left(x\right) - y_0\right| \leq \delta_1\]
+
+        Soit $\delta = \min\left\{\alpha, \delta_2\right\}$. Alors, pour tout $x \in E$:
+        \[0 < \left|x - x_0\right| \leq \delta \leq \delta_2 \implies \left|f\left(x\right) - y_0\right| \leq \delta_1\]
+
+        De plus, par hypothèse:
+        \[0 < \left|x - x_0\right| < \delta \leq \alpha \implies f\left(x\right) \neq y_0\]
+
+        On peut en déduire des deux hypothèses ci-dessus:
+        \[0 < \left|x - x_0\right| \leq \delta \implies 0 < \left|f\left(x\right) - y_0\right| \leq \delta_1\]
+
+        On peut donc en déduire par la première inégalité qu'on avait dérivée, en prenant $y = f\left(x\right)$ :
+        \[\left|g\left(f\left(x\right)\right) - \ell\right| < \epsilon\]
+    }
+
+}
+
+\parag{Exemple 1}{
+    Nous voulons calculer la limite suivante:
+    \[\lim_{x \to 0} \frac{1 - \cos\left(2x\right)}{3x^2 + \sin^2\left(x\right)} = \lim_{x \to 0} \frac{2 \sin^2\left(x\right)}{3x^2 + \sin^2\left(x\right)} = \lim_{x \to 0} \frac{2\overbrace{\left(\frac{\sin x}{x}\right)^2}^{\to 1}}{3 + \underbrace{\left(\frac{\sin x}{x}\right)^2}_{\to 1}} = \frac{1}{2}\]
+
+    En d'autres mots, ici nous avons considéré le changement variable $y = \frac{\sin x}{x}$. Donc, puisque $y$ tend vers $1$ quand $x$ tend vers 0, on avait:
+    \[\lim_{x \to 0} \frac{2\left(\frac{\sin x}{x}\right)^2}{3 + \left(\frac{\sin x}{x}\right)^2} = \lim_{y \to 1} \frac{2y^2}{3 + y^2} = \frac{1}{2}\]
+
+    En pratique, on n'écrit pas ce changement de variable explicitement.
+}
+
+\parag{Exemple 2}{
+    On veut démontrer l'égalité suivante:
+    \[\lim_{x \to x_0} \sqrt{x} = \sqrt{x_0}\]
+
+    Soit $\epsilon > 0$, on cherche $\delta > 0$ tel que:
+    \[0 < \left|x - x_0\right| < \delta \implies \left|\sqrt{x} - \sqrt{x_0}\right| \leq \epsilon\]
+
+    Étudions la seconde inégalité. Puisque $\sqrt{x} \geq 0$ pour tout $x \geq 0$:
+    \[\left|\sqrt{x} - \sqrt{x_0}\right| \leq \left|\frac{x - x_0}{\sqrt{x} + \sqrt{x_0}}\right| \leq \frac{\left|x - x_0\right|}{\left|\sqrt{x_0}\right|} = \frac{\left|x - x_0\right|}{\sqrt{x_0}} \leq \frac{\delta}{\sqrt{x_0}}\]
+
+    Ainsi, on peut prendre $\delta = \sqrt{x_0}\epsilon$ et on obtient:
+    \[0 < \left|x - x_0\right| < \delta = \sqrt{x_0}\epsilon \implies \left|\sqrt{x} - \sqrt{x_0}\right| \leq \frac{\delta}{\sqrt{x_0}} = \frac{\sqrt{x_0}\epsilon}{\sqrt{x_0}} = \epsilon\]
+
+    Ainsi, on a démontré par la définition de la limite que:
+    \[\lim_{x \to x_0} \sqrt{x} = x_0\]
+
+    \qed
+}
+
+\parag{Exemple 3}{
+    Nous voulons calculer la limite suivante:
+    \[\lim_{x \to 2} \frac{\sqrt{x + 2} - \sqrt{2x}}{\sqrt{x - 1} - 1}\]
+
+    La première chose à faire est d'utiliser la propriété qu'on a démontré ci-dessus pour calculer ce que donne cette limite. On trouve $\frac{0}{0}$, qui est une forme indéterminée. Nous devons donc faire plus de travail, multiplions le numérateur et le dénominateur par le conjugué des deux différences de racines:
+    \[\lim_{x \to 2} \frac{\sqrt{x + 2} - \sqrt{2x}}{\sqrt{x - 1} - 1} = \lim_{x \to 2} \frac{x + 2 - 2x}{\sqrt{x + 2} + \sqrt{2x}} \cdot \frac{\sqrt{x - 1} + 1}{x - 1 - 1} = \lim_{x \to 2} \overbrace{\frac{2 - x}{x - 2}}^{= -1} \frac{\overbrace{\sqrt{x - 1}}^{\to 1} + 1}{\underbrace{\sqrt{x + 2}}_{\to 2} + \underbrace{\sqrt{2x}}_{\to 2}} = -\frac{1}{2}\]
+
+    Ce que nous avons fait ici c'est de prendre la fonction $g\left(y\right) = \sqrt{y}$, en sachant que $\lim_{y \to y_0} \sqrt{y} = \sqrt{y_0}$, avec $f_1\left(x\right) = x + 2$, $f_2\left(x\right) = 2x$, $f_3\left(x\right) = x - 1$. Or, on sait que:
+    \[\lim_{x \to 2} f_1\left(x\right) = 4, \mathspace \lim_{x \to 2} f_2\left(x\right) = 4, \mathspace \lim_{x \to 2} f_3\left(x\right) = 1\]
+
+    Donc, par le théorème de la composition de fonction:
+    \[\lim_{x \to 2} \sqrt{f_1\left(x\right)} = 2, \mathspace \lim_{x \to 2} \sqrt{f_2\left(x\right)} = 2, \mathspace \lim_{x \to 2} \sqrt{f_3\left(x\right)} = 1\]
+}
+
+\parag{Exemple 4}{
+    Nous voulons calculer la limite suivante:
+    \[\lim_{x \to 1} \frac{\sin\left(\left(x-1\right)^2\right)}{x^3 - x^2 - x + 1}\]
+
+    On remarque que:
+    \[x^3 - x^2 - x + 1 = x^2\left(x - 1\right) - \left(x - 1\right) = \left(x - 1\right)\left(x^2 - 1\right) = \left(x-1\right)^2\left(x+1\right)\]
+
+    Donc, on a:
+    \[\lim_{x \to 1} \frac{\sin\left(\left(x-1\right)^2\right)}{\left(x-1\right)^2 \left(x + 1\right)} = \lim_{x \to 1} \frac{\sin\left(\left(x-1\right)^2\right)}{\left(x-1\right)^2} \cdot \frac{1}{x + 1}\]
+
+    On peut ainsi prendre le changement de variable $f\left(x\right) = \left(x - 1\right)^2$ et $g\left(y\right) = \frac{\sin y}{y}$. Donc:
+    \[\lim_{x \to 1} f\left(x\right) = 0 \implies \lim_{x \to 1} g\left(f\left(x\right)\right) = \lim_{y \to 0} \frac{\sin y}{y} = 1\]
+
+}
+
+\parag{Remarque}{
+    Par le théorème de la limite de la composée de deux fonctions, nous avons que, pour toute fonction $t\left(x\right)$ telle que $\lim_{x \to a} t\left(x\right) = 0$, et qu'il existe un voisinage de $x = a$ dans lequel $t\left(x\right) \neq 0$, alors:
+    \[\lim_{x \to a} \frac{\sin\left(t\left(x\right)\right)}{t\left(x\right)} = 1\]
+}
+
+\parag{Exemple 5}{
+    Nous voulons démontrer que la limite suivante n'existe pas:
+    \[\lim_{x \to 0} \sin\left(\frac{1}{x}\right)\]
+
+    Son domaine de définition est donné par $D\left(f\right) = \mathbb{R} \setminus \left\{0\right\}$. Nous pouvons utiliser la contraposée de la caractérisation des limites à partir des suites ; il nous faut donc trouver deux suite $\left(a_n\right)$ et $\left(b_n\right)$ telles que
+    \[\lim_{n \to \infty} a_n = \lim_{n \to \infty} b_n = 0 \mathspace \text{ et } \mathspace \lim_{n \to \infty} \sin\left(\frac{1}{a_n}\right) \neq \lim_{n \to \infty} \sin\left(\frac{1}{b_n}\right)\]
+
+    Prenons $a_n = \frac{1}{2\pi n}$, $n \in \mathbb{N}^*$. Clairement, sa limite est 0. D'autre part:
+    \[\sin\left(\frac{1}{a_n}\right) = \sin\left(2\pi n\right) = 0, \forall n \in \mathbb{N}^* \implies \lim_{n \to \infty} \sin\left(\frac{1}{a_n}\right) = 0\]
+
+    Prenons aussi $b_n = \frac{1}{2\pi n + \frac{\pi}{2}}$, avec $n \in \mathbb{N}^*$. Clairement, sa limite est aussi 0. De plus:
+    \[\sin\left(\frac{1}{b_n}\right) = \sin\left(2\pi n + \frac{\pi}{2}\right) = 1, \forall n \in \mathbb{N}^* \implies \lim_{n \to \infty} \sin\left(\frac{1}{b_n}\right) = 1\]
+
+    On peut donc en déduire par la caractérisation des suites que $\lim_{x \to 0} \sin\left(\frac{1}{x}\right)$ n'existe pas.
+
+}
+
+\parag{Exemple 6}{
+    Nous voulons calculer la limite suivante:
+    \[\lim_{x \to 0} x \sin\left(\frac{1}{x}\right)\]
+
+    Le domaine de définition est $D\left(f\right) = \mathbb{R} \setminus \left\{0\right\}$. On a:
+    \[-1 \leq \sin\left(\frac{1}{x}\right) \leq 1 \implies 0 \leq \left|\sin\left(\frac{1}{x}\right)\right| \leq 1 \implies 0 \leq \left|x \sin\left(\frac{1}{x}\right)\right| \leq \left|x\right|\]
+
+    Puisque les deux bornes tendent vers 0 quand $x$ tend vers 0, on obtient par les deux gendarmes que:
+    \[\lim_{x \to 0} \left|x\sin\left(\frac{1}{x}\right)\right| = 0 \implies \lim_{x \to 0} x\sin\left(\frac{1}{x}\right) = 0\]
+}
+
+\subsection{Limites lorsque $x$ tend vers $\pm \infty$}
+\parag{Définition du voisinage}{
+    Soit $f: E \mapsto F$. On dit qu'elle est définie au voisinage de $+\infty$ si $\exists \alpha \in \mathbb{R}$ tel que $\left]\alpha, +\infty\right[ \subset E$.
+
+    De la même manière, on dit qu'elle est définie au voisinage de ${\color{red}-\infty}$ si $\exists \alpha \in \mathbb{R}$ tel que ${\color{red}\left]-\infty, \alpha\right[} \subset E$.
+}
+
+\parag{Définition de la limite}{
+    On dit que $f : E\mapsto F$ définie au voisinage de $+\infty$ admet pour limite le nombre réel $\ell$ lorsque $x$ tend vers $+\infty$ si pour tout $\epsilon > 0$, il existe $\alpha \in \mathbb{R}$ tel que:
+    \[\forall x \in E, x \geq \alpha \implies \left|f\left(x\right) - \ell\right| \leq \epsilon\]
+
+    On note:
+    \[\lim_{x \to \infty} f\left(x\right) = \ell\]
+
+    Dans ce cas, on dit que la fonction $f$ admet une asymptote horizontale $y = \ell$ lorsque $x \to \infty$.
+
+    De la même manière, on dit que $f : E\mapsto F$ définie au voisinage de ${\color{red}-\infty}$ admet pour limite le nombre réel $\ell$ lorsque $x$ tend vers ${\color{red}-\infty}$ si pour tout $\epsilon > 0$, il existe $\alpha \in \mathbb{R}$ tel que:
+    \[\forall x \in E, {\color{red}x \leq \alpha} \implies \left|f\left(x\right) - \ell\right| \leq \epsilon\]
+
+    On note:
+    \[\lim_{x \to {\color{red}-\infty}} f\left(x\right) = \ell\]
+
+    Dans ce cas, on dit que la fonction $f$ admet une asymptote horizontale $y = \ell$ lorsque ${\color{red}x \to -\infty}$.
+}
+
+\parag{Exemple}{
+    Nous voulons montrer que
+    \[\lim_{x \to \infty} \frac{1}{x^2} = 0\]
+
+    Soit $\epsilon > 0$, il nous faut trouver $\alpha \in \mathbb{R}$ tel que pour tout $x \geq \alpha$, alors:
+    \[\left|\frac{1}{x^2} - 0\right| \leq \epsilon \implies \frac{1}{\epsilon} \leq x^2\]
+
+    Puisque $x \to \infty$, on peut supposer que $x > 0$, donc:
+    \[\frac{1}{\sqrt{\epsilon}} \leq x\]
+
+    On peut poser $\alpha = \frac{1}{\sqrt{\epsilon}}$. On remarque donc que:
+    \[x \geq \frac{1}{\sqrt{\epsilon}} \implies \left|\frac{1}{x^2} - 0\right| \leq \epsilon\]
+
+    Et donc, par la définition de la limite:
+    \[\lim_{x \to \infty} \frac{1}{x^2} = 0\]
+}
+
+\subsection{Limites infinies}
+\parag{Définition}{
+    $f : E \mapsto F$ définie au voisinage de $x_0 \in \mathbb{R}$ tend vers $+\infty$ lorsque $x \to x_0$ si pour tout $A > 0$, il existe un $\delta > 0$ tel que:
+    \[0 < \left|x - x_0\right| \leq \delta \implies f\left(x\right) \geq A\]
+
+    On note:
+    \[\lim_{x \to x_0} f\left(x\right) = +\infty\]
+
+    De la même manière, on dit que $f : E \mapsto F$ définie au voisinage de $x_0 \in \mathbb{R}$ tend vers ${\color{red}-\infty}$ lorsque $x \to x_0$ si pour tout $A > 0$, il existe un $\delta > 0$ tel que:
+    \[0 < \left|x - x_0\right| \leq \delta \implies f\left(x\right)\ {\color{red}\leq -A}\]
+
+    On note:
+    \[\lim_{x \to x_0} f\left(x\right) = {\color{red} -\infty}\]
+}
+
+\parag{Exemple 1}{
+    Nous voulons montrer que
+    \[\lim_{x \to 0} \frac{1}{x^2} = +\infty\]
+
+    Soit $A > 0$, il nous faut trouver $\delta > 0$ tel que $0 < \left|x\right| \leq \delta$ implique:
+    \[\frac{1}{x^2} \geq A \implies \frac{1}{\left|x\right|} \geq \sqrt{A} \implies \left|x\right| \leq \frac{1}{\sqrt{A}}\]
+
+    On peut donc poser $\delta = \frac{1}{\sqrt{A}}$. En effet:
+    \[\left|x\right| \leq \delta = \frac{1}{\sqrt{A}} \implies \frac{1}{x^2} \geq A\]
+
+    Donc, par la définition de la limite:
+    \[\lim_{x \to 0} \frac{1}{x^2} = +\infty\]
+}
+
+\parag{Exemple 2}{
+    On veut montrer que la limite suivante n'existe pas:
+    \[\lim_{x \to 0} \frac{1}{x}\]
+
+    Dans tout voisinage de $0$, il existe $x_1,x_2$ tels que $x_1 < 0 < x_2$ et pour tout $M > 0$, on a
+    \[\frac{1}{x_1} < -M \iff \frac{1}{x_2} > M\]
+
+}
+
+\subsection{Limites infinies lorsque $x$ tend vers $\pm\infty$}
+\parag{Définition}{
+    On dit que $f : E \mapsto F$ définie au voisinage de $+\infty$ tend vers $+\infty$ lorsque $x \to +\infty$ si:
+    \[\forall A > 0\ \exists \alpha \in \mathbb{R} \telque x \geq \alpha \implies f\left(x\right) \geq A\]
+
+    On note:
+    \[\lim_{x \to +\infty} f\left(x\right) = +\infty\]
+
+    De la même manière, on dit que $f : E \mapsto F$ définie au voisinage de $+\infty$ tend vers ${\color{red}-\infty}$ lorsque $x \to +\infty$ si:
+    \[\forall A > 0\ \exists \alpha \in \mathbb{R} \telque x \geq \alpha \implies {\color{red}f\left(x\right) \leq -A}\]
+
+    On note:
+    \[\lim_{x \to +\infty} f\left(x\right) = {\color{red}-\infty}\]
+
+    Semblablement, on dit que $f : E \mapsto F$ définie au voisinage de ${\color{blue}-\infty}$ tend vers $+\infty$ lorsque ${\color{blue}x \to -\infty}$ si:
+    \[\forall A > 0\ \exists \alpha \in \mathbb{R} \telque {\color{blue}x \leq \alpha} \implies f\left(x\right) \geq A\]
+
+    On note:
+    \[\lim_{{\color{blue}x \to -\infty}} f\left(x\right) = +\infty\]
+
+    Mêmement (oui c'est un mot qui existe), on dit que $f : E \mapsto F$ définie au voisinage de ${\color{blue}-\infty}$ tend vers ${\color{red}-\infty}$ lorsque ${\color{blue}x \to -\infty}$ si:
+    \[\forall A > 0\ \exists \alpha \in \mathbb{R} \telque {\color{blue}x \leq \alpha} \implies {\color{red}f\left(x\right) \leq -A}\]
+
+    On note:
+    \[\lim_{{\color{blue}x \to -\infty}} f\left(x\right) = {\color{red}-\infty}\]
+}
+
+\parag{Exemple}{
+    Nous avons:
+    \[\lim_{x \to \infty} \left(2x + 1\right) = \infty, \mathspace \lim_{x \to -\infty} \left(2x + 1\right) = -\infty, \mathspace \lim_{x \to -\infty} x^2 = +\infty\]
+}
+
+\subsection{Toutes les limites}
+\parag{Récapitulatif}{
+    On a défini quatre types de limites:
+    \begin{enumerate}
+        \item $\lim\limits_{x \to x_0} f\left(x\right) = \ell \in \mathbb{R}$
+        \item $\lim\limits_{x \to \pm\infty} f\left(x\right) = \ell \in \mathbb{R}$
+        \item $\lim\limits_{x \to x_0} f\left(x\right) = +\infty$ ou $-\infty$
+        \item $\lim\limits_{x \to \pm\infty} f\left(x\right) = +\infty$ ou $-\infty$
+    \end{enumerate}
+
+    Tous les résultats obtenus pour $\lim_{x \to x_0} $ restent valable pour $\lim_{x \to \pm\infty} $.
+}
+
+\parag{Formes indéterminées}{
+    \begin{itemize}[left=0pt]
+        \item $\infty - \infty$
+        \item $\frac{\infty}{\infty}$
+        \item $\frac{0}{0}$
+        \item $0\cdot \infty$
+        \item $0^0$
+        \item $1^{\infty}$
+        \item $\infty^0$
+    \end{itemize}
+
+    Nous verrons les trois dernières plus tard, quand nous aurons défini les puissances réelles.
+}
+
+\parag{Exemple 1}{
+    Nous voulons calculer la limite suivante:
+    \[\lim_{x \to \infty} \left(\sqrt{x^2 + 2x} - x\right)\]
+
+    On remarque qu'elle est de la forme indéterminée $\left(\infty - \infty\right)$. Multiplions le numérateur et le dénominateur par le conjugué:
+    \[\lim_{x \to \infty} \frac{x^2 + 2x - x^2}{\sqrt{x^2 + 2x} + x} = \lim_{x \to \infty} \frac{2x}{\sqrt{x^2 + 2x} + x} = \lim_{x \to \infty} \frac{2x}{\underbrace{\sqrt{x^2}}_{= \left|x\right|}\sqrt{1 + \frac{2}{x}} + x}\]
+
+    Puisque la limite tend vers $+\infty$, $x > 0$ et on en déduit que $\left|x\right| = x$. De là, on a :
+    \[\lim_{x \to \infty} \frac{2x}{x\left(\sqrt{1 + \underbrace{\frac{2}{x}}_{\to 0}} + 1\right)} = \frac{2}{\sqrt{1} + 1} = 1\]
+}
+
+\parag{Exemple 2}{
+    Étudions une limite très proche de celle étudiée dans l'exemple ci-dessus:
+    \[\lim_{x \to -\infty} \left(\sqrt{x^2 + 2x} + x\right)\]
+
+    On a à nouveau la forme indéterminée $\left(\infty - \infty\right)$. En multipliant le numérateur et le dénominateur par le conjugué:
+    \[\lim_{x \to -\infty} \frac{x^2 + 2x - x^2}{\sqrt{x^2 + 2x} - x} = \lim_{x \to -\infty} \frac{2x}{\underbrace{\sqrt{x^2}}_{= \left|x\right|} \sqrt{1 + \frac{2}{x}} - x}\]
+
+    Cette fois, $x \to -\infty$, donc $\left|x\right| = -x$. On obtient donc:
+    \[\lim_{x \to -\infty} \frac{2x}{-x\left(\sqrt{1 + \underbrace{\frac{2}{x}}_{\to 0}} + 1\right)} = \frac{2}{-\left(\sqrt{1} + 1\right)} = -1\]
+
+
+}
+
+\end{document}

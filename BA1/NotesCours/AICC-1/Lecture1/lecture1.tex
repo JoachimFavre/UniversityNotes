@@ -1,0 +1,329 @@
+\documentclass{article}
+
+% Expanded on 2021-09-20 at 21:32:34.
+
+\usepackage{../../style}
+
+\title{Advanced information, computation, communication I}
+\author{Joachim Favre}
+\date{Mardi 21 septembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2021-09-21}{Introduction to propositional logic}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the course organisation.
+    \item Small summary of the history around propositional logic.
+    \item Definition of the concept of propositions.
+    \item Definition of connectives (negation, conjunction, disjunction, exclusive or, implication, biconditional) and their precedence.
+    \item Explanation of how truth tables work.
+\end{itemize}
+
+}
+
+\section{Introduction and organisation}
+\subsection{Content}
+\parag{General information}{
+    The course's name was changed recently from Discrete Mathematics; so this will basically be Discrete Mathematics. The teacher's name is Karl Aberer, and it's email is karl.aberer@epfl.ch.
+}
+
+\parag{Subject of the course}{
+    We mostly speak about \important{discrete mathematics}, structures of which the number of elements is finite or can be enumerated. For example, natural numbers, graphs, formulas (since they have a finite number of symbols).
+
+    However, we will not study real numbers. Those will be the subject of the Analysis and Linear Algebra Courses.
+}
+
+\parag{Why important}{
+    Computers are discrete objects: it's components have discrete functions, all data are discrete objects, programs are discrete objects. Everything that is touched by a computer is discrete.
+}
+
+\parag{Content}{
+    The course follows the book ``Discrete Mathematics and Its Applications'' by Kenneth H. Rosen.
+}
+
+\parag{Relation to other courses}{
+    We will see some core concepts of mathematics (such as sets, functions, relations, \ldots). We see them in other course, but we need to understand them for discrete mathematics, they are fundamental so it is good to see them more than once, and it teaches us English.
+}
+
+\subsection{Organisation (Covid)}
+\parag{Hybrid course}{
+    It is a hybrid course, it is subject to evolution. For exercices, there are 7 exercise rooms, and online via Discord.
+}
+
+\parag{Online platforms}{
+    \begin{description}[left=0pt]
+    \item[Moodle] Official announcements
+    \item[Zoom] Used for streaming the lectures, Q\&A, recoding, polls
+    \item[Switchtube] Recorded lectures
+    \item[Discord] For exercises and interacting with assistants
+    \item[Piazza] For discussing and resolving questions, among students and with assistants. It is organised by weeks (see folders on the top).
+    \item[Kahoot] For weekly (non-graded) quizzes on Tuedays.
+\end{description}
+}
+
+\parag{Exercices}{
+They are distributed at the beginning of the week. Open questions aren't questions that could come up in exams, whereas exam questions are example of exams. It is normal if we cannot answer every question, don't panic, it's not a problem.
+
+Rooms will be assigned soon on Moodle.
+}
+
+\parag{Attendance}{
+If we don't want to come to the lectures or the exercises, we are allowed not to come. It's however highly recommended. Anyhow, we can use the following platforms to ask questions:
+\begin{description}
+    \item[Moodle] Organisation
+    \item[Zoom] During lessons
+    \item[Discord] Interact with assistants online and offline
+    \item[Piazza] Interact with other students, and the teaching team
+\end{description}
+}
+
+\parag{Advice}{
+\begin{itemize}[left=0pt]
+    \item Do not procrastinate. Time flies and does not come back.
+    \item Ask questions.
+    \item Do exercises.
+\end{itemize}
+}
+
+\parag{Exam}{
+There will be one exam, and a midterm exam (the latter may or may not be graded). They will be MCQ, with only one right answer. If we want, we can give more than one answer, but it will diminish the number of points.
+
+It will be on the \nth{28} of January, from 8:15 to 11:15.
+}
+
+\section{Propositional logic}
+\subsection{Introduction}
+\parag{Introduction}{
+    Logic is the language of mathematics, we need it to make human language precise. There are problems in natural language when interpreting expressions such as ``or'' or ``if \ldots then''.
+
+    Logic is the basis for mathematical proofs, automated reasoning (neural networks), and so on. It is omnipresent in computing.
+
+    Logic is about statements that are either \important{true or false}. \important{Propositional logic} is the most basic form of logic.
+}
+
+\parag{Some history}{
+    Greek philosophers created a lot of formalism that looks the same as what we have today, but they still struggled on some concepts. Aristotle and Chrysippus are example of such philosophers. 
+
+    Modern mathematicians, such as Leibniz (1750), Boole (1860) and De Morgan (1870), formulated propositional logic. Even though this kind of logic is very basic, it introduces many fundamental concepts for mathematics, such as formal language, variables and operators, axioms, inference, proof, and truth values. 
+    
+    It took humans 3000 years to formalise, so even if it will look simple it is not
+}
+
+\parag{Propositional logic and computing}{
+    Propositional logic allows us to formulate basic search queries (for Google, for instance), describe computer circuits, specify properties of software systems, formally describe games such as Sudoku, and so on.
+
+    There exists an algorithm that can decide whether something that can be stated in propositional logic is true or false, automatically. This is not the case for other logics.
+}
+
+\parag{Propositions}{
+    We define a \important{proposition} to be a declarative sentence that is either \important{true or false} (this is very important). For example, ``the moon is made of green cheese'', ``the Earth is round'', ``1 + 0 = 1'' and ``0 + 0 = 2'' are propositions.
+
+    However, orders or questions are not propositions. For example, the following sentences are not propositions: ``Sit down!'', ``What time is it?'', ``$x + 1 = 2$'', ``$x + y = z$''.
+
+    Propositional logic uses, of course, propositions.
+}
+
+\parag{Atomic propositions}{
+    \important{Atomic propositions} are propositions that cannot be expressed in terms of simpler propositions. For example, ``the moon is made of green cheese'' is an atomic proposition, we cannot ``look inside''.
+
+    We use letters such as $p, q, r, s, \ldots$ to express \important{propositional variables}. We could for example use $p$ to denote $p = $ ``The Earth is round''. 
+
+    The proposition that is always true is denoted by \important{T}, and the one that is always false is denoted by \important{F}.
+}
+
+
+\subsection{Logical connectives}
+\parag{Compound propositions}{
+    \important{Compound propositions} are constructed from \important{logical connectives} and other propositions. For example: 
+    \[p \leftrightarrow q \land \lnot r\]
+
+    The most important logical connectives (which we will explain after) are: 
+    \begin{itemize}
+        \item Negation
+        \item Conjunction
+        \item Disjunction
+        \item Exclusive or
+        \item Implication
+        \item Biconditional
+    \end{itemize}
+    
+}
+
+\parag{Truth table}{
+    A \important{truth table} lists all possible truth values of the propositional variable occurring in a compound propositions, and corresponding truth values of the compound propositions.
+
+    We will see examples hereinafter.
+}
+
+\parag{Negation}{
+    Let $p$ be a proposition. The \important{negation} of $p$, denoted $\lnot p$ (or $\bar{p}$) is the statement ``it is not the case that $p$''. We read $\lnot p$ ``not $p$''.
+
+    For example, if $p = $ ``the Earth is round'' (which is true (or is it ????? (okay that's a joke, I mean I'm not at EPFL thinking the Earth is flat))), then $\lnot p = $ ``the Earth is not round'' (which is false). 
+
+    Here is its truth table:
+    \begin{center}
+    \begin{tabular}{c|c}
+        $p$ & $\lnot p$  \\
+        \hline
+        T & F  \\
+        F & T
+    \end{tabular}
+    \end{center}
+
+    In other words, something that is true becomes false, and something false becomes true.
+}
+
+\parag{Conjunction}{
+    Let $p$ and $q$ be propositions. The \important{conjunction} of $p$ and $q$, denoted $p \land q$, is the proposition ``$p$ and $q$''. The conjunction $p \land q$ is true when both $p$ and $q$ are true and is false otherwise.
+
+    For example, if we have $p = $ ``the Earth is round'' (true), $q = $ ``the moon is round'' (true), and $r = $ ``the moon is made of green cheese'' (false), then $p \land q$ is true and $p \land r$ is false.
+
+    Here is its truth table:
+    \begin{center}
+    \begin{tabular}{c|c|c}
+        $p$ & $q$ & $p \land q$ \\
+        \hline
+        T & T & T \\
+        F & T & F \\
+        T & F & F \\
+        F & F & F 
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Disjunction}{
+    Let $p$ and $q$ be propositions. The \important{disjunction} of $p$ and $q$, denoted $p \lor q$, is the proposition ``$p$ or $q$''. The disjunction $p \lor q$ is false whenever $p$ and $q$ are false, and is true otherwise. In other words, it is true whenever either $p$ or $q$ or both is true.
+
+    Using the same examples as above ($p$ and $q$ true, $r$ false), we have that both $p \lor q$ and $p \lor r$ are true.
+
+    Here is its truth table:
+    \begin{center}
+    \begin{tabular}{c|c|c}
+        $p$ & $q$ & $p \lor q$  \\
+        \hline
+        T & T & T \\
+        F & T & T \\
+        T & F & T \\
+        F & F & F
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Exclusive or}{
+    Let $p$ and $q$ be propositions. The \important{exclusive or}, also called xor, of $p$ and $q$, denoted $p \oplus q$, is the proposition ``$p$ or $q$, but not both''. The exclusive or $p \oplus q$ is true when one of $p$ and $q$ is true, but not both.
+
+    Here is its truth table:
+    \begin{center}
+    \begin{tabular}{cc|c}
+        $p$ & $q$ & $p \oplus q$ \\
+        \hline
+        T & T & F \\
+        F & T & T \\
+        T & F & T \\
+        F & F & F
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Or in natural language}{
+    In natural language, ``or'' has two meanings. The inclusive or (disjunction) and the exclusive or (xor) can be both represented using the word ``or''.
+
+    For example, if we say ``candidates for this position should have a degree in mathematics or computer science'', it means that candidates must have one of those degrees, but they may also have both. On the other hand, if at a restaurant we are asked whether we want ``a soup or a salad'' with our entrée, we are not expected to answer ``both''.
+}
+
+\parag{Implications}{
+    Let $p$ and $q$ be propositions. The \important{conditional statement} $p \to q$ is the proposition ``if $p$, then $q$''. The conditional statement $p \to q$ is false when $p$ is true and $q$ is false, and is true otherwise. We call $p$ the \important{premise} (or hypothesis, or antecedent), and we call $q$ the \important{conclusion} (or consequence). 
+
+    For example, if we have $p = $ ``the Earth is round'' (true), $q = $ ``the moon is round'' (true) and ``the moon is made of green cheese'' (F), then $p \to q$ is true, $p \to r$ is false and $r \to p$ is true. When we suppose something false, then anything can be true.
+
+    Here is its truth table:
+    \begin{center}
+    \begin{tabular}{cc|c}
+        $p$ & $q$ & $p \to q$  \\
+        \hline
+        T & T & T  \\
+        T & F & F  \\
+        F & T & T  \\
+        F & F & T
+    \end{tabular}
+    \end{center}
+
+    \subparag{Intuition}{
+        It is important to understand that implication does not require any connection between the antecedent and the consequence. For example, the following implication is true, even though it would never come up in a conversation (except between AICC student): ``if the moon is made of green cheese, then I have more money than Bill Gates''.
+
+        When doing maths, we need to prove the implication, and thus we need an implication between the propositions (it's a bit hard to prove an implication between two completely unrelated things).
+
+        We can also understand implication as some kind of obligation or contract. For example, if a politician says ``if I am elected, then I will lower taxes''. If they are elected but do not lower taxes, people will say that they broke their campaign pledge. If they are not elected, then no one cares.
+
+        We can notice that if the premise is false, then the conditional statement is true. Similarly, if the conclusion is true, then the conditional statement is true.
+    }
+    
+    \subparag{Fallacy}{
+        Reversing the direction of the arrow is a common logical fallacy, $p \to q$ is not the same as $q \to p$.
+
+        For example, saying that ``if it is a dog, then it has four legs'' is not the same as saying ``if it has four legs, then it is a dog''.
+    }
+
+    \subparag{Mathematical language}{
+        In natural language, there are plenty ways of saying implications. The most important ones are ``$p$ is sufficient for $q$'' and ``$q$ is necessary for $p$''. Those are the sentences we use in maths.
+
+        We say that \important{a necessary condition} for $p$ is $q$, and \important{a sufficient condition} for $q$ is $p$.
+
+        For example, we know that ``If Shaun is a sheep, then it is a mammal''. So, a necessary condition for Shaun to be a sheep, is that it is a mammal (if it were not a mammal, then we would know that it is not a sheep). Similarly, a sufficient condition for Shaw to be a mammal is to be a sheep (we know that if it is a sheep, then it is definitely a mammal, but if Shaun is not a sheep, then it may also be a mammal).
+
+        Another example would be the following: If my age is more that 20 ($p$), then ($\to$) my age is more than 10 ($q$). So, a sufficient condition for my age being more than 10, is that I am more than 20 and a necessary condition for my age being more that 20, is that I am more than 10.
+
+        Similarly, let's say that if it rains, then I take an umbrella. So, a sufficient condition to take an umbrella is that it rains, or, in other words, a necessary condition that it rains, is that I take an umbrella.
+    }
+}
+
+\parag{Biconditional}{
+    Let $p$ and $q$ be propositions. The \important{biconditional statement} $p \leftrightarrow q$ is the propositions ``$p$ if and only $q$'' ($p$ iff $q$). The biconditional statement $p \leftrightarrow q$ is true whenever $p$ and $q$ have the same truth values, and is false otherwise. Biconditional statements are also called bi-implications (since it is $p \to q$ and $q \to p$). We can also say $p$ is necessary and sufficient for $q$. 
+
+    Here is its truth table:
+    \begin{center}
+    \begin{tabular}{c|c|c}
+        $p$ & $q$ & $p \leftrightarrow q$ \\
+        \hline
+        T & T & T  \\
+        T & F & F  \\
+        F & T & F  \\
+        F & F & T
+    \end{tabular}
+    \end{center}
+
+    \subparag{Natural language}{
+        Sometimes, in natural language, we use implications when we really mean biconditionals. For example, when we say ``if you finish your meal, then you can have a dessert'', we also mean ``if you do not finish your meal, the you will not have a dessert'', so it is a biconditional.
+    }
+}
+
+\parag{Precedence}{
+    To avoid having to use thousands of parenthesis, we use the following rule of precedence (priority of operations):
+    \begin{center}
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Operator} & \textbf{Precedence}  \\
+        \hline
+        $\lnot$ & 1 \\
+        \hline
+        $\land$ & 2 \\
+        \hline
+        $\lor$ & 3  \\
+        \hline
+        $\to$ & 4 \\
+        \hline
+        $\leftrightarrow$ & 5 \\
+        \hline
+    \end{tabular}
+    \end{center}
+
+
+    We can thus write: 
+    \[\left(\lnot p\right) \lor q \equiv \lnot p \lor q\]
+    \[p \to \left(q \lor \left(\lnot r\right)\right) \equiv p \to q \lor \lnot r\]
+
+    Notice that the exclusive or does not have any precedence rule. Thus, we must always use parenthesis for this operation.
+}
+
+\end{document}

@@ -1,0 +1,385 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-10 at 10:09:24.
+
+\usepackage{../../style}
+
+\title{Analyse 1}
+\author{Joachim Favre}
+\date{Mercredi 10 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{15}{2021-11-10}{Exponentielle et logarithme cupide}{
+    \begin{itemize}[left=0pt]
+        \item Explication des propriétés des limites infinies, et du théorème du gendarme pour les fonctions.
+        \item Définition des limites à droite et à gauche.
+        \item Définition de la fonction exponentielle, et démonstration de ses propriétés.
+        \item Définition du logarithme naturel (il \textit{ne paie rien} pour attendre). 
+        \item Explication du théorème de la caractérisation des limites infinies à partir des suites.
+    \end{itemize}
+    
+}
+
+\parag{Exemple 3}{
+    Nous voulons calculer la limite suivante: 
+    \[\lim_{x \to 0} \frac{\sin\left(3x^2\right)}{x\tan\left(x\right)}\]
+    
+    On se rend compte que c'est une forme indéterminée $\frac{0}{0}$. Nous avons: 
+    \[\lim_{x \to 0} \frac{\sin\left(3x^2\right)}{x\tan\left(x\right)} = \lim_{x \to 0} \frac{\sin\left(3x^2\right)}{3x^2}\cdot \frac{3x^2 \cos\left(x\right)}{x\sin\left(x\right)} = \lim_{x \to 0} \underbrace{\frac{\sin\left(3x^2\right)}{3x^2}}_{\to 1} \underbrace{\frac{3x}{x}}_{\to 3} \underbrace{\frac{x}{\sin\left(x\right)}}_{\to 1} \underbrace{\cos\left(x\right)}_{\to 1} = 3\]
+    
+    Il est mieux de ne pas ``jeter la limite morceau par morceau'' à chaque fois qu'on a une limite qu'on connait, on ne doit pas la simplifier directement. En effet, la plupart de nos propriétés ne fonctionnent que si nos limites existent. ``Il ne faut pas économiser du papier.'' (Prof. Lachowska)
+}
+
+\parag{Propriétés des limites infinies}{
+    Ces propriétés fonctionnent de la même manière quand on a $x \to \pm\infty$.
+
+    \begin{enumerate}[left=0pt]
+        \item Si $\lim\limits_{x \to x_0} f\left(x\right) = +\infty$ et $\lim\limits_{x \to x_0} g\left(x\right) = +\infty$, alors: 
+        \[\lim_{x \to x_0} \left(f\left(x\right) + g\left(x\right)\right) = + \infty\]
+        \item Si $\lim\limits_{x \to x_0} f\left(x\right) = -\infty$ et $\lim\limits_{x \to x_0} g\left(x\right) = -\infty$, alors: 
+        \[\lim_{x \to x_0} \left(f\left(x\right) + g\left(x\right)\right) = - \infty\]
+        \item Si $\lim\limits_{x \to x_0} f\left(x\right) = \pm \infty$ et que $g\left(x\right)$ est bornée au voisinage de $x_0$: 
+            \[\lim_{x \to x_0} \left(f\left(x\right) \pm g\left(x\right)\right) = \pm\infty\]
+        \item Si $\lim\limits_{x \to x_0} f\left(x\right) = +\infty$ et $\lim\limits_{x \to x_0} g\left(x\right) = \ell \neq 0$, alors: 
+            \begin{functionbypart}{\lim_{x \to x_0} \left(f\left(x\right)g\left(x\right)\right)}
+            +\infty, \mathspace \text{si } \ell > 0 \\
+            -\infty, \mathspace \text{si } \ell < 0
+            \end{functionbypart}
+    \item Si $\lim\limits_{x \to x_0} f\left(x\right) = \pm \infty$, alors: 
+        \[\lim_{x \to x_0} \frac{1}{f\left(x\right)} = 0\]
+    
+
+    \item Si $\lim\limits_{x \to x_0} f\left(x\right) = 0$ et $f\left(x\right) \neq 0$ au voisinage de $x_0$, alors:
+        \begin{functionbypart}{\lim_{x \to x_0} \frac{1}{f\left(x\right)}}
+            +\infty, \mathspace \text{si } f\left(x\right) > 0\ \forall x \text{ au voisinage de } x_0 \\
+            -\infty, \mathspace \text{si } f\left(x\right) < 0\ \forall x \text{ au voisinage de } x_0 \\
+            \text{n'existe pas autrement}
+        \end{functionbypart}
+    \end{enumerate}
+
+    \subparag{Exemple pour le point (3)}{
+        Si on a $f\left(x\right) = \frac{1}{x^2}$ et $g\left(x\right) = \sin\left(\frac{1}{x}\right)$, alors: 
+        \[\lim_{x \to 0} \left(\frac{1}{x^2} + \sin\left(\frac{1}{x}\right)\right) = +\infty\]
+    }
+
+    \subparag{Exemple pour le point (4)}{
+        Nous voulons calculer la limite suivante:
+        \[\lim_{x \to 0} \frac{2x - 1}{x^2} = \lim_{x \to 0} \underbrace{\left(2x - 1\right)}_{\to -1} \frac{1}{x^2} = -\infty\]
+    }
+
+    \subparag{Exemple pour le point (5)}{
+        On sait que $\lim_{x \to 0} \left(-x\right)^2 = 0$ et que $-x^2 < 0$ autour de 0, donc: 
+        \[\lim_{x \to 0} \frac{1}{-x^2} = -\infty\]
+
+        On sait aussi que $\lim_{x \to 0} x = 0$, mais puisqu'il n'existe pas de voisinage où $f\left(x\right)$ est positif xou négatif, alors $\lim_{x \to 0} \frac{1}{x}$ n'existe pas.
+    }
+}
+
+\parag{Théorème du gendarme pour les limites infinie}{
+    Si $\lim\limits_{x \to x_0} f\left(x\right) = +\infty$ et que $g\left(x\right) \geq f\left(x\right)$ pour tout $x$ au voisinage de $x_0$, alors: 
+    \[\lim_{x \to x_0} g\left(x\right) = +\infty\]
+    
+    De la même manière, si $\lim\limits_{x \to x_0} f\left(x\right) = {\color{red}-\infty}$ et que $g\left(x\right)\ {\color{red}\leq}\ f\left(x\right)$ pour tout $x$ au voisinage de $x_0$, alors: 
+    \[\lim_{x \to x_0} g\left(x\right) = {\color{red}-\infty}\]
+
+    \subparag{Remarque}{
+        Ce théorème fonctionne aussi quand $x \to \pm \infty$.
+    }
+}
+
+\subsection{Limites à droite et à gauche}
+\parag{Définition}{
+    $f: E \mapsto F$ est définie à droite de $x_0$ s'il existe $\alpha > 0$ tel que $\left]x_0, x_0 + \alpha\right[ \subset E$.
+
+    Mêmement, $f: E \mapsto F$ est définie à \textcolor{red}{gauche} de $x_0$ s'il existe $\alpha > 0$ tel que ${\color{red}\left]x_0 - \alpha, x_0\right[ } \subset E$.
+}
+
+\parag{Définition des limites à droite et à gauche}{
+    $f: E \mapsto F$ définie à droite de $x_0$ admet pour limite à droite de $x_0$ le nombre réel $\ell$ si $\forall \epsilon > 0$ $\exists \delta > 0$ tel que, pour tout $x \in E$:
+    \[0 < x - x_0 \leq \delta \implies \left|f\left(x\right) - \ell\right| \leq \epsilon\]
+
+    On note: 
+    \[\lim_{x \to x_0^+} f\left(x\right) = \ell\]
+    
+    De manière similaire, $f: E \mapsto F$ définie à \textcolor{red}{gauche} de $x_0$ admet pour limite à \textcolor{red}{gauche} de $x_0$ le nombre réel $\ell$ si $\forall \epsilon > 0$ $\exists \delta > 0$ tel que, pour tout $x \in E$:
+    \[\forall x \in E: 0 < {\color{red}x_0 - x} \leq \delta \implies \left|f\left(x\right) - \ell \leq \epsilon\right|\]
+    
+    On note: 
+    \[\lim_{{\color{red}x \to x_0^-}} f\left(x\right) = \ell\]
+
+    \imagehere{DefinitionLimiteDroiteLimiteGauche.png}
+
+    \subparag{Remarque}{
+        C'est la même définition que ce que les limites ``normales'', sauf que nous enlevons les valeurs absolues.
+    }
+
+    \subparag{Observation}{
+        On remarque que: 
+        \[\lim_{x \to x_0} f\left(x\right) = \ell \iff \lim_{x \to x_0^+} f\left(x\right) = \ell \text{ et } \lim_{x \to x_0^-} f\left(x\right) = \ell\]
+
+        On peut démontrer les deux directions de l'implication à l'aide de la définition de ces limites.
+    }
+}
+
+\parag{Exemple}{
+    Soit la fonction suivante:
+    \begin{functionbypart}{f\left(x\right)}
+    1, \mathspace x \geq 0 \\
+    -1, \mathspace x < 0
+    \end{functionbypart}
+
+    On a: 
+    \[\lim_{x \to 0^+} f\left(x\right) = 1, \mathspace \lim_{x \to 0^-} f\left(x\right) = -1\]
+
+    Par la contraposée notre observation ci-dessus, il en découle que $\lim_{x \to 0} f\left(x\right)$ n'existe pas. Cependant, il faut tout de même faire attention: si notre fonction n'a pas de limite à un point, alors elle n'a pas forcément de limites sur la gauche et sur la droite de ce point. Par exemple, $f\left(x\right) = \sin\left(\frac{1}{x}\right)$ quand $x \to 0$.
+
+    Il est intéressant de remarquer que si on avait pris la fonction suivante, le résultat aurait été le même. La fonction n'aurait même pas eu besoin d'être définie en $x = 0$.
+    \begin{functionbypart}{f\left(x\right)}
+    1, \mathspace x > 0 \\
+    3, \mathspace x = 0 \\
+    -1, \mathspace x < 0
+    \end{functionbypart}
+}
+
+\parag{Remarque}{
+    On peut aussi définir les limites: 
+    \[\lim_{x \to a^+} f\left(x\right) = \pm \infty, \mathspace \lim_{x \to a^-} f\left(x\right) = \pm \infty\]
+     
+    La définition est similaire à celle qu'on avait vues, sans les valeurs absolues.
+}
+
+\parag{Exemple}{
+    Nous avons: 
+    \[\lim_{x \to 0^+} \frac{1}{x} = +\infty, \mathspace \lim_{x \to 0^-} \frac{1}{x} = -\infty\]
+}
+
+\subsection{Fonction exponentielle et logarithmique}
+\parag{Définition fonction exponentielle}{
+    Nous définissons: 
+    \[e^x \over{=}{déf} \sum_{n=0}^{\infty} \frac{x^n}{n!}, \mathspace x \in \mathbb{R}\]
+
+    \subparag{Rappel}{
+        On sait que cette série converge absolument pour tout $x \in \mathbb{R}$ par le critère de d'Alembert: 
+        \[\lim_{n \to \infty} \left|\frac{x^{n+1}}{\left(n+1\right)!} \frac{n!}{x^n}\right| = \lim_{n \to \infty} \frac{\left|x\right|}{n + 1} = 0, \mathspace \forall x \in \mathbb{R}\]
+        
+    }
+}
+
+\parag{Convention}{
+    On prend $0^0 = 1$ et $0! = 1$.
+
+    \subparag{Remarque par rapport à $0^0$}{
+        Il faut faire attention avec $0^0$, ce n'est pas une forme indéterminée, puisqu'on parle de nombres exactes, pas de limites.
+
+        On peut justifier cette convention avec: 
+        \[0^0 = \sum_{n=0}^{\infty} x^n \eval_{x = 0}^{} = \frac{1}{1 - x}\eval_{x=0}^{} = 1\]
+
+        Il est important de noter que ce résultat n'est pas un consensus dans la communauté mathématique, certains mathématiciens pensent que $0^0$ ne devrait pas être défini.
+    }
+
+    \subparag{Remarque par rapport à $0!$}{
+        Nous pouvons justifier cette convention en remarquant que, pour $n \geq 1$:
+        \[n! = n\left(n-1\right)! \implies \left(n-1\right)! = \frac{n!}{n}\]
+        
+        Donc, en prenant $n = 1$: 
+        \[0! = \left(1-1\right)! = \frac{1!}{1} = 1\]
+        
+        Une autre justification est de voir qu'il y a une unique manière de choisir 0 éléments d'un ensemble de $n$ éléments différents. Donc: 
+        \[1 = \binom{n}{0} = \frac{n!}{0!n!} = \frac{1}{0!} \implies 0! = 1\]
+    }
+}
+
+\parag{Proposition}{
+    Pour tout $x, y \in \mathbb{R}$:
+    \begin{enumerate}
+        \item $e^{x + y} = e^x e^y$
+        \item $e^{-x} = \frac{1}{e^x}$ 
+        \item $e^x > 0$
+    \end{enumerate}
+
+    \subparag{Preuve du point (1)}{
+        Nous avons: 
+        \[e^x e^y = \sum_{k=0}^{\infty} \frac{x^k}{k!} \sum_{p=0}^{\infty} \frac{y^p}{p!} = \left(1 + \frac{x}{1} + \frac{x^2}{2!} + \ldots\right)\left(1 + \frac{y}{1} + \frac{y^2}{2!} + \ldots\right)\]
+        
+        Nous voulons regrouper les termes de manière à ce que la somme de la puissance de $x$ et de la puissance de $y$ soient égales (pour faire une preuve complètement formelle, il faudrait justifier ce point plus en détails): 
+        \[\sum_{m=0}^{\infty} \left(\sum_{k+p=m}^{} \frac{x^k}{k!} \frac{y^p}{p!}\right)\]
+
+        Par exemple, si $m = 3$, alors on aurait: 
+        \[\sum_{k+p = 3}^{} \frac{x^k}{k!} \frac{y^p}{p!} = \frac{x^3}{3!} + \frac{x^2}{2!} \frac{y^1}{1} + \frac{x}{1} \frac{y^2}{2!} + \frac{y^3}{3!}\]
+        
+        Maintenant, on peut prendre $p = m - k$ comme changement de variable: 
+        \[\sum_{m=0}^{\infty} \sum_{k=0}^{m} \frac{1}{k!\left(m - k\right)!} x^k y^{m - k}\]
+
+        On remarque que c'est très proche de la formule binomiale. Puisque dans la somme interne $m$ est constant, on peut multiplier et diviser par $m!$:
+        \[\sum_{m=0}^{\infty} \frac{1}{m!} \sum_{k=0}^{m} \frac{m!}{k!\left(m - k\right)!} x^k y^{m - k} = \sum_{m=0}^{\infty} \frac{1}{m!} \left(x+y\right)^m = e^{x + y}\]
+        par la définition de l'exponentielle.
+    }
+
+    \subparag{Preuve du point (2)}{
+        Par la propriété (1), on a: 
+        \[e^x e^{-x} = e^{x - x} = e^{0} = \sum_{k=0}^{\infty} \frac{0^k}{k!} = \frac{0^0}{0!} = 1 \]
+
+        On en déduit que: 
+        \[e^{-x} = \frac{1}{e^x}\]
+        
+        On peut aussi en déduire que $e^x \neq 0$ pour tout $x$. En effet, sinon, la réciproque n'existerait pas pour ces $x$ (on ne peut pas diviser par zéro (très bon morceau de \textit{The Offspring} btw)).
+    }
+
+    \subparag{Preuve du point (3)}{
+        Par la propriété (1):
+        \[e^x = e^{\frac{x}{2}} e^{\frac{x}{2}} = \left(e^{\frac{x}{2}}\right)^2 \geq 0\]
+
+        De plus, puisque $e^x \neq 0$ par le point (2), alors on sait que: 
+        \[e^x > 0, \mathspace \forall x \in \mathbb{R}\]
+    }
+
+    \subparag{Observation}{
+        On remarque qu'on n'a uniquement eu besoin de la première propriété pour montrer les deux autres. 
+
+        \textit{Note personnelle:} C'est réellement la propriété la plus puissante de l'exponentielle. En effet, encore beaucoup d'autres propriétés découlent de celle-ci. Par exemple, à l'aide de la limite qu'on verra un petit peu plus bas (qui est une propriété du nombre $e$, pas particulièrement de l'exponentielle), on peut utiliser cette propriété pour démontrer que:
+        \[\frac{d}{dx} e^x = e^x\]
+
+        De plus, comme mentionné plus tôt dans ces notes, la définition de l'exponentielle complexe découle aussi uniquement de cette propriété:
+        \[e^{iy} = \cos\left(y\right) + i\sin\left(y\right)\]
+         
+        En d'autres mots, le fait que $e^{x + y} = e^x e^y$ est une propriété extrêmement puissante qu'on peut quasiment uniquement utiliser pour définir l'exponentielle (et on peut utiliser la limite qu'on verra un peu plus bas pour faire la différence entre $e^x$ et $a^x$, où $a$ est un réel positif quelconque).
+    }
+}
+
+\parag{Propriétés}{
+    \begin{enumerate}[left=0pt]
+        \item $\lim\limits_{x \to \infty} e^x = +\infty$
+        \item $\lim\limits_{x \to -\infty} e^x = 0$
+        \item $\left(e^x\right)\uparrow$ pour tout $x \in \mathbb{R}$
+    \end{enumerate}
+   
+    On en déduit que $e^{x} : \mathbb{R} \mapsto \mathbb{R}^*_+$ est injective, puisqu'elle est strictement croissante. On verra aussi plus tard qu'elle est surjective, et nous n'utiliserons pas ce que nous allons faire ci-dessous pour le démontrer, donc nous allons, pour l'instant, simplement le prendre comme tel. 
+
+    Ainsi, on sait que $e^x : \mathbb{R} \mapsto \mathbb{R}^*_+$ est bijective.
+    
+    \subparag{Preuve du point (1)}{
+        On a : 
+        \[\lim_{x \to \infty} e^x = \lim_{x \to \infty} \sum_{k=0}^{\infty} \frac{x^k}{k!} \over{\geq}{$k=1$}  \lim_{x \to \infty} \frac{x}{1} = +\infty\]
+        puisque tous les autres termes de la somme sont positifs.
+    }
+
+    \subparag{Preuve du point (2)}{
+        Nous avons, en prenant $y = -x$:
+        \[\lim_{x \to -\infty} e^x = \lim_{y \to \infty} e^{-y} = \lim_{y \to \infty} \frac{1}{\underbrace{e^y}_{\to +\infty}} = 0\]
+    }
+
+    \subparag{Preuve du point (3)}{
+        Soient $x,y \in \mathbb{R}$ tels que $x > y$. Nous avons: 
+        \[e^{x - y} = \sum_{k=0}^{\infty} \frac{\left(x-y\right)^k}{k!} > 1\]
+        puisque pour tout $k > 0$, les termes de la somme sont strictement positifs (on peut donc uniquement prendre le premier terme). 
+
+        Ainsi, on en déduit que: 
+        \[e^{x - y} > 1 \implies e^{x} \frac{1}{e^{y}} > 1 \implies e^x > e^y\]
+        
+        Et donc que $e^x$ est croissante (puisqu'on avait pris $x > y$ au début de la preuve).
+    }
+    
+    
+}
+
+\parag{Proposition}{
+    La limite suivante est remarquable: 
+    \[\lim_{x \to 0} \frac{e^x - 1}{x} = 1\]
+    
+    \subparag{Preuve}{
+        Nous allons démontrer cette limite à l'aide du théorème des deux gendarmes sur la fonction suivante: 
+        \[\left|\frac{e^x - 1}{x} - 1\right|\]
+        
+        Si nous trouvons une expression majorante de cette fonction et qui tend vers $0$, alors nous aurons trouvé notre résultat par les deux gendarmes. Travaillons dessus: 
+        \[\left|\frac{e^x - 1}{x} - 1\right| = \left|\frac{\sum_{k=0}^{\infty} \frac{x^k}{k!} - 1}{x} - 1\right| = \left|\frac{\sum_{{\color{red}k=1}}^{\infty} \frac{x^k}{k!}}{x} - 1\right|\]
+        
+        Or, puisque $x$ est constant dans la somme, c'est égal à:
+        \[\left|\sum_{k=1}^{\infty} \frac{x^{k-1}}{k!} - 1\right| = \left|\sum_{{\color{red}k=2}}^{\infty} \frac{x^{k-1}}{k!}\right| \leq \sum_{j=2}^{\infty} \frac{\left|x\right|^{k+1}}{k!} = \left|x\right|\sum_{k=2}^{\infty} \frac{\left|x\right|^{k-2}}{k!}\]
+
+        Puisque $k! > \left(k-2\right)!$, on en déduit que: 
+        \[\left|x\right|\sum_{k=2}^{\infty} \frac{\left|x\right|^{k-2}}{k!} \leq \left|x\right| \sum_{k=2}^{\infty} \frac{\left|x\right|^{k-2}}{\left(k-2\right)!}\]
+        
+
+        Ainsi, en prenant $n = k-2$:
+        \[\left|x\right| \sum_{k=2}^{\infty} \frac{\left|x\right|^{k-2}}{\left(k-2\right)!} = \left|x\right|\sum_{n=0}^{\infty} \frac{\left|x\right|^{n}}{n!} = \left|x\right|e^{\left|x\right|} < \underbrace{\left|x\right|e}_{\to 0}\]
+
+        En effet, puisqu'on s'intéresse à la limite quand $x \to 0$, alors on a $\left|x\right| < 1$. 
+
+        On peut bien en déduire par le théorème des gendarmes que: 
+        \[\lim_{x \to 0} \left|\frac{e^x - 1}{x} - 1\right| = 0 \implies \lim_{x \to 0} \frac{e^x - 1}{x} - 1 = 0 \implies \lim_{x \to 0} \frac{e^x - 1}{x} = 1\]
+
+        \qed
+    }
+
+    \subparag{Généralisation}{
+        On remarque que, si $\lim_{x \to a} t\left(x\right) = 0$, et si $t\left(x\right) \neq 0$ au voisinage de $x = a$, alors, par le théorème de combinaison de limites: 
+        \[\lim_{x \to a} \frac{e^{t\left(x\right)} - 1}{t\left(x\right)} = 1\]
+    }
+
+    \subparag{Note personnelle}{
+        On peut retrouver cette limite si on se souvient que $\left(e^x\right)' = e^x$ et de la définition de la dérivée. En effet: 
+        \[\left(e^x\right)' : \lim_{dx \to 0} \frac{e^{x+dx} - e^x}{dx} = \lim_{dx \to 0} \frac{e^x e^{dx} - e^x}{dx} = \lim_{h \to 0} e^x\frac{e^{dx} - 1}{dx}\]
+
+        Or, pour que ce soit égal à $e^x$, on en déduit forcément que: 
+        \[\lim_{dx \to 0} \frac{e^{dx} - 1}{dx}\]
+        
+        Notez qu'on utilise normalement cette limite pour démontrer la dérivée de l'exponentielle, et non l'inverse. Ceci est seulement une méthode pour la retrouver en cas d'oubli.
+    }
+    
+}
+
+\parag{Fonction réciproque}{
+    On sait que $e^{x} : \mathbb{R} \mapsto \mathbb{R}^*_+$ est bijective, donc on peut définir la fonction réciproque. On appelle cette fonction le logarithme naturel, ou logarithme Népérien (il est intéressant savoir que cette référence à John Napier n'est faite qu'en français, ``Neperian Logarithm'' ne veut rien dire en anglais).
+
+    On sait dont qu'il existe $\log\left(x\right) : \mathbb{R}^*_+ \mapsto \mathbb{R}$ telle que: 
+    \[e^x = y \iff x = \log\left(y\right), \mathspace \forall x \in \mathbb{R}, \forall y \in \mathbb{R}^*_+\]
+}
+
+\parag{Propriétés}{
+    \begin{enumerate}[left=0pt]
+        \item $e^{\log\left(x\right)} = x, \mathspace \forall x \in \mathbb{R}^*_+$
+        \item $\log\left(e^x\right) = x, \mathspace \forall x \in \mathbb{R}$ 
+        \item $\log\left(xy\right) = \log\left(x\right) + \log\left(y\right)$
+        \item $\log\left(\frac{x}{y}\right) = \log\left(x\right) - \log\left(y\right)$
+        \item $\log\left(x^{r}\right) = r\log\left(x\right), \mathspace \forall r \in \mathbb{N}^*$
+        \item $\log\left(1\right) = 0$
+        \item $\log\left(e\right) = 1$
+    \end{enumerate}
+    
+    \subparag{Preuve du point (3)}{
+        On a: 
+        \[e^{\log\left(x\right) + \log\left(y\right)} = e^{\log\left(x\right)}e^{\log\left(y\right)} = xy = e^{\log\left(xy\right)}\]
+        
+        En prenant un $\log$ des deux côtés. 
+        \[\log\left(x\right) + \log\left(y\right) = \log\left(xy\right)\]
+    }
+
+    Les autres démonstrations sont très similaires et considérées triviales, et donc (naturellement) laissées en exercice au lecteur \wink.
+}
+
+\subsection[Caractérisation]{Retour de la caractérisation des limites à partir des suites}
+\parag{Remarque}{
+    Si on a une fonction et une suite telles que: 
+    \[\lim_{x \to \infty} f\left(x\right) = m \mathspace \text{ et } \mathspace \lim_{n \to \infty} a_n = \infty\]
+    
+    Alors: 
+    \[\lim_{n \to \infty} f\left(a_n\right) = m\]
+
+    C'est aussi vrai dans l'autre direction, mais dans ce cas c'est pour toute suite, et donc c'est moins intéressant.
+}
+
+\parag{Exemple}{
+    Nous voulons calculer la limite suivante: 
+    \[\lim_{n \to \infty} \left(n! - \sqrt{\left(n!\right)^2 - n!}\right)\]
+    
+     Considérons la limite ci-dessous: 
+     \[\lim_{x \to \infty} f\left(x\right) = \lim_{x \to \infty} \left(x - \sqrt{x^2 - x}\right) = \lim_{x \to \infty} \frac{x^2 - x^2 + x}{x + \sqrt{x^2 - x}} = \lim_{x \to \infty} \frac{x}{x\left(1 + \sqrt{1 - \frac{1}{x}}\right)} = \frac{1}{2}\]
+     
+    Donc, en prenant $a_n = n!$, on peut en conclure que : 
+    \[\lim_{n \to \infty} f\left(n!\right) = \lim_{x \to \infty} f\left(x\right) = \frac{1}{2}\]
+    puisque $\lim_{n \to \infty} n! = +\infty$.
+}
+
+\end{document}
