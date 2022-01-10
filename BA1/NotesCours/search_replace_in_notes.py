@@ -144,6 +144,7 @@ def open_lecture(course, lecture):
     os.startfile(path)
 
 
+print("Extracting lecture pages from table of contents...")
 lectures_begin_page = extract_lectures_begin_page(COURSE)
 
 if lectures_begin_page is not None:

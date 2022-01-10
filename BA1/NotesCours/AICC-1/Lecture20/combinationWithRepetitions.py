@@ -1,19 +1,40 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Nov 27 23:56:38 2021
+Draws table for combinations with repetitions.
 
-@author: joach
+Output:
+| & | & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ &
+| & $\bullet$ & | & $\bullet$ & $\bullet$ & $\bullet$ &
+| & $\bullet$ & $\bullet$ & | & $\bullet$ & $\bullet$ &
+| & $\bullet$ & $\bullet$ & $\bullet$ & | & $\bullet$ &
+| & $\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & | &
+$\bullet$ & | & | & $\bullet$ & $\bullet$ & $\bullet$ &
+$\bullet$ & | & $\bullet$ & | & $\bullet$ & $\bullet$ &
+$\bullet$ & | & $\bullet$ & $\bullet$ & | & $\bullet$ &
+$\bullet$ & | & $\bullet$ & $\bullet$ & $\bullet$ & | &
+$\bullet$ & $\bullet$ & | & | & $\bullet$ & $\bullet$ &
+$\bullet$ & $\bullet$ & | & $\bullet$ & | & $\bullet$ &
+$\bullet$ & $\bullet$ & | & $\bullet$ & $\bullet$ & | &
+$\bullet$ & $\bullet$ & $\bullet$ & | & | & $\bullet$ &
+$\bullet$ & $\bullet$ & $\bullet$ & | & $\bullet$ & | &
+$\bullet$ & $\bullet$ & $\bullet$ & $\bullet$ & | & | &
+
+Created on Sat Nov 27 23:56:38 2021
+@author: Joachim Favre
 """
-def recursivePrint(nBarsLeft, nFruitsLeft):
-    if nBarsLeft > 0:
-        for text in recursivePrint(nBarsLeft - 1, nFruitsLeft):
+
+
+def recursive_print(n_bars_left, n_fruits_left):
+    if n_bars_left > 0:
+        for text in recursive_print(n_bars_left - 1, n_fruits_left):
             yield "| & " + text
-    if nFruitsLeft > 0:    
-        for text in recursivePrint(nBarsLeft, nFruitsLeft - 1):
+    if n_fruits_left > 0:
+        for text in recursive_print(n_bars_left, n_fruits_left - 1):
             yield "$\\bullet$ & " + text
-    
-    if nBarsLeft <= 0 and nFruitsLeft <= 0:
+
+    if n_bars_left <= 0 and n_fruits_left <= 0:
         yield ""
-            
-for text in recursivePrint(2, 4):
+
+
+for text in recursive_print(2, 4):
     print(text)

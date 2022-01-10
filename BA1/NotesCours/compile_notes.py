@@ -90,7 +90,7 @@ def extract_lecture_command(content):
     in_summary = False
     summary = ""
     title = ""
-    lecture_no = 0
+    lecture_no = "0"
     date = "1970-01-01"
     temp = ""
     for line in content.split("\n"):
@@ -134,6 +134,10 @@ def extract_lecture_command(content):
                 result += temp + line + "\n"
                 temp = ""
                 lecture_command = False
+
+    if (summary.count(r"\begin{itemize}[left=0pt]")
+            < summary.count(r"\begin{itemize}")):
+        print("\tSummary has left indent in lecture " + lecture_no)
 
     if temp != "":  # should never happen
         result += temp
@@ -376,7 +380,7 @@ def create_main_tex(tmp_dir, tex_files, config, summaries):
 
     page_style_no_title = ("\\fancyhf{}\n"
                            + "\\fancyfoot[LE,RO]{\\thepage}\n")
-    
+
     if config["english"]:
         foreword_key = 'en'
     else:
