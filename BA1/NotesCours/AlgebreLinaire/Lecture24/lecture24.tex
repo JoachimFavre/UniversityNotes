@@ -22,25 +22,25 @@
 }
 
 \parag{Méthode}{
-    Utilisons notre approche de moindres carrées. Les solutions $\bvec{\hat{\beta}}$ de $A \bvec{\beta} = \bvec{y}$ au sens des moindres carrés sont les solutions des équations normales: 
+    Utilisons notre approche de moindres carrées. Les solutions $\bvec{\hat{\beta}}$ de $A \bvec{\beta} = \bvec{y}$ au sens des moindres carrés sont les solutions des équations normales:
     \[A^T A \bvec{\hat{\beta}} = A^T \bvec{y}\]
-    
+
     On sait que la solution $\bvec{\hat{\beta}}$ existe toujours. La solution est unique, si et seulement si les colonnes de $A$ sont linéairement indépendants, donc si et seulement si les $x_i$ ne sont pas tous égaux (si et seulement si au moins deux sont différents).
 
-    
+
 }
 
 \parag{Solution explicite}{
-    Notre cas est tellement simple que nous pouvons chercher une solution explicite. Cependant, nous n'avons pas besoin de connaître le résultat par cœur. 
+    Notre cas est tellement simple que nous pouvons chercher une solution explicite. Cependant, nous n'avons pas besoin de connaître le résultat par cœur.
 
-    Commençons par définir le point moyen: 
+    Commençons par définir le point moyen:
     \[\bar{x} = \frac{1}{n} \sum_{i}^{} x_i, \mathspace \bar{y} = \frac{1}{n} \sum_{i}^{} y_i\]
 
-    Cherchons maintenant les équations normales: 
+    Cherchons maintenant les équations normales:
     \[A^T A = \begin{bmatrix} 1 & \ldots & 1 \\ x_1 & \ldots & x_n \end{bmatrix} \begin{bmatrix} 1 & x_1 \\ \vdots & \vdots \\ 1 & x_n \end{bmatrix} = \begin{bmatrix} n & \sum x_i \\ \sum_{}^{} x_i & \sum_{}^{} x_i^2 \end{bmatrix} = \begin{bmatrix} n & n \bar{x} \\ n \bar{x} & \left\|\bvec{x}\right\|^2 \end{bmatrix} \]
     \[A^T \bvec{y} = \begin{bmatrix} 1 & \ldots & 1 \\ x_1 & \ldots & x_n \end{bmatrix} \begin{bmatrix} y_1 \\ \vdots \\ y_n \end{bmatrix} = \begin{bmatrix} \sum_{}^{} y_i \\ \sum_{}^{} x_i y_i \end{bmatrix} = \begin{bmatrix} n \bar{y} \\ \bvec{x} \dotprod \bvec{y} \end{bmatrix} \]
-    
-    On remarque que si on avait préalablement centré nos données, donc si on avait pris $\bar{x} = \bar{y} = 0$, cela aurait simplifié nos calculs. 
+
+    On remarque que si on avait préalablement centré nos données, donc si on avait pris $\bar{x} = \bar{y} = 0$, cela aurait simplifié nos calculs.
 
     Supposons que notre matrice est inversible. Alors:
     \[\bvec{\hat{b}} = \left(A^T A\right)^{-1} A^T \bvec{y} = \begin{bmatrix} n & n \bar{x} \\ n \bar{x} & \left\|\bvec{x}\right\|^2 \end{bmatrix}^{-1} \begin{bmatrix} n \bar{y} \\ \bvec{x} \dotprod \bvec{y} \end{bmatrix}\]
@@ -48,20 +48,20 @@
     On peut utiliser la formule pour inverser les matrices $2 \times 2$:
     \[\frac{1}{n \left\|\bvec{x}\right\|^2 - n^2 \bar{x}^2} \begin{bmatrix} \left\|\bvec{x}\right\|^2 & -n \bar{x} \\ -n \bar{x} & n \end{bmatrix} \begin{bmatrix} n \bar{y} \\ \bvec{x} \dotprod \bvec{y} \end{bmatrix} = \frac{1}{n \left\|\bvec{x}\right\|^2 - n^2 \bar{x}^2} \begin{bmatrix} \left\|\bvec{x}\right\|^2 n \bar{y} - n \bar{x} \left(\bvec{x} \dotprod \bvec{y}\right) \\ -n^2 \bar{x} \bar{y} + n\left(\bvec{x} \dotprod \bvec{y}\right)  \end{bmatrix}\]
 
-    On en déduit donc que: 
+    On en déduit donc que:
     \[\hat{\beta}_1 = \frac{\bvec{x} \dotprod \bvec{y} - n \bar{x} \bar{y}}{\left\|\bvec{x}\right\|^2 - n \bar{x}^2}\]
-    
+
     Notez qu'il ne faut surtout pas apprendre cette solution par cœur, que nous pouvons juste résoudre les équations normales. Ceci était juste pour nous montrer qu'on a développé assez d'outils pour obtenir un résultat, qui est de plus relativement simple.
 }
 
 \parag{Justification du moindre carré}{
     Ces formules nous permettent de calculer $\hat{b}_0, \hat{b}_1$ tels que $\left\|A \bvec{\hat{\beta}} - \bvec{y}\right\|^2$ est aussi petit que possible. Nous voulons étudier la quantité qu'on est \textit{réellement} en train de minimiser:
     \[A \bvec{\hat{b}} - \bvec{y} = \begin{bmatrix} 1 & x_1 \\ \vdots & \vdots \\ 1 & x_n \end{bmatrix} \begin{bmatrix} \hat{\beta}_0 \\ \hat{\beta}_1 \end{bmatrix} - \begin{bmatrix} y_1 \\ \vdots \\ y_n \end{bmatrix} = \begin{bmatrix} \hat{\beta}_0 + \hat{\beta}_1 x_1 - y_1 \\ \ldots \\ \hat{\beta}_0 + \hat{\beta}_1 x_n - y_n \end{bmatrix} \]
-    
-    Ainsi: 
+
+    Ainsi:
     \[\left\|A \bvec{\hat{\beta}} - \bvec{y}\right\|^2 = \left(\hat{\beta}_0 + \hat{\beta}_1 x_1 - y_1\right)^2 + \ldots + \left(\hat{\beta}_0 + \hat{\beta}_1 x_n - y_n\right)^2\]
 
-    On minimise donc la somme des carrés des erreurs verticales. 
+    On minimise donc la somme des carrés des erreurs verticales.
 
     \imagehere{erreurMoindreCarre.png}
 }
@@ -83,47 +83,47 @@
 }
 
 \parag{Exemple}{
-    Soit la matrice suivante: 
+    Soit la matrice suivante:
     \[A = \begin{bmatrix} 6 & -2 & -1 \\ -2 & 6 & -1 \\ -1 & -1 & 5 \end{bmatrix} \]
-    
-    On remarque que $A$ est bien symétrique puisque $A^T = A$. Calculons son polynôme caractéristique: 
+
+    On remarque que $A$ est bien symétrique puisque $A^T = A$. Calculons son polynôme caractéristique:
     \[p_A\left(\lambda\right) =\left(6 -\lambda\right)^2\left(5 - \lambda\right) -2 -2 - \left(6 -\lambda\right) - 4\left(5 - \lambda\right) - \left(6 - \lambda\right) = \left(8 - \lambda\right)\left(6 - \lambda\right)\left(3 - \lambda\right)\]
-    
-    Les valeurs propres de $A$ sont donc 8, 6, 3. Elles ont toutes une multiplicité algébrique de 1, donc la matrice est diagonalisable. En calculant $\ker\left(A - \lambda I_3\right)$, on obtient: 
+
+    Les valeurs propres de $A$ sont donc 8, 6, 3. Elles ont toutes une multiplicité algébrique de 1, donc la matrice est diagonalisable. En calculant $\ker\left(A - \lambda I_3\right)$, on obtient:
     \[\ker\left(A - 8 I_3\right) = \vect\left\{\begin{bmatrix} 1 \\ -1 \\ 0 \end{bmatrix} \right\} \implies \bvec{v}_1 = \begin{bmatrix} 1 \\ -1 \\ 0 \end{bmatrix}  \]
     \[\ker\left(A - 6 I_3\right) = \vect\left\{\begin{bmatrix} 1 \\ 1 \\ -2 \end{bmatrix} \right\} \implies \bvec{v}_2 = \begin{bmatrix} 1 \\ 1 \\ -2 \end{bmatrix} \]
     \[\ker\left(A - 3 I_3\right) = \vect\left\{\begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \right\} \implies \bvec{v}_3 = \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \]
-    
-    Ceci nous permet de diagonaliser $A$: 
+
+    Ceci nous permet de diagonaliser $A$:
     \[D = \begin{bmatrix} \lambda_1 & 0 & 0 \\ 0 & \lambda_2 & 0 \\ 0 & 0 & \lambda_3 \end{bmatrix} = \begin{bmatrix} 8 & 0 & 0 \\ 0 & 6 & 0 \\ 0 & 0 & 3 \end{bmatrix}, \mathspace P = \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \bvec{v}_2 & \bvec{v}_3 \\  &  &  \end{bmatrix} = \begin{bmatrix} 1 & 1 & 1 \\ -1 & 1 & 1 \\ 0 & -2 & 1 \end{bmatrix} \]
-    
+
     On a que $A \bvec{v}_i = \lambda_i \bvec{v}_i$, donc $AP = PD$, ce qui nous montre bien qu'on a trouvé $A = PDP^{-1}$.
 
-    Nous voulons maintenant trouver l'inverse de $P$. Cela peut prendre beaucoup de temps, mais ici on peut faire une observation utile: les colonnes de $P$ sont orthogonales (et ce n'est pas un accident). En effet: 
+    Nous voulons maintenant trouver l'inverse de $P$. Cela peut prendre beaucoup de temps, mais ici on peut faire une observation utile: les colonnes de $P$ sont orthogonales (et ce n'est pas un accident). En effet:
     \[\bvec{v}_1 \dotprod \bvec{v}_2 = 0, \mathspace \bvec{v}_1 \dotprod \bvec{v}_3 = 0, \mathspace \bvec{v}_2 \dotprod \bvec{v}_3 = 0\]
 
-    Ainsi, si on normalise nos vecteurs, on va obtenir des vecteurs orthonormés, et donc une matrice orthogonale (dont le calcul de l'inverse est très simple, puisque, pour de telles matrices $U^{-1} = U^T$): 
+    Ainsi, si on normalise nos vecteurs, on va obtenir des vecteurs orthonormés, et donc une matrice orthogonale (dont le calcul de l'inverse est très simple, puisque, pour de telles matrices $U^{-1} = U^T$):
     \[\left\|\bvec{v}_1\right\|^2 = 1^2 + \left(-1\right)^2 + 0^2 = 2 \implies \bvec{u}_1 = \frac{1}{\left\|\bvec{v}_1\right\|} \bvec{v}_1 = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\ -1 \\ 0 \end{bmatrix} \]
     \[\left\|\bvec{v}_2\right\|^2 = 1^2 + 1^2 + \left(-2\right)^2 = 6 \implies \bvec{u}_2 = \frac{1}{\left\|\bvec{u}_2\right\|} \bvec{v}_2 = \frac{1}{\sqrt{6}} \begin{bmatrix} 1 \\ 1 \\ -2 \end{bmatrix} \]
     \[\left\|\bvec{v}_3\right\|^2 = 1^2 + 1^2 + 1^2 = 3 \implies \bvec{u}_3 = \frac{1}{\left\|\bvec{v}_3\right\|} \bvec{v}_3 = \frac{1}{\sqrt{3}} \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix} \]
-    
-    $\bvec{u}_1, \bvec{u}_2$ et $\bvec{u}_3$ sont toujours des vecteurs propres associés aux mêmes valeurs propres, puisqu'on peut les multiplier par un scalaire. Ainsi, on peut redéfinir: 
+
+    $\bvec{u}_1, \bvec{u}_2$ et $\bvec{u}_3$ sont toujours des vecteurs propres associés aux mêmes valeurs propres, puisqu'on peut les multiplier par un scalaire. Ainsi, on peut redéfinir:
     \[P = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \bvec{u}_2 & \bvec{u}_3 \\  &  &  \end{bmatrix} = \begin{bmatrix} 1 / \sqrt{2} & 1 / \sqrt{6} & 1 / \sqrt{3} \\ -1 / \sqrt{2} & 1 / \sqrt{6} & 1 / \sqrt{3} \\ 0 & -2 / \sqrt{6} & 1 / \sqrt{3} \end{bmatrix} \]
-    
-    On a toujours que $A = PDP^{-1}$, avec le même $D$ que ci-dessus. Étudions maintenant $P^T P$: 
+
+    On a toujours que $A = PDP^{-1}$, avec le même $D$ que ci-dessus. Étudions maintenant $P^T P$:
     \[P^T P = \begin{bmatrix}  & \bvec{u}_1^T &  \\  & \bvec{u}_2^T &  \\  & \bvec{u}_3^T &  \end{bmatrix} \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \bvec{u}_2 & \bvec{u}_3 \\  &  &  \end{bmatrix} = \begin{bmatrix} \bvec{u}_1 \dotprod \bvec{u}_1 & \bvec{u}_1 \dotprod \bvec{u}_2 & \bvec{u}_1 \dotprod \bvec{u}_3 \\ \bvec{u}_2 \dotprod \bvec{u}_1 & \bvec{u}_2 \dotprod \bvec{u}_2 & \bvec{u}_2 \dotprod \bvec{u}_3 \\ \bvec{u}_3 \dotprod \bvec{u}_1 & \bvec{u}_3 \dotprod \bvec{u}_2  & \bvec{u}_3 \dotprod \bvec{u}_3\end{bmatrix} = I_3  \]
-    
-    Ainsi, on trouve que $P^{-1} = P^T$. Donc: 
+
+    Ainsi, on trouve que $P^{-1} = P^T$. Donc:
     \[A = PDP^T\]
 
     On dit que $A$ est \important{diagonalisable en base orthonormée}.
 
     \subparag{Importance de la symétrie}{
-        Nous nous demandons pourquoi il est nécessaire que $A$ soit symétrique dans cette histoire. 
+        Nous nous demandons pourquoi il est nécessaire que $A$ soit symétrique dans cette histoire.
 
-        Si $A = PDP^T$ avec $D$ diagonale, alors: 
+        Si $A = PDP^T$ avec $D$ diagonale, alors:
         \[A^T = \left(PDP^T\right)^T = \left(P^T\right)^T D^T P^T = P D P^T = A\]
-        
+
         En effet, les matrices diagonales sont symétriques. On se rend donc compte que c'est une condition nécessaire que $A$ soit symétrique pour que l'on puisse espérer diagonaliser $A$ avec une base de vecteurs propres orthonormés.
 
         Il est plus difficile de démontrer qu'il est \textit{suffisant} que $A$ soit symétrique: on va seulement en prouver une partie.
@@ -134,7 +134,7 @@
         \begin{enumerate}
             \item Toutes les valeurs propres de $A$ étaient réelles.
             \item Les valeurs propres de $A$ associés à des valeurs propres distinctes étaient orthogonales.
-            \item Les multiplicités algébriques et géométriques étaient égales. 
+            \item Les multiplicités algébriques et géométriques étaient égales.
         \end{enumerate}
 
         Nous allons voir des théorèmes, qui montrent que ceci n'était pas un accident.
@@ -150,31 +150,32 @@
 }
 
 \parag{Théorème}{
-    Soit $A$ une matrice symétrique, i.e. $A^T = A$. 
+    Soit $A$ une matrice symétrique, i.e. $A^T = A$.
 
-    Si $\bvec{v}_1$ et $\bvec{v}_2$ sont deux vecteurs propres de $A$ associés à des valeurs propres $\lambda_1$ et $\lambda_2$ \textit{distinctes}, alors $\bvec{v}_1$ et $\bvec{v}_2$ sont orthogonaux. En d'autres mots: 
+    Si $\bvec{v}_1$ et $\bvec{v}_2$ sont deux vecteurs propres de $A$ associés à des valeurs propres $\lambda_1$ et $\lambda_2$ \textit{distinctes}, alors $\bvec{v}_1$ et $\bvec{v}_2$ sont orthogonaux. En d'autres mots:
     \[\lambda_1 \neq \lambda_2 \implies \bvec{v}_1 \dotprod \bvec{v}_2 = 0\]
-    
+
     \subparag{Preuve}{
-        On a: 
+        On a:
         \[A \bvec{v}_1 = \lambda_1 \bvec{v}_1, \mathspace A \bvec{v}_2 = \lambda_2 \bvec{v}_2, \mathspace \lambda_1 \neq \lambda_2\]
 
-        On veut démontrer que $\bvec{v}_1 \dotprod \bvec{v}_2 = 0$. Ainsi, considérons $\left(A \bvec{v}_1\right) \dotprod \bvec{v}_2$: 
+        On veut démontrer que $\bvec{v}_1 \dotprod \bvec{v}_2 = 0$. Ainsi, considérons $\left(A \bvec{v}_1\right) \dotprod \bvec{v}_2$:
         \[\left(A \bvec{v}_1\right) \dotprod \bvec{v}_2 = \left(\lambda_1 \bvec{v}_1\right) \dotprod \bvec{v}_2 = \lambda_1 \left(\bvec{v}_1 \dotprod \bvec{v}_2\right)\]
 
-        De plus, on voit aussi que: 
+        De plus, on voit aussi que:
         \begin{multiequality}
         \left(A \bvec{v}_1\right) \dotprod \bvec{v}_2 & = \left(A \bvec{v}_1\right)^T \bvec{v}_2  \\
-        & = \bvec{v}_1^T A^T \bvec{v}_2 = \bvec{v}_1^T A \bvec{v}_2  \\
+        & = \bvec{v}_1^T A^T \bvec{v}_2 \\
+        & = \bvec{v}_1^T A \bvec{v}_2 \\
         & = \bvec{v}_1^T \lambda_2 \bvec{v}_2 \\
         & = \lambda_2 \left(\bvec{v}_1^T \bvec{v}_2\right)  \\
-        & = \lambda_2\left(\bvec{v}_1 \dotprod \bvec{v}_2\right) 
+        & = \lambda_2\left(\bvec{v}_1 \dotprod \bvec{v}_2\right)
         \end{multiequality}
-        
-        Ainsi, on en déduit que: 
+
+        Ainsi, on en déduit que:
         \[\lambda_1 \left(\bvec{v}_1 \dotprod \bvec{v}_2\right) = \lambda_2\left(\bvec{v}_1 \dotprod \bvec{v}_2\right)\]
-        
-        Or, nécessairement, pour que $\lambda_1 x = \lambda_2 x$ où $\lambda_1 \neq \lambda_2$ (ça nous permet d'éviter la division par 0), il faut nécessairement que $x = 0$. Donc, $\bvec{v}_1 \dotprod \bvec{v}_2 = 0$: ces vecteurs sont orthogonaux. 
+
+        Or, nécessairement, pour que $\lambda_1 x = \lambda_2 x$ où $\lambda_1 \neq \lambda_2$ (ça nous permet d'éviter la division par 0), il faut nécessairement que $x = 0$. Donc, $\bvec{v}_1 \dotprod \bvec{v}_2 = 0$: ces vecteurs sont orthogonaux.
 
         \qed
     }

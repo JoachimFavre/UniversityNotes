@@ -14,7 +14,7 @@
 \lecture{23}{2021-12-09}{Moindres carrés et début des régressions}{
 \begin{itemize}[left=0pt]
     \item Explication de la méthode de calcul de la solution au moindres carrés de $A \bvec{x} = \bvec{b}$, passant par les équations normales.
-    \item Explication de la méthode de calcul de la solution au moindres carrés de $A \bvec{x} = \bvec{b}$, passant la factorisation $QR$. 
+    \item Explication de la méthode de calcul de la solution au moindres carrés de $A \bvec{x} = \bvec{b}$, passant la factorisation $QR$.
     \item Démonstration de l'unicité de cette solution lorsque les colonnes de $A$ sont linéairement indépendantes.
     \item Introduction aux régressions linéaires et explication de leur utilité.
 \end{itemize}
@@ -25,17 +25,17 @@
 \parag{Introduction}{
     Maintenant que nous avons vu plus de notions, nous pouvons revenir à notre motivation de départ: on souhaite trouver $\bvec{x} \in \mathbb{R}^n$ tel que $A \bvec{x} = \bvec{b}$. Cependant, si les colonnes de $A$ sont liées, ou si, par exemple on a $m > n$ (plus d'équations que d'inconnues), il se pourrait qu'aucune solution n'existe. Ainsi, nous voulons trouver une solution qui est la plus proche possible.
 
-    On cherche donc $\bvec{x} \in \mathbb{R}^n$ tel que $A \bvec{x}$ est aussi proche que possible de $\bvec{b} \in \mathbb{R}^m$. En considérant tous les $\bvec{x}$ dans $\mathbb{R}^n$, on peut ``atteindre'' n'importe quel point de $\im\left(A\right)$ (mais aucun autre). Ainsi, puisque $A \bvec{x} = \bvec{b}$ n'a pas de solution, cela implique que $\bvec{b}$ n'est pas dans l'image de $A$. Or, on sait que l'unique point de $\im\left(A\right)$ le plus proche de $\bvec{b}$ est la projection orthogonale de $\bvec{b}$ sur $\im\left(A\right)$. Ainsi, on va tenter de choisir $\bvec{\hat{x}}$ tel que: 
+    On cherche donc $\bvec{x} \in \mathbb{R}^n$ tel que $A \bvec{x}$ est aussi proche que possible de $\bvec{b} \in \mathbb{R}^m$. En considérant tous les $\bvec{x}$ dans $\mathbb{R}^n$, on peut ``atteindre'' n'importe quel point de $\im\left(A\right)$ (mais aucun autre). Ainsi, puisque $A \bvec{x} = \bvec{b}$ n'a pas de solution, cela implique que $\bvec{b}$ n'est pas dans l'image de $A$. Or, on sait que l'unique point de $\im\left(A\right)$ le plus proche de $\bvec{b}$ est la projection orthogonale de $\bvec{b}$ sur $\im\left(A\right)$. Ainsi, on va tenter de choisir $\bvec{\hat{x}}$ tel que:
     \[A \bvec{\hat{x}} = \proj_{\im\left(A\right)} \bvec{b} = \bvec{\hat{b}}\]
 
-    Comme $\bvec{\hat{b}}$ est dans $\im A$, il existe $\bvec{\hat{x}} \in \mathbb{R}^n$ (qui n'est pas forcément unique) tel que $A \bvec{\hat{x}} = \bvec{\hat{b}}$. Si on trouve un tel $\bvec{\hat{x}}$, on a gagné. En effet, pour tout $x \in \mathbb{R}^n$: 
+    Comme $\bvec{\hat{b}}$ est dans $\im A$, il existe $\bvec{\hat{x}} \in \mathbb{R}^n$ (qui n'est pas forcément unique) tel que $A \bvec{\hat{x}} = \bvec{\hat{b}}$. Si on trouve un tel $\bvec{\hat{x}}$, on a gagné. En effet, pour tout $x \in \mathbb{R}^n$:
     \[\left\|A \bvec{x} - \bvec{b}\right\| \geq \left\|\bvec{\hat{b}} - \bvec{b}\right\| = \left\|A \bvec{\hat{x}} - \bvec{b}\right\|\]
-    
+
     En d'autres mots, aucun $\bvec{x}$ ne fait strictement mieux que $\bvec{\hat{x}}$.
 }
 
 \parag{Méthode}{
-    Pour trouver $\bvec{\hat{x}}$ tel que $A \bvec{\hat{x}}$ est aussi proche que possible de $\bvec{b}$, on peut adopter différents points de vue, tous équivalents. En voici une: 
+    Pour trouver $\bvec{\hat{x}}$ tel que $A \bvec{\hat{x}}$ est aussi proche que possible de $\bvec{b}$, on peut adopter différents points de vue, tous équivalents. En voici un:
 
     \begin{multiequation}
     & \bvec{\hat{b}} = \proj_{\im A}\left(\bvec{b}\right) = A \bvec{x}  \\
@@ -44,31 +44,31 @@
     \implies & A^T \left(\bvec{\hat{b}} - \bvec{b}\right) = \bvec{0} \\
     \implies & A^T \left(A \bvec{\hat{x}} - \bvec{b}\right) = \bvec{0}  \\
     \implies & A^T A \bvec{\hat{x}} - A^T \bvec{b} = \bvec{0}  \\
-    \implies & A^T A \bvec{\hat{x}} = A^T \bvec{b} 
+    \implies & A^T A \bvec{\hat{x}} = A^T \bvec{b}
     \end{multiequation}
-    
-    En partant de notre équation de départ, on donc simplement les deux côtés par $A^T$. Ce nouveau système a, nécessairement, au moins une solution. 
+
+    En partant de notre équation de départ, on multiplie donc simplement les deux côtés par $A^T$. Ce nouveau système a, nécessairement, au moins une solution.
 }
 
 
 \parag{Théorème}{
-    Étant donné un système d'équation $A \bvec{x} = \bvec{b}$ (qui pourrait ne pas avoir de solution), on définit un autre système d'équations, appelées \important{équations normales}: 
+    Étant donné un système d'équation $A \bvec{x} = \bvec{b}$ (qui pourrait ne pas avoir de solution), on définit un autre système d'équations, appelées \important{équations normales}:
     \[A^T A \bvec{\hat{x}} = A^T \bvec{b}\]
-    
-    Alors, ce système a au moins une solution, et chaque solution $\bvec{\hat{x}}$ a la propriété que: 
+
+    Alors, ce système a au moins une solution, et chaque solution $\bvec{\hat{x}}$ a la propriété que:
     \[\left\|A \bvec{\hat{x}} - \bvec{b}\right\| \leq \left\|A \bvec{x} - \bvec{b}\right\|, \mathspace \forall \bvec{x}\]
 
     \subparag{Observation}{
-        On peut voir $\left\|A \bvec{\hat{x}} - \bvec{b}\right\|$ est l'erreur à la solution réellement attendue, donc cette erreur est minimale.
+        On peut voir que $\left\|A \bvec{\hat{x}} - \bvec{b}\right\|$ est l'erreur à la solution réellement attendue, donc cette erreur est minimale.
     }
-    
+
     \subparag{Remarque}{
-        On appelle chaque $\bvec{\hat{x}}$ une \important{solution au moindres carrés} de $A \bvec{x} = \bvec{b}$ car $\bvec{\hat{x}}$ minimise (rend aussi petit que possible): 
+        On appelle chaque $\bvec{\hat{x}}$ une \important{solution au moindres carrés} de $A \bvec{x} = \bvec{b}$ car $\bvec{\hat{x}}$ minimise (rend aussi petit que possible):
         \begin{multiequality}
         \left\|A \bvec{\hat{x}}\right\|^2 =\ & \left(A \bvec{\hat{x}} - \bvec{b}\right) \dotprod \left(A \bvec{\hat{x}} - \bvec{b}\right)  \\
-        =\ & \left(A \bvec{\hat{x}} - \bvec{b}\right)^2_1 + \ldots + \left(A \bvec{\hat{x}} - \bvec{b}\right)_m^2 
+        =\ & \left(A \bvec{\hat{x}} - \bvec{b}\right)^2_1 + \ldots + \left(A \bvec{\hat{x}} - \bvec{b}\right)_m^2
         \end{multiequality}
-        
+
         On minimise donc le carré des erreurs individuelles, ce qui justifie le nom.
     }
 }
@@ -82,49 +82,49 @@
         \item $A^T A \in \mathbb{R}^{n \times n}$ est inversible.
         \item Les colonnes de $A$ sont linéairement indépendantes.
     \end{enumerate}
-    
-    Dans le cas où elles sont vraies (donc qu'au moins une est vraie), alors: 
+
+    Dans le cas où elles sont vraies (donc qu'au moins une est vraie), alors:
     \[\bvec{\hat{x}} = \left(A^T A\right)^{-1} A^T \bvec{b}\]
-     
+
     \subparag{Preuve}{
         On va démontrer que $\left(1\right) \implies \left(3\right) \implies \left(2\right) \implies \left(1\right)$. Dans ce cas, on aura bien démontré que si une des proposition est vraie, alors elles le seront toutes.
 
         \begin{itemize}[left=0pt]
-            \item $\left(1\right) \implies \left(3\right)$ est vrai car on peut considérer la contraposée (si (3) est faux, alors (1) est faux): On sait que les colonnes de $A$ sont linéairement indépendantes, donc qu'il existe $\bvec{z} \neq \bvec{0}$ tel que $A \bvec{z} = \bvec{0}$. Ainsi, en prenant $\bvec{\hat{x}}$, une solution aux moindres carrés:
+            \item $\left(1\right) \implies \left(3\right)$ est vrai car on peut considérer la contraposée (si (3) est faux, alors (1) est faux): On sait que les colonnes de $A$ sont linéairement dépendantes, donc qu'il existe $\bvec{z} \neq \bvec{0}$ tel que $A \bvec{z} = \bvec{0}$. Ainsi, en prenant $\bvec{\hat{x}}$, une solution aux moindres carrés:
             \[A^T A \left(\bvec{\hat{x}} + \bvec{z}\right) = A^T A \bvec{\hat{x}} + A^T A \bvec{z} = A^T A \bvec{\hat{x}} + \bvec{0}\]
 
             Donc, $\bvec{\hat{x}} + \bvec{z} \neq \bvec{\hat{x}}$ est une autre solution, ce qui montre bien qu'elles ne sont pas uniques.
-            
-                
+
+
         \item Démontrons aussi $\left(3\right) \implies \left(2\right)$ en passant par la contraposée. Puisque $A^T A$ n'est pas inversible, alors il existe $\bvec{z} \neq \bvec{0}$ tel que $A^T A \bvec{z} = \bvec{0}$. Ainsi:
             \[A \bvec{z} \in \ker\left(A^T\right) = \left(\im A\right)^\perp\]
-        
+
             Or, puisque $A \bvec{z} \in \im A$, $A \bvec{z}$ appartient à la fois à un espace vectoriel et son orthogonal. On en déduit que $A \bvec{z} = \bvec{0}$, et donc que les colonnes de $A$ sont linéairement dépendantes.
 
-        \item $\left(2\right) \implies \left(1\right)$ est clair vu que les équations normales sont sous la forme $A^T A \bvec{\hat{x}} = A^T \bvec{b}$. Si la matrice est inversible, alors la solution est clairement unique. 
+        \item $\left(2\right) \implies \left(1\right)$ est clair vu que les équations normales sont sous la forme $A^T A \bvec{\hat{x}} = A^T \bvec{b}$. Si la matrice est inversible, alors la solution est clairement unique.
         \end{itemize}
-        
+
         \qed
     }
 }
 
 \parag{Exemple}{
-    Soient la matrice et le vecteur suivants: 
+    Soient la matrice et le vecteur suivants:
     \[A = \begin{bmatrix} 3 & 1 \\ 6 & 2 \\ 0 & 2 \end{bmatrix}, \mathspace \bvec{b} = \begin{bmatrix} 11 \\ 17 \\ 6 \end{bmatrix} \]
 
-    On veut trouver les solutions au moindres carrés, donc on doit résoudre les équations normales: 
+    On veut trouver les solutions au moindres carrés, donc on doit résoudre les équations normales:
     \[A^T A \bvec{x} = A^T \bvec{b} \implies \begin{bmatrix} 45 & 15 \\ 15 & 9 \end{bmatrix} \begin{bmatrix} \hat{x}_1 \\ \hat{x}_2 \end{bmatrix} = \begin{bmatrix} 135 \\ 57 \end{bmatrix} \]
 
     Notez que $A^T A$ est symétrique, et sera toujours symétrique. Si $A^T A$ n'est pas symétrique dans nos calculs c'est que nous avons fait une erreur!
 
-    On peut résoudre notre système en échelonnant. On trouve: 
+    On peut résoudre notre système en échelonnant. On trouve:
     \[\bvec{\hat{x}} = \begin{bmatrix} 2 \\ 3 \end{bmatrix} \]
-    
-    De plus, on voit que: 
-    \[A \bvec{\hat{x}} = \begin{bmatrix} 3 & 1 \\ 6 & 2 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 2 \\ 3 \end{bmatrix} = \begin{bmatrix} 9 \\ 18 \\ 6 \end{bmatrix} \]
-    qui est la projection de $\bvec{b}$ sur $\im A$. 
 
-    L'erreur (inévitable) est donnée par: 
+    De plus, on voit que:
+    \[A \bvec{\hat{x}} = \begin{bmatrix} 3 & 1 \\ 6 & 2 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 2 \\ 3 \end{bmatrix} = \begin{bmatrix} 9 \\ 18 \\ 6 \end{bmatrix} \]
+    qui est la projection de $\bvec{b}$ sur $\im A$.
+
+    L'erreur (inévitable) est donnée par:
     \[A \bvec{\hat{x}} - \bvec{b} = \begin{bmatrix} 9 \\ 18 \\ 6 \end{bmatrix} - \begin{bmatrix} 11 \\ 17 \\ 6 \end{bmatrix} = \begin{bmatrix} -2 \\ 1 \\ 0 \end{bmatrix} \implies \left\|A \bvec{\hat{x}} - \bvec{b}\right\|^2 = 5\]
     et tout autre $\bvec{x}$ ferait pire.
 }
@@ -132,19 +132,19 @@
 \parag{Méthode via factorisation $QR$}{
     Soit $A \in \mathbb{R}^{m \times n}$. Supposons quel les colonnes de $A$ sont libres. Alors, on sait par la méthode du Grand Schtroumpf qu'il existe $Q \in \mathbb{R}^{m \times n}$ et $R \in \mathbb{R}^{n \times n}$ telles que $A = QR$, où $Q^T Q = I_n$ et $R$ est triangulaire et inversible.
 
-    De plus, par notre dernier théorème ci-dessus, on sait que $\bvec{b} \in \mathbb{R}^m$, la solution aux moindres carrés de $A \bvec{x} = \bvec{b}$, est l'unique solution de: 
+    De plus, par notre dernier théorème ci-dessus, on sait que $\bvec{b} \in \mathbb{R}^m$, la solution aux moindres carrés de $A \bvec{x} = \bvec{b}$, est l'unique solution de:
     \[A^T A \bvec{\hat{x}} = A^T \bvec{b}\]
-    
-    On peut donc écrire: 
+
+    On peut donc écrire:
     \[A^T = R^T Q^T \implies A^{T} A = R^T Q^T Q R = R^T I R = R^T R\]
-    
-    Ainsi, notre système d'équations peut être écrit sous la forme: 
+
+    Ainsi, notre système d'équations peut être écrit sous la forme:
     \[A^T A \bvec{\hat{x}} = A^T \bvec{b} \implies R^T R \bvec{\hat{x}} = R^T Q^T \bvec{b} \implies R \bvec{\hat{x}} = Q^T \bvec{b}\]
     puisque $R$ est inversible, et donc $R^T$ est aussi inversible.
 }
 
 \parag{Théorème}{
-    Si les colonnes de $A \in \mathbb{R}^{m \times n}$ sont linéairement indépendantes, alors pour tout $\bvec{b} \in \mathbb{R}^m$, la solution aux moindres carrés de $A \bvec{x} = \bvec{b}$ est la solution de: 
+    Si les colonnes de $A \in \mathbb{R}^{m \times n}$ sont linéairement indépendantes, alors pour tout $\bvec{b} \in \mathbb{R}^m$, la solution aux moindres carrés de $A \bvec{x} = \bvec{b}$ est la solution de:
     \[R \bvec{\hat{x}} = Q^T \bvec{b}\]
     où $A = QR$ est une factorisation $QR$ : $Q^T Q = I_n$ et $R$ est une matrice inversible et triangulaire.
 
@@ -153,29 +153,29 @@
     }
 
     \subparag{Remarque}{
-        À la main, cet algorithme est plus compliqué que celui qui passe par les équations normales. Cependant, pour un ordinateur, cet algorithme est bien meilleur, notamment car cela implique moins de \textit{floating point errors} (problèmes d'arrondis dû au fait que les nombres ne peuvent pas avoir une infinité de décimales dans les ordinateurs).1
+        À la main, cet algorithme est plus compliqué que celui qui passe par les équations normales. Cependant, pour un ordinateur, cet algorithme est bien meilleur, notamment car cela implique moins de \textit{floating point errors} (problèmes d'arrondis dû au fait que les nombres ne peuvent pas avoir une infinité de décimales dans les ordinateurs).
     }
 }
 
 \parag{Exemple}{
-    Soient la matrice et le vecteurs suivants: 
+    Soient la matrice et le vecteurs suivants:
     \[A = \begin{bmatrix} 3 & 1 \\ 6 & 2 \\ 0 & 2 \end{bmatrix}, \mathspace \bvec{b} = \begin{bmatrix} 11 \\ 17 \\ 6 \end{bmatrix} \]
 
     On a déjà calculé la factorisation $QR$ de $A$:
     \[\begin{bmatrix} 3 & 1 \\ 6 & 2 \\ 0 & 2 \end{bmatrix} = \begin{bmatrix} 1 / \sqrt{5} & 0 \\ 2 / \sqrt{5} & 0 \\ 0 & 1 \end{bmatrix} \begin{bmatrix} 3\sqrt{5} & \sqrt{5} \\ 0 & 2 \end{bmatrix} \]
-    
-    La solution aux moindres carrés est données par $R \bvec{\hat{x}} = Q^T \bvec{b}$: 
+
+    La solution aux moindres carrés est données par $R \bvec{\hat{x}} = Q^T \bvec{b}$:
     \[\begin{bmatrix} 3\sqrt{5} & \sqrt{5} \\ 0 & 2 \end{bmatrix} \begin{bmatrix} \hat{x}_1 \\ \hat{x}_2 \end{bmatrix} = \begin{bmatrix} 9\sqrt{5} \\ 6 \end{bmatrix} \implies \bvec{\hat{x}} = \begin{bmatrix} 2 \\ 3 \end{bmatrix} \]
-    
+
     Ce système est simple à résoudre puisqu'il est triangulaire.
 }
 
 \parag{Observation}{
-    On voit que, si $A = QR$, alors la solution aux moindres carrés de $A \bvec{x} = \bvec{b}$ est: 
+    On voit que, si $A = QR$, alors la solution aux moindres carrés de $A \bvec{x} = \bvec{b}$ est:
     \[R \bvec{\hat{x}} = Q^T \bvec{b}\]
-    
-    Ceci est cohérent car: 
-    \[A \bvec{\hat{x}} = QR \bvec{\hat{x}} = QQ^T \bvec{b} = \proj_{\im Q} \bvec{b} = \proj_{\im Q} \bvec{b}\]
+
+    Ceci est cohérent car:
+    \[A \bvec{\hat{x}} = QR \bvec{\hat{x}} = QQ^T \bvec{b} = \proj_{\im Q} \bvec{b} = \proj_{\im A} \bvec{b}\]
     comme attendu.
 }
 
@@ -183,7 +183,7 @@
 \parag{Introduction}{
     Étant données des paires de scalaires $\left(x_i, y_i\right)$, on cherche la relation :
     \[y_i \approx \beta_1 x_i + \beta_0\]
-    
+
     En d'autres mots, on cherche la meilleure droite qui passe par ces points.
 
     Ce serait très utile pour l'analyse de données scientifique (comme par exemple pour calculer l'augmentation de la température de la planète au fil du temps).
@@ -192,9 +192,9 @@
 
     \imagehere{RegressionLineaireEglisesMeurtresFallacy.png}
 
-    On en déduit donc que: 
+    On en déduit donc que:
     \[\left[\# \text{meurtres}\right] \approx 0.23\cdot\left[\# \text{églises}\right] - 31.8\]
-    
+
     Cependant, cette statistique ne fait aucun sens. En effet, la variable cachée derrière est la taille de la population dans la ville ; détruire des églises ne va pas diminuer le nombre de meurtres.
 }
 
@@ -203,12 +203,12 @@
     \[y = \beta_1 x + \beta_0\]
     où $\beta_1, \beta_0 \in \mathbb{R}$ sont nos inconnues.
 
-    On a des points $\left(x_1, y_1\right), \ldots, \left(x_n, y_n\right)$, et on veut que: 
+    On a des points $\left(x_1, y_1\right), \ldots, \left(x_n, y_n\right)$, et on veut que:
     \[\beta_1 x_i + \beta_0 \approx y_i, \mathspace \forall i = 1, \ldots, n\]
-    
-    On veut minimiser l'erreur. Pour commencer, écrivons tout ceci sous forme matricielle: 
+
+    On veut minimiser l'erreur. Pour commencer, écrivons tout ceci sous forme matricielle:
     \[\begin{bmatrix} 1 & x_1 \\ \vdots & \vdots \\ 1 & x_n \end{bmatrix} \begin{bmatrix} \beta_0 \\ \beta_1 \end{bmatrix} \approx \begin{bmatrix} y_1 \\ \vdots \\ y_n \end{bmatrix} \implies A \bvec{\beta} \approx \bvec{y}\]
-    
+
     On cherche donc $\bvec{\beta} \in \mathbb{R}^2$ tel que $A \bvec{\beta}$ soit aussi proche que possible de $\bvec{y}$.
 }
 

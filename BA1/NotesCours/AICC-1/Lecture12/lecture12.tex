@@ -12,13 +12,13 @@
 \maketitle
 
 \lecture{12}{2021-10-27}{Greed, coins and same-sex marriages}{
-    \begin{itemize}
+    \begin{itemize}[left=0pt]
         \item Explanation of the concept of greedy algorithms.
         \item Explanation of the Cashier's algorithm, and proof of its optimality for American and European denominations.
-        \item Definition of matching, stable matching and unstable matching. 
+        \item Definition of matching, stable matching and unstable matching.
         \item Explanation of the marriage problem, and explanation of the Gale-Shapley algorithm, which allows to always find a stable matching (in the context of the marriage problem).
     \end{itemize}
-    
+
 }
 
 \subsection{Optimisation algorithms}
@@ -27,7 +27,7 @@
 }
 
 \parag{Greedy algorithms}{
-    They are very short-sighted, and the only take the ``best'' choice at every step. 
+    They are very short-sighted, and the only take the ``best'' choice at every step.
 
     This does not always gives us the optimal result. Sometimes, we have to go down a hill to get up a mountain. However, in many instances it does. Proving that the greedy algorithm is correct is required to use it.
 }
@@ -74,7 +74,7 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
         \item cannot have 2 dimes and 1 nickel;
         \item the total amount of change in dimes, nickels, and pennies cannot exceed 24 cents.
     \end{enumerate}
-    
+
     \subparag{Proof of part (1)}{
         Let's suppose for contradiction that we have 3 dimes = 30 cents. Then we can replace them by $25 + 5$ cents, which represent two coins.
 
@@ -90,9 +90,9 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
 
         Another way of seeing this is to see that we have at most 2 dimes, 1 nickel and 4 pennies, but we cannot have 2 dimes and 1 nickel, so we thus need to get rid of the penny. In other words, we have 2 dimes and 4 nickels, which represent 24 cents.
     }
-    
-    
-    
+
+
+
 }
 
 \parag{Theorem (optimality)}{
@@ -103,16 +103,16 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
 
         Since the ``optimal'' solution is optimal, we know $\bar{c}_{25} \geq c_{25}$. Let's assume for contradiction that our program did not produce an optimal solution, meaning $\bar{c}_{25} > c_{25}$. It would then mean that the optimal solution would reach the same value, $n$, by using one less 25 cents coin. Thus, it needs to compensate this difference with the other coins:
         \[10 c_{10} + 5c_5 + c_1 > 24\]
-        
+
         This is a contradiction by the above lemma.
 
-        The same way, assuming that $\bar{c}_{10} > c_{10}$, then we would have 
+        The same way, assuming that $\bar{c}_{10} > c_{10}$, then we would have
         \[5c_5 + c_1 > 9\]
         which is also a contradiction.
 
         Again, assuming that $\bar{c}_5 \geq c_5$, then we would have $c_1 > 5$ which is another contradiction. We thus also conclude that $\bar{c}_1 = c_1$.
     }
-    
+
 }
 
 \parag{Available coins}{
@@ -120,7 +120,7 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
 }
 
 \parag{Europe denominations}{
-    In Europe we have $1, 5, 10, 20, 50$. 
+    In Europe we have $1, 5, 10, 20, 50$.
 
     \subparag{Lemma}{
         The solution with the smallest coins
@@ -131,7 +131,7 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
         \end{enumerate}
     }
 
-    We can then use this lemma to prove this denomination's optimality, using a proof similar to the one hereinabove. 
+    We can then use this lemma to prove this denomination's optimality, using a proof similar to the one hereinabove.
 }
 
 
@@ -145,7 +145,7 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
 
 \subsection{Stable matching}
 \parag{Goal}{
-    The task is to pair elements from equally sized two groups considering their preferences for members of the other group so that there are no ways to improve the preferences. 
+    The task is to pair elements from equally sized two groups considering their preferences for members of the other group so that there are no ways to improve the preferences.
 }
 
 \parag{Definition of matching}{
@@ -161,12 +161,12 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
        \item $\left\{2,2\right\}$ and $\left\{\left(1,2\right),\left(2,4\right)\right\}$ are not matchings.
        \item $\left\{\left(1,3\right),\left(2,4\right)\right\}$ is a maximum matching.
    \end{itemize}
-    
+
    Let $B = \left\{1, 2, 3, 4, 5\right\}$
    \begin{itemize}
        \item $\left\{\left(1,3\right), \left(2,4\right)\right\}$ and $\left\{\left(5,3\right),\left(2,4\right)\right\}$ are two different maximum matchings.
    \end{itemize}
-   
+
 }
 
 \parag{Definition of preferences}{
@@ -175,7 +175,7 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
     \subparag{Example}{
         For example, if we have $A = \left\{\text{Lou, Glenn, Bobbie, Tyler}\right\}$. Then, we could have $L_{\text{Tyler}} = \left\{\text{Bobbie, Lou, Glenn}\right\}$.
     }
-    
+
 }
 
 \parag{Stability of matching}{
@@ -191,12 +191,12 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
             \item $L_{\text{Bobbie}} = \left\{\text{Lou, Glenn, Tyler}\right\}$
             \item $L_{\text{Tyler}} = \left\{\text{Lou, Glenn, Bobbie}\right\}$
         \end{itemize}
-        
+
         Let's begin with $\left\{\left(\text{\textcolor{red}{Glenn}, Lou}\right), \left(\text{\textcolor{red}{Bobbie}, Tyler}\right)\right\}$. It is unstable since Glenn prefers Bobbie over Lou, and Bobbie prefers Glenn over Tyler.
 
-        Reordering our matching, we get $\left\{\left(\text{Glenn, \textcolor{red}{Bobbie}}\right), \left(\text{\textcolor{red}{Lou}, Tyler}\right)\right\}$. It is unstable as well since Bobbie prefers to be with Lou, and Lou prefers to be with Bobbie. 
+        Reordering our matching, we get $\left\{\left(\text{Glenn, \textcolor{red}{Bobbie}}\right), \left(\text{\textcolor{red}{Lou}, Tyler}\right)\right\}$. It is unstable as well since Bobbie prefers to be with Lou, and Lou prefers to be with Bobbie.
 
-        Then, our new matching is $\left\{\left(\text{\textcolor{red}{Lou}, Bobbie}\right), \left(\text{\textcolor{red}{Glenn}, Tyler}\right)\right\}$. Again, Lou prefers to be with Glenn, and Glenn prefers to be with Lou. 
+        Then, our new matching is $\left\{\left(\text{\textcolor{red}{Lou}, Bobbie}\right), \left(\text{\textcolor{red}{Glenn}, Tyler}\right)\right\}$. Again, Lou prefers to be with Glenn, and Glenn prefers to be with Lou.
 
         If we reorder another time our matchings, we will have come back to the initial matching, which shows that this will go on forever. It is possible that there does not exist any stable matching. (No one wants to stay with Tyler, poor them.)
     }
@@ -233,18 +233,18 @@ while |M| < |A1|:
 }
 
 \parag{Example}{
-    Let's say we have $A_1 = \left\{x_1, x_2, x_3, x_4\right\}$ and $A_2 = \left\{y_1, y_2, y_3, y_4\right\}$. Moreover, let 
+    Let's say we have $A_1 = \left\{x_1, x_2, x_3, x_4\right\}$ and $A_2 = \left\{y_1, y_2, y_3, y_4\right\}$. Moreover, let
     \[L_{x_i} = \left\{y_1, y_2, y_3, y_4\right\}\]
-   \[L_{y_1} = \left\{x_2, x_1, x_3, x_4\right\}\] 
+   \[L_{y_1} = \left\{x_2, x_1, x_3, x_4\right\}\]
    \[L_{y_2} = \left\{x_4, x_3, x_2, x_1\right\}\]
    \[L_{y_3} = \left\{x_2, x_3, x_4, x_1\right\}\]
    \[L_{y_4} = \left\{x_4, x_1, x_2, x_3\right\}\]
-   
+
    Let's pick $x_1$. Since it prefers $y_1$ over everyone else, and since $y_1$ is not paired yet, then we add $\left(x_1, y_1\right)$ to M.
 
    Now, picking $x_2$, it also prefers $y_1$. Since $y_1$ prefers $x_2$, then $x_1$ leaves $y_1$. $M$ becomes $\left(x_2, y_1\right)$.
 
-   We can pick $x_1$ again. $y_1$ is no longer on its list, so let's look at $y_2$. Since it is not paired yet, $M$ becomes $\left(x_2, y_1\right), \left(x_1, y_2\right)$. 
+   We can pick $x_1$ again. $y_1$ is no longer on its list, so let's look at $y_2$. Since it is not paired yet, $M$ becomes $\left(x_2, y_1\right), \left(x_1, y_2\right)$.
 
    We can now pick $x_3$. $y_1$ is already paired and $x_2$ is before $x_3$ in $L_{y_1}$, then $x_3$ removes $y$ from $L_{x_3}$. Considering $y_2$ now, since it prefers $x_3$ than $x_1$, $x_1$ leaves $y_2$, and $M$ becomes $\left(x_2, y_1\right), \left(x_3, y_2\right)$.
 
