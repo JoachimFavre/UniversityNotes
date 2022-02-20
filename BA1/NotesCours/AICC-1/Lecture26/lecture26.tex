@@ -1,0 +1,140 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-15 at 16:23:14.
+
+\usepackage{../../style}
+
+\title{AICC}
+\author{Joachim Favre}
+\date{Mercredi 15 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{26}{2021-12-15}{Reality vs. expectations}{
+\begin{itemize}[left=0pt]
+    \item Definition of the distribution of a random variable, and of the probability mass function.
+    \item Definition of expected value, and proof of the fact that we only need need to compute it using a probability mass function.
+\end{itemize}
+}
+
+\parag{Definition: distribution of a random variable}{
+    The \important{distribution} of a random variable $X$ on a sample space $S$ is the set of pairs $\left(r, p\left(X = r\right)\right)$ for all $r \in X\left(S\right)$, where $p\left(X = r\right)$ is the probability that $X$ takes the value $r$: 
+    \[p\left(X = r\right) = \sum_{s \in S, X\left(s\right) = r}^{} p\left(s\right)\]
+
+    \subparag{Probability mass function}{
+        If the range of the function $X$ is countable, then $p\left(X = r\right)$ can be interpreted as a function: $p : X\left(S\right) \mapsto \mathbb{R}$. The, this function is called \important{probability mass function} and it is a probability distribution over the sample space $X\left(S\right)$. Indeed, we can see it sums to one:
+        \[\sum_{r \in X\left(S\right)}^{} p\left(X = r\right) = \sum_{r \in X\left(S\right)}^{} \sum_{s \in S, X\left(s\right) = r}^{} p\left(s\right) = \sum_{s \in S}^{} p\left(s\right) = 1\]
+
+        If the range of $X$ is not countable, then it breaks down (the probability to get any number when generating a random real number between 0 and 10 is $0$, but then the sum of all probabilities is 0, which is a problem). This is continuous probability and we use integrals for that.
+
+        In our case, we will only consider random variables with countable range, so we can definitely think of $p$ as a function for now.
+    }
+}
+
+\parag{Example 1}{
+    Let's suppose that a coin is flipped three times. Let $X\left(t\right)$ be the random variable that equals the number of heads that appear when $t$ is the outcome. Our sample space is $S = \left\{H, T\right\}^3$. We can compute the probability distribution of our random variable: 
+    \[p\left(X = 0\right) = \sum_{s \in S, X\left(s\right) = 0}^{} p\left(s\right) = \frac{1}{8}\]
+    \[p\left(X = 1\right) = \sum_{s \in S, X\left(s\right) = 1}^{} p\left(s\right) = \frac{3}{8}\]
+    
+    Continuing that way, we get that our probability distribution is: 
+    \[\left\{\left(0, \frac{1}{8}\right), \left(1, \frac{3}{8}\right), \left(2, \frac{3}{8}\right), \left(3, \frac{1}{8}\right)\right\}\]
+}
+
+\parag{Example 2}{
+    Let's get back to measuring the number of points we get in exams. Let's consider the case in which we check two answers. Then: 
+    \[S = \left\{\left(1, 2\right), \left(1, 3\right), \left(1, 4\right), \left(2, 3\right), \left(2, 4\right), \left(3, 4\right)\right\}\]
+
+    \begin{functionbypart}{X_2\left(s\right)}
+    \frac{1}{2} \text{ if the correct answer is ticked}  \\
+    - \frac{1}{2} \text{ if the correct answer is not ticked}
+    \end{functionbypart}
+
+    Let's assume that the answer is randomly guessed: 
+    \[p\left(X_2 = \frac{1}{2}\right) = \frac{1}{2}, \mathspace p\left(X_2 = \frac{-1}{2}\right) = \frac{1}{2}\]
+    
+    Now, let's assume that one answer can be excluded. And that that we choose two answers out of the three left: 
+    \[p\left(X_2 = \frac{1}{2}\right) = \frac{2}{3}, \mathspace p\left(X_2 = \frac{-1}{2}\right) = \frac{1}{3}\]
+    
+    Finally, let's assume that two answers can be safely excluded: 
+    \[p\left(X_2 = \frac{1}{2}\right) = 1, \mathspace p\left(X_2 = -\frac{1}{2}\right) = 0\]
+}
+
+\parag{Example 3: Bernoulli Trials}{
+    The number of successes in $n$ Bernoulli trials is: 
+    \[C\left(n, k\right) p^k q^{n-k} = b\left(k: n, p\right)\]
+
+    We can interpret $b\left(k: n, p\right)$ as a probability distribution: 
+    \[p\left(X = k\right) = b\left(k : n, p\right)\]
+}
+
+\subsection{Expected value}
+\parag{Definition: Expected value}{
+    The \important{expected value} (or \important{expectation} or \important{mean}) of the random variable $X$ on the sample space $S$ is equal to: 
+    \[E\left(X\right) = \sum_{s \in S}^{} p\left(s\right) X\left(s\right)\]
+}
+
+\parag{Example 1}{
+    Let $X$ be the number that comes up when a fair dice is rolled. We want to compute the expected value of $X$: 
+    \[E\left(X\right) = \sum_{s \in S}^{} p\left(s\right)X\left(s\right) = \frac{1}{6}\left(1 + 2 + 3 + 4 + 5 + 6\right) = \frac{7}{2}\]
+}
+
+\parag{Example 2}{
+    We wonder what is the expected value for getting points when guessing the answer. 
+
+    If we tick one answer, then the expected value is: 
+    \[E\left(X_1\right) = \frac{1}{4} \cdot 1 + \frac{3}{4} \left(-\frac{1}{3}\right) = 0\]
+    
+    Similarly, if we tick two answers: 
+    \[E\left(X_2\right) = \frac{1}{2} \cdot \frac{1}{2} + \frac{1}{2} \left(- \frac{1}{2}\right) = 0\]
+    
+    So, if we don't know anything, we basically don't get any points. This makes more sense than getting some points when knowing nothing, which then needs to be corrected.
+}
+
+\parag{Theorem}{
+    If $X$ is a random variable and $p\left(X = r\right)$ is the probability distribution, where $p\left(X = r\right) = \sum_{s \in S, X\left(s\right) = r}^{} p\left(s\right)$, then: 
+    \[E\left(X\right) = \sum_{r \in X\left(S\right)}^{} p\left(X = r\right)r\]
+    
+    \subparag{Proof}{
+        By definition, our expected value is given by: 
+        \[E\left(X\right) = \sum_{s \in S}^{} p\left(s\right)X\left(s\right)\]
+
+        We can group terms: 
+        \begin{multiequality}
+            E\left(X\right) & = \sum_{r \in X\left(S\right)}^{} \sum_{s \in S, X\left(s\right) = r}^{} p\left(s\right)X\left(s\right)  \\
+            & = \sum_{r \in X\left(s\right)}^{} \sum_{s \in S, X\left(s\right) = r}^{} p\left(s\right)r \\
+            & = \sum_{r \in X\left(s\right)}^{} r \sum_{s \in S, X\left(s\right) = r}^{} p\left(s\right) 
+        \end{multiequality}
+        
+        We can recognise the definition of probability distribution of a random variable, so:
+        \[E\left(X\right) = \sum_{r \in X\left(S\right)}^{} p\left(X = r\right)r\]
+        
+        \qed
+    }
+}
+
+\parag{Example}{
+    Let's say we are rolling a pair of fair dice. We want to know the expected value for the sum. 
+
+    Let $X$ be the random variable that is equal to the sum the dice. The range of $X$ is $\left\{2, 3, \ldots, 11, 12\right\}$. Moreover, we can compute probabilities: 
+    \[p\left(X = 2\right) = p\left(X = 12\right) = \frac{1}{36}\]
+    \[p\left(X = 3\right) = p\left(X = 11\right) = \frac{2}{36}\]
+    
+    We can continue, and this allows us to get a sum of eleven terms: 
+    \[E\left(X\right) = 2 \frac{1}{36} + 3 \frac{2}{36} + \ldots + 11 \frac{2}{36} + 12 \frac{1}{36} = 7\]
+    
+    If we had considered the whole domain, we would have had thirty-six terms in this sum!
+}
+
+\parag{Theorem: Expected value of Bernoulli trials}{
+    The expected number of successes when $n$ mutually independent Bernoulli trials are performed is $np$, where $p$ is the probability of success of each trial.
+
+    \subparag{Proof}{
+        We could prove this theorem my using our theorem above, and the following equality: 
+        \[k \binom{n}{k} = n \binom{n-1}{k-1}\]
+        
+        However, this would take around 5 lines, whereas we will be able to prove this theorem in one line next week (it is on the next page in this document, but for me it is next week (in fact, I am cleaning those notes on Saturday the \nth{18} of December, so it's not exactly in a week, but you get what I mean)).
+    }
+}
+
+\end{document}

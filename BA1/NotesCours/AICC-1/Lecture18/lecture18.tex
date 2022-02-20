@@ -1,0 +1,477 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-17 at 15:16:07.
+
+\usepackage{../../style}
+
+\title{AICC 1}
+\author{Joachim Favre}
+\date{Mercredi 17 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{18}{2021-11-17}{Basis, arithmetic, and primes}{
+    \begin{itemize}[left=0pt]
+        \item Explanation of the concept of basis, and how to convert from one basis to another.
+        \item Explanation on how to do arithmetic (addition and multiplication) with base $b$ expansions.
+        \item Explanation on how to compute $b^n \Mod n$.
+        \item Definition of prime and composite numbers. Explanation and proof of the Fundamental Theorem of Arithmetic, the Trial Division theorem, and the infinitude of primes.
+        \item Explanation of the sieve of Eratosthenes. 
+    \end{itemize}
+}
+
+\parag{More tables}{
+    Let's look at $\mathbb{Z}_4$:
+    \begin{center}
+    \begin{tabular}{c|c|c|c|c}
+        $\cdot$ & 0 & 1 & 2 & 3 \\
+        \hline
+        0 & 0 & 0 & 0 & 0 \\
+        \hline
+        1 & 0 & 1 & 2 & 3  \\
+        \hline
+        2 & 0 & 2 & 0 & 2 \\
+        \hline
+        3 & 0 & 3 & 2 & 1
+    \end{tabular}
+    \end{center}
+    
+    We see that we do not have a multiplicative inverse for every non-zero number: there is no $x$ such that $2\cdot x = 1$. 
+
+    In fact, $\mathbb{Z}_m$ has a multiplicative inverse if and only if $m$ is prime.
+}
+
+\parag{Arithmetic modulo $m$}{
+    The operations $+_m$ and $\cdot_m$ satisfy many of the usual properties, the same way as ordinary addition and multiplication,:
+    \begin{itemize}
+        \item Closure: $a + b \in \mathbb{Z}_m$, $a\cdot b \in \mathbb{Z}_m$
+        \item Commutativity: $a + b = b + a$, $a\cdot b = b\cdot a$
+        \item Associativity: $a + \left(b + c\right) = \left(a + b\right) + c$, $a\cdot\left(b\cdot c\right) = \left(a\cdot b\right)\cdot c$
+        \item Distributivity: $a\cdot\left(b + c\right) = a\cdot b + a\cdot c$
+        \item Existence of the additive identity: $x + 0 = x$
+        \item Existence of the multiplicative identity, $x\cdot 1 = x$
+        \item Existence of the additive inverse: $x + \left(-x\right) = 0$
+    \end{itemize}
+
+    The only problem is the existence of multiplicative inverse. 
+
+    In the terminology of abstract algebra, $\mathbb{Z}_m$ with $+_m$ is \important{commutative group}, and $\mathbb{Z}_m$ with $+_m$ and $\cdot_m$ is a commutative ring.
+}
+
+\subsection{Integer representation}
+\parag{Introduction}{
+    In general, we use \important{decimal} --- or \important{base 10} --- notation to represent integer.
+
+    For example, when we write 965, we mean: 
+    \[9\cdot 10^2 + 6\cdot 10^1 + 5\cdot 10^0\]
+
+    In fact, we could use any base $b$, where $b$ is a positive integer greater than 1. The most important bases for computing are base 2 (binary), base 8 (octal), and base 16 (hexadecimal).
+
+    In the ancient times, Mayans used base 20 (number of fingers and toes), and Babylonians used base 60 (it is why there are 60 seconds in one minute, or 360° is a full circle).
+}
+
+\parag{Base $b$ representation}{
+    Let $b$ be a positive integer greater than $1$, $n$ be a positive integers. Then, there exists $k \in \mathbb{N}_0$ and $a_0, \ldots, a_k \in \mathbb{N}_0$, and $a_k \neq 0$, such that:
+    \[n = a_k b^k + \ldots + a_1 b + a_0\]
+
+    The coefficients $a_0, \ldots, a_k$ are called the base-$b$ digits of the representation, and it is denoted 
+    \[\left(a_k a_{k-1} \ldots a_1 a_0\right)_b\]
+
+    We usually omit the subscript 10 for base 10 expansions.
+
+    \subparag{Proof}{
+        We can use induction to prove this theorem (we did a similar proof to prove that the binary expansion is unique earlier).
+    }
+}
+
+\parag{Binary expansion}{
+    Most computers represent numbers and do arithmetic with binary (since, in their circuits, electricity either flows or not). In these expansions, the only digits used are 0 and 1.
+
+    For example: 
+    \[\left(1 0101 1111\right)_2 = 1\cdot 2^8 + 0\cdot 2^7 + 1\cdot 2^6 + 0\cdot 2^5 + 1\cdot 2^4 + 1\cdot 2^3 + 1\cdot 2^2 + 1\cdot 2^1 + 1\cdot 2^0 = 351\]
+}
+
+\parag{Octal expansion}{
+    The octal expansion uses the digits $\left\{0,1,2,3,4,5,6,7\right\}$.
+
+    For example: 
+    \[\left(7016\right)_8 = 7\cdot 8^3 + 0\cdot 8^2 + 1\cdot 8^1 + 6\cdot 8^0 = 3598\]
+}
+
+\parag{Hexadecimal expansion}{
+    For this expansion, we need 16 digits, so we use letters to represent numbers 10 through 15. Thus, we use the digits $\left\{0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F\right\}$.
+
+    For example: 
+    \[\left(2AE0B\right)_{16} = 2\cdot 16^4 + 10\cdot 16^3 + 14\cdot 16^2 + 0\cdot 16^1 + 11\cdot 16^0 = 175627\]
+}
+
+\parag{Obtaining a base $b$ expansion}{
+    Let's say we want to get the base 2 expansion of $\left(11\right)_{10}$. We have: 
+    \[11 = 8 + 2 + 1 = 1 \cdot 2^3 + 0\cdot 2^2 + 1\cdot 2^1 + 1\cdot 2^0\]
+    
+    Obtaining this last equality may be very hard through trial and error, here it is just for more illustration (if we have this result, we are done, we would not need the following algorithm). We see that: 
+    \[11 \Mod 2 = {\color{red}1}, \mathspace 11 \Div 2 = 1\cdot 2^2 + 0\cdot 2^1 + 1\cdot 2^0 = 5\]
+    
+    So, we can do it again: 
+    \[5 \Mod 2 = {\color{red}1}, \mathspace 5 \Div 2 = 1\cdot 2^1 + 0\cdot 2^0 = 2\]
+    \[2 \Mod 2 = {\color{red}0}, \mathspace 2 \Div 2 = 1\cdot 2^0 = 1\]
+    \[1 \Mod 2 = {\color{red}1}, \mathspace 1 \Div 2 = 0\]
+
+    And that's where the process ends. We can now read the numbers from bottom to top: 
+    \[\left(11\right)_{10} = \left(1011\right)_2\]
+
+    It may be easier to write our numbers in a table:
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        $x_{n} = x_{n-1} \Div 2$ & 11 & 5 & 2 & 1 & 0 \\
+        \hline
+        $x_{n} \Mod 2$ & 1 & 1 & 0 & 1 & \\
+        \hline
+    \end{tabular}
+    \end{center}
+
+    We can then read the last line from right to left.
+}
+
+
+\begin{filecontents*}[overwrite]{basebexpansion.code}
+procedure base_b_expansion(n, b > 1)
+    q := n
+    k := 0
+    while(q != 0)
+        a[k] := q mod b
+        q := q div b
+        k := k + 1
+    return {a[k-1], ..., a[1], a[0]}  // base b expansion of n
+\end{filecontents*}
+
+\parag{Pseudocode}{
+    Here is the pseudocode for this algorithm:
+
+    \importcode{basebexpansion.code}{pseudo}
+}
+
+
+\parag{Example}{
+    We want to find the octal expansion of $\left(12345\right)_{10}$. Successively dividing by 8 gives: 
+    \[12345 = 8\cdot 1543 + {\color{red}1}\]
+    \[1543 = 8\cdot 192 + {\color{red}7}\]
+    \[192 = 8\cdot 24 + {\color{red}0}\]
+    \[24 = 8\cdot 3 + {\color{red}0}\]
+    \[3 = 8\cdot 0 + {\color{red}3}\]
+
+    So, $\left(12345\right)_{10} = \left(30071\right)_8$.
+}
+
+\parag{Comparison of hexadecimal, octal, and binary representations}{
+    We can draw the two following tables:
+
+    \begin{center}
+    \begin{tabular}{|c|c|}
+        \hline
+        Binary & Hexadecimal \\
+        \hline
+        0000 & 0 \\
+        \hline
+        0001 & 1 \\
+        \hline
+        0010 & 2 \\
+        \hline
+        0011 & 3 \\
+        \hline
+        0100 & 4 \\
+        \hline
+        0101 & 5 \\
+        \hline
+        0110 & 6 \\
+        \hline
+        0111 & 7 \\
+        \hline
+        1000 & 8 \\
+        \hline
+        1001 & 9 \\
+        \hline
+        1010 & A \\
+        \hline
+        1011 & B \\
+        \hline
+        1100 & C \\
+        \hline
+        1101 & D \\
+        \hline
+        1110 & E \\
+        \hline
+        1111 & F  \\
+        \hline
+    \end{tabular}
+    \hspace{3em}
+    \begin{tabular}{|c|c|}
+        \hline
+        Binary & Octal \\
+        \hline
+        000 & 0 \\
+        \hline
+        001 & 1 \\
+        \hline
+        010 & 2 \\
+        \hline
+        011 & 3 \\
+        \hline
+        100 & 4 \\
+        \hline
+        101 & 5 \\
+        \hline
+        110 & 6 \\
+        \hline
+        111 & 7 \\
+        \hline
+    \end{tabular}
+    \end{center}
+    
+    
+
+    Each octal digit corresponds to a block of 3 binary digits, and each hexadecimal digit corresponds to a block of 4 binary digits. Thus, to do conversion between binary and hexadecimal, and binary and octal (and thus octal and hexadecimal), we don't need to do all the computations, only to look up in the table. For example, converting a number in base 2, we only need to group numbers of 3:
+    \[\left(011\ 111\ 010\ 111\ 100\right)_2 = \left(37274\right)_8\]
+
+    Similarly, for hexadecimal:  
+    \[\left(0011\ 1110\ 1011\ 1100\right)_2 = \left(3EBC\right)_{16}\]
+    
+
+    Hexadecimal is very useful to shorten binary representation, to make them more readable. This is why private keys are written in hexadecimal, for example: they represent binary numbers, but they are made smaller. This is also why the lowest level programming is hexadecimal and not binary.
+}
+
+\subsection{Arithmetic with base $b$ expansions}
+\parag{Addition}{
+    Let's recall how we add numbers. Let's say we want to add $a = \left(1110\right)_2$ and $b = \left(1011\right)_2$. We can do column addition: 
+    \begin{center}
+    \begin{tabular}{r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}}
+        & \tiny$1$ & \tiny$1$ & \tiny$1$ & &  \\
+        & & 1 & 1 & 1 & 0  \\
+        + & & 1 & 0 & 1 & 1  \\
+        \hline
+        & 1 & 1 & 0 & 0 & 1
+    \end{tabular}
+    \end{center}
+    
+    Let's try to extract the algorithm behind column addition. We see that, first, we begin by the right most elements. Moreover, we may have a carry. We have:
+    \begin{center}
+    \begin{tabular}{lll}
+        $a_0 + b_0 = 1$ & $c_1 = 0$ & $s_0 = 1$ \\
+        $a_1 + b_1 + c_0 = 1 + 1 + 0 = 10$ & $c_2 = 1$ & $s_1 = 0$ \\
+        $a_2 + b_2 + c_1 = 1 + 0 + 1 = 10$ & $c_3 = 1$ & $s_2 = 0$ \\
+        $a_3 + b_3 + c_2 = 1 + 1 + 1 = 11$ & $c_4 = 1$ & $s_3 = 1$ \\
+                                             & & $s_4 = c_4 = 1$ 
+    \end{tabular}
+    \end{center}
+    
+    So, completely generally, we can deduce that, if we have $a_i + b_i + c_{i-1}$ then: 
+    \[c_{i} = \left\lfloor \frac{a_i + b_i + c_{i-1}}{2} \right\rfloor \mathspace \text{ and } \mathspace s_i = a_i + b_i + c_{i-1} - 2c_{i} \]
+    
+}
+
+\begin{filecontents*}[overwrite]{addBinaryNumbers.code}
+    procedure add(a, b: array of n elements defining binary expansions):
+    c := 0
+    for j := 0 to n - 1:
+        d := floor(a[j] + b[j] + c)/2
+        s[j] := a[j] + b[j] + c - 2d
+        c := d
+    s[n] := c
+    return {s[0], s[1], ..., s[n]}  // We could return s, but I think this is clearer
+\end{filecontents*}
+
+
+\parag{Binary addition of integers}{
+    Here is pseudocode for adding two binary numbers:
+    \importcode{addBinaryNumbers.code}{pseudo}
+    
+    The number of additions of bits used by the algorithm to add two $d$-bit integers is $O\left(d\right)$ (note that $d$ is not the number, but its number of digits).
+
+    \subparag{Utility}{
+        It might seem ridiculous to define addition using addition, multiplication and division. However, using this algorithm, we only need to define addition, division and multiplication for 1-bit numbers, and then we can use it for all possible numbers. Those definitions are hard-wired in the CPU. 
+    }
+}
+
+\parag{Multiplication}{
+    Let's say we want to multiply $a = \left(110\right)_2$ and $b = \left(101\right)_2$. Again, let's look at a column product:
+    \begin{center}
+    \begin{tabular}{r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}}
+        & & & & & 1 & 1 & 0  \\
+        $\cdot$ & & & & & 1 & 0 & 1  \\
+        \hline
+        & & & & & 1 & 1 & 0  \\
+        & & & & 0 & 0 & 0 & $\bullet$  \\
+        + & & & 1 & 1 & 0 & $\bullet$ & $\bullet$  \\
+        \hline
+          & &  & 1 & 1 & 1 & 1 & 0
+
+    \end{tabular}
+    \end{center}
+
+    We are using two observations to do that. We see that: 
+    \[a\cdot b = a\cdot\left(b_k2^k + \ldots b_0\right) = ab_k2^k + ab_{k-1}2^{k-1} + \ldots + ab_02^0\]
+
+    First, if $a = 2^j$, then we are adding $j$ zeros at the end (those are the $\bullet$ in the column product). Second, we see that we are summing ``partial product'' (corresponding to the second step in the column product). For example, with our previous values: 
+    \[a\cdot b_02^0 = \left(110\right)_2 \cdot 1 \cdot {\color{red}2^0} = \left(110\right)_2\]
+    \[a\cdot b_12^1 = \left(110\right)_2 \cdot 0 \cdot {\color{red} 2^1} = \left(000{\color{red}0}\right)_2\]
+    \[a\cdot b_2 2^2 = \left(110\right)_2 \cdot 1\cdot {\color{red}2^2} = \left(110{\color{red}00}\right)_2\]
+    
+    And then: 
+    \[\left(110\right)_2 + \left(0000\right)_2 + \left(11000\right)_2 = \left(11110\right)_2\]
+}
+
+\begin{filecontents*}[overwrite]{binaryMultiplication.code}
+procedure multiply(a, b: arrays of n elements representing a positive integer)
+    c := empty array of n elements  // partial products
+    for j := 0 to n-1
+        if b == 1 then c[j] := a with j zeros appended
+        else c[j] := 0
+
+    p := 0
+    for j := 0 to n-1
+        p := p + c[j]
+    return p
+\end{filecontents*}
+
+\parag{Algorithm}{
+    Here is the pseudocode for multiplying two positive integers:
+    \importcode{binaryMultiplication.code}{pseudo}
+    
+    This algorithm uses $O\left(d^2\right)$ additions, where $d$ is the number of bits of the factors.
+
+    \subparag{Utility}{
+        Again, as for addition, we only need to know 1-bit multiplication by 0 and by 1 to write this algorithm. We can then call the sum algorithm.
+    }
+}
+
+\parag{Binary modular exponentiation}{
+    Notably in cryptography, it is sometimes important to be able to find $b^n \Mod m$ efficiently, where $b, n$ and $m$ are large integers.
+
+    Let's use the binary expansion of $n$ to compute $b^n$:
+    \[b^{n} = b^{a_{k-1} 2^{k-1} + \ldots + a_0} = \left(b^{2^{k-1}}\right)^{a_{k-1}} \cdot \ldots \cdot \left(b\right)^{a_0}\]
+
+    We thus see that, in order to compute $b^n$, we only need to be able to compute the values of: 
+    \[b, \mathspace b^2, \mathspace b^4 = \left(b^2\right)^2, \mathspace b^8 = \left(b^4\right)^2, \mathspace \ldots, \mathspace b^{2^{k-1}}\]
+}
+
+\parag{Example}{
+    Let's say we want to compute $3^{11}$. First, let's not that $\left(11\right)_{10} = \left(1011\right)_2$. So: 
+    \[3^{11} = 3^{1\cdot 2^{3} + 0\cdot 2^2 + 1\cdot 2^1 + 1\cdot 2^0} = 3^{1\cdot 2^3}\cdot 3^{0\cdot 2^2}\cdot 3^{1\cdot 2^1}\cdot 3^{1\cdot 2^0} = 3^{2^3} \cdot 3^{2} \cdot 3\]
+    
+    And, we see that the computations begin to be very hard. Computing $3^1$ to $3^4$ is fine, but $3^8 = 81^2$ begins to be hard to be done by hand.
+}
+
+\parag{Applying the modulus}{
+    Let's compute $3^{11}$ mod 5. Similarly:
+    \[3^{11} = 3^{8}\cdot 3^2 \cdot 3\]
+    
+    Now: 
+    \begin{itemize}
+        \item $3^1 \Mod 5 = 3$
+        \item $3^2 \Mod 5 = 4$
+        \item $3^4 \Mod 5 = \left(3^2\right)^2 \Mod 5 = \left(3^2 \Mod 5\right)^2 \Mod 5 = 4^2 \Mod 5 = 1$
+        \item $3^8 \Mod 5 = \left(\left(\left(3^2\right)^2\right)^2\right) \Mod 5 = 1^2 \Mod 5 = 1$
+    \end{itemize}
+    
+    So: 
+    \[3^{11} \Mod 5 = 3^{8} 3^2 3 \Mod 5 = \left(3^8 \Mod 5 \cdot 3^2 \Mod 5 \cdot 3^1 \Mod 5\right) \Mod 5 = 1 \cdot 4 \cdot 3 \Mod 5 = 2\]
+
+    So, even though $3^{11}$ is very large, modular arithmetic allows us to get those computations much more easily. 
+}
+
+\subsection{Prime numbers}
+\parag{Definition}{
+    A positive integer $p$ greater than $1$ is called \important{prime} if the only positive factors of $p$ are 1 and $p$. A positive integer that is greater than 1 and is not prime is called \important{composite}.
+
+    \subparag{Examples}{
+        For example, 7 is prime but 6 is composite.
+    }
+    
+}
+
+\parag{The Fundamental Theorem of Arithmetic}{
+    If $n$ is an integer greater than $1$, then $n$ can be written uniquely as a product of primes.
+
+    \subparag{Examples}{
+        $999 = 3^3 \cdot 37$, $1024 = 2^{10}$, $641 = 641$
+    }
+
+    \subparag{Proof of existence}{
+        Let's first prove by strong induction that $n$ can be written as a product of primes (which may or may not be unique).
+
+        Basis step: $P\left(2\right)$ is true since $2$ is a prime.
+
+        Inductive step: The inductive hypothesis is that $P\left(j\right)$ is true for all integers $j$ with $2 \leq j \leq k$. To show $P\left(k+1\right)$, we consider two cases. If $k+1$ is prime, then $P\left(k+1\right)$ is true. Else, $k+1$ is composite and can thus be written as a product of two positive integers $a, b$ where $2 \leq a \leq b < k+1$. By the inductive hypothesis, $a$ and $b$ can be written as a product of primes and therefore $k+1$ can also be written as the product of those primes.
+    }
+
+    \subparag{Proof of unicity}{
+        Let's suppose for contradiction that there exists a $n \geq 2$ for which that there exists two distinct arrays of primes such that: 
+        \[n = p_1 p_2 \ldots p_i = q_1 q_2 \ldots q_j\]
+        
+        Since those two products are equal, we can simplify the primes numbers that are on both sides of the equation. Now, it means that there are no primes that are both in the left hand side and in the right hand side. Moreover, both sides still have primes (since $n \neq 1$, and the arrays are distinct).
+
+        So, let's consider $p_m$, the first element on the left hand side that has no been simplified previously. Since we know that prime numbers can only be divided by one and by themselves, we know that none of the number on the right hand side is divisible by $p_m$.
+
+        However, we know that if $a \ndivides b$ and $a \ndivides c$, then $a \ndivides bc$, so, the right hand side is not divisible by $p_m$. However, since the left hand side is divisible by $p_m$, this is a contradiction.
+
+        \qed
+    }
+    
+}
+
+\parag{Theorem (Trial division)}{
+    If $n$ is a composite integer, then $n$ has a prime divisor less than or equal to $\sqrt{n}$.
+
+    \subparag{Usefulness}{
+        If we want to know if a number is prime, we thus only need to check for primes less than or equal to $\sqrt{n}$, which is much smaller than $n$.
+    }
+
+    \subparag{Proof}{
+        By hypothesis, $n$ is composite. Thus, it can be written as $n = ab$, where 
+        \[2 \leq a,b \leq n\]
+
+        Let's assume that both numbers are greater than $\sqrt{n}$. In other words, $a > \sqrt{n}$ and $b > \sqrt{n}$. Thus: 
+        \[n = ab > \sqrt{n}\sqrt{n} = n\]
+        
+        Which is a contradiction. We thus know that $a \leq \sqrt{n}$ or $b \leq \sqrt{n}$. Without loss of generality (WLOG), let's pick $a \leq \sqrt{n}$. So, either $a$ is a prime, or $a$ has a prime factor $\leq \sqrt{n}$. In both cases, we know our theorem holds.
+
+        \qed
+    }
+}
+
+\parag{Sieve of Eratosthenes}{
+    The sieve of Eratosthenes can be used to find all primes not exceeding a specified positive integer. 
+
+    Here is its idea. Let's write numbers from 2 to 100. The first number is a prime (it's 2), so we remove all the integers (other than 2) that are divisible by 2. Then, the first element after 2 which has not been removed is not a prime, and we can repeat those steps until all numbers have either been removed or seen as prime. 
+
+    There is a nice animation on Wikipedia that explains this algorithm:
+
+    \begin{center}
+        \small\url{https://commons.wikimedia.org/wiki/File:Sieve_of_Eratosthenes_animation.svg}
+    \end{center}
+}
+
+\parag{Infinitude of primes (Euclid's theorem)}{
+    There are infinitely many primes. 
+
+    \subparag{Proof}{
+        This proof was originally done by Euclid. 
+
+        Let's assume for contradiction that there are $n \in \mathbb{N}$ primes: $p_1, \ldots, p_n$  are all the existing prime. Let's take the following number: 
+        \[q = p_1\cdot\ldots\cdot p_n + 1\]
+        
+        We notice that none of $p_1, \ldots, p_n$ can divide $q$. Indeed, else: 
+        \[p_i \divides q \implies q = kp_i = p_1\cdot\ldots\cdot p_n + 1 \implies kp_i + p_1 \cdot \cdot \ldots \cdot p_n = 1\]
+        
+        $p_i$ can divide the left hand side but not the right hand side. This is a contradiction. 
+
+        We deduce that $q$ cannot be prime (since it is greater than all the primes), and it cannot be composite (since it would have a prime factor that is not in $p_1, \ldots, p_n$). This is a contradiction.
+  
+        \qed
+    }
+    
+}
+
+\end{document}

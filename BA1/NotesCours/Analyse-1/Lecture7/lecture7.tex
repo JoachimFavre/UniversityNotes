@@ -1,0 +1,313 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-10-13 at 10:13:44.
+
+\usepackage{../../style}
+
+\title{Analyse I}
+\author{Joachim Favre}
+\date{Mercredi 13 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2021-10-13}{Suite des limites de suites}{
+\begin{itemize}[left=0pt]
+    \item Démonstration de l'unicité des limites.
+    \item Démonstration que toute suite convergente est bornée.
+    \item Explication du comportement des limites lorsque nous additionnons, ou multiplions des suites convergentes.
+    \item Étude de la convergence des limites lorsqu'elles sont combinées par des opérations.
+    \item Démonstration de la limite d'un quotient entre deux polynômes.
+    \item Démonstration que s'il existe une relation d'ordre entre deux suites convergentes, alors elle existe aussi pour leur limites.
+    \item Démonstration du théorème des deux gendarmes pour les suites.
+\end{itemize}
+
+}
+
+\parag{Exemple}{
+    Soit $p \in \mathbb{Q}, p > 0$. Considérons la suite 
+    \begin{systemofequations}{}
+    &\ a_0 = 1 \\
+    &\ a_n = \frac{1}{n^p}, \mathspace n \geq 1
+    \end{systemofequations}
+
+    On veut démontrer que 
+    \[\lim_{n \to \infty} a_n = \lim_{n \to \infty} \frac{1}{n^p} = 0\]
+    
+    \subparag{Démonstration}{
+    Soit $\epsilon > 0$. On cherche $n_0 \in \mathbb{N}$ tel que $\forall n \geq n_0$, on a:
+    \[\left|\frac{1}{n^p} - 0\right| \leq \epsilon \iff \frac{1}{n^p} \leq \epsilon \iff \frac{1}{\epsilon} \leq n^p \over{\iff}{$p > 0$} \frac{1}{\epsilon^{\frac{1}{p}}} \leq n\]
+        
+    Il est possible de démontrer cette dernière implication, que si $x \leq y$ alors $x^p \leq y^p$ et $x^{\frac{1}{p}} \leq y^{\frac{1}{p}}$, en utilisant les axiomes des nombres réels. Voir le paragraphe suivant.
+
+    Si on choisit 
+    \[n_0 = \left\lfloor \frac{1}{\epsilon^{\frac{1}{p}}}\right\rfloor + 1 > \frac{1}{\epsilon^{\frac{1}{p}}}\]
+
+    Alors, $\forall n \geq n_0$: 
+    \[n > \frac{1}{\epsilon^{\frac{1}{p}}} \iff \frac{1}{n} < \epsilon^{\frac{1}{p}} \over{\iff}{$p>0$} \frac{1}{n^p} < \epsilon\]
+    
+
+    On a bien démontré que 
+    \[\lim_{n \to \infty} \frac{1}{n^p} = 0 \mathspace \forall p > 0\]
+    en utilisant la définition de la limite (on l'a démontré pour $p \in \mathbb{Q}$, mais cela marche aussi pour $p \in \mathbb{R}$, mais on définira les puissances réelles plus tard). 
+    }
+}
+
+\parag{Exercice}{
+    On veut démontrer que 
+    \[\forall x, y \in \mathbb{R} \telque 0 < x \leq y \implies x^m \leq y^m \text{ et } x^{\frac{1}{m}} \leq y^{\frac{1}{m}} \mathspace \forall m \in \mathbb{N}^*\]
+    
+    Astuce: démontrer la première implication en faisant une preuve par récurrence, puis utiliser ce résultat pour la puissance de réciproque.
+
+    Il y a une correction dans les slides de la professeure, mais je ne considère pas que ça vaut la peine de la mettre ici.
+}
+
+\parag{Proposition (Unicité de la limite)}{
+    Soit $\left(a_n\right)_{n\in\mathbb{N}}$ une suite de nombres réels et supposons que $a \in \mathbb{R}$ et $b \in \mathbb{R}$ sont des limites de $\left(a_n\right)$. Alors, $a = b$. 
+
+    \subparag{Démonstration}{
+        Soit $\epsilon > 0$. Puisque $\lim_{n \to \infty} a_n = a$, on sait que:
+        \[\exists n_0 \in \mathbb{N} \telque \forall n \geq n_0, \ \left|a_n - a\right|\leq \frac{\epsilon}{2}\]
+        
+        Le $\frac{\epsilon}{2}$ vient du fait que c'est vrai pour tout $\epsilon$ (on peut donc prendre celui qu'on veut). De la même manière, puisque $\lim_{n \to \infty} a_n = b$: 
+        \[\exists m_0 \in \mathbb{N} \telque \forall n \geq m_0, \ \left|a_n - b\right| \leq \frac{\epsilon}{2}\]
+
+        Donc, $\forall n \geq \max\left(n_0, m_0\right)$, on sait que: 
+        \[\left|a - b\right| = \left|a - a_n + a_n - b\right| \over{\leq}{$\dagger$} \left|a - a_n\right| + \left|a_n - b\right| \leq \frac{\epsilon}{2} + \frac{\epsilon}{2} = \epsilon \]
+        où $\dagger$ est l'inégalité triangulaire. Donc, puisque le résultat qu'on a trouvé est vrai pour tout $\epsilon > 0$, on a: 
+        \[\forall \epsilon > 0 \ \left|a - b\right| \leq \epsilon \implies a - b = 0 \implies a = b\]
+
+        Puisque le seul nombre positif qui est plus petit que tous les nombres positifs est 0.
+
+        \qed
+    }
+}
+
+\parag{Inégalité triangulaire}{
+    Pour tout $x, y \in \mathbb{R}$, on a que: 
+    \[\left|x + y\right| \leq \left|x\right| + \left|y\right|\]
+    
+    \subparag{Démonstration}{
+        $\forall x \in \mathbb{R}$, on a $x \leq \left|x\right|$ et $-x \leq \left|x\right|$, et de la même manière pour $\forall y \in \mathbb{R}$. 
+
+        Alors, si $x + y \geq 0$, on a: 
+        \[\left|x + y\right| = x + y \leq \left|x\right| + \left|y\right|\]
+        
+        Sinon, si $x + y$ < 0, on a: 
+        \[\left|x + y\right| = -x -y \leq \left|x\right| + \left|y\right|\]
+        
+        \qed
+    }
+    
+}
+
+\parag{Exemple divergent}{
+    On veut démontrer que $a_n = \left(-1\right)^n$ est divergente.
+
+    \subparag{Démonstration}{
+        Supposons par l'absurde qu'il existe la limite $\ell \in \mathbb{R}$ de $\left(-1\right)^n$. 
+
+        Donc, si on prend $\epsilon = \frac{1}{4}$, on sait que: 
+        \[\exists n_0 \in \mathbb{N} \telque \forall n \geq n_0 \implies \left|a_n - \ell\right| \leq \frac{1}{4}\]
+
+        On remarque que $a_{2k} = 1$ et $a_{2k + 1} = -1$ pour tout $k \in \mathbb{N}$. Donc, pour tout $k$  tels que $2k \geq n_0$ et $2k + 1 \geq n_0$, on a: 
+        \[\left|a_{2k} - \ell\right| = \left|1 - \ell\right| \leq \frac{1}{4} \mathspace \text{et} \mathspace \left|a_{2k + 1} - \ell\right| = \left|-1 - \ell\right| \leq \frac{1}{4}\]
+
+        De là, en utilisant l'inégalité triangulaire, on trouve: 
+        \[2 = \left|\ell - 1 + \left(-1 - \ell\right)\right| \leq \left|\ell - 1\right| + \left|-1 - \ell\right| \leq \frac{1}{4} + \frac{1}{4} = \frac{1}{2}\]
+        
+        Ce qui est une contradiction, on ne peut pas dire que $2 \leq \frac{1}{2}$. On en déduit donc que la série n'a pas de limite et donc qu'elle est divergente.
+
+        \qed
+    }
+}
+
+\parag{Proposition}{
+    Toute suite convergente est bornée.
+
+    \subparag{Démonstration}{
+        Soit $\left(a_n\right)$ une série convergente. On sait donc que 
+        \[\lim_{n \to \infty} a_n = \ell \in \mathbb{R}\]
+        
+        Prenons $\epsilon = 1$. Donc, il existe $n_0 \in \mathbb{N}$ tel que pour tout $n \geq n_0$ on a: 
+        \[\left|a_n - \ell\right| \leq 1 \iff \ell - 1 \leq a_n \leq \ell + 1\]
+
+        Soit $S = \left\{a_0, a_1, \ldots, a_{n_0 - 1}\right\}$. C'est un ensemble fini, donc il a un minimum et un maximum. On peut donc dire que la suite $\left(a_n\right)$ est bornée par 
+        \[\min\left(\min S, \ell - 1\right) \mathspace \text{ et } \mathspace \max\left(\max S, \ell + 1\right)\]
+        
+        \qed
+    }
+    
+
+    \subparag{Réciproque}{
+        La réciproque de la proposition est fausse. En effet, on a démontré un contre-exemple ci-dessus. $a_n = \left(-1\right)^n$ est bornée par $-1$ et $1$, cependant elle est divergente.  
+    }
+}
+
+\subsection{Opération algébriques sur les limites}
+\parag{Proposition}{
+    Soient $\left(a_n\right)$ et $\left(b_n\right)$ deux suites convergentes. En d'autres mots:
+    \[\lim_{n \to \infty} a_n = a \mathspace \text{ et } \lim_{n \to \infty} b_n = b\]
+    
+    Alors:
+    \begin{enumerate}
+        \item $\lim\limits_{n \to \infty} \left(a_n \pm b_n\right) = a \pm b$
+        \item $\lim\limits_{n \to \infty} pa_n = pa$ pour tout $p \in \mathbb{R}$.
+        \item $\lim\limits_{n \to \infty} \left(a_n\cdot b_n\right) = a\cdot b$
+        \item $\lim\limits_{n \to \infty} \left(\frac{a_n}{b_n}\right) = \frac{a}{b}$, si $b \neq 0$.
+    \end{enumerate}
+}
+
+\parag{Convergence des opérations}{
+    Soit $\left(a_n\right)$ et $\left(b_n\right)$ des suites. On peut étudier la convergence de leurs opérations:
+    \begin{enumerate}
+        \item\label{enum:convegenceSommeSuites} Si $\left(a_n + b_n\right)$ converge, alors soit $\left(a_n\right)$ et $\left(b_n\right)$ convergent, soit elles divergent toutes les deux.
+        \item Si $\left(a_n b_n\right)$ converge, on ne sait rien de la convergence de $\left(a_n\right)$ et $\left(b_n\right)$.
+        \item Si $\lim_{n \to \infty} a_n = 0$, alors la suite $\left(\frac{1}{a_n}\right)$ est divergente, si elle existe (s'il n'y a pas de division par zéro).
+    \end{enumerate}
+
+    De plus:
+    \begin{enumerate}
+        \setcounter{enumi}{3}
+        \item Si $\left(a_n + b_n\right)$ converge et que $\left(b_n\right)$ converge, alors $\left(a_n\right)$ converge.
+        \item Si $\left(a_n b_n\right)$ converge et que $\left(b_n\right)$ converge vers quelque chose d'autre que 0, alors $\left(a_n\right)$ est convergente.
+    \end{enumerate}
+    
+    \subparag{Remarque}{
+        On peut tirer un cas particulier de la propriété (\ref{enum:convegenceSommeSuites}). Si on a 
+        \[\lim_{n \to \infty} \left(a_n - b_n\right) = 0\]
+        alors soit $\left(a_n\right)$ et $\left(b_n\right)$ divergent, soit leur limite sont égales.
+    }
+    
+    \subparag{Preuve de la propriété (3)}{
+        Soit $\left(a_n\right)$, une suite qui converge vers 0. On sait donc que $\forall \epsilon > 0$, $\exists n_0 \in \mathbb{N}$ tel que $\forall n \geq n_0$ on a: 
+        \[\left|a_n - 0\right| \leq \epsilon \iff \left|a_n\right| \leq \epsilon \iff \left|\frac{1}{a_n}\right| \geq \frac{1}{\epsilon}\]
+
+        Soit $M > 0$, un nombre quelconque. Prenons $\epsilon = \frac{1}{M}$. On a donc que $\forall n \geq n_0$: 
+        \[\left|\frac{1}{a_n}\right| \geq \frac{1}{\epsilon} = M\]
+
+        Ainsi, on voit que $\left(\frac{1}{a_n}\right)$ n'est pas bornée et donc divergente.
+
+        \qed
+    }
+    
+
+    \subparag{Preuve de la propriété (5)}{
+        Soit $\left(a_n\right)$ et $\left(b_n\right)$ deux suites telles que $\left(a_n b_n\right)$ converge, et 
+        \[\lim_{n \to \infty} b_n = b \neq 0\]
+        
+        On a donc:
+        \[a_n = \frac{a_n b_n}{b_n} \implies \lim_{n \to \infty} a_n = \lim_{n \to \infty} \frac{a_n b_n}{b_n} = \frac{\lim\limits_{n \to \infty} a_n b_n}{\lim\limits_{n \to \infty} b_n}\]
+        
+        On peut séparer la limite sur le numérateur et le dénominateur, puisque les deux limites existent. On en déduit donc que $\left(a_n\right)$ est convergente.
+
+        \qed
+    }
+}
+
+\parag{Proposition (quotient de deux suites polynomiales)}{
+    Pour $p, q \in \mathbb{N}^*$, si on a:
+    \[x_n = a_p n^p + \ldots + a_1 n + a_0 \mathspace a_i \in \mathbb{R},\ a_p \neq 0\]
+    et: 
+    \[y_n = b_q n^q + \ldots + b_1 n + b_0 \mathspace b_i \in \mathbb{R},\ b_q \neq 0\]
+    
+    Alors,
+    \begin{functionbypart}{\lim_{n \to \infty} \left(\frac{x_n}{y_n}\right)}
+    0, \mathspace \text{si } p < q \\
+    \frac{a_p}{b_q}, \mathspace \text{si } p = q \\
+    \text{diverge}, \mathspace \text{si } p < q
+    \end{functionbypart}
+    
+    \subparag{Démonstration}{
+        On a: 
+        \[\frac{x_n}{y_n} = \frac{a_p n^p + \ldots + a_0}{b_q n^q + \ldots + b_0} = \frac{n^p \overbrace{\left(a_p + a_{p-1} \frac{1}{n} + \ldots + \frac{a_0}{n^p}\right)}^{u_{n}}}{n^q \underbrace{\left(b_q + \ldots + \frac{b_0}{n^q}\right)}_{v_n}} = \frac{n^p u_n}{n^q v_n}\]
+        
+        Regardons la limite du quotient entre $u_n$ et $v_n$: 
+        \[\lim_{n \to \infty} \frac{u_n}{v_n} = \lim_{n \to \infty} \frac{a_p + \overbrace{a_{p-1} \frac{1}{n} }^{\to 0}+ \ldots + \overbrace{a_0 \frac{1}{n_p}}^{\to 0}}{b_q + \ldots + \underbrace{b_0 \frac{1}{n^q}}_{\to 0}} = \frac{a_p}{b_q}\]
+        qui n'est pas égal à 0, puisque $a_p \neq 0$. 
+
+        \important{Si $p < q$:} 
+    \[\lim_{n \to \infty} \frac{n^p}{n^q} = \lim_{n \to \infty} \frac{1}{n^{q - p}} = 0\]
+        puisque $q - p > 0$. Donc: 
+        \[\lim_{n \to \infty} \frac{x_n}{y_n} = \lim_{n \to \infty} \frac{n^p}{n^q} \frac{u_n}{v_n} = 0\cdot \frac{a_p}{b_q} = 0\]
+        
+        \important{Si $p = q$:}
+        \[\lim_{n \to \infty} \frac{n^p}{n^p} = \lim_{n \to \infty} 1 = 1 \]
+        
+        Donc:
+        \[\lim_{n \to \infty} \frac{x_n}{y_n} = \lim_{n \to \infty} \frac{n^p}{n^p} \frac{u_n}{v_n} = 1 \cdot \frac{a_p}{b_q} = \frac{a_p}{b_q}\]
+        
+        \important{Si $p > q$:} On sait, puisque 
+        \[\lim_{n \to \infty} \frac{1}{n^{p-q}} = 0\]
+        alors $\left(n^{p - q}\right)$ est divergente. Or, puisque 
+        \[\frac{x_n}{y_n} = n^{p - q} \frac{u_n}{v_n}\]
+        est le produit entre une suite divergente et une suite qui convergent vers autre chose que 0, on sait qu'elle est divergente.
+    }
+    
+}
+
+\parag{Exemple}{
+    On peut utiliser notre théorème pour trouver que
+    \[\lim_{n \to \infty} \frac{85n^2 + 5n + 2}{2n^3 + n + 7} = 0\]
+}
+
+\subsection{Relation d'ordre}
+\parag{Proposition}{
+    Soient $\left(a_n\right)$ et $\left(b_n\right)$ deux suites convergentes. En d'autres mots: 
+    \[\lim_{n \to \infty} a_n = a \mathspace \text{ et } \mathspace \lim_{n \to \infty} b_n = b\]
+    
+    Supposons que $\exists m_0 \in \mathbb{N}$ tel que $\forall n \geq m_0$ on a que 
+    \[a_n \geq b_n\]
+    
+    Alors, on sait que 
+    \[a \geq b\]
+    
+    \subparag{Démonstration}{
+        Supposons par l'absurde que $b > a$.
+
+        Soit $\epsilon = \frac{b-a}{4}$. Par la définition de la limite, on sait qu'il existe $n_0 \in \mathbb{N}$ tel que 
+        \[a - \epsilon \leq a_n \leq a + \epsilon \mathspace \text{ et } \mathspace b - \epsilon \leq b_n \leq b + \epsilon\]
+
+        De là, on sait que pour tout $n \geq n_0$ on a: 
+        \[a_n \leq a + \epsilon = a + \frac{b-a}{4} < a + \frac{b-a}{2} = b - \frac{b-a}{2} < b - \frac{b-a}{4} = b - \epsilon \leq b_n\]
+
+        En d'autres mots, $\forall n \geq n_0$: 
+        \[a_n < b_n\]
+        
+        Ce qui est une contradiction.
+
+        \qed
+    }
+}
+
+\parag{Théorème des deux gendarmes pour les suites}{
+    Soient $\left(a_n\right)$, $\left(b_n\right)$ et $\left(c_n\right)$ telles que 
+    \begin{enumerate}
+        \item $\lim\limits_{n \to \infty} a_n = \lim\limits_{n \to \infty} c_n = \ell$
+        \item $\exists k \in \mathbb{N}$ tel que $\forall n \geq k$ on a $a_n \leq b_n \leq c_n$
+    \end{enumerate}
+
+    Alors 
+    \[\lim_{n \to \infty} b_n = \ell\]
+    
+    \subparag{Démonstration}{
+        Soit $\epsilon > 0$. On sait qu'il existe $n_0 \in \mathbb{N}$ tel que $\forall n \geq n_0$, on a: 
+        \[-\epsilon \leq a_n - \ell \leq \epsilon \mathspace \text{et} \mathspace -\epsilon \leq c_n - \ell \leq \epsilon\]
+
+        De plus, pour tout $n \geq k$, on sait que 
+        \[a_n - \ell \leq b_n - \ell \leq c_n - \ell\]
+
+        Ainsi, $\forall n \geq \max\left(n_0, k\right)$, alors les deux inégalités sont satisfaites. Donc: 
+        \[-\epsilon \leq a_n - \ell \leq b_n - \ell \leq c_n - \ell \leq c_n - \ell \leq \epsilon\]
+
+        En d'autres mots: 
+        \[-\epsilon \leq b_n - \ell \leq \epsilon \implies \left|b_n - \ell\right| \leq \epsilon\]
+        
+        Ainsi, par la définition de la limite, on a bien trouvé que 
+        \[\lim_{n \to \infty} b_n = \ell\]
+        
+        \qed
+    }
+}
+
+\end{document}

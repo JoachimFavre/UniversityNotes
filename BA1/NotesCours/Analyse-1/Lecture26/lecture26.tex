@@ -1,0 +1,338 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-22 at 10:15:24.
+
+\usepackage{../../style}
+
+\title{Analyse}
+\author{Joachim Favre}
+\date{Mercredi 22 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{26}{2021-12-22}{J'ai un exam cet aprèm, alèd}{
+\begin{itemize}[left=0pt]
+    \item Explication des liens entre les sujets étudiés (les points les plus importants sont d'utiliser la même méthode pour étudier la convergence d'intégrales pour les séries, et le critère de l'intégrale pour les séries).
+    \item Explication et calcul des croissances relatives des fonctions.
+    \item Résumé des différentes classes de régularité des fonctions.
+    \item Conseils de la professeure pour se préparer à l'examen.
+\end{itemize}
+
+}
+
+\section{Révision}
+\parag{Sujets étudiés}{
+    \begin{enumerate}[left=0pt]
+        \item Nombres réels (infimums, suprémums) et nombres complexes.
+        \item Suites numériques $\left(a_n\right)$.
+        \item Séries numériques $\sum_{}^{} a_n$.
+        \item Fonctions réelles.
+        \item Limites de fonctions.
+        \item Dérivées de fonctions.
+        \item Développements limités.
+        \item Séries entière $\sum_{}^{} a_n \left(x - x_0\right)^n$,  séries de Taylor.
+        \item Intégrales de fonctions continues sur $\left[a, b\right]$.
+        \item Intégrales généralisées.
+    \end{enumerate}
+}
+
+\subsection[Limites de suites et limites de fonctions]{Liens entre les limites de suites et les limites de fonctions}
+\parag{Caractérisation des limites à partir des suites}{
+    Par la caractérisation des limites à partir des suites, on peut facilement trouver une limite de suite à partir d'une limite de fonction.
+
+    \subparag{Exemple 1}{
+        Par exemple: 
+        \[\lim_{x \to 0^+} f\left(x\right) = \ell \implies \lim_{n \to \infty} f\left(\frac{1}{n}\right) = \ell\]
+        
+        Cependant, il existe des fonctions telles que $\lim_{n \to \infty} f\left(\frac{1}{n}\right) = \ell$, mais: 
+        \[\lim_{x \to 0^+} f\left(x\right) \text{ n'existe pas}\]
+
+        Ceci arrive quand deux suites qui tendent vers $0^+$ sont telles que: 
+        \[\lim_{n \to \infty} f\left(a_n\right) \neq \lim_{n \to \infty} f\left(b_n\right)\]
+        
+    }
+    
+    \subparag{Exemple 2}{
+        Voici un autre exemple: 
+        \[\lim_{x \to \infty} f\left(x\right) = \ell \implies \lim_{n \to \infty} f\left(n\right) = \ell\]
+        
+        De la même manière, on peut trouver des fonctions pour lesquelles cela ne marche pas dans l'autre direction.
+    }
+
+}
+
+\parag{Exemple 1}{
+    Calculons la limite suivante: 
+    \[\lim_{n \to \infty} \frac{\log\left(\left(1 + \frac{1}{n^2}\right)^{2n}\right)}{\sin\left(\frac{1}{n}\right)}\]
+    
+    Prenons $x = \frac{1}{n}$: 
+    \[\lim_{x \to 0^+} \frac{\log\left(\left(1 + x^2\right)^{\frac{2}{x}}\right)}{\sin x} = \lim_{x \to 0^+} \frac{2 \log\left(1 + x^2\right)}{x \sin\left(x\right)}\]
+    
+    On peut utiliser leur développement limité: 
+    \[\lim_{x \to 0^+} \frac{2\left(x^2 - \frac{x^4}{2} + x^4 \epsilon\left(x\right)\right)}{x\left(x - \frac{x^3}{6} + x^3 \epsilon\left(x\right)\right)} = \lim_{x \to 0^+} \frac{2x^2 \overbrace{\left(1 - \frac{x^2}{2} + x^2 \epsilon\left(x\right)\right)}^{\to 0}}{x^2 \underbrace{\left(1 - \frac{x}{6} + x\epsilon\left(x\right)\right)}_{\to 0}} = 2\]
+    
+    Ainsi, par la propriété: 
+    \[\lim_{n \to \infty} \frac{\log\left(1 + \frac{1}{n^2}\right)^{2n}}{\sin\left(\frac{1}{n}\right)} = 2\]
+}
+
+\parag{Exemple 2}{
+    Nous voulons savoir si la série suivante converge: 
+    \[\sum_{n=1}^{\infty} \left(1 - \cos\left(\frac{1}{n}\right)\right)\]
+    
+    Essayons de la comparer avec $\sum_{}^{} \frac{1}{n^{\alpha}}$; calculons la limite suivante: 
+    \[\lim_{x \to 0^+} \frac{1 - \cos\left(x\right)}{x^{\alpha}} = \lim_{x \to 0'+} \frac{1 - \left(1 - \frac{x^2}{2} + \frac{x^4}{4!} + \epsilon\left(x\right)x^4\right)}{x^{\alpha}} \over{=}{$\alpha = 2$} \lim_{x \to 0^+} \frac{\frac{x^2}{2} - \frac{x^4}{24} + \epsilon\left(x\right)x^4}{x^2} = \frac{1}{2}\]
+    
+    On en déduit que, par la caractérisation des limites à partir des suites: 
+    \[\lim_{n \to \infty} \frac{1 - \cos\left(\frac{1}{n}\right)}{\left(\frac{1}{n}\right)^2} = \frac{1}{2}\]
+    
+    Ainsi, par la définition de la limite, $\exists n_0 \in\mathbb{N}$ tel que $\forall n \geq n_0$: 
+    \[\frac{1}{4} \leq \left|\frac{1 - \cos\left(\frac{1}{n}\right)}{\frac{1}{n^2}}\right| \leq \frac{3}{4} \implies \frac{1}{4} \frac{1}{n^2} \leq 1 - \cos\left(\frac{1}{n}\right) \leq \frac{3}{4} \frac{1}{n^2}\]
+    
+    Les séries $\sum_{n=1}^{\infty} \left(1 - \cos\left(\frac{1}{n}\right)\right)$ et $\sum_{n = 1}^{\infty} \frac{1}{n^2}$ ont donc la même nature (par comparaison). De plus, on sait que: 
+    \[\sum_{n=1}^{\infty} \frac{1}{n^p} \text{ converge} \iff p > 1\]
+
+    Ainsi, nos deux séries convergent.
+
+    Notez que nous avons dérivé et utilisé le même critère que celui que nous avions utilisé pour les intégrales généralisées.
+}
+
+\subsection[Séries numériques et intégrales généralisées]{Lien entre les séries numériques et les intégrales généralisées}
+\parag{Proposition}{
+    Soit $f \geq 0$ une fonction continue et strictement décroissante pour tout $x \geq a$ pour un certain $a \geq 1$. 
+
+    Alors: 
+    \[\sum_{n=1}^{\infty} f\left(n\right) \text{ converge} \iff \int_{1}^{\infty} f\left(x\right)dx \text{ converge}\]
+    
+    En d'autres mots, les deux convergent, ou les deux divergent.
+
+    \subparag{Preuve}{
+        \imagehere{integralTestWhiteBackground.png}
+
+        En regardant ce dessin, on peut voir que: 
+        \[\sum_{n=2}^{\infty} f\left(n\right) \text{ est l'aire bleue}\]
+        \[\sum_{n=1}^{\infty} f\left(n\right) \text{ est l'aire rouge}\]
+        
+        On voit donc l'inégalité suivante: 
+        \[{\color{blue}\sum_{n=2}^{\infty} f\left(n\right)} \leq \int_{1}^{\infty} f\left(x\right)dx \leq {\color{red}\sum_{n=1}^{\infty} f\left(n\right)}\]
+
+        Ainsi, nous savons donc bien que cette série et intégrale sont de même nature.
+    }
+}
+
+\parag{Exemple 1}{
+    Nous voulons savoir si la série suivante converge: 
+    \[\sum_{n=1}^{\infty} \frac{1}{n^p}\]
+    
+    Ceci est difficile, on pourrait utiliser le critère de condensation, mais il n'est pas facile à démontrer non plus. Cependant, par notre proposition ci-dessus, on sait que la convergence de de cette série est équivalente à la convergence de l'intégrale suivante: 
+    \[\int_{1}^{\infty} \frac{dx}{x^p}\]
+    
+    Or, c'est intégrale est facile à calculer. On peut voir qu'elle converge si et seulement si $p > 1$.
+}
+
+\parag{Exemple 2}{
+    Nous voulons savoir pour quels $c$ la série suivante converge:
+    \[\sum_{n=2}^{\infty} \frac{1}{n \left(\log\left(n\right)\right)^c}\]
+    
+    En utilisant notre proposition ci-dessus, on sait que la convergence de cette série est équivalente à la convergence de: 
+    \[\int_{2}^{\infty} \frac{dx}{x\left(\log\left(x\right)\right)^c}\]
+    
+    Prenons le changement de variable $\log\left(x\right) = u$: 
+    \[\int_{\log\left(2\right)}^{\infty} \frac{du}{u^c}\]
+    
+    Qui converge si et seulement si $c > 1$. Ainsi, par notre proposition: 
+    \[\sum_{n=2}^{\infty} \frac{1}{n\left(\log\left(n\right)\right)^c}\text{ converge} \iff c > 1\]
+}
+
+\subsection[Fonctions dérivables et séries entières]{Lien entre les fonctions dérivables et les séries entières}
+\parag{Rappel}{
+    On sait que les trois séries entières suivantes ont le même rayon de convergence $r$: 
+    \[\sum_{k=0}^{\infty} a_k\left(x - x_0\right)^k, \mathspace \sum_{{\color{red}k=1}}^{\infty} k a_k\left(x - x_0\right)^{k-1}, \mathspace \sum_{k=0}^{\infty} \frac{a_k}{k + 1}\left(x - x_0\right)^{k+1}\]
+
+    Si $r > 0$, on peut prendre $f\left(x\right) = \sum_{k=0}^{\infty} a_k\left(x - x_0\right)^k$. Alors: 
+    \[f'\left(x\right) = \sum_{k=1}^{\infty} ka_k\left(x - x_0\right)^{k-1}, \mathspace F\left(x\right) = \sum_{k=0}^{\infty} \frac{a_k}{k+1}\left(x - x_0\right)^{k+1}\]
+    où $F'\left(x\right) = f\left(x\right)$ sur $\left]x_0 - r, x_0 + r\right[ $ et $F\left(x_0\right) = 0$.
+}
+
+\parag{Exemple 1}{
+    Soit la fonction suivante: 
+    \[f\left(x\right) = \sum_{k=1}^{\infty} \frac{\left(-1\right)^k x^{2k+1}}{\left(2k + 1\right)!}\]
+    
+    En utilisant d'Alembert, on peut voir que notre série converge $\forall x \in \mathbb{R}$. Nous voulons trouver: 
+    \[\int_{0}^{\frac{\pi}{2}} f\left(x\right)dx\]
+    
+
+    Pour commencer, on sait que: 
+    \[\sin\left(x\right)= \sum_{{\color{red}k=0}}^{\infty} \frac{\left(-1\right)^k x^{2k+1}}{\left(2k + 1\right)!} \implies f\left(x\right) = \sin\left(x\right) - x\]
+
+    Ainsi, on peut calculer notre intégrale: 
+    \[\int_{0}^{\frac{\pi}{2}}f\left(x\right) = \int_{0}^{\frac{\pi}{2}} \left(\sin\left(x\right)- x\right)dx = -\cos\left(x\right) \eval_{0}^{\frac{\pi}{2}} - \frac{1}{2} x^2 \eval_{0}^{\frac{\pi}{2}} = -\left(-1\right) - \frac{1}{2} \left(\frac{\pi}{2}\right)^2 = 1 - \frac{\pi^2}{8}\]
+    
+    Nous aurions aussi pu utiliser notre proposition, mais cela aurait été beaucoup plus compliqué. 
+}
+
+\parag{Exemple 2}{
+    Soit la fonction suivante:
+    \begin{functionbypart}{f\left(x\right)}
+        x \log\left(x\right), \mathspace x > 0  \\
+        \sin\left(x\right) e^{\frac{1}{x}}, \mathspace x < 0 \\
+        0, \mathspace x = 0
+    \end{functionbypart}
+
+    Nous voulons savoir si $f : \mathbb{R} \mapsto \mathbb{R}$ est continue en $x = 0$, et si elle est dérivable en $x = 0$.
+
+    Calculons la limite par la droite: 
+    \[\lim_{x \to 0^+} x \log\left(x\right) \over{=}{$y = \frac{1}{x}$} \lim_{y \to \infty} \frac{1}{y} \log\left(\frac{1}{y}\right) = \lim_{y \to \infty} \frac{-\log\left(y\right)}{y} \over{=}{BL} \lim_{y \to \infty} \frac{\frac{-1}{y}}{1} = 0 \]
+
+    Calculons aussi la limite par la gauche: 
+    \[\lim_{x \to 0^-} f\left(x\right) = \lim_{x \to 0^-} \underbrace{\sin\left(x\right)}_{\to 0} \underbrace{e^{\frac{1}{x}}}_{\to 0} = 0\]
+    
+    Ainsi, on a obtenu que notre fonction est continue: 
+    \[\lim_{x \to 0^+} f\left(x\right) = \lim_{x \to 0^-} f\left(x\right) = f\left(0\right)\]
+    
+    Regardons maintenant si la fonction est dérivable. Calculons la dérivée à droite: 
+    \[\lim_{x \to 0^+} \frac{f\left(x\right) - f\left(0\right)}{x - 0} = \lim_{x \to 0+} \frac{x\log\left(x\right)}{x} = \lim_{x \to 0^+} \log\left(x\right) = -\infty\]
+
+    Calculons aussi la dérivée à gauche: 
+    \[\lim_{x \to 0^-} \frac{f\left(x\right)-f\left(0\right)}{x - 0} = \lim_{x \to 0^-} \underbrace{\frac{\sin\left(x\right)}{x}}_{\to 1} \underbrace{e^{\frac{1}{x}}}_{\to 0} = 0\]
+    
+    On obtient donc que $f$ n'est pas dérivable à droite en $x = 0$, mais que $f'_g\left(0\right) = 0$. Ainsi, cette fonction n'est pas dérivable en $x = 0$, mais elle est continue en ce point.
+}
+
+\subsection{Croissance relative des fonctions}
+\parag{Calcul de limites}{
+    \subparag{Limite 1}{
+        Soit $\alpha > 0$, nous voulons calculer la limite suivante:
+        \[\lim_{x \to \infty} \frac{x^{\alpha}}{a^k} \over{=}{BH} \lim_{x \to \infty} \frac{\alpha x^{\alpha - 1}}{a^x\left(\log a\right)}\]
+
+        Ainsi, en appliquant Bernoulli-L'Hospital $k$ fois:
+        \[\lim_{x \to \infty} \frac{\alpha\left(\alpha - 1\right)\ldots\left(\alpha - k +1\right)\overbrace{x^{\overbrace{\alpha - k}^{\leq 0}}}^{0 \text{ ou constant}}}{\underbrace{a^x \left(\log a\right)^k}_{\to \infty}} = 0\]
+
+        Concrètement, cela veut dire que $a^k$ croit plus rapidement que $x^{\alpha}$.
+    }
+    
+    \subparag{Limite 2}{
+        Soit $\alpha > 0$, calculons maintenant aussi la limite suivante: 
+        \[\lim_{x \to \infty} \frac{\log\left(x\right)}{x^{\alpha}} \over{=}{BH} \lim_{x \to \infty} \frac{\frac{1}{x}}{\alpha x^{\alpha - 1}} = \lim_{x \to \infty} \frac{1}{\alpha x^{\alpha}} = 0\]
+    }
+    
+    \subparag{Limite 3}{
+        Soit $\alpha > 0$, calculons la limite suivante: 
+        \[\lim_{x \to 0^+} x^{\alpha} \log\left(x\right) \over{=}{$y = \frac{1}{x}$} \lim_{y \to \infty} \frac{1}{y^{\alpha}} \log\left(\frac{1}{y}\right) = \lim_{y \to \infty} \frac{-\log\left(y\right)}{y^{\alpha}} \over{=}{(2)}  0\]
+    }
+}
+
+\parag{Hiérarchie de croissance de fonctions}{
+    Soit $a > 1$, $\alpha > 0$, comme on a vu dans le paragraphe ci-dessus:
+    \[\lim_{x \to \infty} \frac{x^{\alpha}}{a^x} = 0, \mathspace \lim_{x \to \infty} \frac{\log\left(x\right)}{x^{\alpha}} = 0, \mathspace \lim_{x \to 0^+} x^{\alpha}\log\left(x\right) = 0\]
+    
+    Introduisons le symbole $\succ$, qui veut dire ``croit plus vite''. Soit $k \in\mathbb{N}^*$, alors: 
+    \[x^{\frac{\alpha}{k}} \succ \log\left(x\right) \implies x^{\alpha} \succ \left(\log\left(x\right)\right)^k\]
+    
+    On a donc trouvé que, avec $\alpha > 0$, $k > 0$:
+    \[a^x \succ x^{\alpha}, \mathspace x^{\alpha} \succ \left(\log\left(x\right)\right)^k\]
+}
+
+\parag{Avec des suites}{
+    \subparag{Limite 1}{
+        Calculons la limite suivante:
+        \[\lim_{n \to \infty} \frac{a^n}{n!}\]
+
+        Utilisons le critère de d'Alembert: 
+        \[\lim_{n \to \infty} \left|\frac{a_{n+1}}{a_n}\right| = \lim_{n \to \infty} \frac{a^{n+1}}{\left(n+1\right)!} \frac{n!}{a^n} = \lim_{n \to \infty} \frac{a}{n+1} = 0, \mathspace \forall a\]
+
+        On a donc trouvé que:
+        \[\lim_{n \to \infty} \frac{a^n}{n!} = 0\]
+
+    }
+    
+    \subparag{Limite 2}{
+        Calculons la limite suivante:
+        \[\lim_{n \to \infty} \frac{n!}{n^n}\]
+
+        Utilisons le critère de d'Alembert: 
+    \[\lim_{n \to \infty} \left|\frac{a_{n+1}}{a_n}\right| = \lim_{n \to \infty} \frac{\left(n+1\right)!}{\left(n+1\right)^n} \frac{n^n}{n!} = \lim_{n \to \infty} \frac{n+1}{\left(n+1\right)^n} \frac{n^n}{n+1}\]
+
+        Ainsi, c'est égal à:
+        \[\lim_{n \to \infty} \left(\frac{n}{n+1}\right)^n = \lim_{n \to \infty} \frac{1}{\left(\frac{1}{1} + \frac{1}{n}\right)^n} = \frac{1}{e} < 1\]
+        
+        On a donc trouvé: 
+        \[\lim_{n \to \infty} \frac{n!}{n^n} = 0\]
+    }
+}
+
+\parag{Résumé}{
+    On a donc trouvé: 
+    \[n^n \succ n! \succ a^n \sim a^x \succ x^p \sim n^p > \left(\log n\right)^q \sim \left(\log x\right)^q\]
+    où $\sim$ veut dire que les deux fonctions croient à la même vitesse.
+}
+
+\subsection{Classes de régularité des fonctions}
+\parag{Classes de régularité des fonctions}{
+    Nous pouvons dessiner la liste suivante ; un point implique le suivant:
+
+    \begin{center}
+    \begin{tabularx}{\linewidth}{lX}
+        \fullbf{Analytique} & $f\left(x\right)$ est égale à sa série de Taylor sur $I$ (un intervalle ouvert). \\
+        \fullbf{Infiniment dérivable (ou lisse)} & $f \in C^{\infty}\left(I, \mathbb{R}\right)$. \\
+        \fullbf{$n$ fois continûment dérivable} & $f \in C^n\left(I, \mathbb{R}\right)$, où $n \geq 2$. \\
+        \fullbf{$n$ fois dérivable} & $f^{\left(n\right)}$ existe sur $I$. \\
+        \fullbf{Dérivable} & $f'\left(x\right)$ existe sur $I$. \\
+        \fullbf{Continue} & $\lim\limits_{x \to a} f\left(x\right) = f\left(a\right)$ pour tout $ \in I$. \\
+        \fullbf{Intégrable sur $\left[a, b\right] \subset I$} & $\displaystyle \int_{a}^{b} f\left(x\right)dx$ existe (y compris les intégrales généralisées). \\
+    \end{tabularx}
+    \end{center}
+
+    Pour les fonctions dérivables, nous avons le théorème des accroissement finis (TAF). C'est à dire que $\exists t \in \left]x, y\right[  \subset I$ tel que: 
+    \[f'\left(t\right) = \frac{f\left(y\right) - f\left(x\right)}{y - x}\]
+    
+
+    Pour les fonctions continues, nous avons le théorème de la valeur intermédiaire (TVI), c'est à dire que, avec $\left[a, b\right] \subset I$: 
+    \[f\left(\left[a, b\right]\right) = \left[\min_{\left[a, b\right]} f, \max_{\left[a, b\right]} f\right]\]
+    
+    Pour les fonctions continues, il y a aussi le théorème de la moyenne. Celui-ci dit que $\exists c \in \left[a, b\right] \subset I$ tel que: 
+    \[\int_{a}^{b} f\left(x\right)dx = f\left(c\right)\left(b-a\right)\]
+    
+    
+}
+
+\subsection{Préparation à l'examen}
+\parag{Sujets}{
+    \begin{enumerate}[left=0pt]
+        \item Nombre réels, infimums et suprémums.
+        \item Nombres complexes.
+        \item Méthodes de récurrence.
+        \item Limites des  suites (y compris les suites définies par récurrence; ainsi que les limsup et les liminf).
+        \item Séries numériques (critères de convergence).
+        \item Limites de fonctions (par définition, à partir des suites, avec Bernoulli-L'Hopsital ou les développements limités).
+        \item Continuité, prolongement par continuité, limites à gauche et à droite.
+        \item Théorème des valeurs intermédiaires.
+        \item Dérivée d'une fonction, fonction différentiable à gauche et à droite.
+        \item Théorème des accroissement finis, propriétés des fonctions différentiables sur un intervalle.
+        \item Développements limités.
+        \item Formule de Taylor et séries de Taylor.
+        \item Séries entières, rayon et domaine de convergence.
+        \item Intégrale et primitives, théorème de la moyenne.
+        \item Changement de variable, intégration par parties, décomposition en fractions simples (fractions partielles).
+        \item Intégrales généralisées, critères de convergence.
+    \end{enumerate}
+}
+
+\parag{Comment réviser}{
+    \begin{enumerate}[left=0pt]
+        \item Lire et mémoriser les résumés.
+        \item Relire les notes de cours (en diagonale, ou, pour les bouts dont on se souvient moins, en détails).
+        \item Faire les tests blancs et les séries de questions ouvertes (faire un diagnostique de nos connaissances).
+        \item Relire les séries d'exercices.
+        \item Faire les examens de 2017, 2018, 2019, 2020 (tous les examens --- sauf celui de 2020 --- ont aussi une partie uniquement liée à notre section qui ne se trouve pas dans les documents qui nous ont été fournis; il faut donc les faire en moins de 3h puisque cela représente seulement 64 points des 80 totaux).
+        \item Relire les résumés.
+        \item Faire l'examen de 2019.
+    \end{enumerate}
+
+    \vspace{1em}
+
+    \imagehere[0.8]{MessageFinProfesseure.png}
+}
+
+
+\end{document}

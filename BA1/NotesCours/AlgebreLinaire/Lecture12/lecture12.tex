@@ -1,0 +1,259 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-01 at 13:13:15.
+
+\usepackage{../../style}
+
+\title{Algèbre}
+\author{Joachim Favre}
+\date{Lundi 01 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2021-11-01}{Basique, simple. Parce que vous êtes trop cons.}{
+    \begin{itemize}[left=0pt]
+        \item Explication du théorème de la base extraite.
+        \item Explication de comment trouver une base de l'image d'une matrice.
+        \item Démonstration qu'un vecteur peut être décrit parfaitement dans une base par un vecteur de coordonnées.
+        \item Définition de la matrice de changement de base, et de l'application coordonnées.
+    \end{itemize}
+
+}
+
+\parag{Familles}{
+    Une famille de vecteurs $\left(\bvec{v}_1, \ldots, \bvec{v}_p\right)$ de $V$ engendrent toujours un sous espace
+    \[H = \vect\left\{\bvec{v}_1, \ldots, \bvec{v}_p\right\}\]
+
+    Si la famille est libre, c'est une base de $H$. Si la famille est liée, on peut retirer des vecteurs pour rendre la famille libre.
+}
+
+\parag{Exemple 1}{
+    Soit les deux vecteurs de $\mathbb{R}^2$ suivants:
+    \[\bvec{v}_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}, \mathspace \bvec{v}_2 = \begin{bmatrix} -2 \\ -2 \end{bmatrix} \]
+
+    \imagehere[0.5]{ExempleFamilleLieePasBase.png}
+
+    On remarque que $\vect\left\{\bvec{v}_1, \bvec{v}_2\right\}$ est une droite qui passe par l'origine. Donc,
+    \[\vect\left\{\bvec{v}_1, \bvec{v}_2\right\} = \vect\left\{\bvec{v}_1\right\} = \vect\left\{\bvec{v}_2\right\}\]
+
+    Donc chacun $\bvec{v}_1$ et $\bvec{v}_2$ forment une base pour la droite.
+
+}
+
+\parag{Exemple 2}{
+    Soit les trois vecteurs de $\mathbb{R}^3$ suivant:
+    \[\bvec{v}_1 = \begin{bmatrix} 0 \\ 2 \\ -1 \end{bmatrix}, \mathspace \bvec{v}_2 = \begin{bmatrix} 2 \\ 2 \\ 0 \end{bmatrix}, \mathspace \bvec{v}_3 = \begin{bmatrix} 6 \\ 16 \\ -5 \end{bmatrix} \]
+
+    Pour déterminer s'ils sont linéairement dépendants, on peut calculer le déterminant de la matrice qui a ces vecteurs en tant que colonnes:
+    \[\det\begin{bmatrix} 0 & 2 & 6 \\ 2 & 2 & 16 \\ -1 & 0 & -5 \end{bmatrix} = 0\]
+
+    Donc cette matrice n'est pas inversible, et ses vecteurs sont donc liés. On peut voir que:
+    \[\bvec{v}_3 = 5\bvec{v}_1 + 3\bvec{v}_2\]
+
+    On peut aussi exprimer $\bvec{v}_1$ en fonction de $\bvec{v}_2$ et $\bvec{v}_3$, l'analyse qu'on fait ci-dessous serait similaire.
+
+    On veut montrer que
+    \[\vect\left\{\bvec{v}_1, \bvec{v}_2, \bvec{v}_3\right\} = \vect\left\{\bvec{v}_1, \bvec{v}_2\right\}\]
+
+    Pour faire cela, on va montrer que le premier ensemble est inclus dans le deuxième, puis que le deuxième est inclus dans le premier.
+
+    Si $\bvec{v}$ est dans $H = \vect\left\{\bvec{v}_1, \bvec{v}_2, \bvec{v}_3\right\}$, alors il existe $c_1, c_2, c_3$ tels que:
+    \[\bvec{v} = c_1 \bvec{v}_1 + c_2 \bvec{v}_2 + c_3 \bvec{v}_3 = c_1 \bvec{v}_1 + c_2 \bvec{v}_2 + c_3\left(5 \bvec{v}_1 + 3 \bvec{v}_2\right)\]
+
+    Ce qui nous permet de conclure que:
+    \[\bvec{v} = \left(c_1 + 5c_3\right)\bvec{v}_1 + \left(c_2 + 3c_3\right)\bvec{v}_2\]
+
+    Donc, $\bvec{v}$ est une combinaison linéaire de $\bvec{v}_1$ et $\bvec{v}_2$. En d'autres mots, cela veut dire que
+    \[\vect\left\{\bvec{v}_1, \bvec{v}_2, \bvec{v}_3\right\} \subset \vect\left\{\bvec{v}_1, \bvec{v}_2\right\}\]
+
+    Dans l'autre sens, n'importe quelle combinaison linéaire de $\bvec{v}_1$ et $\bvec{v}_2$ est aussi une combinaison linéaire de $\bvec{v}_1$, $\bvec{v}_2$ et $\bvec{v}_3$ (il suffit de mettre le dernier coefficient à zéros). Autrement dit,
+    \[\vect\left\{\bvec{v}_1, \bvec{v}_2\right\} \subset \vect\left\{\bvec{v}_1, \bvec{v}_2, \bvec{v}_3\right\}\]
+
+}
+
+\parag{Théorème de la base extraite}{
+    Soit $F = \left(\bvec{v}_1, \ldots, \bvec{v}_p\right)$ une famille de vecteurs de $V$ et $H = \vect\left\{\bvec{v}_1, \ldots, \bvec{v}_p\right\}$.
+    \begin{enumerate}
+        \item Si l'un des vecteurs de $F$ (disons $\bvec{v}_k$) est une combinaison linéaire des autres vecteurs de $F$, alors la famille obtenue en supprimant dans $F$ le vecteur $\bvec{v}_k$ engendre toujours $H$.
+        \item Si $H \neq \left\{\bvec{0}\right\}$, alors il existe une sous-famille de $F$ qui est une base de $H$. Autrement dit, on peut extraire de la famille $F$ une base de $H$.
+    \end{enumerate}
+
+    \subparag{Preuve}{
+        On peut utiliser la même idée que ce qu'on a fait dans l'exemple ci-dessus.
+    }
+
+}
+
+\parag{Bases du kernel et de l'image}{
+    Soit $A \in \mathbb{R}^{m \times n}$ une matrice donnée.
+
+    On a déjà trouvé une façon de déterminer une base du noyau de $A$. En effet, on peut mettre $A$ sous forme échelonnée réduite pour trouver l'ensemble solution de $A \bvec{x} = \bvec{0}$ en forme paramétrique. Les vecteurs obtenus engendrent le noyau et ils sont linéairement indépendants, donc ils forment une base.
+
+    On voudrait faire la même chose pour trouver une base de l'image de $A$. On sait que les colonnes de $A$ génèrent l'image de $A$, cependant ils ne sont pas nécessairement linéairement indépendants. On peut par contre utiliser le théorème de la base extraite pour extraire une base.
+
+    Par exemple, prenons la matrice suivante:
+    \[A = \begin{bmatrix} -3 & 6 & -1 & 1 & -7 \\ 1 & -2 & 2 & 3 & -1 \\ 2 & -4 & 5 & 8 & -4 \end{bmatrix}\]
+
+    On appelle la $i$-ème colonne $\bvec{a}_i$. On a donc:
+    \[\im A = \vect\left\{\bvec{a}_1, \bvec{a}_2, \bvec{a}_3, \bvec{a}_4, \bvec{a}_5\right\}\]
+
+    Par définition, les colonnes de $A$ engendrent le sous-espace $\im A$. Elles ne forment pas une base de $\im A$ puisqu'elles sont linéairement dépendantes. On peut s'en rendre compte en calculant le noyau de $A$. Dans notre exemple, le vecteur suivant fait partie du kernel:
+    \[A \bvec{x} = \bvec{0} \text{ avec }\bvec{x} = \begin{bmatrix} 2 \\ 1 \\ 0 \\ 0 \\ 0 \end{bmatrix} \implies 2\bvec{a}_1 + \bvec{a}_2 = \bvec{0}\]
+
+
+    Utilisons le théorème de la base extraite. Il est toujours possible de choisir des colonnes de $A$ qui forment une base de $\im A$. Mais on ne peut pas les choisir n'importe comment. Notre étude du noyau nous dit exactement procéder.
+
+    On sait que
+    \[\ker A = \vect\left\{\begin{bmatrix} 2 \\ 1 \\ 0 \\ 0 \\ 0 \end{bmatrix}, \begin{bmatrix} 1 \\ 0 \\ -2 \\ 1 \\ 0 \end{bmatrix}, \begin{bmatrix} -3 \\ 0 \\ 2 \\ 0 \\ 1 \end{bmatrix} \right\}\]
+
+    En d'autres mots:
+    \begin{systemofequations}{}
+    &\ \bvec{a}_2 = -2 \bvec{a}_1  \\
+    &\ \bvec{a}_4 = -\bvec{a}_1 + 2\bvec{a}_3  \\
+    &\ \bvec{a}_5 = 3\bvec{a}_1 - 2\bvec{a}_3
+    \end{systemofequations}
+
+    Donc, par le théorème de la base extraite, on sait que
+    \[\im A = \vect\left\{\bvec{a}_1, \bvec{a}_2, \bvec{a}_3, \bvec{a}_4, \bvec{a}_5\right\} = \vect\left\{\bvec{a}_1, \bvec{a}_3\right\}\]
+
+    On remarque que, de manière générale, on ne modifie pas la dépendance linéaire des colonnes en échelonnant une matrice. En d'autres mots, si la première et la deuxième colonne sont dépendantes linéairement dans la matrice échelonnée réduite, alors elles le sont aussi dans la matrice de base. Plus que ça, si on remarque que 3 fois la première colonne donne la deuxième colonne dans la matrice échelonnée réduite, alors c'est aussi le cas dans la matrice de base.
+
+    Puisqu'on ne modifie pas l'indépendance linéaire en échelonnant une matrice, et puisque la première et la troisième colonne de la matrice échelonnée réduite sont clairement linéairement indépendants, $\bvec{a}_1$ et $\bvec{a}_3$ sont donc aussi linéairement indépendants.
+
+    On peut justifier cela de manière plus formelle. Étudions si $\bvec{a}_1$ et $\bvec{a}_3$ sont linéairement dépendants:
+    \[c_1 \bvec{a}_1 + c_3 \bvec{a}_3 = \bvec{0} \iff A \begin{bmatrix} c_1 \\ 0 \\ c_3 \\ 0 \\ 0 \end{bmatrix} = \bvec{0}\]
+
+    Or, l'ensemble solution ne change pas si on échelonne $A$, donc:
+    \[\begin{bmatrix} 1 & -2 & 0 & -1 & 3 \\ 0 & 0 & 1 & 2 & -2 \\ 0 & 0 & 0 & 0 & 0 \end{bmatrix} \begin{bmatrix} c_1 \\ 0 \\ c_3 \\ 0 \\ 0 \end{bmatrix} = \bvec{0} \implies c_1 \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix} + c_3 \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 0 \end{bmatrix} \]
+
+    Ainsi, on en déduit qu'ils sont linéairement indépendants, donc ils forment une base de l'image de $A$.
+}
+
+\parag{Théorème}{
+    Les colonnes pivots d'une matrice forment une base de son image.
+
+    \subparag{Remarque}{
+        L'échelonnement permet d'identifier les colonnes pivots, mais ce sont bien les colonnes de $A$ qui engendre $\im A$. Les colonnes d'une forme échelonnée de $A$ pourraient engendrer un tout autre espace.
+    }
+}
+
+\subsection{Système de coordonnées}
+\parag{Théorème de représentation d'un vecteur}{
+    Soit $\mathcal{B} = \left(\bvec{b}_1, \ldots, \bvec{b}_n\right)$ une base d'une space vectoriel $V$. Alors, pour tout vecteur $\bvec{x}$ de $V$, il existe une famille \textit{unique} $\left(c_1, \ldots, c_n\right)$ de scalaires tels que:
+    \[\bvec{x} = c_1 \bvec{b}_1 + \ldots + c_n \bvec{b}_n\]
+
+    \subparag{Preuve}{
+        \important{Existence:} Comme $\mathcal{B}$ est une base de $V$, on a $V = \vect\left\{\bvec{b}_1, \ldots, \bvec{b}_n\right\}$. Donc, $\bvec{x}$ est une combinaison linéaire de $\bvec{b}_1, \ldots, \bvec{b}_n$.
+
+        \vspace{1em}
+
+        \important{Unicité:} Supposons par l'absurde que ce n'est pas unique, i.e. que:
+        \[\bvec{x} = c_1 \bvec{b}_1 + \ldots + c_n \bvec{b}_n \mathspace \text{et} \mathspace \bvec{x} = d_1 \bvec{b}_1 + \ldots + d_n \bvec{b}_n\]
+
+        Alors, on a:
+        \[\bvec{0} = \bvec{x} - \bvec{x} = c_1 \bvec{b}_1 + \ldots + c_n \bvec{b}_n - d_1 \bvec{b}_1 - \ldots - d_n \bvec{b}_n\]
+
+        Ce qui implique que:
+        \[\bvec{0} = \left(c_1 - d_1\right)\bvec{b}_1 + \ldots + \left(c_n - d_n\right)\bvec{b}_n\]
+
+        Comme $\mathcal{B}$ est une base, les vecteurs $\bvec{b}_1, \ldots, \bvec{b}_n$ sont linéairement indépendants. Donc,
+        \[c_1 - d_1 = \ldots = c_n - d_n = 0 \implies c_1 = d_1, \ldots, c_n = d_n\]
+
+        Ce qui est une contradiction.
+
+        \qed
+    }
+
+    \subparag{Importance}{
+        Si on est d'accord sur la base, connaître le vecteur $\bvec{x}$ ou connaître les coefficients $c_1, \ldots, c_n$ est équivalent.
+    }
+}
+
+\parag{Notation}{
+    Soit $\mathcal{B} = \left(\bvec{b}_1, \ldots, \bvec{b}_n\right)$ une base de $V$ (l'ordre des vecteurs n'est pas important, mais une fois qu'on l'a choisit on ne doit plus le changer).
+
+    Pour chaque $\bvec{x}$ dans $V$, il existe un unique choix de $c_1, \ldots, c_n \in \mathbb{R}$ tels que
+    \[\bvec{x} = c_1 \bvec{b}_1 + \ldots + c_n \bvec{b}_n\]
+
+    Ces $c_i$ sont les \important{composantes} ou \important{coordonnées} de $\bvec{x}$ dans la base $\mathcal{B}$.
+
+    Le \important{vecteur de coordonnées} (visible ci-après) identifie $\bvec{x}$ de façon unique (dans la base $\mathcal{B}$) : on peut trouver l'un à partir de l'autre. On écrit:
+    \[\left[\bvec{x}\right]_{\mathcal{B}} = \begin{bmatrix} c_1 \\ \vdots \\ c_n \end{bmatrix} \in \mathbb{R}^{n}\]
+
+    De plus, $\bvec{x} \mapsto \left[\bvec{x}\right]_{\mathcal{B}}$ est \important{l'application coordonnées} définie par $B$, de $V$ vers $\mathbb{R}^{n}$.
+}
+
+\parag{Exemple 1}{
+    Soit $\mathcal{E} = \left(\bvec{e}_1, \bvec{e}_2\right)$ la base canonique de $\mathbb{R}^2$. Soit le vecteur suivant:
+    \[\bvec{x} = \begin{bmatrix} 5 \\ 3 \end{bmatrix} \in \mathbb{R}^2\]
+
+    On se rend compte que:
+    \[\bvec{x} = 5\bvec{e}_1 + 3\bvec{e}_2 \implies \left[\bvec{x}\right]_{\mathcal{E}} = \begin{bmatrix} 5 \\ 3 \end{bmatrix} = \bvec{x}\]
+
+    C'est pour cela que nous appelons notre base, la base canonique. Cette propriété est très spéciale, et elle n'est vraie que pour cette base. De manière générale, il ne faut pas confondre $\bvec{x}$ et son vecteur de coordonnées.
+}
+
+\parag{Exemple 2}{
+    Soit $\mathcal{B} = \left(\bvec{b}_1, \bvec{b}_2\right)$, avec:
+    \[\bvec{b}_1 = \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \mathspace \bvec{b}_2 = \begin{bmatrix} 1 \\ 2 \end{bmatrix} \]
+
+    On peut vérifier que c'est une base de $\mathbb{R}^2$. On veut trouver le vecteur $\bvec{x}$ de coordonnées:
+    \[\left[\bvec{x}\right]_{\mathcal{B}} = \begin{bmatrix} 3 \\ 1 \end{bmatrix} \implies \bvec{x} = 3\bvec{b}_1 + \bvec{b}_2 = \begin{bmatrix} 4 \\ 2 \end{bmatrix}\]
+
+    Soit maintenant le vecteur suivant:
+    \[\bvec{y} = \begin{bmatrix} 7 \\ 4 \end{bmatrix} \]
+
+    Maintenant, si on veut trouver ses coordonnées pour $\mathcal{B}$, il faut résoudre un système. On peut aussi le faire ``avec les mains'', et on trouve:
+    \[\left[\bvec{y}\right]_{\mathcal{B}} = \begin{bmatrix} 5 \\ 2 \end{bmatrix} \]
+
+    Pour un $\bvec{x}$ quelconque (quoi ? j'ai rien dit\ldots) dans $\mathbb{R}^2$, on a que ses coordonnées (uniques) $c_1, c_2$ dans la base $\mathcal{B} = \left(\bvec{b}_1, \bvec{b}_2\right)$ satisfont:
+    \[c_1 \bvec{b}_1 + c_2 \bvec{b}_2 = \bvec{x} \]
+
+    Qui est équivalent à:
+    \[\begin{bmatrix} & \\ \bvec{b}_1 & \bvec{b}_2 \\ & \end{bmatrix}  \left[\bvec{x}\right]_{\mathcal{B}} = \bvec{x} \iff \begin{bmatrix} 1 & 1 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} c_1 \\ c_2 \end{bmatrix} = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \]
+
+    On sait que la matrice composée des vecteurs de base est inversible (puisque ces colonnes représentent une base), on a donc:
+    \[\begin{bmatrix} c_1 \\ c_2 \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 0 & 2 \end{bmatrix}^{-1} \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \]
+
+}
+
+\parag{Généralisation}{
+    Plus généralement, soit $\mathcal{B} = \left(\bvec{b}_1, \ldots, \bvec{b}_n\right)$ une base de $\mathbb{R}^{n}$. On définit la matrice de passage, ou \important{matrice de changement de base}, $P$:
+    \[P_{\mathcal{B}} = \begin{bmatrix}  &  &  \\ \bvec{b}_1 & \ldots & \bvec{b}_n \\  &  &  \end{bmatrix} \in \mathbb{R}^{n\times n}\]
+
+    Alors, la relation suivante:
+    \[\bvec{x} = c_1 \bvec{b}_1 + \ldots c_n \bvec{b}_n \text{ où } \left[\bvec{x}\right]_{\mathcal{B}} = \begin{bmatrix} c_1 \\ \vdots \\ c_n \end{bmatrix}\]
+    s'écrit aussi:
+    \[\bvec{x} = P_{\mathcal{B}} \left[\bvec{x}\right]_{\mathcal{B}}\]
+
+    C'est donc bien une matrice de changement de base, puisqu'elle transforme un vecteur de la base $\mathcal{B}$ en un vecteur de la base canonique.
+
+    De plus, on sait que $P_{\mathcal{B}}$ est inversible (puisque ses colonnes représentent une base), on a donc:
+    \[\left[\bvec{x}\right]_{\mathcal{B}} = P_{\mathcal{B}}^{-1} \bvec{x}\]
+
+    On voit que $P_{\mathcal{B}}^{-1}$ est la matrice de \important{l'application coordonnées} (qu'on avait définie plus haut). Cette application est donc linéaire (car c'est le produit d'une matrice et du vecteur donné en paramètre) et bijective (puisque la matrice est inversible).
+
+}
+
+\parag{Théorème}{
+    Soit $\mathcal{B}$ une base d'un espace vectoriel $V$. L'application coordonnées $\bvec{x} \mapsto \left[\bvec{x}\right]_{\mathcal{B}}$ est une application linéaire bijective de $V$ dans $\mathbb{R}^{n}$ ($n$ est le nombre de vecteurs de la base, plus tard on l'appellera la dimension de l'espace vectoriel).
+
+    \subparag{Preuve}{
+        Laissée en exercice au lecteur.
+    }
+
+    \subparag{Remarque}{
+        Une application linéaire bijective est un \important{isomorphisme} d'espaces vectoriels.
+
+        La linéarité nous dit que:
+        \[\left[c_1 \bvec{u}_1 + \ldots + c_p \bvec{u}_p\right]_{\mathcal{B}} = c_1 \left[\bvec{u}_1\right]_{\mathcal{B}} + \ldots + c_p \left[\bvec{u}_p\right]_{\mathcal{B}}\]
+
+        Ça, et la bijectivité de $\bvec{x} \mapsto \left[\bvec{x}\right]_{\mathcal{B}}$ donnent un sens précis à l'intuition que $V$ et $\mathbb{R}^{n}$ ``se ressemblent fortement'' (le fait que ce soit un isomorphisme, nous permet de savoir qu'il y a le même nombre d'éléments).
+
+        De plus, la linéarité nous permet de nous rendre compte que, si des vecteurs sont linéairement dépendants dans une base, alors ils le seront aussi dans n'importe quelle autre base ; et de la même manière s'ils sont linéairement indépendants. Cette propriété est très puissante.
+
+    }
+}
+
+\end{document}

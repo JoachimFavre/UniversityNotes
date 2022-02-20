@@ -1,0 +1,292 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-06 at 10:18:50.
+
+\usepackage{../../style}
+
+\title{Analyse 1}
+\author{Joachim Favre}
+\date{Lundi 06 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{21}{2021-12-06}{Propriétés des DL, et rayons de convergence}{
+\begin{itemize}[left=0pt]
+    \item Explication des opérations algébriques sur les développements limités, et des développements limités de fonctions composées.
+    \item Explication du calcul de limites par développements limités.
+    \item Définition des séries entières, et de leur domaine de convergence.
+    \item Démonstration que le domaine de convergence d'une série entière est toujours un intervalle contenant $x_0$ et centré sur ce dernier.
+    \item Définition du rayon de convergence.
+\end{itemize}
+
+}
+
+\subsection{Retour aux développements limités}
+\parag{Proposition: opérations algébriques sur les DL}{
+    Soient $f,g : E \mapsto \mathbb{R}$ deux fonction admettant un DL autour de $x = a$:
+    \[f\left(x\right) = a_0 + a_1\left(x - a\right) + \ldots + a_n\left(x - a\right)^n + \left(x - a\right)^n \epsilon_1\left(x\right) = P_f^n\left(x\right) + \left(x - a\right)^n \epsilon_1\left(x\right)\]
+    \[g\left(x\right) = b_0 + b_1\left(x - a\right) + \ldots + b_n\left(x - a\right)^n + \left(x - a\right)^n \epsilon_2\left(x\right) = P_g^n\left(x\right) + \left(x - a\right)^n \epsilon_2\left(x\right)\]
+    \[\lim_{x \to a} \epsilon_1\left(x\right) = 0, \mathspace \lim_{x \to a} \epsilon_2\left(x\right) = 0\]
+
+    Alors:
+    \begin{enumerate}
+        \item $\alpha f\left(x\right) + \beta g\left(x\right)$ admet un DL d'ordre $n$ autour de $x = a$ et:
+            \[P^n_{\alpha f + \beta g}\left(x\right) = \alpha P_{f}^n\left(x\right) + \beta P_g^n\left(x\right)\]
+        \item $f\left(x\right)g\left(x\right)$ admet aussi un DL d'ordre $n$:
+            \[P_{f \cdot g}^n\left(x\right) = P_f^n\left(x\right) P_g^n\left(x\right)\]
+            où on ne conserve que les termes d'ordre $\leq n$.
+
+        \item Si $b_0 \neq 0$ et $g\left(x\right) \neq 0$, alors:
+            \[P^n_{\frac{f}{g}}\left(x\right) = \frac{P_f^n\left(x\right)}{P_{g}^n\left(x\right)}\]
+
+    \end{enumerate}
+}
+
+\parag{Exemple}{
+    Trouvons le DL d'ordre 4 autour de $x = 0$ de la fonction suivante:
+    \[f\left(x\right) = \frac{1}{1 - x^2}\]
+
+    \subparag{Méthode 1}{
+        Utilisons les fractions partielles et la première propriété:
+        \begin{multiequality}
+        \frac{1}{1 - x^2} =\ & \frac{1}{2} \frac{1}{1-x} + \frac{1}{2} \frac{1}{1+x}  \\
+        =\ & \frac{1}{2}\left(1 + x + x^2 + x^4 + x^4 \epsilon_1\left(x\right)\right)  \\
+         & + \frac{1}{2} \left(1 - x + x^2 - x^3 + x^4 + x^4 \epsilon_2\left(x\right)\right)  \\
+        =\ & 1 + x^2 + x^4 + \epsilon\left(x\right) x^4
+        \end{multiequality}
+
+    }
+
+    \subparag{Méthode 2}{
+        Nous aurions aussi pu utiliser la deuxième propriété:
+        \begin{multiequality}
+        \frac{1}{1 - x^2} =\ & \frac{1}{1-x} \cdot \frac{1}{1 + x} \\
+        =\ & \left(1 + x + x^2 + x^3 + x^4 + \epsilon_1\left(x\right) x^4\right) \\
+        & \cdot\left(1 - x + x^2  - x^3 + x^4 + \epsilon_2\left(x\right)x^4\right)  \\
+        =\ & 1 + x + x^2 + x^3 + x^4 + \left(-x -x^2 -x^3 - x^4\right)  \\
+        & + \left(x^2 + x^3 + x^4\right) + \left(-x^3 -x^4\right) + x^4 + \epsilon\left(x\right) x^4 \\
+        =\ & 1 + x^2 + x^4 + \epsilon\left(x\right)x^4
+        \end{multiequality}
+    }
+
+    \subparag{Méthode 3}{
+        Nous aurions pu utiliser la troisième proposition. En effet, faisons une division en colonne:
+
+        \begin{center}
+        \begin{tabular}{c@{\,}c@{\,}c@{\,}c@{\,}c@{\,}c@{\,}c@{\,}c@{\,}|l}
+            1 &   &    &   &    &   &    & $\quad$ & $1 - x^2$ \\
+            \hhline{~~~~~~~~|-}
+            1 & $-$ & $x^2$ &   &    &   &    &   & $1 + x^2 + x^4 + \ldots$ \\
+            \hhline{---~~~~~|~}
+              &   & $x^2$ &   &    &   &    &   & \\
+              &   & $x^2$ & $-$ & $x^4$ &   &    &   & \\
+            \hhline{~~---~~~|~}
+              &   &    &   & $x^4$ &   &    &   & \\
+              &   &    &   & $x^4$ & $-$ & $x^6$ &   & \\
+            \hhline{~~~~---~|~}
+              &   &    &   &    &   & $x^6$ &   & \\
+              &   &    &   &    &   & $\vdots$  &   &
+        \end{tabular}
+        \end{center}
+
+        Ainsi, en prenant les termes de degré $\leq 4$, on a bien:
+        \[\frac{1}{1 - x^2} = 1 + x^2 + x^4 + \epsilon\left(x\right) x^4\]
+    }
+
+    \subparag{Méthode 4}{
+        Quatrièmement, nous aurions pu utiliser une autre méthode, dite des coefficients indéterminés. On cherche des coefficients tels que:
+        \[f\left(x\right) = a_0 + a_1 x + a_2 x + a_3 x^3 + a_4 x^4 + x^4 \epsilon\left(x\right) = \frac{1}{\left(1-x\right)^2}\]
+
+        De là, on en déduit que:
+        \[\left(a_0 + a_1 x + a_2 x^2 + a_3 x^3 + a_4 x^4\right)\left(1 - x^2\right) = 1 \text{ jusqu'à l'ordre 4}\]
+
+        En développant, on trouve le système suivant:
+        \[a_0 = 1, \mathspace a_1 = 0, \mathspace a_2 - a_0 = 0, \mathspace a_3 - a_1 = 0, \mathspace a_4 - a_2 = 0\]
+
+        En résolvant ce système, on obtient:
+        \[a_0 = 1, \mathspace a_1 = 0, \mathspace a_2 = 1, \mathspace a_3 = 0, \mathspace a_4 = 1\]
+
+        On a donc bien obtenu:
+        \[f\left(x\right) = 1 + x^2 + x^4 + \epsilon\left(x\right) x^4\]
+    }
+}
+
+\parag{Proposition: DL d'une fonction composée}{
+    Soient $f$ et $g$, deux fonctions, où $f$ admet un DL autour de $x = a$, et $g$ autour de $y = 0$:
+    \[f\left(x\right) = a_1\left(x - a\right) + \ldots + a_n\left(x - a\right)^n + \left(x - a\right)^n \epsilon_1\left(x\right)\]
+    \[g\left(y\right) = g\left(0\right) + b_1 y + \ldots + b_n y^n + y^n \epsilon_2\left(y\right)\]
+
+    Alors, $g \circ f$ admet un DL d'ordre $n$ autour de $x = a$, donné par:
+    \[P_{g \circ f}^n\left(x\right) = g\left(0\right) + b_1\left(P_f^n\left(x - a\right)\right) + b_2\left(P_f^n\left(x - a\right)\right)^2 + \ldots + b_n\left(P_f^n\left(x - a\right)^n\right)\]
+    où on ne conserve que les termes d'ordre $\leq n$.
+}
+
+\parag{Exemple}{
+    Reprenons notre exemple ci-dessus, calculons le DL de la fonction suivante autour de $x = 0$:
+    \[h\left(x\right) = \frac{1}{1 - x^2}\]
+
+    Prenons $g\left(y\right) = \frac{1}{1 - y}$ et $f\left(x\right) = x^2$. On voit que $f$ est son propre développement limité autour de $x = 0$, donc:
+    \[g\left(y\right) = 1 + y + y^2 + y^3 + y^4 + \epsilon_1\left(y\right) y^4, \mathspace f\left(x\right) = x^2\]
+
+    Ainsi, on peut remplacer $y = x^2$:
+    \[h\left(x\right) = 1 + \left(x^2\right) + \left(x^2\right)^2 + \epsilon\left(x\right)x^4 = 1 + x^2 + x^4 + \epsilon\left(x\right) x^4\]
+}
+
+\subsection{Développements limités pour le calcul des limites}
+\parag{Exemple}{
+    Disons que nous voulons calculer la limite suivante (qui est une forme indéterminée $\frac{0}{0}$):
+    \[\lim_{x \to 0} \frac{\sin^2 x - x^2}{\left(e^x  - 1 - x\right)^2}\]
+
+    On se souvient que:
+    \[\sin\left(x\right) = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \ldots\]
+
+    De plus, on connait déjà le développement limité de $e^x$, par sa définition:
+    \[e^x = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \ldots = \sum_{k=0}^{\infty} \frac{x^k}{k!} = \sum_{k=0}^{\infty} \frac{f^{\left(k\right)}\left(0\right)}{k!} x^k\]
+
+    Commençons par le dénominateur:
+    \[\left(e^x - 1 - x\right)^2 = \left(\frac{x^2}{2} + \frac{x^3}{3!} + \frac{x^4}{4!} + \ldots\right)^2 = \left(\frac{x^2}{2}\right)^2 + \epsilon_1\left(x\right) x^4 = \frac{x^4}{4} + \epsilon_1\left(x\right) x^4\]
+
+    On prend le premier terme qui n'est pas 0. Nous aurons peut-être besoin d'aller plus loin, mais pas nécessairement.
+
+    De plus:
+    \[\sin^2\left(x\right) = \left(x - \frac{x^3}{3!} + \frac{x^5}{5!} - \ldots\right)^2 = x^2 - 2 \frac{x x^3}{3!} + \epsilon_2\left(x\right) x^4 = x^2 - \frac{1}{3}x^4 + \epsilon_2\left(x\right) x^4\]
+
+    On prend un développement limité du même ordre que le dénominateur.
+
+    Ainsi, on obtient par les opérations algébriques sur les limites:
+    \[\lim_{x \to 0} \frac{\sin^2\left(x\right) - x^2}{\left(e^x - 1 - x\right)^2} = \lim_{x \to 0} \frac{x^2 - \frac{1}{3} x^4 + \epsilon_2\left(x\right) x^4 - x^{2}}{\frac{x^4}{4} + \epsilon_1\left(x\right) x^4} = \lim_{x \to 0} \frac{\frac{-1}{3}x^4 + \epsilon_2\left(x\right)x^4}{\frac{x^4}{4} + \epsilon_1\left(x\right)x^4}\]
+
+    Ainsi, en simplifiant les $x^4$, on obtient que c'est égal à:
+    \[\lim_{x \to 0} \frac{\frac{-1}{3} + \epsilon_2\left(x\right)}{\frac{1}{4} + \epsilon_1\left(x\right)} = \frac{-4}{3}\]
+
+
+    \subparag{Note 1}{
+        Si on n'avait pas calculé assez de terme pour un développement limité, on se serait retrouvé avec une forme indéterminée de la forme $\frac{\epsilon_1\left(x\right)}{\epsilon_2\left(x\right)}$. Si on avait calculé trop de termes, alors ils tendraient juste vers 0, donc ce ne serait pas un problème.
+
+        Dans les deux cas, cela nous force à faire trop de calculs, mais ce n'est pas ``grave'', on n'obtient pas la mauvaise valeur à la fin.
+    }
+
+    \subparag{Note 2}{
+        Cette méthode est plus puissante que Bernoulli-L'Hospital. Si BL fonctionne, alors cette méthode fonctionne. Notez que, si on utilise BL pour cet exemple, il faudra dériver quatre fois.
+    }
+}
+
+\parag{Exercice au lecteur}{
+    Calculez la limite suivante à l'aide des développements limités:
+    \[\lim_{x \to 0} \frac{e^{\sin\left(x\right)} - e^x}{x^3}\]
+
+}
+
+\section{Séries entières}
+\subsection{Rayon de convergence}
+\parag{Définition}{
+    On appelle \important{série entière} les expressions sous la forme:
+    \[\sum_{k=0}^{\infty} a_k\left(x - x_0\right)^k, \mathspace a_k \in \mathbb{R}\ \forall k \in \mathbb{N}\]
+
+    Le \important{domaine de convergence} est défini par:
+    \[D = \left\{x \in \mathbb{R} \telque \sum_{k=0}^{\infty} a_k\left(x - x_0^k\right) \text{ converge}\right\}\]
+
+    La fonction $f\left(x\right) = \sum_{k=0}^{\infty} a_k\left(x - x_0\right)^k$ avec $x\in D$ est définie par la série entière.
+}
+
+\parag{Exemple 1}{
+    Par la définition de l'exponentielle:
+    \[e^x \over{=}{déf} \sum_{k=0}^{\infty} \frac{x^k}{k!}\]
+
+    On peut (re-)trouver son domaine de convergence. Utilisons le critère de d'Alembert:
+    \[\lim_{k \to \infty} \left|\frac{a_{k+1}}{a_k}\right| = \lim_{k \to \infty} \left|\frac{x^{k+1}}{\left(k + 1\right)!} \cdot \frac{k!}{x^k}\right| = \lim_{k \to \infty} \frac{\left|x\right|}{k + 1} = 0, \mathspace \forall x \in \mathbb{R}\]
+
+    Ainsi, cette série entière converge pour tout $x$ dans $\mathbb{R}$, donc $D = \mathbb{R}$.
+}
+
+\parag{Exemple 2}{
+    Prenons la série entière suivante:
+    \[\sum_{k=0}^{\infty} a_k\left(x - x_0\right)^k, \mathspace a > 0\]
+
+    À nouveau, on peut utiliser le critère de d'Alembert:
+    \[\left|\frac{a^{k+1}\left(x - x_0\right)^{k+1}}{a^k \left(x - x_0\right)^k}\right| = a \left|x - x_0\right|\]
+
+    Donc, si $\left|x - x_0\right| < \frac{1}{a}$, alors la série converge absolument. Si $\left|x - x_0\right| > \frac{1}{a}$, alors elle diverge grossièrement. On doit encore considérer les cas où $\left|x - x_0\right| = \frac{1}{a}$.
+
+    Si $x = x_0 + \frac{1}{a}$, alors on a:
+    \[\sum_{k=0}^{\infty} a^k \frac{1}{a^k} = \sum_{k=0}^{\infty} 1 \text{, qui diverge}\]
+
+    Si $x = x_0 - \frac{1}{a}$, alors:
+    \[\sum_{k=0}^{\infty} a^k \left(\frac{-1}{a}\right)^k = \sum_{k=0}^{\infty} \left(-1\right)^k \text{, qui diverge}\]
+
+    On peut donc en déduire que:
+    \[D = \left]x_0 - \frac{1}{a}, x_0 + \frac{1}{a}\right[ \]
+}
+
+\parag{Théorème: rayon de convergence}{
+    Soit la série entière $\sum_{k=0}^{\infty} a_k\left(x - x_0\right)^{k}$.
+
+    Il existe $r$, son \important{rayon de convergence}, où $0 \leq r \leq +\infty$, tel que:
+    \begin{enumerate}
+        \item La série converge absolument pour tout $x$ tels que $\left|x - x_0\right| < r$.
+        \item La série diverge pour tout $x$ tels que $\left|x - x_0\right| > r$
+    \end{enumerate}
+
+    \subparag{Remarque 1}{
+        La convergence de la série entière en $x = x_0 \pm r$ doit être étudié séparément.
+    }
+
+    \subparag{Remarque 2}{
+        On voit donc que $D$ est un intervalle qui contient $x_0$, et centré en $x_0$.
+    }
+
+    \subparag{Remarque 3}{
+        Si $r \neq 0$ et $r \in \mathbb{R}_+$, alors $D$ est un des 4 intervalles suivants:
+        \[\left]x_0 - r\right[, \mathspace \left[x_0 - r\right[, \mathspace \left]x_0 - r\right], \mathspace \left[x_0 - r\right]  \]
+
+        Si $r = 0$, alors $D = \left\{x_0\right\}$. Par exemple, la série entière $\sum_{k=0}^{\infty} k! x^k$ ne converge que si $x = 0$, donc $D = \left\{0\right\}$.
+
+        Si $r = +\infty$, alors $D = \mathbb{R}$. Par exemple, la série entière $\sum_{k=0}^{\infty} \frac{x^k}{k!} = e^x$ converge pour tout $x$, donc $r = +\infty$ et $D = \mathbb{R}$.
+    }
+}
+
+\parag{Proposition}{
+    Soit $\sum_{k=0}^{\infty} a_k\left(x - x_0\right)^k$ une série entière de rayon de convergence $r$.
+    \begin{enumerate}
+        \item Supposons que $a_k \neq 0$ pour tout $k \in \mathbb{N}$. Si $\lim_{k \to \infty} \left|\frac{a_{k+1}}{a_k}\right| = \ell$, où $0 \leq \ell \leq +\infty$, alors $r = \frac{1}{\ell}$.
+
+        On a donc:
+        \[r = \lim_{k \to \infty} \left|\frac{a_k}{a_{k+1}}\right|\]
+
+        \item Si $\lim_{k \to \infty} \left|a_k\right|^{\frac{1}{k}} = \ell$ avec $0 \leq \ell \leq +\infty$, alors $r = \frac{1}{\ell}$.
+    \end{enumerate}
+
+    \subparag{Preuve du point 1}{
+        Utilisions le critère de d'Alembert:
+        \[\lim_{x \to \infty} \left|\frac{a_{k+1} \left(x - x_0\right)^{k+1}}{a_k \left(x - x_0\right)^k}\right| = \lim_{k \to \infty} \underbrace{\left|x - x_0\right|}_{\text{constant}} \underbrace{\left|\frac{a_{k+1}}{a_k}\right|}_{\to \ell} = \left|x - x_0\right| \ell\]
+
+        Donc, la série converge absolument si $\left|x - x_0\right|\ell < 1$, ce qui est équivalent à:
+        \[\left|x - x_0\right| < \frac{1}{\ell} = r\]
+
+        De la même manière, la série diverge grossièrement si $\left|x - x_0\right| \ell > 1$, ce qui est équivalent à:
+        \[\left|x - x_0\right| > \frac{1}{\ell} = r\]
+    }
+}
+
+\parag{Exemple}{
+    Soit la série entière suivante:
+    \[\sum_{n=1}^{\infty} \frac{x^n}{n2^n} = \sum_{n=1}^{\infty} a_n x^n, \mathspace a_n = \frac{1}{n 2^n}\]
+
+    Utilisons la première partie de la proposition:
+    \[\lim_{n \to \infty} \left|\frac{a_n}{a_{n+1}}\right| = \lim_{n \to \infty} \frac{1}{n 2^n} \frac{\left(n + 1\right)2^{n+1}}{1} = \lim_{n \to \infty} \frac{2\left(n+1\right)}{n} = 2\]
+
+    Notre rayon de convergence est donc $r = 2$, on en déduit que $\left]-2, 2\right[ \subset D$. Nous devons encore étudier $x = \pm 2$. Commençons par $x = 2$:
+    \[\sum_{n=1}^{\infty} \frac{2^n}{n 2^n} = \sum_{n=1}^{\infty} \frac{1}{n}\]
+    qui diverge puisque c'est la série harmonique. Donc, $2 \not \in D$.
+
+    Étudions maintenant $x = -2$:
+    \[\sum_{n=1}^{\infty} \frac{\left(-2\right)^n}{n2^n} = \sum_{n=1}^{\infty} \frac{\left(-1\right)^n}{n}\]
+    qui est la série harmonique alternée et qui converge par le critère de Leibniz. Donc, $2 \in D$.
+
+    Ainsi, on en déduit que notre domaine de convergence est $D = \left[-2, 2\right[ $, avec un rayon de convergence $r = 2$.
+}
+
+
+
+\end{document}

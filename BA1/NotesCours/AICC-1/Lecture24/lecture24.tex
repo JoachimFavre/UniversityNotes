@@ -1,0 +1,429 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-08 at 15:18:41.
+
+\usepackage{../../style}
+
+\title{AICC 1}
+\author{Joachim Favre}
+\date{Mercredi 08 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{24}{2021-12-08}{Soon rich at a casino (by making one ofc)}{
+\begin{itemize}[left=0pt]
+    \item Laplace's definition of probabilities. 
+    \item Definition of complementary events, and proof of the probabilities of complements and unions.
+    \item Definition of probability distributions, and of the uniform distribution.
+    \item Definition of the probability of an event which does not follow a uniform distribution.
+    \item Definition of conditional probability, and explanation on how to compute them.
+    \item Definition of the independence of two events, and generalisation to more events with pairwise independence and mutually independence. 
+    \item Explanation of lots of examples.
+\end{itemize}
+}
+
+\section{Probabilities}
+\subsection{Introduction and history}
+\parag{Short history}{
+    The first treatise of probability was written by Cardano in the \nth{16} century, because he was short on money and started gambling. Thus, probabilities began with gambling!
+
+    Then, in the \nth{18} century, Bayes developed Bayes' theorem, which is the first concept of statistical data analysis. During the same century, Laplace developed the classical theory of probability, analysing games of chance.
+
+    In the \nth{20} century, Kolmogorov developed the modern axiomatic of probability theory, yielding probabilities over real numbers. This is much more complex than what we will see. 
+}
+
+\parag{Definitions}{
+    An \important{experiment} is a procedure that yields one \important{outcome} out of a given set. The \important{sample space}, $S$, of the experiment is the set of possible outcomes. An \important{event} $E$ is a subset of the sample space. An event \important{occurs} if the outcome belongs to the sample space.
+
+    \subparag{Example}{
+        Rolling a dice is an experiment, its sample space is $S = \left\{1, 2, 3, 4, 5, 6\right\}$, an event could be $E = \left\{5, 6\right\}$ (rolling a 5 or a 6), and, for instance, this even occurs when rolling a 6.
+    }
+}
+
+\parag{Definition of probability}{
+    If $S$ is a finite sample space of equally likely outcomes, and $E$ is an event (so a subset of $S$), then the \important{probability} of $E$ is:
+    \[p\left(E\right) = \frac{\left|E\right|}{\left|S\right|}\]
+
+    \subparag{Observation}{
+        We notice that, for every event $E$, we have: 
+        \[0 \leq p\left(E\right) \leq 1\]
+
+        Indeed, $E \subset S$, so $0 \leq \left|E\right| \leq \left|S\right|$. By convention, no probability is negative or strictly greater than 1.
+    }
+
+    \subparag{Note}{
+        This definition is known as the ``classical definition of probability'', or Laplace's definition. Indeed, in Laplace's \textit{Théorie Analytique des Probabilités}, he writes:
+        
+        \vspace{1em}
+        
+        ``\texttt{La théorie des probabilités consiste à réduire tous les événements qui peuvent avoir lieu dans une circonstance donnée, à un certain nombre de cas également possibles, c'est-à-dire tels que nous soyons également indécis sur leur existence, et à déterminer parmi ces cas, le nombre de ceux qui sont favorables à l'événement dont on cherche la probabilité. Le rapport de ce nombre à celui de cas possibles, est la mesure de cette probabilité qui n'est donc qu'une fraction dont le numérateur est le nombre des cas favorables, et dont le dénominateur est celui de tous les cas possibles.}''
+
+        \vspace{1em}
+
+        Wikipedia (accessed on \nth{8} December 2021) writes it more concisely, in English:
+
+        \vspace{1em}
+
+        ``\texttt{The probability of an event is the ratio of the number of cases favorable to it, to the number of all cases possible when nothing leads us to expect that any one of these cases should occur more than any other, which renders them, for us, equally possible.}''
+    }
+    
+    \subparag{Fallacies}{
+        Note that we always have to be careful when applying probabilities. For example, the prosecutor's fallacy (on which I will come back in the next lesson (aha it's a cliffhanger)) has already led to people getting convicted for crimes they had not done.
+    }
+}
+
+\parag{Example}{
+    We wonder what is the probability that, when rolling two (fair) dice, their sum gives 7. 
+
+    By basic combinatorics, both dice can give 6 values, so $\left|S\right| = 6 \cdot 6 = 36$. For $E$, we can list the possibilities: 
+    \[E = \left\{\left(1, 6\right), \left(2, 5\right), \left(3, 4\right), \left(4, 3\right), \left(5, 2\right), \left(6, 1\right)\right\} \implies \left|E\right| = 6\]
+
+    So, we can compute the probability: 
+    \[p\left(E\right) = \frac{6}{36} = \frac{1}{6}\]
+
+    Now, let's compute the probability to have a 6 in one of those dice (that at least one die rolls a 6). Again, let's list the elements of $E_2$: 
+    \[E_2 = \left\{\left(1, 6\right), \left(2, 6\right), \left(3, 6\right), \left(4, 6\right), \left(5, 6\right), \left(6, 6\right), \left(6,1\right), \left(6, 2\right), \left(6, 3\right), \left(6, 4\right), \left(6, 5\right)\right\}\]
+    
+    So, $\left|E_2\right| = 11$. We can now compute $p\left(E_2\right)$:
+    \[p\left(E_2\right)= \frac{11}{36} \approx 0.31\]
+
+    \subparag{Terminology}{
+        Note that, in English, we say ``one die'' (singular), and ``multiple dice'' (plural).
+
+        This is not absolute, it is the subject of controverses amongst English speakers: some say that we should use the word ``dice'' in singular. In any case, the word ``dices'' does not exist as a noun. Anyhow, we will use the convention explained hereinabove in this course.
+    }
+}
+
+\parag{Example 2}{
+    For the EuroMillions, we choose a set of 5 numbers out of 50 and 2 numbers out of 12. We wonder what is the probability that a person picks the correct 7 numbers.
+
+    The number of ways to choose 5 numbers out of 50 and to choose 2 number out of 12 is, by the product rule: 
+    \[C\left(50, 5\right)C\left(12, 2\right) = 139\,838\,160\]
+    
+    Since there is only one exact combination that gives the win, the size of the event space is 1. Thus, the probability of winning is given by: 
+    \[\frac{1}{139\,838\,160} \approx \SI{0.000000715}{\percent} = 7.15 \cdot 10^{-9}\]
+}
+
+\parag{Example 3}{
+    Let's say we wonder what is the probability that the numbers $11, 4, 17, 39, 23$ are drawn in that order from a bin with $50$ balls labelled with the numbers from $1$ to $50$. 
+
+    If the ball selected is not returned to the bin, then the size of the sample space is given by a permutation; the size of the event is 1 since there is exactly winning combination. So, the probability is given by: 
+    \[\frac{1}{50\cdot 49 \cdot 48 \cdot 47 \cdot 46} = \frac{1}{254\,251\,200}\]
+    
+    Now, if the ball is returned to the bin before the next ball is selected, we have a permutation with repetitions, so the probability is given by: 
+    \[\frac{1}{50^{5}} = \frac{1}{312\,500\,000}\]
+    
+}
+
+\subsection{Properties of probabilities}
+\parag{Theorem: complements of events}{
+    Let $E$ be an event in a sample space $S$. The probability of the event $\bar{E} = S \setminus E$, the \important{complementary events} of $E$, is given by: 
+    \[p\left(\bar{E}\right) = 1 - p\left(E\right)\]
+    
+    \subparag{Proof}{
+        Using set theory, we get: 
+        \[p\left(\bar{E}\right) = \frac{\left|\bar{E}\right|}{\left|S\right|} = \frac{\left|S \setminus E\right|}{\left|S\right|} = \frac{\left|S\right| - \left|E\right|}{\left|S\right|} = 1 - p\left(E\right)\]
+
+        \qed
+    }
+    
+    \subparag{Example}{
+        The probability not to roll a 6 with 2 dice is: 
+        \[1 - \frac{11}{36} = \frac{25}{36} \approx \SI{70}{\percent}\]
+    }
+}
+
+\parag{Example}{
+    A sequence of 10 bits is chosen randomly. We wonder what is the probability that at least one of these bits is 0.
+
+    We notice that the total number of strings is given by: 
+    \[\left|S\right| = 2^{10} = 1024\]
+    
+    The probability that all bits are 1 is given by $\frac{1}{1024}$, thus the probability that there is at least one 0 is given by: 
+    \[1 - \frac{1}{1024} = \frac{1023}{1024}\]
+    
+}
+
+\parag{Theorem: probability of unions}{
+    Let $E_1$ and $E_2$ be events in a sample space $S$. Then: 
+    \[p\left(E_1 \cup E_2\right) = p\left(E_1\right) + p\left(E_2\right) - p\left(E_1 \cap E_2\right)\]
+
+    \subparag{Proof}{
+        The proof follows from the inclusion-exclusion formula.
+    }
+}
+
+\parag{Example 1}{
+    Let the sample space be positive integers not exceeding 100. We wonder what is the probability that a positive integer selected at random from this sample space is divisible by either 2 or 5.
+
+    Let $E_1$ be the event that the number is divisible by 2, and $E_2$ that the number is divisible by $5$. This yields that $E_1 \cup E_2$ is the even that the integer is divisible by $2$ or $5$, and $E_1 \cap E_2$ that the integer is divisible by $2$ and $5$.
+
+    So, we can compute our probability: 
+    \[p\left(E_1 \cup E_2\right) = p\left(E_1\right) + p\left(E_2\right) - p\left(E_1 \cap E_2\right) = \frac{50}{100} + \frac{20}{100} - \frac{10}{100} = \frac{3}{5}\]
+}
+
+\parag{Example 2}{
+    Let's get back a previous example: we roll two dice and we want to know the probability to roll a 6.
+
+    Let's pick $E_1$ to be the event that the first die is 6, and $E_2$ that the second die is 6. Thus, we have: 
+    \[p\left(E_1 \cup E_2\right) = \frac{1}{6} + \frac{1}{6} - \frac{1}{36} = \frac{11}{36}\]
+}
+
+\subsection{Probabilities without equally likely outcomes}
+\parag{Limitation of Laplace's definition}{
+    We assumed that all outcomes are equally likely, but this is not the case.
+
+    For example, let's compute the sum of rolling two dice. The set of possible outcomes is 
+    \[S = \left\{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12\right\}\]
+    
+    However, drawing the following table, we can see that they are not all equally likely:
+    \begin{center}
+    \begin{tabular}{c|ccccccccc}
+        $+$ & 1  & 2  & 3  & 4  & 5  & 6  \\
+        \hline
+        1 & 2  & 3  & 4  & 5  & 6  & 7  \\
+        2 & 3  & 4  & 5  & 6  & 7  & 8  \\
+        3 & 4  & 5  & 6  & 7  & 8  & 9  \\
+        4 & 5  & 6  & 7  & 8  & 9  & 10 \\
+        5 & 6  & 7  & 8  & 9  & 10 & 11 \\
+        6 & 7  & 8  & 9  & 10 & 11 & 12 \\
+    \end{tabular}
+    \end{center}
+
+    Indeed, for example the sum gives 7 six times more often than 2.
+}
+
+\parag{Definition: Probability distribution}{
+    Let $S$ be a sample space of an experiment with a finite or countable number of outcomes. We assign a probability $p\left(s\right)$ to each outcome $s$, so that:
+    \begin{enumerate}
+        \item $0 \leq p\left(s\right) \leq 1$, for each $s \in S$
+        \item $\displaystyle \sum_{s \in S}^{} p\left(s\right) = 1$
+    \end{enumerate}
+    
+    The function $p$ from the set of all outcomes of the sample space $S$ is called a \important{probability distribution}.
+}
+
+\parag{Example 1}{
+    We roll two dice, and compute their sum. The set of possible outcomes is: 
+    \[S = \left\{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12\right\}\]
+
+    Looking at the table drawn above, there each diagonal only has one number, so we get that the probability distribution is given by:
+    \[p\left(7 - i\right) = \frac{6 - \left|i\right|}{36}, \mathspace -5 \leq i \leq 5\]
+
+    So, more explicitly: 
+    \[p\left(i\right) = \frac{6 - \left|7 - i\right|}{36}, \mathspace 2 \leq i \leq 12\]
+}
+
+\parag{Example 2}{
+    Let's take a biased coin such that heads ($H$) come up twice as often as tails ($T$). We wonder what probabilities we should assign to the outcomes $H$ and $T$.
+
+    This gives us a first equation: 
+    \[P\left(H\right) = 2P\left(T\right)\]
+
+    Moreover, since probabilities must add up to one (it is in the definition of probability distributions): 
+    \[P\left(H\right) + P\left(T\right) = 1\]
+    
+    This is a system of 2 equations with 2 unknowns. Solving it, we get: 
+    \[P\left(H\right) = \frac{2}{3}, \mathspace P\left(T\right) = \frac{1}{3}\]
+    
+}
+
+\parag{Definition: Uniform distribution}{
+    Let $S$ be a set with $n$ elements. The \important{uniform distribution} assigns the probability $\frac{1}{n}$ to each elements of $S$, i.e: 
+    \[p\left(s\right) = \frac{1}{n}, \mathspace \forall s \in S\]
+    
+    \subparag{Example}{
+        The distribution in a fair coin-flipping experiement is uniform: 
+        \[p\left(H\right) = P\left(T\right) = \frac{1}{2}\]
+    }
+
+    \subparag{Note}{
+        Laplace's definition supposes we only work with uniform distributions.
+    }
+    
+}
+
+\parag{Definition: Probability of an event}{
+    The \important{probability} of the event $E$ is the sum of the probabilities of the outcomes in $E$. In other words: 
+    \[p\left(E\right) = \sum_{s \in E}^{} p\left(s\right)\]
+}
+
+\parag{Example}{
+    Let's say that we have a biased die so that $3$ appears twice as often as each other number, but that the other five outcomes are equally likely. We wonder what is the probability that an odd numbers appears when we roll this die.
+
+    The informations above give us the following equation: 
+    \[p\left(3\right) = 2P, \mathspace p\left(s\right) = P\ \forall s \in \left\{1,2,4,5,6\right\}\]
+    
+    Moreover, since probabilities have to add up to 1: 
+    \[\sum_{s \in S}^{} p\left(s\right) = 5P + p\left(3\right) = 7P = 1 \implies P = \frac{1}{7}\]
+    
+    So, the probability of having an odd number is given by: 
+    \[\sum_{s \in \left\{1, 3, 5\right\}}^{} p\left(s\right) = p\left(1\right) + p\left(3\right) + p\left(5\right) = \frac{4}{7}\]
+    which is higher than with a fair die.
+}
+
+\parag{Complements and unions}{
+    The two following properties still hold with our new definition:
+    \[p\left(\bar{E}\right) = 1 - p\left(E\right), \mathspace p\left(E_1 \cup E_2\right) = p\left(E_1\right) + p\left(E_2\right) - p\left(E_1 \cap E_2\right)\]
+
+    \subparag{Proof of the first equality}{
+        This is a direct proof: 
+        \[p\left(\bar{E}\right) = \sum_{s \in \bar{E}}^{} p\left(s\right) = \sum_{s \in S \setminus E}^{} p\left(s\right) = \sum_{s \in S}^{} p\left(s\right) - \sum_{s \in E}^{} p\left(s\right) = 1 - p\left(E\right) \]
+
+        \qed
+    }
+}
+
+\subsection{Conditional probability}
+\parag{Introduction}{
+    Often, probabilities exist in some context, or when a certain condition is satisfied. 
+
+    For example, we may wonder what is the chance to test positive on Covid-19. This is probably a different probability than the chance to test positive on Covid if one feel sick.
+
+    Moreover, the chance of having a head if the last 5 coin tosses were tails is the same as having a head without any context; but it would be nice to have a way to prove this.
+}
+
+\parag{Definition: conditional probability}{
+    Let $E$ and $F$ be events, with $p\left(F\right) \neq 0$. The \important{conditional probability} of $E$ given $F$, denoted by $p\left(E | F\right)$, is defined as: 
+    \[p\left(E|F\right) = \frac{p\left(E \cap F\right)}{p\left(F\right)}\]
+    
+    It can be interpreted as the probability that $E$ occurs, give the fact (or knowing) that $F$ occurs.
+
+    \subparag{Intuition}{
+        It is like if we had a new sample space: F.
+
+        \imagehere{ConditionalProbability.png}
+    }
+}
+
+\parag{Example 1}{
+    We roll a dice, and we wonder what is the probability that the outcome is even. Without any additional knowledge, this is $\frac{3}{6} = \frac{1}{2}$.
+
+    However, if we know that the roll gave a number less than or equal to 3, then we need to compute conditional probability. Let $E$ be the event that the outcome is even, and $F$ be that the die gives a value less than or equal to $3$. Both $p\left(E\right)$ and $p\left(F\right)$ are $\frac{1}{2}$. Finally, $E \cap F$ is the event that the outcome is even and it is less than or equal to three, so $p\left(E \cap F\right) = \frac{1}{6}$ (the only possibility is that the die gives 2). Thus: 
+    \[p\left(E | F\right) = \frac{p\left(E \cap F\right)}{p\left(F\right)} = \frac{\frac{1}{6}}{\frac{1}{2}} = \frac{1}{3}\]
+}
+
+\parag{Example 2}{
+    We toss a coin 6 times. We wonder what is the probability that the last toss is heads. If we don't know anything more, then the probability is $\frac{1}{2}$.
+
+    Let's now analyse the case in which the first five tosses are tails. Let $E$ be the event that the last toss is heads ($p\left(E\right) = \frac{1}{2}$) and $F$ be that the first 5 tosses are tail ($p\left(F\right) = \frac{1}{2^{5}}$). We see that $E \cap F$ is the event of having 5 tosses followed by a head and its probability is given by $p\left(E \cap F\right) = \frac{1}{2^6}$ (this event is an exact sequence, so this is the reciprocal of the sample space size). So, we can compute the probability: 
+    \[p\left(E | F\right) = \frac{p\left(E \cap F\right)}{p\left(F\right)} = \frac{\frac{1}{2^6}}{\frac{1}{2^5}} = \frac{1}{2}\]
+    
+    This is often known as the gambler fallacy, or Monte Carlo fallacy.
+
+    \subparag{Intuition}{
+        This makes sense, since the coin has ``no way to know'' what the previous events were. If there was a higher probability of getting heads after having tails, then what would happen if we toss 5 heads, wait a day and toss the coin again? What if it were somebody else who tossed the coin? Those questions reveal that there must be a problem, and thus that the probability is indeed $\frac{1}{2}$.
+    }
+}
+
+\parag{Definition: Independence}{
+    The events $E$ and $F$ are \important{independent} if and only if: 
+    \[p\left(E \cap F\right) = p\left(E\right)p\left(F\right)\]
+
+    \subparag{Example}{
+        The result of tossing coins (getting tail or head) are independent events.
+    }
+    
+}
+
+\parag{Theorem: Independence}{
+    If $E$ and $F$ are independent, then: 
+    \[p\left(E | F\right)= p\left(E\right)\]
+    
+    \subparag{Proof}{
+        This is a direct proof: 
+        \[p\left(E | F\right) = \frac{p\left(E \cap F\right)}{p\left(F\right)} = \frac{p\left(E\right) p\left(F\right)}{p\left(F\right)} = p\left(E\right)\]
+        
+        \qed
+    }
+}
+
+\parag{Example 1}{
+    Let's assume that each of the four ways a family can have two children $\left\{BB, GG, BG, GB\right\}$ (where $B$ means boy, $G$ means girl, in a world where there are exactly two sexes) is equally likely. 
+
+    Let $E = \left\{BG, GB\right\}$ be the event that a family with tow children has both girls and boys, and $F = \left\{GG, BG, GB\right\}$ that a family with two children has at most one boy. We wonder if $E$ and $F$ are independent.
+    
+    We can deduce that $p\left(E\right) = \frac{1}{2}$ and $p\left(F\right) = \frac{3}{4}$. Moreover, $E \cap F = \left\{BG, GB\right\}$, so $p\left(E \cap F\right) = \frac{1}{2}$. Thus: 
+    \[p\left(E\right) p\left(F\right) = \frac{3}{8} \neq \frac{1}{2} = p\left(E \cap F\right)\]
+    
+    So, those two events are not independent.
+}
+
+\parag{Example 2}{
+    Let's ask ourselves the same question, but with a family who has three children: 
+    \[S = \left\{BBB, BBG, BGB, GBB, GGB, GBG, BGG, GGG\right\} \implies \left|S\right| = 8\]
+    
+
+    We have: 
+    \[E = \left\{BBG, GGB, BGB, BGG, GBB, GBG\right\} \implies p\left(E\right) = \frac{6}{8} = \frac{3}{4}\]
+    \[F = \left\{GGB, BGG, GBG, GGG\right\} \implies p\left(F\right) = \frac{4}{8} = \frac{1}{2}\]
+
+    Now, we can look at their intersection: 
+    \[E \cap F = \left\{GGB, BGG, GBG\right\} \implies p\left(E \cap F\right) = \frac{3}{8}\]
+
+    Finally, we can see that those events are independent: 
+    \[p\left(E\right) p\left(F\right) = \frac{3}{4} \cdot \frac{1}{2} = \frac{3}{8} = p\left(E \cap F\right)\]
+
+    Increasing the size of the sample space can change the dependence of events. This means that we must not trust our intuition.
+}
+
+\parag{Definition: pairwise independence}{
+    The events $E_1, \ldots, E_n$ are \important{pairwise independent} if and only if: 
+    \[p\left(E_i \cap E_j\right) = p\left(E_i\right)p\left(E_j\right), \mathspace \forall i, j, i < j \leq n\]
+}
+
+
+\parag{Mutual independence}{
+    The events $E_1, \ldots, E_n$ are \important{mutually independent} if and only if: 
+    \[p\left(E_1 \cap \ldots \cap E_n\right) = p\left(E_1\right)\cdot p\left(E_2\right) \cdots p\left(E_n\right)\]
+}
+
+\parag{Theorem: Independence}{
+    If events are mutually independent, then they are pairwise independent.
+
+    \subparag{Reciprocal}{
+        The reciprocal is wrong. For example, let's say we are tossing a fair coin twice.
+
+        Let's take $E_1$ be the event that the first toss is 1, $E_2$ be that the second toss is 1 and $E_3$ be that the two tosses have a different result. We have: 
+        \[p\left(E_1\right) = \frac{1}{2}, \mathspace p\left(E_2\right) = \frac{1}{2}, \mathspace p\left(E_3\right) = \frac{1}{2}\]
+
+        $E_1, E_2, E_3$ are pairwise independent: 
+        \[p\left(E_1 \cap E_2\right) = \frac{1}{4} = p\left(E_1\right)p\left(E_2\right)\]
+        \[p\left(E_1 \cap E_3\right) = \frac{1}{4} = p\left(E_1\right)p\left(E_3\right)\]
+        \[p\left(E_2 \cap E_3\right) = \frac{1}{4} = p\left(E_2\right)p\left(E_3\right)\]
+        
+        However, they are not mutually exclusive: 
+        \[p\left(E_1 \cap E_2 \cap E_3\right) = 0 \neq \frac{1}{8} = p\left(E_1\right)p\left(E_2\right)p\left(E_3\right)\]
+    }
+}
+
+\parag{Analysis of side information}{
+    We roll a pair of dice remotely (we don't see the result). Then, an observer tells us some property of the dice. Depending on what he says, we decide whether we bet that the sum is 7.
+
+    Without side information, we know that the probability is $\frac{1}{6}$.
+
+    \subparag{Case 1}{
+        Let's say that the observer tells us that ``the sum is 7''. Then we know that we can bet, since we have a 100\% chance of winning.
+    }
+
+    \subparag{Case 2}{
+        Let's now say that the observer is less generous and says ``the roll contains a $6$''.
+
+        Let's use conditional probability to study the result. Let $S_7$ be the event that the sum is 7, and $R_6$ be that the roll contains a 6. We notice that $\left|S_7 \cap R_6\right|$ is 2, since there are only two ways of getting a sum of 7 with a 6 ($\left(1, 6\right), \left(6, 1\right)$). So, the probability is given by: 
+        \[S\left(S_7 | R_6\right) = \frac{p\left(S_7 \cap R_6\right)}{p\left(R_6\right)} = \frac{\frac{2}{36}}{\frac{11}{36}} = \frac{2}{11} > \frac{1}{6}\]
+
+        So, this would be a good idea to bet. However, this is a bit counter-intuitive, since we would get the exact same result if the observer told us that the roll contains any other number. Why does this give us more information, this seems very counter-intuitive? Let's consider the following case before answering this question.
+    }
+    
+    \subparag{Case 3}{
+        Let's now say that the observer tells us ``the dice are different''. 
+
+        The probability is given by: 
+        \[p\left(S_7 | R_{diff}\right) = \frac{p\left(S_7 \cap R_{diff}\right)}{p\left(R_{diff}\right)} = \frac{\frac{1}{6}}{\frac{5}{6}} = \frac{1}{5} > \frac{1}{6}\]
+
+        This is increasing our chances, and it makes sense since we are eliminating ``bad'' cases (there is no way of reaching 7 with dice that give the same result). This makes us understand more the second case: by only sticking to one number, we are removing some bad results.
+    }
+}
+
+\end{document}

@@ -1,0 +1,253 @@
+\documentclass{article}
+
+% Expanded on 2021-09-29 at 10:24:04.
+
+\usepackage{../../style}
+
+\title{Analyse I}
+\author{Joachim Favre}
+\date{Mercredi 29 septembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2021-09-29}{Développement des infimums et suprémums}{
+    \begin{itemize}[left=0pt]
+    \item Démonstration que les suprémums et infimums sont uniques.
+    \item Définition de la notation des intervalles, et démonstration de leur suprémums et infimums.
+    \item Démonstration de la densité de $\mathbb{Q}$ dans $\mathbb{R}$.
+    \item Définition des minimums et maximums.
+\end{itemize}
+
+}
+
+\parag{Infimum et suprémum}{
+    Un synonyme d'infimum est ``la borne inférieure de $S$'', et suprémum est équivalent à ``la borne supérieure de $S$''.
+
+    Le dernier axiome de $\mathbb{R}$ est que ``tout sous-ensemble non-vide $S \subset \mathbb{R}^*_+$ (réels positifs), admet une borne inférieure.
+}
+
+\parag{Théorème}{
+    Tout sous-ensemble non-vide majoré $S \subset \mathbb{R}$ possède un suprémum, qui est unique. De la même manière, tout sous-ensemble non-vide minoré $S \subset \mathbb{R}$ possède un infimum, qui est unique.
+
+    \subparag{Démonstration}{
+        Séparons notre démonstration en quatre cas:
+
+        \vspace{1em}
+        \important{(a)} Si $S \subset \left\{x \in \mathbb{R}, x > 0\right\} \implies \exists a \in \mathbb{R}, a = \inf S$ par l'axiome de la borne inférieure.
+
+        \vspace{1em}
+        \important{(b)} Si $S \subset \mathbb{R}$ est un ensemble tel que $\exists t \in \mathbb{R}^*_-$ (noter que $t < 0$) pour lequel $x \geq t \ \forall x \in S$ ($S$ est minoré par $t$, $t \leq 0$).
+
+        \imagehere{schemaPreuveInfimumCasB.png}
+
+        Soit $S_1 = \left\{x - t + 1, x \in S\right\} \subset \mathbb{R}^*_+$. On sait par l'axiome de la borne inférieure qu'il existe $a_1 = \inf S_1$. On veut démontrer que $a = a_1 + t - 1 = \inf S$. Vérifions les deux propriétés:
+        \[\forall x \in S \implies \overbrace{x - t + 1}^{\in S_1} \geq a_1 \implies \overbrace{x}^{\in S} \geq a_1 + t - 1 = a\]
+        \[\forall \epsilon > 0 \ \exists y \in S \telque \overbrace{y - t + 1}^{\in S_1} - a_1 \leq \epsilon \implies \overbrace{y}^{\in S} - \overbrace{\left(a_1 + t - 1\right)}^{a} \leq \epsilon\]
+
+        \vspace{1em}
+        \important{(c)} Soit $S \subset \mathbb{R}$, un ensemble tel que $\exists p \in \mathbb{R}$ pour lequel $x \leq p$, $\forall x \in S$. En d'autres mots, $S$ est majoré par $p \in \mathbb{R}$.
+
+        Considérons $S_2 = \left\{y \in \mathbb{R} : y = -x, x \in S\right\}$, donc $S_2$ est minoré par $-p \in \mathbb{R}$ ($S_2$ est juste la ``symétrie'' de $S$). Par (b), on sait que $\exists a_2 \in \mathbb{R} = \inf S_2$ (puisque $S_2$ est minoré). Donc, $a = -a_2 = \sup S$ (on peut aussi démontrer que les deux propriétés du suprémum tiennent, mais c'est un exercice au lecteur).
+
+        \vspace{1em}
+        \important{Unicité} On veut montrer que si $\inf S$ existe, alors il est le plus grand minorant de $S$. De la même manière, si $\sup S$ existe, alors il est le plus petit majorant de $S$. En particulier, cela implique que $\inf S$ et $\sup S$ sont uniques (s'ils existent).
+
+        \imagehere{schemaPreuveInfimumCasD.png}
+
+        Pour la deuxième phrase, supposons par l'absurde qu'il existe $\sup S$ et $b \in \mathbb{R}$ tel que $b < \sup S$, et $b$ est un majorant de $S$.
+
+        Donc,
+        \[\exists \epsilon = \frac{\sup S - b}{2} \implies \sup S - \epsilon > b \geq x \ \forall x \in S \implies \sup S - x > \epsilon\]
+        ce qui contredit la définition de $\sup S$.
+
+        Nous pouvons donc bien en conclure que $\sup S$ est le plus petit majorant de $S$ et que, en particulier, le $\sup S$ est unique.
+
+        Le cas de l'infimum est symétrique.
+
+        \qed
+    }
+}
+
+\subsection{Dans le cas des intervalles}
+\parag{Notation des intervalles}{
+    Soient $a,b \in \mathbb{R}$, tel que $a < b$:
+    \begin{itemize}
+        \item $\left\{x \in \mathbb{R} : a \leq x \leq b\right\} = \left[a, b\right]$, intervalle fermé borné
+        \item $\left\{x \in \mathbb{R} : a < x < b\right\} = \left]a,b\right[$ intervalle ouvert borné
+        \item $\left\{x \in \mathbb{R} : a \leq x < b\right\} = \left[a, b\right[$ intervalle semi-ouvert borné
+        \item $\left\{x \in \mathbb{R} : a < x \leq b\right\} = \left]a, b\right]$ intervalle semi-ouvert borné
+        \item $-\infty$ et $\infty$, $\mathbb{R} \cup \left\{-\infty, \infty\right\} = \bar{\mathbb{R}}$ la droite réelle achevée, $-\infty < x < \infty,\ \forall x \in \mathbb{R}$
+    \end{itemize}
+
+    Intervalles non-bornés:
+    \begin{itemize}
+        \item $\left\{x \in \mathbb{R}: x \geq a\right\} = \left[a, +\infty\right[$ fermé
+    \item $\left\{x \in \mathbb{R} : x \leq b\right\} = \left]-\infty, b\right]$ fermé
+    \item $\left\{x \in \mathbb{R} : x > a\right\} = \left]a, +\infty\right[$ ouvert
+    \item $\left\{x \in \mathbb{R} : x < b\right\} = \left]-\infty, b\right[$ ouvert
+    \end{itemize}
+
+    Notations sur les lettres:
+    \begin{itemize}
+        \item $\mathbb{R}_+ = \left[0, +\infty\right[ = \left\{x \geq 0\right\}$
+        \item $\mathbb{R}^*_+ = \left]0, +\infty\right[ = \left\{x > 0\right\}$
+        \item $\mathbb{R}_- = \left]-\infty, 0\right] = \left\{x \leq 0\right\}$
+        \item $\mathbb{R}^*_- = \left]-\infty, 0\right[ = \left\{x < 0\right\}$
+        \item $\mathbb{R}^* = \mathbb{R}^*_+ \cup \mathbb{R}^*_- = \left\{x \in \mathbb{R} : x \neq 0\right\}$
+    \end{itemize}
+
+
+    Il faut connaitre ces notations pour l'examen.
+}
+
+\parag{Théorème des suprémums et infimums d'un intervalle borné}{
+    Nous voulons trouver comment trouver $\sup S$ et $\inf S$ pour un sous-ensembles $S \subset \mathbb{R}$ donné. Ce théorème nous est d'une certaine aide:
+    \subparag{Proposition}{
+    \[\sup\left[a, b\right] = \sup\left[a, b\right[ = \sup\left]a, b\right] = \sup\left]a, b\right[ = b\]
+
+        Et de la même manière pour les infimums.
+    }
+
+    \subparag{Démonstration}{
+        \begin{itemize}[left=0pt]
+            \item[\important{(a)}] On veut montrer que
+                \[\sup \left[a,b\right] = b\]
+
+                La première propriété tient:
+                \[b \geq x\ \forall x \in \left[a, b\right] = \left\{x \in \mathbb{R} : a \leq x \leq b\right\}\]
+
+                De même pour la deuxième: Soit $\epsilon > 0$ donné. On veut trouver $x_{\epsilon} \in \left[a, b\right]$ tel que $b - x_{\epsilon} \leq \epsilon$. On peut prendre
+                \[x_{\epsilon} = b \implies b-b = 0 < \epsilon\ \forall \epsilon > 0\]
+
+            \item[\important{(b)}] On veut maintenant montrer que
+                \[\inf \left]a,b\right[ = a\]
+
+                La première condition est vraie:
+                \[a \leq x \ \forall x \in \left]a, b\right[ \over{=}{\text{par déf}}  \left\{x \in \mathbb{R}: a < x < b\right\}\]
+
+                Pour la deuxième propriété on a besoin d'un petit peu plus ruser. Soit $\epsilon > 0$. On veut trouver
+                \[x_{\epsilon} \in \left]a, b\right[ \telque x_{\epsilon} - a \leq \epsilon \iff a < x_{\epsilon} < b \text{ et } x_{\epsilon} \leq a + \epsilon\]
+
+               Si $\epsilon < b - a$, on peut prendre $x_{\epsilon} = a + \epsilon$ qui marche avec les deux propriétés.
+
+               Si $\epsilon \geq b - a$, alors on prend $x_{\epsilon} = \frac{b + a}{2}$ qui marche aussi avec les deux propriétés.
+
+        \end{itemize}
+
+       Les autres cas de ce théorèmes sont similaires.
+
+      \qed
+    }
+}
+
+\subsection{Densité d'un ensemble dans un autre}
+\parag{Théorème de la propriété d'Archimède}{
+    Pour tout couple $\left(x, y\right)$ de nombres réels tel que $x > 0$ et $y \geq 0$, il existe $n \in \mathbb{N}^*$ tel que $nx > y$.
+
+    \subparag{Démonstration}{
+        \begin{enumerate}
+            \item On veut montrer que $\mathbb{N} \subset \mathbb{R}$ n'est pas majoré.
+
+            Supposons par l'absurde que $\mathbb{N}$ est majoré, alors, il existe $x = \sup \mathbb{N} \in \mathbb{R}$. Puisque la deuxième propriété tient pour n'importe quel $\epsilon > 0$, elle tient pour un $\epsilon$ précis, donc, si on prend $\epsilon = \frac{1}{2}$, alors $\exists n \in \mathbb{N}$ tel que:
+            \[\sup \mathbb{N} - n \leq \frac{1}{2} \implies \sup \mathbb{N} \leq n +\frac{1}{2} < \overbrace{n + 1}^{m} \implies \overbrace{m}^{\in \mathbb{N}} > \sup \mathbb{N}\]
+            ce qui est une contradiction (un nombre de l'ensemble ne peut pas être plus grand que le plus petit majorant).
+
+        \item Soit $\frac{y}{x} \in \mathbb{R}_+$. On sait que $\exists n \in \mathbb{N} \telque n > \frac{y}{x}$ (sinon $\frac{y}{x}$ serait un majorant). Donc,
+            \[n > \frac{y}{x} \iff nx > y\]
+
+            \qed
+        \end{enumerate}
+
+    }
+
+    Puisque ce théorème tient, on dit que $\mathbb{R}$ est un corps \important{archimédien}. On peut aussi démontrer cette propriété pour $\mathbb{Q}$.
+}
+
+\parag{Théorème de la densité de $\mathbb{Q}$ dans $\mathbb{R}$}{
+    $\mathbb{Q}$ est dense dans $\mathbb{R}$, i.e pour tout couple $x,y \in \mathbb{R}$ avec $x < y$, il existe un nombre rationnel $r \in \mathbb{Q} \telque x < r < y$.
+
+    \subparag{Démonstration}{
+    Par la propriété d'Archimède, \[\exists n \in \mathbb{N}^* \telque n\left(y - x\right) > 1 \implies y - x > \frac{1}{n} > 0 \implies x < x + \frac{1}{n} < y\]
+
+    Cela marcherait si $x$ est rationnel, mais dans la majorité des cas $x + \frac{1}{n}$ n'est pas rationnel. En réécrivant notre inégalité, nous avons:
+    \[x < x + \frac{1}{n} \implies \frac{nx}{n} < \frac{nx + 1}{n}\]
+
+    En prenant $\left\lfloor x \right\rfloor $, la partie entière de $x$, i.e le plus grand entier $\leq x$ on a:
+    \[x = \frac{nx}{x} < \frac{\left\lfloor nx \right\rfloor + 1}{n} \leq \frac{nx + 1}{n} <y\]
+
+    Or, avec $r = \frac{\left\lfloor nx \right\rfloor + 1}{n} \in \mathbb{Q}$, on a
+    \[x < r < y\]
+
+    Ce qui conclut notre démonstration. \qed
+    }
+
+}
+
+\parag{Théorème}{
+    Soient $r,q \in \mathbb{Q}$, avec $r < q$. Alors, il existe $x \in \mathbb{R} \setminus \mathbb{Q}$ (irrationnel) tel que $r < x < q$.
+
+    On peut aussi démontrer $\forall x,y \in \mathbb{R}$ avec $x < y$, on a que $\exists z \in \mathbb{R} \setminus \mathbb{Q} \telque x < z < y$.
+
+    \subparag{Démonstration}{
+        Laissée en exercice au lecteur.
+    }
+
+}
+
+
+\subsection{Retours aux infimums et supremums}
+
+
+\parag{Exemple 1}{
+    Si on a $S = \left\{x > a\right\} = \left]a, -\infty\right[$. Alors, son infimum est donné par $\inf S = a$ et $\sup S$ n'existe pas (puisqu'il n'existe pas de majorant).
+}
+
+\parag{Exemple 2}{
+    Soit $S = \left\{\frac{3n - 2}{n}, n \in \mathbb{N}^*\right\} \subset \mathbb{R}$.
+    \begin{itemize}
+        \item Pour commencer, récrivons l'ensemble:
+        \[\frac{3n - 2}{n} = 3 - \frac{2}{n}\]
+
+        Ceci implique que
+        \[\frac{2}{n+1} < \frac{2}{n}\ \forall n \in \mathbb{N}^* \implies 3 - \frac{2}{n+1} > 3 - \frac{2}{n} \implies S \text{ est croissante}\]
+
+        Donc, si $n = 1$, on a $3 - \frac{2}{1} = 1$, ce qui veut dire que $S$ est minoré par 1, i.e. $1 \leq x\ \forall x \in S$. Par le théorème démontré précédemment, cela implique que $\inf S$ existe. On veut montrer qu'il est égal à $1$:
+
+        La première propriété tient déjà, puisqu'on a démontré que 1 est un minorant de $S$, i.e. $1 \leq x\ \forall x \in S$.
+
+        La deuxième propriété tient aussi:
+        \[\forall \epsilon > 0\ \exists x_{\epsilon} = 1 \telque x_{\epsilon} - 1 = 1-1 \leq \epsilon\]
+
+        Donc, $\inf S = 1$.
+
+
+    \item On remarque que $S$ est majoré par $3$ ($3 \geq 3 - \frac{1}{n} \ \forall n \in \mathbb{N}^*$). Donc, $\sup S$ existe ; on veut maintenant montrer que $\sup S = 3$.
+        \begin{enumerate}
+            \item $3 > x\ \forall x \in S$ puisque, comme prouvé ci-dessus $3 > 3 - \frac{1}{n}\ \forall n \in \mathbb{N}^*$.
+            \item Soit $\epsilon > 0$. Il faut démontrer l'existence de $x_{\epsilon}$. Résolvons l'inégalité suivante pour $n \in \mathbb{N}^*$:
+                \[3 - \left(3 - \frac{2}{n}\right) \leq \epsilon \iff \frac{2}{n} \leq \epsilon \iff \frac{2}{\epsilon} \leq n\]
+
+              Puisque $\mathbb{N}$ n'est pas majoré il existe $n \in \mathbb{N}^* \telque n \geq \frac{2}{\epsilon}$ quel que soit $\epsilon > 0$.
+
+              Ce qui nous permet de conclure que $\sup S = 3$, même si $3 \not\in S$.
+              \qed
+        \end{enumerate}
+
+
+    \end{itemize}
+
+}
+
+\parag{Remarque par rapport à la terminologie}{
+    Si $\inf S \in S$, on dit que \important{$S$ possède un minimum}, avec $\min S = \inf S$ dans ce cas.
+
+    Si $\sup S \in S$, on dit que \important{$S$ possède un maximum}, avec $\max S = \sup S$ dans ce cas.
+}
+
+\parag{Exemple 2, la suite}{
+    Cela veut donc dire que $S$ a un minimum, $\min S = 1$, mais il n'a pas de maximum puisque $\sup S \not \in S$.
+}
+
+
+\end{document}

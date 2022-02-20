@@ -1,0 +1,428 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-15 at 10:21:32.
+
+\usepackage{../../style}
+
+\title{Analyse}
+\author{Joachim Favre}
+\date{Mercredi 15 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{24}{2021-12-15}{''Les intégrales c'est un art'' (prof. Lachowska)}{
+\begin{itemize}[left=0pt]
+    \item Explication et démonstration de la méthode d'intégration par partie.
+    \item Explication et démonstration de la méthode pour calculer les intégrales de fonctions rationnelles.
+    \item Calcul de l'aire d'une ellipse.
+\end{itemize}
+}
+
+\parag{Remarque}{
+    Pour le changement de variable, si on a $u = f\left(x\right)$, alors c'est comme si on avait:
+    \[\frac{du}{dx} = f'\left(x\right) \implies du = f'\left(x\right)dx = \frac{d\left(f\left(x\right)\right)}{dx} dx = d\left(f\left(x\right)\right)\]
+
+    On peut manipuler ces formes différentielles car $df\left(x\right)$ veut dire, géométriquement, le petit changement de $f$.
+
+    Ainsi, par exemple: 
+    \[\int g\left(x\right) f'\left(x\right) dx = \int g\left(x\right) d\left(f\left(x\right)\right)\]
+}
+
+\parag{Exemple 2}{
+    Calculons l'intégrale indéfinie suivante (on veut la primitive la plus générale, donc avec un $+ C$):
+    \[\int \frac{xdx}{\sqrt{1 - x^2}}\]
+
+    La première méthode est de prendre le changement de variable $x = \sin\left(t\right) = \phi\left(t\right)$, donc :
+    \[\frac{dx}{dt} = \phi'\left(t\right) = \cos\left(t\right) \implies dx = \phi'\left(t\right)dt = \cos\left(t\right)dt\]
+
+    Ainsi, on peut revenir à notre intégrale:
+    \begin{multiequality}
+    \int \frac{xdx}{\sqrt{1 - x^2}} & = \int \frac{\sin\left(t\right)\cos\left(t\right)}{\cos\left(t\right)} dt  \\
+    & = \int\sin\left(t\right)dt  \\
+    & = -\cos\left(t\right) + C  \\
+    & = -\cos\left(\arcsin\left(x\right)\right) + C  \\
+    & = -\sqrt{1 - \sin^2\left(\arcsin\left(x\right)\right)} + C  \\
+    & = -\sqrt{1 - x^2} + C 
+    \end{multiequality}
+
+    \vspace{1em}
+
+    Une autre de manière de résoudre cette intégrale est de voir qu'il y a la dérivée de $1 - x^2$ à une constante près au numérateur. Ainsi, prenons $u = 1 - x^2 \implies du = -2xdx$:
+    \[\int \frac{xdx}{\sqrt{1 - x^2}} = \frac{-1}{2} \int \frac{du}{\sqrt{u}} = -\frac{1}{2} \int u^{-\frac{1}{2}} du = \frac{-1}{2} \frac{1}{\frac{1}{2}} u^{\frac{1}{2}} + C = -u^{\frac{1}{2}} + C = -\sqrt{1 - x^2} + C\]
+}
+
+\parag{Exemple 3}{
+    Calculons l'intégrale indéfinie suivante:
+    \[\int \frac{dx}{\sin\left(x\right)}\]
+
+    Ceci n'est pas une intégrale facile, mais on peut se rendre compte que multiplier par $\sin\left(x\right)$ au numérateur et au dénominateur va nous aider:
+    \[\int \frac{dx}{\sin\left(x\right)} = \int \frac{\sin\left(x\right)}{\sin^2\left(x\right)} dx = -\int \frac{\sin\left(x\right)}{1 - \cos^2\left(x\right)}dx\]
+
+    Ainsi, on peut prendre le changement de variable $u = \cos\left(x\right) \implies du = -\sin\left(x\right)dx$:
+    \[\int \frac{dx}{\sin\left(x\right)} = -\int \frac{du}{1 - u^2} = - \frac{1}{2} \int\left(\frac{1}{1 - u} + \frac{1}{1 + u}\right)du = \frac{1}{2} \log\left|1 - u\right| - \frac{1}{2}\log\left|1 + u\right| + C\]
+
+    Et ainsi: 
+    \[\int \frac{dx}{\sin\left(x\right)} = \frac{1}{2} \log\left|\frac{1-u}{1+u}\right| + C = \frac{1}{2}\log\left|\frac{1 - \cos\left(x\right)}{1 + \cos\left(x\right)}\right| + C\]
+    
+
+    En effet, la primitive de $\frac{1}{x}$ est donnée par $\log\left|x\right| + C$ pour tout $x$ qui n'est pas zéro. Il faut tout de me faire attention qu'on n'a pas le droit de calculer $\int_{-1}^{1} \frac{1}{x}dx = \log\left|1\right| - \log\left|1\right|$ puisque $\frac{1}{x}$ n'est pas continue sur $\left[-1, 1\right]$.
+
+    \vspace{1em}
+
+    Une autre méthode pour calculer cette intégrale est d'utiliser le trick suivant:
+    \[\int \frac{dx}{\sin\left(x\right)} = \int \frac{\sin^2\left(\frac{x}{2}\right) + \cos^2\left(\frac{x}{2}\right)}{2\sin\left(\frac{x}{2}\right)\cos\left(\frac{x}{2}\right)} dx = \frac{1}{2} \int \frac{\sin\left(\frac{x}{2}\right)}{\cos\left(\frac{x}{2}\right)}dx + \frac{1}{2} \int \frac{\cos\left(\frac{x}{2}\right)}{\sin\left(\frac{x}{2}\right)}dx\]
+
+    Ainsi, on peut prendre la changement de variable suivant:
+    \[\int \frac{\sin\left(\frac{x}{2}\right) d\left(\frac{x}{2}\right)}{\cos\left(\frac{x}{2}\right)} + \int \frac{\cos\left(\frac{x}{2}\right)d\left(\frac{x}{2}\right)}{\sin\left(\frac{x}{2}\right)} = -\int \frac{d\left(\cos \frac{x}{2}\right)}{\cos \left(\frac{x}{2}\right)} + \int \frac{d\left(\sin \frac{x}{2}\right)}{\sin \left(\frac{x}{2}\right)}\]
+
+    Ce qui nous permet de conclure que: 
+    \[\int \frac{dx}{\sin\left(x\right)} = -\log\left|\cos \left(\frac{x}{2}\right)\right| + \log\left|\sin \left(\frac{x}{2}\right)\right| + C\]
+
+    Les deux résultats que nous avons obtenu à l'aide de nos deux méthodes sont bien égaux, on peut le vérifier à l'aide des identités trigonométriques.
+
+    \subparag{Citation de la prof}{
+        ''Les dérivées c'est du travail manuel, les intégrales c'est un art'' (prof. Lachowska)
+
+        Et je suis complètement d'accord avec elle, les intégrales c'est beaucoup plus marrant! Et encore, on n'a pas vu les équations différentielles. \smiley
+    }
+
+}
+
+\parag{Remarque}{
+    Parfois, deux expressions sont égales à une constante près. Par exemple:
+    \[\log\left(5x\right) = \log\left(5\right) + \log\left(x\right) = \log\left(x\right) + C\]
+
+    \[\tan^2\left(t\right) = \frac{\sin^2\left(t\right)}{\cos^2\left(t\right)} = \frac{1 - \cos^2\left(t\right)}{\cos^2\left(t\right)} = \frac{1}{\cos^2\left(t\right)} - 1 = \frac{1}{\cos^2\left(t\right)} + C\]
+}
+
+\parag{Proposition: intégration par partie}{
+    Soient $g, f : I \mapsto \mathbb{R}$ des fonctions continûment dérivables sur $I$, où $\left[a, b\right] \subset I$. Alors:
+    \[\int_{a}^{b} f\left(x\right) g'\left(x\right)dx = f\left(x\right)g\left(x\right) \eval_{a}^{b} - \int_{a}^{b} g\left(x\right) f'\left(x\right)dx\]
+
+    \subparag{Preuve}{
+        Considérons la dérivée de $\left(fg\right)\left(x\right)$:
+        \begin{multiequation}
+        & \left(fg\right)'\left(x\right) = f'\left(x\right)g\left(x\right) + f\left(x\right)g'\left(x\right)  \\
+        \iff & f\left(x\right)g'\left(x\right) = \left(fg\right)'\left(x\right) - f'\left(x\right)g\left(x\right) 
+        \end{multiequation}
+
+        Ainsi, en intégrant des deux côtés:
+        \begin{multiequality}
+        \int_{a}^{b} f\left(x\right)g'\left(x\right)dx =\ & \int_{a}^{b} \left(fg\right)'\left(x\right)dx - \int_{a}^{b} f'\left(x\right)g\left(x\right)dx  \\
+        =\ & f\left(x\right)g\left(x\right) \eval_{a}^{b} - \int_{a}^{b} g\left(x\right)f'\left(x\right)dx 
+        \end{multiequality}
+
+        En effet, une primitive de la dérivée d'une fonction est cette fonction.
+
+        \qed
+    }
+
+    \subparag{Mnémotechnie}{
+        On peut écrire notre résultat sous la forme suivante:
+        \[\int_{a}^{b} fdg = fg \eval_{a}^{b} - \int_{a}^{b} gdf\]
+
+    }
+
+    \subparag{Utilité}{
+        Cette méthode marche très bien pour:
+        \begin{itemize}
+            \item polynômes$\displaystyle \cdot \left(\log x\right)^k$
+            \item polynômes$\displaystyle \cdot \sin\left(x\right)$
+            \item polynômes$\displaystyle \cdot \cos\left(x\right)$
+            \item polynômes$\displaystyle \cdot e^x$
+        \end{itemize}
+    }
+
+
+    \subparag{Note personnelle}{
+        Personnellement, je ne connais pas cette formule. Je préfère utiliser la méthode DI, de BlackPenRedPen. Voici une vidéo où il l'explique:
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=2I-_SV8cwsw}
+        \end{center}
+
+        Concrètement, on dessine le tableau suivant:
+        \begin{center}
+        \begin{tabular}{ccc}
+            & D & I  \\
+            $+$ & $\displaystyle f\left(x\right)$ & $\displaystyle g'\left(x\right)$  \\
+            $-$ & $f'\left(x\right)$ & $g\left(x\right)$
+        \end{tabular}
+        \end{center}
+
+        On dérive la fonction sous le D et on intègre celle sous le I.
+
+        Notre intégrale nous est donnée par la diagonale $f\left(x\right)g\left(x\right)$, à laquelle on ajoute l'intégrale de la dernière ligne $-f'\left(x\right)g\left(x\right)$ (le signe va toujours avec la colonne du D). Un gros avantage de cette méthode c'est qu'on n'a pas besoin de connaître la formule, qu'on peut l'appliquer directement, mais aussi qu'on peut l'appliquer plusieurs fois d'affilée. Par exemple, si on veut calculer l'intégrale de $x^2 e^x$:
+        \begin{center}
+        \begin{tabular}{ccc}
+            & D & I  \\
+            $+$ & $\displaystyle x^2$ & $\displaystyle e^x$  \\
+            $-$ & $\displaystyle x$ & $\displaystyle e^x$  \\
+            $+$ & $\displaystyle 1$ & $\displaystyle e^x$
+        \end{tabular}
+        \end{center}
+
+        À nouveau, notre intégrale est donnée par la somme des diagonales (où le signe va avec la première colonne), à laquelle on ajoute l'intégrale de la dernière ligne:
+        \[\int x^2 e^x dx = x^2 e^x - xe^x + \int e^x dx + C\]
+
+        Finalement, on peut noter que si on atteint un 0 dans la dernière ligne (par dérivation ; par intégration c'est peu probable qu'un 0 apparaisse), on obtient directement notre intégrale:
+        \begin{center}
+        \begin{tabular}{ccc}
+            & D & I  \\
+            $+$ & $\displaystyle x^2$ & $\displaystyle e^x$  \\
+            $-$ & $\displaystyle x$ & $\displaystyle e^x$  \\
+            $+$ & $\displaystyle 1$ & $\displaystyle e^x$  \\
+            $-$ & $\displaystyle 0$ & $\displaystyle e^x$
+        \end{tabular}
+        \end{center}
+
+        Donc, on a:
+        \[\int x^2 e^x dx = x^2 e^x - xe^x + e^x \underbrace{- \int0\cdot e^x dx}_{0} + C\]
+
+    }
+}
+
+\parag{Exemple 1}{
+    Calculons l'intégrale suivante par partie:
+    \begin{multiequality}
+    \int \underbrace{\left(\log x\right)^2}_{f\left(x\right)} d\underbrace{x}_{g\left(x\right)} =\ & x\left(\log x\right)^2- \int \underbrace{\left(2 \log x\right) \frac{1}{x}}_{f'\left(x\right)} \underbrace{x}_{g\left(x\right)} dx  \\
+    =\ & x\left(\log x\right)^2- 2 \int\underbrace{\log\left(x\right)}_{f\left(x\right)} d\underbrace{x}_{g\left(x\right)}  \\
+    =\ & x \left(\log x\right)^2 - 2x \log\left(x\right) + 2 \int x \frac{1}{x} dx  \\
+    =\ & x\left(\log x\right)^2 - 2x\log\left(x\right) + 2x + C 
+    \end{multiequality}
+    
+    \subparag{Note personnelle}{
+        Avec la méthode DI, on aurait fait le tableau suivant:
+
+        \begin{center}
+        \begin{tabular}{ccc}
+            & D & I  \\
+            $+$ & $\displaystyle \left(\log x\right)^2$ & $\displaystyle 1$  \\
+            $-$ & $\displaystyle 2 \log\left(x\right) \frac{1}{x}$ & $\displaystyle x$
+        \end{tabular}
+        \end{center}
+
+        Donc, note intégrale est donnée par:
+        \[\int \left(\log x\right)^2 dx = x\left(\log x\right)^2 - 2\int \log\left(x\right)dx + C_1\]
+
+        On peut à nouveau appliquer la méthode DI:
+        \begin{center}
+        \begin{tabular}{ccc}
+            & D & I  \\
+            $+$ & $\displaystyle \log x$ & $\displaystyle 1$  \\
+            $-$ & $\displaystyle \frac{1}{x}$ & $\displaystyle x$
+        \end{tabular}
+        \end{center}
+
+        Ainsi, $\int \log\left(x\right) dx = x\log\left(x\right) - \int dx = x\log\left(x\right) - x$. On peut l'appliquer dans notre première intégrale:
+        \begin{multiequality}
+        \int \left(\log x\right)^2 dx =\ & x\left(\log x\right)^2 - 2\int \log\left(x\right)dx + C_1  \\
+        =\ & x\left(\log x\right)^2 - 2 x\log\left(x\right) + 2x + C 
+        \end{multiequality}
+    }
+}
+
+\parag{Exemple 2}{
+    Calculons l'intégrale suivante par partie:
+    \begin{multiequality}
+    \int \sin\left(x\right) e^x dx =\ & \int \sin\left(x\right) de^x  \\
+    =\ & e^x \sin\left(x\right) - \int e^x \cos\left(x\right) dx  \\
+    =\ & e^x \sin\left(x\right) - \int e^x d\left(\sin x\right)  \\
+    =\ & e^x \sin\left(x\right) - e^x \sin\left(x\right) + \int \sin\left(x\right) e^x dx  \\
+    =\ & \int \sin\left(x\right) e^x dx 
+    \end{multiequality}
+
+    On a donc trouvé que notre intégrale était égale à elle-même, ce qui est juste, mais ne nous aide pas. \frownie\ On en déduit que commencer en intégrant $f'\left(x\right)$ et en dérivant $g\left(x\right)$, puis de de dériver $f\left(x\right)$ et d'intégrer $g'\left(x\right)$ (donc d'inverser les intégrations et dérivations à la deuxième étape) ne nous mène nulle part. 
+
+    Réessayons, mais cette fois en intégrant deux fois le $\sin\left(x\right)$ et en dérivant le $e^x$ (notez qu'on aurait aussi pu choisir d'intégrer deux fois le $e^x$ et de dériver $\sin\left(x\right)$):
+    \begin{multiequality}
+    \int \sin\left(x\right) e^x dx =\ & e^x \sin\left(x\right) - \int e^x \cos\left(x\right) dx  \\
+    =\ & e^x \sin\left(x\right) - e^x \cos\left(x\right) + \int e^x \left(-\sin\left(x\right)\right)dx + C_1\\
+    =\ & e^x \left(\sin x - \cos x\right) - \int e^x \sin\left(x\right) dx + C_1   
+    \end{multiequality}
+    
+    Ainsi, on a trouvé que:
+    \begin{multiequation}
+    & \int \sin\left(x\right) e^x dx = e^x \left(\sin x - \cos x\right) - \int \sin\left(x\right) e^x dx + C_1\\
+    \iff & 2\int \sin\left(x\right)e^x dx = e^x\left(\sin x - \cos x\right) + C_1 \\
+    \iff & \int \sin\left(x\right)e^x dx = \frac{1}{2}e^x\left(\sin x - \cos x\right) + C
+    \end{multiequation}
+
+    \subparag{Remarque}{
+        On peut donc voir que si, en calculant notre intégrale, on retombe sur notre intégrale de départ avec un signe négatif ou un facteur multiplicatif (simplement différent de 1), alors on peut la trouver directement. Cette méthode marche typiquement pour intégrer les fonctions suivantes: 
+        \[\cos\left(x\right) e^x, \mathspace \sin\left(x\right)e^x\]
+    }
+}
+
+\parag{Exemple 3}{
+    Calculons l'intégrale suivante:
+    \begin{multiequality}
+        \int \frac{\log\left(\sqrt{x}\right)}{\left(x - 1\right)^2} dx =\ & \frac{1}{2} \int \frac{\log\left(x\right)}{\left(x - 1\right)^2} dx  \\
+    =\ & - \frac{1}{2} \int \log\left(x\right) \left(\frac{1}{x - 1}\right)' dx  \\
+    =\ & \frac{-1}{2} \int \log\left(x\right) d\left(\frac{1}{x - 1}\right)  \\
+    =\ & \frac{-1}{2} \cdot \frac{\log\left(x\right)}{x - 1} + \frac{1}{2} \int \frac{1}{x-1} \cdot \frac{1}{x} dx \\
+    =\ & \frac{-1}{2} \cdot \frac{\log x}{x - 1} + \frac{1}{2} \int\left( \frac{1}{x - 1} - \frac{1}{x}\right)dx  \\
+    =\ & \frac{-1}{2} \cdot \frac{\log x}{x - 1} + \frac{1}{2} \log\left|x - 1\right| - \frac{1}{2} \log \left|x\right| + C 
+    \end{multiequality}
+
+    On peut vérifier notre résultat en le dérivant.
+}
+
+\parag{Intégration des fonctions rationnelles}{
+    L'intégrale de fonctions rationnelles, $\int \frac{P\left(x\right)}{Q\left(x\right)}dx$, s'exprime toujours en termes de fonctions élémentaires.
+
+    Notez que ce n'est de loin pas le cas de toutes les fonctions. Par exemple, $\int \sin\left(x\right) \log\left(x\right) dx$ ou $\int e^{x^2} dx$ existent bien puisque ces fonctions sont continues, mais elles ne sont pas exprimables à l'aide de fonctions élémentaires (fonctions rationnelles, trigonométriques, exponentielles, inverses, etc).
+
+    Pour commencer, on sait qu'on peut toujours calculer la division de nos deux polynômes, de manière à avoir un polynôme (dont l'intégrale est très facile à calculer) auquel on ajoute un reste. Ce reste est toujours de telle forme que son numérateur est de degré est strictement inférieur à celui de son dénominateur. De plus, on sait qu'on peut toujours factoriser un polynôme à coefficients réels à l'aide de polynômes à coefficients réels de degré au plus 2. Ainsi, on peut toujours appliquer les fonctions partielles pour séparer notre reste en termes de la forme:
+    \begin{enumerate}
+        \item $\displaystyle \frac{1}{ax + b}, \mathspace a \neq 0$
+        \item $\displaystyle \frac{\left(cx + d\right)}{\left(x - a\right)\left(x - b\right)}, \mathspace a \neq b$ 
+        \item $\displaystyle \frac{1}{\left(ax + b\right)^k}, \mathspace k \geq 2$
+        \item $\displaystyle \frac{1}{x^2 + px + q}, \mathspace p^2 - 4q < 0$
+        \item $\displaystyle \frac{x}{x^2 + px + q}, \mathspace p^2 - 4q < 0$
+        \item $\displaystyle \frac{1}{\left(1 +  x^2\right)^n}, \mathspace n \geq 2$
+        \item $\displaystyle \frac{x}{\left(1 + x^2\right)^n}, \mathspace n \geq 2$
+    \end{enumerate}
+
+
+    
+    Étudions tous ces cas.
+
+    \subparag{Note personnelle}{
+        La professeure nous conseille d'utiliser la méthode des coefficients indéterminés pour calculer les fractions partielles (voir le cas 2), cependant, à titre personnel, je trouve que la ``cover-up method'' de BlackPenRedPen (et oui, encore lui \smiley) est plus pratique et rapide pour trouver ces coefficients. Voici un lien où il en parle:
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=qckgd4QhFbs}
+        \end{center}
+    }
+    
+
+    \subparag{Cas 1}{
+        Soit $a \neq 0$. Alors:
+
+        \[\int \frac{dx}{ax + b} = \frac{1}{a} \int \frac{d\left(ax + b\right)}{ax + b} = \frac{1}{a} \log\left|ax + b\right| + C\]
+    }
+
+    \subparag{Cas 2}{
+        Soit $a \neq b$, alors:
+        \[\]
+        \begin{multiequality}
+            \int \frac{\left(cx + d\right)dx}{\left(x - a\right)\left(x - b\right)} =\ & \int\left(\frac{A}{x - a} + \frac{B}{x - b}\right)dx  \\
+            =\ & A\log\left|x - a\right| + B\log\left|x - b\right| + C 
+        \end{multiequality}
+
+        De tels $A$ et $B$ existent toujours, un théorème d'algèbre l'affirme; c'est ce qu'on appelle les fractions partielles. Pour les trouver, on peut utiliser les coefficients indéterminés; en multipliant les deux côtés par $\left(x-a\right)\left(c-b\right)$:
+        
+        \begin{multiequation}
+        & \frac{cx + d}{\left(x - a\right)\left(x - b\right)} = \frac{A}{x - a} + \frac{B}{x - b} \\
+        \iff & A\left(x - b\right) + B\left(x - a\right) = cx + d
+        \end{multiequation}
+
+        Donc:
+        \begin{systemofequations}{}
+        &\ - Ab - Ba = d \\
+        &\ A + B = c
+        \end{systemofequations}
+
+        Qu'on peut résoudre:
+        \[A = \frac{ac - d}{a - b}, \mathspace B = c - A\]
+
+        
+
+    }
+
+    \subparag{Cas 3}{
+        Soit $k \geq 2$, alors:
+        \begin{multiequality}
+        \int \frac{dx}{\left(ax + b\right)^k} \over{=}{$t = ax + b$}\ & \frac{1}{a} \int \frac{dt}{t^k}  \\
+        =\ & \frac{1}{a} \int t^{-k} dt  \\
+        =\ & \frac{1}{a}\cdot\frac{1}{-k + 1} t^{-k + 1} + C  \\
+        =\ & \frac{1}{a\left(1 - k\right)} \left(ax + b\right)^{-k + 1} + C 
+        \end{multiequality}
+        
+        \[\]
+    }
+
+    \subparag{Cas 4}{
+        Supposons qu'on n'a aucune racine réelle, donc si $p^2 - 4q < 0$:
+        \[\int \frac{dx}{x^2 + px + q} = \frac{dx}{\left(x + \frac{p}{2}\right)^2 + q - \frac{p^2}{4}}\]
+
+        Puisque $p^2 - 4q < 0$, alors on a $q - \frac{p^2}{4} > 0$. Ainsi, prenons $c^2= q - \frac{p^2}{4}$. De plus, prenons le changement de variable $u = x + \frac{p}{2}$:
+        \[\int \frac{du}{u^2 + c^2} = \frac{1}{c^2} \int \frac{c d\left(\frac{u}{c}\right)}{\left(\frac{u}{c}\right)^2 + 1} \over{=}{$t = \frac{u}{c}$} \frac{1}{c} \int \frac{dt}{t^2 + 1} = \frac{1}{c} \arctan\left(t\right) + C\]
+
+        Et ainsi, on trouve que:
+        \[\int \frac{dx}{x^2 + px + q} = \frac{1}{\sqrt{q - \frac{p^2}{4}}} \arctan\left(\frac{x + \frac{p}{2}}{\sqrt{q - \frac{p^2}{4}}}\right) + C\]
+    }
+
+    \subparag{Cas 5}{
+        Supposons à nouveau que le dénominateur n'ait pas de racine réelle, donc que $p^2 - 4q < 0$:
+        \[\int \frac{xdx}{x^2+ px + q} = \frac{\left(x + \frac{p}{2}\right) - \frac{p}{2}}{\left(x + \frac{p}{2}\right)^2 + q - \frac{p^2}{4}}dx\]
+
+        À nouveau, $p^2 - 4q < 0$, donc prenons $c^2 = q - \frac{p^2}{4}$. De plus, on peut prendre le changement de variable $u = x + \frac{p}{2}$:
+        \[\int \frac{\left(u - \frac{p}{2}\right)du}{u^2 + c^2} = \int \frac{udu}{u^2 + c^2} - \frac{p}{2} \int \frac{du}{u^2 + c^2}\]
+
+        On sait calculer la deuxième intégrale par le cas 4, mais nous devons calculer $\int \frac{udu}{u^2 + c^2}$. Pour cela, prenons le changement de variable $t= u^2 + c^2\implies dt = 2udu$:
+        \[\int \frac{udu}{u^2 + c^2} = \frac{1}{2} \int \frac{dt}{t} = \frac{1}{2} \log\left|t\right| + C = \frac{1}{2} \log\left|u^2 + c^2\right| + C\]
+
+        Ce qui nous permet de conclure que le premier terme de cette somme d'intégrales est donné par: 
+        \[\int \frac{udu}{u^2 + c^2} = \frac{1}{2} \log\left|x^2 + px + q\right| + C\]
+    }
+
+    \subparag{Cas 6}{
+        Soit $n \geq 2$. Calculons l'intégrale suivante en prenant le changement de variable $x = \tan\left(t\right) \implies dx = \frac{1}{\cos^2\left(t\right)}dt$: 
+        \[\int \frac{dx}{\left(1 + x^2\right)^n} = \int \frac{1}{\left(\frac{1}{\cos^2\left(t\right)}\right)^n} \cdot \frac{1}{\cos^2\left(t\right)} dt = \int \left(\cos t\right)^{2\left(n - 1\right)}dt\]
+
+        Or, on peut passer par la formule de De Moivre pour exprimer la fonction suivante sous la forme d'une somme de sinus et de cosinus d'angles multiples: 
+        \[\left(\cos\left(x\right)\right)^n = \left(\frac{e^{ix} + e^{-ix}}{2}\right)^n\]
+
+        Par exemple: 
+        \[\cos^2\left(x\right) = \frac{1}{2}\left(1 + \cos\left(2x\right)\right)\]
+    }
+
+    \subparag{Cas 7}{
+        Finalement, soit $n \geq 2$; calculons:
+        \[\int \frac{xdx}{\left(1 + x^2\right)^n}\]
+
+        Prenons le changement de variable $u= 1 + x^2\implies du = 2x dx$:
+        \[\int \frac{xdx}{\left(1 + x^2\right)^n} = \frac{1}{2} \int \frac{du}{u^n} = \frac{1}{2} \frac{1}{-n + 1} u^{-n + 1} + C\]
+
+        Ce qui nous permet de conclure que: 
+        \[\int \frac{xdx}{\left(1 + x^2\right)^n} = \frac{1}{2\left(1 - n\right)} \left(x^2 + 1\right)^{-n + 1} + C\]
+    }
+
+}
+
+\parag{Exemple}{
+    Les intégrales sont utiles pour calculer des aires, calculons donc l'aire d'une ellipse. L'équation des ellipses est donné par:
+    \[\frac{y^2}{b^2} + \frac{x^2}{a^2} = 1 \implies y^2 = b^2 - \frac{b^2}{a^2} x^2 \implies y = \pm b\sqrt{1 - \frac{x^2}{a^2}}\]
+
+    Ainsi, on peut prendre la partie positive, et l'intégrer entre $0$ et $a$ de manière à uniquement avoir $\frac{1}{4}$ de l'aire [mettre dessin prof]:
+    \[\int_{0}^{a} b\sqrt{1 - \frac{x^2}{a^2}}dx\]
+    
+    \imagehere[0.7]{aireEllipseIntegrale.png}
+
+    Prenons le changement de variable $u = \frac{x}{a} \implies du = \frac{1}{a} dx$. De plus, on remarque que $u\left(0\right) = 0$ et $u\left(a\right)= 1$; ainsi:
+    \[\int_{0}^{a} b\sqrt{1 - \frac{x^2}{a^2}}dx = ab \int_{0}^{1} \sqrt{1 - u^2}du\]
+
+    Prenons maintenant le changement de variable $u = \sin\left(t\right) \implies du = \cos\left(t\right)dt$. De plus, on voit que $u \in \left[0, 1\right] \implies t \in \left[0, \frac{\pi}{2}\right]$:
+    \[ab \int_{0}^{1} \sqrt{1 - u^2}du = ab \int_{0}^{\frac{\pi}{2}}  \cos^2\left(t\right)dt = \frac{ab}{2} \int_{0}^{\frac{\pi}{2}} \left(1 + \cos^2\left(t\right)\right) dt = \frac{ab}{2} t \eval_{0}^{\frac{\pi}{2}} \]
+
+    Donc, un quart de l'aire de l'ellipse est égal à: 
+    \[\frac{ab}{2} \cdot \frac{\pi}{2} - 0 = \frac{1}{4}\pi ab\]
+    
+    Ainsi, on en déduit que l'aire d'une ellipse est donnée par: 
+    \[A_{ellipse} = \pi ab\]
+    ce qui est cohérent avec l'aire d'un cercle, où $a = b = r$.
+
+    \subparag{Note personnelle}{
+        L'aire d'une ellipse a une formule très simple, cependant c'est loin de la formule pour la périmètre d'une ellipse:
+        \imagehere[0.7]{memeAreaEllipse.png}
+
+        Voici une très bonne vidéo de Matt Parker, allias Stand-up Maths (qui a participé dans plusieurs vidéos de Numberphile, et qui est absolument incroyable), où il en parle: 
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=5nW3nJhBHL0}
+        \end{center}
+    }
+    
+}
+
+\end{document}

@@ -1,0 +1,261 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-10-06 at 10:09:20.
+\usepackage{../../style}
+
+\title{Analyse 1}
+\author{Joachim Favre}
+\date{Mercredi 06 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2021-10-06}{Fin des nombres complexes}{
+\begin{itemize}[left=0pt]
+    \item Définition du concept de conjugaison (le conjugué d'un nombre complexe) et de ses propriétés.
+    \item Dérivation de la formule du cosinus et du sinus données par somme d'exponentielle complexe, et explication de leur utilité.
+    \item Solution générale à l'équation $z^n = c$ où $c \in \mathbb{C}^*$ est une constante non-nulle, et $n \in \mathbb{N}$.
+    \item Explication du théorème fondamentale de l'algèbre.
+\end{itemize}
+
+}
+
+\parag{Exemple}{
+    Disons que nous avons $z = 2 - 2\sqrt{3}i$ et que nous voulons trouver $z^{15}$. Si nous voulons l'utiliser en utilisant les coefficient binomiaux, en utilisant le triangle de Pascale, nous aurions non seulement besoin d'arriver jusqu'à la quinzième ligne de ce triangle, mais aussi de trouver les 16 termes de $z^{15}$, puis de le simplifier.
+
+    Une meilleure méthode consiste à prendre la forme polaire exponentielle et appliquer la formule de De Moivre:
+    \[\left|z\right| = \sqrt{4 + 12} = 4, \mathspace \arg\left(z\right) = \arctan\left(-\frac{2\sqrt{3}}{2}\right) = \arctan\left(-\sqrt{3}\right) = -\frac{\pi}{3}\]
+
+    Donc:
+    \[z = 4e^{-i \frac{\pi}{3}} \implies z^{15} = 4^{15} e^{-5 \pi i} = 4^{15} e^{-\pi i} = -4^{15}\]
+}
+
+\parag{Définition de conjugaison}{
+    Soit $z = a + ib \in \mathbb{C}$. Son \important{conjugué}, $\bar{z}$, est défini comme :
+    \[\bar{z} \over{=}{\text{déf}} a - ib\]
+
+    Si $z \neq 0$, on peut donc noter
+    \[z^{-1} = \frac{a - ib}{a^2 + b^2} = \frac{\bar{z}}{\left|z\right|^2}\]
+
+    Donc, puisque $zz^{-1} = 1$, on a que:
+    \[\bar{z} z = \left|z\right|^2 \in \mathbb{R}\]
+}
+
+\parag{Conjugaison sous forme polaire}{
+    Soit $z = \rho\left(\cos\left(\phi\right) + i\sin\left(\phi\right)\right)$. On a que
+    \[\bar{z} = \rho\left(\cos\left(\phi\right) - i\sin\left(\phi\right)\right) = \rho\left(\cos\left(-\phi\right) + i\sin\left(-\phi\right)\right) \implies \bar{z} = \rho e^{-i\phi}\]
+
+    Puisque $\sin\left(x\right)$ est impair et $\cos\left(x\right)$ est pair.
+}
+
+\parag{Propriétés de la conjugaison}{
+    Pour $z, w \in \mathbb{C}$, on a:
+    \begin{enumerate}[left=0pt]
+        \item $\bar{z \pm w} = \bar{z} \pm \bar{w}$
+        \item $\bar{z\cdot w} = \bar{z} \cdot \bar{w}$
+        \item $\bar{\frac{z}{w}} = \frac{\bar{z}}{\bar{w}}$, $w \neq 0$
+        \item $\left|\bar{z}\right| = \left|z\right|$
+    \end{enumerate}
+
+    \subparag{Preuve}{
+        Laissée au lecteur. Indice: utiliser la forme cartésienne pour (1) et la forme polaire exponentielle pour (2), (3) et (4).
+    }
+
+    Ces propriétés nous permettent de simplement trouver le conjugué d'un nombre complexe: on remplace $i$ par $-i$.
+
+    De plus, puisque $z = a + ib$ et $\bar{z} = a - ib$, alors on a que
+    \[\Re\left(z\right) = \frac{z + \bar{z}}{2}, \mathspace \Im\left(z\right) = \frac{z - \bar{z}}{2i}\]
+
+    En particulier, si $\left|z\right| = 1$, on peut écrire $z$ sous la forme:
+    \[z = \cos\left(\phi\right) + i\sin\left(\phi\right) = e^{i\phi}\]
+
+    On peut en déduire la formule suivante $\forall \phi = \mathbb{R}$:
+    \begin{systemofequations}{}
+    &\ \cos\left(\phi\right) = \frac{e^{i\phi} + e^{-i\phi}}{2} \\
+    &\ \sin\left(\phi\right) = \frac{e^{i\phi} - e^{-i\phi}}{2i}
+    \end{systemofequations}
+}
+
+\parag{Application}{
+    On veut exprimer $\sin^{4} \phi$ en termes de fonctions de multiples de $\phi$:
+    \[\sin^4 \phi = \left(\frac{e^{i\phi} - e^{-i\phi}}{2i}\right)^{4} = \frac{1}{16} \left(e^{4i\phi} - 4e^{3i\phi} e^{-i\phi} + 6 e^{2i\phi} e^{-2i\phi} - 4 e^{i\phi} e^{-3i\phi} + 4^{-i\phi}\right) = \]
+
+    On peut simplifier ceci de la manière suivante:
+    \[\sin^{4} \phi = \frac{1}{16}\left(e^{4i\phi} - 4e^{2i\phi} + 6 - 4e^{-2i\phi} + e^{-4i\phi}\right) = \frac{1}{16}\left(\underbrace{e^{4i\phi} + e^{-4i\phi}}_{2\cos\left(4\phi\right)} \underbrace{- 4e^{2i\phi} -4e^{-2i\phi}}_{-8\cos\left(2\phi\right)} + 6\right)\]
+
+    On a donc:
+    \[\sin^4 \phi = \frac{1}{8} \cos\left(4\phi\right) - \frac{1}{2}\cos\left(2\phi\right) + \frac{3}{8}\]
+
+}
+
+\subsection{Racines de nombres complexes}
+\parag{Proposition}{
+    Si $w = \rho e^{i\phi} \in \mathbb{C}^*$, alors pour tout $n \in \mathbb{N}^*$:
+    \[\left\{z \in \mathbb{C}^* \telque z^{n} = w\right\} = \left\{\sqrt[n]{\rho}e^{i \frac{\phi + 2k\pi}{n}}, k = 0, 1 , 2, \ldots, n-1\right\}\]
+
+    \subparag{Démonstration}{
+        Soit $z = re^{i\theta}, r > 0, \theta \in \mathbb{R}$. Supposons que $z^{n} = w$, où $w = \rho e^{i\phi}$. En appliquant De Moivre, on trouve que
+        \[z^{n} = \left(r e^{i\phi}\right)^{n} = w \implies r^n e^{in \theta} = \rho e^{i\phi}\]
+
+        Donc,
+        \[r^{n} = \rho > 0 \iff r = \sqrt[n]{\rho}\]
+
+        Et, pour $k \in \mathbb{Z}$:
+        \[n\theta = \phi + 2k\pi \implies \theta = \frac{\phi + 2k\pi}{n}\]
+
+        Cependant, on remarque que
+        \[k = 0 \implies \theta = \frac{\phi}{n} \text{ et } k = n \implies \theta = \frac{\phi}{n} + 2\pi\]
+
+        Qui sont égaux, à $2k\pi$ près. Ainsi, on trouve donc bien que
+        \[\theta = \frac{\phi + 2k\pi}{n}, k = 0, 1, 2, \ldots, n - 1\]
+
+        Et donc que
+        \[\left\{z \in \mathbb{C}^* \telque z^{n} = w\right\} = \left\{\sqrt[n]{\rho}e^{i \frac{\phi + 2k\pi}{n}}, k = 0, 1 , 2, \ldots, n-1\right\}\]
+
+        \qed
+    }
+
+}
+
+\parag{Racine carrées}{
+    Si on a $z^{2} = w = \rho e^{i\phi}$, $\rho > 0$, alors :
+    \[\left\{z = \sqrt{\rho} e^{i \frac{\phi + 2k\pi}{2}}, k = 0, 1\right\} = \left\{\sqrt{\rho} e^{\frac{i\phi}{2}}, \sqrt{\rho}e^{i\left(\frac{\phi}{2} + \pi\right)}\right\} = \left\{\sqrt{\rho}e^{i \frac{\phi}{2}}, -\sqrt{\rho}e^{i \frac{\phi}{2}}\right\}\]
+
+    Il existe donc deux racines carrées pour tout $w \in \mathbb{C}^*$.
+}
+
+\parag{Exemple}{
+    Nous voulons résoudre l'équation $z^3 = -1 + i$, avec $z \in \mathbb{C}$.
+
+    Soit $w = -1 + i$. Nous avons que $\left|w\right| = \sqrt{2}$ et
+    \[\arg\left(z\right) = \arctan\left(\frac{-1}{1}\right) + \pi = \arctan\left(-1\right) + \pi = -\frac{\pi}{4} + \pi = \frac{3\pi}{4}\]
+
+    Nous savons par la proposition ci-dessus que:
+    \[\left\{z \telque z^3 = w, z \in \mathbb{C}^*\right\} = \left\{\sqrt[6]{2} e^{i \frac{\frac{3\pi}{4} + 2k\pi}{3}}, k = 0, 1, 2\right\}\]
+
+    \imagehere{SchemaSolutionsComplexesTriangle.png}
+
+    \subparag{Exercice au lecteur}{
+        Calculer les arguments des 3 racines $z_0, z_1, z_2$.
+    }
+
+    En général, les racines n-ièmes de $w \in \mathbb{C}^*$ sont situées sur un cercle de rayon $\sqrt[n]{\left|w\right|}$ aux sommets d'un polygône régulier à $n$ côtés, puisque la différence entre chaque argument est toujours $\frac{2\pi}{n}$.
+
+    L'orientation du polygône dépend de l'argument de $w$.
+}
+
+\parag{Exercice d'examen}{
+    Soit $z \in \mathbb{C}^*$. Alors l'équation $\left(\frac{z}{\bar{z}}\right)^2 = z$ possède:
+    \begin{enumerate}
+        \item Exactement deux solutions dans $C^*$
+        \item Exactement trois solutions dans $C^*$
+        \item Un nombre infini de solutions dans $\mathbb{C}*$
+        \item Au moins une solution $z \in \mathbb{C}*$ telle que $\left|z\right| > 1$.
+    \end{enumerate}
+
+    \subparag{Réponse}{
+        La réponse est (2). En effet, soit $z \neq 0$, $z = \rho e^{i\phi}$. Donc,
+        \[\left(\frac{\rho e^{i\phi}}{\rho e^{-i\phi}}\right) = \rho e^{i\phi} \implies \left(e^{2i\phi}\right)^2 = \rho e^{i\phi} \implies e^{4i\phi} = \rho e^{i\phi} \implies e^{3i\phi} = \rho\]
+
+        De là, on a que les arguments et les modules sont égaux. Donc, $\rho = 1$ et $e^{3i\phi} = 1$. On trouve ainsi:
+        \[\left\{\phi = \frac{2k\pi}{3}, k = 0, 1, 2\right\} \implies z = \left\{1, e^{i \frac{2\pi}{3}}, e^{i \frac{4\pi}{3}}\right\}\]
+
+        Ce qui donne donc bien trois solutions.
+    }
+}
+
+\subsection{Équations polynomiales dans $\mathbb{C}$}
+
+\parag{Équation quadratique}{
+    On veut trouver les solutions de $az^2 + bz + c = 0$ dans $\mathbb{C}$ avec $a, b, c \in \mathbb{C}$, et $a \neq 0$. En complétant le carré, on peut démontrer que la solution est toujours
+    \[z = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}\]
+
+    Où la racine carrée est celle d'un nombre complexe, et donc celle qu'on a définit plus haut.
+
+    Si $b^2 - 4ac = 0$, alors il existe une seule solution $z = -\frac{b}{2a}$. Sinon, si $b^2 - 4ac \neq 0$, alors il existe toujours deux solutions complexes.
+}
+
+\parag{Théorème fondamental de l'algèbre}{
+    Tout polynôme $P\left(z\right) = a_n z^n + a_{n - 1} z^{n-1} + \ldots + a_1 z + a_0$, avec $a_n, \ldots, a_0 \in \mathbb{C}$ et $a_n \neq 0$, s'écrit sous la forme
+    \[P\left(z\right) = a_n \left(z - z_1\right)\left(z - z_2\right)\ldots\left(z - z_n\right)\]
+
+    où $z_1, \ldots, z_n \in \mathbb{C}$ (peut-être avec des répétitions). Sans répétition nous avons
+    \[P\left(z\right) = a-n \left(z - w_1\right)^{m_1} \left(z - w_2\right)^{m_2}\ldots\left(z - w_p\right)^{m_p}\]
+
+    où $w_1, \ldots, w_p \in \mathbb{C}$ sont distincts et $m_1 + m_2 + \ldots + m_p = n$, avec $m_1, \ldots, m_p \in \mathbb{N}^*$. On dit que $m_i$ est la multiplicité de la racine $w_i$.
+
+    \subparag{Remarque}{
+        Ce n'est pas vrai dans $\mathbb{R}$. Par exemple,
+        \[P\left(x\right) = x^2 + 1 = 0\]
+
+        de degré 2 n'a pas de racine dans $\mathbb{R}$, mais a deux solutions, $x = \pm i$ dans $\mathbb{C}$.
+
+        Ainsi, dans $\mathbb{C}$, on peut écrire
+        \[P\left(x\right) = \left(x - i\right)\left(x + i\right) = 0\]
+    }
+}
+
+\parag{Exemple}{
+    Est-ce que le polynôme $z^2 + \left(1- i\right)z - i = P\left(z\right)$ est divisible par $\left(z - i\right)$ ? On peut soit vérifier que $P\left(i\right) = 0$, soit essayer de faire la division de polynôme (la première méthode est certainement la plus rapide).
+
+    On trouve bien que $z = i$ est une racine, donc que c'est divisible.
+}
+
+\subsection{Polynômes à coefficients réels}
+\parag{Proposition}{
+    Si $z \in \mathbb{C}$ est une racine de $P\left(z\right)$, un polynôme à \important{coefficients réels}, alors $\bar{z}$ l'est aussi.
+
+    \subparag{Démonstration}{
+        On va démontrer que $P\left(z\right) = 0 \implies P\left(\bar{z}\right) = 0$ si $P\left(z\right)$ a des coefficients réels. Donc,
+        \[P\left(\bar{z}\right) = a_n \bar{z}_n + \ldots + a_1 \bar{z}_1 + a_0 = \sum_{k=0}^{n} a_k \bar{z}_k\]
+
+        Puisque tous les coefficients sont réels, on sait que $a_k = \bar{a}_k$. Ainsi, c'est égal à:
+        \[\sum_{k=0}^{n} \bar{a}_k \bar{z}_k =  \bar{\sum_{k=0}^{n} a_k z_k} = \bar{P\left(z\right)} = \bar{0} = 0\]
+    }
+}
+
+\parag{Corolaire}{
+    Tout polynôme non-constant à coefficients réels peut être factorisé en produit de polynômes à coefficients réels de degré 1 ou 2.
+
+    \subparag{Démonstration}{
+        Soit $P\left(z\right)$ à coefficients réels, et $z_i \not \in \mathbb{R}$ une de ses solutions. On sait que $\bar{z}_i$ est aussi une racine, et donc que $\left(z - z_i\right)\left(z - \bar{z}_i\right)$ divise $P(z)$. En d'autres mots, on sait que $P\left(z\right)$ est un multiple de:
+        \[\left(z - z_i\right)\left(z - \bar{z}_i\right) = z^2 - z\left(z_i + \bar{z}_i\right) + z_i \bar{z}_i = z^2 - \left(2\Re\left(z_i\right)\right)z + \left|z\right|^2 \]
+        qui n'a que des coefficients réels.
+    }
+
+
+    \subparag{Exemple}{
+        Si on a
+        \[P\left(z\right) = z^3 - 2z^2 + z - 2 = \left(z-i\right)\left(z + i\right)\left(z- 2\right)\]
+        Alors on peut bien l'écrire sous la forme d'un produit de polynôme à coefficient réels de degré un ou deux:
+        \[P\left(z\right) = \left(z^2 - i^2\right)\left(z - 2\right) = \left(z^2 + 1\right)\left(z - 2\right)\]
+
+    }
+
+}
+
+\subsection{Sous-ensemble du plan complexe}
+\parag{Exemple 1}{
+    Soit $z_0 \in \mathbb{C}$ et $r > 0$ (donc $r \in \mathbb{R}$, c'est sous-entendu quand on dit que $r > 0$, puisque les nombres complexes ne sont pas ordonnés). Considérons $\left\{z \in \mathbb{C} \telque \left|z - z_0\right| = r\right\}$. Cela trace un cercle sur le plan complexe. En effet:
+    \[\left|z - z_0\right| = \left|x + iy - x_0 - iy_0\right| = \left|x - x_0 + i\left(y - y_0\right)\right| = \sqrt{\left(x - x_0\right)^2 + \left(y - y_0\right)^2} = r\]
+
+    Ce qui est équivalent à
+    \[\left(x - x_0\right)^2 + \left(y - y_0\right)^2 = r^2\]
+    qui est l'équation du cercle de rayon $r$ et centre $\left(x_0, y_0\right)$.
+
+    \imagehere{EnsembleCerclePlanComplexe.png}
+}
+
+\parag{Exemple 2}{
+    Soit l'ensemble suivant
+    \[\left\{z \in \mathbb{C}^* \telque \left(\frac{z}{\left|z\right|}\right)^3 = i\right\}\]
+
+    Prenons $z = \rho e^{i\phi}$ avec $\rho > 0$. Donc,
+    \[\left(\frac{\rho e^{i\phi}}{\rho}\right)^3 = i \implies e^{3i\phi} = i = e^{\frac{\pi}{2}i + 2k\pi i} \implies \phi \in \left\{\frac{\pi}{6}, \frac{\pi}{6} + \frac{2\pi}{3}, \frac{\pi}{6} + \frac{4\pi}{3}\right\}\]
+
+    Puisque $\rho$ est arbitraire, on n'a pas de condition dessus, ce sont donc les trois demis droites (sans le point $z = 0$) des trois angles de l'ensemble ci-dessus.
+
+    \imagehere{EnsembleDemiDroitesPlanComplexe.png}
+}
+
+\end{document}

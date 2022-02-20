@@ -1,0 +1,145 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-20 at 13:20:56.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Lundi 20 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{26}{2021-12-20}{Calcul de la SVD}{
+\begin{itemize}[left=0pt]
+    \item Fin de la réflexion pour le calcul de la SVD.
+    \item Généralisation de la méthode du calcul de la SVD à n'importe quelle matrice $m \times n$.
+    \item Décomposition de la SVD en somme, de manière similaire à la décomposition spectrale.
+\end{itemize}
+
+}
+
+\parag{Suite de l'exemple}{
+    Inévitablement, un des $A \bvec{v}_1$, $A \bvec{v}_2$ et $A \bvec{v}_3$ doit être être nul car ils sont orthogonaux et ils font partie de $\mathbb{R}^2$. Si les trois vecteurs étaient non-nuls, alors ils seraient linéairement indépendants (puisqu'ils sont orthogonaux); or, dans $\mathbb{R}^2$ on ne peut pas avoir de famille linéairement indépendantes avec plus de deux vecteurs.
+
+    Normalisons nos deux vecteurs non-nuls:
+    \[\bvec{u}_1 = \frac{1}{\left\|A \bvec{v}_1\right\|} A \bvec{v}_1 = \frac{1}{6\sqrt{10}} \begin{bmatrix} 18 \\ 6 \end{bmatrix} = \frac{1}{\sqrt{10}} \begin{bmatrix} 3 \\ 1 \end{bmatrix} \]
+    \[\bvec{u}_2 = \frac{1}{\left\|A \bvec{v}_2\right\|} A \bvec{v}_2 = \frac{1}{3\sqrt{10}} \begin{bmatrix} 3 \\ -9 \end{bmatrix} = \frac{1}{\sqrt{10}} \begin{bmatrix} 1 \\ -3 \end{bmatrix} \]
+
+    Définissons maintenant les \important{valeurs singulières} de $A$ (les valeurs propres étaient uniquement pour les matrices carrées, les valeurs singulières fonctionnent pour n'importe quelle matrice):
+    \[\sigma_1 = \left\|A \bvec{v}_1\right\| = \sqrt{\lambda_1} = \sqrt{360} = 6\sqrt{10}\]
+    \[\sigma_2 = \left\|A \bvec{v}_2\right\| = \sqrt{\lambda_2} = \sqrt{90} = 3\sqrt{10}\]
+
+    Pour rappel, pour calculer les valeurs singulières d'une matrice $A$, on doit calculer les valeurs propres de $A^T A$.
+
+    Ainsi, on a avait déjà:
+    \[\bvec{v}_1 = \begin{bmatrix} 1 / 3 \\  2 / 3 \\ 2 / 3\end{bmatrix}, \mathspace \bvec{v}_2 = \begin{bmatrix} -2 / 3 \\ -1 / 3 \\ 2 / 3 \end{bmatrix}, \mathspace \bvec{v}_3 = \begin{bmatrix} 2 / 3 \\ -2 / 3 \\ 1 / 3 \end{bmatrix}: \mathspace \text{base orthonormée de } \mathbb{R}^3\]
+    \[\bvec{u}_1 = \begin{bmatrix} 3 / \sqrt{10} \\ 1 / \sqrt{10} \end{bmatrix}, \mathspace \bvec{u}_2 = \begin{bmatrix} 1 / \sqrt{10} \\ -3 / \sqrt{10} \end{bmatrix}: \mathspace \text{base orthonormée de } \mathbb{R}^2\]
+
+    De plus, par construction, on peut écrire:
+    \[A \bvec{v}_1 = \sigma_1 \bvec{u}_1, \mathspace A \bvec{v}_2 = \sigma_2 \bvec{u}_2. \mathspace A \bvec{v}_3 = \bvec{0}\]
+
+    On peut écrire tout ça sous forme matricielle:
+    \[V = \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \bvec{v}_2 & \bvec{v}_3 \\  &  &  \end{bmatrix} = \frac{1}{3} \begin{bmatrix} 1 & -2 & 2 \\ 2 & -1 & -2 \\ 2 & 2 & 1 \end{bmatrix}: \mathspace \text{matrice $3\times3$ orthogonale}\]
+    \[U = \begin{bmatrix}  &  \\ \bvec{u}_1 & \bvec{u}_2 \\  &  \end{bmatrix} = \frac{1}{\sqrt{10}} \begin{bmatrix} 3 & 1 \\ 1 & -3 \end{bmatrix}: \mathspace \text{matrice $2 \times2$ orthogonale} \]
+    \[\Sigma = \begin{bmatrix} \sigma_1 & 0 & 0 \\ 0 & \sigma_2 & 0 \end{bmatrix} = \begin{bmatrix} 6 \sqrt{10} & 0 & 0 \\ 0 & 3\sqrt{10} & 0 \end{bmatrix}: \mathspace \text{matrice $2 \times 3$ diagonale}\]
+
+    Notez que le fait que $U$ soit symétrique est un accident. Tout ceci nous permet d'écrire:
+    \[A V = A \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \bvec{v}_2 & \bvec{v}_3 \\  &  &  \end{bmatrix} = \begin{bmatrix}  &  &  \\ A \bvec{v}_1 & A \bvec{v}_2 & A \bvec{v}_3 \\  &  &  \end{bmatrix} \]
+
+    En utilisant nos égalités, on trouve que:
+    \[AV = \begin{bmatrix}  &  &  \\ \sigma_1 \bvec{u}_1 & \sigma_2 \bvec{u}_2 & 0 \\  &  &  \end{bmatrix} = \begin{bmatrix}  &  \\ \bvec{u}_1 & \bvec{u}_2 \\  &  \end{bmatrix}  \begin{bmatrix} \sigma_1 & 0 & 0 \\ 0 & \sigma_2 & 0 \end{bmatrix} = U \Sigma \]
+
+    Ceci nous permet de conclure que:
+    \[AV = U \Sigma \implies A = U \Sigma V^{-1} = U \Sigma V^T\]
+    puisque $V$ est une matrice orthogonale. On a donc bien trouvé des matrices telles que:
+    \[A = U \Sigma V^T\]
+}
+
+\parag{Cas général}{
+    Soit $A \in \mathbb{R}^{m\times n}$ une matrice quelconque.
+
+    \begin{itemize}[left=0pt]
+        \item On sait par le théorème spectral que la matrice symétrique $A^T A$ de taille $n \times n$ a $n$ valeurs propres réelles $\lambda_1, \ldots, \lambda_n$ associées à une base de vecteurs propres orthonormées $\bvec{v}_1, \ldots, \bvec{v}_n \in \mathbb{R}^{n}$. On choisit d'ordonner les valeurs propres (on sait qu'elles sont réelles par le théorème spectral; si elles étaient complexes on ne pourrait pas les ordonner) de sorte que:
+        \[\lambda_1 \geq \lambda_2 \geq \ldots \geq \lambda_n\]
+
+    \item Les valeurs propres sont positives ou nulles car $\lambda_i = \left\|A \bvec{v}_i\right\|^2$ (on l'a prouvé). On définit donc:
+    \[\sigma_1 = \left\|A \bvec{v}_1\right\| = \sqrt{\lambda_1}, \mathspace \ldots, \mathspace \sigma_n = \left\|A \bvec{v}_n\right\| = \sqrt{\lambda_n}\]
+
+    Puisqu'on a ordonné nos valeurs propres, on a aussi la relation d'ordre suivante:
+    \[\sigma_1 \geq \sigma_2 \geq \ldots \geq \sigma_n \geq 0\]
+
+    On appelle $\sigma_1, \ldots, \sigma_n$ les \important{valeurs singulières} de $A$.
+    \item Il est possible que certaines des valeurs singulières de $A$ soient nulles. Disons que $A$ a $r$ valeurs singulières non nulles:
+    \[\sigma_1 \geq \sigma_2 \geq \ldots \geq \sigma_r > 0\]
+
+    En d'autres mots, si $n > r$, alors $\sigma_{r + 1} = \sigma_{r+2} = \ldots = \sigma_n = 0$.
+    \item On définit $r$ vecteurs unitaires (c'est-à-dire de norme égale à 1):
+    \[\bvec{u}_1 = \frac{1}{\left\|A \bvec{v}_1\right\|} A \bvec{v}_1 = \frac{1}{\sigma_1} A \bvec{v}_1\]
+    \[\vdots\]
+    \[\bvec{u}_r = \frac{1}{\left\|A \bvec{v}_r\right\|} A \bvec{v}_r = \frac{1}{\sigma_r} A \bvec{v}_r\]
+
+    On a donc:
+    \[A \bvec{v}_1 = \sigma_1 \bvec{u}_1, \mathspace \ldots, \mathspace A \bvec{v}_r = \sigma_r \bvec{u}_r\]
+
+    Les vecteurs $\bvec{u}_1, \ldots, \bvec{u}_r$ sont orthonormés dans $\mathbb{R}^m$ car ils sont orthogonaux (on a démontré que $\left(A \bvec{v}_i\right) \dotprod \left(A \bvec{v}_j\right) = 0$ quand $i \neq j$) et car ils sont de norme égale à 1.
+    \item Les vecteurs $\bvec{u}_1, \ldots, \bvec{u}_r$ sont linéairement indépendants dans $\mathbb{R}^m$. Donc, on a forcément que $r \leq m$ (par la dimension de $\mathbb{R}^m$). Il reste deux cas possibles:
+        \begin{itemize}
+            \item Si $r = m$, alors $\bvec{u}_1, \ldots, \bvec{u}_r$ forment une base orthonormée de $\mathbb{R}^m$.
+            \item Si $r < m$, alors $\bvec{u}_1, \ldots, \bvec{u}_r$ forment une base orthonormée d'un sous-espace de $\mathbb{R}^m$. On sait qu'il est toujours possible de compléter cette base en choisissant $m - r$ vecteurs $\bvec{u}_{r+1}, \ldots, \bvec{u}_m$ tels que:
+            \[\bvec{u}_1, \ldots, \bvec{u}_r, \bvec{u}_{r+1}, \ldots, \bvec{u}_m\]
+            forment une base orthonormée de $\mathbb{R}^m$. En effet, on peut compléter la base avec des vecteurs, puis on peut appliquer le Grand Schtroumpf: il ne fera rien aux $r$ premiers vecteurs puisqu'ils sont déjà orthonormaux, mais va rendre orthonormaux les vecteurs qu'on ajouté.
+        \end{itemize}
+
+    \item Dans tous les cas, on a:
+    \[A \bvec{v}_i = \sigma_i \bvec{u}_i, \mathspace \forall i = 1, \ldots, \min\left(m, n\right)\]
+    (Cette expression ne fait du sens que quand $\bvec{v}_i$ et $\bvec{u}_i$ sont définis, c'est pourquoi on a besoin du $\min$.)
+
+    En effet, c'est vrai pour $i \leq r$ car c'est comme ça qu'on a défini $\bvec{u}_i$:
+    \[\bvec{u}_i = \frac{1}{\left\|A \bvec{v}_i\right\|} = A \bvec{v}_i, \mathspace \sigma_i = \left\| A \bvec{v}_i\right\|\]
+
+    De plus, c'est aussi vrai quand $i > r$ car $\sigma_i = 0$, donc:
+    \[\left\|A \bvec{v}_i\right\| = 0 \implies A \bvec{v}_i = \bvec{0}\]
+
+
+    \item Prenons les matrices suivantes, qui vont nous permettre de simplifier l'écriture:
+    \[U = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_m \\  &  &  \end{bmatrix} \in \mathbb{R}^{m \times m}, \mathspace \text{orthogonale}\]
+    \[V = \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \ldots & \bvec{v}_n \\  &  &  \end{bmatrix} \in \mathbb{R}^{n \times n}, \mathspace \text{orthogonale}\]
+    \[\Sigma \in \mathbb{R}^{m \times n}, \mathspace \text{ diagonale avec } \Sigma_{ii} = \sigma_i\]
+
+    Pour rappel, une matrice $m \times n$ diagonale est telle que:
+    \[i \neq j \implies \Sigma_{ij} = 0\]
+
+    \imagehere{matriceDiagonaleSVD.png}
+
+    \item On peut écrire nos équations de manières compactes:
+    \[AV = U\Sigma\]
+
+    Ainsi, puisque $VV^T = I_n$ (c'est une matrice orthogonale), on sait que $V^{-1} = V^T$. Ceci nous permet d'en déduire que:
+    \[A = U\Sigma V^T\]
+
+    On a donc bien trouvé la décomposition SVD de $A$.
+    \end{itemize}
+}
+
+\parag{Décomposition en somme}{
+    On sait que quand $A = A^T$, alors on peut écrire:
+    \[A = VDV^T, \mathspace V = \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \ldots & \bvec{v}_n \\  &  &  \end{bmatrix}, \mathspace D = \begin{bmatrix} \lambda_1 & \ldots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \ldots & \lambda_n \end{bmatrix} \]
+
+    On avait discuté au cours précédent qu'on peut écrire cela sous la forme de la décomposition spectrale:
+    \[A = \lambda_1 \bvec{v}_1 \bvec{v}_1^T + \ldots + \lambda_n \bvec{v}_n \bvec{v}_n^T\]
+
+    De manière complètement similaire, on sait que, par la SVD, on peut écrire:
+    \[A = U \Sigma V^T, \mathspace  \]
+
+    Où:
+    \[U = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_m \\  &  &  \end{bmatrix}, \mathspace V = \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \ldots & \bvec{v}_n \\  &  &  \end{bmatrix}, \mathspace \Sigma = \begin{bmatrix} \sigma_1 & \ldots & 0 & \ldots & 0 \\ \vdots & \ddots & \vdots &  & \vdots \\ 0 & \ldots & \sigma_r & \ldots & 0 \\ \vdots &  & \vdots &  & \vdots \\ 0 & \ldots & 0 & \ldots & 0 \end{bmatrix}\]
+
+    De manière très similaire, on peut donc aussi écrire:
+    \[A = \sigma_1 \bvec{u}_1 \bvec{v}_1^T + \ldots + \sigma_r \bvec{u}_r \bvec{v}_r^T\]
+
+    Ceci est justifiable de la même manière que pour la décomposition spectrale.
+}
+
+\end{document}

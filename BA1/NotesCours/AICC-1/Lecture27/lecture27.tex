@@ -1,0 +1,326 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-21 at 08:35:50.
+
+\usepackage{../../style}
+
+\title{AICC}
+\author{Joachim Favre}
+\date{Mardi 21 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{27}{2021-12-21}{Staying on the road on average}{
+\begin{itemize}[left=0pt]
+    \item Proof of the linearity of expectations.
+    \item Definition of independent random variables, and proof of the fact that the expected values of the product of independent random variables is the product of the expected values. 
+    \item Definition of variance and standard deviation. 
+    \item Proof of a theorem and a corollary allowing to compute variance more easily.
+    \item Proof of the law of the unconscious statistician. 
+    \item Proof of Bianmé's formula, stating that the variance of independent random variables is linear.
+\end{itemize}
+}
+
+\parag{Example}{
+    On an exam we have 24 questions with 4 choices. Let's say we are doing random guessing. We want to know the expected value.
+
+    This is a Bernoulli trial with $n = 24$ and $p = \frac{1}{4}$, so: 
+    \[E\left(X\right) = \frac{24}{4} = 6\]
+    
+    Similarly, if someone knows the answer to 12 questions, then, by guessing randomly on the 12 other questions, he or she will get $E\left(X\right) = 3$ points. So, if the teacher wants us to answer 12 questions, then the average must be at 15 points.
+}
+
+\parag{Theorem: linearity of expectations}{
+    Let $X_1, \ldots, X_n$ are random variables on $S$ and $a, b \in \mathbb{R}$. Then:  
+    \[E\left(X_1 + \ldots + X_n\right) = E\left(X_1\right) + \ldots + E\left(X_n\right)\]
+    \[E\left(aX + b\right) = aE\left(X\right) + b\]
+    
+    \subparag{Proof}{
+        The proof is based on the fact that we are using sums, which are linear.
+
+        Let's proof the case that $E\left(X_1 + X_2\right) = E\left(X_1\right) + E\left(X_2\right)$. Notice that $X_1$ and $X_2$ are functions, so $\left(X_1 + X_2\right)\left(s\right) = X_1\left(s\right) + X_2\left(s\right)$. Thus, by our theorem on the computation of expected values:
+        \[E\left(X_1 + X_2\right) = \sum_{s \in S}^{} \left(X_1 + X_2\right)\left(s\right)p\left(s\right) = \sum_{s \in S}^{} \left(X_1\left(s\right) + X_2\left(s\right)\right)p\left(s\right)\]
+
+        Which we can simplify using the linearity of summations: 
+        \[\sum_{s \in S}^{} X_1\left(s\right)p\left(s\right) + \sum_{s \in S}^{} X_2\left(s\right)p\left(s\right) = E\left(X_1\right) + E\left(X_2\right)\]
+        
+    }
+}
+
+\parag{Example 1}{
+    We are rolling two dice. Let $X_1$ be the number that the first dice rolled, and $X_2$ be the same for the second dice. We know that: 
+    \[E\left(X_1\right) = E\left(X_2\right) = \frac{7}{2}\]
+    
+    Thus, by our theorem, the expected value of their sum is given by: 
+    \[E\left(X_1 + X_2\right) = E\left(X_1\right) + E\left(X_2\right) = \frac{7}{2} + \frac{7}{2}\]
+
+    In other words, we did not have to do all the hard work we did to compute the expected value of the sum of two dice; this theorem is very powerful.
+}
+
+\parag{Example 2: Bernoulli Trials}{
+    Let's say we are doing Bernoulli trials with probability of success $p$. Let $X_i$ be the random variable that gives $1$ if the $i$\Th trial is a success, and $0$ if it is not. We notice that the expected value of a specific variable is: 
+    \[E\left(X_i\right) = p\cdot 1 + 0\left(1 - p\right) = p\]
+    
+    Thus, the expected value of $n$ trials is given by: 
+    \[E\left(X_1 + \ldots + X_n\right) = E\left(X_1\right) + \ldots + E\left(X_n\right) = p + \ldots + p = np\]
+    
+}
+
+\parag{Example 3}{
+    Let $X_i$ be the random variable that defines the number of points we get when checking $i$ answers: 
+    \begin{center}
+    \begin{minipage}{0.45\textwidth}
+        \begin{functionbypart}{X_1\left(S\right)}
+        1, \mathspace \text{correct}  \\
+        \frac{-1}{3}, \mathspace \text{incorrect}
+        \end{functionbypart}
+    \end{minipage}
+    \begin{minipage}{0.45\textwidth}
+        \begin{functionbypart}{X_2\left(S\right)}
+        \frac{1}{2}, \mathspace \text{correct}  \\
+        \frac{-1}{2}, \mathspace \text{incorrect}
+        \end{functionbypart}
+    \end{minipage}
+    \end{center}
+
+    Let's say we no longer want negative points, so let us define $Y_i\left(s\right) = 6X_i\left(s\right) + 3$:
+    \begin{center}
+    \begin{minipage}{0.45\textwidth}
+        \begin{functionbypart}{Y_1\left(S\right)} 
+        9, \mathspace \text{correct}  \\
+        1, \mathspace \text{incorrect}
+        \end{functionbypart}
+    \end{minipage}
+    \begin{minipage}{0.45\textwidth}
+        \begin{functionbypart}{Y_2\left(S\right)}
+        6, \mathspace \text{correct}  \\
+        0, \mathspace \text{incorrect}
+        \end{functionbypart}
+    \end{minipage}
+    \end{center}
+
+    We can compute the expected value of our new variables: 
+    \[E\left(Y_i\right) = 6E\left(X_i\right) + 3 = 6\cdot 0 + 3 = 3\]
+
+    Which is a bias the Professor would have to correct when setting the average.
+}
+
+\parag{Definition}{
+    The ordered pair $\left(i, j\right)$ is an \important{inversion} of a permutation of the first $n$ positive integers if $i < j$ but $j$ precedes $i$ in the permutation.
+
+    \subparag{Example}{
+        There are six inversions in the permutation of $3, 5, 1, 4, 2$: 
+        \[\left(1, 3\right), \left(1, 5\right), \left(2, 3\right), \left(2, 4\right), \left(2, 5\right), \left(4, 5\right)\]
+        
+    }
+    
+}
+
+\parag{Expected number of inversions}{
+    We want to find the expected number of inversions in a random permutation of the first $n$ integers.
+
+    Let $S$ be our sample space, i.e. all permutations of $n$ integers. Moreover, let $I_{i,j}\left(s\right)$ be a random variable defined as follows: 
+    \begin{functionbypart}{I_{i,j}\left(s\right)}
+        1, \mathspace \text{if $\left(i, j\right)$ has been inverted} \\
+        0, \mathspace \text{otherwise}
+    \end{functionbypart}
+
+    Let's also define the following random variable: 
+    \[X\left(s\right) = \sum_{1 \leq i < j \leq n}^{} I_{i,j}\left(s\right)\]
+    
+    It counts the number of inversions. Let's compute the expected value of $I_{i,j}$: 
+    \[E\left(I_{i,j}\right) = \sum_{r \in I_{i, j}\left(S\right)}^{} rp\left(I_{i, j} = r\right) = 1\cdot p\left(I_{i, j} = 1\right) + 0\cdot p\left(I_{i, j} = 0\right) = 1\cdot \frac{1}{2} + 0\cdot \frac{1}{2} = \frac{1}{2}\]
+    
+    Indeed, if we fix a pair, then for every permutation there are two versions: one in which they are exchanged and one in which they are in order. Thus, $p\left(I_{i, j} = 1\right) = p\left(I_{i, j} = 0\right) = \frac{1}{2}$.
+
+    We still need to compute the expected value of $X$: 
+    \[E\left(X\right) = E\left(\sum_{1 \leq i < j \leq n}^{}I_{i,j}\right) = \sum_{1 \leq i < j \leq n}^{} E\left(I_{i,j}\right) = \sum_{1 \leq i < j \leq n}^{} \frac{1}{2} = \binom{n}{2} \frac{1}{2} = \frac{n\left(n-1\right)}{4}\]
+}
+
+\parag{Definition: Independent random variables}{
+    The random variables $X$ and $Y$ on a sample space $S$ are independent if: 
+    \[p\left(X = r_1 \land Y = r_2\right) = p\left(X = r_1\right)\cdot p\left(Y = r_2\right)\]
+    
+}
+
+\parag{Theorem}{
+    If $X$ and $Y$ are independent variables on a sample space $S$, then: 
+    \[E\left(X \cdot Y\right) = E\left(X\right) E\left(Y\right)\]
+    
+    \subparag{Proof}{
+        Let's do a direct proof:
+        \[E\left(X \cdot Y\right) = \sum_{s \in S}^{} \left(X\cdot Y\right)\left(s\right)p\left(s\right) = \sum_{s \in S}^{} X\left(s\right)Y\left(s\right)p\left(s\right)\]
+
+        As usual, let's group terms:
+        \[\sum_{r_1 \in X\left(S\right)}^{}  \sum_{r_2 \in X\left(S\right)}^{} \sum_{\substack{s \in S \\ X\left(s\right) = r_1 \\ Y\left(s\right) = r_2}}^{} r_1 r_2 p\left(s\right) = \sum_{r_1 \in X\left(S\right)}^{}  \sum_{r_2 \in X\left(S\right)}^{} r_1 r_2 \sum_{\substack{s \in S \\ X\left(s\right) = r_1  \\ Y\left(s\right) = r_2}}^{} p\left(s\right)\]
+
+        The third sum is, by definition, $p\left(X = r_1 \land Y = r_2\right)$:
+        \[\sum_{r_1 \in X\left(S\right)}^{}  \sum_{r_2 \in X\left(S\right)}^{} r_1 r_2 p\left(X = r_1 \land Y = r_2\right)\]
+
+        We know that our two random variables are independent, so:
+        \[\sum_{r_1 \in X\left(S\right)}^{}  \sum_{r_2 \in X\left(S\right)}^{} r_1 r_2 p\left(X = r_1\right) p\left(Y = r_2\right)\]
+        Again, we can group terms:
+        \[\sum_{\substack{r_1 \in X\left(S\right)}}^{} r_1 p\left(X_1 = r_1\right) \underbrace{\sum_{r_2 \in Y\left(s\right)}^{} r_2 p\left(Y = r_2\right)}_{E\left(Y\right)}\]
+
+        Since $E\left(Y\right)$ does not depend on $r_1$, we can factor it out of the sum:
+        \[E\left(Y\right) \sum_{r_1 \in X\left(S\right)}^{} r_1 p\left(X = r_1\right) = E\left(Y\right) E\left(X\right)\]
+
+        \qed
+    }
+}
+
+\subsection{Variance}
+\parag{Definition: variance}{
+    Let $X$ be a random variable on the sample space $S$. The \important{variance} of $X$, denoted by $V\left(X\right)$, is: 
+    \[V\left(X\right) = \sum_{s \in S}^{} \left(X\left(s\right) - E\left(X\right)\right)^2 p\left(s\right)\]
+    
+    \subparag{Motivation}{
+        There are many ways of having a random variable which expected value is a number. For instance, it could always give the same number, or it could give numbers in both extremes. As the Professor says, if you are on the road on average, it does not make you a good driver.
+
+        Variance is a way of measuring the ``average distance to the mean''. The square is here for many reasons. First, it makes $X\left(S\right) - E\left(X\right)$ positive (working with absolute values is always very complicated; squares allow us to differentiate this, for example). Second, this is usual to take the square of the distance (see least squares in algebra, for example). Third, this will give us a nice theorem hereinafter.
+    }
+}
+
+\parag{Definition: standard deviation}{
+    The \important{standard deviation} of $X$, denoted by $\sigma\left(X\right)$, is defined as: 
+    \[\sigma\left(X\right) = \sqrt{V\left(X\right)}\]
+    
+    \subparag{Note}{
+        We take a square root to remove the square from the variance. This is for example very important for physical units.
+    }
+    
+}
+
+\parag{Example}{
+    Let $X$ and $Y$ be random variables on $S = \left\{1, 2, 3, 4, 5, 6\right\}$. Let's define them as follows:
+    \begin{center}
+    \begin{minipage}{0.45\textwidth}
+        \[X\left(s\right) = 0, \mathspace \forall s \in S\]
+    \end{minipage}
+    \begin{minipage}{0.45\textwidth}
+        \begin{functionbypart}{Y\left(s\right)}
+        -1, \mathspace s \in \left\{1, 2, 3\right\}  \\
+        1, \mathspace s \in \left\{4, 5, 6\right\}
+        \end{functionbypart}
+    \end{minipage}  
+    \end{center}
+
+    We can compute their expected values, and realise that, in fact, we cannot distinguish them thanks to that:
+    \[E\left(X\right) = E\left(Y\right) = 0\]
+    
+    Let's now compute the variance of $X$: 
+    \[V\left(X\right) = \sum_{s \in S}^{} \underbrace{\left(X\left(s\right) - E\left(X\right)\right)^2}_{= 0} p\left(s\right) = 0\]
+    
+    Let's also compute the variance of $Y$: 
+    \[V\left(Y\right) = \sum_{s \in S}^{} \underbrace{\left(Y\left(s\right) - E\left(Y\right)\right)^2}_{= 1} p\left(s\right) = \sum_{s \in S}^{} \frac{1}{6} = 1\]
+    
+}
+
+\parag{Theorem}{
+    If $X$ is a random variable on a sample space $S$, then: 
+    \[V\left(X\right) = E\left(X^2\right) - E\left(X\right)^2\]
+
+    \subparag{Proof}{
+        By definition of the variance: 
+        \begin{multiequality}
+            V\left(X\right) =\ & \sum_{s \in S}^{} \left(X\left(s\right) - E\left(X\right)\right)^2 p\left(s\right) \\
+            =\ & \underbrace{\sum_{s \in S}^{} X\left(s\right)^2 p\left(s\right)}_{= E\left(X^2\right)} - 2 \sum_{s \in S}^{} X\left(s\right) E\left(X\right)p\left(s\right) + \sum_{s \in S}^{} E\left(X\right)^2 p\left(s\right)\\
+            =\ & E\left(X^2\right) - 2 E\left(X\right) \underbrace{\sum_{s \in S}^{} X\left(s\right)p\left(s\right)}_{= E\left(X\right)} + E\left(X\right)^2 \underbrace{\sum_{s \in S}^{} p\left(s\right)}_{= 1}  \\
+            =\ & E\left(X^2\right) - 2 E\left(X\right) E\left(X\right) + E\left(X\right)^2 \\
+            =\ & E\left(X^2\right) - E\left(X\right)^2  
+        \end{multiequality}
+
+        \qed
+    }
+}
+
+\parag{Corollary}{
+    If $X$ is a random variable on a sample space $S$, and $E\left(X\right) = \mu$, then: 
+    \[V\left(X\right) = E\left(\left(X - \mu\right)^2\right)\]
+
+    \subparag{Proof}{
+        Let's look at $E\left(\left(X - \mu\right)^2\right)$: 
+        \[E\left(\left(X - \mu\right)^2\right) = E\left(X^2 - 2\mu X + \mu^2\right) = E\left(X^2\right) - 2\mu E\left(X\right) + \mu^2  \]
+
+        And thus, by the definition of $\mu$:
+        \[E\left(X^2\right) - 2\mu \mu + \mu^2 = E\left(X^2\right) - \mu^2 = E\left(X^2\right) - E\left(X\right)^2 = V\left(X\right)\]
+
+        Which is the variance by our theorem above.
+
+        \qed
+    }
+}
+
+\parag{Theorem: law of the unconscious statistician}{
+    Let $X$ be a random variable, and $g$ be a function. Then: 
+    \[E\left(g\left(X\right)\right) = \sum_{x \in X\left(S\right)}^{} g\left(x\right)p\left(X = x\right)\]
+    
+    \subparag{Name}{
+        This theorem is named the ``law of the unconscious statistician'' since we apply it very often without realising that we are doing so. 
+    }
+    
+
+    \subparag{Proof}{
+        Let's do a direct proof:
+        \[E\left(g\left(X\right)\right) = \sum_{s \in S}^{} g\left(X\left(s\right)\right) p\left(s\right) = \sum_{x \in X\left(S\right)}^{} \sum_{\substack{s \in S \\ X\left(s\right) = x}}^{} g\left(X\left(s\right)\right)p\left(s\right) \]
+
+        Since we grouped terms, $X\left(S\right) = x$, which does not depend on $s$:
+        \[\sum_{x \in X\left(S\right)}^{} g\left(x\right) \sum_{\substack{s \in S \\ X\left(s\right) = x}}^{} p\left(s\right) = \sum_{x \in X\left(S\right)}^{} g\left(x\right) p\left(X = x\right) \]
+
+        \qed
+    }
+}
+
+\parag{Example}{
+    Let's compute the variance of the number that comes up when a fair die is rolled: 
+    \[V\left(X\right) = E\left(X^2\right) - E\left(X\right)^2\]
+    
+    We already know that $E\left(X\right) = \frac{7}{2}$, but we must also compute $E\left(X^2\right)$. We can do so by using the law of the unconscious statistician: 
+    \[E\left(X^2\right) = \frac{1}{6} \left(1^2 + 2^2 + 3^2 + 4^2 + 5^2 + 6^2\right) = \frac{91}{6}\]
+    
+    So, we get that: 
+    \[V\left(X\right) = \frac{91}{6} - \left(\frac{7}{2}\right)^2 = \frac{35}{12}\]
+}
+
+\parag{Bienaymé's formula}{
+   Let $X$ and $Y$ be two independent random variables on a sample space $S$, then: 
+   \[V\left(X + Y\right) = V\left(X\right) + V\left(Y\right)\]
+   
+   This can be generalised to $n$ independent random variables:
+   \[V\left(X_1 + \ldots + X_n\right) = V\left(X_1\right) + \ldots + V\left(X_n\right)\]
+   
+   \subparag{Proof}{
+       Let's do a direct proof:
+       \begin{multiequality}
+           V\left(X + Y\right) =\ & E\left(\left(X + Y\right)^2\right) - E\left(X + Y\right)^2  \\
+           =\ & E\left(X^2 + 2XY + Y^2\right) - \left(E\left(X\right) + E\left(Y\right)\right)^2  \\
+           =\ & E\left(X^2\right) + 2\overbrace{E\left(XY\right)}^{= E\left(X\right)E\left(Y\right)} + E\left(Y^2\right) \\
+           & - E\left(X\right)^2 - 2E\left(X\right)E\left(Y\right) - E\left(Y\right)^2 \\
+           =\ & E\left(X^2\right) - E\left(X\right)^2 + E\left(Y^2\right) - E\left(Y\right)^2\\
+           =\ & V\left(X\right) + V\left(Y\right) 
+       \end{multiequality}
+
+       So, we are indeed using the fact that those random variables are independent.
+
+       \qed
+   }
+}
+
+
+\parag{Variance of Bernoulli trials}{
+    We want to know the variance of random variable $X$, where $X\left(t\right) = 1$ if the Bernoulli trial is a success, and $X\left(t\right) = 0$. We know that $E\left(X\right) = p$, let's compute $E\left(X^2\right)$ using the law of the unconscious statistician:
+    \[E\left(X^2\right) = p\cdot 1^2 + \left(1 - p\right)\cdot 0^2 = p\]
+    
+    So, our variance is given by: 
+    \[V\left(X\right) = E\left(X^2\right) - E\left(X\right)^2 = p - p^2 = p\left(1 - p\right) = pq\]
+
+    Thus, since trials are independent, the variance of $n$ of them is given by: 
+    \[V\left(X_1 + \ldots + X_n\right) = V\left(X_1\right) + \ldots + V\left(X_n\right) = pq + \ldots + pq = npq\]
+}
+
+
+
+
+
+\end{document}

@@ -1,0 +1,147 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-22 at 13:16:54.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Lundi 22 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{18}{2021-11-22}{Fin de la propreté et début des produits scalaires}{
+\begin{itemize}[left=0pt]
+    \item Fin des matrices diagonales en expliquant leur utilité, et en revenant à Fibonacci et aux changement de base d'applications linéaires.
+    \item Définition de distance Euclidienne.
+    \item Définition du produit scalaire.
+\end{itemize}
+
+}
+
+\parag{Théorème}{
+    Soit $A \in \mathbb{R}^{n\times n}$ une matrice quelconque et soient $\lambda_1, \ldots \lambda_p$ les valeurs propres distinctes de $A$.
+
+    On a toujours que $\dim\ker\left(A - \lambda_i I_n\right)$ (la dimension géométrique de $\lambda_i$) est inférieure ou égale à la multiplicité algébrique de $\lambda_i$ pour chaque $i$.
+
+    $A$ est diagonalisable si et seulement si $\dim\ker\left(A - \lambda_i I_n\right)$ est égale à la multiplicité algébrique de $\lambda_i$ pour tout $i \in \left\{1, 2, \ldots, p\right\}$
+
+    \subparag{Remarque}{
+        Si $A$ est diagonalisable, alors pour chaque $\lambda_i$, on peut trouver une base $\mathcal{B}_i$ de $\ker\left(A - \lambda_i I_n\right)$. Mises toutes ensemble, les bases $\mathcal{B}_1, \ldots, \mathcal{B}_p$ forment une base de vecteurs propres de $A$ pour $\mathbb{R}^{n}$.
+    }
+}
+
+\parag{Exemple}{
+    Soit la matrice suivante:
+    \[A = \begin{bmatrix} 5 & 0 & 0 & 0 \\ 0 & 5 & 0 & 0 \\ 1 & 4 & -3 & 0 \\ -1 & -2 & 0 & -3 \end{bmatrix} \]
+
+    On remarque que la matrice est triangulaire inférieure, donc que ses valeurs propres sont sur sa diagonale. Ainsi, on trouve que $\lambda_1 = 5$ et $\lambda_2 = -3$, avec une multiplicité algébrique de 2 chacune. En effet, le polynôme caractéristique de $A$ est donné par:
+    \[p_A\left(\lambda\right) = \det\left(A - \lambda I_4\right) = \left(5 - \lambda\right)^2\left(-3 - \lambda\right)^2\]
+
+    Calculons maintenant les espaces propres associés aux valeurs propres:
+    \[\ker\left(A - \lambda_1 I_4\right) = \ker\begin{bmatrix} 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 1 & 4 & -8 & 0 \\ -1 & -2 & 0 & -8 \end{bmatrix} = \vect\left\{\begin{bmatrix} 8 \\ 0 \\ 1 \\ -1 \end{bmatrix}, \begin{bmatrix} 0 \\ 4 \\ 2 \\ -1 \end{bmatrix} \right\}\]
+    \[\ker\left(A - \lambda_2 I_4\right) = \ker\begin{bmatrix} 8 & 0 & 0 & 0 \\ 0 & 8 & 0 & 0 \\ 1 & 4 & 0 & 0 \\ -1 & -2 & 0 & 0 \end{bmatrix} = \vect\left\{\begin{bmatrix} 0 \\ 0 \\ 1 \\ 0 \end{bmatrix}, \begin{bmatrix} 0 \\ 0 \\ 0 \\ 1 \end{bmatrix} \right\}\]
+
+    On en déduit que l'ensemble suivant est une base de $\mathbb{R}^4$ de vecteurs propres de $A$.
+    \[\left\{\begin{bmatrix} 8 \\ 0 \\ 1 \\ -1 \end{bmatrix}, \begin{bmatrix} 0 \\ 4 \\ 2 \\ -1 \end{bmatrix}, \begin{bmatrix} 0 \\ 0 \\ 1 \\ 0 \end{bmatrix}, \begin{bmatrix} 0 \\ 0 \\ 0 \\ 1 \end{bmatrix} \right\}\]
+
+    Ainsi, on en déduit que $A = PDP^{-1}$, où:
+    \[P = \begin{bmatrix} 8 & 0 & 0 & 0 \\ 0 & 4 & 0 & 0 \\ 1 & 2 & 1 & 0 \\ -1 & -1 & 0 & 1 \end{bmatrix}, \mathspace D = \begin{bmatrix} 5 & 0 & 0 & 0 \\ 0 & 5 & 0 & 0 \\ 0 & 0 & -3 & 0 \\ 0 & 0 & 0 & -3 \end{bmatrix} \]
+}
+
+\parag{Retour à Fibonacci}{
+    Revenons à notre exemple de Fibonacci, voir ce qu'on peut faire plus rapidement avec nos nouveaux outils. Pour rappel, on avait trouvé:
+    \[\begin{bmatrix} f_k \\ f_{k+1} \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix}^{k} \begin{bmatrix} 1 \\ 1 \end{bmatrix} \]
+
+    On peut prendre:
+    \[A = \begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix} \implies p_A\left(\lambda\right) = \det\begin{bmatrix} -\lambda & 1 \\ 1 & 1-\lambda \end{bmatrix} = -\lambda\left(1 - \lambda\right) - 1 = \lambda^2 - \lambda - 1 = \left(\lambda - \phi\right)\left(\lambda - \bar{\phi}\right)\]
+
+    Donc, $\lambda_1 = \phi$ et $\lambda_2 = \bar{\phi}$, où:
+    \[\phi = \frac{1 + \sqrt{5}}{2}, \mathspace \bar{\phi} = \frac{1 - \sqrt{5}}{2}\]
+
+    Les deux valeurs propres sont distinctes, donc $A$ est diagonalisable. Dès lors, $A = PDP^{-1}$, et on sait comment calculer $P$ et $D$. Ainsi:
+    \[\begin{bmatrix} f_{k} \\ f_{k+1} \end{bmatrix} = A^k \begin{bmatrix} 1 \\ 1 \end{bmatrix} = \left(PDP^{-1}\right)^k \begin{bmatrix} 1 \\ 1 \end{bmatrix} = PD^k P^{-1} \begin{bmatrix} 1 \\ 1 \end{bmatrix} = P\begin{bmatrix} \lambda_1^k & 0 \\ 0 & \lambda_2^k \end{bmatrix} P^{-1} \begin{bmatrix} 1 \\ 1 \end{bmatrix} \]
+
+    De manière générale, les matrices diagonalisables nous permettent d'étudier beaucoup de systèmes dynamiques. Elles nous permettent aussi de résoudre des systèmes d'équations différentielles, ou d'étudier les chaines de Markov.
+}
+
+\parag{Changement de base d'application linéaire}{
+    Soit $T : \mathbb{R}^n \mapsto \mathbb{R}^n$ une application linéaire avec $T\left(\bvec{x}\right) = A \bvec{x}$, où $A \in \mathbb{R}^{n \times n}$ est la matrice de $T$ pour la base canonique.
+
+    Soit $\mathcal{C} = \left(\bvec{c}_1, \ldots, \bvec{c}_n\right)$ une base quelconque de $\mathbb{R}^n$. On se demande quelle est la matrice de $T$ pour la base $\mathcal{C}$. En d'autres mots, on cherche $B \in \mathbb{R}^{n \times n}$ telle que $\left[T\left(\bvec{x}\right)\right]_{\mathcal{C}} = B\left[\bvec{x}\right]_{\mathcal{C}}$.
+
+    \imagehere[0.7]{DiagonalisationEtApplicationsLineaires.png}
+
+    On trouve donc que $B = C^{-1} A C$, et donc $B$ et $A$ sont semblables.
+
+    Note personnelle: au lieu de faire un dessin, on peut aussi utiliser les matrices de passage (dont la notation est très cohérente). Notons $\mathcal{E}$, la base canonique. On a $C = \matricepassage{C}{E}$, et $A$ ``prend un vecteur en base $\mathcal{E}$ en entrée'', et ``donne un vecteur en base $\mathcal{E}$ en sortie''. Donc:
+    \[\left[T\left(\bvec{x}\right)\right]_{\mathcal{C}} = \matricepassage{C}{E} A \matricepassage{E}{C} \left[\bvec{x}\right]_{\mathcal{C}} \implies B = \matricepassage{C}{E} A \matricepassage{E}{C} = C^{-1} A C\]
+}
+
+\parag{Vecteurs propres et applications linéaires}{
+    Soit $A$ une matrice diagonalisable. On sait donc qu'elle est semblable à une matrice diagonale, et on sait que $A$ admet une base de vecteurs propres $\bvec{v}_1, \ldots, \bvec{v}_n$ avec valeurs propres $\lambda_1, \ldots, \lambda_n$ de sorte que $A = PDP^{-1}$ avec:
+    \[P = \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \ldots & \bvec{v}_n \\  &  &  \end{bmatrix}, \mathspace D = \begin{bmatrix} \lambda_1 &  &  \\  & \ddots &  \\  &  & \lambda_n \end{bmatrix} \]
+
+    Si $A$ est la matrice de $T : \mathbb{R}^n \mapsto \mathbb{R}^n$ en base canonique, alors $D$ est la matrice de $T$ (de la même application) par rapport à la base de vecteurs propres $\mathcal{B} = \left(\bvec{v}_1, \ldots, \bvec{v}_n\right)$.
+
+    Si $\bvec{x} = a_1 \bvec{v}_1 + \ldots + a_n \bvec{v}_n$, on a:
+    \[T\left(\bvec{x}\right) = T\left(a_1 \bvec{v}_1 + \ldots + a_n \bvec{v}_n\right) = a_1 T\left(\bvec{v}_1\right) + \ldots + a_n T\left(\bvec{v}_n\right) = a_1 \lambda_1 \bvec{v}_1 + \ldots + a_n \lambda_n \bvec{v}_n\]
+
+    Ainsi, on en déduit que:
+    \[\left[\bvec{x}\right]_{\mathcal{B}} = \begin{bmatrix} a_1 \\ \vdots \\ a_n \end{bmatrix} \implies \left[T\left(\bvec{x}\right)\right]_{\mathcal{B}} = \begin{bmatrix} a_1 \lambda_1 \\ \vdots \\ a_n \lambda_n \end{bmatrix} = \begin{bmatrix} \lambda_1 &  &  \\  & \ddots &  \\  &  & \lambda_n \end{bmatrix} \begin{bmatrix} a_1 \\ \vdots \\ a_n \end{bmatrix} = \begin{bmatrix} \lambda_1 &  &  \\  & \ddots &  \\  &  & \lambda_n \end{bmatrix} \left[\bvec{x}\right]_{\mathcal{B}}\]
+
+    On en déduit donc que la matrice qui permet de décrire $T$ en base $\mathcal{B}$ est la matrice avec les valeurs propres sur la diagonale.
+}
+
+
+\section{Orthogonalité et méthode des moindres carrés}
+\parag{Introduction}{
+    Considérons un système d'équations linéaires $A \bvec{x} = \bvec{b}$, où $A \in \mathbb{R}^{m \times n}$, $b \in \mathbb{R}^{m}$et $\bvec{x} \in \mathbb{R}^{n}$ (l'inconnue).
+
+    Il se pourrait que ce système n'ait pas de solution, mais disons que nous ne voulons pas abandonner. En effet, il se pourrait qu'il existe $\bvec{x}$ tel que:
+    \[A \bvec{x} \approx \bvec{b}\]
+
+    Notre vecteur $\bvec{b}$ pourrait venir de mesures, qui sont rarement exactes. Cela pourrait par exemple être utile dans ce scénario.
+
+    Il nous faut définir de nouveaux concepts de ``taille'' et de ``distance'' dans $\mathbb{R}^n$ et $\mathbb{R}^m$.
+}
+
+\parag{Distance}{
+    Nous avons déjà vu une formule pour calculer la distance entre deux vecteurs dans $\mathbb{R}^2$. On peut utiliser la distance Euclidienne.
+
+    Par exemple, soient les deux vecteurs suivants:
+    \[\bvec{u} = \begin{bmatrix} 1 \\ 2 \end{bmatrix}, \mathspace \bvec{v} = \begin{bmatrix} 4 \\ 1 \end{bmatrix} \]
+
+    \imagehere[0.7]{DistanceEuclidienne.png}
+
+    Prenons la différence entre ces deux vecteurs:
+    \[\bvec{w} = \bvec{v} - \bvec{u} = \begin{bmatrix} 4 \\ 1 \end{bmatrix} - \begin{bmatrix} 1 \\ 2 \end{bmatrix} = \begin{bmatrix} 3 \\ -1 \end{bmatrix} \]
+
+    Par Pythagore, la distance entre $\bvec{u}$ et $\bvec{v}$ est donc:
+    \[d^2 = 3^2 + 1^2 = 10 \implies d = \sqrt{10}\]
+
+    On se rend compte que la distance entre $\bvec{u}$ et $\bvec{v}$ est équivalente à la distance entre $\bvec{w}$ et l'origine, $\bvec{o}$. On appelle ceci la \important{norme} de $\bvec{w}$.
+}
+
+\parag{Définition du produit scalaire}{
+    Soient les deux vecteurs de $\mathbb{R}^n$ suivants:
+    \[\bvec{u} = \begin{bmatrix} u_1 \\ \vdots \\ u_n \end{bmatrix}, \mathspace \bvec{v} = \begin{bmatrix} v_1 \\ \vdots \\ v_n \end{bmatrix} \]
+
+    Le \important{produit scalaire} de $\bvec{u}$ et $\bvec{v}$ est un scalaire noté $\bvec{u} \dotprod \bvec{v}$ défini comme suit:
+    \[\bvec{u} \dotprod \bvec{v} = \bvec{u}^T \bvec{v} = \begin{bmatrix} u_1 & \cdots & u_n \end{bmatrix} \begin{bmatrix} v_1 \\ \vdots \\ v_n \end{bmatrix} = u_1 v_1 + \ldots + u_n v_n \]
+}
+
+\parag{Exemple}{
+    Soient les deux vecteurs suivants:
+    \[\bvec{u} = \begin{bmatrix} 3 \\ -1 \\ 2 \end{bmatrix}, \mathspace \bvec{v} = \begin{bmatrix} 1 \\ 4 \\ -1 \end{bmatrix} \]
+
+    Ainsi, on obtient que:
+    \[\bvec{u} \dotprod \bvec{v} = 3\cdot 1 + \left(-1\right)4 + 2\left(-1\right) = -3 = 1\cdot 3 + 4\left(-1\right) + \left(-1\right)2 = \bvec{v} \dotprod \bvec{u}\]
+
+    De plus:
+    \[\bvec{u} \dotprod \bvec{u} = 3\cdot 3 + \left(-1\right)\left(-1\right) + 2\cdot 2 = 9 + 1 + 4 = 14\]
+
+}
+
+\end{document}

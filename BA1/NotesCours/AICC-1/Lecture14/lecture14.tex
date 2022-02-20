@@ -1,0 +1,309 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-03 at 15:13:01.
+
+\usepackage{../../style}
+
+\title{AICC}
+\author{Joachim Favre}
+\date{Mercredi 03 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2021-11-03}{Big-Theta and algorithm complexity}{
+\begin{itemize}[left=0pt]
+    \item Proof of some facts linked to big-$O$ notation.
+    \item Definition of Big-$\Omega$, Big-$\Theta$ and little-$o$ notation.
+    \item Definition of time and space complexity for algorithms, and explanation why we will focus on worst-case time complexity.
+    \item Examples of worst-case time complexity of maximum finding, linear search, binary search, bubble sort and insertion sort algorithms.
+\end{itemize}
+
+}
+
+\parag{Power of logarithms}{
+    We want to show that $\log_2\left(x\right)^t$ is $O\left(x^{\epsilon}\right)$, where $t, \epsilon > 0$.
+
+    It is rather obvious that $x < 2^{x}$ when $x > 0$ (there are thousand of proofs possible, such as induction for natural numbers, or Taylor series). So:
+
+    \begin{multiequation}
+    & x < 2^{x}  \\
+    \implies & \log_2\left(x\right) < x \\
+    \implies & \log_2\left(x^{\frac{\epsilon}{t}}\right) < x^{\frac{\epsilon}{t}}  \\
+    \implies & \frac{\epsilon}{t}\log_2\left(x\right) < x^{\frac{\epsilon}{t}} \\
+    \implies & \log_2\left(x\right) < \frac{t}{\epsilon}x^{\frac{\epsilon}{t}} \\
+    \implies & \log_2\left(x\right)^t < \left(\frac{t}{\epsilon}\right)^t x^{\epsilon}
+    \end{multiequation}
+
+    Then, taking $k = 1$ and $C = \left(\frac{t}{\epsilon}\right)^t$, we find that $\log_2\left(x\right)^t$ is $O\left(x^{\epsilon}\right)$.
+
+    We have to be careful about the constants. If $t = 1000$ and $\epsilon = 0.0001$, then $C = 10^{6}$. So, even though in the long term it would grow slower than $x^{\epsilon}$, it is not the case for values that we would use commonly. In other words, even though the big-$O$ of an algorithm is worse than one of another, does not necessarily means that it is better (personal note: see galactic algorithms; don't you want to do a 1729-dimensional (nice number) Fourier transform to multiply two numbers? It's more optimised in the long run though.).
+}
+
+\parag{Symmetry}{
+    We wonder if we know that $f$ is not $O\left(g\right)$, then can we conclude that $g$ is $O\left(f\right)$? The answer is no.
+
+    Let the following functions:
+    \begin{functionbypart}{f\left(n\right)}
+        n! \mathspace \text{if } n \text{ is even} \\
+        \left(n-1\right)! \mathspace \text{if } n \text{ is odd}
+    \end{functionbypart}
+
+    \begin{functionbypart}{g\left(n\right)}
+        \left(n-1\right)! \mathspace \text{if } n \text{ is even} \\
+        n! \mathspace \text{if } n \text{ is odd}
+    \end{functionbypart}
+
+    First, let's prove that $f$ is not $O\left(g\right)$. For all $C$, for all $n > C$, if $n$ is even:
+    \[f\left(n\right) = n! = n\left(n-1\right)! > C\left(n - 1\right)! = Cg\left(n\right)\]
+
+    We can use the same way when $n$ is odd to prove that $g$ is not $O\left(f\right)$.
+}
+
+\subsection{Big-$\Omega$ and Big-$\Theta$}
+\parag{Big-Omega notation}{
+    Let $f$ and $g$ be functions from the set of integers or the set of real numbers to the set of real numbers. We say that $f\left(x\right)$ is $\Omega\left(g\left(x\right)\right)$ if there are constants $C$ and $k$ with $C > 0$ such that
+    \[\left|f\left(x\right)\right| \geq C\left|g\left(x\right)\right| \mathspace x > k\]
+
+    \subparag{Remark}{
+        This is basically the inverse of the big-$O$ notation. Big-$O$ gives an upper bound of the growth of a function, while big-Omega gives a lower bound.
+    }
+
+    \subparag{Terminology}{
+        We say ``$f\left(x\right)$ is big-Omega of $g\left(x\right)$''.
+    }
+
+    \subparag{Symmetric}{
+        $f\left(x\right)$ is $\Omega\left(g\left(x\right)\right)$ if and only if $g\left(x\right)$ is $O\left(f\left(x\right)\right)$.
+    }
+}
+
+\parag{Example}{
+    Let $f\left(x\right) = 8x^3 + 5x^2 + 7$. It is $\Omega\left(x^3\right)$, since $x^3$ is $O\left(f\left(x\right)\right)$.
+}
+
+\parag{Bit-Theta notation}{
+    Let $f$ and $g$ be functions from the set of integers or the set of real numbers to the set of real numbers.
+
+    The function $f\left(x\right)$ is $\Theta\left(g\left(x\right)\right)$ if $f\left(x\right)$ is $O\left(g\left(x\right)\right)$ and $f\left(x\right)$ is $\Omega\left(g\left(x\right)\right)$.
+
+    \subparag{Terminology}{
+        We say that ``$f$ is big-Theta of $g\left(x\right)$'', ``$f\left(x\right)$ is of order $g\left(x\right)$'', or ``$f\left(x\right)$ and $g\left(x\right)$ are of the same order''.
+    }
+
+    \subparag{Symmetry}{
+        When $f\left(x\right)$ is $\Theta\left(g\left(x\right)\right)$ then also $g\left(x\right)$ is $\Theta\left(f\left(x\right)\right)$.
+
+        It is equivalent to say that $f\left(x\right)$ is $O\left(g\left(x\right)\right)$ and $g\left(x\right)$ is $O\left(f\left(x\right)\right)$.
+    }
+
+    \subparag{Literature}{
+        Sometimes people in literature use the big-$O$ notation when they mean the big-Theta.
+    }
+}
+
+\parag{Example}{
+    Since both $8x^3 + 5x^2 + 7$ is $O\left(x^3\right)$ and $x^3$ is $O\left(8x^3 + 5x^2 + 7\right)$, we thus know that $8x^3 + 5x^2 + 7$ is $\Theta\left(x^3\right)$.
+}
+
+\parag{Polynomials}{
+    By the theorem we saw in the last lesson, we get that $f\left(x\right) = a_nx^{n} + \ldots + a_0$ is $\Theta\left(x^{n}\right)$.
+}
+
+\parag{Little-o}{
+    We say that ``$f\left(x\right)$ is $o\left(g\left(x\right)\right)$'' if:
+    \[\lim_{x \to \infty} \frac{f\left(x\right)}{g\left(x\right)} = 0\]
+}
+
+\parag{Example}{
+    We see that $x^2$ is $o\left(x^3\right)$, but $x^2 + x + 1$ is not $o\left(x^2\right)$.
+}
+
+\parag{Little-$o$ and Big-$O$}{
+    If $f\left(x\right)$ and $g\left(x\right)$ are functions such that $f\left(x\right)$ is $o\left(g\left(x\right)\right)$, then $f\left(x\right)$ is $O\left(g\left(x\right)\right)$.
+
+    \subparag{Warning}{
+        The reciprocal is not true. For example, $x^2 + x + 1$ is $O\left(x^2\right)$, but not $o\left(x^2\right)$.
+    }
+}
+
+\parag{Linearithmic and linear functions}{
+    We want to show that $x$ is $O\left(x\log x\right)$. We see that $x$ is $o\left(x \log x\right)$:
+    \[\lim_{x \to \infty} \frac{x}{x\log x} = \lim_{x \to \infty} \frac{1}{\log x} = 0\]
+
+    So, we deduce that $x$ is $O\left(x\log x\right)$.
+}
+
+\parag{Polynomial and exponential functions}{
+    We want to show that $x^d$ is $O\left(b^x\right)$, where $b > 1$ and $d > 0$. We can use L'Hospital's rule to compute the following limit:
+    \[\lim_{x \to \infty} \frac{x^{d}}{b^{x}} = \lim_{x \to \infty} \frac{dx^{d-1}}{\ln\left(b\right)b^x} = \lim_{x \to \infty} \frac{d\left(d-1\right) x^{d-2}}{\ln\left(b\right)^2 b^x} = \ldots = \lim_{x \to \infty} \frac{d\left(d-1\right)\ldots2\cdot 1}{\log\left(b\right)^{d} b^{x}} = 0\]
+
+    So, we can deduce that $x^{d}$ is $o\left(b^{x}\right)$, therefore $x^d$ is $O\left(b^x\right)$.
+}
+
+\parag{The gap between polynomial and exponential}{
+    We know there is a tremendous gasp between the polynomial and the exponential growth, we are looking for a function in between.
+
+    Let's write $x = b^{\log_b\left(x\right)}$. Then, we have $x^{d} = b^{d\log_b\left(x\right)}$.
+
+    We notice that there is something between logarithms and linear growth, poly-logarithms. So, we can choose $\log_b\left(x\right)^c$ for $c > 1$ as exponent of $b$:
+    \[b^{\log_b\left(x\right)^{c}}\]
+
+    This is called ``quasi-polynomial'' and it stands between polynomial and exponential growth.
+
+    \subparag{Remark}{
+        the best algorithm to solve ``graph isomorphism'' is quasi-polynomial.
+    }
+}
+
+\subsection{Computational complexity}
+\parag{Task}{
+    Given an algorithm, we want to know how efficient it is for solving a problem given an input of a particular size.
+}
+
+\parag{Complexity}{
+    There are two types of complexity. Indeed, we may want to know how much time an algorithm uses to solve the problem for an input of a given size (\important{time complexity}), or how much computer memory it uses to solve the problem for an input of a given size (\important{space complexity}).
+
+    It is important to understand the concept of complexity, in order to know whether it is possible to use an algorithm for inputs of a particular size, or to choose the best algorithm in a context, among all the ones that solve the task.
+}
+
+\parag{Time complexity}{
+    We will focus on time complexity. If the algorithm is sequential, all operations are executed in order (other types of algorithms might for example be parallelised, so we will restrain ourselves to the sequential ones). In this case, we can say that time complexity is equivalent to the number of operations that are performed.
+
+    We can use big-$O$ and big-Theta notations to describe the time complexity.
+
+    We will ignore implementation details (such as the data structures that are used, the hardware and the software) because it would only make everything more complicated, for no reason.
+}
+
+\parag{Determining time complexity}{
+    We determine the number of basic operations, such as addition, multiplication, etc. We assume that all operations use a constant time (it is not exactly right, but since we only want to know how time grows when the input size grows, then it is no big problem).
+
+    We can ignore the small details, such as the ``house-keeping'' (initialisation of the first variables, etc.)
+}
+
+\parag{Worst-case time complexity}{
+    We want to be pessimistic (if we want to sort a list and we get an already sorted list, then some sorting algorithms will be very fast; we choose exactly the inverse, the worst possible case). It gives us an upper bound on the number of operations an algorithm uses to solve a problem with input of a particular size.
+
+    We can also study average case time complexity of an algorithm, the average number of operations, however it is much harder to do. We will thus not consider it.
+}
+
+\begin{filecontents*}[overwrite]{max.code}
+procedure max(a : array of n integers)
+    max := a[1]
+    for i := 2 to n
+        if max < a[i] then max := a[i]
+    return max
+\end{filecontents*}
+
+\parag{Example}{
+    Let's study the following code:
+    \importcode{max.code}{pseudo}
+
+    The first observation we can make is that the loop is executed $c\left(n\right) = n - 1$ times (where $c$ is the cost function). We are doing two comparisons at each iteration of the loop, one in the if, and one in the condition of the for loop. We are doing one last comparison at the end of the loop, to know we have to get out of it.
+
+    So, the total cost for input of size $n$ is $2\cdot c\left(n\right) + 1$. $c\left(n\right)$ is $\Theta\left(n\right)$, $2c\left(n\right)$ is $\Theta\left(n\right)$ and $2\cdot c\left(n\right) + 1$ is $\Theta\left(n\right)$.
+
+    It is clear we have done quite too much work. In fact, we do not care about some extra operations ``outside the loop'', a constant number of operations ``inside the loop'' (constant when we modify $n$, not that differ at each iteration). In other words, we only had to count the loops.
+}
+
+\subsection{Complexity of searching and sorting algorithms}
+\begin{filecontents*}[overwrite]{linearsearch.code}
+procedure linearsearch(x: integer, a: array of n distinct integers)
+    i := 1
+    while(i <= n and x != a[i])
+        i := i + 1
+    if i <= n then location := i else location := 0
+    return location
+\end{filecontents*}
+
+\parag{Worst case complexity of linear search}{
+    As a reminder, here is the code for linear search:
+    \importcode{linearsearch.code}{pseudo}
+
+    We have a loop which is executed at most $n + 1$ times, so $c\left(n\right) = n$, which is $\Theta\left(n\right)$.
+}
+
+\begin{filecontents*}[overwrite]{binarysearch.code}
+procedure binarysearch(x: integer, a: array of n increasing integers)
+    i := 1
+    j := n
+    while i < j
+        m := floor((i + j)/2)
+        if x > a[m] then i := m + 1 else j := m
+    if x = a[i] then location := i else location := 0
+    return location
+\end{filecontents*}
+
+\parag{Worst case complexity of binary search}{
+    As a reminder, here is the code for binary search:
+    \importcode{binarysearch.code}{pseudo}
+
+    Let's assume that $n = 2^k$ for convenience (it eases our explanation, and does not change anything in fact). After the first iteration, our list is of length $2^{k-1}$, then it becomes $2^{k-2}$, and so on until it is of length 1. So, this loop will be run $k + 1$ times. However, we know that:
+    \[n = 2^{k} \implies k = \log_2\left(n\right)\]
+
+    Therefore, this algorithm has a cost function that is $\Theta\left(\log n\right)$. This has a slower growth than linear complexity, so it is faster than linear search (but it needs the array to be sorted before; adding the two costs makes binary search become slower if we will search something only once in the list (but if we search multiple times, then it becomes worth)).
+}
+
+\begin{filecontents*}[overwrite]{bubblesort.code}
+procedure bubblesort(a: array of n >= 2 number)
+    for i := 1 to n - 1
+        for j := 1 to n - i
+            if a[j] > a[j+1] then interchange(a[j], a[j+1])
+\end{filecontents*}
+
+\parag{Worst case complexity of bubble sort}{
+    As a reminder, here is the code for bubble sort:
+    \importcode{bubblesort.code}{pseudo}
+
+    We notice that the outer loop is executed $n - 1$ times. The inner loop is executed $n - 1$ times when $i = 1$, $n - 2$ times when $i = 2$, and so on until $1$ time when $i = n - 1$.
+
+    So, in total, the inner loop is executed
+    \[\left(n-1\right) + \left(n-2\right) + \ldots + 1 = \frac{n\left(n-1\right)}{2} \text{ times}\]
+    which is a polynomial of degree 2.
+
+    Therefore, we deduce that the time complexity of this algorithm is $\Theta\left(n^2\right)$.
+}
+
+\begin{filecontents*}[overwrite]{insertionsort.code}
+procedure insertionsort(a: array of n >= 2 numbers)
+    for j := 2 to n
+        i := 1
+        while a[j] > a[i] and i < j
+            i := i + 1
+        m := a[j]
+        for k := 0 to j - i - 1
+            a[j - k] := a[j - k - 1]
+        a[i] := m
+\end{filecontents*}
+
+
+\parag{Worst case complexity of insertion sort}{
+    As a reminder, here is the code for insertion sort:
+    \importcode{insertionsort.code}{pseudo}
+
+    We notice that the outer loop is executed $n - 1$ times, the first inner loop is executed $n-1 + \ldots + 1$ times, and the second inner loop is also executed $n - 1 + \ldots + 1$ times.
+
+    So, we deduce that the complexity of this algorithm is $\Theta\left(n^2\right)$, the same as bubble sort. We will see later that there exists other sorting algorithms which are $\Theta\left(n \log\left(n\right)\right)$.
+}
+
+\subsection{Understanding complexity}
+\parag{Note}{
+    Here is the commonly used terminology for the complexity of algorithms:
+    \begin{center}
+        \begin{tabular}{|ll|}
+            \hline
+            \textbf{Complexity} & \textbf{Terminology}  \\
+            \hline
+            $\Theta\left(1\right)$ & Constant complexity  \\
+            $\Theta\left(\log n\right)$ & Logarithmic complexity  \\
+            $\Theta\left(n\right)$ & Linear complexity  \\
+            $\Theta\left(n\log n\right)$ & Linearithmic complexity  \\
+            $\Theta\left(n^b\right)$ & Polynomial complexity  \\
+            $\Theta\left(b^n\right)$, $b > 1$ & Exponential complexity \\
+            $\Theta\left(n!\right)$ & Factorial complexity \\
+            \hline
+        \end{tabular}
+    \end{center}
+}
+
+\end{document}

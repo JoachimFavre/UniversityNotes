@@ -1,0 +1,377 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-17 at 10:15:20.
+
+\usepackage{../../style}
+
+\title{Analyse 1}
+\author{Joachim Favre}
+\date{Mercredi 17 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{16}{2021-11-17}{Continuité}{
+\begin{itemize}[left=0pt]
+    \item Définition de la continuité, et de la continuité à gauche et à droite.
+    \item Exemple de fonctions continues, et explication des opérations algébriques sur les fonctions continues.
+    \item Explication du prolongement par continuité d'une fonction en un point.
+    \item Explication du théorème de la valeur intermédiaire (TVI) et de son corollaire.
+\end{itemize}
+
+}
+
+\subsection{Fonctions continues}
+\subsubsection{Continuité}
+\parag{Définition de la continuité}{
+    Une fonction $f : E \mapsto F$ est continue en un point $x_0 \in E$ si 
+    \[\lim_{x \to x_0} f\left(x\right) = f\left(x_0\right)\]
+    
+    Cela nous donne trois conditions pour qu'une fonction soit continue:
+    \begin{enumerate}
+        \item $\lim\limits_{x \to x_0} f\left(x\right) = \ell \in \mathbb{R}$ existe
+        \item $f$ est bien définie en $x = x_0$
+        \item $\lim\limits_{x \to x_0} f\left(x\right) = f\left(x_0\right)$
+    \end{enumerate}
+
+    \subparag{Interprétation graphique}{
+        Les images des valeurs autour de $x_0$ s'approchent de $f\left(x_0\right)$. En d'autres mots, on peut tracer la fonction sans lever le crayon autour de $x_0$. 
+    }
+    
+}
+
+\parag{Exemples de fonctions continues}{
+    \begin{enumerate}[left=0pt]
+        \item $f\left(x\right) = x^p$ où $p \in \mathbb{N}$ est continue sur $\mathbb{R}$.
+        \item Tout polynôme est continu sur $\mathbb{R}$ (on peut utiliser les opérations algébriques sur les limites).
+        \item Toute fonction rationnelle est continue sur son domaine.
+        \item $f\left(x\right) = \sqrt[p]{x}$ est continue sur son domaine pour tout $p \in \mathbb{N}$.
+        \item $f\left(x\right) = \sin\left(x\right)$ et $g\left(x\right) = \cos\left(x\right)$ sont continues sur $\mathbb{R}$.
+    \end{enumerate}
+
+    \subparag{Preuve pour le point (5)}{
+        Nous voulons montrer que: 
+        \[\lim_{x \to a} \sin\left(x\right) = \sin\left(a\right)\]
+        
+        On a: 
+        \begin{multiequality}
+        \left|\sin x - \sin a\right| = & \left|\sin\left(\frac{x + a}{2} + \frac{x - a}{2}\right) - \sin\left(\frac{x + a}{2} - \frac{x - a}{2}\right)\right|  \\
+        = & \left|\sin\left(\frac{x+a}{2}\right)\cos\left(\frac{x-a}{2}\right) + \cos\left(\frac{x+a}{2}\right)\sin\left(\frac{x-a}{2}\right)\right.  \\
+        & \ \left.- \sin\left(\frac{x+a}{2}\right)\cos\left(\frac{x-a}{2}\right) + \cos\left(\frac{x+a}{2}\right)\sin\left(\frac{x-a}{2}\right)\right|  \\
+        = & 2\left|\sin\left(\frac{x-a}{2}\right)\underbrace{\cos\left(\frac{x+a}{2}\right)}_{\leq 1}\right|  \\
+        \leq & 2\left|\sin\left(\frac{x-a}{2}\right)\right|  \\
+        \leq & 2\underbrace{\left|\frac{x-a}{2}\right|}_{\to 0} 
+        \end{multiequality}
+        
+        Ainsi, par le théorème des deux gendarmes:
+        \[\lim_{x \to a} \left|\sin x - \sin a\right| = 0 \implies \lim_{x \to a} \left(\sin x - \sin a\right) = 0\]
+        
+        Ce qui nous permet de conclure que $\sin\left(x\right)$ est continue:
+        \[\lim_{x \to a} \sin x = \sin a\]
+    }
+}
+
+\parag{Critère de Cauchy pour les fonctions continues}{
+    $f : E \mapsto F$ définie au voisinage de $x = x_0$ et en $x_0$. $f$ est continue en $x = x_0$ si et seulement si: 
+    \[\forall \epsilon > 0 \ \exists \delta > 0 \telque \forall x_1, x_2 \in \left\{x \in E \telque \left|x - x_0\right| \leq \delta\right\} \text{ on a } \left|f\left(x_1\right) - f\left(x_2\right)\right| \leq \epsilon\]
+
+    \subparag{Reformulation}{
+        En d'autres mots, pour tout écart vertical $\epsilon$, il existe un écart horizontal $\delta$ tel que pour toute paire de nombre, où les deux nombres sont delta-proches de $x_0$, leur image sont epsilon-proches. 
+    }
+}
+
+\parag{Continuité sur le côté}{
+    $f : E \mapsto F$ est dite continue à droite en $x_0 \in E$ si : 
+    \[\lim_{x \to x_0^+} f\left(x\right) = f\left(x_0\right)\]
+    
+    Mêmement, $f : E \mapsto F$ est dite continue à \textcolor{red}{gauche} en $x_0 \in E$ si : 
+    \[\lim_{{\color{red}x \to x_0^-}} f\left(x\right) = f\left(x_0\right)\]
+
+    \subparag{Remarque}{
+        On voit que $f$ est continue en $x = x_0$ si et seulement si elle est continue à gauche et à droite.
+    }
+    
+}
+
+\parag{Exemple 1}{
+    Soit la fonction suivante:
+    \begin{functionbypart}{f\left(x\right)}
+    2x + 1, \mathspace x \geq 0 \\
+    \frac{\sin\left(x\right)}{x}, \mathspace x < 0
+    \end{functionbypart}
+
+    Nous voulons étudier la continuité en $x = 0$. Pour commencer, on voit que $f$ est bien définie à ce point. Nous pouvons maintenant calculer les limites sur le côté: 
+    \[\lim_{x \to 0^+} f\left(x\right) = \lim_{x \to 0^+} \left(2x + 1\right) = 1\]
+    \[\lim_{x \to 0^-} f\left(x\right) = \lim_{x \to 0^-} \frac{\sin x}{x} = 1\]
+
+    Ainsi, en combinant ces deux résultats on obtient que: 
+    \[\lim_{x \to 0} f\left(x\right) = 1\]
+
+    De plus, puisque cette limite est égale à $f\left(0\right)$, la fonction est continue en $x = 0$.
+}
+
+\parag{Exemple 2}{
+    Prenons maintenant une fonction très similaire à celle ci-dessus, mais avec une petit différence: 
+    \begin{functionbypart}{g\left(x\right)}
+    2x + 1, \mathspace x > 0  \\
+    2, \mathspace x = 0 \\
+    \frac{\sin x}{x}, \mathspace x < 0
+    \end{functionbypart}
+
+    On remarque que, comme la dernière fois: 
+    \[\lim_{x \to 0^+} g\left(x\right) = \lim_{x \to 0^-} g\left(x\right) = 1 = \lim_{x \to 0} g\left(x\right)\]
+
+    Cependant, puisque $g\left(0\right) = 2 \neq 1 = \lim_{x \to 0} g\left(x\right)$, on en déduit que $g\left(x\right)$ n'est pas continue en $x = 0$.
+    
+}
+
+\parag{Opérations algébriques sur les fonctions continues}{
+    Si $f$ et $g$ sont continues en $x = x_0$, alors:
+    \begin{enumerate}
+        \item $\alpha f + \beta g$ est continue en $x = x_0$ pour tout $\alpha, \beta \in \mathbb{R}$.
+        \item $f\cdot g$ est continue en $x = x_0$.
+        \item $\frac{f}{g}$ est continue en $x = x_0$ si $g\left(x_0\right) \neq 0$ (puisque $g$ est continue, ça veut donc dire que la limite n'est pas 0 en $x_0$ donc c'est effectivement tout bon).
+    \end{enumerate}
+
+    De plus, soient $f : E\mapsto F$ et $g : G \mapsto H$ où $f\left(E\right) \subset G$. Si $f$ est continue en $x_0 \in E$ et $g$ est continue en $f\left(x_0\right) \in G$, alors $\left(g \circ f\right)$ est continue en $x_0$.
+
+    \subparag{Remarque}{
+        Si $\left(g \circ f\right)$ est continue en $x = x_0$, alors on ne sait rien sur la continuité de $f$ en $x_0$ et de $g$ en $f\left(x_0\right)$.
+    }
+    
+}
+
+\parag{Exemple}{
+    On sait que la fonction suivante est continue sur $\mathbb{R}$: 
+    \[f\left(x\right) = \frac{\sin\left(x^2 + 8x + 1\right)}{\sqrt{x^2 + 5 + \cos\left(x\right)}}\]
+    
+}
+
+\subsubsection{Prolongement par continuité d'une fonction en un point}
+\parag{Définition}{
+    Soit $f : E \mapsto F$ une fonction telle que $c \not\in E$ ($f$ n'est pas définie en $x = c$) et: 
+    \[\lim_{x \to c} f\left(x\right) \in \mathbb{R} \text{ existe}\]
+    
+    Alors, la fonction $\hat{f} : E \cup \left\{c\right\} \mapsto F$: 
+    \begin{functionbypart}{\hat{f}\left(x\right)}
+        f\left(x\right), \mathspace x \in E \\
+        \lim\limits_{x \to c} f\left(x\right), \mathspace x = c
+    \end{functionbypart}
+
+    Cette fonction est appelée \important{le prolongement par continuité} de $f$ au point $x = c$. S'il existe, un tel prolongement est unique (puisque la limite est unique), et la fonction $\hat{f}$ est continue en $x = c$.
+
+    \subparag{Note}{
+        C'est une question courante en examen.
+    }
+    
+}
+
+\parag{Exemple 1}{
+    Soit la fonction suivante: 
+    \[f\left(x\right) = x\sin\left(\frac{1}{x}\right)\]
+    
+    Son domaine est donné par $D\left(f\right) = \mathbb{R} \setminus \left\{0\right\} = \mathbb{R}^*$. On a: 
+    \[\lim_{x \to 0} x \sin\left(\frac{1}{x}\right) = 0\]
+
+    Ainsi, le prolongement par continuité est donné par: 
+    \begin{functionbypart}{\hat{f}\left(x\right)}
+        x\sin\left(\frac{1}{x}\right), \mathspace x \neq 0 \\
+        0, \mathspace x = 0
+    \end{functionbypart}
+}
+
+\parag{Exemple 2}{
+    Soit la fonction suivante: 
+    \[f\left(x\right) = \frac{\sqrt{x + 4} - 2}{e^{2x} - 1}\]
+
+    La fonction est est définie sur $D\left(f\right) = \left[-4, +\infty\right[ \setminus \left\{0\right\}$. On veut trouver le prolongement par continuité en $x = 0$ s'il existe. On remarque que: 
+        \[\lim_{x \to 0} \frac{\sqrt{x + 4} - 2}{e^{2x} - 1} = \lim_{x \to 0} \frac{x + 4 - 4}{\sqrt{x+4} + 2} \cdot \frac{2x}{e^{2x} - 1} \cdot \frac{1}{2x} = \lim_{x \to 0} \underbrace{\frac{1}{\sqrt{x+4} + 2}}_{\to \frac{1}{2}}\cdot \underbrace{\frac{2x}{e^{2x} - 1}}_{\to 1} \frac{1}{2} = \frac{1}{8}\]
+    
+
+        On peut donc définir: 
+        \begin{functionbypart}{\hat{f}\left(x\right)}
+        \frac{\sqrt{x + 4} - 2}{e^{2x} - 1}, \mathspace x \in \left[-4, +\infty\right[ \setminus \left\{0\right\} \\
+        \frac{1}{8}, \mathspace x = 0
+        \end{functionbypart}
+
+        On a $D\left(\hat{f}\right) = \left[-4, +\infty\right[$.
+    
+}
+
+\subsubsection{Fonctions continues sur un intervalle}
+\parag{Définition}{
+    Une fonction $f : I \mapsto F$ --- où $I$ est un intervalle ouvert non-vide --- est \important{continue sur $I$} si $f$ est continue en tous point point $x \in I$.
+
+    Une fonction $f : \left[a, b\right] \mapsto F$, avec $a < b$, est \important{continue sur $\left[a,b\right]$} si elle est continue sur $\left]a, b\right[ $ et continue à droite en $x = a$ et à gauche en $x = b$.
+}
+
+\parag{Exemple}{
+    Soit la fonction suivante: 
+    \begin{functionbypart}{f\left(x\right)}
+    \frac{1}{2x + 3}, \mathspace x \neq -\frac{3}{2} \\
+    0, \mathspace x = -\frac{3}{2}
+    \end{functionbypart}
+
+    Cette fonction est continue sur $\left]-\frac{3}{2}, 5\right[$, sur $\left[-1, 5\right]$ et sur $\left]-\frac{3}{2}, \infty\right[ $. Cependant, elle n'est pas continue sur $\left[-\frac{3}{2}, 5\right] $
+}
+
+\parag{Théorème (très important)}{
+    Soient $a < b \in \mathbb{R}$ et $f : \left[a, b\right] \mapsto F$ une fonction continue sur l'intervalle fermé et borné $\left[a, b\right]$. 
+
+    Alors, $f$ atteint son infimum et son supremum sur $\left[a, b\right]$.
+
+    \subparag{Remarque}{
+        C'est équivalent à dire que: 
+        \[\exists \max_{\left[a,b\right] } f\left(x\right) \mathspace \text{ et } \mathspace \exists \min_{\left[a,b\right]}f\left(x\right)\]
+        
+    }
+
+    \subparag{Exercice au lecteur}{
+        Démontrer que $f$ est bornée (sans utiliser le théorème, c'est un point qu'on utilise pour démontrer ce théorème).
+    }
+    
+    \subparag{Étude des hypothèses du théorème (1)}{
+        Pour ce théorème, nous avons besoin que notre fonction soit \important{continue} sur un intervalle \textit{fermé et borné}.
+
+        Si notre fonction n'est pas continue, on pourrait par exemple avoir: 
+        \begin{functionbypart}{f\left(x\right)}
+        2 - x^2, \mathspace x \in \left[-1, 1\right] \setminus \left\{0\right\} \\
+        0, \mathspace x = 0
+        \end{functionbypart}
+
+        Son suprémum sur l'intervalle $\left[-1, 1\right]$ est 2, mais il n'existe pas de $x$ tel que $f\left(x\right) = 2$, donc la fonction n'atteint pas son suprémum.
+
+        On pourrait aussi avoir:
+        \begin{functionbypart}{f\left(x\right)}
+            \frac{1}{x}, \mathspace x \in \left]0, 1\right]  \\
+            1, \mathspace x = 0
+        \end{functionbypart}
+
+        Cette fonction n'est clairement pas continue en $x = 0$ et, puisqu'elle n'est pas bornée, son supremum sur $\left[0, 1\right] $ n'existe pas.
+    }
+
+    \subparag{Étude des hypothèses du théorème (2)}{
+        Pour ce théorème, nous avons besoin que notre fonction soit \textit{continue} sur un intervalle \important{fermé et borné}.
+
+        Si notre fonction est définie sur un intervalle ouvert: 
+        \[f\left(x\right) =  - x^2, \mathspace \left]-1, 1\right[  \mapsto \mathbb{R}\]
+
+        Son infimum sur cet intervalle est 1, mais la fonction ne l'atteint pas sur $\left]-1, 1\right[ $
+        
+
+        On pourrait aussi avoir une fonction définie sur un intervalle semi-ouvert: 
+        \[f\left(x\right) = \frac{1}{x}, \mathspace \left]0,1\right]  \mapsto \mathbb{R}\]
+        
+        Le suprémum de cette fonction n'existe pas sur $\left]0, 1\right] $.
+    }
+}
+
+\parag{Théorème de la valeur intermédiaire (TVI)}{
+    Soient $a < b \in \mathbb{R}$ et $f : \left[a,b\right]  \mapsto \mathbb{R}$ une fonction continue.
+
+    Alors, $f$ atteint son suprémum, son infimum, et toutes les valeurs comprises entre les deux.
+
+    \subparag{Remarque 1}{
+        Une autre écriture de ce théorème est de dire que 
+        \[f\left(\left[a, b\right]\right) = \left[\min_{\left[a,b\right]} f\left(x\right), \max_{\left[a,b\right]} f\left(x\right)\right]\]
+    }
+
+    \subparag{Remarque 2}{
+        Une autre écriture équivalente du théorème est: 
+        \[\forall c \in \left[\min_{\left[a,b\right]} f\left(x\right), \max_{\left[a,b\right]} f\left(x\right)\right], \mathspace \exists x \telque f\left(x\right) = c\]
+
+        Il existe au moins un tel $x$, il pourrait y en avoir plus.
+    }
+    
+    \subparag{Observation}{
+        En particulier, on remarque que $f$ atteint toutes les valeurs comprises entre $f\left(a\right)$ et $f\left(b\right)$ (même si ce ne sont pas les suprémums et infimums).
+    }
+
+    \subparag{Preuve}{
+        La preuve de ce théorème est très difficile et absolument pas considérée comme triviale. Puisque c'est probablement la preuve la plus difficile du cours, elle n'est pas laissée en exercice au lecteur.
+    }
+
+}
+
+\parag{Exemple}{
+    \imagehere{IVTRepresentation.png}
+}
+
+\begin{filecontents*}[overwrite]{methode_dichotomie.code}
+// On suppose que la fonction est continue sur [a,b] et que f(a)*f(b) < 0.
+procedure metohode_dichotomie(f, a, b, erreur_max):
+    while abs(b-a)/2 > erreur_max:
+        c := (a + b)/2
+        if f(c) == 0: return c
+        else if f(c)*f(a) < 0: b := c
+        else: a := c
+    return (a + b)/2
+\end{filecontents*}
+
+
+\parag{Corollaire 1}{
+    Soient $a < b \in \mathbb{R}$ et $f: \left[a,b\right] \mapsto \mathbb{R}$ une fonction continue telle que $f\left(a\right)f\left(b\right) < 0$ ($f\left(a\right)$ et $f\left(b\right)$ sont de signes opposés et sont non-nuls).
+
+    Alors, il existe au moins un point $c \in \left]a, b\right[ $ tel que $f\left(c\right) = 0$. 
+
+    \subparag{Utilité}{
+        On peut utiliser ce théorème pour démontrer qu'au moins une solution existe.
+        
+        De plus, on peut utiliser ce théorème pour écrire un algorithme permettant d'estimer un zéro d'une fonction. En effet, en divisant la taille de l'intervalle par 2, on peut savoir dans lequel des deux sous-intervalles il y a une solution, et ainsi pouvoir s'en approcher de plus en plus. On appelle cet algorithme une méthode de Dichotomie (il est moins efficace que la méthode de Newton, mais a des hypothèses moins fortes), et voici son pseudocode:
+       
+        \importcode{methode_dichotomie.code}{pseudo}
+    }
+}
+
+\parag{Exemple 1}{
+    On veut démontrer que l'équation suivante possède au moins deux solutions sur $\left[0, \pi\right]$:
+    \[\sin\left(x\right) + \frac{1}{x - 4} = 0\]
+    
+    On remarque que $f\left(x\right) = \sin\left(x\right) + \frac{1}{x-4}$ est continue sur $\left[0, \pi\right]$, qui est fermé borné ; donc, le théorème de la valeur intermédiaire s'applique. On remarque que les valeurs aux bornes sont négatives: 
+    \[f\left(0\right) = \sin\left(0\right) + \frac{1}{-4} = \frac{-1}{4} < 0\]
+    \[f\left(\pi\right) = \sin\left(\pi\right) + \frac{1}{\pi - 4} = \frac{1}{\pi - 4} < 0\]
+    
+    Si on trouver une valeur positive entre les deux ce sera gagné. Essayons une valeur facile à calculer, $x = \frac{\pi}{2}$: 
+    \[f\left(\frac{\pi}{2}\right) = \sin\left(\frac{\pi}{2}\right) + \frac{1}{\frac{\pi}{2} - 4} = 1 + \frac{1}{\underbrace{\frac{\pi}{2} - 4}_{< -2}} > 0\] 
+    
+    Ainsi, puisque $f\left(0\right)f\left(\frac{\pi}{2}\right) < 0$, on sait qu'il existe au moins un $x_1 \in \left[0, \frac{\pi}{2}\right]$ tel que: 
+    \[f\left(x_1\right) = 0\]
+    
+    De plus, puisque $f\left(\frac{\pi}{2}\right)f\left(\pi\right) < 0$, il existe au moins un $x_2 \in \left[\frac{\pi}{2}, \pi\right]$ tel que: 
+    \[f\left(x_2\right) = 0\]
+    
+    Finalement, on sait que $x_1 \neq x_2$ puisque $f\left(\frac{\pi}{2}\right) \neq 0$. 
+
+    On a donc démontré l'existence de 2 solutions à l'équation $f\left(x\right) = 0$ sur l'intervalle $\left[0, \pi\right]$.
+}
+
+
+\parag{Exemple 2}{
+    On veut démontrer l'existence d'une solution à l'équation $\cos\left(x\right) = x$ sur l'intervalle $\left[0, \frac{\pi}{2}\right]$. 
+
+    Prenons la fonction suivante: 
+    \[f\left(x\right) = \cos\left(x\right) - x\]
+    
+    Puisque $f$ est continue sur $\mathbb{R}$, alors le corollaire peut être appliqué si on trouve un bon intervalle. Regardons les valeurs des bornes: 
+    \[f\left(0\right) = \cos\left(0\right) - 0 = 1 > 0\]
+    \[f\left(\frac{\pi}{2}\right) = \cos\left(\frac{\pi}{2}\right) - \frac{\pi}{2} = -\frac{\pi}{2} < 0\]
+
+    Ainsi, par le TVI (ou par son corollaire), il existe au moins une solution de l'équation $\cos\left(x\right) = x$ sur $\left]0, \frac{\pi}{2}\right[ $.
+
+    On peut même faire mieux, calculons les valeurs à $\frac{\pi}{6}$ et $\frac{\pi}{4}$: 
+    \[f\left(\frac{\pi}{4}\right) = \frac{\sqrt{2}}{2} - \frac{\pi}{4}\]
+    \[f\left(\frac{\pi}{6}\right) = \frac{\sqrt{3}}{2} - \frac{\pi}{6}\]
+
+    Or, on peut regarder les carrés: 
+    \[\frac{1}{2} < \frac{9}{16} \implies \frac{\sqrt{2}}{2} < \frac{3}{4} < f\left(\frac{\pi}{4}\right) = \frac{\pi}{4} \implies \frac{\sqrt{2}}{2} - \frac{\pi}{4} < 0\]
+    \[\frac{3}{4} > \frac{9}{16} \implies \frac{\sqrt{3}}{2} > \frac{3}{4} \implies f\left(\frac{\pi}{6}\right) = \underbrace{\frac{\sqrt{3}}{2}}_{> \frac{3}{4}} - \underbrace{\frac{\pi}{6}}_{< \frac{3}{4}} > 0\]
+    
+    Ainsi, on en déduit qu'une solution de $\cos\left(x\right) = x$ se trouve dans $\left]\frac{\pi}{6}, \frac{\pi}{4}\right[ $.
+
+    De plus, on remarque que: 
+    \[\cos\left(x_0\right) = x_0 \implies \cos\left(\cos\left(x_0\right)\right) = \cos\left(x_0\right) = x_0 \implies \cos\left(x_0\right) = \arccos\left(x_0\right)\]
+
+    \imagehere[0.4]{CosxEgalX.png}
+}
+
+\end{document}

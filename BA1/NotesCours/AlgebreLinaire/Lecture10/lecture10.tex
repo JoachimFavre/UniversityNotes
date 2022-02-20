@@ -1,0 +1,277 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-10-25 at 13:15:31.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Lundi 25 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2021-10-25}{Entrée dans l'hyper-espace}{
+\begin{itemize}[left=0pt]
+    \item Définition des espaces vectoriels, et des propriétés qu'ils doivent suivre.
+    \item Définition des sous-espaces vectoriels, et des propriétés qu'ils doivent suivre.
+\end{itemize}
+
+}
+
+\section{Espaces et sous-espaces vectoriels}
+\subsection{Espaces vectoriels}
+
+\parag{Introduction}{
+    Avec ce chapitre, nous faisons un bon en abstraction. Cela demande un effort intellectuel important. Cet effort sera récompensé parce qu'il va rendre nos outils mathématiques bien plus largement applicables.
+
+    Jusqu'ici nous avons travaillé dans
+    \[\mathbb{R}^{n} = \left\{\begin{bmatrix} x_1 \\ \vdots \\ x_n \end{bmatrix} \telque x_1, \ldots, x_n \in \mathbb{R}\right\}\]
+
+    On a appelé $\bvec{x} \in \mathbb{R}^{n}$ un vecteur.
+
+    Sans y prêter attention, nous avons utilisé les propriétés suivantes de $\mathbb{R}^{n}$, valides pour tout $\bvec{u}, \bvec{v}, \bvec{w} \in \mathbb{R}^{n}$ et $c, d \in \mathbb{R}$:
+
+    \begin{center}
+    \begin{minipage}{0.45\textwidth}
+        \begin{itemize}[left=0pt]
+        \item $\bvec{u} + \bvec{v} \in \mathbb{R}^{n}$
+        \item $\bvec{u} + \bvec{v} = \bvec{v} + \bvec{u}$
+        \item $\left(\bvec{u} + \bvec{v}\right) + \bvec{w} = \bvec{u} + \left(\bvec{v} + \bvec{w}\right)$
+        \item $\bvec{u} + \bvec{0} = \bvec{u}$
+        \item $\bvec{u} + \left(-\bvec{u}\right) = \bvec{0}$
+    \end{itemize}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+    \begin{itemize}[left=0pt]
+        \item $c \bvec{u} \in\mathbb{R}^{n}$
+        \item $c\left(\bvec{u} + \bvec{v}\right) = c \bvec{u} + c \bvec{v}$
+        \item $\left(c + d\right)\bvec{u} = c \bvec{u} + d \bvec{u}$
+        \item $c\left(d \bvec{u}\right) = \left(cd\right)\bvec{u}$
+        \item $1 \bvec{u}= \bvec{u}$
+    \end{itemize}
+    \end{minipage}
+    \end{center}
+}
+
+\parag{Généralisation}{
+    En réalité, ce sont là \textit{toutes} les propriétés de $\mathbb{R}^{n}$ que nous avons utilisées. Donc, si au lieu de $\mathbb{R}^{n}$ on a un autre ensemble $V$ muni d'opérations ``d'addition de deux éléments'' et de ``multiplication par un scalaire'', et que ces opérations ont toutes les propriétés ci-dessus, alors on peut refaire tout notre travail des semaines précédentes dans $V$ plutôt que dans $\mathbb{R}^{n}$.
+
+    On aura les notions de combinaison linéaire, d'indépendance linéaire, d'espace engendré (``vect''), d'application linéaire, etc.
+
+    On appelle un ensemble $V$ muni de telles opérations un \important{espace vectoriel}. Un \important{vecteur} est un élément $\bvec{v}$ dans $V$.
+}
+
+\parag{Définition}{
+    On appelle un \important{espace vectoriel} tout ensemble non vide $V$ constitué d'objets appelés vecteurs, sur lequel sont définies deux opérations appelées addition et multiplication par un scalaire (nombre réel). Ces opérations vérifient les dix axiomes énumérées ci-après, quels que soient les vecteurs $\bvec{u}$, $\bvec{v}$ et $\bvec{w}$ de $V$ et les scalaires $c$ et $d$:
+    \begin{enumerate}
+        \item La somme de $\bvec{u}$ et $\bvec{v}$, notée $\bvec{u} + \bvec{v}$, est dans $V$.
+        \item $\bvec{u} + \bvec{v} = \bvec{v} + \bvec{u}$
+        \item $\left(\bvec{u} + \bvec{v}\right) + \bvec{w} = \bvec{u} + \left(\bvec{v} + \bvec{w}\right)$
+        \item Il existe un vecteur de $V$ dit vecteur nul, ou zéro, noté $\bvec{0}$, tel que $\bvec{u} + \bvec{0} = \bvec{u}$
+        \item Pour tout vecteur de $\bvec{u}$ de $V$, il existe un vecteur $-\bvec{u}$ de $V$ tel que $\bvec{u} + \left(-\bvec{u}\right) = \bvec{0}$.
+        \item Le produit du vecteur $\bvec{u}$ par le scalaire $c$, noté $c \bvec{u}$, est dans $V$.
+        \item $c\left(\bvec{u} + \bvec{v}\right) = c \bvec{u} + c \bvec{v}$
+        \item $\left(c + d\right)\bvec{u} = c \bvec{u} + d \bvec{u}$
+        \item $c\left(d \bvec{u}\right) = \left(cd\right)\bvec{u}$
+        \item $1 \bvec{u} = \bvec{u}$
+    \end{enumerate}
+
+    En d'autres mots, la somme de deux vecteurs doit suivre ces 5 axiomes:
+
+    \begin{center}
+    \begin{minipage}[t]{0.45\textwidth}\vspace{0pt}
+    Somme de deux vecteurs:
+    \begin{enumerate}
+        \item Stable.
+        \item Commutative.
+        \item Associative.
+        \item Existence du vecteur nul.
+        \item Existence de l'inverse.
+    \end{enumerate}
+
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.45\textwidth}\vspace{0pt}
+    Produit par un scalaire:
+    \begin{enumerate}
+        \item Stable.
+        \item Distributive sur une somme de vecteur.
+        \item Distributive sur une somme de scalaire.
+        \item Associative.
+        \item Existence de l'unité.
+    \end{enumerate}
+
+    \end{minipage}
+    \end{center}
+}
+
+\parag{Exemple 1}{
+    Si on a $V = \mathbb{R}^{n}$, avec l'addition et la multiplication par un scalaire habituelles, alors c'est bien un espace vectoriel.
+}
+
+\parag{Exemple 2}{
+    Prenons $V = \mathbb{R}^{m \times n}$ avec l'addition et la multiplication par un scalaire habituelles pour des matrices.
+
+    On pourrait démontrer que les axiomes tiennent pour cet ensemble et ces opérations, donc $\mathbb{R}^{m \times n}$ est un espace vectoriel, et les vecteurs sont les matrices.
+}
+
+\parag{Exemple 3}{
+    Si on prend $V = \mathbb{P}_n$, l'ensemble des polynômes de degré $n$ ou moins, avec les opérations décrites ci-dessus.
+
+    Un élément $p$ de $\mathbb{P}_n$ est un polynôme de degré au plus $n$, c'est-à-dire que $p$ est une fonction de $\mathbb{R}$ vers $\mathbb{R}$ telle que
+    \[p\left(t\right) = a_0 + a_1 t + a_2 t^2 + \ldots + a_n t^n\]
+    pour tout $t \in \mathbb{R}$ avec certains coefficients fixés $a_0, \ldots, a_n \in \mathbb{R}$.
+
+    Alors on définit leur somme notée $p + q$ comme étant le polynôme tel que
+    \[\left(p + q\right)\left(t\right) = p\left(t\right) + q\left(t\right) = a_0 + \ldots + a_n t^{n} + b_0 + \ldots + b_n t^n = \left(a_0 + b_0\right) + \ldots + \left(a_n + b_n\right)t^{n}\]
+
+    Pour tout $t \in \mathbb{R}$, on remarque que $p + q$ est dans $\mathbb{P}_n$.
+
+    Étant donné un scalaire $c \in \mathbb{R}$, on définit le produit de $c$ et $p$, noté $cp$, comme étant le polynôme tel que
+    \[\left(cp\right)\left(t\right) = c p\left(t\right) = \left(ca_0\right) + \ldots \left(c a_n\right)t^n\]
+
+    Pour tout $t \in \mathbb{R}$, on remarque que $cp$ est dans $\mathbb{P}_n$.
+
+    Il est clair que la somme des polynômes est commutative et associatives.
+
+    Soit $z$ le polynôme tel que $z\left(t\right) = 0$ pour tout $t \in \mathbb{R}$. Notons que $z$ est dans $\mathbb{P}_n$, et que $\left(p + z\right)\left(t\right) = p\left(t\right) + z\left(t\right) = p\left(z\right)$, donc $p + z = p$.
+
+    On définit $-p = \left(-1\right)p$.
+
+    On peut démontrer toutes les autres propriétés, donc $\mathbb{P}_n$ est un espace vectoriel.
+
+}
+
+\parag{Propriétés}{
+    Soit $V$, un espace vectoriel. Alors, nous avons les propriétés suivantes:
+    \begin{enumerate}
+        \item Le vecteur nul $\bvec{0}$ est unique.
+        \item Pour $\bvec{u} \in V$ donné, le vecteur $-\bvec{u}$ est unique.
+        \item $0 \bvec{u} = 0$
+        \item $c \bvec{0} = \bvec{0}$
+        \item $-\bvec{u} = \left(-1\right)\bvec{u}$
+    \end{enumerate}
+
+    \subparag{Preuve}{
+        Laissée au lecteur.
+    }
+}
+
+\subsection{Sous-espaces vectoriels}
+\parag{Définition de sous-espace vectoriel}{
+    On appelle un \important{sous-espace vectoriel}, ou, en abrégé, sous-espace, d'un espace vectoriel $V$ toute sous-ensemble $H$ de $V$ possédant les trois propriétés suivantes:
+    \begin{enumerate}
+        \item Le vecteur nul de $V$ appartient à $H$.
+        \item $H$ est stable par l'addition vectorielle, i.e:
+        \[\bvec{u}, \bvec{v} \in H \implies \bvec{u} + \bvec{v} \in H\]
+        \item $H$ est stable par la multiplication par un scalaire, i.e, pour tout scalaire $c$:
+        \[\bvec{u} \in H \implies c \bvec{u} \in H\]
+
+    \end{enumerate}
+
+    \subparag{Remarque}{
+        Il est presque suffisant d'avoir les propriétés (2) et (3) pour avoir un sous-espace, puisque $0\cdot \bvec{u} = \bvec{0}$. Cependant, cela pose problème si $H$ est complètement vide. Uniquement dans ce cas, les propriétés (2) et (3) tiennent, mais la propriété (1) ne tient pas.
+    }
+
+}
+
+\parag{Exemple 1}{
+    Soit $V = \mathbb{R}^{n}$ et
+    \[H = \left\{\bvec{x} \in \mathbb{R}^{n} \telque x_1 + \ldots + x_n = 0\right\}\]
+
+    On remarque que les trois propriétés tiennent:
+    \begin{enumerate}
+        \item $\bvec{0}$ est dans $H$. En effet: \[x_1 + \ldots + x_n = 0 + \ldots + 0 = 0\]
+        \item Si $\bvec{u}, \bvec{v} \in H$, alors $\bvec{u} + \bvec{v} \in H$, en effet:
+        \[u_1 + \ldots + u_n = 0 \text{ et } v_1 + \ldots + v_n = 0 \implies \left(u_1 + v_1\right) + \ldots + \left(u_n + v_n\right) = 0\]
+        \item Si $\bvec{u} \in H$ et $c$ est un scalaire, alors $c \bvec{u} \in H$, en effet:
+        \[u_1 + \ldots + u_n = 0 \implies c u_1 + \ldots + c u_n = c\left(u_1 + \ldots + u_n\right) = c\cdot0 = 0\]
+    \end{enumerate}
+
+    Donc, $H$ est un sous-espace vectoriel de $\mathbb{R}^{n}$.
+
+}
+
+\parag{Non-exemple 1}{
+    Soit $V = \mathbb{R}^{n}$ et
+    \[H = \left\{\bvec{x} \in \mathbb{R}^{n} \telque x_1 + \ldots + x_n = 1\right\}\]
+
+    Ce n'est pas un sous-espace vectoriel de $\mathbb{R}^{n}$, puisqu'il n'a pas le vecteur nul.
+}
+
+\parag{Non-exemple 2}{
+    Soit $V = \mathbb{R}^{n}$ et
+    \[H = \left\{\bvec{x} \in \mathbb{R}^{n} \telque x_1 \geq 0, \ldots, x_n \geq 0\right\}\]
+
+    Cependant, si on prend $\bvec{u} \in H$, $\bvec{u} \neq \bvec{0}$, et qu'on le multiplie par un scalaire négatif, alors il n'appartient pas à $H$. La troisième propriété ne tient donc pas.
+}
+
+\parag{Exemple 2}{
+    Soit $V = \mathbb{R}^{n \times n}$ et
+    \[H = \left\{A \in \mathbb{R}^{n \times n} \telque A = A^{T}\right\}\]
+
+    On appelle de telles matrices, des matrices symétriques. Alors, on a:
+    \begin{enumerate}
+        \item $\bvec{0} \in H$ puisque la matrice nulle est égale à elle-même après avoir été transposée $(0^T = 0)$.
+        \item Si $A,B \in \mathbb{R}^{n\times n}$ sont dans $H$, alors $C = A+B \in H$. En effet:
+            \[\left(A + B\right)^{T} = A^{T} + B^{T} = A + B\]
+
+        \item Si $A \in \mathbb{R}^{n\times n}$ est dans $H$ et $c \in \mathbb{R}$ est un scalaire, alors $B = cA$ est dans $H$. En effet:
+            \[B^{T} = \left(cA\right)^{T} = cA^{T} = cA = B\]
+
+    \end{enumerate}
+
+    Donc, l'ensemble des matrices symétriques de taille $n \times n$ est un sous-espace vectoriel de $\mathbb{R}^{n\times n}$.
+}
+
+\parag{Exemple 3}{
+    Soit $V = \mathbb{P}_5$, et $H = \mathbb{P}_3$. On a bien que $H$ est un sous-ensemble de $V$. De plus:
+    \begin{enumerate}
+        \item $z\left(t\right) = 0$ pour tout $t \in \mathbb{R}$ définit bien un polynôme nul, qui est dans $\mathbb{P}_5$ et dans $\mathbb{P}_3$.
+        \item Pour tous $p, q \in \mathbb{P}_3$, on a bien que $p + q \in \mathbb{P}_3$ (on pourrait le démontrer plus formellement, mais on l'a déjà fait dans le cas général de $\mathbb{P}_n$).
+        \item Pour tout $p \in \mathbb{P}_3$ et $c \in \mathbb{R}$, on a bien que $cp \in \mathbb{P}_3$.
+    \end{enumerate}
+
+Donc $\mathbb{P}_3$ est un sous-espace vectoriel de $\mathbb{P}_5$. Plus généralement, $\mathbb{P}_m$ est un sous-espace vectoriel de $\mathbb{P}_n$ si et seulement si $m \leq n$.
+
+On aurait pu argumenter en disant que $\mathbb{P}_3$ est un sous-ensemble de $\mathbb{P}_5$, et il est un espace vectoriel quand on utilise les mêmes opérations, donc c'est un sous-espace.
+}
+
+\parag{Non-exemple 4}{
+    $\mathbb{R}^{2}$ n'est pas un sous espace vectoriel de $\mathbb{R}^{3}$, puisque $\mathbb{R}^2$ n'est pas un sous-ensemble de $\mathbb{R}^3$.
+
+    Cependant, $V = \left\{x \in \mathbb{R}^3 \telque x_3 = 0\right\}$ est un sous-espace vectoriel de $\mathbb{R}^3$.
+
+    En d'autres mots, par exemple,
+    \[\begin{bmatrix} 1 \\ 2 \\ 0 \end{bmatrix} \neq \begin{bmatrix} 1 \\ 2 \end{bmatrix} \]
+
+}
+
+\parag{Exemple 5}{
+    Soit $V$ est un espace vectoriel et $H = \left\{\bvec{0}\right\} \subset V$ où $\bvec{0}$ est le vecteur nul de $V$. Alors, $H$ est un sous-espace vectoriel de $V$.
+
+    On appelle $\left\{\bvec{0}\right\}$ le \important{sous-espace nul} ou \important{sous-espace trivial}.
+}
+
+\parag{Exemple 6 (sous-espace engendré)}{
+    Soit $V$ un espace vectoriel. Soient $\bvec{v}_1, \ldots, \bvec{v}_3 \in V$ des vecteurs de $V$. L'ensemble
+    \[H = \vect\left\{\bvec{v}_1, \bvec{v}_2, \bvec{v}_3\right\} = \left\{c_1 \bvec{v}_1 + c_2 \bvec{v}_2 + c\bvec{v}_3, \mathspace c_1, c_2, c_3 \in \mathbb{R}\right\}\]
+    de toutes les combinaisons linéaires de ces trois vecteurs est un sous-ensemble de $V$.
+
+    De plus, c'est un sous-espace vectoriel de $V$. En effet:
+    \begin{enumerate}
+        \item $\bvec{0} \in H$, puisque
+        \[0 \bvec{v}_1 + 0 \bvec{v}_2 + 0 \bvec{v}_3 = \bvec{0}\]
+        \item Si $\bvec{u} \in H$, alors il existe $c_1, c_2, c_3$ tels que
+        \[\bvec{u} = c_1 \bvec{v}_1 + c_2 \bvec{v}_2 + c_3 \bvec{v}_3\]
+        et de la même manière pour $\bvec{v} \in H$, avec des scalaires $d_1, d_2, d_3 \in \mathbb{R}$. Alors, on a:
+        \[\bvec{u} + \bvec{v} = \left(c_1 + d_1\right) \bvec{v}_1 + \left(c_2 + d_2\right)\bvec{v}_2 + \left(c_3 + d_3\right) \bvec{v}_3 \in H\]
+
+        \item La preuve est similaire, et elle est laissée en exercice au lecteur.
+    \end{enumerate}
+
+}
+
+\end{document}

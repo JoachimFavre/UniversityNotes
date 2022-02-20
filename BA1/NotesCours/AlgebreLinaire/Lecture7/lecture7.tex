@@ -1,0 +1,275 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-10-14 at 08:15:05.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Jeudi 14 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2021-10-14}{Transposées et inverses}{
+\begin{itemize}[left=0pt]
+    \item Définition des matrices transposées.
+    \item Démonstrations de certaines propriétés des matrices transposées.
+    \item Définition des matrices inverses.
+    \item Démonstrations de certaines propriétés des inverses.
+    \item Explication d'un algorithme pour trouver une matrice inverse.
+\end{itemize}
+
+}
+
+\parag{Transposé d'une matrice}{
+    Soit $A \in \mathbb{R}^{m \times n}$. Sa \important{transposée} est $A^{p} \in \mathbb{R}^{n \times m}$ telle que $\left(A^T\right)_{ij} = A_{ji}$.
+
+    En d'autres mots, les lignes deviennent des colonnes et les colonnes deviennent des lignes.
+
+    \imagehere{DefinitionMatriceTransposee.png}
+}
+
+\parag{Propriétés}{
+    \begin{enumerate}[left=0pt]
+        \item $\left(A^T\right)^T = A$
+        \item $\left(A + B\right)^T = A^T + B^T$
+        \item $\left(rA\right)^T = rA^T$
+        \item $\left(AB\right)^T = B^T A^T$
+    \end{enumerate}
+
+    Attention, en général, $\left(AB\right)^T \neq A^T B^T$. En soit c'est logique, car on n'est même pas sûr que le produit $A^T B^T$ est défini si $AB$ l'est (par contre on est sûr que $B^T A^T$ est défini).
+
+    On peu en déduire que
+    \[\left(A_1 A_2 \ldots A_k\right)^T = A_k^T \ldots A_2^T A_1^T\]
+
+    \subparag{Preuve}{
+        Laissée en tant qu'exercice au lecteur.
+    }
+}
+
+\parag{Vision équivalente pour le produit de matrice}{
+    Prenons la matrice suivante:
+    \[A = \begin{bmatrix} 3 & 0 & -1 \\ 2 & 5 & 2 \end{bmatrix} \]
+
+    Alors on que
+    \[\begin{bmatrix} 3 & 0 & {\color{red}-1} \\ 2 & 5 & {\color{red}2} \end{bmatrix} \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} -1 \\ 2 \end{bmatrix} \mathspace \text{ et } \mathspace \begin{bmatrix} 1 & 0 \end{bmatrix} \begin{bmatrix} {\color{red}3} & {\color{red}0} & {\color{red}-1} \\ 2 & 5 & 2 \end{bmatrix} = \begin{bmatrix} 3 & 0 & -1 \end{bmatrix} \]
+
+    En combinant ces résultats:
+    \[\begin{bmatrix} 1 & 0 \end{bmatrix} \begin{bmatrix} 3 & 0 & {\color{red}-1} \\ 2 & 5 & 2 \end{bmatrix} \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} = -1\]
+
+    De manière générale, si on multiplie $A$ par un vecteur colonne ayant son $j$-ème coefficient égal à 1, et tous les autres nuls, alors on va obtenir la $j$-ème colonne de $A$. De manière similaire, si on multiplie un vecteur ligne construit de la même manière par $A$, alors on va obtenir la $i$-ème ligne de $A$.
+
+    Si on utilise cette propriété pour calculer le coefficient $\left(i, j\right)$ de $AB$, on peut choisir de faire les produits dans un autre ordre (le produit est associatif). De ce fait, on peut obtenir un produit entre la $i$-ème ligne de $A$ et la $j$-ème colonne de $B$. Donc,
+    \[\left(AB\right)_{ij} = \begin{bmatrix} a_{i1} & \ldots & a_{in} \end{bmatrix} \begin{bmatrix} b_{ij} \\ \vdots \\ b_{nj} \end{bmatrix} = a_{1i} b_{ij} + \ldots + a_{in} b_{nj}\]
+
+    On retrouve bien la même règle.
+
+}
+
+\subsection{Inversion de matrices}
+\parag{Le cas des scalaires}{
+    L'inverse d'un scalaire non nul $a \in \mathbb{R}$ est le scalaire $c = \frac{1}{a} = a^{-1}$ tel que $ac = 1$ où $1$ est l'identité pour le produit. Pour les matrices \important{carrées}, on généralise comme suit.
+}
+
+\parag{Définition de l'inverse d'une matrice}{
+    $A \in \mathbb{R}^{n \times n}$ (carrée) est \important{inversible} s'il existe une matrice $C \in \mathbb{R}^{n \times n}$ telle que $AC = I_n$ et $CA = I_n$. Dans le cas où $C$ existe, on l'appelle \important{l'inverse} de $A$.
+}
+
+\parag{Unicité}{
+    Si $A$ est inversible, la matrice $C$ telle que $CA = AC = I$ est \important{unique}.
+
+    \subparag{Preuve}{
+        Supposons qu'il existe une autre matrice $B \in \mathbb{R}^{n \times n}$ telle que $AB = BA = I$. Alors:
+        \[B = BI = B\left(AC\right) = \left(BA\right)C = IC = C\]
+        ce qui est une contradiction, puisqu'on avait supposé $B \neq C$.
+
+        \qed
+    }
+
+    Dès lors, si $A$ est inversible, son inverse est donc unique et on peut la noter $A^{-1}$ (on utilise une notation qui prend avantage de cette unicité). La matrice $A^{-1}$, si elle existe, est caractérisée par
+    \[A^{-1}A = A A^{-1} = I\]
+
+}
+
+\parag{Nomenclature}{
+    Une matrice non-inversible est appelée \important{singulière}. Une matrice inversible est appelée \important{non-singulière}.
+}
+
+\parag{Exemple}{
+    Si on a
+    \[A = \begin{bmatrix} 3 & 5 \\ 2 & 3 \end{bmatrix} \mathspace \text{ et } \mathspace C = \begin{bmatrix} -3 & 5 \\ 2 & -3 \end{bmatrix} \]
+
+    alors on se rend compte que $AC = CA = I$. Donc, $A$ est inversible et $C$ est son inverse. Mais aussi, $C$ est inversible et $A$ est son inverse. On a donc
+    \[A = C^{-1} \mathspace \text{ et } \mathspace C = A^{-1}\]
+
+    On peut donc ``choisir'' quelle matrice est l'inverse de l'autre.
+
+    \subparag{Plus généralement}{
+        Si $A \in \mathbb{R}^{n \times n}$ est inversible, son inverse $A^{-1}$ est inversible également, et l'inverse de $A^{-1}$ est $\left(A^{-1}\right)^{-1} = A$.
+    }
+
+}
+
+\parag{Théorème}{
+    Si $A$ est une matrice $n \times n$ inversible, alors, pour tout vecteur $\bvec{b} \in \mathbb{R}^{n}$, l'équation $A \bvec{x} = \bvec{b}$ admet pour unique solution le vecteur
+    \[\bvec{x} = A^{-1} \bvec{b}\]
+
+    \subparag{Preuve}{
+        \important{Est une solution}: On sait que $A^{-1} \bvec{b}$ existe, puisque $A$ est inversible par hypothèse. Or, en substituant cette égalité dans l'équation, on remarque que:
+        \[A\left(A^{-1}\bvec{b}\right) = \left(A A^{-1}\right)\bvec{b} = I_n\bvec{b} = \bvec{b}\]
+
+        Donc, $A \bvec{x} = \bvec{b}$ admet $A^{-1} \bvec{b}$ comme solution.
+
+        \vspace{1em}
+        \important{Est unique}: Cette solution est unique. En effet, si $\bvec{x}$ est une solution quelconque, alors
+        \[A \bvec{x} = \bvec{b} \implies A^{-1} A \bvec{x} = A^{-1} \bvec{b} \implies \bvec{x} = A^{-1} \bvec{b}\]
+        qui est un vecteur bien défini et unique.
+
+        \qed
+    }
+
+    \subparag{Corollaire}{
+        Si $A$ est inversible, alors les colonnes de $A$ sont linéairement indépendantes et elles engendrent $\mathbb{R}^{n}$.
+    }
+
+
+}
+
+\parag{Cas particulier du 2x2}{
+    Soit la matrice suivante:
+    \[A = \begin{bmatrix} a & b \\ c & d \end{bmatrix} \in \mathbb{R}^{2\times2}\]
+
+    On peut vérifier que $A$ est inversible si et seulement si $\det\left(A\right) = ad - bc \neq 0$. Dans ce cas:
+    \[A^{-1} = \frac{1}{ad - bc} \begin{bmatrix} d & -b \\ -c & a \end{bmatrix} \]
+
+    \subparag{Preuve}{
+        \important{Si $ad - bc \neq 0$}, on a
+        \[\frac{1}{ad - bc} \begin{bmatrix} d & -b \\ -c & a \end{bmatrix} \begin{bmatrix} a & b \\ c & d \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} \]
+
+        On peut vérifier que $A^{-1} A$ est aussi égal à la matrice identité.
+
+        \vspace{1em}
+        \important{Si $ad - bc = 0$}, alors les colonnes de $A$ sont colinéaires (c'est laissé en exercice au lecteur). De ce fait, elles ne sont pas indépendantes, donc  on peut utiliser la réciproque du théorème qu'on vient de voir.
+    }
+
+}
+
+\parag{Déterminant pour les matrices 2x2}{
+    Pour une matrice $A \in \mathbb{R}^{2\times2}$, la quantité $ad - bc$ est tellement importante qu'on lui donne un nom, on l'appel le \important{déterminant} de $A$, noté :
+    \[\det A = \det\begin{bmatrix} a & b \\ c & d \end{bmatrix} = ad - bc\]
+
+    On a prouvé que $A$ est inversible si et seulement si $\det A \neq 0$. Plus tard, on généralisera ce résultat pour des matrice $n \times n$ avec $n$ quelconque.
+}
+
+\parag{Exemple}{
+    Soit la matrice
+    \[A = \begin{bmatrix} 2 & 3 \\ 2 & 4 \end{bmatrix} \implies \det A = 2\cdot 4 - 3\cdot 2 = 2 \neq 0\]
+
+    Puisque le déterminant est non nul, cette matrice est inversible, et son inverse est donnée par:
+    \[A^{-1} = \frac{1}{\det A} \begin{bmatrix} d & -b \\ -c & a \end{bmatrix} = \frac{1}{2}\begin{bmatrix} 4 & -3 \\ -2 & 2 \end{bmatrix} \]
+
+    On peut vérifier notre résultat en vérifiant que $A A^{-1} = A^{-1} A = I$.
+}
+
+\parag{Application aux systèmes 2x2}{
+    Si on a un système
+    \begin{systemofequations}{}
+    &\ 2x_1 + 3x_2 = b_1 \\
+    &\ 2x_1 + 4x_2 = b_2
+    \end{systemofequations}
+
+    La matrice équivalente est celle de notre exemple ci-dessus. Son déterminant est non-nul et son inverse est simple à calculer. Donc,
+    \[\bvec{x} = A^{-1} \bvec{b} = \frac{1}{2}\begin{bmatrix} 4 & -3 \\ -2 & 2 \end{bmatrix} \begin{bmatrix} b_1 \\ b_2 \end{bmatrix} = \frac{1}{2} \begin{bmatrix} 4b_1 - 3b_2 \\ -2b_1 + 2b_2 \end{bmatrix} \]
+
+    Ainsi, il est maintenant très simple de résoudre un système linéaire de deux équations à deux inconnues.
+}
+
+\parag{Propriétés de l'inverse}{
+    \begin{enumerate}[left=0pt]
+        \item Si $A$ est une matrice inversible, alors $A^{-1}$ est inversible et
+            \[\left(A^{-1}\right)^{-1} = A\]
+
+        \item Si $A$ et $B$ sont deux matrices $n \times n$ inversibles, alors $AB$ est inversible et
+            \[\left(AB\right)^{-1} = B^{-1} A ^{-1}\]
+
+        \item Si $A$ est une matrice inversible, alors $A^{T}$ l'est aussi, et
+            \[\left(A^{T}\right)^{-1} = \left(A^{-1}\right)^T\]
+    \end{enumerate}
+
+    \subparag{Preuve}{
+        \begin{enumerate}[left=0pt]
+            \item $A^{-1}$ est inversible si et seulement s'il existe une matrice $C$ telle que
+            \[A^{-1} C = I \mathspace \text{ et } \mathspace C A^{-1} = I\]
+
+            C'est effectivement le cas avec $C = A$, donc $\left(A^{-1}\right)^{-1} = A$.
+            \item $AB$ est inversible si et seulement s'il existe une matrice $C$ telle que:
+            \[\left(AB\right) C = I \mathspace \text{ et } \mathspace C\left(AB\right) = I\]
+
+            C'est effectivement le cas avec $C = B^{-1} A^{-1}$ puisque
+            \[ABC = ABB^{-1}A^{-1} = AIA^{-1} = A A^{-1} = I\]
+
+            De plus:
+            \[CAB = B^{-1} A^{-1} A B = B^{-1} I B = B^{-1} B = I\]
+
+
+            \item $A^{T}$ est inversible si et seulement s'il existe une matrice $C$ telle que
+            \[A^T C = I \mathspace \text{ et } \mathspace C A^T = I\]
+
+            C'est effectivement le cas avec $C = \left(A^{-1}\right)^T$ puisque:
+            \[C A^{T} = \left(A^{-1}\right)^T A^{T} = \left(A A^{-1}\right)^T = I^T = I\]
+
+            Le fait que $A^T C = I$ peut être démontré de la même manière.
+
+            \qed
+        \end{enumerate}
+
+    }
+
+}
+
+\parag{Corollaire}{
+    Le produit de matrices $n \times n$ inversibles est inversible, et l'inverse de ce produit est donné par
+    \[\left(A_1 A_2 \ldots A_k\right)^{-1} = A_k^{-1} \ldots A_2^{-1} A_1^{-1}\]
+
+    \subparag{Preuve pour 3 matrices}{
+        Si on a $A, B, C$ inversibles, alors:
+        \[\left(ABC\right)^{-1} = \left(BC\right)^{-1} A^{-1} = C^{-1} B^{-1} A^{-1}\]
+    }
+}
+
+\parag{Calcul de l'inverse}{
+    Soit $A \in \mathbb{R}^{n\times n}$. On veut calculer $A^{-1}$.
+
+    Raisonnons colonne par colonne. Soient $\bvec{e}_1, \ldots, \bvec{e}_n$ les colonnes de $I_n$. La matrice $A^{-1}$ est de taille $n \times n$, elle a donc $n$ colonnes dans $\mathbb{R}^n$. Écrivons:
+    \[A^{-1} = \begin{bmatrix}  &  &  \\  &  &  \\ \bvec{y}_1 & \ldots & \bvec{y}_n \\  &  &  \\  &  &  \end{bmatrix} \]
+
+    La $k$-ème colonne est $\bvec{y}_k$, qu'on peut obtenir de la manière suivante (comme on l'a vu plus haut, en début du cours):
+    \[\bvec{y}_k = A^{-1} \bvec{e}_k \implies A \bvec{y}_k = A A^{-1} \bvec{e}_k = I \bvec{e}_k = \bvec{e}_k\]
+
+    Donc, la $k$-ème colonne de $A^{-1}$ est l'unique solution de l'équation vectorielle suivante:
+    \[A \bvec{y}_k = \bvec{e}_k\]
+
+    On peut donc résoudre cette équation pour chaque colonne de $A^{-1}$. Si $A$ n'est pas inversible, un des systèmes n'aura pas de solution unique.
+
+    Cependant, cela va nous demander de résoudre $n$ système différents, mais qui ont tous la même matrice $A$. On peut donc organiser nos calculs pour résoudre ces $n$ systèmes ensemble. En effet, pour résoudre $A \bvec{x} = \bvec{e}_1$, on va échelonner la matrice augmentée donnée par
+    \[\begin{bmatrix}  &  \\ A & \bvec{e}_1 \\  &  \end{bmatrix} \]
+
+    Sous forme échelonnée réduite, puisque le système est carré et qu'il y a une solution unique, on obtiendra
+    \[\begin{bmatrix}  &  \\ I_n & \bvec{y}_1 \\  &  \end{bmatrix} \]
+
+    On fera exactement le même raisonnement pour $\bvec{y}_2$. Les opérations qu'on fait pour échelonner les matrices augmentées seront les mêmes, ils ne dépendent que de $A$. Donc, si on a la matrice
+    \[ \begin{bmatrix}  &  &  &  \\ A & \bvec{e}_1 & \ldots & \bvec{e}_n \\  &  &  &  \end{bmatrix} = \begin{bmatrix}  &  \\ A & I \\  &  \end{bmatrix} \]
+    et qu'on la réduit, on va obtenir
+    \[\begin{bmatrix}  &  \\ I_n & A^{-1} \\  &  \end{bmatrix} \]
+
+    Cet algorithme n'est pas forcément le plus efficace pour un ordinateur, mais il fonctionne!
+}
+
+
+
+
+
+
+
+\end{document}

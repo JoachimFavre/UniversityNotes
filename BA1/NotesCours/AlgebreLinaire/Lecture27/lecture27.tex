@@ -1,0 +1,193 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-23 at 08:17:51.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Jeudi 23 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{27}{2021-12-23}{La puissance de la SVD}{
+\begin{itemize}[left=0pt]
+    \item Démonstration de la méthode pour extraire une base orthonormée pour chacun des 4 sous-espaces importants d'une matrice, à partir de sa SVD.
+    \item Application de la SVD au cas particulier d'une matrice carrée.
+\end{itemize}
+}
+
+\parag{Rappel}{
+    Le théorème de la SVD nous assure que, si on a une matrice quelconque $A \in \mathbb{R}^{m \times n}$, alors, on peut écrire $A$ sous la forme:
+    \[A = U \Sigma V^T\]
+
+    Où:
+    \[U = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_m \\  &  &  \end{bmatrix} \in \mathbb{R}^{m \times m}, \mathspace \text{orthogonale}\]
+    \[V = \begin{bmatrix}  &  &  \\ \bvec{v}_1 & \ldots & \bvec{v}_m \\  &  &  \end{bmatrix} \in \mathbb{R}^{n \times n}, \mathspace \text{orthogonale}\]
+    \[\Sigma = \begin{bmatrix} \sigma_1 &  &  &  &  \\  & \ddots &  &  &  \\  &  & \sigma_r &  &  \\  &  &  &  &  \\  &  &  &  &  \end{bmatrix} \in \mathbb{R}^{m \times n}, \mathspace \text{ diagonale} \]
+
+    De plus, on a vu qu'on peut réécrire ce produit matriciel: 
+    \[A = U\Sigma V^T = \sigma_1 \bvec{u}_1 \bvec{v}_1^T + \ldots + \sigma_r \bvec{u}_r \bvec{v}_r^T\]
+    
+}
+
+\parag{Théorème: base de l'image}{
+    Les vecteurs $\left\{\bvec{u}_1, \ldots, \bvec{u}_r\right\}$ forment une base orthonormée de $\im A$.
+
+
+    \subparag{Preuve que $\im \subset \vect$}{
+        On veut montrer que $\im A \subset \vect\left\{\bvec{u}_1, \ldots, \bvec{u}_r\right\}$.
+
+        \vspace{1em}
+
+        Soit $\bvec{x} \in \mathbb{R}^n$ un vecteurs quelconque (ça aura été une blague très récurrente; si vous vous demandez d'où ça vient, cherchez ``évêque quelconque'' sur YouTube (si vous voulez la solution, allez regarder \textit{What the Cut 36}, d'Antoine Daniel)). Alors: 
+        \begin{multiequality}
+        A \bvec{x} & = \left(\sigma_1 \bvec{u}_1 \bvec{v}_1^T + \ldots + \sigma_r \bvec{u}_r \bvec{v}_r^T\right)\bvec{x} \\
+        & = \underbrace{\sigma_1}_{\in \mathbb{R}} \underbrace{\bvec{u}_1}_{\in \mathbb{R}^{m \times 1}} \underbrace{\bvec{v}_1^T}_{\in \mathbb{R}^{1 \times n}} \underbrace{\bvec{x}}_{\in \mathbb{R}^{n \times 1}} + \ldots + \sigma_r \bvec{u}_r \bvec{v}_r^T \bvec{x}
+        \end{multiequality}
+        
+        Or, on remarque que $\bvec{v}_i^T \bvec{x} \in \mathbb{R}^{1 \times 1}$, ce qui est donc un scalaire (on peut même reconnaitre la définition du produit scalaire). On a la commutativité pour le produit matrice-scalaire, donc: 
+        \[A \bvec{x} = \sigma_1 \left(\bvec{v}_1^T \bvec{x}\right) \bvec{u}_1 + \ldots + \sigma_r \left(\bvec{v}_r^T \bvec{x}\right) \bvec{u}_r\]
+
+        Notez que les parenthèses ne sont pas nécessaires, elles sont uniquement là pour faciliter la lecture. On déduit de notre égalité ci-dessus que touts les vecteurs dans $\im A$ sont des combinaisons linéaires des vecteurs $\bvec{u}_1, \ldots, \bvec{u}_r$. En d'autres mots: 
+        \[\im A \subseteq \vect\left\{\bvec{u}_1, \ldots, \bvec{u}_r\right\}\]
+    }
+    
+    \subparag{Preuve que $\im \subset \vect$}{
+        On veut montrer que $\vect\left\{\bvec{u}_1, \ldots, \bvec{u}_r\right\} \subset \im A$.
+
+        \vspace{1em}
+
+        Pour cela, il nous suffit de montrer que chaque $\bvec{u}_i$ fait partie de $\im A$. En effet, $\im A$ est un sous-espace vectoriel; donc, toute combinaison linéaire de vecteurs qui font partie de cet ensemble, fait aussi partie de cet ensemble.
+
+        On remarque bien que $\bvec{u}_i \in \im A$ (pour $i = 1, \ldots, r$) car on peut écrire notre formule comme:
+        \[A \bvec{x} = \sigma_1 \left(\bvec{v}_1 \dotprod \bvec{x}\right) \bvec{u}_1 + \ldots + \sigma_r \left(\bvec{v}_r \dotprod \bvec{x}\right) \bvec{u}_r\]
+
+        Ainsi, en prenant $\bvec{x} = \frac{1}{\sigma_i} \bvec{v}_i$, on a: 
+        \begin{multiequality}
+        A \bvec{x} & = \sigma_1\left(\bvec{v}_1^T \bvec{x}\right)\bvec{u}_1 + \ldots + \sigma_r\left(\bvec{v}_r^T \bvec{x}\right) \bvec{u}_r  \\
+        & = \bvec{0} + \ldots + \sigma_i \left(\bvec{v}_i^T \frac{1}{\sigma_i} \bvec{v}_i\right)\bvec{u}_i + \ldots +\bvec{0} \\
+        & = \bvec{u}_i 
+        \end{multiequality}
+
+        En effet, les vecteurs $\left\{\bvec{v}_1, \ldots, \bvec{v}_r\right\}$ sont orthonormaux, donc $\bvec{v}_i \dotprod \bvec{v}_j = 0$, sauf si $i = j$, auquel cas $\bvec{v}_i \dotprod \bvec{v}_i = 1$.
+        
+        On a trouvé un $\bvec{x}$ tel que $A \bvec{x} = \bvec{u}_i$, ce qui nous permet d'en déduire que les vecteurs $\bvec{u}_i$ font bien partie de l'image de $A$.
+
+        Pour démontrer ce fait, on aurait aussi pu partir de la manière dont on a construit la SVD. On avait construit nos vecteurs de telle manière que $A \bvec{v}_i = \sigma_i \bvec{u}_i$. Ainsi, on avait directement que:
+        \[A \left(\frac{1}{\sigma_i} \bvec{v}_i\right) = \bvec{u}_i\]
+        
+        Ceci nous permet donc de déduire que $\vect\left\{\bvec{u}_1, \ldots, \bvec{u}_r\right\} \subseteq \im A$, par l'argument donné au début de cette démonstration.
+    }
+
+    \subparag{Preuve}{
+        Par les deux points précédents, on sait que: 
+        \[\vect\left\{\bvec{u}_1, \ldots, \bvec{u}_r\right\} = \im A\]
+
+        De plus, on sait que les vecteurs $\left\{\bvec{u}_1, \ldots, \bvec{u}_r\right\}$ sont orthonormés et tous non-nuls, ils sont donc linéairement indépendants.
+        
+        Ceci nous permet de conclure que les vecteurs $\left\{\bvec{u}_1, \ldots, \bvec{u}_r\right\}$ forment une base orthonormée pour l'image de $A$.
+
+        \qed
+    }
+}
+
+\parag{Corollaire 1}{
+    Puisqu'on a $r$ vecteurs qui nous font une base, on trouve: 
+    \[\rang A = \dim\im A = r\]
+
+    Ce qui est le nombre de valeurs singulières strictement positives de $A$.
+}
+
+\parag{Corollaire 2}{
+    Les vecteurs $\left\{\bvec{u}_{r+1}, \ldots, \bvec{u}_{m}\right\}$ forment une base de $\ker\left(A^T\right)$.
+
+    En particulier, cela nous dit que: 
+    \[\dim\left(\ker A^T\right) = m - r\]
+
+    \subparag{Preuve}{
+        Nos vecteurs $\left\{\bvec{u}_{r+1}, \ldots, \bvec{u}_m\right\}$ forment aussi une base orthonormée, celle du complément orthogonal générées par $\left\{\bvec{u}_1, \ldots, \bvec{u}_r\right\}$. En effet, nous avons bien $m - r$ vecteurs et, si un vecteur est orthogonal aux vecteurs d'une base, alors il est aussi orthogonal à tous les vecteurs de l'espace. Ceci nous permet d'en déduire que $\left\{\bvec{u}_{r+1}, \ldots, \bvec{u}_m\right\}$ forment une base orthonormée pour: 
+        \[\left(\im A\right)^\perp = \ker\left(A^T\right)\]
+
+        \qed
+    }
+}
+
+\parag{SVD de la transposée}{
+    On remarque que, si on connaît la SVD d'une matrice, alors il est très facile de trouver la SVD de sa transposée: 
+    \[A = U \Sigma V^T \implies A^T = \left(U \Sigma V^T\right)^T = \left(V^T\right)^T \Sigma^T U^T = V \Sigma^T U^T\]
+    
+    En effet, la transposée d'une matrice diagonale $m \times n$ est une matrice diagonale $n \times m$. En particulier, on voit que les valeurs singulières de $A$ et de $A^T$ sont les mêmes.
+}
+
+\parag{Théorème}{
+    Les vecteurs $\left\{\bvec{v}_1, \ldots, \bvec{v}_r\right\}$ forment une base orthonormée pour:
+    \[\im\left(A^T\right)\]
+
+    \subparag{Preuve}{
+        Nous pouvons utiliser un raisonnement similaire à celui ci-dessus.
+    }
+    
+}
+
+\parag{Corollaire}{
+    Les vecteurs $\left\{\bvec{v}_{r+1}, \ldots, \bvec{v}_n\right\}$ forment une base orthonormée pour: 
+    \[\left(\im\left(A^T\right)\right)^\perp = \ker\left(A\right)\]
+}
+
+\parag{Résumé}{
+    Nous avons trouvé des base orthonormées pour les 4 sous-espaces intéressants de $A$:
+    \begin{center}
+    \begin{tabular}{ll}
+        \textbf{Sous-espace} & \textbf{Base orthonormée}  \\
+        $\displaystyle \im A$ & $\displaystyle \left\{\bvec{u}_1, \ldots, \bvec{u}_r\right\}$ \\
+        $\displaystyle \ker A^T$ & $\displaystyle \left\{\bvec{u}_{r+1}, \ldots, \bvec{u}_m\right\}$  \\
+        $\displaystyle \im A^T$ & $\displaystyle \left\{\bvec{v}_1, \ldots, \bvec{v}_r\right\}$  \\
+        $\displaystyle \ker A$ & $\displaystyle \left\{\bvec{v}_{r+1}, \ldots, \bvec{v}_n\right\}$ \\
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Implications}{
+    Non-seulement nous avons trouvé des bases pour ces sous-espaces, mais en plus elles sont orthonormées, ce qui est extrêmement pratique. Par exemple, nous pourrions facilement calculer les matrices de projection sur ces sous-espaces.
+}
+
+\parag{Cas d'une matrice carrée}{
+    On sait que le SVD des matrices carrées $A \in \mathbb{R}^{n \times n}$ existent aussi. Ainsi, il existe $U, V$ orthogonales de taille $n \times n$ et $\Sigma$ une matrice diagonale carrée telles que: 
+    \[A = U\Sigma V^T\]
+    
+    \subparag{Déterminant}{
+        On peut utiliser notre théorème pour séparer le produit de matrices: 
+        \[\det\left(A\right) = \det\left(U \Sigma V^T\right) = \det\left(U\right)\det\left(\Sigma\right)\det\left(V^T\right)\]
+        
+        On peut retrouver que le déterminant d'une matrice orthogonale est $\pm 1$:
+        \[1 = \det\left(I_n\right) = \det\left(U^T U\right) = \underbrace{\det\left(U^T\right)}_{\det\left(U\right)}\det\left(U\right) = \det\left(U\right)^2\]
+
+        Ainsi, on trouve que: 
+        \[\det\left(A\right) = \pm \sigma_1 \cdots \sigma_n\]
+    }
+    
+    \subparag{Inversibilité}{
+        En utilisant notre formule ci-dessus, on trouve que $A$ est inversible si et seulement is $\sigma_1, \ldots, \sigma_n$ sont toutes non-nulles. Cela peut aussi se voir avec le fait que le nombre de valeurs singulières non-nulles est égal à la dimension de son espace image, qui doit être égal à $n$ pour les matrices inversibles.
+    }
+
+    \subparag{Inverse}{
+        On peut facilement calculer l'inverse: 
+        \[A^{-1} = \left(U \Sigma V^T\right)^{-1} = \left(V^T\right)^{-1} \Sigma^{-1} U^{-1} = V \Sigma^{-1} U^T\]
+        
+        De plus, l'inverse d'une matrice diagonale peut être facilement calculée: 
+        \[\Sigma^{-1} = \begin{bmatrix} \sigma_1 & \ldots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \ldots & \sigma_n \end{bmatrix}^{-1} = \begin{bmatrix} \frac{1}{\sigma_1} & \ldots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \ldots & \frac{1}{\sigma_n} \end{bmatrix}\]
+    }
+
+    \subparag{Valeurs singulières de l'inverse}{
+        On a trouvé la SVD de l'inverse ci-dessus, donc les valeurs singulières de l'inverse sont: 
+        \[\frac{1}{\sigma_1}, \ldots, \frac{1}{\sigma_n}\]
+    }
+    
+    \subparag{Inverse de la transpose}{
+        On peut faire une preuve différente que celle qu'on avait faite pour $\left(A^T\right)^{-1} = \left(A^{-1}\right)^T$ en utilisant la SVD. Cette preuve est laissée en exercice au lecteur (comment terminer \textit{parfaitement} un semestre!). 
+    }
+}
+
+\end{document}

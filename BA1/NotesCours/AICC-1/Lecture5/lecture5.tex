@@ -1,0 +1,489 @@
+\documentclass{article}
+
+% Expanded on 2021-10-05 at 08:06:35.
+
+\usepackage{../../style}
+
+\title{AICC-1}
+\author{Joachim Favre}
+\date{Mardi 05 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2021-10-05}{Inference rules and the beginning of proofs}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the different inference rules in propositional logic.
+    \item Explanation of the different inference rules in predicate logic.
+    \item Definition of the vocabulary used for proofs (theorem, axiom, lemma, corollary, proposition, conjecture).
+    \item Definition of the different types of proofs: direct and indirect (contrapositive or contradiction).
+\end{itemize}
+}
+
+
+\subsection{Inference rules in propositional logic}
+\parag{Conjunction}{
+    Using the tautology $p \land q \to p \land q$, we get the following inference rule:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $p$  \\
+        & $q$ \\
+        \hline
+        $\therefore$ & $p \land q$
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Modus Ponens}{
+    Using the tautology $\left(p \land p \to q\right) \to q$, we get the following inference rule:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $p \to q$ \\
+        & $p$  \\
+        \hline
+        $\therefore$ & $q$
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Modus Tollens}{
+    Using the tautology $\left(\lnot q \land p \to q\right) \to \lnot p$, we get the following inference rule:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $p \to q$  \\
+        & $\lnot q$ \\
+        \hline
+        $\therefore$ & $\lnot p$
+    \end{tabular}
+    \end{center}
+
+    This has to do with the contrapositive of the proposition.
+}
+
+\parag{Trivial inference rule}{
+    If we know that $p \equiv q$, then $p \to q$ is a tautology. Thus:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $p$ \\
+        \hline
+        $\therefore$ & $q$
+    \end{tabular}
+    \end{center}
+
+    \subparag{Example}{
+        Let's say that we know $p \to q$ and $\lnot q$, then we can use the trivial inference rule:
+        \begin{center}
+        \begin{tabular}{rl}
+            & $p \to q$ \\
+            & $\lnot q$ \\
+            & $\lnot q \to \lnot p$ \\
+            \hline
+            $\therefore$ & $\lnot p$
+        \end{tabular}
+        \end{center}
+
+        We have thus just proven the Modus Tollens (it indeed had to do with the contrapositive).
+    }
+}
+
+\parag{Hypothetical syllogism}{
+    Using the tautology $\left(p \to q \land q \to r\right) \to \left(p \to r\right)$, we get the following inference rule:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $p \to q$ \\
+        & $q \to r$ \\
+        \hline
+        $\therefore$ & $p \to r$
+    \end{tabular}
+    \end{center}
+
+    \subparag{Terminology}{
+        This inference is also sometimes called the ``chain rule'', or ``transitivity of implication''.
+    }
+
+    \subparag{Usefulness}{
+        Note that this inference rule is very important in maths, since we are always chaining our reasoning.
+    }
+
+    \subparag{Example}{
+        Let's say we know that ``if I have passed AICC, I can advance to year 2 of the studies'' and ``if I can advance to year 2 of the studies, I can take Analysis 4''.
+
+        We can thus deduce that ``if I have passed AICC, then I can take Analysis 4''.
+    }
+}
+
+\parag{Dumb Argument Prover}{
+    Let's say we want to create a ``Dumb Argument Prover'', DAB \textit{(j'effectue le DAB)}. We can use the following procedure:
+    \begin{enumerate}
+        \item Build the complete truth table for all premises and the conclusion.
+        \item Remove all rows where at least one premise is false.
+        \item Check whether the column of the conclusion contains only T.
+    \end{enumerate}
+
+    The problem of this method is that if we have many premises then our truth table will be huge. Using implications help to go much faster.
+
+    \subparag{Example}{
+        If we have $p_1$, \ldots, $p_n$ and $\left(p_1 \land\ldots \land p_n\right) \to q$, then we know $q$.
+
+        The dumb prover would take a lot of time to build the table and remove what it does not need: it would do a lot of ``unncessary work''. Indeed, we would only need to check for the first line --- the one where every premise is true --- but the dumb prover would check every line. Anyhow, the reasoning we are developing here is much more efficient.
+    }
+
+}
+
+\parag{Resolution}{
+    Using the tautology $\left(\left(\lnot p \lor r\right) \land \left(p \lor q\right)\right) \to \left(q \lor r\right)$, we get the following rule of inference:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $\lnot p \lor r$ \\
+        & $p \lor q$ \\
+        \hline
+        $\therefore$ & $q \lor r$
+    \end{tabular}
+    \end{center}
+
+    \subparag{Usefulness}{
+        Resolution plays an important role in automated theorem proofing and AI. It allows to eliminate proposition variables from the premises, so it is very powerful.
+    }
+
+    \subparag{Example}{
+        Let's say we know that ``the weather is bad or I am at the beach'' and ``the weather is nice or I am at home''.
+
+        We can then deduce that ``I am at home or at the beach''.
+    }
+
+    \subparag{''Resolution rules them all''}{
+        ``I think you have all seen the movie'', but it's not a movie, it's a book \frownie\ (which I haven't read, but that's not the question).
+
+        Let's say we have $p \to q$ and $q \to r$. We can do the following reasoning to show that resolution includes the chain rule:
+        \begin{center}
+        \begin{tabular}{rll}
+            & $p \to q$ & premise \\
+            & $q \to r$ & premise \\
+            & $\lnot p \lor q$ & equivalence \\
+            & $\lnot q \lor r$ & equivalence \\
+            & $\lnot p \lor r$ & resolution  \\
+            \hline
+            $\therefore$ & $p \to r$ & equivalence
+        \end{tabular}
+        \end{center}
+
+        Similarly, we can see that it it also includes Modus Ponens:
+        \begin{center}
+        \begin{tabular}{rll}
+            & $p \to q$ & premise  \\
+            & $p$ & premise \\
+            & $\lnot p \lor q$ & equivalence \\
+            & $p \lor F$ & equivalence \\
+            & $q \lor F$ & resolution \\
+            \hline
+            $\therefore$ & $q$ & equivalence
+        \end{tabular}
+        \end{center}
+
+        On a similar note, we have already showed that Modus Ponens implies Modus Tollens.
+    }
+}
+
+\parag{Summary}{
+    \begin{center}
+    % See document preamble to get how I centered the cells
+        \begin{tabularx}{\linewidth}{|>{\hsize=0.15\hsize}C|>{\hsize=0.4\hsize}C|>{\hsize=0.35\hsize}C|}
+        \hline
+        \fullbf{Deduction} & \fullbf{Corresponding tautology} & \fullbf{Name}  \\
+        \hline
+        \pdfhere{Conjunction.pdf} & $p \land q \to p \land q$ & Conjunction \\
+        \hline
+        \pdfhere{ModusPonens.pdf} & $\left(p \land p \to q\right) \to q$ & Modus Ponens \\
+        \hline
+        \pdfhere{ModusTollens.pdf} & $\left(\lnot q \land p \to q\right) \to \lnot p$ & Modus Tollens \\
+        \hline
+        \pdfhere{HypotheticalSyllogism.pdf} & $\left(p\to q \land q\to r\right) \to \left(p \to r\right)$ & Hypothetical Syllogism \\
+        \hline
+        \pdfhere{Resolution.pdf} & $\left(\left(\lnot p \lor r\right) \land \left(p \lor q\right)\right) \to \left(q \lor r\right)$ & Resolution  \\
+        \hline
+    \end{tabularx}
+    \end{center}
+}
+
+\parag{Other inference rule}{
+    We can also derive the following inference rule. We give them names, but they are directly implied by the other inference rules:
+    \begin{center}
+    % See document preamble to get how I centered the cells
+        \begin{tabularx}{\linewidth}{|>{\hsize=0.15\hsize}C|>{\hsize=0.4\hsize}C|>{\hsize=0.35\hsize}C|}
+        \hline
+        \fullbf{Deduction} & \fullbf{Corresponding tautology} & \fullbf{Name} \\
+        \hline
+        \pdfhere{DisjunctiveSyllogism.pdf} & $\left(\left(p \lor q\right) \land\lnot p\right) \to q$ & Disjunctive syllogism\\
+        \hline
+        \pdfhere{Addition.pdf} & $p \to \left(p \lor q\right)$ & Addition \\
+        \hline
+        \pdfhere{Simplification.pdf} & $\left(p \land q\right) \to p$ & Simplification \\
+        \hline
+    \end{tabularx}
+    \end{center}
+
+    Note that the disjunctive syllogism is a simpler form of resolution, addition is dual to conjunction and simplification is a simpler form of Modus Ponens.
+}
+
+\parag{Warning}{
+    Note that even seemingly obvious conclusions need an argument. For example:
+    \begin{center}
+    \begin{tabular}{rll}
+        & $p \land \left(p \to q\right)$ & Premise \\
+        & $p$ & Simplification \\
+        & $p \to q$ & Simplification \\
+        \hline
+        $\therefore$ & $q$ & Modus Ponens
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Fallacies}{
+    Some people use fallacies in their argumentation (consciously or unconsciously).
+
+    \subparag{Fallacy of affirming the conclusion}{
+        Note that $\left(p \to q \land q\right) \to p$ is not a tautology. Thus, the following argumentation is wrong.
+
+        ``If you do every problem in this book, then you will learn discrete mathematics.'' You learnt discrete mathematics, thus you did every problem in this book (no).
+    }
+
+    \subparag{Fallacy of denying the hypothesis}{
+        Note that $\left(p \to q \land\lnot p\right) \to \lnot q$ is not a tautology. Thus, the following argumentation is wrong.
+
+        ``If you do every problem in this book, then you will learn discrete mathematics.'' You did not do every problem in this book, thus you did not learn discrete mathematics (no).
+    }
+}
+
+\subsection{Inference rules in predicate logic}
+\parag{Introduction}{
+    Arguments in predicate logic either use arguments from propositional logic, or rules of inference for quantified statements.
+}
+
+\parag{Universal Instantiation (UI)}{
+    The following rule of inference is valid:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $\forall x P\left(x\right)$ \\
+        \hline
+        $\therefore$ & $P\left(c\right)$ for an arbitrary $c$
+    \end{tabular}
+    \end{center}
+
+    \subparag{Example}{
+        Let's say the domain consists of only Men, and Socrates is a Man. If we know that ``all men are mortal'', then we can conclude that ``Socrates is mortal''.
+
+        Now, if we have any universe of discourse (such as all beings), then the complete solution is given by:
+        \begin{center}
+        \begin{tabular}{rll}
+            & $\forall x\left(\text{Man}\left(x\right) \to \text{Mortal}\left(x\right)\right)$ & Premise \\
+            & $\text{Man}\left(\text{Socrates}\right) \to \text{Mortal}\left(\text{Socrates}\right)$ & Universal Instantiation \\
+            & $\text{Man}\left(\text{Socrates}\right)$ & Premise \\
+            \hline
+            $\therefore$ & $\text{Mortal}\left(\text{Socrates}\right)$ & Modus Ponens
+        \end{tabular}
+        \end{center}
+    }
+}
+
+\parag{Universal Generalisation (UG)}{
+    Universal generalisation is the following inference rule:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $P\left(c\right)$ for an arbitrary $c$ \\
+        \hline
+        $\therefore$ & $\forall x P\left(x\right)$
+    \end{tabular}
+    \end{center}
+
+    Note that we must not do any assumption about $c$.
+
+    \subparag{Example}{
+        This is often used implicitly in Mathematical Proofs.
+
+        For example, when computing limits with the definition, we say: ``Let $\epsilon > 0$ be given [\ldots]. Therefore, we know that it is true $\forall \epsilon > 0$.''
+    }
+}
+
+\parag{Existential Instantiation (EI)}{
+    The following rule of inference is valid:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $\exists x P\left(x\right)$ \\
+        \hline
+        $\therefore$ & $P\left(c\right)$ for some element $c$
+    \end{tabular}
+    \end{center}
+
+    \subparag{Example}{
+        Let's say we know that there is someone who knows Java in the class. Let's call this person $a$, and say that $a$ knows Java.
+    }
+}
+
+\parag{Existential Generalisation (EG)}{
+    Existential Generalisation is the following inference rule:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $P\left(c\right)$ for some element $c$ \\
+        \hline
+        $\therefore$ & $\exists x P\left(x\right)$
+    \end{tabular}
+    \end{center}
+
+    \subparag{Example}{
+        Let's say we know that Michelle --- who is in the class --- knows Java. Thus, someone knows Java in the class.
+    }
+}
+
+\parag{Universal Modus Ponens}{
+    The following rule of inference is valid:
+    \begin{center}
+    \begin{tabular}{rl}
+        & $\forall x \left(P\left(x\right) \to Q\left(x\right)\right)$ \\
+        & $P\left(c\right)$ for an arbitrary $c$  \\
+        \hline
+        $\therefore$ & $Q\left(c\right)$
+    \end{tabular}
+    \end{center}
+
+    \subparag{Proof}{
+        This inference rule combines both the Universal Instantiation and Modus Ponens into one rule:
+        \begin{center}
+        \begin{tabular}{rll}
+            & $\forall x \left(P\left(x\right) \to Q\left(x\right)\right)$ & Premise  \\
+            & $P\left(c\right)$ for an arbitrary $c$ & Premise  \\
+            & $P\left(c\right) \to Q\left(c\right)$ & Universal Instantiation  \\
+            \hline
+            $\therefore$ & $Q\left(c\right)$ & Modus Ponens
+        \end{tabular}
+        \end{center}
+
+        This could have been used for Socrates example.
+    }
+}
+
+\parag{Summary}{
+    \begin{center}
+    % See document preamble to get how I centered the cells
+        \begin{tabularx}{\linewidth}{|>{\hsize=0.4\hsize}C|>{\hsize=0.35\hsize}C|>{\hsize=0.15\hsize}C|}
+        \hline
+        \fullbf{Deduction} & \fullbf{Name} & \fullbf{Shorten name} \\
+        \hline
+        \pdfhere{UniversalInstantiation.pdf} & Universal Instantiation & UI  \\
+        \hline
+        \pdfhere{UniversalGeneralization.pdf} & Universal Generalization & UG  \\
+        \hline
+        \pdfhere{UniversalModusPonens.pdf} & Universal Modus Ponens &  \\
+        \hline
+        \pdfhere{ExistentialInstantiation.pdf} & Existential Instantiation & EI  \\
+        \hline
+        \pdfhere{ExistentialGeneralization.pdf} & Existential Generalization & EG  \\
+        \hline
+    \end{tabularx}
+    \end{center}
+}
+
+\parag{Example}{
+    We want to show that ``a student in this class has not read the book'' and ``everyone in this class passed the first exam'' imply ``someone who passed the first exam has not read the book''.
+
+    Let's first define predicates: Let $C\left(x\right) := $ ``$x$ is a student in the class'', $B\left(x\right) := $ ``$x$ read the book'', and $E\left(x\right) := $ ``$x$ passed the exam''. Second, let's translate the premises: We know that $\exists x \left(C\left(x\right) \land \lnot B\left(x\right)\right)$, and $\forall x \left(C\left(x\right) \to E\left(x\right)\right)$. Third, let us also translate what we want to show: $\exists x \left(E\left(x\right) \land \lnot B\left(x\right)\right)$.
+
+    From then, we can do our proof:
+    \begin{center}
+    \begin{tabular}{rll}
+        1 & $\exists x \left(C\left(x\right) \land \lnot B\left(x\right)\right)$ & Premise  \\
+        2 & $\forall x \left(C\left(x\right) \to E\left(x\right)\right)$ & Premise  \\
+        3 & $C\left(a\right) \to E\left(a\right)$ for all a & UI from (2)  \\
+        4 & $C\left(\hat{a}\right) \land \lnot B\left(\hat{a}\right)$ for some $\hat{a}$ & EI from (1)  \\
+        5 & $C\left(\hat{a}\right) \to E\left(\hat{a}\right)$ & (3) is true for all $a$, so it is true for $\hat{a}$ \\
+        6 & $C\left(\hat{a}\right)$ & Simplification from (4) \\
+        7 & $E\left(\hat{a}\right)$ & Modus Ponens from (5) and (6) \\
+        8 & $\lnot B\left(\hat{a}\right)$ & Simplification from (4) \\
+        9 & $E\left(\hat{a}\right) \land \lnot B\left(\hat{a}\right)$ & Conjunction from (7) and (8) \\
+        \hline
+        $\therefore$ & $\exists x\left(E\left(x\right) \land\lnot B\left(x\right)\right)$ & EG from (9)
+    \end{tabular}
+    \end{center}
+}
+
+
+\subsection{Proofs}
+\parag{Introduction}{
+    ``Mathematicians prove things, that's what they do.'' (Prof. Aberer)
+
+    Apart from being at the core of mathematics, proofs have many practical applications as well. For example, it allows us to verify that a computer program is correct, to establish that operating systems are secure, to enable programs to make inferences in artificial intelligence, and so on.
+}
+
+\parag{Terminology}{
+    A \important{mathematical proof} is a valid argument that establishes the truth of a statement, in particular of a theorem. A \important{theorem} is a statement that can be shown to be true using definitions, axioms, other theorems or rules of inference. An \important{axiom} is a statement which is given as true.
+
+    A \important{lemma} is a ``helping theorem'', it is something we prove in order to prove a theorem right after. A \important{corollary} is a result which follows directly and trivially from a theorem. \important{Propositions} are less important theorems.
+
+    A \important{conjecture} is a statement that is being proposed to be true; we do not have a proof for it, but we think it may be true (but it may end up wrong). For example, Fermat's last theorem was conjectured in 1634 (well not exactly, this is Fermat, he said he had a proof but that his margins were too small) and was proven in 1995. On a similar note, Euler's conjecture (which tries to generalise Fermat's last theorem), which was conjectured in 1769, was proven to be wrong in 1966 with a counter-example.
+
+    \important{Informal proofs}, which are generally shorter, often use multiple rules of inferences at each step, skip steps, do not state every inference rule explicitly, and so on. They are much easier to understand and to explain to people, but they make it also easier to introduce errors. This is not the way a computer would do a proof.
+}
+
+\parag{Theorems}{
+    Many theorems assert that a property holds for all elements in a domain, such as the integers, the real numbers, or discrete structures. Thus, they are often of the form:
+    \[\forall x\left(P\left(x\right) \to Q\left(x\right)\right)\]
+
+    To prove a theorem of this form, we show that:
+    \[P\left(c\right) \to Q\left(c\right)\]
+    where $c$ is an  arbitrary element of the domain. We can then use the universal generalisation to get the theorem.
+
+    Note that, often, the universal quantifier is omitted by standard mathematical convention. For example ``if $x > y$, where $x$ and $y$ are positive real numbers, then $x^2 > y^2$'' really means ``for all positive real numbers $x$ and $y$, if $x > y$, then $x^2 > y^2$'':
+    \[\forall x > 0 \forall y > 0\left(x > y \to x^2 > y^2\right)\]
+}
+
+
+\parag{Types of proof}{
+    \begin{center}
+    % See document preamble to get how I centered the cells
+    \begin{tabularx}{\linewidth}{|>{\hsize=0.25\hsize}X>{\hsize=0.4\hsize}X>{\hsize=0.35\hsize}X|}
+        \hline
+        \textit{Trivial proof} & If we know that $q$ is true, then $p \to q$ is true as well. & ``If it is raining, then $1 = 1$'' \\
+        \hline
+        \textit{Vacuous proof} & If we know that $p$ is false, then $p\to q$ is true. & ``If I am both rich and poor, then $2 + 2 = 5$'' \\
+        \hline
+        \textit{Direct proof} & Assume that $p$ is true, then use definitions, axioms and theorems together with rules of inference till the statement $q$ results. & This is when we usually use syllogisms. \\
+        \hline
+        \textit{Proof by contraposition} & Assume that $\lnot q$ is true, then use definitions, axioms and theorems together with rules of inference till the statement $\lnot p$ results. & Uses $p \to q \equiv \lnot q \to \lnot p$\\
+        \hline
+        \textit{Proof by contradiction} & Assume that $p$ and $\lnot q$ are true, then perform a direct proof to construct a contradiction. & Uses $p \to q \equiv \left(p \land \lnot q\right) \to F$ \\
+        \hline
+    \end{tabularx}
+    \end{center}
+
+    The two last proofs are called \important{indirect proofs}.
+}
+
+\subsection{Proofs examples}
+\parag{Definition: parity}{
+    The integer $n$ is \important{even} if there exists an integer $k$ such that:
+    \[n = 2k\]
+
+    The integer $n$ is \important{odd} if there exists an integer $k$ such that:
+    \[n = 2k + 1\]
+
+    \subparag{Note}{
+        We can prove that a number is either even xor odd.
+    }
+}
+
+\parag{Theorem: odd squares}{
+    If $n$ is an odd integer, then $n^2$ is odd.
+
+    \subparag{Proof}{
+        Let $n$ be an odd number. Therefore, there exists $k$, such that $n = 2k + 1$ (by definition). Thus, we have:
+        \[n^{2} = \left(2k + 1\right)^2 = 4k^2 + 4k + 1 = 2\left(2k^2 + 2k\right) + 1\]
+
+        Let $k' = 2k^2 + 2k$. We know it's an integer (we'd have to prove that as well to be really formal). Therefore,
+        \[n^2 = 2k' + 1\]
+
+        Which means that $n^2$ is odd.
+        \qed
+    }
+
+}
+
+\end{document}

@@ -1,0 +1,204 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-16 at 08:19:01.
+
+\usepackage{../../style}
+
+\title{Algèbre}
+\author{Joachim Favre}
+\date{Jeudi 16 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{25}{2021-12-16}{James Bond Spectre}{
+\begin{itemize}[left=0pt]
+    \item Explication du théorème spectral pour les matrices symétriques.
+    \item Explication des décompositions spectrales.
+    \item Début de la réflexion pour trouver la SVD, \textit{Singular Value Decomposition} --- le couteau Suisse de l'algèbre linéaire.
+\end{itemize}
+
+}
+
+\parag{Théorème spectral des matrices symétriques}{
+    Toute matrice \textit{symétrique} $A \in \mathbb{R}^{n \times n}$ vérifie les propriétés suivantes:
+    \begin{enumerate}
+        \item $A$ admet $n$ valeurs propres réelles (pas forcément distinctes).
+        \item Pour chaque valeur propre $\lambda$, sa multiplicité géométrique est égale à sa multiplicité algébrique.
+        \item Les sous-espaces propres sont deux à deux orthogonaux, ce qui signifie que deux vecteurs propres associés à des valeurs propres distinctes sont orthogonaux.
+        \item $A$ est diagonalisable en base orthonormée.
+    \end{enumerate}
+
+    Ce dernier fait est une condition nécessaire et suffisante: $A = A^T$ si et seulement si $A$ est diagonalisable en base orthonormée.
+
+    Notez qu'en diagonalisant une matrice symétrique, on pourrait se retrouver avec une matrice $P$ qui ne serait pas orthogonale. En effet, il faut correctement choisir les vecteurs propres associés à la même valeur propre, et il nous faudra peut-être normaliser tous les vecteurs de notre base.
+
+    \subparag{Preuves et remarques}{
+        \begin{enumerate}[left=0pt]
+            \item La preuve n'est pas difficile mais requiert quelques calculs avec des nombres complexes.
+            \item La preuve est longue, mais ce fait est important car il nous dit que $A$ est diagonalisable.
+            \item On l'a démontré au cours précédent.
+            \item C'est-à-dire qu'on peut choisir $n$ vecteurs propres $\bvec{u}_1, \ldots, \bvec{u}_n$ orthonormés associés à des valeurs propres $\lambda_1, \ldots, \lambda_n$ (avec répétitions) de sorte que:
+            \[\mathspace D = \begin{bmatrix} \lambda_1 & \ldots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \ldots & \lambda_n \end{bmatrix}, \mathspace P = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_n \\  &  &  \end{bmatrix}\]
+            \[A = PDP^T, \mathspace P^{-1} = P^T\]
+        \end{enumerate}
+    }
+
+    \subparag{Terminologie}{
+        Le terme ``spectral'' fait référence aux valeurs propres.
+
+        Note personnelle: j'aime beaucoup ce terme, je pense à \textit{James Bond: Spectre} à chaque fois.
+    }
+
+}
+
+\parag{Exemple}{
+    Soit la matrice suivante:
+    \[A = \begin{bmatrix} 3 & -2 & 4 \\ -2 & 6 & 2 \\ 4 & 2 & 3 \end{bmatrix} \implies p_A\left(\lambda\right) = \left(7 - \lambda\right)^2\left(-2 - \lambda\right)\]
+
+    Le professeur nous conseille vivement de directement regarder si notre matrice est symétrique quand on nous donne une matrice carrée et qu'on commence à nous parler de valeurs propres.
+
+    On remarque que les valeurs propres de $A$ sont $\lambda_1 = \lambda_2 = 7$ et $\lambda_3 = -2$. Par le théorème spectral, on connait déjà les multiplicités géométriques de ces valeurs propres: 2 et 1 respectivement, comme leur multiplicité algébrique.
+
+    Calculons les vecteurs propres associés à $\lambda_3 = -2$:
+    \[\ker\left(A - \left(-2\right)I_3\right) = \vect\left\{\begin{bmatrix} -2 \\ -1 \\ 2 \end{bmatrix} \right\} \implies \bvec{v}_3 = \begin{bmatrix} -2 \\ -1 \\ 2 \end{bmatrix} \]
+
+    Puisqu'au final on voudra trouver une base orthonormale, normalisons $\bvec{v}_3$:
+    \[\bvec{u}_3 = \frac{1}{\left\|\bvec{v}_3\right\|} \bvec{v}_3 = \frac{1}{3} \begin{bmatrix} -2 \\ -1 \\ 2 \end{bmatrix} \]
+
+    Calculons maintenant les vecteurs propres associés à $\lambda_1 = \lambda_2 = 7$:
+    \[\ker\left(A - 7I_3\right) = \vect\left\{\begin{bmatrix} 1 \\ -2 \\ 0 \end{bmatrix}, \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix} \right\} \implies \bvec{v}_1 = \begin{bmatrix} 1 \\ -2 \\ 0 \end{bmatrix}, \bvec{v}_2 = \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix} \]
+    qu'on peut trouver en échelonnant notre matrice.
+
+    On peut vérifier que des vecteurs propres associés à des valeurs propres distinctes sont bien orthogonaux:
+    \[\bvec{v}_3 \dotprod \bvec{v}_1 = 0, \mathspace \bvec{v}_3 \dotprod \bvec{v}_2 = 0\]
+
+    Cependant, on peut remarquer que $\bvec{v}_1$ et $\bvec{v}_2$ ne sont pas orthogonaux
+    \[\bvec{v}_1 \dotprod \bvec{v}_2 = 1 \neq 0\]
+
+    $\bvec{v}_1$ et $\bvec{v}_2$ forment une base pour l'espace propre $\ker\left(A - 7I_3\right)$, et nous aimerions avoir une base orthonormée pour le même espace propre. L'algorithme du Grand-Schtroumpf nous ne change pas l'espace engendré par les vecteurs, on peut donc l'appliquer sur $\left\{\bvec{v}_1, \bvec{v}_2\right\}$. Cependant, notez bien qu'on n'aurait pas pu l'appliquer sur $\left\{\bvec{v}_1, \bvec{v}_2, \bvec{v}_3\right\}$, puisqu'on n'aurait pas obtenu de vecteurs propres au final; mais on peut l'appliquer sur $\left\{\bvec{v}_1, \bvec{v}_2\right\}$, car on va rester dans le sous-espace $\ker\left(A - 7I_3\right)$, donc notre résultat nous donnera bien des vecteurs propres.
+
+    La première étape du Grand-Schtroumpf consiste à normaliser le premier vecteur:
+    \[\bvec{u}_1 = \frac{1}{\left\|\bvec{v}_1\right\|} \bvec{v}_1 = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 \\ -2 \\ 0 \end{bmatrix} \]
+
+    On calcule ensuite la projection de $\bvec{v}_2$ sur $\vect\left\{\bvec{u}_1\right\}$, puis on retranche ce résultat à $\bvec{v}_2$:
+    \[\bvec{w}_2 = \bvec{v}_1 - \proj_{\vect\left\{\bvec{u}_1\right\}}\bvec{v}_1 = \bvec{v}_1- \left(\bvec{u}_1 \dotprod \bvec{v}_2\right) \bvec{u}_1 = \begin{bmatrix} 4 / 5 \\ 2 / 5 \\ 1 \end{bmatrix} \]
+
+    Finalement, on peut normaliser $\bvec{w}_2$:
+    \[\bvec{u}_2 = \frac{1}{\left\|\bvec{w}_2\right\|} \bvec{w}_2 = \frac{\sqrt{5}}{3} \begin{bmatrix} 4 / 5 \\ 2 / 5 \\ 1 \end{bmatrix} \]
+
+    On a donc $A = PDP^T$, avec:
+    \[D = \begin{bmatrix} 7 & 0 & 0 \\ 0 & 7 & 0 \\ 0 & 0 & -2 \end{bmatrix}, \mathspace P = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \bvec{u}_2 & \bvec{u}_3 \\  &  &  \end{bmatrix} = \begin{bmatrix} 1 / \sqrt{5} & 4 / 3\sqrt{5} & -2 / 3 \\ -2 / \sqrt{5} & 2 / 3\sqrt{5} & -1 / 3 \\ 0 & 5 / 3\sqrt{5} & 2 / 3 \end{bmatrix} \]
+}
+
+\parag{Exemple: décomposition spectrale}{
+    On pourrait aussi écrire la factorisation $A = PDP^T$ sous une forme intéressante, qui décompose $A$ en une somme. En effet, partons de notre diagonalisation en base orthonormale :
+    \[A = PDP^T = \begin{bmatrix}  &  &  \\ \bvec{u} & \bvec{v} & \bvec{w} \\  &  &  \end{bmatrix} \begin{bmatrix} \lambda_1 & 0 & 0 \\ 0 & \lambda_2 & 0 \\ 0 & 0 & \lambda_3 \end{bmatrix} \begin{bmatrix}  & \bvec{u}^T &  \\  & \bvec{v}^T &  \\  & \bvec{w}^T &  \end{bmatrix} \]
+
+    Donc:
+    \begin{multiequality}
+    A =\ & \begin{bmatrix} u_1 & v_1 & w_1 \\ u_2 & v_2 & w_2 \\ u_3 & v_3 & w_3 \end{bmatrix} \begin{bmatrix} \lambda_1 & 0 & 0 \\ 0 & \lambda_2 & 0 \\ 0 & 0 & \lambda_3 \end{bmatrix} \begin{bmatrix} u_1 & u_2 & u_3 \\ v_1 & v_2 & v_3 \\ w_1 & w_2 & w_3 \end{bmatrix}  \\
+    =\ & \begin{bmatrix} \lambda_1 u_1 & \lambda_2 v_1 & \lambda_3 w_1 \\ \lambda_1 u_2 & \lambda_2 v_2 & \lambda_3 w_2 \\ \lambda_1 u_3 & \lambda_2 v_3 & \lambda_3 w_3 \end{bmatrix} \begin{bmatrix} u_1 & u_2 & u_3 \\ v_1 & v_2 & v_3 \\ w_1 & w_2 & w_3 \end{bmatrix}
+    \end{multiequality}
+
+    Qui est égal à:
+    \[\begin{bmatrix}
+        {\color{red}\lambda_1 u_1 u_1} + {\color{green}\lambda_2 v_1 v_1} + {\color{blue}\lambda_3 w_1 w_1} & {\color{red} \lambda_1 u_1 u_2} + {\color{green}\lambda_2 v_1 v_2} + {\color{blue}\lambda_3 w_1 w_2} & {\color{red}\lambda_1 u_1 u_3} + {\color{green}\lambda_2 v_1 v_3} + {\color{blue}\lambda_3 w_1 w_3} \\
+        {\color{red}\lambda_1 u_2 u_1} + {\color{green}\lambda_2 v_2 v_1} + {\color{blue}\lambda_3 w_2 w_1} & {\color{red} \lambda_1 u_2 u_2} + {\color{green}\lambda_2 v_2 v_2} + {\color{blue}\lambda_3 w_2 w_2} & {\color{red}\lambda_1 u_2 u_3} + {\color{green}\lambda_2 v_2 v_3} + {\color{blue}\lambda_3 w_2 w_3} \\
+        {\color{red}\lambda_1 u_3 u_1} + {\color{green}\lambda_2 v_3 v_1} + {\color{blue}\lambda_3 w_3 w_1} & {\color{red} \lambda_1 u_3 u_2} + {\color{green}\lambda_2 v_3 v_2} + {\color{blue}\lambda_3 w_3 w_2} & {\color{red}\lambda_1 u_3 u_3} + {\color{green}\lambda_2 v_3 v_3} + {\color{blue}\lambda_3 w_3 w_3}
+    \end{bmatrix}\]
+
+    Ainsi, on trouve que c'est égal à:
+    \[{\color{red} \lambda_1 \begin{bmatrix} u_1 u_1 & u_1 u_2 & u_1 u_3 \\ u_2 u_1 & u_2 u_2 & u_2 u_3 \\ u_3 u_1 & u_3 u_2 & u_3 u_3 \end{bmatrix} } + {\color{green} \lambda_2 \begin{bmatrix} v_1 v_1 & v_1 v_2 & v_1 v_3 \\ v_2 v_1 & v_2 v_2 & v_2 v_3 \\ v_3 v_1 & v_3 v_2 & v_3 v_3 \end{bmatrix} } + {\color{blue} \lambda_3 \begin{bmatrix} w_1 w_1 & w_1 w_2 & w_1 w_3 \\ w_2 w_1 & w_2 w_2 & w_2 w_3 \\ w_3 w_1 & w_3 w_2 & w_3 w_3 \end{bmatrix} }\]
+
+    Ce qui est lui même égal à:
+    \[\lambda_1 \begin{bmatrix} u_1 \\ u_2 \\ u_3 \end{bmatrix} \begin{bmatrix} u_1 & u_2 & u_3 \end{bmatrix} + \lambda_2 \begin{bmatrix} v_1 \\ v_2 \\ v_3 \end{bmatrix} \begin{bmatrix} v_1 & v_2 & v_3 \end{bmatrix} + \lambda_3 \begin{bmatrix} w_1 \\ w_2 \\ w_3 \end{bmatrix} \begin{bmatrix} w_1 & w_2 & w_3 \end{bmatrix}\]
+
+    Ce qui nous permet de, finalement, trouver la décomposition spectrale de $A$:
+    \[A = \lambda_1 \bvec{u} \bvec{u}^T + \lambda_2 \bvec{v} \bvec{v}^T + \lambda_3 \bvec{w} \bvec{w}^T\]
+}
+
+\parag{Décomposition spectrale}{
+    Soit $A \in \mathbb{R}^{n \times n}$, une matrice symétrique. On sait qu'elle est diagonalisable en base orthonormée. Ainsi, on sait qu'on peut trouver $\lambda_1, \ldots, \lambda_n$, des valeurs propres réelles, et $\bvec{u}_1, \ldots, \bvec{u}_n$ des vecteurs propres orthonormés de telle manière que $A = PDP^T$ où:
+    \[D = \begin{bmatrix} \lambda_1 & \ldots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \ldots & \lambda_n \end{bmatrix}, \mathspace P = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_n \\  &  &  \end{bmatrix}  \]
+
+    Ainsi, on trouve que:
+    \begin{multiequality}
+    A =\ & PDP^T  \\
+    =\ & \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_n \\  &  &  \end{bmatrix}  \begin{bmatrix} \lambda_1 & \ldots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \ldots & \lambda_n \end{bmatrix} \begin{bmatrix}  & \bvec{u}_1^T &  \\  & \vdots &  \\  & \bvec{u}_n^T &  \end{bmatrix}  \\
+    =\ & \begin{bmatrix}  &  &  \\ \lambda_1 \bvec{u}_1 & \ldots & \lambda_n \bvec{u}_n \\  &  &  \end{bmatrix} \begin{bmatrix}  & \bvec{u}_1^T &  \\  & \vdots &  \\  & \bvec{u}_n^T &  \end{bmatrix}  \\
+    =\ & \lambda_1 \bvec{u}_1 \bvec{u}_1^T + \ldots + \lambda_n \bvec{u}_n \bvec{u}_n^T
+    \end{multiequality}
+}
+
+\parag{Théorème}{
+    Si $A \in \mathbb{R}^{n\times n}$ est symétrique alors:
+    \begin{enumerate}
+        \item $A$ a $n$ valeurs propres réelles $\lambda_1, \ldots, \lambda_n$ (multiplicités comptées, c'est-à-dire qu'elles ne sont pas forcément distinctes).
+        \item Elle admet une base de vecteurs propres orthonormés $\left(\bvec{u}_1, \ldots, \bvec{u}_n\right)$.
+        \item On peut trouver la décomposition suivante, appelée \important{décomposition spectrale}:
+        \[A = \lambda_1 \bvec{u}_1 \bvec{u}_1^T + \ldots + \lambda_n \bvec{u}_n \bvec{u}_n^T\]
+    \end{enumerate}
+}
+
+\subsection{Décomposition en valeurs singulières}
+\parag{But}{
+    Notre but est de trouver la SVD, \textit{Singular Value Decomposition}, qui est ``le couteau Suisse de l'algèbre linéaire''.
+
+    Une fois qu'on aura trouvé la décomposition en valeurs singulières, on peut répondre à toutes les questions qu'on a vues jusque là, comme la dimension du Kernel, ou la matrice de projection sur l'espace image, très simplement.
+
+    Dans notre cours, les méthodes qu'on a vues jusque là seront plus rapides. Cependant, pour un ordinateur, avec une matrice un million par un milliard (ce qui est plus courant que ce qu'on pourrait imaginer), alors cela devient très intéressant; notamment grâce à Gene Golub (et non pas \textit{Gollum}) qui a développé un algorithme permettant de les calculer de manière très efficace.
+
+    Le théorème de la SVD, celui que l'on veut développer, nous dit que, pour \textit{n'importe quelle matrice} $A$, il existe deux matrices orthogonales $U \in \mathbb{R}^{m \times m}$ et $V \in \mathbb{R}^{n \times n}$, et une matrice diagonale $\Sigma \in \mathbb{R}^{m \times n}$ telles que:
+    \[A = U \Sigma V^T\]
+}
+
+\parag{Définition: matrice diagonale}{
+    Une matrice $n \times m$ est diagonale si:
+    \[a_{ij} \neq 0 \implies i = j\]
+
+    Voici quelques exemples de matrices diagonales:
+    \[\begin{bmatrix} 3 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 4 \end{bmatrix}, \mathspace \begin{bmatrix} 1 & 0 & 0 & 0 & 0 \\ 0 & 5 & 0 & 0 & 0 \\ 0 & 0 & 9 & 0 & 0 \end{bmatrix}, \mathspace \begin{bmatrix} 2 & 0 & 0 \\ 0 & 6 & 0 \\ 0 & 0 & 5 \\ 0 & 0 & 0 \\ 0 & 0 & 0 \end{bmatrix}  \]
+}
+
+\parag{Exemple}{
+    Soit la matrice suivante :
+    \[A = \begin{bmatrix} 4 & 11 & 14 \\ 8 & 7 & -2 \end{bmatrix} \]
+
+Cette matrice n'est pas carrée, donc certainement pas symétrique. Ainsi, le théorème spectral ne nous dit rien à propos de $A$ directement. Par contre, on sait que $A^T A$ est toujours carrée et symétrique ($\left(A^T A\right)^T = A^T A$):
+    \[A^T A = \begin{bmatrix} 4 & 8 \\ 11 & 7 \\ 14 & -2 \end{bmatrix} \begin{bmatrix} 4 & 11 & 14 \\ 8 & 7 & -2 \end{bmatrix} = \begin{bmatrix} 80 & 100 & 40 \\ 100 & 170 & 140 \\ 40 & 140 & 200 \end{bmatrix} \]
+
+    Ainsi, le théorème spectral nous dit que $A^T A$ a trois valeurs propres réelles $\lambda_1, \lambda_2, \lambda_3$ et qu'on peut trouver trois vecteurs propres associés $\left(\bvec{v}_1, \bvec{v}_2, \bvec{v}_3\right)$ orthonormés.
+
+    En effet, on peut calculer les valeurs propres:
+    \[p_{A^T A} \left(\lambda\right) = -\lambda\left(\lambda^2 - 540\lambda + 32400\right) \implies \lambda_1 = 360, \lambda_2 = 90, \lambda_3 = 0\]
+
+    Avec un peu plus de travail, on trouve aussi trois vecteurs propres orthonormaux de $A^T A$:
+    \[\bvec{v}_1 = \begin{bmatrix} 1 / 3 \\ 2 / 3 \\ 2 / 3 \end{bmatrix}, \mathspace \bvec{v}_2 = \begin{bmatrix} -2 / 3 \\ -1 / 3 \\ 2 / 3 \end{bmatrix}, \mathspace \bvec{v}_3 = \begin{bmatrix} 2 / 3 \\ -2 / 3 \\ 1 / 3 \end{bmatrix} \]
+
+    Ces trois vecteurs sont des vecteurs propres de $A^T A$, mais on se demande ce qu'ils signifient pour $A$. Essayons de regarder ce que donne $A \bvec{v}_1$:
+    \[A \bvec{v}_1 = \begin{bmatrix} 4 & 11 & 14 \\ 8 & 7 & -2 \end{bmatrix} \begin{bmatrix} 1 / 3 \\ 2 / 3 \\ 2 / 3 \end{bmatrix}  = \begin{bmatrix} 18 \\ 6 \end{bmatrix} \implies \left\|A \bvec{v}_1\right\|^2 = 18^2 + 6^2 = 360\]
+
+    On remarque quelque chose d'intéressant, $\left\|A \bvec{v}_1\right\|^2 = \lambda_1$. Faisons le même calcul pour les autres vecteurs propres:
+    \[A \bvec{v}_2 = \begin{bmatrix} 4 & 11 & 14 \\ 8 & 7 & -2 \end{bmatrix} \begin{bmatrix} -2 / 3 \\ -1 / 3 \\ 2 / 3 \end{bmatrix} = \begin{bmatrix} 3 \\ -9 \end{bmatrix} \implies \left\|A \bvec{v}_2\right\|^2 = 90 = \lambda_2\]
+    \[A \bvec{v}_3 = \begin{bmatrix} 4 & 11 & 14 \\ 8 & 7 & -2 \end{bmatrix} \begin{bmatrix} 2 / 3 \\ -2 / 3 \\ 1 / 3 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix} \implies \left\|A \bvec{v}_3\right\|^2 = 0 = \lambda_3\]
+
+    Nous voulons démontrer que $\left\|A \bvec{v}_i\right\|^2 = \lambda_i$:
+    \begin{multiequality}
+    \left\|A \bvec{v}_i\right\|^2 & = \left(A \bvec{v}_i\right) \dotprod \left(A \bvec{v}_i\right) = \left(A \bvec{v}_i\right)^T \left(A \bvec{v}_i\right) = \bvec{v}_i^T \underbrace{A^T A \bvec{v}_i}_{\lambda_i \bvec{v}_i}  \\
+    & = \lambda_i \bvec{v}_i^T \bvec{v}_i = \lambda_i \left(\bvec{v}_i \dotprod \bvec{v}_i\right) = \lambda_i \left\|\bvec{v}_i\right\|^2 = \lambda_i
+    \end{multiequality}
+
+    Cela nous permet d'en déduire que les valeurs propres de $A^T A$ sont toujours positives ou nulles.
+
+    Une autre observation qu'on peut faire, qui est très importante, c'est que les vecteurs $A \bvec{v}_1, A \bvec{v}_2$ et $A \bvec{v}_3$ sont orthogonaux:
+    \[\left(A \bvec{v}_1\right) \dotprod \left(A \bvec{v}_2\right) = 0, \mathspace \left(A \bvec{v}_1\right) \dotprod \left(A \bvec{v}_3\right) = 0, \mathspace \left(A \bvec{v}_2\right) \dotprod \left(A \bvec{v}_3\right) =  0\]
+
+    On remarque que ce n'est pas un accident. En effet, si $i \neq j$:
+    \[\left(A \bvec{v}_i\right) \dotprod \left(A \bvec{v}_j\right) = \left(A \bvec{v}_i\right)^T \left(A \bvec{v}_j\right) = \bvec{v}_i^T \underbrace{A^T A \bvec{v}_j}_{\lambda_j \bvec{v}_j} = \lambda_j \bvec{v}_i^T \bvec{v}_j = \lambda_j \bvec{v}_i \dotprod \bvec{v}_j = 0\]
+    puisqu'on avait choisi les vecteurs propres pour qu'ils soient orthonormaux (le théorème spectral nous garantit leur existence).
+
+}
+
+
+\end{document}

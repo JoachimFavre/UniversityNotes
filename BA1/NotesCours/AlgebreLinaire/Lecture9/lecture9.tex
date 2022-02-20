@@ -1,0 +1,238 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-10-21 at 08:13:36.
+
+\usepackage{../../style}
+
+\title{Algèbre}
+\author{Joachim Favre}
+\date{Jeudi 21 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2021-10-21}{Détermination(.) du déterminant}{
+\begin{itemize}[left=0pt]
+    \item Calcul du déterminant pour les matrices élémentaires.
+    \item Découverte que déterminant d'un produit de matrice est le produit des déterminants ($\det\left(AB\right) = \det\left(A\right)\det\left(B\right)$).
+    \item Utilisation de ce fait pour calculer des déterminants plus simplement.
+    \item Explication de l'interprétation géométrique des déterminants.
+    \item Notez que le titre de ce cours fait une référence à Undertale : en \textit{run} génocide, quand on sauvegarde, il est juste écrit ``Détermination.''. C'est peut-être la référence la plus compliquée à comprendre, même pour les personnes qui connaissent ce jeu, du coup je me suis dit qu'il fallait que je l'explique !
+\end{itemize}
+
+}
+
+
+\parag{Théorème}{
+    Soit $A$ une matrice carrée.
+    \begin{enumerate}
+        \item Si l'on \important{ajoute à une ligne} de $A$ un multiple d'une autre ligne, alors la matrice $B$ obtenue vérifie
+        \[\det B = \det A\]
+
+        \item Si l'on \important{échange deux lignes} de $A$, alors la matrice $B$ obtenue vérifie
+        \[\det B = -\det A\]
+
+        \item Si l'on \important{multiplie une ligne} de $A$ par $k$, alors la matrice $B$ obtenue vérifie
+        \[\det B = k\det A\]
+    \end{enumerate}
+
+    \subparag{Remarque}{
+        Ce théorème est très pratique pour calculer un déterminant d'une matrice. On peut transformer notre matrice $A$ en matrice diagonale, puis il est très simple de retrouver le déterminant si on a pris notes des opérations qu'on a utilisée.
+    }
+}
+
+\parag{Exemple pour une matrice $2\times2$}{
+    Si on a une matrice
+    \[A = \begin{bmatrix} a & b \\ c & d \end{bmatrix} \implies \det A = ad - bc\]
+
+    \important{(1) :} Alors, si on ajoute $k$ fois la première ligne à la seconde ligne:
+    \[\det \begin{bmatrix} a & b \\ c + ka & d + ka \end{bmatrix} = a\left(d + kb\right) - b\left(c + ka\right) = ad + akb - bc - bka = ad - bc = \det A\]
+
+    Or, pour faire cette transformation on a utilisé la matrice $E$:
+    \[E = \begin{bmatrix} 1 & 0 \\ k & 1 \end{bmatrix} \implies \det E = 1\]
+    puisque la matrice est diagonale. On observe que, ici:
+    \[\det\left(EA\right) = \det\left(E\right)\det\left(A\right)\]
+
+    \vspace{1em}
+
+    \important{(2) :} Si on permute les deux premières lignes, alors:
+    \[\det \begin{bmatrix} c & d \\ a & b \end{bmatrix} = cb - da = -\left(ad - bc\right) = -\det A\]
+
+    La matrice élémentaire qu'on a utilisée est donnée par $E$ :
+    \[E = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} \implies \det E = -1\]
+
+    On remarque que, à nouveau:
+    \[\det\left(EA\right) = \det\left(E\right)\det\left(A\right)\]
+
+    \vspace{1em}
+
+    \important{(3) :} Si on multiplie la deuxième ligne par $k \neq 0$:
+    \[\det \begin{bmatrix} a & b \\ kc & kd \end{bmatrix} = akd - bkc = k\left(ad - bc\right) = k\det A\]
+
+    La matrice élémentaire que nous avons utilisée est :
+    \[E = \begin{bmatrix} 1 & 0 \\ 0 & k \end{bmatrix} \implies \det E = k\]
+
+    Or, encore une fois:
+    \[\det\left(EA\right) = \det\left(E\right)\det\left(A\right)\]
+
+
+}
+
+\parag{Théorème (multiplication de matrice élémentaire)}{
+    Si $E$ est une matrice élémentaire, et $A$ est une matrice quelconque, alors
+    \[\det\left(EA\right) = \det\left(E\right)\det\left(A\right)\]
+
+    \subparag{Généralisation}{
+        On se rendra compte que c'est vrai pour n'importe quelle matrice $A$ et $B$.
+    }
+}
+
+\parag{Exemple avec des nombres}{
+    Prenons la matrice suivante
+    \[A = \begin{bmatrix} 1 & -4 & 2 \\ -2 & 8 & -9 \\ -1 & 7 & 0 \end{bmatrix} \]
+
+    On veut ajouter deux fois la première ligne à la deuxième ligne:
+    \[E_1 = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} \implies E_1 A = \begin{bmatrix} 1 & -4 & 2 \\ 0 & 0 & -5 \\ -1 & 7 & 0 \end{bmatrix} \]
+
+    On veut maintenant ajouter la première à la troisième ligne:
+    \[E_2 = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 1 & 0 & 1 \end{bmatrix} \implies E_2 E_1 A = \begin{bmatrix} 1 & -4 & 2 \\ 0 & 0 & -5 \\ 0 & 3 & 2 \end{bmatrix}\]
+
+    Finalement, on peut échanger les deux dernières lignes:
+    \[E_3 = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{bmatrix} \implies E_3 E_2 E_1 A = \begin{bmatrix} 1 & -4 & 2 \\ 0 & 3 & 2 \\ 0 & 0 & -5 \end{bmatrix} = U\]
+
+    On a bien obtenu une matrice triangulaire, $U$. On a donc:
+    \[U = E_3 E_2 E_1 A \iff \det\left(U\right) = \det\left(E_3 E_2 E_1 A\right)\]
+
+    Pour calculer le déterminant de $U$, on peut multiplier les coefficients de sa ligne:
+    \[\det\left(U\right) = \left(1\right)\left(3\right)\left(-5\right) = -15\]
+
+    Or, pour trouver le déterminant du produit, on peut prendre le produit des déterminants:
+    \[\det\left(E_3 E_2 E_1 A\right) = \det\left(E_3\right)\det\left(E_2 E_1 A\right) = \ldots = \det\left(E_3\right)\det\left(E_2\right)\det\left(E_1\right)\det\left(A\right)\]
+
+    Ce calcul est relativement simple à faire:
+    \[\det\left(E_3\right)\det\left(E_2\right)\det\left(E_1\right)\det\left(A\right) = \left(-1\right)\left(1\right)\left(1\right)\det\left(A\right) = -\det\left(A\right)\]
+
+
+    On peut donc en déduire que
+    \[\det\left(U\right) = \det\left(E_3 E_2 E_1 A\right) \iff -15 = -\det\left(A\right) \iff \det\left(A\right) = 15\]
+}
+
+\parag{Théorème}{
+    $A \in \mathbb{R}^{n \times n}$ est inversible si et seulement si $\det\left(A\right) \neq 0$.
+
+    \subparag{Preuve}{
+        Soit $M \in \mathbb{R}^{n \times n}$ la forme échelonnée réduite de $A$. Il existe une séquence de matrices élémentaires $E_1, \ldots, E_k \in \mathbb{R}^{n \times n}$ telles que
+        \[M = E_k \cdots E_1 A \]
+
+        On peut par exemple les trouver avec la méthode du pivot. On en déduit que:
+        \[\det\left(M\right) = \det\left(E_k \cdots E_1 A\right) = \det\left(E_k\right)\det\left(E_{k-1} \cdots E_1 A\right)\]
+
+        En répétant cette idée:
+        \[\det\left(M\right) = \underbrace{\det\left(E_k\right)}_{\neq 0}\cdots\underbrace{\det\left(E_1\right)}_{\neq 0}\det\left(A\right)\]
+
+        Par la ``zero-product property'', cela veut dire que soit $\det\left(M\right) = 0 = \det\left(A\right)$, soit ils sont les deux non-nuls. En d'autres mots:
+        \[\det\left(A\right) \neq 0 \iff \det\left(M\right) \neq 0\]
+
+        \important{Si $A$ est inversible}, alors elle a $n$ pivots. Donc, $M = I_n$. Ceci implique alors que :
+        \[\det\left(M\right) = \det\left(I_n\right) = 1 \implies \det\left(A\right) \neq 0\]
+
+        \important{Si $A$ n'est pas inversible}, alors elle a strictement moins que $n$ pivots. Donc, $M$ a au moins une ligne de zéros. Ainsi:
+        \[\det M = 0 \implies \det A = 0\]
+
+        \vspace{1em}
+
+        On a donc bien démontré que $A$ est inversible si et seulement si $\det A \neq 0$.
+        \qed
+    }
+
+}
+
+\parag{Théorème (produit de déterminant)}{
+    Pour $A, B \in \mathbb{R}^{n\times n}$ (matrices carrées de même taille), alors on a:
+    \[\det\left(AB\right) = \det\left(A\right)\det\left(B\right)\]
+
+    \subparag{Preuve}{
+    \important{Si $A$ n'est pas inversible}, alors $\det\left(A\right) = 0$, et $AB$ n'est pas inversible (la preuve de ce deuxième point est laissée en exercice au lecteur). On en déduit donc que $\det\left(AB\right) = 0$. Or, on sait aussi que
+    \[\det\left(A\right) = 0 \implies \det\left(A\right)\det\left(B\right) = 0 = \det\left(AB\right)\]
+    Donc notre propriété tient bien.
+
+    \vspace{1em}
+
+    \important{Si $A$ est inversible}, alors sa forme échelonnée réduite est $I_n$, et il existe une séquence de matrices élémentaires $E_1, \ldots, E_k$ telles que:
+    \[E_k \cdots E_1 A = I_n \implies A^{-1} = E_k \cdots E_1 \]
+
+    Ceci implique que:
+    \[A = \left(E_k \cdots E_1\right)^{-1} = E_1^{-1} \cdots E_k^{-1}\]
+
+    Or, on sait que l'inverse d'une matrice élémentaire est une matrice élémentaire (on le sait puisqu'une opération élémentaire est toujours inversible par une autre opération élémentaire). Donc, on a:
+    \begin{multiequality}
+    \det\left(AB\right) & = \det\left(E_1^{-1} \cdots E_k^{-1} B\right)  \\
+    & = \det\left(E_1^{-1}\right)\cdots\det\left(E_k^{-1}\right)\det\left(B\right)  \\
+    & = \det\left(E_1^{-1}\cdots E_k^{-1}\right)\det\left(B\right) \\
+    & = \det\left(A\right)\det\left(B\right)
+    \end{multiequality}
+
+    \qed
+    }
+}
+
+\parag{Déterminant de l'inverse}{
+    Si $A \in \mathbb{R}^{n\times n}$ est inversible, alors on a que:
+    \[1 = \det\left(I_n\right) = \det\left(A A^{-1}\right) = \det\left(A\right)\det\left(A^{-1}\right) \]
+
+    Donc:
+    \[\det\left(A^{-1}\right) = \frac{1}{\det\left(A\right)}\]
+}
+
+\parag{Déterminant d'une puissance}{
+    Si on a $A \in \mathbb{R}^{n \times n}$ et $k \in \mathbb{N}^*$, alors:
+    \[\det\left(A^{k}\right) = \det\left(A \cdots A\right) = \underbrace{\det\left(A\right)\cdots \det\left(A\right)}_{k \text{ fois}} = k\det\left(A\right)\]
+
+    \subparag{Inversibilité de la puissance}{
+        Il est donc intéressant de voir que si $A$ n'est pas inversible, alors $A^{k}$ ne le sera jamais. De la même manière, si $A$ est inversible, alors $A^{k}$ l'est forcément.
+    }
+
+}
+
+\parag{Déterminant du produit avec un scalaire}{
+    Si on a $A \in \mathbb{R}^{n\times n}$ et $k \in \mathbb{R}$, alors:
+    \[\det\left(kA\right) = \det\left(kI_n A\right) = \det\left(k I_n\right) \det\left(A\right) = k^{n}\det\left(A\right)\]
+
+}
+
+\parag{Théorème (interprétation géométrique)}{
+    Si $A$ est une matrice $2 \times 2$, l'aire du parallélogramme défini par les colonnes de $A$ est égale à $\left|\det A\right|$. Si $A$ est une matrice $3\times 3$, le volume du parallélépipède défini par les colonnes de $A$ est égal à $\left|\det A\right|$.
+
+    \imagehere{interpretationGeometriqueDeterminant.png}
+
+    \subparag{Notation}{
+        Il arrive que $\det A$ soit noté $\left|A\right|$. Il ne faut pas confondre cette notation avec la valeur absolue d'un scalaire, comme $\left|\det A\right|$.
+    }
+
+
+    \subparag{Remarque}{
+        Dans le cas $2\times 2$, si les colonnes de la matrice sont colinéaire, alors l'aire du parallélogramme qu'ils dessinent est nul. Or, s'ils sont colinéaires ont sait que la matrice n'est pas inversible, ce qui est donc cohérent.
+
+        On peut faire la même réflexion avec une matrice $3\times 3$, dans le cas où des vecteurs sont coplanaires.
+    }
+
+}
+\parag{Le cas des transformations linéaires}{
+    \imagehere{determinantMulitplieSurfaceTransformationLineaire.png}
+
+    On peut voir qu'une transformation linéaire $T : \mathbb{R}^2 \mapsto \mathbb{R}^2$ définie comme $T\left(\bvec{x}\right) = A \bvec{x}$ a pour effet de multiplier la surface par $\left|\det A\right|$, dans le cas d'un carré.
+
+    De manière générale, si $S$ est une région de $\mathbb{R}^2$ de surface finie, alors
+    \[\text{surface}\left(T\left(S\right)\right) = \left|\det A\right|\text{surface}\left(S\right)\]
+
+    On a le résultat analogue dans $\mathbb{R}^3$:
+    \[\text{volume}\left(T\left(S\right)\right) = \left|\det A\right| \text{volume}\left(S\right)\]
+
+
+}
+
+
+
+
+
+\end{document}

@@ -1,0 +1,359 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-10-25 at 10:13:30.
+
+\usepackage{../../style}
+
+\title{Analyse 1}
+\author{Joachim Favre}
+\date{Lundi 25 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2021-10-25}{Cauchy, liminf, limsup et début de Netflix}{
+\begin{itemize}[left=0pt]
+    \item Définition des suites de Cauchy, et démonstration qu'une suite converge si et seulement si elle est Cauchy.
+    \item Définition des limites supérieures et inférieures.
+    \item Définition des séries numériques.
+    \item Démonstration des cas de convergence et de divergence des séries géométriques.
+\end{itemize}
+
+}
+
+\subsection{Suites de Cauchy}
+
+\parag{Définition des suites de Cauchy}{
+    La suite $\left(a_n\right)$ est une suite de Cauchy si, $\forall \epsilon > 0$, il existe $n_0 \in \mathbb{N}$ tel que $\forall n \geq n_0$ et $m \geq n_0$, alors: 
+    \[\left|a_n - a_m\right| < \epsilon\]
+    
+    \subparag{Remarque}{
+        Cela veut donc dire qu'on peut trouver un $n_0$ après lequel la différence entre deux termes est toujours plus petite que epsilon.
+    }
+}
+
+\parag{Proposition}{
+    Une suite $\left(a_n\right)$ est une suite de Cauchy \important{si et seulement si} $\left(a_n\right)$ est convergente. 
+
+    \subparag{Preuve $\implies$}{
+        Puisque $\left(a_n\right)$ est une suite de Cauchy, alors on peut prendre $\epsilon = 1$ et $m = r$, donc on a 
+        \[\exists r \in \mathbb{N} \telque \left|a_n - a_r\right| \leq 1 \mathspace \forall n \geq r\]
+
+        Ainsi, on en déduit que, pour tout $n \geq r$, alors $\left|a_n\right| \leq \left|a_r\right| + 1$. Plus généralement, pour tout $n$:
+        \[\left|a_n\right| \leq \max\left\{\left|a_r\right| + 1, \left|a_0\right|, \left|a_1\right|, \ldots, \left|a_{r-1}\right|\right\}\]
+        
+        Puisqu'il y a un nombre fini d'éléments, le maximum existe et donc la suite est bornée. Par Wolzano-Weierstrass, on sait donc qu'il existe une sous-suite convergente $\left(a_{n_k}\right) \subset \left(a_n\right)$ telle que:
+        \[\lim_{k \to \infty} a_{n_k} = \ell\]
+        
+        Puisque $\left(a_n\right)$ est une suite de Cauchy, on sait que pour tout $\epsilon > 0$, alors il existe $m_0 \in \mathbb{N}$ tel que: 
+        \[\left|a_p - a_q\right| \leq \frac{\epsilon}{2} \mathspace \forall p, q \geq m_0\]
+        
+        De plus, puisque $\left(a_{n_k}\right)$ converge vers $\ell$, il existe $j_0 \in \mathbb{N}$ tel que:
+        \[\left|a_{n_j} - \ell\right| \leq \frac{\epsilon}{2} \mathspace \forall j \geq j_0\]
+        
+        Soit $k_0 = \max\left(m_0, j_0\right)$. On sait que nos deux inégalités ci-dessus tiennent pour tout $n \geq k_0$. Puisque les sous-suites sont strictement croissantes et de nombres entiers, on en déduit que $n_{k_0} \geq k_0$. Or, $k_0 \geq m_0$ par sa définition, donc, par notre première inégalité: 
+        \[\left|a_{n} - a_{n_{k_0}}\right| \leq \frac{\epsilon}{2}\]
+        
+
+        De la même manière, $k_0 \geq j_0$ par la définition de $k_0$, donc, par la deuxième inégalité : 
+        \[\left|a_{n_{k_0}} - \ell\right| \leq \frac{\epsilon}{2}\]
+        
+        Ainsi: 
+        \[\left|a_{n} - \ell\right| = \left|a_n - a_{n_{k_0}} + a_{n_{k_0}} - \ell\right| \leq \left|a_n - a_{n_{k_0}}\right| + \left|a_{n_{k_0}} - \ell\right| \leq \frac{\epsilon}{2} + \frac{\epsilon}{2} = \epsilon\]
+
+        Donc, par la définition de la limite: 
+        \[\lim_{n \to \infty} a_n = \ell\]
+        
+    }
+
+    \subparag{Preuve $\impliedby$}{
+        Puisque 
+        \[\lim_{n \to \infty} a_n = \ell\]
+        on sait que pour tout $\epsilon > 0$, il existe $n_0 \in \mathbb{N}$ tel que 
+        \[\forall n \geq n_0, \mathspace \left|a_n - \ell\right| \leq \frac{\epsilon}{2}\]
+        
+        Ainsi, $\forall p, q \geq n_0$, on a  
+        \[\left|a_p - a_q\right| = \left|a_p - \ell + \ell - a_q\right| \leq \left|a_{p} - \ell\right| + \left|\ell - a_q\right| \leq \frac{\epsilon}{2} + \frac{\epsilon}{2} = \epsilon\]
+
+        Donc, $\left(a_n\right)$ est une suite de Cauchy.
+        \qed
+    }
+}
+
+\parag{Remarque}{
+    Si on a une limite telle que
+    \[\lim_{n \to \infty} \left(a_{n+k} - a_n\right) = 0, \mathspace \forall k \in \mathbb{N}\]
+    alors, cela ne veut pas nécessairement dire que c'est une suite de Cauchy.
+
+    \subparag{Exemple}{
+        Prenons la suite suivante: 
+        \[a_n = \sqrt{n}\]
+
+        Ainsi, on a: 
+        \[\lim_{n \to \infty} \left(a_{n+k} - a_n\right) = \lim_{n \to \infty} \left(\left(n + k\right)^{\frac{1}{2}} - n^{\frac{1}{2}}\right) = \lim_{n \to \infty} \frac{k}{\left(n + k\right)^{\frac{1}{2}} + n^{\frac{1}{2}}} = 0 \]
+        
+        Cependant, $\left(a_n\right)$ diverge puisqu'elle n'est pas bornée. Ainsi, par notre théorème, elle ne peut pas être une suite de Cauchy.
+    }
+
+    \subparag{Explication}{
+        $\lim_{n \to \infty} \left(a_{n+k} - a_n\right) = 0$ implique que pour tout $\epsilon > 0$, il existe $n_0 \in \mathbb{N}$ tel que pour tout $n \geq n_0$
+        \[\left|a_{n+k} - a_n\right| \leq \epsilon\]
+        
+        Ici, $n_0$ peut dépendre de $k$. Dans l'exemple où on a $a_n = \sqrt{n}$, si on augmente $k$, on obtient toujours $n_0$ plus grand pour un $\epsilon$ donné. Mais, dans la propriété de Cauchy, $n_0 \in \mathbb{N}$ est le même pour toute différence $k = m - n$ d'indice.
+
+        Donc, la propriété de Cauchy est plus forte que 
+        \[\lim_{n \to \infty} \left(a_{n+k} - a_n\right) = 0 \mathspace \forall k \in \mathbb{N}\]
+        
+    }
+     
+}
+
+\subsection[Limpsup et liminf]{Limite supérieure et limite inférieure d'une suite bornée}
+\parag{Définition}{
+    Soit $\left(x_n\right)$ une suite bornée. On sait donc par définition qu'il existe $m, M \in \mathbb{R}$ tels que 
+    \[m \leq x_n \leq M \mathspace \forall n \in \mathbb{N}\]
+    
+    On définit les suites:
+    \[y_n = \sup\left\{x_k, k \geq n\right\} \mathspace z_n = \inf\left\{x_k, k \geq n\right\}\]
+    
+    On remarque que $y_n$ est décroissante (puisqu'on regarde le suprémum d'un ensemble toujours plus petit ; on jette à chaque fois un terme de plus, puis on regarde le suprémum de ce qui reste) et minorée par $y_n \geq x_n \geq m$ pour tout $n \in \mathbb{N}$. 
+
+    De la même manière, on voit que $z_n$ est croissante, et majorée par $z_n \leq x_n \leq M$ pour tout $n \in \mathbb{N}$.
+
+    On définit donc 
+    \[\lim_{n \to \infty} y_n \over{=}{déf} \limsup_{n \to \infty} x_n \mathspace \text{ et } \mathspace \lim_{n \to \infty} z_n \over{=}{déf} \liminf_{n \to \infty} x_n\]
+    
+    Elles existent toujours, et:
+    \[z_n \leq x_n \leq y_n \mathspace \forall n \in \mathbb{N}\]
+}
+
+\parag{Exemple}{
+    Prenons la suite 
+    \[x_n = \left(-1\right)^{n} \left(1 + \frac{1}{n^2}\right), \mathspace n \geq 1\]
+    
+    On remarque que, clairement, $x_n$ est bornée puisque $-2 \leq x_n \leq 2$. On a: 
+    \[x_n = \left(-2, 1 + \frac{1}{4}, -1 - \frac{1}{9}, 1 + \frac{1}{16}, -1 - \frac{1}{25}\right)\]
+
+    On peut maintenant construire $\left(y_n\right)$: 
+    \[y_n = \left(1 + \frac{1}{4}, 1 + \frac{1}{4}, 1 + \frac{1}{16}, 1 + \frac{1}{16}, \ldots, 1 + \frac{1}{\left(n + \frac{1 + \left(-1\right)^{n+1}}{2}\right)^2}\right)\]
+    où la fraction au dénominateur donne alternativement $1$ et $0$ selon la parité de $n$. 
+
+    Construisons maintenant $\left(z_n\right)$: 
+    \[z_n = \left(-2, -1 - \frac{1}{9}, -1 - \frac{1}{9}, -1 - \frac{1}{25}, \ldots, -1 - \frac{1}{\left(n + \frac{1 + \left(-1\right)^{n}}{2}\right)^2}\right)\]
+    
+    On se retrouve donc avec: 
+    \[\lim_{n \to \infty} y_n = 1 \mathspace \text{ et } \mathspace \lim_{n \to \infty} z_n = -1\]
+}
+
+\parag{Proposition}{
+    Une suite bornée $\left(x_n\right)$ converge vers $\ell \in \mathbb{R}$ si et seulement si: 
+    \[\liminf_{n \to \infty} x_n = \limsup_{n \to \infty}x_n = \ell\]
+    
+    \subparag{Preuve $\implies$}{
+        Laissée en exercice au lecteur.
+    }
+    
+    \subparag{Preuve $\impliedby$}{
+        On sait par hypothèse que :
+        \[\lim_{n \to \infty} y_n = \lim_{n \to \infty} z_n = \ell\]
+
+        Et donc, par le théorème des deux gendarmes :
+        \[z_n \leq x_n \leq y_n \implies \lim_{n \to \infty} x_n = \ell\]
+        
+        \qed
+    }
+    
+}
+
+\parag{Exemple 1}{
+    Prenons la suite de toute à l'heure: 
+    \[x_n = \left(-1\right)^{n} \left(1 + \frac{1}{n^2}\right) \mathspace n \geq 1\]
+    
+    On a montré que 
+    \[\limsup_{n \to \infty} x_n = 1 \mathspace \text{ et } \mathspace \liminf_{n \to \infty} x_n = -1\]
+    
+    Par la contraposée de la propriété précédente, on sait que $\left(x_n\right)$ diverge.
+}
+
+\parag{Exemple 2}{
+    Prenons la suite suivante: 
+    \[x_n = 1 - \frac{1}{n}, \mathspace n \geq 1\]
+    
+    On trouve que 
+    \[y_n = \sup\left\{x_k, k \geq n\right\} = \left(1, 1, 1, \ldots\right)\]
+    qui ne sont pas des éléments de $\left(x_n\right)$. De plus, on a 
+    \[z_n = \inf\left\{x_k, k \geq n\right\} = \left(0, \frac{1}{2}, \frac{2}{3}, \ldots\right) = x_n\]
+    ce qui est vrai de manière générale pour toute suite croissante. On en déduit ainsi que 
+    \[\limsup_{n \to \infty} x_n = 1 \mathspace \text{ et } \mathspace \liminf_{n \to \infty} x_n = 1\]
+    
+    Or, cela implique que $\left(x_n\right)$ est convergente, et que:
+    \[\lim_{n \to \infty} x_n = 1\]
+    
+}
+
+\section{Séries numériques}
+\subsection{Définitions et exemples}
+\parag{Définition}{
+    La \important{série} de terme général $a_n$ est un couple:
+    \begin{enumerate}
+        \item La suite $\left(a_n\right)$.
+        \item La suite des sommes partielles :
+        \[S_n \over{=}{déf} \sum_{k=0}^{n} a_k = a_0 + a_1 + \ldots + a_n\]
+    \end{enumerate}
+}
+
+\parag{Somme partielle}{
+    On note la $n$-ème somme partielle :
+    \[S_n = \sum_{k=0}^{n} a_k\]
+}
+
+\parag{Série}{
+    On note la série de terme général $a_k$: 
+    \[\sum_{k=0}^{\infty} a_k\]
+
+    On appelle $a_k$ le $k$-ème terme.
+
+    On dit que la série est convergente si et seulement si la suite $\left(S_n\right)$ des sommes partielles est convergente. 
+    
+    La limite $\lim_{n \to \infty} S_n$ s'appelle la somme de la série $\sum_{k=0}^{\infty} a_k$. Dans le cas où elle existe, on dit que $\sum_{k=0}^{\infty} a_k$ converge vers $\ell$ et on note: 
+    \[\sum_{k=0}^{\infty} a_k = \ell\]
+    
+}
+
+\parag{Divergence}{
+    Si $\left(S_n\right)$ est divergente, alors on dit que la série $\sum_{k=0}^{\infty} a_k$ est divergente. En particulier, si $\lim_{n \to \infty} S_n = \pm\infty$, alors on écrit 
+    \[\sum_{k=0}^{\infty} a_k = \pm\infty\]
+}
+
+
+\parag{Exemple}{
+    Prenons la série suivante 
+    \[\sum_{n=0}^{\infty} n \implies S_n = \sum_{k=0}^{n} k = 0 + 1 + \ldots + n = \frac{n\left(n+1\right)}{2} \geq n\]
+
+    En d'autres mots, la suite n'est pas bornée. On trouve donc que 
+    \[\lim_{n \to \infty} S_n = \infty \implies \sum_{n=0}^{\infty} n = \infty\]
+}
+
+\parag{Exemple pour les séries géométriques}{
+    Prenons la série suivante: 
+    \[\sum_{k=0}^{\infty} \frac{1}{2^{k}} \implies S_n = \sum_{k=0}^{n} \frac{1}{2^{k}} = 1 + \frac{1}{2} + \ldots + \frac{1}{2^{n}}\]
+    
+    Pour rappel, on avait trouvé que: 
+    \[\left(1 + x + x^2 + \ldots + x^{n}\right)\left(1 - x\right) = 1 - x^{n+1}, \mathspace \forall x \in \mathbb{R}\]
+    
+    On peut donc diviser par $1-x$: 
+    \[1 + x + \ldots + x^{n} = \frac{1 - x^{n+1}}{1 - x}, \mathspace \forall x \neq 1\]
+    
+    Si $x = \frac{1}{2}$, on trouve que 
+    \[S_n = 1 + \frac{1}{2} + \ldots + \frac{1}{2^{n}} = \frac{1 - \frac{1}{2^{n+1}}}{1 - \frac{1}{2}}\]
+    
+    En prenant la limite: 
+    \[\lim_{n \to \infty} S_n = \lim_{n \to \infty} \frac{1 - \overbrace{\frac{1}{2^{n+1}}}^{\to 0}}{1 - \frac{1}{2}} = \frac{1}{1 - \frac{1}{2}} = 2\]
+    
+    On peut donc écrire: 
+    \[\sum_{k=0}^{\infty} \frac{1}{2^{k}} = 2\]
+    
+}
+
+\parag{Proposition (convergence des séries géométriques)}{
+    Nous avons l'égalité suivante: 
+    \[\sum_{k=0}^{\infty} r^{k} = \frac{1}{1 - r} \mathspace \left|r\right| < 1\]
+    
+    \subparag{Preuve}{
+        On peut utiliser la même méthode que l'exemple ci-dessus. On a besoin du $\left|r\right| < 1$ pour avoir 
+        \[\lim_{n \to \infty} r^{n+1} = 0\]
+        
+    }
+    
+    \subparag{Remarque personnelle}{
+        On peut utiliser la méthode suivante pour retrouver que 
+        \[1 + x + \ldots + x^{n} = \frac{1 - x^{n + 1}}{1-x}\]
+        
+
+        Soit $f\left(x\right) = 1 + x + \ldots + x^{n}$. On a l'égalité suivante: 
+        \[xf\left(x\right) = x + x^2 + \ldots + x^{n+1}\]
+        
+        Ainsi en ajoutant $1$ des deux côtés, on peut remarquer que:
+        \[1 + xf\left(x\right) = 1 + x + x^2 + \ldots + x^{n+1} = f\left(x\right) + x^{n+1}\]
+
+        Il ne nous reste qu'à résoudre pour $f\left(x\right)$: 
+        \[f\left(x\right)\left(1 - x\right) = 1 - x^{n+1} \implies f\left(x\right) = \frac{1 - x^{n+1}}{1 - x}\]
+        
+    }
+    
+    
+}
+
+\parag{Proposition (divergence des séries géométriques)}{
+    La série 
+    \[\sum_{k=0}^{\infty} r^{k} \]
+    est divergente si $\left|r\right| \geq 1$
+
+    \subparag{Preuve}{
+        Si $r > 1$ ou $r < -1$, alors 
+        \[S_n = \frac{1 - r^{n+1}}{1 - r}\]
+        n'est pas bornée, et est donc divergente.
+
+        Si $r = 1$, alors :
+        \[S_n = \sum_{k=0}^{n} 1 = n+1 \implies \lim_{n \to \infty} S_n = \infty\]
+        
+        Si $r = -1$, alors 
+        \[S_n = \sum_{k=0}^{n} \left(-1\right)^{n}\]
+        
+        On peut regarder les premiers termes: 
+        \[\left(S_n\right) = \left(1, 0, 1, 0, \ldots\right)\]
+
+        Ce qui nous permet d'en déduire que $\left(S_n\right)$ est divergente.
+
+        \qed
+    }
+    
+}
+
+\parag{Paradoxe d'Achille et la tortue}{
+    Disons qu'Achille et une tortue font la course. Si Achille cours à $\SI{10}{\meter\per\second}$ et la tortue à $\SI{0.1}{\meter\per\second}$. Selon Zénon, si Achille donne une avance de $\SI{100}{\meter}$ à la tortue, alors il ne pourra jamais la rattraper puisque, quand Achille avance de $\SI{100}{\meter}$, alors la tortue avance de $\SI{1}{\meter}$. Ensuite, quand il avance de $\SI{1}{\meter}$, la tortue avance de $\SI{1}{\centi\meter}$. Ainsi, à chaque fois, la tortue se retrouve plus loin qu'Achille.
+
+    Regardons ça avec nos mathématiques actuelles. Considérons le temps qu'il faudrait à Achille pour rattraper la tortue (on a vue qu'une série géométrique pouvait donner des valeurs finies, pourquoi pas ici ?). Ce temps est donné par: 
+    \[t = \frac{\SI{100}{\meter}}{\SI{10}{\meter\per\second}} + \frac{\SI{1}{\meter}}{\SI{10}{\meter\per\second}} + \frac{\SI{0.01}{\meter}}{\SI{10}{\meter\per\second}} + \ldots = \SI{10}{\second } + \SI{\frac{1}{10}}{\second } + \SI{\frac{1}{1000}}{\second } + \ldots = \SI{10}{\second }\left(1 + \frac{1}{100} + \frac{1}{10000} + \ldots\right)\]
+    qui est une série géométrique de $r = \frac{1}{100}$. Donc, 
+    \[t = \SI{10}{\second } \sum_{k=0}^{\infty} \left(\frac{1}{100}\right)^{k} = \SI{10}{\second } \frac{1}{1 - \frac{1}{100}} = \SI{10}{\second } \frac{1}{\frac{99}{100}} = \SI{\frac{1000}{99}}{\second }\]
+    
+    Ainsi, on voit qu'Achille rattrapera la tortue en $\SI{\frac{1000}{99}}{\second}$.
+    
+    \vspace{1em}
+
+    \important{Conclusion:} D'après Zénon, l'impossibilité pour Achille de rattraper la tortue vient du fait qu'il lui faudrait couvrir un nombre infini d'intervalles. Mais, d'après notre calcul, une somme infinie d'intervalles de décroissance géométrique peuvent converger vers une somme finie. 
+}
+
+\parag{Exemple}{
+    La série 
+    \[\sum_{n=1}^{\infty} \frac{1}{n}\]
+    est divergente. 
+
+    \subparag{Preuve}{
+        Supposons qu'il existe 
+        \[\exists \lim_{n \to \infty} S_n = S \in \mathbb{R}\]
+        
+        Considérons la sous-suite $\left(S_{2n}\right) \subset \left(S_n\right)$ : 
+        \[S_n = 1 + \frac{1}{2} + \ldots + \frac{1}{n} \mathspace \text{ et } \mathspace S_{2n} = 1 + \frac{1}{2} + \ldots + \frac{1}{2n}\]
+        
+        Puisque $\left(S_n\right)$ converge vers $S$, on sait que 
+        \[\lim_{n \to \infty} S_{2n} = S = \lim_{n \to \infty} S_n\]
+        
+        Mais: 
+        \[S_{2n} - S_n = \underbrace{\frac{1}{n+1}}_{\geq \frac{1}{2n}} + \underbrace{\frac{1}{n+2}}_{\geq \frac{1}{2n}} + \ldots + \underbrace{\frac{1}{2n}}_{\geq \frac{1}{2n}} \geq n \frac{1}{2n} = \frac{1}{2}\]
+        
+        Or, quand $n \to \infty$, on a que 
+        \[0 = S_{2n} - S_n \geq \frac{1}{2}\]
+        qui est une contradiction.
+
+        On peut donc en déduire que 
+        \[\lim_{n \to \infty} S_n = \infty\]
+        (puisque $S_n$ est croissante, la limite ne peut pas diverger vers $-\infty$ ou osciller).
+
+        \qed
+    }
+}
+ 
+
+\end{document}

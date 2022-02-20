@@ -1,0 +1,342 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-08 at 10:16:59.
+
+\usepackage{../../style}
+
+\title{Analyse}
+\author{Joachim Favre}
+\date{Mercredi 08 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{22}{2021-12-08}{Séries de Taylor et primitives de séries entières}{
+\begin{itemize}[left=0pt]
+    \item Définition des séries de Taylor et des séries de MacLaurin.
+    \item Explication de la méthode pour déterminer si une série de Taylor converge vers sa fonction.
+    \item Calcul de séries de Taylor remarquables.
+    \item Définition des primitives.
+    \item Explication d'un théorème permettant de calculer la primitive d'une fonction définie par une série entière, et de son corollaire qui permet de calculer la dérivée d'un telle fonction.
+\end{itemize}
+
+}
+
+\parag{Exemple}{
+    Soit la série entière suivante: 
+    \[\sum_{k=0}^{\infty} \frac{3^k}{\left(k+1\right)2^{k+2}}\left(x - 1\right)^k \implies a_k = \frac{2^{k}}{\left(k+1\right)2^{k+2}}\]
+    
+    Nous cherchons le rayon de convergence et le domaine de convergence.
+
+    On peut passer par l'inverse du critère de d'Alembert pour obtenir le rayon directement: 
+    \[\lim_{k \to \infty} \left|\frac{a_k}{a_{k+1}}\right| = \lim_{k \to \infty} \frac{3^{k}}{\left(k+1\right)2^{k+2}}\cdot\frac{\left(k+2\right)2^{k+3}}{3^{k+1}} \lim_{k \to \infty} \frac{2}{3} \cdot \frac{k+2}{k+1} = \frac{2}{3} = r\]
+    
+    On en déduit que $\left]\frac{1}{3}, \frac{5}{3}\right[ \subset D$, puisque $x_0 = 1$. Nous devons encore étudier les bornes.
+
+    On remarque que, quand $x = \frac{5}{3}$: 
+    \[\sum_{k=0}^{\infty} \frac{3^k}{\left(k+1\right)2^{k+2}} \left(\frac{2}{3}\right)^k = \sum_{k=0}^{\infty} \frac{3^k 2^k}{\left(k+1\right)2^{k+2} 3^k} = \frac{1}{4} \sum_{k=0}^{\infty} \frac{1}{k+1}\]
+    qui est la série harmonique, donc elle diverge.
+
+    De plus, étudions $x = \frac{1}{3}$: 
+    \[\sum_{k=0}^{\infty} \frac{3^k}{\left(k+1\right)2^{k+2}} \left(-\frac{2}{3}\right)^k = \sum_{k=0}^{\infty} \frac{\left(-1\right)^k}{4\left(k+1\right)} = \frac{1}{4} \sum_{k=0}^{\infty} \frac{\left(-1\right)^k}{k+1}\]
+    qui est la série harmonique alternée, et qui converge par le critère de Leibniz. 
+
+    On en déduit donc que: 
+    \[r = \frac{2}{3}, \mathspace D = \left[\frac{1}{3}, \frac{5}{3}\right[ \]
+}
+
+\subsection{Série de Taylor}
+\parag{Définition}{
+    Soit $f : I \mapsto \mathbb{R}$ (où $I$ est un intervalle ouvert, comme d'habitude) une fonction de classe $C^{\infty}\left(I\right)$ (elle est indéfiniment dérivable sur cet intervalle), et $x_0 \in I$.
+
+    Alors, la \important{série de Taylor} au point $x_0$ est: 
+    \[\sum_{k=0}^{\infty} \frac{f^{\left(k\right)}\left(x_0\right)}{k!}\left(x - x_0\right)^{k}\]
+
+    \subparag{Terminologie}{
+        Si $x_0 = 0$, alors cette série est appelée la \important{série de Maclaurin}: 
+        \[\sum_{k=0}^{\infty} \frac{f^{\left(k\right)}\left(0\right)}{k!}x^k\]
+        
+    }
+    
+    \subparag{Note}{
+        Nous avions déjà étudié la formule de Taylor, et le polynôme de Taylor. Voici la série de Taylor!
+    }
+
+    \subparag{Note personnelle}{
+        Je me permets de remettre ici le lien de la vidéo de 3Blue1Brown qui parle des séries de Taylor:
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=3d6DsjIBzJ4}
+        \end{center}
+    }
+    
+}
+
+\parag{Convergence}{
+    Nous avons déjà des méthodes qui nous permettent de trouver le rayon et le domaine de convergence des séries de Taylor (puisque ce sont des séries entières). Cependant, nous voulons maintenant aussi trouver l'ensemble $E \subset D$ dans lequel la série converge vers sa fonction, i.e:
+    \[f\left(x\right) = \sum_{k=0}^{\infty} \frac{f^{\left(k\right)}\left(x_0\right)}{k!}\left(x - x_0\right)^k, \mathspace \forall x \in E\]
+
+    On se souvient que la formule de Taylor nous donne: 
+    \[f\left(x\right) = \sum_{k=0}^{n} \frac{f^{\left(k\right)}\left(x_0\right)}{k!}\left(x - x_0\right)^k + \frac{f^{\left(n+1\right)}\left(u\right)}{\left(n+1\right)!}\left(x - x_0\right)^{n+1}\]
+    où $u$ est entre $x$ et $x_0$.
+
+    Ainsi, $\sum_{k=0}^{\infty} \frac{f\left(k\right)\left(x_0\right)}{k!}\left(x - x_0\right)^k$ converge vers $f\left(x\right)$ si et seulement si: 
+    \[\lim_{n \to \infty} R_n\left(f\right)\left(x\right) = 0\]
+    
+}
+
+\parag{Exemple 1}{
+    Par la définition de l'exponentielle:
+    \[e^x \over{=}{déf} \sum_{k=0}^{\infty} \frac{x^k}{k!}\]
+   
+    Comme on l'a déjà démontré plusieurs fois, cette série converge pour tout $x \in \mathbb{R}$, par le critère de d'Alembert. De plus, puisque cette série est la définition de l'exponentielle, alors clairement la série donne toujours la même valeur que l'exponentielle. Ainsi: 
+    \[D = E = \mathbb{R}\]
+}
+
+\parag{Exemple 2}{
+    Soit la fonction de classe $C^{\infty}\left(\left]0, +\infty\right[ \right)$ suivante: 
+    \[f\left(x\right) = \log\left(x\right)\]
+    
+    \subparag{Série de Taylor}{
+        On peut démontrer par récurrence que: 
+        \[f'\left(x\right) = \frac{1}{x}, \mathspace f''\left(x\right) = \frac{-1}{x^2}, \mathspace \ldots, \mathspace f^{\left(k\right)}\left(x\right) = \frac{\left(-1\right)^{k+1} \left(k-1\right)!}{x^k}\]
+        
+        En prenant $x_0 = 1$, on remarque donc que: 
+        \[f^{\left(k\right)}\left(1\right) = \left(-1\right)^{k+1}\left(k-1\right)!\]
+
+        Ainsi, on peut calculer la série de Taylor de $\log\left(x\right)$ en $x_0 = 1$: 
+        \begin{multiequality}
+        \Taylor\left(\log\left(x\right)\right)_{x = 1} =\ & \sum_{k=1}^{\infty} \frac{\left(-1\right)^{k+1} \left(k-1\right)!}{k!} \left(x - 1\right)^k \\
+        =\ & \sum_{k=1}^{\infty} \frac{\left(-1\right)^{k+1}}{k} \left(x - 1\right)^k 
+        \end{multiequality}
+        
+        On peut aussi prendre le changement de variable $x - 1 = y$, ce qui nous permet d'avoir la série de MacLaurin de $\log\left(1 + y\right)$ (en $y_0 = 0$): 
+        \[\MacLaurin\left(\log\left(1 + y\right)\right) = \sum_{k=1}^{\infty} \frac{\left(-1\right)^{k+1}}{k} y^k = y - \frac{y^2}{2} + \frac{y^3}{3} - \ldots\]
+    }
+    
+    \subparag{Convergence de la série}{
+        Calculons maintenant le rayon de convergence de cette série (on regarde celui de la série de Taylor, mais on pourra de toutes façons utiliser notre résultat pour la série de MacLaurin): 
+        \[\lim_{k \to \infty} \left|\frac{a_k}{a_{k+1}}\right| = \lim_{k \to \infty} \left|\frac{\left(-1\right)^{k+1}}{k} \frac{k+1}{\left(-1\right)^{k+2}} \right| = \lim_{k \to \infty} \frac{k+1}{k} = 1\]
+        
+        Ainsi, on en déduit que $\left]0, 2\right[ \subset D$. Étudions $x = 0$: 
+        \[\sum_{k=1}^{\infty} \frac{\left(-1\right)^{k+1} \left(-1\right)^k}{k} = -\sum_{k=1}^{\infty} \frac{1}{k}\]
+        qui est la série harmonique, et donc qui diverge.
+
+        Étudions aussi $x = 2$: 
+        \[\sum_{k=1}^{\infty} \frac{\left(-1\right)^{k+1}}{k} 1^k = \sum_{k=1}^{\infty} \frac{\left(-1\right)^{k+1}}{k}\]
+        qui est la série harmonique alternée, et qui converge par le critère de Leibniz.
+
+        Ainsi, on en déduit que $D = \left]0, 2\right] $.
+    }
+    
+    
+
+    \subparag{Convergence vers $f\left(x\right)$}{
+        Calculons la limite du reste: 
+        \[\lim_{n \to \infty} \left|R_n\left(x\right)\right| = \lim_{n \to \infty} \left|\frac{\left(-1\right)^{n+2}}{u^{n+1}} n! \frac{\left(x-1\right)^{n+1}}{\left(n+1\right)!}\right| = \lim_{n \to \infty} \frac{1}{n+1} \left|\frac{x-1}{u}\right|^{n+1}\]
+        
+        Ceci est une limite très difficile. On peut la simplifier en considérant uniquement $x$ plus grand que $\frac{1}{2}$. Cependant, on peut démontrer (et on va démontrer ci-après dans ce cours) que le reste converge vers 0 quand $0 < x \leq 2$. Ainsi, $E = D = \left]0, 2\right] $.
+
+        Particulièrement, on remarque que, avec $x = 2$, on obtient la série harmonique alternée. Ainsi: 
+        \[\log\left(2\right) = \sum_{k=1}^{\infty} \frac{\left(-1\right)^{k+1}}{k} = 1 - \frac{1}{2} + \frac{1}{3} - \ldots\]
+    }
+    
+}
+
+\parag{Exemple 3}{
+    Prenons la fonction suivante: 
+    \[f\left(x\right) = \frac{1}{x}\]
+    
+    On sait que la série de MacLaurin est donnée par la série géométrique; en d'autres mots:
+    \[\sum_{k=0}^{\infty} x^k = \frac{1}{1 - x}\]
+
+    On peut donc en déduire que $D = E = \left]-1, 1\right[ $. En effet: 
+    \[\lim_{n \to \infty} \sum_{k=0}^{n} x^k = \lim_{n \to \infty} \frac{1 - x^{n+1}}{1 - x} = \frac{1}{1 - x}\]
+    puisque $\left|x\right| < 1$.
+}
+
+\parag{Exemple 4}{
+    Soit $f\left(x\right) = \sin\left(x\right)$. On sait que $f \in C^{\infty}\left(\mathbb{R}\right)$. De plus, on remarque que: 
+    \[f'\left(x\right) = \cos\left(x\right), \mathspace f''\left(x\right) = -\sin\left(x\right), \mathspace f'''\left(x\right) = -\cos\left(x\right), \mathspace f^{\left(4\right)}\left(x\right) = \sin\left(x\right), \mathspace \ldots\]
+    \[f'\left(0\right) = 1, \mathspace f''\left(0\right) = 0, \mathspace f'''\left(0\right) = -1, \mathspace f^{\left(4\right)} = 0, \mathspace \ldots\]
+
+    On peut donc calculer la série de MacLaurin: 
+    \[\MacLaurin\left(\sin x\right) = \sum_{k=0}^{\infty} \frac{\left(-1\right)^k}{\left(2k + 1\right)!} x^{2k + 1}, \mathspace \forall x \in \mathbb{R}\]
+
+    Or, on peut démontrer que le domaine de convergence est tel que $D = \mathbb{R}$ à l'aide du critère de d'Alembert.
+
+    Calculons maintenant la limite du reste: 
+    \[\lim_{n \to \infty} \left|R_n\left(x\right)\right| = \lim_{n \to \infty} \left|\frac{\left(\sin\left(u\right) \text{ ou } \cos\left(u\right)\right)}{\left(n+1\right)!}\right| \left|x^{n+1}\right| \leq \lim_{n \to \infty} \frac{\left|x^{n+1}\right|}{\left(n+1\right)!}\]
+    
+    On voit que la série $\sum_{n=0}^{\infty} \frac{\left|x\right|^{n+1}}{\left(n+1\right)!}$ converge par le critère de d'Alembert: 
+    \[\lim_{n \to \infty} \frac{\left|x\right|^{n+2}}{\left(n+2\right)!} \frac{\left(n+1\right)!}{\left|x\right|^{n+1}} = \lim_{n \to \infty} \frac{\left|x\right|}{n+2} = 0, \mathspace \forall x \in \mathbb{R}\]
+    
+    Ainsi, on en déduit par le critère nécessaire de la convergence des séries: 
+    \[\lim_{n \to \infty} \frac{\left|x\right|^{n+1}}{\left(n+1\right)!} = 0, \mathspace \forall x\in \mathbb{R}\]
+    
+    Ainsi, par le théorème des deux gendarmes: 
+    \[\lim_{n \to \infty} \left|R_n\left(x\right)\right| = 0 \implies \lim_{n \to \infty} R_n\left(x\right) = 0, \mathspace \forall x \in \mathbb{R}\]
+    
+    Ce qui nous permet d'en déduire que $E = D = \mathbb{R}$.
+    
+}
+
+\parag{Séries de Taylor remarquables}{
+    Les séries de Taylor suivantes convergent vers leur fonction pour tout $x \in \mathbb{R}$:
+    \begin{center}
+    \begin{tabular}{|c|c|}
+        \hline
+        $\displaystyle \sin\left(x\right)$ & $\displaystyle \sum_{k=0}^{\infty} \frac{\left(-1\right)^k}{\left(2k + 1\right)!} x^{2k + 1}$  \\
+        \hline
+        $\displaystyle \cos\left(x\right)$ & $\displaystyle \sum_{k=0}^{\infty} \frac{\left(-1\right)^k}{\left(2k\right)!} x^{2k}$  \\
+        \hline
+        $\displaystyle e^x$ & $\displaystyle \sum_{k=0}^{\infty} \frac{x^k}{k!}$ \\
+        \hhline{|=|=|}
+        $\displaystyle \sinh\left(x\right)$ & $\displaystyle \sum_{k=0}^{\infty} \frac{1}{\left(2k + 1\right)!} x^{2k + 1}$  \\
+        \hline
+        $\displaystyle \cosh\left(x\right)$ & $\displaystyle \sum_{k=0}^{\infty} \frac{1}{\left(2k\right)!} x^{2k}$ \\
+        \hline
+    \end{tabular}
+    \end{center}
+
+    Il est important de se souvenir des trois premières, mais $\sinh$ et $\cosh$ peuvent être retrouvées à partir de $e^x$ (surtout si on se souvient que ce sont les fonctions paires et impaires qui décomposent $e^x$, et que le développement limité d'une fonction impaire n'a que des coefficients devant des $x^k$ où $k$ est impair, et de manière similaire pour les fonctions paires).
+}
+
+\parag{Remarque}{
+    On peut trouver une série de Taylor($f$) telle que $E \neq D$. En effet, soit la fonction suivante:
+    \begin{functionbypart}{f\left(x\right)}
+    e^{\frac{-1}{x^2}}, \mathspace x \neq 0 \\
+    0, \mathspace x = 0
+    \end{functionbypart}
+
+    Calculons la dérivée en 0: 
+    \[f'\left(0\right) = \lim_{x \to 0} \frac{e^{\frac{-1}{x^2}} - 0}{x - 0} = \pm \lim_{x \to 0^{\pm}} \frac{e^{\frac{-1}{x^2}}}{\left|x\right|} \]
+    
+    Prenons le changement de variable $t = \frac{1}{x^2} \iff \left|x\right| = \frac{1}{\sqrt{t}}$: 
+    \[f'\left(0\right) = \pm \lim_{t \to \infty} \frac{e^{-t}}{t^{- \frac{1}{2}}} = \pm \lim_{t \to \infty} \frac{t^{\frac{1}{2}}}{e^t} \over{=}{BL} \lim_{t \to \infty} \frac{\frac{1}{2}}{t^{\frac{1}{2}} e^{t}} = 0\]
+    
+    Calculons maintenant $f'\left(x\right)$, quand $x \neq 0$: 
+    \[f'\left(x\right) = e^{- \frac{1}{x^2}} \cdot \frac{2}{x^3} = \frac{2}{x^3} e^{-\frac{1}{x^2}}\]
+    
+    Ceci nous permet de calculer $f''\left(0\right)$:
+    \[f''\left(0\right) = \lim_{x \to 0} \frac{\frac{2}{x^3} e^{\frac{-1}{x^2}} - 0}{x - 0} = \lim_{x \to 0} \frac{2e^{-\frac{1}{x^2}}}{x^4}\]
+    
+    On peut maintenant faire le changement de variable $t = \frac{1}{x^2}$, utiliser deux fois BL, et trouvera $f''\left(0\right) = 0$ (c'est un exercice au lecteur).
+
+    En continuant ainsi, on peut trouver que: 
+    \[\Taylor\left(f\right)_{x = 0} = 0, \mathspace \forall x \in \mathbb{R}\]
+    
+    Ainsi, Taylor$\left(f\right)_{x=0} \neq f\left(x\right)$ sauf pour $x = 0$. On en déduit donc que $D = \mathbb{R}$, mais $E = \left\{0\right\}$.
+
+}
+
+\subsection[Primitive et dérivée]{Primitive et dérivée d'une fonction définie par une série entière}
+\parag{Définition}{
+    Soit $f : \left[a, b\right] \mapsto \mathbb{R}$ une fonction continue sur $\left[a, b\right] $.
+
+    La fonction $F : \left[a, b\right] \mapsto \mathbb{R}$ est une \important{primitive} de $f$ sur $\left[a, b\right] $ si: 
+    \[F'\left(x\right) = f\left(x\right), \mathspace \forall x \in \left]a, b\right[ \]
+
+    \subparag{Remarque}{
+        Si $F_1\left(x\right)$ et $F_2\left(x\right)$ sont deux primitives de $f\left(x\right)$ sur $\left[a, b\right] $, alors : 
+        \[F_1\left(x\right) = F_2\left(x\right) + \alpha, \mathspace \forall x \in \left[a, b\right], \mathspace \alpha \in \mathbb{R} \]
+
+        On avait déjà démontré cela, c'est un des corollaires du théorème des accroissements finis.
+    }
+}
+
+\parag{Exemples}{
+    Nous pouvons déjà trouver les primitives suivantes:
+    \begin{center}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \fullbf{$\displaystyle f\left(x\right)$} & \fullbf{$\displaystyle F\left(x\right)$} & \fullbf{$\displaystyle D$} \\
+        \hline
+        $\displaystyle \sin\left(x\right)$ & $\displaystyle -\cos\left(x\right) + C$ & $\displaystyle \forall x \in \mathbb{R}$ \\
+        \hline
+        $\displaystyle \cos\left(x\right)$ & $\displaystyle \sin\left(x\right) + C$ & $\displaystyle \forall x \in \mathbb{R}$ \\
+        \hline
+        $\displaystyle \frac{1}{x}$ & $\displaystyle \log\left(x\right) + C$ & $\displaystyle x > 0$ \\
+        \hline
+        $\displaystyle x^k$ & $\displaystyle \frac{1}{k+1} x^{k+1} + C$ & $\displaystyle k \neq 1, x > 0$ \\
+        \hline
+        $\displaystyle e^x$ & $\displaystyle e^x + C$ & $\displaystyle \forall x \in \mathbb{R}$  \\
+        \hline
+    \end{tabular}
+    \end{center}
+
+}
+
+\parag{Théorème}{
+    \begin{enumerate}[left=0pt]
+    \item Les deux séries entières suivantes ont le même rayon de convergence, $r$: 
+        \[f\left(x\right) = \sum_{k=0}^{\infty} b_k \left(x - x_0\right)^{k}, \mathspace F\left(x\right) = \sum_{k=0}^{\infty} \frac{b_k}{k+1} \left(x - x_0\right)^{k+1}\]
+    \item Si $r > 0$, alors $f\left(x\right)$ est continue sur $\left]x_0 - r, x_0 + r\right[ $. 
+    \item Si $r > 0$, alors $F\left(x\right)$ est la primitive de $f\left(x\right)$ sur $\left]x_0 - r, x_0 + r\right[ $ telle que $F\left(x_0\right) = 0$.
+    \end{enumerate}
+    
+    \subparag{Preuve}{
+        Il faudrait la convergence uniforme des fonctions pour démontrer ce théorème (qui est ``non-trivial'' (je cite la professeure)).
+    }
+}
+
+\parag{Corollaire}{
+    Les deux séries entières suivantes ont le même rayon de convergence $r$.
+    \[f\left(x\right) = \sum_{k=0}^{\infty} a_k \left(x - x_0\right)^k, \mathspace g\left(x\right) = \sum_{{\color{red}k=1}}^{\infty} k a_k \left(x - x_0\right)^{k-1}\]
+
+    De plus, si $r > 0$, alors $f\left(x\right)$ est continûment dérivable sur $\left]x_0 - r, x_0 + r\right[ $, et $f'\left(x\right) = g\left(x\right)$.
+
+    \subparag{Remarque}{
+        Le rayon de convergence est le même, mais le domaine de convergence ne l'est pas forcément : la convergence aux bornes peut varier.
+    }
+}
+
+\parag{Exemple}{
+    On sait que: 
+    \[\frac{1}{1 - z} = \sum_{k=0}^{\infty} z^k, \mathspace \forall z \in \left]-1, 1\right[ \]
+
+    Prenons le changement de variable $x = 1 - z \iff z = 1 - x$: 
+    \[f\left(x\right) = \frac{1}{x} = \sum_{k=0}^{\infty} \left(-1\right)^{k} \left(x - 1\right)^k, \mathspace \forall x \in \left]0, 2\right[ \]
+    
+    Ainsi, le rayon de convergence de cette série entière est $r = 1$.
+
+    Par le théorème qu'on vient de voir, la série entière suivante a le même rayon de convergence, 1, est la primitive de $f\left(x\right) = \frac{1}{x}$ sur $\left]0, 2\right[ $ et est telle que $F\left(1\right) = 0$:
+    \[\sum_{k=0}^{\infty} \frac{\left(-1\right)^k}{k+1} \left(x - 1\right)^{k+1} = \sum_{k=1}^{\infty} \frac{\left(-1\right)^{k+1}}{k} \left(x - 1\right)^k \over{=}{\smiley} \Taylor\left(\log x\right)_{x = 1}\]
+
+    (Notez que le smiley a été mis par la Professeure dans son cours, je ne me permettrais absolument pas d'une baisse de sérieux dans mes notes\ldots Mes notes sont très sérieuses vous savez!)
+
+    Ceci nous permet de calculer résoudre le problème qu'on avait avec la limite ci-dessus. De plus, on a déjà vu que $\Taylor\left(\log x\right)_{x = 1}$ converge vers $\log\left(2\right)$ pour $x = 2$, donc on a: 
+    \[E = D = \left]0, 2\right] \]
+
+    On en déduit donc que: 
+    \[\frac{1}{x} = \sum_{k=0}^{\infty} \left(-1\right)^k \left(x - 1\right)^k, \mathspace x \in \left]0, 2\right[ \]
+    \[\log\left(x\right) = \sum_{k=1}^{\infty} \frac{\left(-1\right)^{k-1}}{k} \left(x - 1\right)^k, \mathspace x \in \left]0, 2\right] \]
+
+    On note que les domaines de convergence des deux séries sont différents dans ce cas (même si les rayons de convergences sont égaux, puisqu'ils doivent l'être par le corollaire ci-dessus)!
+}
+
+\parag{Retour à un exemple de limite}{
+    Trouvons la valeur du paramètre $b \in \mathbb{R}$ telle que la fonction suivante admet un prolongement par continuité en $x = 0$:
+    \begin{functionbypart}{f\left(x\right)}
+        \frac{\log\left(1 + 3x + 3x^2\right)}{2x \cos\left(x\right)}, \mathspace 0 < x < \frac{\pi}{2} \\
+        \frac{\sqrt{1 + x^2} - \left(1 - x\right)}{bx}, \mathspace -\frac{\pi}{2} < x < 0
+    \end{functionbypart}
+
+    Commençons par calculer la limite vers la droite, en utilisant le développement limité du logarithme naturel (l'intérieur du logarithme tend vers 1, donc on a bien le droit d'utiliser ce DL): 
+    \begin{multiequality}
+    \lim_{x \to 0^+} \frac{\log\overbrace{\left(1 + 3x + 3x^2\right)}^{\to 1}}{2x \cos\left(x\right)} =\ & \lim_{x \to 0^+} \frac{\left(3x + 3x^2\right) + \epsilon\left(x\right)\left(3x + 3x^2\right)}{2x\cos\left(x\right)}  \\
+    =\ & \frac{\left(3 + 3x\right) + \overbrace{\epsilon\left(x\right)}^{\to 0}\left(3 + 3x\right)}{2\underbrace{\cos\left(x\right)}_{\to 1}}  \\
+    =\ & \frac{3}{2} 
+    \end{multiequality}
+    
+    Calculons aussi la limite vers la gauche: 
+    \begin{multiequality}
+    \lim_{x \to 0^-} \frac{\sqrt{1 + x^2} - \left(1 - x\right)}{bx} =\ & \lim_{x \to 0^-} \frac{1 + x^2 - \left(1 - x\right)^2}{bx\left(\sqrt{1 + x^2} + \left(1 - x\right)\right)}  \\
+    =\ & \lim_{x \to 0^-} \frac{1 + x^2  -1 - 2x - x^2}{bx\left(\sqrt{1 + x^2} + \left(1 - x\right)\right)}  \\
+    =\ & \lim_{x \to 0^-} \frac{2}{b\underbrace{\left(\sqrt{1 + x^2} + \left(1 - x\right)\right)}_{\to 2}}  \\
+    =\ & \frac{2}{2b} = \frac{1}{b} 
+    \end{multiequality}
+    
+    On veut que les deux limites soient égales, donc $b = \frac{2}{3}$.
+}
+
+\end{document}

@@ -1,0 +1,316 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-29 at 10:16:37.
+
+\usepackage{../../style}
+
+\title{Analyse 1}
+\author{Joachim Favre}
+\date{Lundi 29 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{19}{2021-11-29}{Le théorème préféré des élèves selon la prof'}{
+\begin{itemize}[left=0pt]
+    \item Démonstration du théorème des accroissements finis (TAF), de trois de ses corollaires, et de sa version généralisée.
+    \item Explication de la méthode pour démontrer qu'une équation a exactement $n$ solutions.
+    \item Démonstration de la règle de Bernoulli-L'Hospital et exemples d'application.
+\end{itemize}
+
+}
+
+
+\parag{Remarque}{
+    Si $f : \left]a, b\right[ \mapsto \mathbb{R}$ est une fonction dérivable et 
+    \[\lim_{x \to a^+} f\left(x\right) = \lim_{x \to b^-} f\left(x\right) = \alpha\]
+    où $\alpha = +\infty$ ou $\alpha = -\infty$.
+
+    Alors, il existe $c \in \left]a, b\right[ $ tel que: 
+    \[f'\left(c\right) = 0\]
+}
+
+\parag{Exemple}{
+    Soit la fonction suivante: 
+    \begin{functionbypart}{f\left(x\right)}
+        x^2 \cos\left(\frac{1}{x}\right), \mathspace x \neq 0 \\
+        0, \mathspace x = 0
+    \end{functionbypart}
+
+    Elle est clairement continue sur $\left[-\frac{1}{2}, \frac{1}{2}\right]$. De plus, on peut voir que, si $x \neq 0$, sa dérivée est donnée par: 
+    \[f'\left(x\right) = 2x\cos\left(\frac{1}{x}\right) - x^2 \sin\left(\frac{1}{x}\right) \left(\frac{-1}{x^2}\right) = 2x\cos\left(\frac{1}{x}\right) + \sin\left(\frac{1}{x}\right)\]
+
+    De plus, calculons la dérivée en $x = 0$: 
+    \[f'\left(0\right) = \lim_{x \to 0} \frac{x^2 \cos\left(\frac{1}{x}\right) - 0}{x - 0} = \lim_{x \to 0} \underbrace{x}_{\to 0} \underbrace{\cos\left(x\right)}_{\text{borné}} = 0\]
+    
+    Finalement, on remarque que $f\left(x\right)$ est paire, donc que $f\left(\frac{1}{2}\right) = f\left(\frac{-1}{2}\right)$. Ainsi, par le théorème de Rolle, on sait que $\exists c \in \left]\frac{-1}{2}, \frac{1}{2}\right[ $ tel que $f'\left(c\right) = 0$.
+
+    On a trouvé que $c = 0$ fonctionnait, mais on en cherche d'autres. Résolvons l'équation suivante: 
+    \[f'\left(x\right) = 2x\cos\left(\frac{1}{x}\right) + \sin\left(\frac{1}{x}\right) = 0 \over{\implies}{$y = \frac{1}{x}$}  \frac{2}{y} \cos\left(y\right) + \sin\left(y\right) = 0 \over{\implies}{$\cos\left(y\right) \neq 0$} \tan\left(y\right) = \frac{-2}{y} \]
+    
+    Puisqu'on cherche $x \in \left] \frac{-1}{2}, \frac{1}{2}\right[ $, on en déduit que $y \in \left]-\infty, -2\right[ \cup \left]2, +\infty\right[$. Puisque $\tan\left(y\right)$ est périodique, on déduit qu'il y a un nombre infini de tel $c$.
+
+    \subparag{Remarque}{
+        $f\left(x\right)$ est un exemple d'une fonction dérivable sur $\left]-\frac{1}{2}, \frac{1}{2}\right[ $, mais pas de class $C^1\left(\left]\frac{-1}{2}, \frac{1}{2}\right[ \right)$.
+
+        En effet, on avait trouvé que la dérivée est donnée par: 
+        \begin{functionbypart}{f'\left(x\right)}
+            f'\left(x\right) = 2x\cos\left(\frac{1}{x}\right) + \sin\left(\frac{1}{x}\right) \\
+            f'\left(0\right) = 0
+        \end{functionbypart}
+
+        Cependant: 
+        \[\lim_{x \to 0} f'\left(x\right) = \lim_{x \to 0} \left(\underbrace{2x}_{\to 0} \underbrace{\cos\left(\frac{1}{x}\right)}_{\text{borné}} + \underbrace{\sin\left(\frac{1}{x}\right)}_{\text{n'existe pas}}\right)\]
+        
+        Ainsi, la limite n'existe pas, donc $f'\left(x\right)$ n'est pas continue en $x = 0$. On en déduit donc bien que $f$ n'est pas de classe $C^1\left(\left]\frac{-1}{2}, \frac{1}{2}\right[\right) $.
+    }
+    
+}
+
+\parag{Théorème des accroissements finis (TAF)}{
+    Soient $a < b \in \mathbb{R}$, et $f: \left[a, b\right] \mapsto \mathbb{R}$ telle que:
+    \begin{enumerate}
+        \item $f$ est continue sur $\left[a, b\right]$
+        \item $f$ est dérivable sur $\left]a, b\right[ $
+    \end{enumerate}
+
+    Alors, il existe au moins un point $c \in \left]a, b\right[ $ tel que: 
+    \[f'\left(c\right) = \frac{f\left(b\right) - f\left(a\right)}{b - a}\]
+    
+    \subparag{Remarque}{
+        On voit que si $f\left(a\right) = f\left(b\right)$, alors on retrouve le théorème de Rolle.
+    }
+    
+    \subparag{Preuve}{
+        Prenons $g$, la droite qui passe par $\left<a, f\left(a\right)\right>$ et $\left<b, f\left(b\right)\right>$. La pente de cette droite est donnée par:
+        \[g'\left(x\right) = \frac{f\left(b\right) - f\left(a\right)}{b - a}\]
+        
+        L'équation de cette droite est donné par: 
+        \[g\left(x\right) = f\left(a\right) + \frac{f\left(b\right) - f\left(a\right)}{b - a} \left(x - a\right)\]
+
+        Prenons maintenant la fonction suivante: 
+        \[h\left(x\right) \over{=}{déf} f\left(x\right) - g\left(x\right) = f\left(x\right) - f\left(a\right) - \frac{f\left(b\right) - f\left(a\right)}{b - a} \left(x - a\right)\]
+
+        On remarque que $h\left(a\right) = 0$ et $h\left(b\right) = 0$ (puisque $g\left(a\right) = f\left(a\right)$ et $g\left(b\right) = f\left(b\right)$ par construction). De plus, on voit que $h\left(x\right)$ est continue sur $\left[a,b\right] $ et dérivable sur $\left]a, b\right[ $. Ainsi, le théorème de Rolle s'applique, donc on sait qu'il existe $c \in \left]a, b\right[ $ tel que $h'\left(c\right) = 0$. Donc: 
+        \[0 = h'\left(c\right) = f'\left(c\right) - g'\left(c\right) = f'\left(c\right) - \frac{f\left(b\right) - f\left(a\right)}{b - a}\]
+
+        Ainsi, on en déduit que:
+        \[f'\left(c\right) = \frac{f\left(b\right) - f\left(a\right)}{b - a}\]
+
+        \qed
+    }
+}
+
+\parag{Corollaire 1}{
+    Soit $f : \left[a, b\right]  \mapsto \mathbb{R}$ une fonction continue sur $\left[a, b\right] $, dérivable sur $\left]a,b\right[ $ et telle que $f'\left(x\right) = 0$ pour tout $x \in \left]a, b\right[ $.
+
+    Alors, cette fonction est constante sur $\left[a, b\right]$.
+
+    \subparag{Preuve}{
+        Supposons par l'absurde qu'il existe $c_1 \neq c_2 \in \left[a, b\right]$ tels que $f\left(c_1\right) \neq f\left(c_2\right)$. Donc, par le TAF, il existe $d \in \left]c_1, c_2\right[ $ tel que: 
+        \[f'\left(d\right) = \frac{f\left(c_2\right) - f\left(c_1\right)}{c_2 - c_1} \neq 0\]
+        
+        Ceci est une contradiction puisqu'on avait dit que $f'\left(x\right) = 0$ pour tout $x \in \left]a, b\right[ $.
+
+        \qed
+    }
+}
+
+\parag{Corollaire 2}{
+    Soit $f\left(x\right)$ et $g\left(x\right)$ deux fonctions continues, dérivables sur $\left]a, b\right[ $ et telles que $f'\left(x\right) = g'\left(x\right)$ pour tout $x \in \left]a, b\right[ $. Alors: 
+    \[f\left(x\right) = g\left(x\right) + \alpha, \mathspace \text{où } \alpha \in \mathbb{R}\]
+    
+    \subparag{Note personnelle}{
+        Commençons par notre hypothèse:
+        \[f'\left(x\right) = g'\left(x\right) \implies f'\left(x\right) - g'\left(x\right) = 0 \implies \left(f\left(x\right) - g\left(x\right)\right)' = 0\]
+
+        Ainsi, par le corollaire 1, il existe $\alpha \in \mathbb{R}$ tel que: 
+        \[f\left(x\right) - g\left(x\right) = \alpha \implies f\left(x\right) = g\left(x\right) + \alpha\]
+        
+        
+    }
+    
+}
+
+\parag{Corollaire 3}{
+    $f'\left(x\right) \geq 0$ pour tout $x \in \left]a, b\right[ $ si et seulement si $f$ est croissante sur $\left]a, b\right[ $.
+    
+    De la même manière, ${\color{red}f'\left(x\right) \leq 0}$ pour tout $x \in \left]a, b\right[ $ si et seulement si $f$ est \textcolor{red}{décroissante} sur $\left]a, b\right[ $.
+
+    Mêmement, ${\color{red}f'\left(x\right) > 0}$ pour tout $x \in \left]a, b\right[ $, \textcolor{red}{alors} $f$ est \textcolor{red}{strictement croissante} sur $\left]a, b\right[ $.
+
+    De manière similaire, ${\color{red}f'\left(x\right) < 0}$ pour tout $x \in \left]a, b\right[ $, \textcolor{red}{alors} $f$ est \textcolor{red}{strictement décroissante} sur $\left]a, b\right[ $.
+
+    \subparag{Remarque}{
+        Si $f$ est strictement croissante, cela n'implique pas que $f'\left(x\right) > 0$ pour tout $x \in \left]a, b\right[ $ (on sait uniquement que $f'\left(x\right) \geq 0$). 
+
+        Par exemple: on peut prendre $f\left(x\right) = x^3$. $f$ est strictement croissante sur $\left[-1, 1\right] $, mais $f'\left(0\right) = 0$.
+
+    }
+    
+    \subparag{Preuve de $\implies$}{
+        Supposons que $f'\left(x\right) > 0$ pour tout $x \in \left]a, b\right[ $. Supposons par l'absurde que $f$ n'est pas strictement croissante sur cet intervalle, donc que $\exists x_1, x_2 \in \left]a, b\right[ $ tels que $f\left(x_1\right) \geq f\left(x_2\right)$ .
+
+        Cependant, par le TAF, on sait qu'il existe $c \in \left]x_1, x_2\right[ $ tel que: 
+        \[f'\left(c\right) = \frac{\overbrace{f\left(x_2\right) - f\left(x_1\right)}^{\leq 0}}{\underbrace{x_2 - x_1}_{> 0}} \leq 0\]
+
+        Ce qui est une contradiction, puisque $f'\left(x\right) > 0$ pour tout $x$.
+
+        La preuve est similaire pour les fonctions croissantes, décroissantes et strictement décroissantes.
+
+        \qed
+    }
+
+    \subparag{Preuve de $\impliedby$}{
+        Supposons que $f\left(x\right)$ est croissante. On remarque que: 
+        \[x > c \implies f\left(x\right) \geq f\left(c\right)\]
+        \[x < c \implies f\left(x\right) \leq f\left(c\right)\]
+        
+        Ainsi, dans les deux cas: 
+        \[\frac{f\left(x\right) - f\left(c\right)}{x - c} \geq 0 \implies f'\left(c\right) = \lim_{x \to c} \frac{f\left(x\right) - f\left(c\right)}{x - c} \geq 0\]
+        
+        Le preuve est similaire si $f$ est décroissante.
+
+        \qed
+    }
+
+}
+
+\parag{Exemple (courant en examen)}{
+    Disons que nous voulons démontrer que l'équation $x + \log\left(x\right) = 0$ a exactement une solution réelle.
+
+    Prenons $f\left(x\right) = x + \log\left(x\right)$. On remarque que c'est une fonction continue et dérivable sur $\left]0, +\infty\right[ $. De plus, on observe que: 
+    \[f\left(1\right) = 1 + \log\left(1\right) = 1 > 0\]
+    \[f\left(\frac{1}{e}\right) = \frac{1}{e} + \log\left(\frac{1}{e}\right) = \frac{1}{e} - \log\left(e\right) = \frac{1}{e} - 1 < 0\]
+    
+    Ainsi, on en déduit par le TVI qu'il existe \textit{au moins} une solution $c \in \left]\frac{1}{e}, 1\right[ $.
+
+    Supposons maintenant par l'absurde qu'il existe au moins deux solutions. Ainsi, $\exists a < b \in \left]0, +\infty\right[  $ tels que $f\left(a\right) = f\left(b\right) = 0$. On en déduit par le théorème de Rolle qu'il existe $d \in \left]a, b\right[ $ tel que $f'\left(d\right) = 0$. Mais, calculons cette dérivée: 
+    \[f'\left(x\right) = 1 + \frac{1}{x} > 0, \mathspace \forall x \in \left]0, +\infty\right[ \]
+    
+    Ce qui est une contradiction avec l'existence d'un $d$ tel que $f'\left(d\right) = 0$. Ainsi, on en déduit qu'il existe \textit{au plus} une solution de $f\left(x\right) = 0$.
+
+    Des deux affirmations, on peut en déduire qu'il existe \textit{exactement} une solution à l'équation $x + \log\left(x\right) = 0$.
+
+    \subparag{Remarque}{
+        Si nous voulions démontrer qu'il y avait exactement 5 solutions, il aurait fallu séparer l'intervalle en 5 sous-intervalles.
+    }
+}
+
+\parag{TAF généralisé}{
+    Soient $f, g : \left[a, b\right] \mapsto \mathbb{R}$ telles que: 
+    \begin{enumerate}
+        \item $f,g$ sont continues sur $\left[a, b\right] $
+        \item $f, g$ sont dérivables sur $\left]a, b\right[ $
+        \item $g'\left(x\right) \neq 0$ sur $\left]a, b\right[ $
+    \end{enumerate}
+    
+    Alors, il existe $c \in \left]a, b\right[ $ tel que: 
+    \[\frac{f'\left(c\right)}{g'\left(c\right)} = \frac{f\left(b\right) - f\left(a\right)}{g\left(b\right) - g\left(a\right)}\]
+    
+    \subparag{Remarque}{
+        On retrouve le théorème des accroissements finis en prenant $g\left(x\right) = x$.
+    }
+}
+
+\subsection{Règle de Bernoulli-L'Hospital}
+\parag{Théorème}{
+    Soient $a < b \in \mathbb{R}$, et $f, g : \left]a, b\right[ \mapsto \mathbb{R} $ deux fonctions dérivables sur $\left]a, b\right[ $ telles que:
+    \begin{enumerate}
+        \item $g\left(x\right) \neq 0$, $g'\left(x\right) \neq 0$ sur $\left]a, b\right[ $
+        \item $\lim\limits_{x \to a^+} f\left(x\right) = \lim\limits_{x \to a^+} g\left(x\right) = +\infty \text{ ou } -\infty \text{ ou } 0$ (l'un des 3, pas les 3)
+        \item $\lim\limits_{x \to a^+} \dfrac{f'\left(x\right)}{g'\left(x\right)} = \mu \in \mathbb{R} \cup \left\{\pm \infty\right\}$
+    \end{enumerate}
+
+    Alors, on en déduit que: 
+    \[\lim_{x \to a^+}  \frac{f\left(x\right)}{g\left(x\right)} = \mu\]
+    
+    \subparag{Preuve}{
+        On considère le cas où 
+        \[\lim_{x \to a^+} f\left(x\right) = \lim_{x \to a^+} g\left(x\right) = 0\]
+        
+        On peut prolonger par continuité $f$ et $g$ en $a$.
+
+        De plus, par le TAF généralisé appliqué sur $\left[a, x\right] $, $\forall x \in \left]a, b\right[ $, on sait que $\exists c\left(x\right)$ tel que $a < c\left(x\right) < x$ et: 
+        \[\frac{f'\left(c\left(x\right)\right)}{g'\left(c\left(x\right)\right)} = \frac{f\left(x\right) - \overbrace{f\left(a\right)}^{= 0}}{g\left(x\right) \underbrace{- g\left(a\right)}_{= 0}} = \frac{f\left(x\right)}{g\left(x\right)}\]
+        puisqu'on a prolongé par continuité $f$ et $g$ en $a$.
+        
+        Par le théorème des deux gendarmes, on remarque que $\lim_{x \to a^+} c\left(x\right) = a^+$. Ainsi: 
+        \[\lim_{x \to a^+} \frac{f\left(x\right)}{g\left(x\right)} = \lim_{x \to a^+} \frac{f'\left(c\left(x\right)\right)}{g'\left(c\left(x\right)\right)} = \lim_{x \to a^+} \frac{f'\left(x\right)}{g'\left(x\right)} = \mu\]
+        où $\mu$ est un nombre réel ou $\pm \infty$ et existe par hypothèse.
+    }
+
+    \subparag{Remarque 1}{
+        On peut remplacer $\lim_{x \to a^+} $ par $\lim_{x \to b^-} $ ou $\lim_{x \to \pm \infty} $.
+    }
+
+    \subparag{Remarque 2}{
+        La non-existence de $\lim_{x \to a^+} \frac{f'\left(x\right)}{g'\left(x\right)}$ n'implique pas la non-existence de $\lim_{x \to a^+} \frac{f\left(x\right)}{g\left(x\right)}$.
+    }
+    
+}
+
+\parag{Exemple}{
+    Calculons la limite suivante sans notre théorème ci-dessus:
+    \[\lim_{x \to \infty} \frac{x - \sin\left(x\right)}{x + \sin\left(x\right)} = \lim_{x \to \infty} \frac{1 - \overbrace{\frac{\sin\left(x\right)}{x}}^{\to 0}}{1 + \underbrace{\frac{\sin\left(x\right)}{x}}_{\to 0}} = 1\]
+
+    Cependant, si on essayait d'appliquer ce théorème, on aurait trouvé une limite qui n'existe pas: 
+    \[\lim_{x \to \infty} \frac{1 - \cos\left(x\right)}{1 + \cos\left(x\right)}\]
+    
+    En effet, prenons les suites $a_k = 2k\pi$ et $b_k = \frac{\pi}{2} + 2k\pi$. Ainsi, on trouve: 
+    \[\lim_{k \to \infty} \frac{1 - \cos\left(2k\pi\right)}{1 + \cos\left(2k\pi\right)} = \lim_{k \to \infty} \frac{1 - 1}{1 + 1} = 0, \mathspace  \lim_{k \to \infty} \frac{1 - \cos\left(\frac{\pi}{2} + 2k\pi\right)}{1 + \cos\left(\frac{\pi}{2} + 2k\pi\right)} = \lim_{k \to \infty} \frac{1 - 0}{1 + 0} = 1\]
+    
+    On n'aurait pas non pu appliquer ce théorème sur la deuxième limite, la première hypothèse n'est pas tenue: $1 + \cos\left(x\right)$ est nul pour une infinité de points.
+}
+
+\parag{Règle de Bernoulli-L'Hospital}{
+    Soient $f, g : \left\{x \in I, x_0 \neq x\right\} \mapsto \mathbb{R}$ (dans les notations de la professeure, $I$ est un intervalle ouvert) telles que:
+    \begin{enumerate}
+        \item $f,g$ sont dérivables sur $I \setminus \left\{x_0\right\}$
+        \item $g\left(x\right) \neq 0$ et $g'\left(x\right) \neq 0$ sur $I \setminus \left\{x_0\right\}$
+        \item $\lim\limits_{x \to x_0} f\left(x\right) = \lim\limits_{x \to x_0} g\left(x\right) = 0 \text{ ou } +\infty \text{ ou } -\infty$
+        \item $\lim\limits_{x \to x_0} \frac{f'\left(x\right)}{g'\left(x\right)} = \mu \in \mathbb{R} \cup \left\{\pm \infty\right\}$
+    \end{enumerate}
+}
+
+\parag{Exemple 1}{
+    Soit $\alpha > 0$. Calculons la limite suivante: 
+    \[\lim_{x \to \infty} \frac{\log\left(x\right)}{x^{\alpha}} \over{=}{BL} \lim_{x \to \infty} \frac{\frac{1}{x}}{\alpha x^{\alpha - 1}} = \lim_{x \to \infty} \frac{1}{\alpha} \frac{1}{x^{\alpha}} \over{=}{$\alpha > 0$} 0, \mathspace \forall \alpha > 0\]
+    
+    On a donc obtenu que: 
+    \[\lim_{x \to \infty} \frac{\log\left(x\right)}{x^{\alpha}} = 0, \mathspace \forall \alpha > 0\]
+    
+}
+
+\parag{Exemple 2}{
+    Prenons la limite: 
+    \[\lim_{x \to 0} \frac{\log\left(1 + x\right)}{x} \over{=}{BL} \lim_{x \to 0} \frac{\frac{1}{1 + x}}{1} = \lim_{x \to 0} \frac{1}{1 + x} = 1\]
+    
+    Ainsi, on a trouvé que:
+    \[\lim_{x \to 0} \frac{\log\left(1 + x\right)}{x} = 1\]
+}
+
+\parag{Exemple 3}{
+    Soit la limite suivante: 
+    \[\lim_{x \to 0} \left(\cos\left(2x\right)\right)^{\frac{3}{x^2}}\]
+    
+    C'est une forme indéterminée $1^{\infty}$. Prenons la définition de l'exponentielle en base $a$: 
+    \[\lim_{x \to 0} \left(\cos\left(2x\right)\right)^{\frac{3}{x^2}} = \lim_{x \to 0} e^{\frac{3}{x^2} \log\left(\cos\left(2x\right)\right)}\]
+
+    Puisque $e^x$ est continue, calculons la limite suivante: 
+    \[\lim_{x \to 0} \frac{3}{x^2} \log\left(\cos\left(2x\right)\right) = \lim_{x \to 0} \frac{\overbrace{3\log\left(\cos\left(2x\right)\right)}^{\to 0}}{\underbrace{x^2}_{\to 0}} = \lim_{x \to 0} \frac{f\left(x\right)}{g\left(x\right)}\]
+    
+    On remarque que $g\left(x\right) = x^2 \neq 0$ au voisinage de $x = 0$ et $g'\left(x\right) = 2x \neq 0$ au voisinage de $x = 0$. Ainsi, BL est applicable si $\lim_{x \to 0} \frac{f'\left(x\right)}{g'\left(x\right)} = \mu \in \mathbb{R} \cup \left\{\pm \infty\right\}$.
+    \[\lim_{x \to 0} \frac{f'\left(x\right)}{g'\left(x\right)} = \lim_{x \to 0} \frac{\frac{3}{\cos\left(2x\right)} \left(-\sin\left(2x\right)\right)\cdot 2}{2x} = \lim_{x \to 0} \underbrace{\frac{\sin\left(2x\right)}{2x}}_{\to 1} \cdot \underbrace{\frac{1}{\cos\left(2x\right)}}_{\to 1} \cdot 2\left(-3\right) = -6 = \lim_{x \to 0} \frac{f\left(x\right)}{g\left(x\right)}\]
+
+    Ainsi, puisque $e^x$ est continue sur $\mathbb{R}$: 
+    \[\lim_{x \to 0} \left(\cos\left(2x\right)\right)^{\frac{3}{x^2}} = \lim_{x \to 0} e^{\frac{3}{x^2} \log\left(\cos\left(2x\right)\right)} = e^{-6} = \frac{1}{e^6}\]
+    
+    Il est assez incroyable d'obtenir un résultat aussi simple après autant de calculs et de théorie! \smiley
+}
+
+
+ 
+
+
+\end{document}

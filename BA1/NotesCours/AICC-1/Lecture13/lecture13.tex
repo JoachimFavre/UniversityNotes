@@ -1,0 +1,291 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-02 at 08:35:32.
+
+\usepackage{../../style}
+
+\title{AICC 1}
+\author{Joachim Favre}
+\date{Mardi 02 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2021-11-02}{$O$-MG there's Alan}{
+    \begin{itemize}[left=0pt]
+        \item Explanation and proof of the Halting problem (Turing $\gg$ all).
+        \item Definition of the Big-$O$ notation.
+        \item Explanation of properties of the Big-$O$.
+        \item Derivation of the Big-$O$ of common functions (constants, logarithms, poly-logarithms, linear, linearithmic, polynomials, exponentials and factorials).
+    \end{itemize}
+
+}
+
+\subsection{The Halting Problem (yay Turing)}
+\parag{Question}{
+    Can we solve any problem by an algorithm? Turing (\smiley) proved that nope!
+
+    It is similar to Gödel proving that not every theorem can be proven, with Gödel's incompleteness theorem.
+}
+
+\parag{Halting problem}{
+    He defined an unsolvable problem, the \important{halting problem}: Can we develop a procedure that takes as input a computer program along with its input and determines whether the program will eventually halt when used with that input?
+
+    For example, a program with a \texttt{while(true)} loop would never stop.
+}
+
+\parag{Theorem}{
+    The halting problem cannot be solved using an algorithm.
+
+    \subparag{Proof}{
+        We are not going to do a completely formal one, since we would else need to know exactly what is a procedure, the input and output and how a procedure can be encoded as a string.
+
+        \vspace{1em}
+
+        Let's assume for contradiction that there is such a procedure, and let's call it $H\left(P, I\right)$, which says whether the program $P$ with the inputs $I$ halts. It could for example output ``halts'' or ``loops forever'' depending on what $P$ does with the inputs $I$.
+
+        Let's construct a procedure $K\left(P\right)$. If $H\left(P, P\right)$ outputs ``loops forever'', them $K\left(P\right)$ halts. If $H\left(P, P\right)$ outputs ``halt'', then $K\left(P\right)$ goes into an infinite loop. This can be easily constructed, since it is basically an if clause.
+
+        \imagehere{HaltinProblemAlgorithmGraph.png}
+
+        Now, we can call $K$ with $K$ as input, i.e. $K\left(K\right)$. If the output of $H\left(K, K\right)$ is ``loops forever'', then $K\left(K\right)$ halts, which is a contradiction. If the output of $H\left(K, K\right)$ is ``halts'', then $K\left(K\right)$ loops forever, which is also a contradiction.
+
+        \qed
+    }
+}
+
+\begin{filecontents*}[overwrite]{collatz.code}
+define function f(n) = n/2 if n is even or 3n + 1 if n is odd
+procedure collatz(n):
+    c := f(n)
+    while c != 1
+        c := f(c)
+    return 0
+\end{filecontents*}
+
+
+\parag{Other example}{
+    Let the following code:
+    \importcode{collatz.code}{pseudo}
+
+    If we have $n = 3$, then we will have the following sequence of c's:
+    \[10, 5, 16, 8, 4, 2, 1\]
+
+    Now, let's pick $n = 7$:
+    \[22, 11, 34, 17, 52, 26, 13, 40, 20, 10, 5, 16, 8, 4, 2, 1\]
+
+    The Collatz conjecture (``conjecture de Syracuse'') says that \texttt{collatz(n)} halts for all integers $n$. This is considered one of the most difficult problem nowadays.
+
+    Now we can try to write a program that halts when the Collatz conjecture is false. If it was possible, then it would be very easy to prove mathematical problems.
+
+    \vspace{1em}
+
+    Personal note: I'm not sure I agree with this case, we ``only'' have to prove the Collatz conjecture is true or false, and then we have a one-line-long program returning \texttt{true} or \texttt{false} depending on what we proved. I think a better example is that, we know some theorems cannot be proven (maybe the Collatz conjecture is one of those, but we don't know) thanks to Gödel's incompleteness theorem; thus writing a program that predicts the result of such theorem is a contradiction to Gödel's theorem.
+}
+
+
+\section{Measuring complexity}
+\parag{Amount of details}{
+    We have different amounts of details we can take into account.
+    \begin{enumerate}
+        \item Precisely count everything involved (computer instructions, disk accesses, \ldots).
+
+            It is very inconvenient and will not be the same on every computers.
+        \item Measure the amount of time a program takes on a computer.
+
+            If sorting a list of $n$ elements takes $\SI{2}{\second }$, then we would not be able to know how much time it takes to sort a list of $2n$ elements.
+    \end{enumerate}
+
+    This last sentence is important, it would be great if, for example, knowing that a program sorted $n$ elements in $s$ seconds, we could deduce how much time it would take to sort $m$ elements.
+}
+
+\parag{Example}{
+    Assume we want to run the following algorithm:
+    \begin{enumerate}
+        \item Create a list of 3000 random numbers and sort it using bubble sort.
+        \item Create $n$ lists of length 1500 and sort them using bubble sort.
+        \item Create a list of length $400\cdot n$ and sort it using bubble sort.
+    \end{enumerate}
+
+    \imagehere[0.75]{OptimisationExampleGraph.png}
+
+    We can see some imperfections, it is due to the fact that it was done on a real computer, so there might be another task coming, and so.
+
+    The blue dots are constants, it is the first task. The orange dots are linear, they are the second task. And, the green dots are quadratic, they represent the third task.
+
+    We have approximately:
+    \begin{enumerate}
+        \item $\SI{1000}{\milli\second }$ for the first task; it is independent of $n$
+        \item $\SI{200n}{\milli\second }$ for the second task
+        \item $\SI{1.5n^2}{\milli\second }$ for the third task
+    \end{enumerate}
+
+    We can thus estimate the time spent using:
+    \[f\left(n\right) = 1.5n^2 + 200n + 1000\]
+
+    So, for a small $n$, then the first task dominates the cost. Then, some time later, it's the second one. However, finally, it's the third tasks that takes over. In other words, ultimately, only $g\left(n\right) = 1.5n^2$ is relevant, the others do not have any impact.
+}
+
+\parag{Observations}{
+    In the last paragraph, we realised that, if we have the following function:
+    \[f\left(n\right) = g\left(n\right) + h\left(n\right) + \ldots + t\left(n\right)\]
+
+    Then, only the ``ultimately largest'' of $g, h, \ldots, t$ determines $f$'s behaviours when $n$ gets large.
+
+    Moreover, $f\left(n\right)$'s growth rate is independent of multiplicative constants in $g\left(n\right)$, since on different computers, there might be different CPUs, so, anyway, there would be a constant here (it might be twice as slow, for example). We can see that with another property:
+    \[\frac{g\left(m\right)}{g\left(n\right)} = \frac{cg\left(m\right)}{cg\left(n\right)}\]
+}
+
+\parag{Consequence}{
+    So, when considering a runtime function for $f\left(n\right)$, we focus on parts that grows the fastest when $n\to \infty$, and we forget about multiplicative constants.
+
+    Using those two ideas, we come up with the Big-$O$ notation.
+}
+
+\parag{Big-$O$ notation}{
+    Let $f$ and $g$ be functions from the set of integers or the set of real numbers to the set of real numbers. We say that $f\left(x\right)$ is $O\left(g\left(x\right)\right)$ if there are constants $C$ and $k$ such that:
+    \[\left|f\left(x\right)\right| \leq C\left|g\left(x\right)\right|, \mathspace \forall x > k\]
+
+    This is read as ``$f\left(x\right)$ is big-$O$ of $g\left(x\right)$'' or, ``$g$ asymptotically dominates $f$''.
+
+    The constants $C$ and $k$ are called \important{witnesses} to the relationship ``$f\left(x\right)$ is $O\left(g\left(x\right)\right)$''. We only need to find one pair of witnesses to prove the relation.
+
+    We will write ``$f\left(n\right)$ is $O\left(g\left(n\right)\right)$'' when we use natural numbers. The definition is the same.
+
+    \subparag{Remark}{
+        Sometimes ``$f\left(x\right) = O\left(g\left(x\right)\right)$'' is used in literature, however it's an abuse of the equality sign. We could use $f\left(x\right) \in O\left(g\left(x\right)\right)$ since $O\left(g\left(x\right)\right)$ is the set of functions that have this big-$O$ notation, but nobody uses that.
+    }
+}
+
+\parag{Example}{
+    We want to show that $f\left(x\right) = x^2 + 2x + 1$ is $O\left(x^2\right)$.
+
+    An interesting fact is that, for $x > 0$, then $f\left(x\right) > x^2$. However, we will be able to prove the property using the multiplicative constant.
+
+    \subparag{Proof}{
+        If $x > 1$, then $x^2 > x$ and $x^2 > 1$. So:
+        \[\left|f\left(x\right)\right| = f\left(x\right) = x^2 + 2x + 1 < x^2+ 2x^2 + x^2 = 4x^2\]
+
+        So, with $C = 4$ and $k = 1$, then:
+        \[\left|f\left(x\right)\right| < Cx^2, \mathspace \forall x > k\]
+    }
+
+    \imagehere{IllustrationBigONotationExample.png}
+}
+
+\parag{Example 2}{
+    We want to show that $x^2$ is not $O\left(x\right)$.
+
+    Let's assume for contradiction that there exists $k$ and $C$ such that
+    \[x^2 \leq Cx, \forall x > k\]
+
+    Thus, we get that:
+    \[x^2 \leq Cx \implies x \leq C\]
+
+    But it is not true $\forall x > k$ if we have $x \leq C$ (the professor used another method, but I have to admit I prefer this one).
+
+    \qed
+}
+
+\parag{Examples}{
+    \begin{itemize}[left=0pt]
+        \item 75 is $O\left(1\right)$ and 1 is $O\left(75\right)$
+        \item 1 is $O\left(x\right)$ but $x$ is not $O\left(1\right)$.
+        \item $x$ is $O\left(x^2\right)$ but $x^2$ is not $O\left(x\right)$.
+        \item $x^2$ is $O\left(x^2\right)$
+        \item $x^2$ is $O\left(x^3\right)$
+        \item $x^2$ is $O\left(6x^2 + x + 3\right)$ and $6x^2 + x + 3$ is $O\left(x^2\right)$
+    \end{itemize}
+
+    Note that $O\left(75\right)$ and $O\left(6x^2 + x + 3\right)$ are unusual.
+}
+
+\parag{Theorem (Big-$O$ for polynomials)}{
+    Let $f\left(x\right) = a_n x^{n} + \ldots + a_1 x + a_0$, where $a_0, \ldots, a_n$ are real numbers and $a_n \neq 0$. Then, $f\left(x\right)$ is $O\left(x^{n}\right)$.
+
+    \subparag{Proof}{
+        If $x > 1$, then $x^{n} > x^{n - k}$ for $k = 1, \ldots, n$. So:
+        \begin{multiequality}
+            \left|a_n x^{n} + a_{n-1} x^{n-1} \ldots + a_0\right| & \leq \left|a_n x^{n}\right| + \left|a_{n-1} x^{n-1}\right| \ldots + \left|a_0\right|  \\
+                                                                  & \leq \left|a_n\right|\left|x^{n}\right| + \left|a_{n-1}\right|\left|x^{n-1}\right| + \ldots a_0  \\
+                                                                  & \leq \left|a_n\right|x^{n} + \left|a_{n-1}\right|x^{n} + \ldots + \left|a_0\right|x^{n}  \\
+                                                                  & = \left(\left|a_n\right| + \left|a_{n-1}\right| + \ldots + \left|a_0\right|\right)x^{n}  \\
+                                                                  & = Cx^{n}
+        \end{multiequality}
+
+    }
+}
+
+\parag{Monomials}{
+    Let $n, m$ constants, with $n > m$. We have that $x^{m}$ is $O\left(x^{n}\right)$ but $x^{n}$ is not $O\left(x^{m}\right)$.
+}
+
+\parag{Logarithms}{
+    Let $a, b, n, m$ be constants, with $a > 0$, $b >0$ and $n > m$.
+
+    $\log_b\left(x^{m}\right)$ is $O\left(\log_a\left(x^{n}\right)\right)$ and $\log_a\left(x^{n}\right)$ is $O\left(\log_b\left(x^{m}\right)\right)$. Indeed:
+    \[\log_b\left(x^{m}\right) = m \log_b\left(x\right) = \frac{m}{\log\left(b\right)} \log\left(x\right)\]
+
+    More specifically, and more importantly, they are all $O\left(\log\left(x\right)\right)$. For a logarithm, its basis and the power inside do not matter.
+}
+
+\parag{Factorial function}{
+    Let the following function:
+    \[f\left(n\right) = n! = 1\cdot 2 \cdot \ldots \cdot n\]
+
+    Then, we have:
+    \[n! = 1\cdot 2\cdot\ldots\cdot n \leq n\cdot n\cdot\ldots\cdot n = n^{n}\]
+
+    So, $n!$ is $O\left(n^{n}\right)$ taking $C = 1$ and $k = 1$.
+
+    Moreover, we see that
+    \[\log\left(n!\right) \leq \log\left(n^{n}\right) = n\log\left(n\right)\]
+
+    Hence, we deduce that $\log\left(n!\right)$ is $O\left(n\log\left(n\right)\right)$ taking $C = 1$ and $k = 1$. This is a big-$O$ that is often found, which grows a bit faster than linearly. Since it is a combination of a logarithmic and a linear function, we call it linearithmic. It's considered good for an algorithm.
+}
+
+\parag{Combinations of functions}{
+    \begin{itemize}[left=0pt]
+        \item It is transitive. In other words, if $f\left(x\right)$ is $O\left(g\left(x\right)\right)$ and $g\left(x\right)$ is $O\left(h\left(x\right)\right)$ then $f\left(x\right)$ is $O\left(h\left(x\right)\right)$.
+        \item It preserves multiplication. In other words, if $f_1\left(x\right)$ is $O\left(g_1\left(x\right)\right)$ and $f_2\left(x\right)$ is $O\left(g_2\left(x\right)\right)$, then $\left(f_1\cdot f_2\right)\left(x\right)$ is $O\left(\left(g_1\cdot g_2\right)\left(x\right)\right)$.
+        \item We can add functions that have the same growth without changing anything. In other words, if $f_1\left(x\right)$ and $f_2\left(x\right)$ are both $O\left(g\left(x\right)\right)$, then $\left(f_1 + f_2\right)\left(x\right)$ is also $O\left(g\left(x\right)\right)$.
+        \item More precisely, if we add two functions that have different growth, then only the one with the highest matters (just like black lives, they matter). In other words, if $f_1\left(x\right)$ is $O\left(g_1\left(x\right)\right)$ and $f_2\left(x\right)$ is $O\left(g_2\left(x\right)\right)$, then $\left(f_1 + f_2\right)\left(x\right)$ is $O\left(\max\left(\left|g_1\left(x\right)\right|, \left|g_2\left(x\right)\right|\right)\right)$.
+    \end{itemize}
+
+
+    \subparag{Proof of the last fact}{
+        We know that there exists $k_1, k_2, C_1, C_2$ such that
+        \[\left|f_1\left(x\right)\right| \leq C_1\left|g_1\left(x\right)\right|, \mathspace x \geq k_1\]
+        \[\left|f_2\left(x\right)\right| \leq C_2\left|g_2\left(x\right)\right|, \mathspace x \geq k_2\]
+
+        Let's take $k = \max\left(k_1, k_2\right)$, and $g\left(x\right) = \max\left(g_1\left(x\right), g_2\left(x\right)\right)$. Then, for $x > k$, we have:
+        \begin{multiequality}
+            \left|f_1\left(x\right) + f_2\left(x\right)\right| & \leq \left|f_1\left(x\right)\right| + \left|f_2\left(x\right)\right|  \\
+                                                               & \leq C_1\left|g_1\left(x\right)\right| + C_2\left|g_2\left(x\right)\right|  \\
+                                                               & \leq C_1 \left|g\left(x\right)\right| + C_2 \left|g\left(x\right)\right|  \\
+                                                               & = \left(C_1 + C_2\right)\left|g\left(x\right)\right|
+        \end{multiequality}
+
+
+        So, taking $C = C_1 + C_2$, this property holds as  well.
+    }
+}
+
+\parag{Summary}{
+    Let's take functions $f : \mathbb{R}_+ \mapsto \mathbb{R}$. We have the following order of growth:
+    \begin{description}
+        \item[Constant:] $O(1)$
+        \item[Logarithmic:] $O\left(\log x\right)$
+        \item[Poly-logarithmic:] $O\left(\left(\log x\right)^{d}\right)$, where $d > 1$
+        \item[Linear:] $O\left(x\right)$
+        \item[Linearithmic:] $O\left(x\log x\right)$
+        \item[Polynomial:] $O\left(x^{d}\right)$, where $d > 1$
+        \item[Exponential:] $O\left(b^{x}\right)$, where $b > 0$
+        \item[Factorial:] $O\left(x^{x}\right)$
+    \end{description}
+
+    Until polynomial growth, it is still acceptable. However, exponential growth or more is very bad for an algorithm. Even though there is only one step in this list between polynomial and exponential growth, the difference is huge.
+
+}
+
+\end{document}

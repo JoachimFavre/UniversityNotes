@@ -1,0 +1,409 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-13 at 10:44:23.
+
+\usepackage{../../style}
+
+\title{Analyse 1}
+\author{Joachim Favre}
+\date{Lundi 13 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{23}{2021-12-13}{Maintenant on fait des additions, facile aussi!}{
+\begin{itemize}[left=0pt]
+    \item Définition des subdivisions et des sommes de Darboux supérieure et inférieure.
+    \item Définition de l'intégrale de Riemann.
+    \item Démonstration du théorème de la moyenne.
+    \item Démonstration du théorème fondamental du calcul intégral, partie 1 et 2.
+    \item Démonstration des propriétés des intégrales.
+    \item Explication et démonstration de la méthode d'intégration, dite du changement de variable.
+\end{itemize}
+}
+
+\section{Calcul intégral}
+\subsection{Intégrale d'une fonction continue}
+
+\parag{Subdivision}{
+    Soit $\left[a, b\right]$ un intervalle. Une \important{subdivision} de $\left[a, b\right]$ est un ensemble tel que:
+    \[\sigma = \left\{x_0, = a < x_1 < x_2 < \ldots x_n = b\right\}\]
+
+    On définit aussi le \important{pas de subdivision} tel que: 
+    \[\mathcal{P}\left(\sigma\right) = \max\left\{x_i - x_{i-1}\right\}\]
+
+    \subparag{Subdivision régulière}{
+        Une subdivision régulière d'ordre $n$ est donnée par: 
+        \[\sigma = \left\{a, a + \frac{b - a}{n}, \ldots, a + k \frac{b - a}{n}, \ldots, b\right\} \implies \mathcal{P}\left(\sigma\right) = \frac{b-a}{n}\]
+    }
+}
+
+\parag{Définition: Sommes de Darboux}{
+    Soient $f : \left[a, b\right] \mapsto \mathbb{R}$ une fonction continue, et $\sigma$, une subdivision de $\left[a, b\right]$.
+
+    Alors, la \important{somme de Darboux supérieure} de $f$ relativement à $\sigma$ est donnée par: 
+    \[\bar{S_{\sigma}}\left(f\right) \over{=}{déf} \sum_{k=1}^{n} M_k\left(x_k - x_{k - 1}\right), \mathspace \text{où } M_k = \max_{x_{k-1}, x_k}f\left(x\right)\]
+    
+    De plus, la \important{somme de Darboux inférieure} de $f$ relativement à $\sigma$ est donnée par:
+    \[\underline{S_{\sigma}}\left(f\right) \over{=}{déf} \sum_{k=1}^{n} {\color{red}m_k}\left(x_k - x_{k - 1}\right), \mathspace \text{où } {\color{red}m_k} = {\color{red}\min_{{\color{black}x_{k-1}, x_k}}}f\left(x\right)\]
+
+    On sait que ces minimums et maximums existent, les $M_k$ et les $m_k$, puisque la fonction est continue et on considère un intervalle fermé borné.
+
+    \imagehere[0.5]{sommeDarbouxDefinition.png}
+
+    \subparag{Observation}{
+        On peut voir l'inégalité suivante:
+        \[m\left(b - a\right) < \underline{S_{\sigma}}\left(f\right) \leq \bar{S_{\sigma}}\left(f\right) \leq M\left(b - a\right)\]
+        
+        Avec: 
+        \[m = \min_{\left[a, b\right]} f\left(x\right), \mathspace M = \max_{\left[a, b\right]}f\left(x\right)\]
+    }
+}
+
+\parag{Remarque}{
+    Regardons le dessin suivant:
+    \imagehere[0.5]{sommeDarbouxInegalite.png}
+
+    Il est clair que, si $\sigma_1 \subset \sigma_2$ (c'est-à-dire qu'on ajoute des points), alors:
+    \[\underline{S_{\sigma_1}}\left(f\right) \leq \underline{S_{\sigma_2}}\left(f\right) \leq \bar{S_{\sigma_2}}\left(f\right) \leq \bar{S_{\sigma_1}}\left(f\right)\]
+}
+
+\parag{Proposition}{
+    Soient:
+    \[\bar{S}\left(f\right) = \inf\left\{\bar{S_{\sigma}}\left(f\right), \sigma \text{ subdivisions de } \left[a, b\right]\right\}\]
+    \[\underline{S}\left(f\right) = \sup\left\{\underline{S_{\sigma}}\left(f\right), \sigma \text{ subdivisions de } \left[a, b\right]\right\}\]
+
+    Alors, si $f$ est continue sur $\left[a, b\right]$, on a que $\bar{S}\left(f\right) = \underline{S}\left(f\right)$.
+
+    \subparag{Note personnelle}{
+        Par l'inégalité qu'on a remarquée ci-dessus, je pense que cela implique que, par le théorème des deux gendarmes:
+        \[\bar{S}\left(f\right) = \underline{S}\left(f\right) = \lim_{n \to \infty} \bar{S_{\sigma_n}}\left(f\right) = \lim_{n \to \infty} \underline{S_{\sigma_n}}\left(f\right)\]
+        où $\left\{\sigma_n\right\}$ est une suite de subdivisions de $\left[a, b\right]$ telle que:
+        \[\lim_{n \to \infty} \mathcal{P}\left(\sigma_n\right) = 0\]
+
+        Ce fait est utilisé ci-après, et je pense qu'il découle de là.
+    }
+    
+}
+
+\parag{Définition: intégrale de Riemann}{
+    Soit $f : \left[a, b\right] : \mathbb{R}$ une fonction continue, avec $a < b$. Alors, on définit \important{l'intégrale de Riemann} de la fonction $f$ sur $\left[a, b\right]$:
+    \[\int_{a}^{b} f\left(x\right)dx \over{=}{déf} \bar{S}\left(f\right) = \underline{S}\left(f\right)\]
+    
+    \subparag{Terminologie}{
+        On appelle le $a$ la borne inférieure, le $b$ la borne supérieure, et le $x$ la variable d'intégration.
+    }
+
+    \subparag{Note personnelle}{
+        On donne le nom de Riemann à cette définition car on peut aussi définir d'autres intégrales, comme l'intégrale de Lebesgue.
+    }
+    
+}
+
+\parag{Définition: échange de borne}{
+    Si $b < a$, alors on définit: 
+    \[\int_{a}^{b} f\left(x\right)dx \over{=}{déf} -\int_{b}^{a} f\left(x\right)dx\]
+    
+    De plus, si $b = a$: 
+    \[\int_{a}^{a} f\left(x\right)dx = 0\]
+}
+
+\parag{Calcul d'intégrale}{
+    On remarque qu'on peut calculer nos intégrales de la manière suivante: 
+    \[\int_{a}^{b} f\left(x\right)dx = \lim_{n \to \infty} \bar{S_{\sigma_n}}\left(f\right) = \lim_{n \to \infty} \underline{S_{\sigma_n}}\]
+    où $\left\{\sigma_n\right\}$ est une suite de subdivisions de $\left[a, b\right]$ telle que:
+    \[\lim_{n \to \infty} \mathcal{P}\left(\sigma_n\right) = 0\]
+}
+
+\parag{Exemple}{
+    Supposons que nous voulons calculer l'intégrale suivante: 
+    \[\int_{0}^{3} xdx\]
+    
+    Prenons la suite de subdivisions suivante: 
+    \[\sigma_n = \left\{0, \frac{3}{n}, 2\cdot \frac{3}{n}, \ldots, \left(n-1\right) \frac{3}{n}, 3\right\}\]
+    
+    Ce sont des subdivisions où $x_k = k \cdot \frac{3}{n}$, donc des subdivisions régulières.
+
+    Puisque la fonction est croissante, on a: 
+    \[M_k = \max_{\left[x_{k-1}, x_k\right]}f\left(x\right) = \frac{3k}{n}, \mathspace m_k = \min_{\left[x_{k-1}, x_k\right]}f\left(x\right) = \frac{3\left(k-1\right)}{n}\]
+    
+    Ainsi, on peut calculer les sommes de Darboux: 
+    \[\bar{S_{\sigma_n}}\left(f\right) = \sum_{k=1}^{n} M_k \left(x_k - x_{k-1}\right) = \sum_{k=1}^{n} \frac{3k}{n} \frac{3}{n} = \frac{9}{n^2} \sum_{k=1}^{n} k = \frac{9}{n^2} \frac{n\left(n+1\right)}{2}\]
+    \[\underline{S_{\sigma_n}}\left(f\right) = \sum_{k=1}^{n} m_k \left(x_k - x_{k-1}\right) = \sum_{k=1}^{n} \frac{3\left(k - 1\right)}{n} \frac{3}{n} = \frac{9}{n^2} \sum_{k=1}^{n} \left(k-1\right) = \frac{9}{n^2} \frac{n\left(n-1\right)}{2}\]
+    
+    On peut maintenant calculer leur limite:
+    \[\lim_{n \to \infty} \bar{S_{\sigma_n}}\left(f\right) = \lim_{n \to \infty} \frac{9n\left(n+1\right)}{2n^2} = \frac{9}{2}\]
+    \[\lim_{n \to \infty} \underline{S_{\sigma_n}}\left(f\right) = \lim_{n \to \infty} \frac{9n\left(n-1\right)}{2n^2} = \frac{9}{2}\]
+
+    Ce qui était attendu, puisqu'on a un théorème disant que ces deux sommes se rejoignent quand $n \to \infty$ si la fonction est continue. On a donc: 
+    \[\int_{0}^{3} xdx = \frac{9}{2}\]
+    
+    Ce qui est bien l'aire sous la courbe; nous aurions pu la calculer en considérant le triangle qu'elle dessine.
+}
+
+\parag{Propriété 1}{
+    Soit $f\left(x\right)$ continue sur $\left[a,b\right]$, et $c \in \left[a, b\right]$. Alors: 
+    \[\int_{a}^{b} f\left(x\right)dx = \int_{a}^{c} f\left(x\right)dx + \int_{c}^{b} f\left(x\right)dx\]
+}
+
+\parag{Propriété 2}{
+    Comme mentionné plus tôt:
+    \[m\left(b - a\right) < \underline{S_{\sigma}}\left(f\right) \leq \bar{S_{\sigma}}\left(f\right) \leq M\left(b - a\right)\]
+
+    Où:
+    \[m = \min_{\left[a, b\right]} f\left(x\right), \mathspace M = \max_{\left[a, b\right]}f\left(x\right)\]
+
+    Ainsi, on en déduit que: 
+    \[m\left(b - a\right) \leq \int_{a}^{b} f\left(x\right) dx \leq M\left(b - a\right)\]
+}
+
+\parag{Théorème de la moyenne}{
+    Soit $f\left(x\right)$ une fonction continue sur $\left[a, b\right]$, avec $a < b$. 
+
+    Alors, il existe un point $c \in \left[a, b\right]$ tel que: 
+    \[\int_{a}^{b} f\left(x\right) dx = f\left(c\right)\left(b - a\right)\]
+    
+    \imagehere[0.7]{theoremeValeurMoyenneIntegrale.png}
+
+    \subparag{Intuition}{
+        Ce théorème peut être compris de deux manières différentes. La première est, comme sur l'image ci-dessus, de voir qu'il existe un point $c$ tel que l'air du rectangle de hauteur $f\left(c\right)$ est égal à l'aire sous la courbe.
+        
+        Pour voir ce théorème de la deuxième manière, on peut diviser des deux côtés par $b - a$: 
+        \[f\left(c\right) = \frac{1}{b-a} \int_{a}^{b} f\left(x\right)dx\]
+        
+        Ainsi, on voit qu'il existe un point $c$ tel que $f\left(c\right)$ est la valeur moyenne de la fonction sur cet intervalle.
+    }
+    
+
+    \subparag{Preuve}{
+        On sait que: 
+        \[m\left(b-a\right) \leq \frac{1}{b-a} \int_{a}^{b} f\left(x\right) dx \leq M \implies m \leq \frac{1}{b-a} \int_{a}^{b} f\left(x\right)dx \leq M \]
+        
+        Avec:
+        \[m = \min_{\left[a, b\right]} f\left(x\right), \mathspace M = \max_{\left[a, b\right]}f\left(x\right)\]
+
+        Puisque $f$ est continue sur $\left[a, b\right]$, on en déduit par le théorème de la valeur intermédiaire qu'il existe $c \in \left[a, b\right]$ tel que: 
+        \[f\left(c\right) = \frac{1}{b-a}\int_{a}^{b} f\left(x\right)dx \implies f\left(c\right)\left(b - a\right) = \int_{a}^{b} f\left(x\right)dx\]
+        \qed
+    }
+}
+
+\subsection{Relation entre l'intégrale et la primitive}
+\parag{Rappel}{
+    Une primitive $F\left(x\right)$ d'une fonction continue $f\left(x\right)$ sur $\left[a, b\right]$ est une fonction continue sur $\left[a,b\right]$, dérivable sur $\left]a,b\right[ $, telle que: 
+    \[F'\left(x\right) = f\left(x\right), \mathspace \forall x \in \left]a, b\right[ \]
+    
+    De plus, on sait que si $F_1\left(x\right)$ et $F_2\left(x\right)$ sont deux primitives de $f\left(x\right)$ sur $\left[a, b\right]$, alors: 
+    \[\exists C \in \mathbb{R} \ \forall x \in \left[a, b\right] \ F_1\left(x\right) = F_2\left(x\right) + C\]
+}
+
+\parag{Théorème fondamental du calcul intégral partie 1}{
+    Soient $a < b$ et $f$ une fonction continue sur $\left[a,b\right]$. 
+
+    Alors, la fonction suivante est la primitive de $f\left(x\right)$ sur $\left[a, b\right]$ telle que $F\left(a\right) = 0$: 
+    \[F\left(x\right) = \int_{a}^{x} f\left(t\right)dt\]
+    
+    \subparag{Note}{
+        Notez que, puisqu'on utilise $x$ dans les bornes de l'intégrale, alors on ne peut pas l'utiliser comme variable d'intégration. Cependant, c'est une ``\textit{dummy variable}'', donc on pourrait utiliser n'importe quel symbole (comme \smiley, par exemple).
+    }
+
+    \subparag{Preuve}{
+        Soit $x_0 \in \left]a, b\right[ $. Considérons la fraction suivante: 
+        \begin{multiequality}
+        \frac{F\left(x\right) - F\left(x_0\right)}{x - x_0} =\ & \frac{1}{x - x_0} \left(\int_{a}^{x} f\left(t\right)dt - \int_{a}^{x_0} f\left(t\right)dt\right)  \\
+        =\ & \frac{1}{x - x_0} \left(\int_{a}^{x_0} f\left(t\right)dt + \int_{x_0}^{x} f\left(t\right)dt - \int_{a}^{x_0} f\left(t\right)dt \right) \\
+        =\ & \frac{1}{x - x_0} \int_{x_0}^{x} f\left(t\right)dt  \\
+        =\ & f\left(c\left(x\right)\right) \text{ où } c\left(x\right) \text{ est un point entre $x_0$ et $x$}
+        \end{multiequality}
+        par le théorème de la moyenne.
+
+        Ainsi, on peut considérer la limite. On sait que la fonction est continue, donc:
+        \begin{multiequality}
+            F'\left(x_0\right) =\ &  \lim_{x \to x_0}  \frac{F\left(x\right) - F\left(x_0\right)}{x - x_0}  \\
+            =\ & \lim_{x \to x_0} f\left(c\left(x\right)\right) \\
+            =\ & f\left(x_0\right)
+        \end{multiequality}
+
+        On a donc trouvé que: 
+        \[F'\left(x_0\right) = f\left(x_0\right), \mathspace \forall x_0 \in \left]a, b\right[ \]
+        
+        Finalement, on voit que, par définition: 
+        \[F\left(a\right) = \int_{a}^{a} f\left(t\right)dt = 0\]
+
+        Il nous faudrait aussi vérifier les égalités suivantes pour être complètement formels, mais nous ne le ferons pas ici.
+        \[\lim_{x \to a^+} F\left(x\right) = F\left(a\right) = 0, \mathspace \lim_{x \to b^-} F\left(x\right) = F\left(b\right)\]
+        
+        \qed
+    }
+}
+
+\parag{Corollaire: Théorème fondamental du calcul intégral partie 2}{
+    Soient $a < b$ et $f\left(x\right)$ continue sur $\left[a,b\right]$.
+
+    Si $G\left(x\right)$ est une primitive de $f\left(x\right)$ sur $\left[a, b\right]$, alors: 
+    \[\int_{a}^{b} f\left(x\right) dx = G\left(b\right) - G\left(a\right)\]
+    
+    \subparag{Preuve}{
+        On sait déjà que la fonction suivante est une primitive de $f\left(x\right)$ sur $\left[a, b\right]$: 
+        \[F\left(x\right) = \int_{a}^{x} f\left(t\right)dt\]
+        
+        Alors, on a $F\left(x\right) = G\left(x\right) + C$ pour tout $x \in \left[a, b\right] $. Ainsi, on en déduit que: 
+        \[G\left(b\right) - G\left(a\right) = F\left(b\right) - F\left(a\right) = \int_{a}^{b} f\left(t\right) - \int_{a}^{a} f\left(t\right)dt = \int_{a}^{b} f\left(t\right)dt\]
+
+        \qed
+    }
+
+    \subparag{Note personnelle}{
+        Comme d'habitude, l'intuition derrière les maths est très importante pour moi. Je me permets donc de vous diriger vers deux vidéos de 3Blue1Brown. Premièrement, voici l'explication de pourquoi on peut calculer des intégrales définies (donc des aires) à l'aide de primitives:
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=rfG8ce4nNh0}
+        \end{center}
+
+        De plus, voici sa vidéo expliquant plus en détails le lien entre l'aire et la pente, pourquoi calculer la pente est l'opération inverse à calculer une aire:
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=FnJqaIESC2s}
+        \end{center}
+
+        \textit{(Oui, si vous ne l'aviez pas compris, 3Blue1Brown est un crack absolu, et va complètement nous carry pendant nos études.)}
+    }
+    
+}
+
+\parag{Primitives remarquables}{
+    On peut dessiner les tableaux suivants:
+
+    \begin{center}
+    \begin{tabular}{|c|c|}
+        \hline
+        \fullbf{$f\left(x\right)$} & \fullbf{$F\left(x\right)$}  \\
+        \hline
+        $\displaystyle e^x$ & $\displaystyle e^x + C$  \\
+        $\displaystyle \sin\left(x\right)$ & $\displaystyle -\cos\left(x\right) + C$ \\
+        $\displaystyle \cos\left(x\right)$ & $\displaystyle \sin\left(x\right) + C$ \\
+        $\displaystyle \sinh\left(x\right)$ & $\displaystyle \cosh\left(x\right) + C$ \\
+        $\displaystyle \cosh\left(x\right)$ & $\displaystyle \sinh\left(x\right) + C$  \\
+        $\displaystyle a^x, a > 0, a \neq 1$ & $\displaystyle \frac{1}{\log a} a^x + C$ \\
+        \hline
+    \end{tabular}
+    \hspace{1em}
+    \begin{tabular}{|c|c|}
+        \hline
+        \fullbf{$f\left(x\right)$} & \fullbf{$F\left(x\right)$}  \\
+        \hline
+        $\displaystyle \frac{1}{x}$ & $\displaystyle \log\left|x\right| + C$ \\
+        $\displaystyle x^r, r \neq -1$ & $\displaystyle \frac{1}{r + 1} x^{r + 1} + C$  \\
+        $\displaystyle \frac{1}{\cos^2\left(x\right)}$ & $\displaystyle \tan\left(x\right) + C$ \\
+        $\displaystyle \frac{1}{\sin^2\left(x\right)}$ & $\displaystyle -\cot\left(x\right) + C$ \\
+        $\displaystyle \frac{1}{1 + x^2}$ & $\displaystyle \arctan\left(x\right) + C$  \\
+        $\displaystyle \frac{1}{\sqrt{1 - x^2}}$ & $\displaystyle \arcsin\left(x\right) + C$ \\
+        \hline
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Exemple}{
+    Calculons l'intégrale suivante: 
+    \[\int_{0}^{\pi} \sin\left(x\right)dx = -\cos\left(x\right) \eval_{0}^{\pi} = -\cos\left(\pi\right) - \left(-\cos\left(0\right)\right) = 1 + 1 = 2\]
+    
+    \subparag{Remarque}{
+        Il est beau que l'intégrale de 0 jusqu'à $\pi$ --- un nombre transcendant --- de $\sin\left(x\right)$ donne un nombre naturel.
+    }
+}
+
+\parag{Linéarité}{
+    Les intégrales sont linéaires:
+    \[\int_{a}^{b} \left(\alpha f\left(x\right) + \beta g\left(x\right)\right)dx = \alpha \int_{a}^{b} f\left(x\right) + \beta \int_{a}^{b} g\left(x\right)dx\]
+
+    En effet, on a que: 
+    \[\left(\alpha F\left(x\right) + \beta G\left(x\right)\right)' = \alpha f\left(x\right) + \beta g\left(x\right)\]
+}
+
+\parag{Relation d'ordre}{
+    Si $f\left(x\right) \leq g\left(x\right)$ pour tout $x \in \left[a, b\right] $, alors: 
+    \[\int_{a}^{b} f\left(x\right)dx \leq \int_{a}^{b} g\left(x\right) dx\]
+
+    \subparag{Idée de preuve}{
+        Si $f\left(x\right) \geq 0$ pour tout $x \in \left[a, b\right]$. Alors, pour tout $c \in \left]a, b\right[ $: 
+        \[0 \leq \int_{a}^{c} f\left(x\right) dx \leq \int_{a}^{b} f\left(x\right)dx\]
+    
+        En effet, $F'\left(x\right) = f\left(x\right) \geq 0$, donc $F\left(x\right) = \int_{a}^{x} f\left(t\right)dt$ est croissant sur $\left[a, b\right]$ et $F\left(a\right) = 0$.
+    }
+
+    \subparag{Corollaire}{
+        Si $f\left(x\right) \geq 0$, alors 
+        \[\int_{a}^{b} f\left(x\right)dx = 0 \iff f\left(x\right) = 0, \mathspace \forall x \in \left[a, b\right] \] 
+    }
+}
+
+
+\parag{Dérivée d'une intégrale avec des fonctions comme bornes}{
+    Soit $f: \left[a, b\right] \mapsto \mathbb{R}$ une fonction continue, et $g, h : I \mapsto \left[a, b\right] $ dérivables sur $I$. Alors: 
+    \[\frac{d}{dx} \left(\int_{h\left(x\right)}^{g\left(x\right)} f\left(t\right)dt\right) = f\left(g\left(x\right)\right)g'\left(x\right) - f\left(h\left(x\right)\right) h'\left(x\right)\]
+    
+    \subparag{Preuve}{
+        Considérons l'intégrale suivante:
+        \begin{multiequality}
+        \int_{h\left(x\right)}^{g\left(x\right)} f\left(t\right)dt & = \int_{h\left(x\right)}^{a} f\left(t\right)dt + \int_{a}^{g\left(x\right)} f\left(t\right)dt  \\
+        & = \int_{a}^{g\left(x\right)} f\left(t\right)dt - \int_{a}^{h\left(x\right)} f\left(t\right)dt \\
+        & = F\left(g\left(x\right)\right) - F\left(h\left(x\right)\right) 
+        \end{multiequality}
+        où $F\left(x\right) = \int_{a}^{x} f\left(t\right)dt$.
+
+        Ainsi, on en déduit que: 
+        \begin{multiequality}
+        \frac{d}{dx} \left(\int_{h\left(x\right)}^{g\left(x\right)} f\left(t\right)dt\right) & = F'\left(g\left(x\right)\right)g'\left(x\right) - F'\left(h\left(x\right)\right)h'\left(x\right)  \\
+        & = f\left(g\left(x\right)\right)g'\left(x\right) - f\left(h\left(x\right)\right)h'\left(x\right) 
+        \end{multiequality}
+    }
+}
+
+\parag{Exemple (courant en examen)}{
+    Disons que nous voulons calculer la dérivée suivante: 
+    \[\frac{d}{dx} \left(\int_{1}^{3x^2 + 3x} e^{t^2}dt\right)\]
+    
+    Ceci n'est pas une intégrale qu'on peut calculer avec des fonctions élémentaires, donc nous \textit{devons} utiliser la proposition ci-dessus. Ainsi: 
+    \[\frac{d}{dx} \left(\int_{1}^{3x^2 + 3x} e^{t^2}dt\right) = e^{\left(3x^2 + x\right)^2}\left(6x + 1\right) - e^1 \left(1\right)' = e^{\left(3x^2 + x\right)^2}\left(6x + 1\right)\]
+}
+
+\subsection{Techniques d'intégration}
+\parag{Proposition: Formule de changement de variable}{
+    Soit $f : \left[a, b\right] \mapsto \mathbb{R}$ une fonction continue, et $\phi : \left[\alpha, \beta\right] \mapsto \left[a, b\right]$ continûment dérivable sur $I$, où $\left[\alpha, \beta\right] \subset I$.
+
+    Alors: 
+    \[\int_{\phi\left(\alpha\right)}^{\phi\left(\beta\right)} f\left(x\right)dx = \int_{\alpha}^{\beta} f\left(\phi\left(t\right)\right)\phi'\left(t\right)dt, \mathspace \text{où } x = \phi\left(t\right)\]
+    
+    \subparag{Preuve}{
+        Soit $G\left(t\right) = \int_{a}^{\phi\left(t\right)} f\left(x\right)dx$. On sait que sa dérivée est donnée par:
+        \[G'\left(t\right) = f\left(\phi\left(t\right)\right)\phi'\left(t\right) := g\left(t\right)\]
+
+        Puisque $G\left(t\right)$ est une primitive de $g\left(t\right)$ sur $\left[\alpha, \beta\right]$, alors, par le théorème fondamental du calcul intégral:
+        \[\int_{\alpha}^{\beta} g\left(t\right) dt = G\left(\beta\right) - G\left(\alpha\right)\]
+
+        Ainsi, par la définition de ces fonctions:
+        \begin{multiequality}
+        \int_{\alpha}^{\beta} f\left(\phi\left(t\right)\right)\phi'\left(t\right)dt & = \int_{a}^{\phi\left(\beta\right)} f\left(x\right)dx - \int_{a}^{\phi\left(\alpha\right)} f\left(x\right)dx \\
+        & = \int_{\phi\left(\alpha\right)}^{\phi\left(\beta\right)} f\left(x\right)dx 
+        \end{multiequality}
+
+        \qed
+    }
+}
+
+\parag{Exemple 1}{
+    Calculons l'intégrale suivante: 
+    \[\int_{1}^{2} x e^{x^2}dx\]
+    
+    À nouveau, $e^{x^2}$ est une fonction très dure à intégrer, donc faisons un changement de variable. Soit $x = \sqrt{t} = \phi\left(t\right) : \left[1, 4\right] \mapsto \left[1, 2\right]$. On voit que $\phi'\left(t\right) = \frac{1}{2\sqrt{t}}$.
+
+    Ainsi, on trouve: 
+    \[\int_{1}^{2} x e^{x^2}dx = \int_{1}^{4} \sqrt{t}e^t \frac{1}{2\sqrt{t}} dt = \frac{1}{2} \int_{1}^{4} e^t dt = \frac{1}{2} e^t \eval_{1}^{4} = \frac{1}{2} \left(e^4 - e\right)\]
+    
+    \vspace{1em}
+
+    Pour nous simplifier la vie, on peut utiliser une méthode plus rapide. Si on prend $u = x^2$, alors on a $\frac{du}{dx} = 2x$ et donc $\frac{1}{2}du = xdx$. De plus, on voit que $u\left(1\right) = 1$ et $u\left(2\right) = 4$. De là, on trouve que: 
+    \[\int_{1}^{2} xe^{x^2} dx = \int_{1}^{2} e^{x^2} {\color{red}xdx} = \frac{1}{2} \int_{1}^{4} e^{u} du = \frac{1}{2} e^u \eval_{1}^{4} = \frac{1}{2}\left(e^4 - e\right)\]
+}
+
+
+
+\end{document}

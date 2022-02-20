@@ -1,0 +1,366 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-22 at 10:16:16.
+
+\usepackage{../../style}
+
+\title{Analyse 1}
+\author{Joachim Favre}
+\date{Lundi 22 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{17}{2021-11-22}{Des calculs de différences, c'est facile non?}{
+\begin{itemize}[left=0pt]
+    \item Explication de 3 autres corollaires du TVI.
+    \item Définition de fonction dérivable.
+    \item Définition de fonction différentiable, et de fonction dérivée.
+    \item Définition des dérivées sur le côté.
+    \item Démonstration qu'une fonction dérivable est continue.
+    \item Explication des opérations algébriques sur les dérivées, et de la dérivée de la composée de deux fonctions dérivables.
+\end{itemize}
+
+}
+
+
+\parag{Corollaire 2}{
+    Soient $I$ un intervalle ouvert et $f : I \mapsto \mathbb{R}$ une fonction continue strictement monotone. Alors, $f\left(I\right)$ est un intervalle ouvert
+
+    \imagehere{TVICorollaire2.png}
+
+    \subparag{Étude des hypothèses}{
+        Si la fonction n'est pas continue, alors $f\left(I\right)$ pourrait être l'union d'un intervalle ouvert et d'un intervalle semi-ouvert (voir image du milieu).
+
+
+        Si la fonction n'est pas strictement monotone, alors elle pourrait atteindre son maximum (par exemple), et donc $f\left(I\right)$ serait un intervalle semi-ouvert (voir image de droite (rire de droite)).
+    }
+}
+
+\parag{Corollaire 3}{
+    Toute fonction injective continue sur un intervalle est strictement monotone.
+
+    \imagehere{TVICorollaire3.png}
+
+    \subparag{Étude des hypothèses}{
+        Si la fonction est continue mais pas injective, alors elle n'est pas forcément monotone (voir image du milieu).
+
+        On ne sait rien aussi si la fonction est injective mais pas continue (voir image de droite).
+    }
+}
+
+\parag{Corollaire 4}{
+    Toute fonction bijective continue sur un intervalle admet une fonction réciproque qui est continue et strictement monotone.
+
+    \subparag{Remarque}{
+        Le ``strictement monotone'' découle directement du fait que la fonction réciproque soit aussi bijective, donc on peut utiliser le corollaire 3.
+
+        Le point important est que si la fonction $f$ est continue, alors $f^{-1}$ est continue.
+    }
+}
+
+\section{Calcul différentiel}
+\subsection{Fonctions dérivables}
+\parag{Définition de fonction dérivable}{
+    Une fonction $f: E \mapsto F$ est dite \important{dérivable} en $x_0 \in E$ si la limite suivante existe:
+    \[\lim_{x \to x_0} \frac{f\left(x\right) - f\left(x_0\right)}{x - x_0} \over{=}{déf} f'\left(x_0\right) \in \mathbb{R}\]
+
+    Cette limite est appelée la \important{dérivée} de $f$ en $x_0$, notée $f'\left(x_0\right)$.
+
+
+    \subparag{Note personnelle}{
+        En faisant le changement de variable $h = x - x_0$, on a:
+        \[f'\left(x_0\right) = \lim_{x \to x_0} \frac{f\left(x\right) - f\left(x_0\right)}{x - x_0} = \lim_{h \to 0} \frac{f\left(x_0 + h\right) - f\left(x_0\right)}{h}\]
+
+        Cela peut être plus pratique pour les calculs.
+    }
+
+}
+
+\parag{Exemple 1}{
+    Soient la fonction $f\left(x\right) = x^2$ et $x_0 \in \mathbb{R}$:
+    \[\lim_{x \to x_0} \frac{x^2 - x_0^2}{x - x_0} = \lim_{x \to x_0} \frac{\left(x - x_0\right)\left(x + x_0\right)}{x - x_0} = \lim_{x \to x_0} \left(x + x_0\right) = 2x_0\]
+
+    On obtient donc que:
+    \[\left(x^2\right)' = 2x, \mathspace \forall x \in \mathbb{R}\]
+}
+
+\parag{Exemple 2}{
+    Soient $f\left(x\right) = \cos\left(x\right)$ et $x_0 \in \mathbb{R}$. On a:
+    \begin{multiequality}
+    \lim_{x \to x_0} \frac{\cos\left(x\right) - \cos\left(x_0\right)}{x - x_0} & = \lim_{x \to x_0} \frac{\cos\left(\frac{x + x_0}{2} + \frac{x - x_0}{2}\right) - \cos\left(\frac{x + x_0}{2} - \frac{x - x_0}{2}\right)}{x - x_0}  \\
+    & = \lim_{x \to x_0} \frac{-2\sin\left(\frac{x + x_0}{2}\right)\sin\left(\frac{x - x_0}{2}\right)}{x - x_0}  \\
+    & = \lim_{x \to x_0} -\underbrace{\frac{\sin\left(\frac{x - x_0}{2}\right)}{\frac{x - x_0}{2}}}_{\to 1} \underbrace{\sin\left(\frac{x + x_0}{2}\right)}_{\to \sin\left(x_0\right)}  \\
+    & = -\sin\left(x_0\right)
+    \end{multiequality}
+
+    On utilise la continuité de $\sin$ pour calculer cette limite.
+
+    On trouve donc que:
+    \[\left(\cos x\right)' = -\sin x, \mathspace \forall x \in \mathbb{R} \]
+
+    \subparag{Remarque personnelle}{
+        Je trouve personnellement qu'utiliser le changement de variable $h = x - x_0$ simplifie nos calculs:
+        \begin{multiequality}
+        & \lim_{h \to 0} \frac{\cos\left(x_0 + h\right) - \cos\left(x_0\right)}{h} \\
+        = & \lim_{h \to 0} \frac{\cos\left(x_0\right)\cos\left(h\right) - \sin\left(x_0\right)\sin\left(h\right) - \cos\left(x_0\right)}{h}  \\
+        = & \lim_{h \to 0} \left(\cos\left(x_0\right) \underbrace{\frac{\cos\left(h\right) - 1}{h}}_{\to 0} - \sin\left(x_0\right) \underbrace{\frac{\sin\left(h\right)}{h}}_{\to 1}\right)  \\
+        = & -\sin\left(x\right)
+        \end{multiequality}
+
+    }
+
+}
+
+\parag{Exercice au lecteur}{
+    Démontrer que:
+    \begin{itemize}
+        \item $\left(x^3\right)' = 3x^2, \mathspace \forall x \in \mathbb{R}$
+        \item $\left(\sin x\right)' = \cos x, \mathspace \forall x \in \mathbb{R}$
+    \end{itemize}
+}
+
+\parag{Fonction différentiable}{
+    Si $f$ est dérivable en $x = x_0$, on peut écrire:
+    \[f\left(x\right) = f\left(x_0\right) + f'\left(x_0\right)\left(x - x_0\right) + r\left(x\right), \mathspace \text{où } r\left(x\right) \over{=}{déf} f\left(x\right) - f\left(x_0\right) - f'\left(x_0\right)\left(x - x_0\right)\]
+
+    On remarque que:
+    \[\lim_{x \to x_0} \frac{r\left(x\right)}{x - x_0} = \lim_{x \to x_0}  \left(\underbrace{\frac{f\left(x\right) - f\left(x_0\right)}{x - x_0}}_{\to f'\left(x_0\right)} - f'\left(x_0\right)\right) = 0\]
+
+    Ainsi, on en déduit que toute fonction dérivable en $x = x_0$ admet une présentation:
+    \[f\left(x\right) = f\left(x_0\right) + a\left(x - x_0\right) + r\left(x\right), \mathspace \text{où } \lim_{x \to x_0} \frac{r\left(x\right)}{x - x_0} = 0\]
+
+    Dans ce cas, on dit que $f$ est \important{différentiable} en $x_0$.
+
+    Réciproquement, si:
+    \[f\left(x\right) = f\left(x_0\right) + a\left(x - x_0\right) + r\left(x\right), \mathspace \telque \lim_{x \to x_0} \frac{r\left(x\right)}{x - x_0} = 0\]
+
+    Alors:
+    \[\lim_{x \to x_0} \frac{f\left(x\right) - f\left(x_0\right)}{x - x_0} = \lim_{x \to x_0} \underbrace{\frac{a\left(x - x_0\right)}{x - x_0}}_{= a} + \underbrace{\frac{r\left(x\right)}{x - x_0}}_{\to 0} = a\]
+
+    Ainsi, on en déduit que $f$ est dérivable en $x_0$ si et seulement si elle est différentiable en $x = x_0$, et $f'\left(x\right) = a$.
+}
+
+\parag{Définition de fonction dérivée}{
+    Soit $f : E \mapsto F$ une fonction dérivable sur un ensemble $D\left(f'\right) \subset E$.
+
+    On définit la \important{fonction dérivée}:
+    \[\begin{split}
+        f': D\left(f'\right) &\longmapsto \mathbb{R} \\
+        x &\longmapsto f'\left(x\right)
+    \end{split}\]
+}
+
+\parag{Exemple}{
+    Voici les fonctions dérivées qu'on connait:
+    \begin{center}
+    \begin{tabular}{c|c}
+        $f\left(x\right)$ & $f'\left(x\right)$ \\
+        \hline
+        $\cos\left(x\right)$ & $-\sin\left(x\right)$ \\
+        $\sin\left(x\right)$ & $\cos\left(x\right)$  \\
+        $x^2$ & $2x$ \\
+        $x^3$ & $3x^2$
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Interprétation géométrique}{
+    \imagehere[0.6]{InterpretationGeometriqueDerivee.png}
+
+    On voit que $\frac{f\left(x\right) - f\left(x_0\right)}{x - x_0}$ est la pente de la droite passant par $\left<x_0, f\left(x_0\right)\right>$ et $\left<x, f\left(x\right)\right>$. Donc, quand $x \to x_0$, on obtient la pente de la tangente à la courbe $y = f\left(x\right)$ en $x = x_0$.
+
+    L'équation de la tangente est donnée par:
+    \[y - f\left(x_0\right) = f'\left(x_0\right)\left(x - x_0\right) \iff y = f\left(x_0\right) + f'\left(x_0\right)\left(x - x_0\right)\]
+}
+
+\parag{Définition des dérivées sur le côté}{
+    La \important{dérivée à droite} est définie par:
+    \[f'_d\left(x_0\right) \over{=}{déf}  \lim_{x \to x_0^+} \frac{f\left(x\right) - f\left(x_0\right)}{x - x_0}\]
+
+    De la même manière, la \important{dérivée à gauche} est définie par:
+    \[f'_{{\color{red}g}}\left(x_0\right) \over{=}{déf} \lim_{{\color{red}x \to x_0^-}} \frac{f\left(x\right) - f\left(x_0\right)}{x - x_0} \]
+
+    On remarque que $f'\left(x_0\right)$ existe si et seulement s'il existe $f'_d\left(x_0\right)$ et $f'_g\left(x_0\right)$, et que $f'_d\left(x_0\right) = f'_g\left(x_0\right)$
+}
+
+\parag{Proposition}{
+    Une fonction dérivable en $x = x_0$ est continue en $x = x_0$.
+
+    \subparag{Preuve}{
+        On voit que:
+        \begin{multiequality}
+        \lim_{x \to x_0} f\left(x\right) & = \lim_{x \to x_0} \left(f\left(x_0\right) + f\left(x\right) - f\left(x_0\right)\right)  \\
+        & = \lim_{x \to x_0} \left(f\left(x_0\right) + \underbrace{\frac{f\left(x\right) - f\left(x_0\right)}{x - x_0}}_{\to f'\left(x_0\right)}\underbrace{\left(x - x_0\right)}_{\to 0}\right)  \\
+        & = f\left(x_0\right)
+        \end{multiequality}
+
+        Pour calculer cette limite, on utilise que $f$ est dérivable en $x_0$.
+
+        \qed
+    }
+
+    \subparag{Réciproque}{
+        La réciproque de cette proposition est fausse; une fonction continue n'est pas nécessairement dérivable.
+
+        Par exemple, $f\left(x\right) = \left|x\right|$ est continue en $x = 0$:
+        \[\lim_{x \to 0^+} \left|x\right| = \lim_{x \to 0^+} x = 0, \mathspace \lim_{x \to 0^-} \left|x\right| = \lim_{x \to 0^-} \left(-x\right) = 0\]
+
+        On peut donc en déduire que $\left|x\right|$ est continue en $x = 0$:
+        \[\lim_{x \to 0} \left|x\right| = 0 = f\left(0\right)\]
+
+
+        Calculons maintenant les dérivées sur le côté:
+        \[f'_d\left(0\right) = \lim_{x \to 0^+} \frac{\left|x\right|}{x} = \lim_{x \to 0^+} \frac{x}{x} = 1\]
+        \[f'_g\left(0\right) = \lim_{x \to 0^-} \frac{\left|x\right|}{x} = \lim_{x \to 0^-} \frac{-x}{x} = -1\]
+
+        Puisque $f'_d\left(0\right) \neq f'_g\left(0\right)$, on en déduit que $f'\left(0\right)$ n'existe pas.
+
+        Graphiquement, on voit qu'on peut bien dessiner $\left|x\right|$ sans lever le crayons, donc elle est continue, cependant elle n'est pas ``lisse'' en $x = 0$, il y a un angle, donc elle n'y est pas dérivable.
+    }
+}
+
+\parag{Remarque}{
+    On peut introduire la limite infinie si:
+    \[\lim_{x \to x_0} \frac{f\left(x\right) - f\left(x_0\right)}{x - x_0} = \pm \infty\]
+
+    Puisque la limite n'existe pas, $f$ n'est pas dérivable en $x = x_0$.
+
+    Dans ce cas, le graphique de $f$ admet une tangente verticale en $x_0$.
+}
+
+\parag{Exemple}{
+    Prenons la fonction suivante:
+    \begin{functionbypart}{f\left(x\right)}
+    \sqrt[3]{x}, \mathspace x \geq 0 \\
+    -\sqrt[3]{\left|x\right|}, \mathspace x < 0
+    \end{functionbypart}
+
+    On a besoin de définir notre fonction comme ça car on a uniquement défini les racines $n$-èmes pour les $x$ positifs. Calculons les dérivées sur le côté:
+    \[f'_d\left(0\right) = \lim_{x \to 0^+} \frac{\sqrt[3]{x} - 0}{x - 0} = \lim_{x \to 0^+} \frac{x^{\frac{1}{3}}}{x} = \lim_{x \to 0^+} \frac{1}{x^{\frac{2}{3}}} = +\infty\]
+    \[f'_g\left(0\right) = \lim_{x \to 0^-} \frac{\sqrt[3]{x} - 0}{x - 0} = \lim_{x \to 0^-} \frac{-\sqrt[3]{\left|x\right|}}{x} \over{=}{$y = -x$} \lim_{y \to 0^+} \frac{-\sqrt{y}}{-y} = \lim_{y \to 0^+} \frac{1}{y^{\frac{2}{3}}} = +\infty\]
+
+    On en déduit que $f'\left(0\right) = +\infty$. On peut bien voir que, graphiquement, il y a une tangente verticale en $x = 0$.
+
+    \imagehere[0.4]{TangenteVerticale.png}
+}
+
+\parag{Opérations algébriques sur les dérivées}{
+    Soient $f, g : E \mapsto F$ deux fonctions dérivables en $x = x_0$. Alors:
+    \begin{enumerate}
+        \item $\left(\alpha f + \beta g\right)'\left(x_0\right) = \alpha f'\left(x_0\right) + \beta g'\left(x_0\right), \mathspace \forall \alpha, \beta \in \mathbb{R}$
+        \item $\left(f\cdot g\right)'\left(x_0\right) = f'\left(x_0\right)g\left(x_0\right) + f\left(x_0\right)g'\left(x_0\right)$
+        \item $\left(\dfrac{f}{g}\right)'\left(x_0\right) = \dfrac{f'\left(x_0\right)g\left(x_0\right) - g'\left(x_0\right)f\left(x_0\right)}{g^2\left(x\right)}$, si $g\left(x\right) \neq 0$ au voisinage de $x_0$
+    \end{enumerate}
+
+    \subparag{Preuve du point (3)}{
+        Nous voulons montrer que, si $g\left(x_0\right) \neq 0$:
+        \[\left(\frac{1}{g}\right)'\left(x_0\right) = -\frac{g'\left(x_0\right)}{g^2\left(x_0\right)}\]
+
+        On pourra alors utiliser ce fait avec la propriété (2) pour démontrer la propriété (3).
+
+        On a:
+        \begin{multiequality}
+        \left(\frac{1}{g}\right)'\left(x_0\right) & = \lim_{x \to x_0} \frac{\frac{1}{g\left(x\right)} - \frac{1}{g\left(x_0\right)}}{x - x_0}  \\
+        & = \lim_{x \to x_0} \frac{g\left(x_0\right) - g\left(x\right)}{g\left(x\right)g\left(x_0\right)\left(x - x_0\right)}  \\
+        & = \lim_{x \to x_0} \underbrace{\frac{g\left(x_0\right) - g\left(x\right)}{x - x_0}}_{\to -g'\left(x_0\right)} \cdot \underbrace{\frac{1}{g\left(x\right)g\left(x_0\right)}}_{\to \frac{1}{g^2\left(x_0\right)}}  \\
+        & = - \frac{g'\left(x_0\right)}{g^2\left(x_0\right)}
+        \end{multiequality}
+
+        On utilise que $g$ est dérivable et que $g$ est continue.
+    }
+}
+
+\parag{Exemple}{
+    Soit $f\left(x\right) = \tan\left(x\right) = \frac{\sin x}{\cos x}$. Par la propriété (3), on a:
+    \[\left(\tan\left(x\right)\right)' = \frac{\left(\sin\left(x\right)\right)' \cos\left(x\right) - \sin\left(x\right)\left(\cos\left(x\right)\right)'}{\cos^2\left(x\right)} = \frac{\cos^2\left(x\right) + \sin^2\left(x\right)}{\cos^2\left(x\right)} = \frac{1}{\cos^2\left(x\right)}\]
+
+    On en déduit donc que:
+    \[\left(\tan\left(x\right)\right)' = \frac{1}{\cos^2\left(x\right)}\]
+
+    \subparag{Remarque personnelle}{
+        On remarque que:
+        \[1 + \tan^2\left(x\right) = \frac{\cos^2\left(x\right) + \sin^2\left(x\right)}{\cos^2\left(x\right)} = \frac{1}{\cos^2\left(x\right)}\]
+
+        Ces résultats seront très importants quand nous calculerons des intégrales.
+    }
+}
+
+\parag{Proposition}{
+    Soit $f\left(x\right) = x^{n}$, où $n \in \mathbb{N}^*$. On a:
+    \[\left(x^{n}\right)' = nx^{n - 1}, \mathspace \forall x \in \mathbb{R}\]
+
+    \subparag{Preuve}{
+        On va démontrer ce fait par récurrence.
+
+        \important{Initialisation:} Prenons $n = 1$. Alors:
+        \[\left(x\right)' = \lim_{x \to x_0} \frac{x - x_0}{x - x_0} = 1 \implies \left(x\right)' = 1 \mathspace \forall x \in \mathbb{R}\]
+
+        \important{Hérédité:} Supposons que $\left(x^n\right)' = nx^{n-1}$ pour un $n \in \mathbb{N}^*$. On veut montrer que $\left(x^{n+1}\right)' = \left(n+1\right)x^n$:
+        \[\left(x^{n+1}\right)' = \left(x^n \cdot x\right)' = \left(x^n\right)' x + x^n \left(x\right)' = nx^{n-1} x + x^{n}\cdot 1\]
+
+        On peut donc en déduire que:
+        \[\left(x^{n+1}\right)' = nx^{n} + x^n = \left(n+1\right)x^{n}\]
+
+        Ainsi, par récurrence, la proposition $\left(x^n\right)' = nx^{n-1}$ est vraie pour tout $n \in \mathbb{N}^*$.
+
+        \qed
+    }
+}
+
+\parag{Proposition (dérivée de la fonction composée de deux fonctions dérivables)}{
+    Soient $f : E\mapsto F$ une fonction dérivable en $x = x_0 \in E$ et $g : G \mapsto H$ dérivable en $f\left(x_0\right)$, où $f\left(E\right) \subset G$.
+
+    Nous avons:
+    \[\left(g \circ f\right)'\left(x_0\right) = g'\left(f\left(x_0\right)\right)f'\left(x_0\right)\]
+
+    \subparag{Preuve}{
+        Nous voulons calculer la limite suivante:
+        \[\lim_{x \to x_0} \frac{g\left(f\left(x\right)\right) - g\left(f\left(x_0\right)\right)}{x - x_0}\]
+
+        Si $f\left(x\right) \neq f\left(x_0\right)$ au voisinage de $x_0$, on peut prendre:
+        \[\lim_{x \to x_0} \underbrace{\frac{g\left(f\left(x\right)\right) - g\left(f\left(x_0\right)\right)}{f\left(x\right) - f\left(x_0\right)}}_{\to g'\left(f\left(x_0\right)\right)} \cdot \underbrace{\frac{f\left(x\right) - f\left(x_0\right)}{x - x_0}}_{\to f'\left(x\right)} = f'\left(f\left(x_0\right)\right)f'\left(x_0\right)\]
+
+        Si $f\left(x\right) = f\left(x_0\right)$, alors les deux côtés sont nul:
+        \[\frac{g\left(f\left(x_0\right)\right) - g\left(f\left(x_0\right)\right)}{x - x_0} = 0 = g'\left(f\left(x_0\right)\right) \cdot \underbrace{\frac{f\left(x\right) - f\left(x_0\right)}{x - x_0}}_{= 0}\]
+
+        Donc, dans les deux cas, on a que cela tend vers $g'\left(f\left(x_0\right)\right)f'\left(x_0\right)$. Ainsi:
+        \[\left(g \circ f\right)'\left(x_0\right) = g'\left(f\left(x_0\right)\right)f'\left(x_0\right)\]
+
+        \qed
+    }
+}
+
+\parag{Exemple}{
+    Soit la fonction suivante:
+    \[g\left(x\right) = \frac{\sin^2\left(x\right) + \cos^4\left(x\right)}{1 + \sin^2\left(x\right) + \cos^4\left(x\right)}\]
+
+    Prenons le changement de variable $f\left(x\right) = \sin^2\left(x\right) + \cos^4\left(x\right)$:
+    \[g\left(x\right) = \frac{f\left(x\right)}{1 + f\left(x\right)} = \frac{1 + f\left(x\right) - 1}{1 + f\left(x\right)} = 1 - \frac{1}{1 + f\left(x\right)}\]
+
+    Ainsi, on peut maintenant calculer la dérivée de $g$:
+    \[g'\left(x\right) = \left(1 - \frac{1}{1 + f\left(x\right)}\right)' = -\left(\frac{1}{1 + f\left(x\right)}\right)' = -\frac{-f'\left(x\right)}{\left(1 + f\left(x\right)\right)^2} = \frac{f'\left(x\right)}{\left(1 + f\left(x\right)\right)^2}\]
+
+    Nous voulons maintenant calculer la dérivée de $f$. Avant, nous pouvons voir le fait suivant:
+    \[\left(\sin^k\left(x\right)\right)' = k\left(\sin\left(x\right)\right)^{k-1} \cos\left(x\right), \mathspace \left(\cos^k\left(x\right)\right)' = k \left(\cos\left(x\right)\right)^{k-1} \left(-\sin\left(x\right)\right)\]
+
+    Donc:
+    \begin{multiequality}
+        f'\left(x\right) & = \left(\sin^2\left(x\right) + \cos^4\left(x\right)\right)' \\
+        & = 2\sin\left(x\right)\cos\left(x\right) + 4\cos^3 \left(x\right)\left(-\sin\left(x\right)\right)   \\
+        & = \sin\left(2x\right) - 2\sin\left(2x\right)\cos^2\left(x\right)  \\
+        & = \sin\left(2x\right)\underbrace{\left(1 - 2 \cos^2\left(x\right)\right)}_{-\cos\left(2x\right)}  \\
+        & = -\sin\left(2x\right)\cos\left(2x\right)  \\
+        & = -\frac{\sin\left(4x\right)}{2}
+    \end{multiequality}
+
+    On peut donc finir de calculer $g'$:
+    \[g'\left(x\right) = \frac{f'\left(x\right)}{\left(1 + f\left(x\right)\right)^2} = -\frac{\sin\left(4x\right)}{2\left(1 + \sin^2\left(x\right) + \cos^4\left(x\right)\right)^2}\]
+
+}
+
+
+
+
+
+\end{document}

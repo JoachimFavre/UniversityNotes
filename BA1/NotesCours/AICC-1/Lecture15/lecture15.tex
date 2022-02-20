@@ -1,0 +1,256 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-09 at 08:35:26.
+
+\usepackage{../../style}
+
+\title{AICC 1}
+\author{Joachim Favre}
+\date{Mardi 09 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{15}{2021-11-09}{P = NP and induction}{
+    \begin{itemize}[left=0pt]
+        \item Explanation of the effect of the different algorithm growths. Definition of tractable and intractable problems.
+        \item Definition of the classes $P$ and $NP$ of algorithms, and explanation of the $P = NP$ problem.
+        \item Definition of mathematical induction, and strong induction.
+        \item Definition of recursive functions.
+    \end{itemize}
+
+}
+
+\imagehere{ComputeTimeUsedByAlgorithmsAndComplexity.png}
+
+\parag{Effect of complexity}{
+    We realise that the gap between polynomial complexity and exponential is really gargantuous.
+
+    Even $O\left(x^2\right)$ already grows fast, and it is not very efficient.
+}
+
+\parag{Tractable problems}{
+    Commonly, a problem is considered \important{tractable}, if there exists an algorithm, which can solve the problem in polynomial time. In other words, there must exist an algorithm which can, for input of size $n$, produce the result with $O\left(n^d\right)$ operations.
+
+    We call this class of algorithms P for polynomial complexity. For large $d$ and large inputs, it is often not so clear that the problem is really tractable in a practical sense (example: multiplying two very large matrices).
+
+    If such an algorithm does not exist, the problem is considered \important{intractable}.
+}
+
+\parag{Class NP}{
+    The class \important{NP} consists of problems for which the correctness of a proposed solution can be verified in polynomial time. It is for example much easier to verify the solution to an equation, than finding it.
+
+    NP stands for \important{non-deterministic polynomial time}. The non-deterministic is here because it means we can try random solutions and until we find the answer. Thus, NP can always be solved in exponential time (we only need a polynomial time to verify an answer, so we can try all the solutions).
+
+    Nowadays, there is still an open question on this subject: we wonder if P = NP. In other words, we wonder if it is possible to solve problems of the NP class using polynomial class.
+}
+
+\parag{Knapsack Decision problem}{
+    Given a set $S$ of $n$ items, each item with a value and a weight, find the subset of items that exceeds a minimal value while fitting a maximal weight.
+
+    This is a NP problem. No polynomial algorithm is known, whereas checking correctness of the solution is really easy.
+}
+
+\parag{NP-complete problems}{
+    \important{NP-complete} porblems are problems in NP, such that if a polynomial algorithm is found for this problem, then all other problems in NP can also be solved in polynomial time.
+
+    For example, the knapsack decision problems and the 3-SAT are NP-complete.
+}
+
+\parag{3-SAT}{
+    We want to know the satisfiability of propositional statements. As we saw, constructing a truth tables takes $2^n$ rows.
+
+    We will restrict a bit this problem to an easier one, but still NP-complete: 3-SAT. We want to determine the satisfiability of formulas in conjunctive normal form, where each clause has at most 3 variables. For example, the following formula is included in the set of 3-SAT formulas:
+    \[\left(p \lor p \lor q\right) \land \left(\lnot p \lor \lnot q \lor \lnot q\right) \land \left(\lnot p \lor q \lor q\right)\]
+}
+
+\parag{Summary}{
+    We have seen the following types of algorithm:
+
+    \begin{description}[left=0pt]
+        \item[Tractable problem:] There exists a polynomial time algorithm to solve this problem. These problems are said to belong to the \fullbf{Class P}.
+        \item[Class NP:] The solution can be checked in polynomial time, and any algorithm can be solved using exponential time. We wonder if it is possible to solve all NP problems using polynomial time.
+        \item[NP Complete Class:] It is a subset of the NP class. If someone finds a polynomial-complexity algorithm for a member of the class, then it can be used to solve all the problems in the NP class.
+        \item[Intractable Problems:] There does not exist a polynomial time algorithm to solve this problem.
+        \item[Unsolvable Problem] There does not exist any algorithm to solve the problem (for example, the Halting Problem).
+    \end{description}
+
+}
+
+\section{Induction and recursion}
+\subsection{Mathematical induction}
+\parag{Principle of mathematical induction}{
+    Mathematical induction is a tool that allows us to prove that a proposition is true for all integers.
+
+    To do that, we begin with a \important{basis step} by proving that $P\left(1\right)$ is true.
+
+    Then, we make an \important{inductive step}; we assume that $P\left(k\right)$ holds for an arbitrary integer $k$ (\important{inductive hypothesis}), and we prove the proposition for $P\left(k+1\right)$.
+
+    After having done both those steps, we can conclude that the property is true for all $n$. What we have done is proving that all dominos fall, by proving that the first one fall, and that if one falls then the next one falls as well.
+}
+
+\parag{Example}{
+    Let's say we want to prove that $n < 2^n$ for all positive integers $n$.
+
+    \important{Base step:} We take $n = 1$, and we see that, indeed, 1 < 2.
+
+    \important{Inductive step:} We assume that $1 \leq k < 2^k$. So, we have:
+    \[k + 1 \over{<}{I.H.}  2^k + 1 \leq 2^k + 2^k = 2\cdot 2^k = 2^{k+1}\]
+}
+
+\parag{Rule of inference}{
+    Mathematical induction can be expressed as the following rule of inference:
+    \[\left(P\left(1\right) \land \forall k\left(P\left(k\right) \to P\left(k+1\right)\right)\right) \to \forall n P\left(n\right)\]
+    where the domain is the set of positive integers.
+}
+
+\parag{Important points}{
+    \begin{itemize}[left=0pt]
+        \item  In a proof by mathematical induction, we do not assume that $P\left(k\right)$ is true for all positive integers, only for some $k$. We then want to prove that $P\left(k+1\right)$ is true.
+        \item We do not have to begin at 1. If we want to prove a property $\forall n \geq b$, where $b$ is an integer, then we verify that $P\left(b\right)$ is true in our basis step, and not $P\left(1\right)$.
+    \end{itemize}
+}
+
+\parag{Validity}{
+    Mathematical induction is valid because of the well-ordering property (an axiom for the set of positive integers): every non-empty subset of the set of positive integers has a least element.
+
+    Mathematical induction is equivalent to the well ordering property.
+
+    \subparag{Proof}{
+        The following proof is an extra, which we have not seen in class (so it will definitely not be in the exam).
+
+        Let $P$ be a property for which $P\left(1\right)$ and $P\left(k\right) \to P\left(k+1\right)$ are true for all positive integers $k$. Let's suppose for contradiction that there exists a $n$ such that $P\left(n\right)$ is false. Thus, the set $S$ of positive integers for which $P\left(n\right)$ is false is non-empty. By the well-ordering property, we know that $S$ has a least element; let's call that element $m$.
+
+        We know $m \neq 1$ since $P\left(1\right)$ is true by hypothesis. Thus, we can deduce that $m - 1$ is a positive integer ($m - 1 \geq 1$). Moreover, since $m - 1 < m$, and $m$ was the least element of $S$, we know that $m - 1 \not \in S$. In other words, we know that $P\left(m-1\right)$ is true. However, since $m-1$ is a positive integer and since we know that $P\left(k\right) \to P\left(k+1\right)$ is true for all positive integers $k$, then necessarily $P\left(m-1\right) \to P\left(m\right)$. Since $P\left(m-1\right)$ is true, then $P\left(m\right)$ must also be true, which contradicts our assumption that $P\left(m\right)$ is false.
+
+        We deduce that $P$ is true for all $n \in \mathbb{N}$.
+
+        \qed
+    }
+}
+
+\parag{Example 1}{
+    We want to show that $2^n < n!$ for every integer $n \geq 4$.
+
+    \important{Base step:} We take $n = 4$, and, indeed,
+    \[2^4 = 16 < 24 = 4!\]
+
+    \important{Inductive step:} We assume that $2^k < k!$ for some $k \geq 4$. We have:
+    \[2^{k+1} = 2\cdot 2^{k} \over{<}{IH}  2 k! < \left(k+1\right)k! = \left(k+1\right)! \]
+
+    Indeed, $k \geq 4 \implies k + 1 > 2$.
+}
+
+\parag{Example 2}{
+    We want to show that $n^3 - n$ is divisible by $3$, for every positive integer $n$.
+
+    \important{Base step:} Taking $n = 1$, we see that $1 - 1 = 0$ and, indeed, $3 | 0$.
+
+    \important{Inductive step:} We suppose that $n^3 - n$ is divisible by 3 (IH) for some $n$. We have:
+    \[\left(n+1\right)^3 - \left(n+1\right) = n^3 + 3n^2 + 3n + 1 - n - 1 = \left(n^3 - n\right) + 3\left(n^2 + n\right)\]
+
+    We know that $3 | 3\left(n^2 + n\right)$ and, by our inductive hypothesis, $3 | n^3 - n$. So, 3 divides the sum.
+
+    \subparag{Personal remark}{
+        We can see that $n^3 - n = n\left(n+1\right)\left(n-1\right)$. Thus, we could also have done a proof by cases:
+        \[n \equiv 0 \mod 3 \implies n\left(n+1\right)\left(n-1\right) \equiv 0\left(1\right)\left(-1\right) = 0 \mod 3\]
+        \[n \equiv 1 \mod 3 \implies n\left(n+1\right)\left(n-1\right) \equiv 1\left(2\right)\left(0\right) = 0 \mod 3\]
+        \[n \equiv 2 \mod 3 \implies n\left(n+1\right)\left(n-1\right) \equiv 2\left(0\right)\left(1\right) = 0 \mod 3\]
+
+        This gives more intuition on why this property is true (even though it is an example on how induction works, so intuition on the example may not be that useful).
+    }
+}
+
+\parag{Example 3}{
+    We want to show that, if $S$ is a finite set with a non-negative number of elements, $n$, then $S$ has $2^{n}$ subsets.
+
+    \important{Base Step:} We take $n = 0$, so we have $S = \o$. We see that:
+    \[P\left(\o\right) = \left\{\o\right\} \implies \left|P\left(\o\right)\right| = 1 = 2^0\]
+    as required.
+
+    \important{Inductive step:} We have $\left|S\right| = k + 1$. Let's select an element $a \in S$ and let $T = S \setminus \left\{a\right\}$. We know that $\left|T\right| = k$ and thus, by our inductive hypothesis, $\left|P\left(T\right)\right| = 2^k$.
+
+    We see that $S$ contains two kinds of subsets: those that do not contain $a$ (which is exactly T, so there are $2^k$ of those), and those that contain $a$ (it's the exact same subsets, but with $a$ added, so there are also $2^k$ of them (in the slides, there is a more detailed and formal proof on why this is true)). So we do have that:
+    \[2^k + 2^k = 2^{k+1}\]
+}
+
+\parag{Strong induction}{
+    To prove that $P\left(n\right)$ is true for all positive integers $n$, where $P\left(n\right)$ is a propositional function, we complete two steps. First, we show that $P\left(1\right)$ is true (nothing changed here). Then, we show that the following implication is true for all positive integers $k$:
+    \[P\left(1\right) \land P\left(2\right) \land \ldots \land P\left(k\right) \to P\left(k+1\right)\]
+
+    In other words, we prove that all dominos fall by proving that the first one falls, and that if all the ones behind a domino fall, then the latter falls as well.
+
+    Note that we can always use strong induction instead of mathematical induction, but there is no reason to use it if it is simpler to use mathematical induction. In fact, the principles of mathematical induction, strong induction, and the well-ordering property are equivalent.
+}
+
+\parag{Example 1}{
+    We want to show that every positive integer $n$ can be written as a sum of distinct power of two, i.e. that there exists a set of integers $S = \left\{k_1, \ldots, k_m\right\}$ such that:
+    \[n = \sum_{j=1}^{m} 2^{k_{j}}\]
+
+    In other words, we want to show that every positive integer has a binary representation.
+
+    \important{Base step:} We take $n = 1$. We have:
+    \[\sum_{j = 1}^{1} 2^0 = 1 \implies S = \left\{0\right\}\]
+
+    \important{Inductive Step:} We assume that $k = \sum_{j=1}^{m} 2^{k_{j}}$ for $\left\{k_1, \ldots, k_m\right\}$. If $k$ is even, then we definitely know that $2^0$ is not part of the sum, since it is the only possible odd term. In other words, we know that $0 \not\in S$. So, by adding the element $0$ to the set, taking $S' = S \cup \left\{0\right\}$:
+    \[\sum_{j=1}^{m} 2^{k_{j}} + 2^0 = k + 1\]
+
+    If $k$ is odd, then $\frac{k+1}{2}$ is an integer. Therefore, we know that $\frac{k+1}{2}$ can be written as a sum of powers of 2 (we are using strong induction). In other words, there exists a set $S$ such that:
+    \[\frac{k+1}{2} = \sum_{j=1}^{m} 2^{k_{j}} \implies k+1 = \sum_{j=1}^{m} 2\cdot 2^{k_{j}} = \sum_{j=1}^{m} 2^{k_j + 1}\]
+
+    We can thus construct $S' = \left\{k_1 + 1, \ldots, k_n + n\right\}$.
+}
+
+\parag{Example 2}{
+    We want to show that every set of lines in the plane, which do not have any parallel lines, need a common point.
+
+    \important{Base step:} We know that $P\left(2\right)$ is true. If two lines are not parallel, then they have a crossing point.
+
+    \important{Inductive Step:} Let's consider $k+1$ lines, $\ell_1, \ldots, \ell_{k+1}$. By our inductive hypothesis we know that $\ell_1, \ldots, \ell_k$ meet in a common point $P_1$, and $\ell_2, \ldots, \ell_{k+1}$ meet in a common point, $P_2$.
+
+    Let's assume for contradiction that $P_1 \neq P_2$. Then, lines $\ell_2, \ldots, \ell_{k}$ all go through $P_1$ and $P_2$, which is a contradiction since we know that they are not parallel. We thus deduce that our inductive step is true as well.
+
+    \important{Mistake:} Our proof by contradiction is wrong. If we only have three lines, we are saying that ``all the lines between $\ell_2$ and $\ell_2$ go through $P_1$ and $P_2$ and since they are not parallel it is not possible'', but, in this case, it makes no sens because we only have one line, $\ell_2$.
+
+    \subparag{Personal remark}{
+        This false-proof is very similar to the one we saw in analysis, which proved that all the pencils are of the same colour, in any pencil case.
+    }
+}
+
+\subsection{Recursively defined functions}
+\parag{Definition}{
+    A \important{recursive} or \important{inductive} definition of a function $f$, which has a domain of non-negative integers, consists in two step. First, we define the \important{basis step}: we specify the value of the function at zero. Then, we define the \important{recursive step}: we give a rule for finding the function's value at an integer from its values at smaller integers.
+
+    Note that a function $f\left(n\right)$ over natural numbers is a sequence $a_0, a_1, \ldots$ where $f\left(i\right) = a_i$.
+}
+
+\parag{Example 1}{
+    Let's say that $f$ is defined by $f\left(0\right) = 3$, and:
+    \[f\left(n+1\right) = 2f\left(n\right) + 3\]
+
+    We can compute some values:
+    \[f\left(0\right) = 3, \mathspace f\left(1\right) = 2\cdot 3 + 3 = 9, \mathspace f\left(2\right) = 2\cdot 9+ 3 = 21, \mathspace \ldots\]
+}
+
+\parag{Example 2}{
+    The factorial function gets defined very well recursively:
+    \begin{functionbypart}{f\left(n\right) = n!}
+        1, \mathspace \text{if } n = 0 \\
+        f\left(n+1\right) = \left(n+1\right)f\left(n\right), \mathspace \text{else}
+    \end{functionbypart}
+}
+
+\parag{Fibonacci numbers}{
+    The Fibonacci numbers are defined as follows:
+    \[f_0 = 0, \mathspace f_1 = 1, \mathspace f_{n} = f_{n-1} + f_{n-2}\]
+
+    We can compute some of the values:
+    \[f_0 = 0, \mathspace f_1 = 1, \mathspace f_2 = 1, \mathspace f_3  = 2, \mathspace f_4 = 3, \mathspace f_5 = 5\]
+    \[\mathspace f_6 = 8, \mathspace f_7 = 13, \mathspace f_8 = 21, \mathspace f_9 = 34, \mathspace f_{10} = 56\]
+
+    We see that this function grows faster and faster. We'll see that it's, in fact, an exponential growth.
+}
+
+
+
+\end{document}

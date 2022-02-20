@@ -1,0 +1,304 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-10-18 at 10:11:39.
+
+\usepackage{../../style}
+
+\title{Analyse I}
+\author{Joachim Favre}
+\date{Lundi 18 octobre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2021-10-18}{Suite de la suite des limites de suites}{
+\begin{itemize}[left=0pt]
+    \item Démonstration de la limite des racines, et de la limites des suites géométriques.
+    \item Démonstration du critère de d'Alembert.
+    \item Définition des limites infinies, et de ses propriétés (par exemple, la règle du gendarme).
+    \item Explication des formes indéterminées.
+    \item Démonstration que $\left(\cos\left(n\right)\right)$ et $\left(\sin\left(n\right)\right)$ ne convergent pas. 
+    \item Démonstration du théorème de la convergence des suites monotones.
+\end{itemize}
+
+}
+
+\parag{Limite de racine}{
+    Soit $a_0 = 1$, et $a_n = \sqrt[n]{a}$ quand $n \geq 1$, pour $a > 0$. Alors: 
+    \[\lim_{n \to \infty} a_n = 1\]
+
+    \subparag{Preuve}{
+        \important{$a = 1$:} Alors la suite est donnée par $a_n = 1$ pour tout $n$, donc 
+        \[\lim_{n \to \infty} a_n = \lim_{n \to \infty} 1 = 1\]
+        
+        \vspace{1em}
+        \important{$a > 1$:} On remarque que 
+        \[x^{n} - 1 = \left(x - 1\right)\left(x^{n-1} + x^{n-2} + \ldots + x + 1\right) \ \ \forall x \in \mathbb{R}\ \forall n \in \mathbb{N}^*\]
+
+        De là, on en déduit que, quand $x > 0$: 
+        \[x - 1 = \frac{x^{n} - 1}{x^{n-1} + \ldots + x + 1}\]
+
+        Donc, si on prend $x = \sqrt[n]{a} > 1$: 
+        \[0 < \sqrt[n]{a} - 1 = \frac{a - 1}{\underbrace{\underbrace{a^{\frac{n-1}{n}}}_{>1} + \ldots + \underbrace{a^{\frac{1}{n}}}_{>1} + 1}_{>n}} < \frac{a - 1}{n}\]
+        
+        En d'autres mots: 
+        \[0 < \sqrt[n]{a} - 1 < \frac{a - 1}{n}\]
+        
+        Puisque le troisième terme tend vers 0 quand $n \to \infty$, on peut utiliser le théorème des gendarmes :       
+        \[\lim_{n \to \infty} \left(\sqrt[n]{a} - 1\right) = 0 \implies \lim_{n \to \infty} \sqrt[n]{a} = 1\]
+        
+        \vspace{1em}
+        \important{$0 < a < 1$ :} Soit $b = \frac{1}{a} > 1$. Par la deuxième partie, on sait que 
+        \[\lim_{n \to \infty} \sqrt[n]{b} = 1 \implies \lim_{n \to \infty} \frac{1}{\sqrt[n]{a}} = 1 \implies \lim_{n \to \infty} \sqrt[n]{a} =  \frac{1}{\lim\limits_{n \to \infty} \sqrt[n]{b}} = 1\]
+        
+    }
+}
+
+\parag{Suite géométrique}{
+    Soit $a_n = a_0 r^{n}$, avec $a_0 \in \mathbb{R}$, $a_0 \neq 0$, $r \in \mathbb{R}$. Alors: 
+    \begin{itemize}
+        \item $\lim\limits_{n \to \infty} a_0 r^{n} = 0$, $\left|r\right| < 1$
+        \item $\lim\limits_{n \to \infty} a_0 r^{n} = a_0$, $r = 1$
+        \item $\left(a_n\right)$ diverge quand $\left|r\right| > 1$ ou $r = -1$.
+    \end{itemize}
+    
+    \subparag{Preuve}{
+        \begin{enumerate}[left=0pt]
+            \item \important{Soit $r > 1$}. Prenons $r = 1 + x$, avec $x > 0$. Donc: 
+            \[r^n = \left(1 + x\right)^n = 1 + \binom{n}{1}x + \underbrace{\binom{n}{2}x^2 + \ldots + \binom{n}{n}x^n}_{>0} \geq 1 + \binom{n}{1}x = 1 + nx\]
+         
+            Par la propriété d'Archimède, on sait que pour tout $M > 0$, $\exists n \in \mathbb{N}$ tel que $(1 + nx) > M$. Donc: 
+            \[\left|a_0 r^n\right| = \left|a_0 \left(1 + x\right)^{n}\right| \geq \left|a_0\right|\left|1 + nx\right| > \left|a_0\right|M\]
+
+
+            On en déduit que la suite n'est pas bornée, et donc divergente.
+
+            \vspace{1em}
+
+            \item \important{Soit $0 < r < 1$}. Soit $q = \frac{1}{r} > 1$. Donc, $\forall M > 0$, on sait que $\exists n_0 \in \mathbb{N}$ tel que $q^{n} > M$ pour tout $n > n_0$.
+
+            Soit $\epsilon > 0$. On choisit $M = \frac{\left|a_0\right|}{\epsilon} $. Ainsi: 
+            \[q^{n} > \frac{\left|a_0\right|}{\epsilon} \implies \frac{1}{q^{n}} = r^{n} < \frac{\epsilon}{\left|a_0\right|} \mathspace \forall n \geq n_0\]
+            
+            En conséquence, 
+            \[\left|a_0\right|r^{n} < \epsilon\]
+
+            Par la définition de la limite, on a donc: 
+            \[\left|a_0 r^n - 0\right| < \epsilon \implies \lim_{n \to \infty} a_0 r^{n} = 0\]
+            
+            \item \important{Soit $r = 1$}. On en déduit que 
+            \[\lim_{n \to \infty} a_0 r^{n} = \lim_{n \to \infty} a_0 = a_0\]
+            
+            
+        \item \important{Soit $r < 0$}. Exercice au lecteur. Astuce: si $\left|r\right| > 1$, alors par le point (1) on sait que $\left|a_0 r^{n}\right|$ n'est pas bornée. 
+
+                Si $-1 < r < 0$, on peut prendre $q = -r$ donc $\lim_{n \to \infty} a q^{n} = 0$ par le point (2). Donc: 
+                \[\lim_{n \to \infty} \underbrace{a_0 \left(-1\right)^{n}}_{\text{borné}} \underbrace{q_n}_{\to 0} = 0\]
+        \end{enumerate}
+    }
+}
+
+\parag{Exemple}{
+    Soit la suite 
+    \[a_n = \frac{5^{n}}{n!}\]
+
+    Alors, on a 
+    \[\lim_{n \to \infty} a_n = 0\]
+    
+    Pour utiliser les mots de la professeure, ``la factorielle est plus forte que l'exponentielle''.
+
+    \subparag{Preuve}{
+        Soit $n > 6$. Alors on a: 
+        \[a_n = \underbrace{\frac{5}{1} \cdot \frac{5}{2} \cdot \frac{5}{3} \cdot \frac{5}{4} \cdot \frac{5}{5}}_{M} \cdot \underbrace{\frac{5}{6}}_{\leq \frac{5}{6}} \cdot \underbrace{\frac{5}{7}}_{< \frac{5}{6}} \cdot \ldots \cdot \underbrace{\frac{5}{n}}_{< \frac{5}{6}} < M\left(\frac{5}{6}\right)^{n-5} = M\left(\frac{6}{5}\right)^{5} \left(\frac{5}{6}\right)^{n}\]
+        
+        Donc, 
+        \[\lim_{n \to \infty} M\left(\frac{6}{5}\right)^5 \left(\frac{5}{6}\right)^n =  M\left(\frac{6}{5}\right)^5\lim_{n \to \infty} \left(\frac{5}{6}\right)^n = 0\]
+        par le théorème des limites de suites géométriques. De plus, notre suite est bornée: 
+        \[0 \leq \frac{5^{n}}{n!} \leq M\left(\frac{6}{5}\right)^{n} \left(\frac{5}{6}\right)^{n} \forall n > 6\]
+        
+        Puisque les deux bornes tendent vers 0 quand $n \to \infty$ alors $a_n$ tend vers 0 par le théorème des gendarmes. 
+    }
+    
+    \subparag{Remarque}{
+        De la même manière on en déduit que 
+        \[\lim_{n \to \infty} \frac{1000000^n}{n!} = 0\]
+    }
+}
+
+\parag{Remarques}{
+    \begin{enumerate}[left=0pt]
+        \item Si $\lim\limits_{n \to \infty} x_n = \ell \in \mathbb{R}$, alors:
+        \[\lim\limits_{n \to \infty} \left|x_n\right| = \left|\ell\right|\]
+        
+        \item Si $\lim\limits_{n \to \infty} \left|x_n\right| = 0$. Alors, on sait que 
+        \[\lim\limits_{n \to \infty} x_n = 0\]
+        
+    \item En général $\lim\limits_{n \to \infty} \left|x_n\right| = \ell \neq 0$ n'implique pas que $\left(x_n\right)$ converge.
+    \item Si $\left(a_n\right)$ est bornée et $\lim\limits_{n \to \infty} b_n = 0$, alors: 
+    \[\lim_{n \to \infty} a_n b_n = 0\]
+    
+    \end{enumerate}
+    
+    \subparag{Démonstrations}{
+        \begin{enumerate}[left=0pt]
+            \item La démonstration est laissée en exercice au lecteur, mais on utilise que $\left|\left|x_n\right| - \left|\ell\right|\right| \leq \left|x_n - \ell\right|$ (qu'il faut aussi démontrer, naturellement).
+            \item On sait que pour tout $n \geq n_0$ alors 
+        \[0 \leq \left|x_n\right| \leq \epsilon \implies -\epsilon \leq x_n \leq \epsilon \implies \lim_{n \to \infty} x_n = 0\]
+    \item On peut prendre $a_n = \left(-1\right)^n$ comme contre-exemple. En effet 
+        \[\lim_{n \to \infty} \left|\left(-1\right)^n\right| = \lim_{n \to \infty} 1 = 1\]
+        converge, alors que $\left(a_n\right)$ diverge.
+    \item Soit $\left(a_n\right)$ borné, c'est à dire que $\left|a_n\right| < M$ pour tout $n \in \mathbb{N}$. Alors on a: 
+    \[0 \leq \left|a_n b_n\right| \leq M \left|b_n\right|\]
+    
+    Or, par la propriété (2), $\left|b_n\right|$ tend vers 0 quand $n \to \infty$. Donc, par les théorème des gendarmes, on sait que 
+    \[\lim_{n \to \infty} \left|a_n b_n\right| = 0 \over{\implies}{\text{propriété 2}} \lim_{n \to \infty} a_n b_n = 0 \]
+        \end{enumerate}
+    }
+}
+
+\parag{Théorème (Critère de d'Alembert)}{
+    Soit $\left(a_n\right)$ une suite telle que $a_n \neq 0$ pour tout $n \in \mathbb{N}$ et 
+    \[\lim_{n \to \infty} \left|\frac{a_{n+1}}{a_n}\right| = \rho \geq 0\]
+    
+    Alors, si $\rho < 1$, $\lim_{n \to \infty} a_n = 0$. Sinon, si $\rho > 1$, alors $\left(a_n\right)$ diverge. Si $\rho = 1$, on ne sait rien.
+
+    \subparag{Preuve}{
+        \important{$\rho < 1$:} Par hypothèse, nous avons:
+        \[\lim_{n \to \infty} \left|\frac{a_{n+1}}{a_n}\right| = \rho < 1\]
+        
+        On sait que pour tout $\epsilon > 0$, il existe $n_0 \in \mathbb{N}$ tel que $\forall n \geq n_0$ on a:
+        \[\left|\frac{a_{n+1}}{a_n}\right| \leq \rho + \epsilon\]
+        
+        On choisit $\epsilon$ de telle manière que $\rho + \epsilon < 1$ (on sait qu'il existe puisque $\rho < 1$). Soit $m > n_0$. On sait que 
+        \[\left|\frac{a_m}{a_{n_0}}\right| = \underbrace{\left|\frac{a_m}{a_{m-1}}\right|}_{\leq \rho + \epsilon}\underbrace{\left|\frac{a_{m-2}}{a_{m-2}}\right|}_{\leq \rho + \epsilon}\ldots\underbrace{\left|\frac{a_{n_0 + 1}}{a_{n_0}}\right|}_{\leq \rho + \epsilon} \leq \left(\rho + \epsilon\right)^{m - n_0}\]
+        
+        Donc: 
+        \[0 \leq \left|a_m\right| \leq \left(\rho + \epsilon\right)^{m - n_0} \left|a_{n_0}\right| \mathspace \forall m > n_0\]
+        
+        Or la borne supérieure est une suite géométrique, et elle tend vers 0 quand $n$ tend vers l'infini. Donc, par le théorème des gendarmes, on sait que 
+        \[\lim_{n \to \infty} \left|a_m\right| = 0 \implies \lim_{m \to \infty} a_m = 0\]
+        
+        \vspace{1em}
+
+        \important{$\rho > 1$:} On sait que $\exists n_0 \in \mathbb{N}$ tel que $\forall n \geq n_0$, alors 
+        \[\left|\frac{a_{n+1}}{a_n}\right| > \rho - \epsilon\]
+
+        À nouveau, on choisit $\epsilon$ tel que $\rho - \epsilon > 1$ (on sait qu'il existe puisque $\rho > 1$). On a donc: 
+        \[\left|\frac{a_m}{a_{n_0}}\right| = \underbrace{\left|\frac{a_m}{a_{m-1}}\right|}_{\geq \rho + \epsilon}\underbrace{\left|\frac{a_{m-2}}{a_{m-2}}\right|}_{\geq \rho + \epsilon}\ldots\underbrace{\left|\frac{a_{n_0 + 1}}{a_{n_0}}\right|}_{\geq \rho + \epsilon} \geq \left(\rho - \epsilon\right)^{m - n_0}\]
+        
+        En d'autres mots, 
+        \[\left|a_m\right| \geq \left(\rho - \epsilon\right)^{m - n_0} \left|a_{n_0}\right|\]
+        
+        Puisque la borne inférieure diverge, alors $\left(a_n\right)$ est forcément divergente.
+
+        \qed
+    }
+}
+
+\subsection{Limites infinies}
+\parag{Définition}{
+    On dit que $\left(a_n\right)$ tend vers $+\infty$ si $\forall A > 0$, $\exists n_0 \in \mathbb{N}$ tel que $\forall n \geq n_0$, alors $a_n \geq A$.
+
+    On note: 
+    \[\lim_{n \to \infty} a_n = \infty\]
+}
+
+\parag{Définition}{
+    On dit que $\left(a_n\right)$ tend vers $-\infty$ si $\forall A > 0$, $\exists n_0 \in \mathbb{N}$ tel que $\forall n \geq n_0$, alors $a_n \leq -A$.
+
+    On note: 
+    \[\lim_{n \to \infty} a_n = -\infty\]
+}
+
+\parag{Terminologie}{
+   On ne dit pas que des limites ``convergent vers l'infini'', puisqu'elles divergent. On dit qu'elles ``tendent vers l'infini''.
+}
+
+\parag{Propriétés}{
+    \begin{enumerate}[left=0pt]
+        \item Si $\lim\limits_{n \to \infty} a_n = \infty = \lim\limits_{n \to \infty} b_n$, alors:
+        \[\lim\limits_{n \to \infty} \left(a_n + b_n\right) = \infty\]
+
+        \item $\lim\limits_{n \to \infty} a_n = \pm \infty$ et $\left(b_n\right)$ est bornée, alors 
+        \[\lim_{n \to \infty} \left(a_n \pm b_n\right) = \pm \infty\]
+        \item Si $\lim\limits_{n \to \infty} b_n = \infty$ et $a_n \geq b_n$, alors 
+        \[\lim_{n \to \infty} a_n = \infty\]
+        
+        \item Si $\lim\limits_{n \to \infty} b_n = -\infty$ et $a_n \leq b_n$, alors 
+        \[\lim_{n \to \infty} a_n = -\infty\]
+        
+        \item Si $\left(a_n\right)$ est bornée et $\lim\limits_{n \to \infty} b_n = \pm \infty$, alors 
+        \[\lim_{n \to \infty} \frac{a_n}{b_n} = 0\]
+    
+        \item Si $\lim\limits_{n \to \infty} \left|\frac{a_{n+1}}{a_n}\right| = \infty$ et $a_n \neq 0$ pour tout $n$. Alors, $\left(a_n\right)$ diverge.
+    \end{enumerate}
+    
+    On appelle les propriété 3 et 4 ``la règle d'un gendarme'', par opposition à la ``règle des deux gendarmes'' pour les limites finies.
+
+    La démonstration du point $5$ est laissée au lecteur.
+
+    Le point 6 est une continuation au critère de d'Alembert.
+} 
+
+\parag{Formes indéterminées}{
+    \begin{enumerate}[left=0pt]
+        \item $\infty - \infty$
+        \item $0\cdot \infty$
+        \item $\frac{\infty}{\infty}$
+        \item $\frac{0}{0}$
+        \item $1^{\infty}$
+        \item $0^{0}$
+        \item $\infty^{0}$
+    \end{enumerate}
+    
+}
+
+\parag{Suites trigonométriques}{
+    $\left(\cos n\right)$ et $\left(\sin n\right)$ sont divergentes (mais bornées).
+
+    \subparag{Démonstration}{
+    Supposons par l'absurde que $\exists \lim_{n \to \infty} \cos n = \ell$. L'ensemble 
+    \[\left\{\cos\left(n\right), \cos\left(n+1\right), \cos\left(n+2\right), \cos\left(n+3\right), \cos\left(n+4\right)\right\}\]
+    contient toujours des valeurs positives et négatives pour tout $n$, puisque $3 \leq \pi < 4$. Il existe donc un nombre infini de valeurs positives et négatives, ce qui implique que la limite ne peut ni être positive ni être négative. Donc, on en déduit que nécessairement 
+    \[\lim_{n \to \infty} \cos\left(n\right) = 0\]
+
+    Par le même argument, on en déduit aussi que 
+    \[\lim_{n \to \infty} \sin\left(n\right) = 0\]
+    
+    Cependant, cela veut donc dire que 
+    \[\lim_{n \to \infty} \underbrace{\left(\sin^2\left(n\right) + \cos^2\left(n\right)\right)}_{= 1 \ \forall n \in \mathbb{N}} = 0\]
+    
+    Ce qui est une contradiction.
+    \qed
+    }
+}
+
+\parag{Théorème (convergence des suites monotones)}{
+    Toute suite croissante qui est majorée converge vers le supremum de son ensemble. De la même manière, toute suite décroissante qui est minorée converge vers l'infimum de son ensemble.
+
+    De plus, toute suite croissante qui n'est pas majorée tend vers $+\infty$ (diverge). De manière similaire, toute suite décroissante qui n'est pas minorée tend vers $-\infty$ (diverge).
+
+    \subparag{Notation}{
+        $\left(a_n\right)\uparrow$ veut dire que $\left(a_n\right)$ est croissante.
+
+        $\left(a_n\right)\downarrow$ veut dire que $\left(a_n\right)$ est décroissante.
+    }
+
+    \subparag{Preuve}{
+        Soit $\left(a_n\right)\uparrow$ une suite majorée. Alors il existe $\ell = \sup\left\{a_n, n \in \mathbb{N}\right\}$. En d'autres mots, $a_n \leq \ell$ pour tout $n$, et:
+        \[\forall \epsilon > 0, \exists n_0 \in \mathbb{N} \text{ tel que } 0 \leq \ell - a_{n_0} \leq \epsilon\]
+
+        Puisque $\left(a_n\right)$ est croissante, et puisque $\ell$ est un majorant, on sait que $\forall n \geq n_0$, alors $\ell \geq a_n \geq a_{n_0}$. Ainsi: 
+        \[\forall n \geq n_0 \mathspace 0 \leq \ell - a_n \leq \ell - a_{n_0} \leq \epsilon \over{\implies}{\text{déf}} \lim_{n \to \infty} a_n = \ell \]
+
+        Soit $\left(a_n\right)\uparrow$ une suite non majorée. Alors, $\forall A > 0$, $\exists n_0$ tel que $a_{n_0} \geq A$. De plus, on sait que $\left(a_n\right)$ est croissante. Donc, $a_n \geq a_{n_0} \geq A$ pour tout $n \geq n_0$. Par définition, on a donc que 
+        \[\lim_{n \to \infty} a_n = \infty\]
+        
+        Le cas de $\left(a_n\right)\downarrow$ est similaire.
+
+        \qed
+    }
+    
+}
+
+\end{document}

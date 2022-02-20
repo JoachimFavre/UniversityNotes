@@ -1,0 +1,306 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-04 at 08:14:01.
+
+\usepackage{../../style}
+
+\title{Algèbre}
+\author{Joachim Favre}
+\date{Jeudi 04 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2021-11-04}{Dimension et lignes}{
+    \begin{itemize}[left=0pt]
+        \item Définition de la dimension.
+        \item Explication et justification du théorème de la complétion de base.
+        \item Définition de rang.
+        \item Dérivation de l'équation qui lie $\dim\ker A$ et $\rang A$.
+        \item Définition de l'espace engendré par les lignes, $\lgn A$.
+        \item Preuve du fait que $\rang A = \rang A^T$.
+    \end{itemize}
+
+}
+
+\parag{Exemple 1}{
+    La base canonique $\mathbb{P}_3$ est $\mathcal{B} = \left(p_0, p_1, p_2, p_3\right)$ avec:
+    \[p_0\left(t\right) = 1, \mathspace p_1\left(t\right) = t, \mathspace p_2\left(t\right) = t^2, \mathspace p_3 = t^3\]
+
+    Tout $p$ dans $\mathbb{P}_3$ s'écrit $p\left(t\right) = a_0 + a_1 t + a_2t^2 + a_3t^3$ pour certains coefficients $a_0$, $a_1$, $a_2$ et $a_3$. Ce sont les coordonnées de $p$ dans la base $\mathcal{B}$. On peut donc écrire:
+    \[\left[p\right]_{\mathcal{B}} = \left[a_0 p_0\left(t\right) + a_1p_1\left(t\right) + a_2p_2\left(t\right) + a_rp_3\left(t\right)\right]_{\mathcal{B}} = \begin{bmatrix} a_0 \\ a_1 \\ a_2 \\ a_3 \end{bmatrix} \]
+
+    De cette manière, $\mathbb{P}_3$ et $\mathbb{R}^{4}$ sont isomorphes : on peut répondre à des questions d'algèbre linéaire dans $\mathbb{P}_3$ en les transformant en questions dans $\mathbb{R}^4$.
+}
+
+\parag{Exemple 2}{
+    Soit $V = \mathbb{R}^{2\times 3}$ l'espace des matrices de taille $2 \times 3$. Sa base canonique est $\mathcal{B} = \left(B_1, \ldots, B_6\right)$ avec:
+    \[B_1 = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 0 \end{bmatrix}, \mathspace B_2 = \begin{bmatrix} 0 & 1 & 0 \\ 0 & 0 & 0 \end{bmatrix}, \mathspace B_3 = \begin{bmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \end{bmatrix}\]
+    \[B_4 = \begin{bmatrix} 0 & 0 & 0 \\ 1 & 0 & 0 \end{bmatrix}, \mathspace B_5 = \begin{bmatrix} 0 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix}, \mathspace B_6 = \begin{bmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \end{bmatrix}\]
+
+    L'application coordonnées associée à $\mathcal{B}$ est laissée en exercice au lecteur. Elle établit un isomorphisme entre $\mathbb{R}^{2\times3}$ et $\mathbb{R}^{6}$.
+}
+
+\parag{Exemple 3}{
+    Nous voulons trouver une base pour le sous-espace des matrices symétriques $2\times 2$. On se rend compte qu'elles sont toutes sous la forme:
+    \[\begin{bmatrix} a & b \\ b & c \end{bmatrix} = a\begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix} + b \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} + c\begin{bmatrix} 0 & 0 \\ 0 & 1 \end{bmatrix} \]
+
+    Donc on peut utiliser ces matrices comme base, ce qui montre un isomorphisme avec $\mathbb{R}^{3}$.
+}
+
+
+\subsection{Dimension}
+\parag{Théorème}{
+    Si un espace vectoriel $V$ admet une base de $n$ vecteurs, alors toutes les bases de $V$ comportent exactement $n$ vecteurs.
+
+    \subparag{Isomorphisme}{
+        Si $\mathcal{B} = \left(\bvec{b}_1, \ldots, \bvec{b}_n\right)$ est une base de $V$, alors $V$ est isomorphe à $\mathbb{R}^{n}$. Le nombre $n$ ne dépend \textit{pas} du choix de la base.
+    }
+
+    \subparag{Remarque}{
+        On sait que tout espace vectoriel a une base, puisqu'on peut en extraire une d'une famille de vecteurs qui l'engendrent.
+    }
+}
+
+\parag{Définition de la dimension}{
+    On appelle \important{dimension de $V$}, notée $\dim V$, le nombre d'éléments d'une base de $V$.
+
+    Par convention, $\dim \left\{\bvec{0}\right\} = 1$.
+}
+
+\parag{Exemples}{
+    Voici les dimensions de certains espaces vectoriels :
+    \begin{itemize}
+        \item $\dim\mathbb{R}^{n} = n$
+        \item $\dim \mathbb{R}^{m \times n} = mn$
+        \item $\dim \mathbb{P}_n = n + 1$
+        \item L'origine dans $\mathbb{R}^{3}$: 0
+        \item Une droite passant par l'origine dans $\mathbb{R}^{3}$: 1
+        \item Un plan passant par l'origine dans $\mathbb{R}^{3}$: 2
+        \item L'espace $\mathbb{R}^{3}$ tout entier: 3
+        \item L'espace des matrices symétriques de taille $2\times2$ : 3
+        \item L'espace des matrices symétriques de taille $3\times3$ : 6
+        \item L'espace des matrices symétriques de taille $n\times n$ : $\frac{n\left(n+1\right)}{2}$
+    \end{itemize}
+}
+
+\parag{Complétion d'une base}{
+    Soit $H$ un sous-espace vectoriel de $V$. Toute famille libre de $H$ peut être complétée pour former une base de $H$.
+
+    Cette affirmation est celle complémentaire au théorème de la base extraite.
+
+    \subparag{Justification}{
+        Soit $F = \left(\bvec{u}_1, \ldots, \bvec{u}_k\right)$ une famille libre de $H$. Si $H = \vect F$, alors $F$ est une base.
+
+        Sinon, il existe un vecteur dans $H$ mais pas dans $\vect F$. Appelons-le $\bvec{u}_{k+1}$. Alors, $\left(\bvec{u}_1, \ldots, \bvec{u}_k, \bvec{u}_{k+1}\right)$ est toujours libre.
+
+        On peut continuer  à ajouter des vecteurs jusqu'à ce que la famille (toujours libre) engendre $H$. Alors, on obtient une base de $H$.
+    }
+}
+
+\parag{Dimension d'un sous-espace}{
+    Soit $H$ un sous-espace vectoriel de $V$. Alors:
+    \[\dim H \leq \dim V\]
+
+    En effet, une base de $H$ est une famille libre de $V$, on peut la compléter pour obtenir une base de $V$, sans jamais devoir supprimer de vecteur.
+}
+
+
+\parag{Nombre de vecteurs d'une base}{
+    Soit $V$ un espace vectoriel avec $\dim V = p$.
+    \begin{itemize}
+        \item Toute famille libre de $p$ éléments de $V$ est une base de $V$.
+        \item Toute famille de $p$ éléments qui engendre $V$ (exactement) est une base de $V$.
+    \end{itemize}
+
+    \subparag{Justification}{
+        \begin{itemize}[left=0pt]
+            \item On peut ``compléter'' la famille pour obtenir une base, mais une base a $p$ éléments, donc on ne doit rien ajouter.
+            \item On peut ``extraire'' une base de la famille, mais une base a $p$ éléments, donc on ne doit rien retirer.
+        \end{itemize}
+
+    }
+
+}
+
+\parag{Dimension du kernel et de l'image}{
+    Prenons la matrice suivante, et sa forme échelonnée réduite:
+    \[A = \begin{bmatrix} -3 & 6 & -1 & 1 & -7 \\ 1 & -2 & 2 & 3 & -1 \\ 2 & -4 & 5 & 8 & -4 \end{bmatrix} \mathspace \longrightarrow \mathspace \begin{bmatrix} 1 & -2 & 0 & -1 & 3 \\ 0 & 0 & 1 & 2 & -2 \\ 0 & 0 & 0 & 0 & 0 \end{bmatrix} \]
+
+    On avait trouvé la base de son kernel et de son image:
+    \[\ker A = \vect\left\{\begin{bmatrix} 2 \\ 1 \\ 0 \\ 0 \\ 0 \end{bmatrix}, \begin{bmatrix} 1 \\ 0 \\ -2 \\ 1 \\ 0 \end{bmatrix}, \begin{bmatrix} -3 \\ 0 \\ 2 \\ 0 \\ 1 \end{bmatrix} \right\}, \mathspace \im A = \vect \left\{\begin{bmatrix} -3 \\ 1 \\ 2 \end{bmatrix}, \begin{bmatrix} -1 \\ 2 \\ 5 \end{bmatrix} \right\}\]
+
+    De manière générale, on remarque que la \important{dimension de $\ker A$} est égale au nombre de variables libres de l'équation $A \bvec{x} = \bvec{0}$, et la \important{dimension de $\im A$} est égale au nombre de colonnes pivots de $A$.
+
+    On se rend compte, qu'il nous aurait suffit d'un échelonnement non-réduit pour les trouver. De plus, on voit que:
+    \[\dim \ker A + \dim \im A = n\]
+    où $n$ est le nombre de colonnes de $A$.
+}
+
+\subsection{Rang}
+\parag{Définition de rang}{
+    Le \important{rang} (``rank'' en anglais) d'une matrice $A \in \mathbb{R}^{m \times n}$ est la dimension du sous-espace engendré par ses colonnes:
+    \[\rang A = \dim \im A\]
+}
+
+\parag{Observation}{
+    Comme $\im A$ est un sous-espace $\mathbb{R}^{m}$, on a :
+    \[\rang A \leq m\]
+
+    Et, puisque $\im A$ est engendré par $n$ vecteurs, on a aussi:
+    \[\rang A \leq n\]
+}
+
+\parag{Théorème du rang}{
+    L'égalité suivante tiens toujours:
+    \[\rang A + \dim \ker A = n\]
+
+    \subparag{Justification}{
+        \begin{itemize}[left=0pt]
+            \item $\rang A = \text{nombre de colonnes pivots}$
+            \item $\dim\ker A = \text{nombre de colonnes non pivots}$
+            \item $n = \text{nombre de colonnes}$
+        \end{itemize}
+
+    }
+}
+
+\parag{Vrai ou faux}{
+    Est-ce que pour, $A \in \mathbb{R} ^{m \times n}$, on a:
+    \begin{enumerate}
+        \item $\dim\ker A \leq n$?
+        \item $\dim\ker A \leq m$?
+    \end{enumerate}
+
+    On a:
+    \begin{enumerate}
+        \item C'est vrai, on peut le déduire du théorème du rang, puisque $0 \leq \rang A \leq n$. Une autre justification est que le kernel est un sous espace de $\mathbb{R}^{n}$, donc il a une dimension de au plus $n$.
+        \item C'est faux. On peut par exemple prendre la matrice suivante:
+            % Source: https://tex.stackexchange.com/a/3521/252510
+            \setcounter{MaxMatrixCols}{20}
+            \[A = \begin{bmatrix} 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \end{bmatrix}\]
+            \setcounter{MaxMatrixCols}{10}
+
+            On a l'inégalité suivante:
+            \[\dim\ker A = 15 > 2 = m\]
+    \end{enumerate}
+}
+
+\subsection{Espace engendré par les lignes}
+\parag{Lignes des matrices}{
+    Pour une matrice $A \in \mathbb{R}^{m \times n}$, on a considéré $\im A$ l'espace engendré par ses colonnes. Que peut-on dire de l'espace engendré par les lignes de $A$, vues comme des vecteurs de $\mathbb{R}^{n}$?
+}
+
+\parag{Exemple}{
+    Soit la matrice suivante, et sa transpose:
+    \[A = \begin{bmatrix} -3 & 6 & -1 & 1 & -7 \\ 1 & -2 & 2 & 3 & -1 \\ 2 & -4 & 5 & 8 & -4 \end{bmatrix} \implies A^T = \begin{bmatrix} -3 & 1 & 2 \\ 6 & -2 & -4 \\ -1 & 2 & 5 \\ 1 & 3 & 8 \\ -7 & -1 & -4 \end{bmatrix} \]
+
+    Alors, on a:
+    \[\ligne_1\left(A\right) = \begin{bmatrix} -3 \\ 6 \\ -1 \\ 1 \\ -7 \end{bmatrix}, \mathspace \ligne_2\left(A\right) = \begin{bmatrix} 1 \\ -2 \\ 2 \\ 3 \\ -1 \end{bmatrix}, \mathspace \ligne_3\left(A\right) = \begin{bmatrix} 2 \\ -4 \\ 5 \\ 8 \\ -4 \end{bmatrix} \]
+}
+
+\parag{Espace des lignes}{
+    L'espace des lignes de $A \in \mathbb{R}^{m\times n}$ est le sous-espace de $\mathbb{R}^{n}$ engendré par les lignes, noté:
+    \[\lgn A = \im A^T = \vect\left\{\ligne_1\left(A\right), \ldots, \ligne_m\left(A\right)\right\}\]
+}
+
+\parag{Observation}{
+    On remarque que, puisque $\lgn A$ est un sous-espace de $\mathbb{R}^{n}$:
+    \[\lgn A \leq n\]
+
+    De plus, puisque $\lgn A$ est engendré par $m$ vecteurs:
+    \[\lgn A \leq m\]
+
+    Aussi, on remarque que:
+    \[\dim\lgn A = \dim\im A^T = \rang A^T\]
+}
+
+\parag{Théorème}{
+    On a l'égalité suivante:
+    \[\rang A = \rang A^T\]
+
+    Autrement dit:
+    \[\dim\im A = \dim\lgn A\]
+
+    \subparag{Surprise}{
+        Ce résultat est quelque peu surprenant, puisque $\im A$ est un sous-espace de $\mathbb{R}^{m}$, mais $\lgn A$ est un sous-espace de $\mathbb{R}^{n}$.
+    }
+
+
+    \subparag{Lemme}{
+        Soient $A$ et $B$ deux matrices dont le produit $AB$ est compatible. Si $B$ est inversible, alors
+        \[\im A = \im\left(AB\right)\]
+    }
+
+    \subparag{Preuve du lemme}{
+        On va prouver que $\im(AB) \subseteq \im A$, puis que $\im A \subseteq \im(AB)$. On va voir qu'on n'a pas besoin que $B$ soit inversible dans le premier point, mais qu'on en aura besoin dans le deuxième.
+
+        \vspace{1em}
+
+        \important{$\im(AB) \subseteq \im A$:} Soit $\bvec{y}$ un vecteur quelconque dans $\im(AB)$. Par définition de l'image de $AB$, on sait qu'il existe un vecteur $\bvec{z}$ tel que $\bvec{y} = AB \bvec{z}$.
+
+        Donc, cela implique:
+        \[\bvec{y} = A\left(B \bvec{z}\right) = A \bvec{x}, \mathspace \text{avec } \bvec{x} = B \bvec{z}\]
+
+        On peut ainsi en déduire que $\bvec{y}$ est une combinaison linéaire des colonnes de $A$.
+
+        \vspace{1em}
+
+        \important{$\im A \subseteq \im(AB)$} Soit $\bvec{y}$ un vecteur quelconque dans $\im A$. Par définition, il existe $\bvec{x}$ tel que $\bvec{y} = A \bvec{x}$.
+
+        Comme $B$ est inversible, on sait qu'il existe $\bvec{z}$ tel que:
+        \[\bvec{z} = B^{-1} \bvec{x} \implies B \bvec{z} = \bvec{x}\]
+
+        Donc,
+        \[\bvec{y} = A \bvec{x} = AB \bvec{z}\]
+
+        On en déduit que $\bvec{y}$ est dans $\im(AB)$.
+
+        \qed
+    }
+
+    \subparag{Preuve du théorème}{
+        On veut montrer que $\rang A = \rang A^T$.
+
+        Soit $M$ une forme échelonnée de $A$ ; $A$ et $M$ sont de même taille, $m \times n$. On sait qu'il existe une matrice inversible $E \in\mathbb{R}^{m\times m}$ telle que:
+        \[M = E A\]
+
+        En transposant de chaque côté, on trouve:
+        \[M^T = \left(EA\right)^T = A^T E^T\]
+
+        On sait que, puisque $E$ est inversible, alors $E^{T}$ est aussi inversible. Donc, le lemme nous permet d'écrire:
+        \[\im M^T = \im\left(A^T E^T\right) = \im A^T\]
+
+        On sait que $\dim\im A^T = \rang A^T$, mais on veut encore montrer que $\dim \im M^T = \rang A$. On peut étudier un exemple:
+
+        \[A = \begin{bmatrix} -3 & 6 & -1 & 1 & -7 \\ 1 & -2 & 2 & 3 & -1 \\ 2 & -4 & 5 & 8 & -4 \end{bmatrix}\]
+
+        Sa matrice échelonnée réduite équivalent $M$ est :
+        \[\mathspace M = \begin{bmatrix} {\color{red}1} & -2 & 0 & -1 & 3 \\ 0 & 0 & {\color{red}1} & 2 & -2 \\ 0 & 0 & 0 & 0 & 0 \end{bmatrix}, \mathspace M^T = \begin{bmatrix} {\color{red}1} & 0 & 0 \\ -2 & 0 & 0 \\ 0 & {\color{red}1} & 0 \\ -1 & 2 & 0 \\ 3 & -2 & 0 \end{bmatrix}\]
+
+        On déduit à raison que $\dim\im M^T = \text{\# pivots} = \rang A$.
+
+        Donc, on a que:
+        \[\rang A = \rang A^T\]
+
+        \qed
+
+    }
+
+    \subparag{Autre implication}{
+        Nous avons utilisé l'égalité suivante dans la preuve du théorème:
+        \[\lgn A = \im A^T = \im M^T = \lgn M\]
+
+        En regardant l'exemple ci-dessus, il est clair que les colonnes non-nulles de $M^T$ sont linéairement indépendantes (puisque les coefficients sur la droite et la gauche des coefficients pivots sont toujours nuls (en effet, $M$ est une forme échelonnée réduite)).
+
+        Nous avons donc trouvé une procédure pour déterminer une base de l'espace des lignes de $A$.
+
+        Il n'est pas nécessaire d'utiliser la matrice échelonnée réduite, une matrice échelonnée quelconque (\smiley) est suffisante.
+
+        Dans notre exemple ci-dessus:
+        \[\lgn A = \vect\left\{\begin{bmatrix} 1 \\ -2 \\ 0 \\ -1 \\ 3 \end{bmatrix}, \begin{bmatrix} 0 \\ 0 \\ 1 \\ 2 \\ -2 \end{bmatrix}  \right\}\]
+
+    }
+}
+
+\end{document}

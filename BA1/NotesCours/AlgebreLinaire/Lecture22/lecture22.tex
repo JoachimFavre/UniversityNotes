@@ -1,0 +1,178 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-06 at 13:14:43.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Lundi 06 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{22}{2021-12-06}{La la la Schtroumpf la la}{
+    \begin{itemize}[left=0pt]
+        \item Explication de l'algorithme du Grand Schtroumpf (euh de Gram-Schmidt pardon). 
+        \item Explication de la méthode pour factoriser une matrice dans la forme $QR$. 
+        \item Étude du cas de la factorisation $QR$ matrice carrée, et meilleure compréhension du déterminant d'une matrice.
+    \end{itemize}
+}
+
+\subsection{Orthonormalisation}
+\parag{Introduction}{
+    Soit $W = \vect\left\{\bvec{x}_1, \bvec{x}_2\right\}$, où: 
+    \[\bvec{x}_1 = \begin{bmatrix} 3 \\ 6 \\ 0 \end{bmatrix}, \mathspace \bvec{x} = \begin{bmatrix} 1 \\ 2 \\ 2 \end{bmatrix} \]
+    
+    Pour calculer des projections orthogonales sur $W$, ce serait pratique d'avoir une base orthonormée. La base $\mathcal{B} = \left(\bvec{x}_1, \bvec{x}_2\right)$ n'est même pas orthogonale: 
+    \[\bvec{x}_1 \dotprod \bvec{x}_1 = 45, \mathspace \bvec{x}_1 \dotprod \bvec{x}_2 = 15, \mathspace \bvec{x}_2 \dotprod \bvec{x}_2 = 9\]
+    
+    On va donc \important{orthonormaliser} cette base.
+
+    \imagehere[0.7]{MethodeOrthonormalisation.png}
+
+    Pour commencer, normalisons $\bvec{x}_1$: 
+    \[\left\|\bvec{x}_1\right\|^2 = 3^2 + 6^2 + 0^2 = 45 \implies \bvec{u}_1 = \frac{1}{\left\|\bvec{x}_1\right\|} \bvec{x}_1 = \frac{1}{3\sqrt{5}} \begin{bmatrix} 3 \\ 6 \\ 0 \end{bmatrix} = \frac{1}{\sqrt{5}} \begin{bmatrix} 1 \\ 2 \\ 0 \end{bmatrix} \]
+
+    Maintenant, construisons $\bvec{v}_2$. On projette $\bvec{x}_2$ sur la droite donnée par $W_1$, donc la droite engendrée par $\bvec{u}_1$, puis on va soustraire ce résultat à $\bvec{x}_2$:
+    \[\bvec{v}_2 = \bvec{x}_2 - \proj_{W_1}\left(\bvec{x}_2\right) = \bvec{x}_2 - \left(\bvec{x}_2 \dotprod \bvec{u}_1\right) \bvec{u}_1 = \begin{bmatrix} 1 \\ 2 \\ 2 \end{bmatrix} - \frac{5}{\sqrt{5}} \cdot \frac{1}{\sqrt{5}} \begin{bmatrix} 1 \\ 2 \\ 0 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 2 \end{bmatrix} \]
+    
+    Finalement, nous pouvons normaliser $\bvec{v}_2$ pour obtenir le deuxième vecteur de notre base orthonormée: 
+    \[\bvec{u}_2 = \frac{1}{\left\|\bvec{v}\right\|} \bvec{v} = \frac{1}{2} \begin{bmatrix} 0 \\ 0 \\ 2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} \]
+    
+    Ainsi, par construction, $\mathcal{U} = \left(\bvec{u}_1, \bvec{u}_2\right)$ est une base orthonormée, et $\vect\left\{\bvec{u}_1, \bvec{u}_2\right\} = \vect\left\{\bvec{x}_1, \bvec{x}_2\right\}$
+
+    \subparag{Observation 1}{
+        On remarque que: 
+        \[\bvec{x}_1 = \left\|\bvec{x}_1\right\|\bvec{u}_1\]
+
+        De plus, en manipulant un petit peu les équations ci-dessus: 
+        \[\bvec{x}_2 = \left(\bvec{x}_2 \dotprod \bvec{u}_1\right)\bvec{u}_1 + \bvec{v}_2 = \left(\bvec{x}_2 \dotprod \bvec{u}_1\right) \bvec{u}_1 + \left\|\bvec{v}_2\right\| \bvec{u}_2\]
+        
+        Ainsi, on peut écrire ceci sous la forme d'un produit matriciel: 
+        \[\begin{bmatrix}  &  \\ \bvec{x}_1 & \bvec{x}_2 \\  &  \end{bmatrix} = \begin{bmatrix}  &  \\ \bvec{u}_1 & \bvec{u}_2 \\  &  \end{bmatrix} \begin{bmatrix} \left\|\bvec{x}_1\right\| & \bvec{x}_2 \dotprod \bvec{u}_1 \\ 0 & \left\|\bvec{v}_2\right\| \end{bmatrix} \implies A = QR\]
+        où $A$ est la matrice dont les colonnes forment une base quelconque de $W$, $Q$ est une matrice dont les colonnes forment une base orthonormée de $W$, et $R$ est une matrice triangulaire supérieure. On se rendra compte qu'on pourra toujours factoriser $A$ sous cette forme, si les colonnes de $A$ sont linéairement indépendants.
+    }
+
+    \subparag{Observation 2}{
+        Non seulement $\left(\bvec{u}_1, \bvec{u}_2\right)$ est une base orthonormée de $\vect\left\{\bvec{x}_1, \bvec{x}_2\right\}$, mais aussi $\left(\bvec{u}_1\right)$ est une base orthonormée de $\vect\left\{\bvec{x}_1\right\}$.
+    }
+
+    \subparag{Remarque}{
+        Cet algorithme s'appelle formellement l'algorithme de Gram-Schmidt. Cependant, il est beaucoup plus intéressant de lui donner des noms amicaux. Un très bon ami, un \textit{Génie en la Physique}, l'appelle ``l'algorithme du Grand Schmit'', ou ``l'algorithme du Grand Schtroumpf''.
+    }
+}
+
+\parag{Avec 3 vecteurs}{
+    Soient les trois vecteurs suivants: 
+    \[\bvec{x}_1 = \begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix}, \mathspace \bvec{x}_2 = \begin{bmatrix} 0 \\ 1 \\ 1 \\ 1 \end{bmatrix}, \mathspace \bvec{x}_3 = \begin{bmatrix} 0 \\ 0 \\ 1 \\ 1 \end{bmatrix} \]
+    
+    On peut se rendre compte que ces trois vecteurs sont linéairement indépendants, donc ils forment une base pour $W = \vect\left\{\bvec{x}_1, \bvec{x}_2, \bvec{x}_3\right\}$. Comme la dernière fois, on veut construire une base orthonormée $\mathcal{U} = \left(\bvec{u}_1, \bvec{u}_2, \bvec{u}_3\right)$.
+
+    Pour commencer, calculons $\bvec{u}_1$ en normalisant $\bvec{x}_1$: 
+    \[\left\|\bvec{x}_1\right\|^2 = 4 \implies \bvec{u}_1 = \frac{1}{\left\|\bvec{x}_1\right\|} \bvec{x}_1 = \frac{1}{2} \begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix} \]
+    
+    Maintenant, pour calculer $\bvec{v}_2$, on retranche la projection de $\bvec{x}_2$ sur $W_1 = \vect\left\{\bvec{u}_1\right\}$ à $\bvec{x}_2$: 
+    \[\bvec{v}_2 = \bvec{x}_2 - \proj_{W_1}\left(\bvec{x}_2\right) = \bvec{x}_2 - \left(\bvec{x}_2 \dotprod \bvec{u}_1\right)\bvec{u}_1 = \begin{bmatrix} 0 \\ 1 \\ 1 \\ 1 \end{bmatrix} - \frac{3}{2} \cdot \frac{1}{2}\begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix} = \begin{bmatrix} -3 / 4 \\ 1 / 4 \\ 1 / 4 \\ 1 / 4 \end{bmatrix} = \frac{1}{4} \begin{bmatrix} -3 \\ 1 \\ 1 \\ 1 \end{bmatrix} \]
+    
+    Ainsi, en normalisant $\bvec{v_2}$, on obtient $\bvec{u}_1$: 
+    \[\bvec{u}_2 = \frac{1}{\bvec{v}_2} \bvec{v}_2 = \frac{2}{\sqrt{3}} \frac{1}{4} \begin{bmatrix} -3 \\ 1 \\ 1 \\ 1 \end{bmatrix} = \frac{1}{2\sqrt{3}} \begin{bmatrix} -3 \\ 1 \\ 1 \\ 1 \end{bmatrix} \]
+
+    On remarque que, jusque là, le fait qu'on ait 3 vecteurs ne change rien : on n'a jamais utilisé le troisième vecteur.
+
+    \imagehere[0.5]{MethodeOrthonormalisation3Vecteurs.png}
+
+    On va faire le même raisonnement que pour les dernières fois : on va projeter $\bvec{x}_3$ sur $W_2 = \vect\left\{\bvec{u}_1, \bvec{u}_2\right\}$, puis retrancher ce résultat à $\bvec{x}_3$ pour obtenir $\bvec{v_3}$. La projection est calculable facilement, puisque $\left(\bvec{u}_1, \bvec{u}_2\right)$ est une base orthogonale.
+    
+    \[\bvec{v}_3 = \bvec{x}_3 - \proj_{W_2}\left(\bvec{x}_3\right) = \bvec{x}_3 - \left(\bvec{x_3} \dotprod \bvec{u}_1\right)\bvec{u}_1 - \left(\bvec{x}_3 \dotprod \bvec{u}_2\right)\bvec{u}_2\]
+
+    Ainsi, on obtient 
+    \[\bvec{v}_3 = \begin{bmatrix} 0 \\ 0 \\ 1 \\ 1 \end{bmatrix} - 1\cdot \frac{1}{2} \begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix} - \frac{1}{\sqrt{3}} \frac{1}{2\sqrt{3}} \begin{bmatrix} -3 \\ 1 \\ 1 \\ 1 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 1 \\ 1 \end{bmatrix} - \begin{bmatrix} 1 / 2 \\ 1 / 2 \\ 1 / 2 \\ 1 / 2 \end{bmatrix}  - \begin{bmatrix} -1 / 6 \\ 1 / 6 \\ 1 / 6 \\ 1 / 6 \end{bmatrix} = \begin{bmatrix} 0 \\ -2 / 3 \\ 1 / 3 \\ 1 / 3 \end{bmatrix} = \frac{1}{3} \begin{bmatrix} 0 \\ -2 \\ 1 \\ 1 \end{bmatrix} \]
+    
+    Finalement, on peut normaliser $\bvec{v}_3$ pour obtenir $\bvec{u}_3$: 
+    \[\bvec{u}_3 = \frac{1}{\left\|\bvec{v}_3\right\|} \bvec{v}_3 = \frac{\sqrt{3}}{\sqrt{2}} \cdot \frac{1}{3} \begin{bmatrix} 0 \\ -2 \\ 1 \\ 1 \end{bmatrix} = \frac{1}{\sqrt{6}} \begin{bmatrix} 0 \\ -2 \\ 1 \\ 1 \end{bmatrix} \]
+
+    On a donc construit la base orthonormée $U = \left(\bvec{u}_1, \bvec{u}_2, \bvec{u}_3\right)$ pour $W = \vect\left\{\bvec{x}_1, \bvec{x}_2, \bvec{x}_3\right\}$, où: 
+    \[\bvec{u}_1 = \frac{1}{2} \begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix}, \mathspace \bvec{u}_2 = \frac{1}{2\sqrt{3}} \begin{bmatrix} -3 \\ 1 \\ 1 \\ 1 \end{bmatrix}, \mathspace \bvec{u}_3 = \frac{1}{\sqrt{6}} \begin{bmatrix} 0 \\ -2 \\ 1 \\ 1 \end{bmatrix}  \]
+
+    \subparag{Observation}{
+        On remarque que:
+        \begin{itemize}
+            \item $\left\{\bvec{u}_1\right\}$ est une base orthonormée pour $W = \vect\left\{\bvec{x}_1\right\}$.
+            \item $\left\{\bvec{u}_1, \bvec{u}_2\right\}$ est une base orthonormée pour $W = \vect\left\{\bvec{x}_1, \bvec{x}_2\right\}$.
+            \item $\left\{\bvec{u}_1, \bvec{u}_2, \bvec{u}_3\right\}$ est une base orthonormée pour $W = \vect\left\{\bvec{x}_1, \bvec{x}_{2}, \bvec{x}_3\right\}$.
+        \end{itemize}
+        
+
+        De plus, on voit aussi que: 
+        \[\bvec{x}_1 = \left\|\bvec{x}_1\right\| \bvec{u}_1\]
+        \[\bvec{x}_2 = \left(\bvec{x}_2 \dotprod \bvec{u}_1\right)\bvec{u}_1 + \bvec{v}_2 = \left(\bvec{x}_2 \dotprod \bvec{u}_1\right) \bvec{u}_1 + \left\|\bvec{v}_2\right\|\bvec{u}_2\]
+        \begin{multiequality}
+        \bvec{x}_3 =\ & \left(\bvec{x}_3 \dotprod \bvec{u}_1\right)\bvec{u}_1 + \left(\bvec{x}_3 \dotprod \bvec{u}_2\right) \bvec{u}_2 + \bvec{v}_3 \\
+        =\ & \left(\bvec{x}_3 \dotprod \bvec{u}_1\right)\bvec{u}_1 + \left(\bvec{x}_3 \dotprod \bvec{u}_3\right) \bvec{u}_2 + \left\|\bvec{v}_3\right\| \bvec{u}_3
+        \end{multiequality}
+        
+        On peut donc à nouveau écrire $A = QR$: 
+        \[\begin{bmatrix}  &  &  \\ \bvec{x}_1 & \bvec{x}_2 & \bvec{x}_3 \\  &  &  \end{bmatrix} = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \bvec{u}_2 & \bvec{u}_3 \\  &  &  \end{bmatrix} \begin{bmatrix} \left\|\bvec{x}_1\right\| & \bvec{x}_2 \dotprod \bvec{u}_1 & \bvec{x}_3 \dotprod \bvec{u}_1 \\ 0 & \left\|\bvec{v}_2\right\| & \bvec{x}_3 \dotprod \bvec{u}_2 \\ 0 & 0 & \left\|\bvec{v}_3\right\| \end{bmatrix} \]
+        
+        Ainsi, puisque les colonnes de $Q$ forment une base orthonormée pour $\im A$, on a: 
+        \[Q^T Q = I_3\]
+        \[\proj_{\im A}\left(\bvec{y}\right) = QQ^T \bvec{y}\]
+
+        Le plus simple pour trouver la matrice qui projette sur l'espace image de $A$ est donc d'appliquer le Grand Schtroumpf (Gram-Schmidt), de factoriser $A$ sous la forme $QR$, puis de calculer $QQ^T$
+    }
+}
+
+\parag{Dépendance linéaire}{
+    Nous pouvons nous rendre compte que, si nous appliquons le Grand Schtroumpf sur des vecteurs qui sont linéairement dépendants, alors on aurait obtenu le vecteur $\bvec{0}$ à un endroit. Cependant, puisqu'en suite nous devons diviser ce vecteur par sa norme, ce qui est une division par 0, l'algorithme casse bel et bien.
+
+    En effet, la projection d'un vecteur dans un espace auquel il appartient est égal à ce vecteur. Ainsi, quand on va retrancher ce résultat à ce vecteur, alors cela va nous donner $\bvec{0}$.
+
+    Ceci est cohérent puisque notre but est d'orthonormaliser une \textit{base}, ainsi si les vecteurs n'étaient pas linéairement indépendants, alors ce n'était pas une base au départ.
+
+}
+
+\parag{Gram-Schmidt et factorisation QR}{
+    Soit $A$ une matrice de taille $m \times n$ dont les colonnes sont linéairement indépendants. En d'autres mots, $\left(\bvec{x}_1, \ldots, \bvec{x}_n\right)$ est une base de $W = \vect\left\{\bvec{x}_1, \ldots, \bvec{x}_n\right\} = \im A$.
+
+    \important{L'algorithme de Gram-Schmidt} (Grand Schtroumpf) revient à calculer: 
+    \[\bvec{v}_n = \bvec{x}_n - \proj_{W_{n-1}}\left(\bvec{x}_n\right) = \bvec{x}_n - \left(\bvec{x}_n \dotprod \bvec{u}_1\right) \bvec{u}_1 - \ldots - \left(\bvec{x}_n \dotprod \bvec{u}_{n-1}\right)\bvec{u}_{n-1}\]
+    \[\bvec{u}_n = \frac{1}{\left\|\bvec{v}_n\right\|} \bvec{v}_n\]
+    où $W_{n-1} = \vect\left\{\bvec{x}_1, \ldots, \bvec{x}_{n-1}\right\}$.
+
+    Ces calculs nous donnent $\left(\bvec{u}_1, \ldots, \bvec{u}_n\right)$, une \important{base orthonormée} de $W = \im A$. De plus, ils révèlent la factorisation $QR$ de $A$: 
+    \[A = QR, \mathspace Q = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_n \\  &  &  \end{bmatrix}, \mathspace R = \begin{bmatrix} \left\|\bvec{x}_1\right\| & \bvec{x}_2 \dotprod \bvec{u}_1 & \ldots & \bvec{x}_n \dotprod \bvec{u}_1 \\ 0 & \left\|\bvec{v}_2\right\| & \ldots & \bvec{x}_n \dotprod \bvec{u}_2 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \ldots & \left\|\bvec{v}_n\right\| \end{bmatrix} \]
+}
+
+\parag{Matrice carrée}{
+    Étudions la factorisation $QR$ d'une matrice $A \in \mathbb{R}^{n \times n}$ carrée. 
+
+    Appliquons le Grand Schtroumpf à ses colonnes. Il y a deux cas possibles. Si cet algorithme échoue (il y a une division par zéro), alors $A$ n'est pas inversible. S'il aboutit, alors on trouve $Q \in \mathbb{R}^{n \times n}$ et $R \in \mathbb{R}^{n \times n}$ telles que: 
+    \[A = QR, \mathspace Q^T Q = Q Q^T = I_n \implies Q^{-1} = Q^T\]
+    et où $R$ est triangulaire est inversible (elle n'a que des nombres strictement positifs sur sa diagonale, donc son déterminant n'est pas nul).
+
+    On peut utiliser ce résultat pour résoudre $A \bvec{x} = \bvec{b}$. En effet, on remarque que:
+    \[A \bvec{x} = \bvec{b} \iff QR \bvec{x} = \bvec{b} \iff Q^T Q R \bvec{x} = Q^T \bvec{b} \iff R \bvec{x} = Q^T \bvec{b}\]
+    
+    Or, $Q^T \bvec{b}$ est facilement calculable, et, puisque $R$ est triangulaire, il est très facile de résoudre ce système.
+
+    De plus, on peut aussi utiliser ce résultat pour calculer (et mieux comprendre) $\det\left(A\right)$: 
+    \[1 = \det\left(I\right) = \det\left(Q^T Q\right) = \det\left(Q^T\right) \det\left(Q\right) = \det\left(Q\right)^2 \implies \det\left(Q\right) = \pm 1\]
+    
+    Ainsi, on peut utiliser ceci pour calculer $\det\left(A\right)$: 
+    \[\det\left(A\right) = \det\left(QR\right) = \det\left(Q\right)\det\left(R\right) = \pm\det\left(R\right) \implies \left|\det\left(A\right)\right| = \left|\det\left(R\right)\right|\]
+    
+    Cependant, on sait que $R$ est une matrice triangulaire supérieure, ainsi il est très simple de calculer son déterminant: c'est le produit de ses entrées diagonales (mais les calculs pour y arriver rendent cette méthode plus compliquée que celles que nous avions vues jusque là). Ainsi, on en déduit que: 
+    \[\left|\det\left(A\right)\right| = \left\|\bvec{x}_1\right\| \left\|\bvec{v}_2\right\| \left\|\bvec{v}_3\right\|\cdots \left\|\bvec{v}_n\right\|\]
+    
+    \imagehere[0.5]{DeterminantAireParallelogramme.png}
+
+    On peut voir que l'aire du parallélogramme défini par $\bvec{x}_1, \bvec{x}_n$ est égale à l'aire du rectangle définie par $\bvec{x}_1$ et $\bvec{v}_2$, qui vaut $\left\|\bvec{x}_1\right\| \cdot \left\|\bvec{v}_2\right\| = \det\left(R\right)$.
+
+    Ceci est vrai pour tout $n$, donc $\left|\det\left(A\right)\right|$ est l'hyper-volume de l'hyper-parallélépipède de dimension $n$
+
+}
+
+
+
+\end{document}

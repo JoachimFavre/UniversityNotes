@@ -1,0 +1,221 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-12-22 at 15:32:00.
+
+\usepackage{../../style}
+
+\title{AICC}
+\author{Joachim Favre}
+\date{Mercredi 22 décembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{28}{2021-12-22}{My exam went rather well!}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of Markov's inequality. 
+    \item Explanation and proof of Chebyshev's inequality.
+    \item Explanation of the geometric distribution, and computation of its expected value and variance.
+\end{itemize}
+
+}
+
+\subsection{Inequalities for deviation}
+\parag{Notation}{
+    We note $p\left(X \geq a\right)$ to say ``the probability that $X$ is greater than or equal to $a$.
+
+    This is equivalent to: 
+    \[p\left(A\right), \mathspace A = \left\{s \in S | X\left(s\right) \geq a\right\}\]
+}
+
+
+\parag{Markov's Inequality}{
+    Let $X$ be a non-zero and non-negative random variable, i.e.: 
+    \[\exists s\ X\left(s\right) > 0 \land \forall s\ X\left(s\right) \geq 0\]
+    
+    Then, we have the following inequality for all $M > 0$: 
+    \[p\left(X \geq M E\left(X\right)\right) \leq \frac{1}{M}\]
+
+    \subparag{Proof}{
+        We can start from our lower bound: 
+        \[\frac{1}{M} = \frac{E\left(X\right)}{ME\left(X\right)} = \frac{\sum\limits_{x \in X\left(S\right)}^{} xp\left(X = x\right)}{ME\left(X\right)} \geq \frac{\sum\limits_{\substack{x \in X\left(S\right) \\ x \geq ME\left(X\right)}}^{} xp\left(X = x\right)}{ME\left(X\right)}\]
+
+        Which is greater than or equal to:
+        \[\frac{\sum\limits_{\substack{x \in X\left(S\right) \\ x \geq ME\left(X\right)}}^{} ME\left(X\right)p\left(X = x\right)}{ME\left(X\right)} = \sum_{\substack{x \in X\left(S\right) \\ x \geq ME\left(X\right)}}^{} p\left(X = x\right) = p\left(X \geq M E\left(X\right)\right)\]
+    }
+    
+}
+
+\parag{Example}{
+    Let's say we are rolling a die 6 times. We consider rolling a 6 as a success.
+    
+    We know that the expected number of success over those 6 trials is $E\left(X\right) = 1$. We can estimate the probability of having at least 3 successes using Markov inequality: 
+    \[p\left(X \geq 3\right) = p\left(X \geq 3E\left(X\right)\right) \leq \frac{1}{3}\]
+
+    We will do the computations using Bernoulli trials, and see that this is actually not very efficient.
+}
+
+\parag{Chebyshev's Inequality}{
+    Let $X$ be a random variable on a sample space $S$ with probability function $p$. If $r$ is a positive real number, then: 
+    \[p\left(\left|X\left(s\right) - E\left(X\right)\right| \geq r\right) \leq \frac{V\left(X\right)}{r^2}\]
+
+    \subparag{Proof}{
+        Let $A$ be the event defined as follows: 
+        \[A = \left\{s \in S \text{ such that } \left|X\left(S\right) - E\left(X\right)\right| \geq r\right\}\]
+        
+        So, we can see that: 
+        \[p\left(A\right) = p\left(\left|X\left(s\right) - E\left(X\right)\right| \geq r\right)\]
+        \[V\left(X\right) = \sum_{s \in S}^{} \left(X\left(s\right) - E\left(X\right)\right)^2 p\left(s\right)\]
+        by definition of the variance.
+
+        Let's work on the second equality: 
+        \begin{multiequality}
+        V\left(X\right) =\ & \sum_{s \in S}^{} \left(X\left(s\right) - E\left(X\right)\right)^2 p\left(s\right)  \\
+        =\ & \sum_{s \in A}^{} \left(X\left(s\right) - E\left(X\right)\right)^2 p\left(s\right) + \underbrace{\sum_{s \in S \setminus A}^{} \left(X\left(s\right) - E\left(X\right)\right)^2 p\left(s\right)}_{\geq 0}  \\
+        \geq\ & \sum_{s \in A}^{} \left(X\left(s\right) - E\left(X\right)\right)^2 p\left(s\right) \\
+        \geq\ & \sum_{s \in A}^{} r^2 p\left(s\right) = r^2 \sum_{s \in A}^{} p\left(s\right) = r^2 p\left(\left|X\left(s\right) - E\left(X\right)\right| \geq r\right) 
+        \end{multiequality}
+        
+        So, we deduce that:
+        \[p\left(\left|X\left(s\right) - E\left(X\right)\right| \geq r\right) \leq \frac{V\left(X\right)}{r^2}\]
+
+        \qed
+    }
+    
+}
+
+\parag{Example}{
+    Again, we are rolling 6 times a die and consider rolling a 6 being a success. 
+
+    We can see that those are Bernoulli trials, with $n = 6$ and $p = \frac{1}{6}$. Moreover, we know that: 
+    \[E\left(X\right) = np = \frac{6}{6} = 1, \mathspace V\left(X\right) = npq = 6\cdot \frac{1}{6} \cdot \frac{5}{6} = \frac{5}{6}\]
+    
+    So, using Chebyshev's inequality, we can estimate the probability of having at least 3 successes: 
+    \[p\left(\left|X\left(s\right) - E\left(X\right)\right| \geq 2\right) \leq \frac{V\left(X\right)}{2^2} = \frac{5}{6\cdot 2^2} = \frac{5}{24}\]
+    
+    We notice that this is a smaller probability than the $\frac{1}{3}$ we got with Markov inequality.
+
+    We could also compute the exact probability of having 3 or more successes using the binomial distribution: 
+    \[b\left(3: 6, \frac{1}{6}\right) + b\left(4: 6, \frac{1}{6}\right) + b\left(5: 6, \frac{1}{6}\right) + b\left(6: 6, \frac{1}{6}\right)\]
+
+    Which is equal to: 
+    \[\frac{6\cdot 5\cdot 4\cdot 5^3}{1\cdot 2\cdot 3\cdot 6^6} + \frac{5\cdot 5\cdot 5^2}{1\cdot 2\cdot 6^6} + \frac{6\cdot 5}{1\cdot 6^6} + \frac{1}{6^6} \approx 0.06\]
+    
+    
+    So, we can see that none of these inequalities is very efficient. However, they are still estimations that can be useful if we don't know anything.
+}
+
+\subsection{Geometric distribution}
+\parag{Example}{
+    Let's take a biased coin which probability of having tail (T) is $p$.
+
+    We wonder what is the number of tosses needed until a tail shows up. Our sample space is given by: 
+    \[S = \left\{T, HT, HHT, HHHT, \ldots\right\} \implies \left|S\right| = \aleph_0\]
+
+    So, we can compute the probabilities: 
+    \[p\left(T\right) = p, \mathspace p\left(HT\right) = \left(1 - p\right)p, \mathspace p\left(HHT\right) = \left(1 - p\right)^2 p, \mathspace \ldots\]
+    
+    More generally: 
+    \[p\left(H^k T\right) = \left(1 - p\right)^k p\]
+    
+    Let's define $X\left(s\right)$ as the number of toss needed to have a tail. So:
+    \[p\left(X = k\right) = \left(1 - p\right)^k p\]
+}
+
+\parag{Definition}{
+    Let $X$ be a random variable counting the number of failures of an experiment before the first success (which occurs at probability $p$). Then: 
+    \[p\left(X = k\right) = \left(1 - p\right)^k p\]
+
+    Equivalently, if $Y$ counts the number of trials until the success (included), we have $Y = X + 1$, so: 
+    \[p\left(Y = k\right) = \left(1 - p\right)^{k-1}p\]
+    
+    This is called the \important{geometric distribution}.
+
+    \subparag{Example}{
+        Using this distribution, we could consider the length of someone's life if the probability of dying each years is constant. 
+    }
+    
+}
+
+\parag{Expected value}{
+    We can compute the expected value: 
+    \[E\left(X\right) = \sum_{r \in X\left(S\right)}^{} rp\left(X = r\right) = \sum_{j=1}^{\infty} jp\left(X = j\right) = \sum_{j=1}^{\infty} j\left(1 - p\right)^{j-1} p = p \sum_{j=1}^{\infty} j\left(1 - p\right)^{j-1}\]
+    
+    There are two ways of computing a sum looking that way. The first one is to remember that, when using generating functions, we saw that:
+    \[\frac{1}{\left(1 - x\right)^2} = \sum_{j = 0}^{\infty} C\left(2 + j - 1, j\right) x^j = \sum_{j=0}^{\infty} \binom{j+1}{j} x^j = \sum_{j=0}^{\infty} \left(j + 1\right)x^j = \sum_{j=1}^{\infty} jx^{j-1}\]
+
+    The second one is to differentiate: 
+    \[\sum_{j=0}^{\infty} x^j = \frac{1}{1 - x} \over{\implies}{$\frac{d}{dx}$}  \sum_{j=1}^{\infty} jx^{j-1} = \frac{1}{\left(1 - x\right)^2}\]
+    
+    So, using what we just found:
+    \[E\left(X\right) = p \frac{1}{\left(1 - \left(1 - p\right)\right)^2} = \frac{p}{p^2} = \frac{1}{p}\]
+}
+
+\parag{Variance}{
+    By one of our theorems, we know that: 
+    \[V\left(X\right) = E\left(X^2\right) - E\left(X\right)^2 = E\left(X\left(X - 1\right) + X\right) - E\left(X\right)^2 = E\left(X\left(X - 1\right)\right) + E\left(X\right) - E\left(X\right)^2\]
+
+    We know everything but $E\left(X\left(X - 1\right)\right)$. We can compute it using the law of the unconscious statistician:
+    \[E\left(X\left(X - 1\right)\right) = \sum_{j=1}^{\infty} j\left(j-1\right)p\left(X = j\right) = \sum_{j=1}^{\infty} j\left(j-1\right)\left(1 - p\right)^{j-1}p = \sum_{j = 0}^{\infty} \left(j+1\right)j\left(1-p\right)^j p\]
+
+    So: 
+    \[E\left(X\left(X - 1\right)\right) = 2p\left(1-p\right) \sum_{j=0}^{\infty} \frac{j\left(j+1\right)}{2}\left(1 - p\right)^{j-1}\]
+    
+    
+    This sum can also be computed using derivatives, or using generating functions:
+    \[\frac{1}{\left(1 - x\right)^3} = \sum_{j=0}^{\infty} C\left(3 + j - 1, j\right) x^j = \sum_{j=0}^{\infty} \binom{j+2}{j}x^j = \sum_{j=0}^{\infty} \frac{j\left(j+1\right)}{2} x^j\]
+
+    Which we can simplify to:
+    \[\frac{1}{\left(1 - x\right)^3} = \sum_{j=1}^{\infty} \frac{\left(j+1\right)j}{2} x^{j-1} = \sum_{j=0}^{\infty} \frac{\left(j+1\right)j}{2}x^{j-1}\]
+
+    So, we can compute our variance: 
+    \[V\left(X\right) = E\left(X\left(X-q\right)\right) + E\left(X\right) - E\left(X\right)^2 = \frac{2\left(1 - p\right)}{p^2} + \frac{1}{p} - \frac{1}{p^2} = \frac{2 - 2p + p -1 }{p^2}\]
+    
+    Thus, simplifying our result: 
+    \[V\left(X\right) = \frac{1 - p}{p^2} = \frac{q}{p^2}\]
+    
+}
+
+\begin{filecontents*}[overwrite]{randomNumber3.code}
+procedure random_number_3():
+    while True:
+        toss 2 coins
+        if result is in [00, 01, 10]
+            return result
+\end{filecontents*}
+
+
+\parag{Using coins to generate random numbers}{
+    Let's assume that we have a fair coin, and that we would like to generate a random numbers in $\left\{0, \ldots, n-1\right\}$.
+
+    The simple case is if $n - 1 = 2^j$, with $j \geq 1$. Indeed, we only have to flip the coin $j$ times, and consider the result as the number in its binary form. However, this is harder if $n$ does not have this form.
+
+    If $n = 3$, let's use the following algorithm:
+    \importcode{randomNumber3.code}{pseudo}
+    
+    This code could never end. The probability to get a number at the $n$\Th roll is given by a geometric distribution, where $p = \frac{3}{4}$: 
+    \[p\left(X = 1\right) = \frac{3}{4}, \mathspace p\left(X = 2\right) = \frac{1}{4}\cdot \frac{3}{4} = \frac{3}{16}, \mathspace \ldots, \mathspace p\left(X = k\right) = \left(\frac{1}{4}\right)^k \cdot \frac{3}{4}\]
+    
+    Moreover, we know that the expected number of iteration of the loop is: 
+    \[E\left(X\right) = \frac{1}{p} = \frac{4}{3}\]
+
+    And the expected of number of tosses of coins is: 
+    \[E\left(2X\right) = 2E\left(X\right) = \frac{8}{3}\]
+    
+    However, this is not guaranteed, and it could run forever. So, we want to know how likely it is to have many tosses. Let's compute the variance: 
+    \[V\left(X\right) = \frac{1 - p}{p^2} = \frac{\frac{1}{4}}{\frac{9}{16}} = \frac{4}{9}\]
+    
+    We want to know the probability that $X\left(s\right) \geq k$. We want to apply Chebychev inequality, but we need to modify our inequality first: 
+    \[X\left(s\right) \geq k \iff X\left(s\right) - \frac{4}{3} \geq k - \frac{4}{3} \iff \left|X\left(s\right) - E\left(X\right)\right| \geq k - \frac{4}{3}\]
+    
+    So, we can apply Chebychev inequality: 
+    \[p\left(X\left(s\right) \geq k\right) = p\left(\left|X\left(s\right) - E\left(X\right)\right| \geq k - \frac{4}{3}\right) \leq \frac{V\left(X\right)}{\left(k - \frac{4}{3}\right)^2} = \frac{\frac{4}{9}}{\left(k - \frac{4}{3}\right)^2} = \frac{4}{\left(3k - 4\right)^2}\]
+
+    The specific parameters are not really important, but we can see that the probability falls at least as $\frac{1}{k^2}$, since it is at least $\Theta\left(\frac{1}{k^2}\right)$.
+}
+
+\parag{Advice from the Professor}{
+    Doing exercises is a good way to practice, since this allows us to revise (we will see which parts of theory we are lacking).
+}
+
+\end{document}

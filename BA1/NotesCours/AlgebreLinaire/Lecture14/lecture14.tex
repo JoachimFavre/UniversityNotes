@@ -1,0 +1,271 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-08 at 13:10:18.
+
+\usepackage{../../style}
+
+\title{Algèbre linéaire}
+\author{Joachim Favre}
+\date{Lundi 08 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2021-11-08}{Changements de base et applications linéaires}{
+    \begin{itemize}[left=0pt]
+        \item Explication des 4 sous-espaces intéressants de toute matrice.
+        \item Extension du ``grand théorème'' (celui avec (maintenant) 18 proposition équivalentes pour dire qu'une matrice est inversible).
+        \item Explication de la méthode pour faire un changement de base, en passant par la base canonique, ou avec une matrice de passage quelconque qui amène d'une base $\mathcal{B}$ à une base $\mathcal{C}$.
+        \item Extension des applications linéaires à n'importe quel espace vectoriel.
+    \end{itemize}
+
+}
+
+\parag{Sous-espaces intéressants}{
+    On commence à réaliser qu'il y a \important{quatre sous-espaces} intéressants pour une matrice $A \in \mathbb{R}^{m \times n}$:
+    \begin{itemize}
+        \item $\im A^T$ et $\ker A$, sous-espaces de $\mathbb{R}^{n}$, et tels que:
+            \[\dim\im A^T + \dim\ker A = n\]
+
+        \item $\im A$ et $\ker A^T$, sous-espaces de $\mathbb{R}^{m}$, et tels que:
+            \[\dim\im A + \dim\ker A^T = m\]
+    \end{itemize}
+
+    Pour les équations ci-dessus, on utilise le théorème du rang, qui nous dit $\rang A + \dim\ker A = n$, avec $\rang A = \dim \im A = \dim \im A^T = \rang A^T$.
+
+    On reviendra là-dessus plus tard.
+}
+
+\parag{Vrai ou faux}{
+    On a déterminé que les opérations élémentaires sur les lignes n'affectent pas l'espace des lignes:
+    \[\lgn A = \lgn M = \lgn\left(EA\right)\]
+    où $M$ est une forme échelonnée de $A$, $M = EA$.
+
+    Nous nous demandons donc si les affirmations suivantes sont vraies ou fausses:
+    \begin{enumerate}
+        \item $\im A = \im M$
+        \item $\ker A = \ker M$
+    \end{enumerate}
+
+    \subparag{Solution au point (1)}{
+        C'est faux. Si on a :
+        \[A = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \implies M = \begin{bmatrix} 1 \\ 0 \end{bmatrix}  \]
+
+        Alors, clairement,
+        \[\im A \neq \im M\]
+
+    }
+
+    \subparag{Solution au point (2)}{
+        C'est vrai. On peut faire la suite d'implication (qui vont dans les deux sens) suivantes:
+        \begin{multiequation}\label{eq:label}
+                 & x \in \ker A \\
+            \iff & A \bvec{x} = \bvec{0} \\
+            \iff & EA \bvec{x} = E \bvec{0} \\
+            \iff & M \bvec{x} = \bvec{0} \\
+            \iff & \bvec{x} \in \ker M
+        \end{multiequation}
+
+        Il est important de noter qu'on utilise le fait que $E$ soit inversible pour affirmer que:
+        \[A \bvec{x} = \bvec{0} \iff EA \bvec{x} = E \bvec{0}\]
+
+        Sinon, on aurait bien une implication ``$\!\!{\implies}\!\!$'', mais pas un biconditionnel ``$\!\!{\iff}\!\!$''.
+    }
+}
+
+\parag{Résumé}{
+    Nous pouvons résumer ce que nous avons fait à l'aide des théorèmes suivants.
+
+    \subparag{Théorème 1}{
+        Si $A$ et $B$ sont deux matrices équivalentes selon les lignes, alors leur lignes engendrent le même espace. Si $B$ est échelonnée, alors les lignes non-nulles de $B$ forment une base de cet espace.
+    }
+
+    \subparag{Théorème 2}{
+        Soit $A$ une matrice $m \times n$. L'espace engendré par les colonnes de $A$ et l'espace engendré par les lignes de cette matrice ont la même dimension. Cette dimension commune, le rang de $A$, est égale au nombre de positons pivots de $A$ et vérifie la relation :
+        \[\rang A + \dim\ker A = n \iff \rang A + \dim\ker A^T = m\]
+
+    }
+
+    \subparag{Théorème 3 (suite du grand théorème)}{
+        Soit $A$ une matrice $n \times n$. Les propriétés suivantes sont équivalentes :
+
+        \begin{enumerate}[left=0pt]
+            \item $A$ est inversible.
+            \item $A$ est équivalente selon les lignes à la matrice unité $n \times n$, $I_n$.
+            \item $A$ admet $n$ positions de pivot.
+            \item L'équation $A \bvec{x} = \bvec{0}$ admet la solution triviale pour unique solution.
+            \item Les colonnes de $A$ sont linéairement indépendantes.
+            \item L'application $\bvec{x} \mapsto A \bvec{x}$ est injective.
+            \item Pour tout vecteur $\bvec{b} \in \mathbb{R}^{n}$, l'équation $A \bvec{x} = \bvec{b}$ admet au moins une solution (on aurait aussi pu dire ``une solution unique'', ou au plus une solution).
+            \item Les colonnes de $A$ engendrent $\mathbb{R}^{n}$.
+            \item L'application linéaire $x \mapsto A \bvec{x}$ est surjective.
+            \item Il existe une matrice $C$ de taille $n \times n$ telle que $CA = I_n$.
+            \item Il existe une matrice $D$ de taille $n \times n$ telle que $AD = I_n$.
+            \item $A^T$ est inversible.
+            \item Les colonnes de $A$ forment une base de $\mathbb{R}^{n}$.
+            \item $\im A = \mathbb{R}^{n}$
+            \item $\dim\im A = n$
+            \item $\rang A = n$
+            \item $\ker A = \left\{\bvec{0}\right\}$
+            \item $\dim\ker A = 0$
+        \end{enumerate}
+
+    }
+}
+
+\subsection{Changements de base}
+\parag{Introduction}{
+    Plus tôt, on a considéré la matrice de passage $P_{\mathcal{B}}$ qui permet de ``passer'' des coordonnées de $\bvec{x} \in \mathbb{R}^{n}$ dans une base $\mathcal{B} = \left(\bvec{b}_1, \ldots, \bvec{b}_n\right)$ de $\mathbb{R}^{n}$ à $\bvec{x}$ lui même, c'est-à-dire, aux coordonnées de $\bvec{x}$ dans la base canonique:
+    \[\bvec{x} = P_{\mathcal{B}} \left[\bvec{x}\right]_{\mathcal{B}} \mathspace \text{avec } P_{\mathcal{B}} = \begin{bmatrix}  &  &  \\ \bvec{b}_1 & \ldots & \bvec{b}_n \\  &  &  \end{bmatrix} \]
+
+    Nous allons généraliser ce concept de deux façons:
+    \begin{enumerate}
+        \item On va passe d'une base $\mathcal{B}$ à une base $\mathcal{C}$ quelconque ().
+        \item On va travailler dans un espace (ou sous-espace) quelconque.
+    \end{enumerate}
+}
+
+\parag{But}{
+    Soit $V$ un espace vectoriel, et soient $\mathcal{B} = \left(\bvec{b}_1, \ldots, \bvec{b}_n\right)$ et $\mathcal{C} = \left(\bvec{c}_1, \ldots, \bvec{c}_n\right)$ deux bases de $V$ (on sait qu'elles ont le même nombre d'éléments, par le concept de dimension).
+
+    Considérons un vecteur $\bvec{x} \in V$. Si on a les coordonnées de $\bvec{x}$ dans la base $\mathcal{B}$, notées $\left[\bvec{x}\right]_{\mathcal{B}}$, comment peut-on trouver les coordonnées de $\bvec{x}$ dans la base $\mathcal{C}$, notées $\left[\bvec{x}\right]_{\mathcal{C}}$ ?
+}
+
+\parag{Exemple}{
+    \imagehere{ExplicationChangementBase.png}
+
+    En regardant les deux images ci-dessus, on remarque que:
+    \[\bvec{x} = 3\bvec{b}_1 + 1\bvec{b}_2 = 6\bvec{c}_1 + 4\bvec{c}_2\]
+
+    En d'autres mots:
+    \[\left[\bvec{x}\right]_{\mathcal{B}} = \begin{bmatrix} 3 \\ 1 \end{bmatrix} \mathspace \text{ et } \mathspace \left[\bvec{x}\right]_{\mathcal{C}} = \begin{bmatrix} 6 \\ 4 \end{bmatrix} \]
+
+    Le point $\bvec{x}$ est le même dans les deux images, c'est la manière de le décrire qui est différente.
+
+    On veut trouver ce qui lie $\left[\bvec{x}\right]_{\mathcal{B}}$ et $\left[\bvec{x}\right]_{\mathcal{C}}$. On se rend compte que:
+    \[\left[\bvec{x}\right]_{\mathcal{C}} = \left[3\bvec{b}_1 + \bvec{b}_2\right]_{\mathcal{C}}\]
+
+    Puisque l'application coordonnées est linéaire :
+    \[\left[3\bvec{b}_1 + \bvec{b}_2\right]_{\mathcal{C}} = 3\left[\bvec{b}_1\right]_{\mathcal{C}} + \left[\bvec{b}_2\right]_{\mathcal{C}} = \begin{bmatrix}  &  \\ \left[\bvec{b}_1\right]_{\mathcal{C}} & \left[\bvec{b}_2\right]_{\mathcal{C}} \\  &  \end{bmatrix} \begin{bmatrix} 3 \\ 1 \end{bmatrix} =  \begin{bmatrix}  &  \\ \left[\bvec{b}_1\right]_{\mathcal{C}} & \left[\bvec{b}_2\right]_{\mathcal{C}} \\  &  \end{bmatrix} \left[\bvec{x}\right]_{\mathcal{B}}\]
+
+    Si on reçoit (magiquement) l'information que $\bvec{b}_1 = 4\bvec{c}_1 + \bvec{c}_2$ et $\bvec{b}_2 = -6\bvec{c}_1 + \bvec{c}_2$, alors:
+    \[\left[\bvec{b}_1\right]_{\mathcal{C}} = \begin{bmatrix} 4 \\ 1 \end{bmatrix} \mathspace \text{ et } \mathspace \left[\bvec{b}_2\right]_{\mathcal{C}} = \begin{bmatrix} -6 \\ 1 \end{bmatrix} \]
+
+    On peut donc affirmer pour tout $\bvec{x} \in V$ que:
+    \[\left[\bvec{x}\right]_{\mathcal{C}} = \begin{bmatrix} 4 & -6 \\ 1 & 1 \end{bmatrix} \left[\bvec{x}\right]_{\mathcal{B}}\]
+
+    En particulier, avec $\bvec{x}$ tel que
+    \[\left[\bvec{x}\right]_{\mathcal{B}} = \begin{bmatrix} 3 \\ 1 \end{bmatrix} \]
+
+    Alors, on obtient:
+    \[\left[\bvec{x}\right]_{\mathcal{C}} = \begin{bmatrix} 4 & -6 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} 3 \\ 1 \end{bmatrix} = 3\begin{bmatrix} 4 \\ 1 \end{bmatrix} + \begin{bmatrix} -6 \\ 1 \end{bmatrix} = \begin{bmatrix} 6 \\ 4 \end{bmatrix}\]
+
+    Ce qui est bien ce qu'on avait trouvé graphiquement.
+}
+
+\parag{Généralisation}{
+    De manière générale, soient $\mathcal{B} = \left(\bvec{b}_1, \ldots, \bvec{b}_n\right)$ et $\mathcal{C} = \left(\bvec{c}_1, \ldots, \bvec{c}_n\right)$ deux bases d'un espace vectoriel $V$. Étant donné un vecteur $\bvec{x} \in V$, soit
+    \[\left[\bvec{x}\right]_{\mathcal{B}} = \begin{bmatrix} a_1 \\ \vdots \\ a_n \end{bmatrix} \]
+    son vecteur de coordonnées dans la base $\mathcal{B}$.
+
+    Autrement dit, $\bvec{x} = a_1 \bvec{b}_1 + \ldots + a_n  \bvec{b}_n$. Nous voulons maintenant trouver $\left[\bvec{x}\right]_{\mathcal{C}}$. Pour faire cela, on peut utiliser la linéarité de l'application coordonnées :
+    \[\left[\bvec{x}\right]_{\mathcal{C}} = \left[a_1 \bvec{b}_1 + \ldots + a_n \bvec{b}_n\right]_{\mathcal{C}} = a_1 \left[\bvec{b}_1\right]_{\mathcal{C}} = a\left[\bvec{b}_1\right]_{\mathcal{C}} + \ldots + a_n\left[\bvec{b}_n\right]_{\mathcal{C}}\]
+
+    Qu'on peut transformer en produit matrice-vecteur:
+    \[\left[\bvec{x}\right]_{\mathcal{C}} = \begin{bmatrix}  &  &  \\ \left[\bvec{b}_1\right]_{\mathcal{C}} & \ldots & \left[\bvec{b}_n\right]_{\mathcal{C}} \\  &  &  \end{bmatrix} \begin{bmatrix} a_1 \\ \vdots \\ a_n \end{bmatrix} = \begin{bmatrix}  &  &  \\ \left[\bvec{b}_1\right]_{\mathcal{C}} & \ldots & \left[\bvec{b}_n\right]_{\mathcal{C}} \\  &  &  \end{bmatrix} \left[\bvec{x}\right]_{\mathcal{B}}\]
+
+
+    Cette matrice permet de passer des coordonnées $\mathcal{B}$ vers $\mathcal{C}$. Elle est de taille $n \times n$ et on la note $\matricepassage{C}{B}$. On l'appelle la matrice de passage, ou la matrice de changement de base de $\mathcal{B}$ à $\mathcal{C}$. Cette matrice est unique car on a construit cette matrice, et à aucun moment on n'a dû faire de choix.
+
+    On remarque que notre résultat peut être appliqué pour n'importe quel espace vectoriel, et non pas uniquement $\mathbb{R}^2$.
+}
+
+\parag{Théorème}{
+    Soit $\mathcal{B} = \left(\bvec{b}_1, \ldots, \bvec{b}_n\right)$ et $\mathcal{C} = \left(\bvec{c}_1, \ldots, \bvec{c}_n\right)$ deux bases d'un espace vectoriel $V$. Il existe une matrice $n \times n$ unique, notée $\matricepassage{C}{B}$, telle que pour tout vecteur $\bvec{x} \in V$:
+    \[\left[\bvec{x}\right]_{\mathcal{C}} = \matricepassage{C}{B}\left[\bvec{x}\right]_{\mathcal{B}}\]
+
+    Les colonnes de $\matricepassage{C}{B}$ sont les colonnes de composantes, dans la base $\mathcal{C}$, des vecteurs de la base $\mathcal{B}$. Autrement dit:
+    \[\matricepassage{C}{B} = \begin{bmatrix}  &  &  \\ \left[\bvec{b}_1\right]_{\mathcal{C}} & \ldots & \left[\bvec{b}_n\right]_{\mathcal{C}} \\  &  &  \end{bmatrix} \]
+}
+
+\parag{Inverse de la matrice de passage}{
+    La matrice suivante passe de $\mathcal{B}$ à $\mathcal{C}$:
+    \[\matricepassage{C}{B} = \begin{bmatrix}  &  &  \\ \left[\bvec{b}_1\right]_{\mathcal{C}} & \ldots & \left[\bvec{b}_n\right]_{\mathcal{C}} \\  &  &  \end{bmatrix} \]
+
+    De plus, la matrice suivante passe de $\mathcal{C}$ à $\mathcal{B}$:
+    \[\matricepassage{B}{C} = \begin{bmatrix}  &  &  \\ \left[\bvec{c}_1\right]_{\mathcal{B}} & \ldots & \left[\bvec{c}_n\right]_{\mathcal{B}} \\  &  &  \end{bmatrix} \]
+
+    On remarque que leur produit donne la matrice identité, puisque cela correspond à transformer les coordonnées de $\bvec{x}$ de la base $\mathcal{B}$ vers la base $\mathcal{C}$, puis de la matrice $\mathcal{C}$ vers la base $\mathcal{B}$ ; donc, on n'a pas bougé:
+    \[\matricepassage{B}{C}\matricepassage{C}{B} = I_n\]
+
+    On peut donc en déduire que:
+    \[\left(\matricepassage{C}{B}\right)^{-1} = \matricepassage{B}{C} \iff \left(\matricepassage{B}{C}\right)^{-1} = \matricepassage{C}{B} \]
+}
+
+\parag{Exemple}{
+    Plus tôt, on avait un exemple dans $V = \mathbb{R}^2$ avec :
+    \[\bvec{b}_1 = 4\bvec{c}_1 + \bvec{c}_2 \mathspace \text{ et } \bvec{b}_2 = -6 \bvec{c}_1 + \bvec{c}_2\]
+
+    Donc:
+    \[\left[\bvec{b}_1\right]_{\mathcal{C}} = \begin{bmatrix} 4 \\ 1 \end{bmatrix} \mathspace \text{ et } \mathspace \left[\bvec{b}_2\right]_{\mathcal{C}} = \begin{bmatrix} -6 \\ 1 \end{bmatrix} \]
+
+    Ainsi, on en déduit:
+    \[\left[\bvec{x}\right]_{\mathcal{C}} = \begin{bmatrix} 4 & -6 \\ 1 & 1 \end{bmatrix} \left[\bvec{x}\right]_{\mathcal{B}} = \matricepassage{C}{B} \left[\bvec{x}\right]_{\mathcal{B}} \]
+
+    On peut alors calculer:
+    \[\begin{bmatrix}  &  \\ \left[\bvec{c}_1\right]_{\mathcal{B}} & \left[\bvec{c}_2\right]_{\mathcal{B}} \\  &  \end{bmatrix} = \matricepassage{B}{C} = \left(\matricepassage{C}{B}\right)^{-1} = \begin{bmatrix} 4 & -6 \\ 1 & 1 \end{bmatrix}^{-1} = \begin{bmatrix} 1/10 & 3 / 5 \\ -1 / 10 & 2 /  5 \end{bmatrix}  \]
+
+    On en déduit donc:
+    \[\left[\bvec{c}_1\right]_{\mathcal{B}} = \begin{bmatrix} 1 / 10 \\ -1 / 10 \end{bmatrix} \mathspace \text{ et } \mathspace \left[\bvec{c}_2\right]_{\mathcal{B}} = \begin{bmatrix} 3 / 5 \\ 1 / 5 \end{bmatrix} \]
+
+    De plus:
+    \[\bvec{c}_1 = \frac{1}{10}\bvec{b}_1 - \frac{1}{10}\bvec{b}_2 \mathspace \text{ et } \mathspace \bvec{c}_2 = \frac{3}{5}\bvec{b}_1 + \frac{2}{5}\bvec{b}_2\]
+}
+
+\subsection{Applications linéaires d'espaces quelconques}
+\parag{Retour aux applications}{
+    Nous voulons exprimer une application linéaire par rapport à deux bases.
+
+    Soit $T : V \mapsto W$ une application linéaire d'un espace vectoriel $V$ vers un espace vectoriel $W$. Dans le cas particulier $T : \mathbb{R}^n \mapsto \mathbb{R}^m$, on a vu comment exprimer $T$ au moyen d'une matrice $A \in \mathbb{R}^{m \times n}$, $T\left(\bvec{x}\right) = A \bvec{x}$. On peut faire quelque chose de similaire dans des espaces abstraits si on a une base de $V$ et une base de $W$.
+
+    Soit $\mathcal{V} = \left(\bvec{v}_1, \ldots, \bvec{v}_n\right)$ une base de $V$ (donc $\dim V = n$), et soit $\mathcal{W} = \left(\bvec{w}_1, \ldots, \bvec{w}_m\right)$ (donc $\dim W = m$).
+
+    Tout $\bvec{x} \in V$ s'écrit de manière unique dans la base $\mathcal{V}$:
+    \[\bvec{x} = c_1 \bvec{v}_1 + \ldots + c_n \bvec{v}_n \mathspace \text{avec } \left[\bvec{x}\right]_{\mathcal{V}} = \begin{bmatrix} c_1 \\ \vdots \\ c_n \end{bmatrix} \]
+
+    On se demande maintenant que vaut $T\left(\bvec{x}\right)$. On utilise la linéarité de $T$:
+    \[T\left(\bvec{x}\right) = T\left(c_1 \bvec{v}_1 + \ldots + c_n \bvec{v}_n\right) = c_1 T\left(\bvec{v}_1\right) + \ldots + c_n  T\left(\bvec{v}_n\right)\]
+
+    Chacun des vecteurs $T\left(\bvec{v}_1\right), \ldots, T\left(\bvec{v}_n\right)$ appartient à $W$. Donc, on peut les exprimer dans la base $\mathcal{W}$ :
+    \[\left[T\left(\bvec{v}_1\right)\right]_{\mathcal{W}}, \ldots, \left[T\left(\bvec{v}_n\right)\right]_{\mathcal{W}}\]
+
+    Ce sont $n$ vecteurs-colonnes dans $\mathbb{R}^{m}$. Par linéarité de l'application coordonnées, on trouve:
+    \[\left[T\left(\bvec{x}\right)\right]_{\mathcal{W}} = \left[c_1 T\left(\bvec{v}_1\right) + \ldots + c_n T\left(\bvec{v}_n\right)\right]_{\mathcal{W}} = c_1 \left[T\left(\bvec{v}_1\right)\right]_{\mathcal{W}} + \ldots + c_n\left[T\left(\bvec{v}_n\right)\right]_{\mathcal{W}}\]
+
+    On peut donc l'écrire sous la forme d'un produit matrice-vecteur:
+    \[\begin{bmatrix}  &  &  \\ \left[T\left(\bvec{v}_1\right)\right]_{\mathcal{W}} & \ldots & \left[T\left(\bvec{v}_n\right)\right]_{\mathcal{W}} \\  &  &  \end{bmatrix} \underbrace{\begin{bmatrix} c_1 \\ \vdots \\ c_n \end{bmatrix}}_{\left[\bvec{x}\right]_{\mathcal{V}}} \]
+
+    \subparag{Note personnelle}{
+        La différence entre $V$, la matrice, et $\mathcal{V}$, la base, me fait penser à ce XKCD:
+
+        \imagehere{XKCDPolice.png}
+        
+        \begin{center}
+            \url{https://xkcd.com/2309/}
+        \end{center}
+        
+    }
+    
+}
+
+\parag{Théorème}{
+    Soit $T: V \mapsto W$ une application linéaire et soient $\mathcal{V}$ et $\mathcal{W}$ des bases de $V$ et $W$, respectivement. Il existe une matrice unique $A$ telle que, pour tout $\bvec{x} \in V$:
+    \[\left[T\left(\bvec{x}\right)\right]_{\mathcal{W}} = A \left[\bvec{x}\right]_{\mathcal{V}}\]
+
+    Cette matrice est donnée par :
+    \[A = \begin{bmatrix}  &  &  \\ \left[T\left(\bvec{v}_1\right)\right]_{\mathcal{W}} & \ldots & \left[T\left(\bvec{v}_n\right)\right]_{\mathcal{W}} \\  &  &  \end{bmatrix} \]
+    où $\bvec{v}_1, \ldots, \bvec{v}_n$ sont les vecteurs de la base $\mathcal{V}$.
+
+}
+
+\end{document}

@@ -1,0 +1,190 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2021-11-30 at 08:39:57.
+
+\usepackage{../../style}
+
+\title{AICC}
+\author{Joachim Favre}
+\date{Mardi 30 novembre 2021}
+
+\begin{document}
+\maketitle
+
+\lecture{21}{2021-11-30}{Pigeons, pigeons, holes and recursive counting}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the pigeon-hole principle, its generalised version, and of examples in which it applies.
+    \item Explanation on how to count with recurrence relations.
+\end{itemize}
+
+}
+
+\subsection{The pigeon-hole principle}
+\parag{The pigeon-hole principle}{
+    If we have 13 pigeons and 12 holes, then necessarily we must have two 13 pigeons in the same hole. Let us generalise this concept.
+}
+
+\parag{Theorem}{
+    Let $k \in \mathbb{N}_+$. If we have $k+1$ objects we want to put in $k$ boxes, then at least one box contains two or more objects.
+
+    \subparag{Proof}{
+        Left as an exercise for the reader. Hint: use proof by contradiction.
+    }
+
+    \subparag{Remark}{
+        In French, we call this theorem \textit{le principe des tiroirs et des chaussettes de Dirichlet}.
+    }
+    
+}
+
+\parag{Corollary}{
+    A function $f$ from a set with $k+1$ elements to a set with $k$ elements is not one-to-one.
+    
+    \subparag{Proof}{
+        We apply the pigeon-hole principle. We take the elements of our domain as our pigeons and the elements from the codomain as our pigeon-holes. 
+    }
+    
+}
+
+\parag{Generalised version}{
+    If $N$ objects are placed into $k$ boxes, then there is at least one box containing at least $\left\lceil \frac{N}{k} \right\rceil $ objects.
+
+    \subparag{Proof}{
+        Let's suppose for contradiction that none of the boxes has more than $\left\lceil \frac{N}{k} - 1 \right\rceil $ objects.
+
+        We notice that: 
+        \[\left\lceil \frac{N}{k} \right\rceil < \frac{N}{k} + 1\]
+        
+        Indeed, if $k \divides N$, then this is clearly true. Else, we have that $\left\lfloor \frac{N}{k} \right\rfloor < \frac{N}{k} < \left\lceil \frac{N}{k} \right\rceil $.
+
+        Thus, if we put in each box at most $\left\lceil \frac{N}{k} \right\rceil - 1$ objects, our total number of object cannot exceed the following number: 
+        \[k\left(\left\lceil \frac{N}{k} \right\rceil - 1\right) < k\left(\frac{N}{k} - 1 + 1\right) = N\]
+        
+        Since this means that there are less than $N$ objects in total, it is a contradiction.
+
+        \qed
+    }
+    
+}
+
+\parag{Example 1}{
+    Amongst 100 people, there are at least $\left\lceil \frac{100}{12} \right\rceil = 9$ who were born in the same month.
+}
+
+\parag{Example 2}{
+    Let's say we wonder how many cards must be selected from a standard deck of 52 cards to guarantee that at least three cards of the same suit are chosen.
+
+    We have $N$ pigeons and 4 boxes. Thus, we want: 
+    \[\left\lceil \frac{N}{4} \right\rceil \geq 3\]
+    
+    We realise that $N = 12$ works: 
+    \[\left\lceil \frac{12}{4} \right\rceil = 3 \geq 3\]
+    
+    Moreover, we see that $N = 11, 10, 9$ work as well: 
+    \[\left\lceil \frac{9}{4} \right\rceil = 3 \geq 3\]
+    
+    Since $N = 8$ does not work, we have found that $N = 9$ is the smallest possible one.
+}
+
+\parag{Desktop Cabling Problem}{
+    We have $d$ computers and $p$ printers, where $d > p$.
+
+    We wonder how many cables $c$ are needed, connecting computers and printers such that whatever subset of $p$ computers you select each has a separate cable to a printer. This allows $p$ computer to print at the same time, whatever the computers we choose.
+
+    \imagehere{DesktopCablingProblem.png}
+
+    For example, the configuration on the left does not work, since the subset of the two rightmost computers is not such that each computer has its own printer. The one on the right works, but we could for example remove the cable in yellow.
+
+    Let us consider the following method:
+    \imagehere{DesktopCablingSolution.png}
+
+    In other words, the first $p$ computers are directly linked to exactly one printer (different each), and the following $d - p$ computers are linked to all printers. We can show that this is a solution to the desktop cabling problem, and that it is the smallest number of cables that solves the problem.
+
+    \subparag{Proof of solution}{
+        Let $S$ be the set of selected computers, $\left|S\right| =  p$. Let $k$, $0 \leq k \leq p$, be the number of computers from $D_1$ contained in $S$, i.e. $\left|S \cap D_1\right| = k$. They are connected using their unique cable.
+
+        This leaves $p - k$ unconnected printers, and $S$ contains $p - k$ computers from $D_2$. Since there is a cable linking them all to all printer, we can distribute the printers. They can thus be connected.
+    }
+
+    \subparag{Proof of optimality}{
+        Let's suppose for contradiction that this solution is not optimal, and thus that there exists a solution that works with a number of cable less than or equal to:
+        \[p + \left(d - p\right)\cdot p - 1\]
+
+        Let's use the pigeon-hole principle: our holes are our printers, and our pigeons are our computers. By the generalised version, we know that there is a printer $P_r$ that is connected to the following number of computers:
+        \[\left\lfloor \frac{p + \left(d - p\right)p - 1}{p} \right\rfloor = \left\lfloor d - p + \left(1 - \frac{1}{p}\right) \right\rfloor = d - p\]
+        
+        Let's now consider all computers that are not connected to $P_r$. There are at least $p$ computers that are connected to the remaining $p - 1$ printers, which is a contradiction (we cannot connect $p$ computers to $p-1$ printers where each one would have its own printer, since this would be a subset which would break the problem).
+
+        \qed
+    }
+}
+
+\subsection{Counting with recurrence relations}
+\parag{Definition}{
+    A \important{recurrence relation} for the sequence $\left\{a_n\right\}$ is an equation that expresses $\left\{a_n\right\}$ in terms of a finite number $k$ of the preceding terms of the sequence, i.e: 
+    \[a_n = f\left(n, a_{n-1}, a_{n-2}, \ldots, a_{n-k}\right)\]
+    
+    A sequence $\left\{a_n\right\}$ is called a \important{solution} of a recurrence relation if its terms satisfy the recurrence relation.
+
+    The \important{initial conditions} for a sequence specify the terms $a_0, a_1, \ldots, a_{k-1}$.
+}
+
+\parag{Method}{
+    \begin{enumerate}[left=0pt]
+        \item Define a set $P_n$ depending on a parameter $n$.
+        \item Describe $P_n$ in terms of $P_{n-1}, \ldots, P_{n-k}$
+        \item Derive a recurrence relation for $\left|P_n\right|$.
+        \item Solve the recurrence relation.
+    \end{enumerate}
+}
+
+\parag{Example 1}{
+    Let's say we want to count the number of bit strings of length $n$, which do not have two consecutive 0s. 
+
+    First, let's define:
+    \[P_n = \left\{s \eval \left|s\right| = n, \text{no consecutive 0s}\right\}, \mathspace n \geq 3\]
+
+    We can see easily that $\left|P_1\right| = 2$ (0 and 1) and $\left|P_2\right| = 3$ (01, 10 and 11). 
+
+    Second, we see that for $s_n \in P_n$, then we have two cases: either $s_n$ ends with a 1, then we can have $s_n = s_{n-1} 1$, where $s_{n-1} \in P_{n-1}$; or $s_n$ ends in a 0, then $s_{n-1} 10$, where $s_{n-2} \in P_{n-2}$.
+
+    In other words, we can describe $P_n$ the following way: 
+    \[P_n = \left\{s_{n-1} 1 \eval s_{n-1} \in P_{n-1}\right\} \cup \left\{s_{n-2} 10 \eval s_{n-2} \in P_{n-2}\right\}\]
+
+    Third, we see that we get: 
+    \[\left|P_n\right| = \left|P_{n-1}\right| + \left|P_{n-2}\right|\]
+    since the sets we take the union of are disjoint.
+    
+}
+
+\parag{Example 2}{
+    In the Tower of Hanoi, we have three pegs and $n$ disks. We are allowed to move the disks one at a time from one peg to another, as long as a larger disk is never placed on a smaller. The goal is to move all disks to the second peg (in order, with the largest on the bottom, since those are the rule). We wonder how many moves we need.
+
+    \imagehere[0.5]{TowerOfHanoi.png}
+
+    Let $\left\{H_n\right\}$ denote the number of moves needed to solve the Tower of Hanoi puzzle with $n$ disks. The initial condition is $H_1 = 1$ since a single disk can be transferred from peg 1 to peg 2 in one move.
+
+    We can see that to move $n$ objects from peg 1 to peg 2, we can move $n-1$ objects to peg 3, move the $n$\Th to peg 2, and move back the $n-1$ to peg 2. Thus, we have the following recursive formula: 
+    \[H_n = 2H_{n-1} + 1\]
+    
+    \subparag{Solving the recurrence}{
+        Let's now say we want to solve this recurrence (in an informal way): 
+        \begin{multiequality}
+        H_n =\ & 2 H_{n-1} + 1 \\
+        =\ & 2^1 \left(2 H_{n-2} + 1\right) + 1 \\
+        =\ & 2^2 H_{n-2} + 2^1 + 1  \\
+        =\ & 2^2\left(2 H_{n-3} + 1\right) + 2^1 + 1 \\
+        =\ & 2^3 H_{n-3} + 2^2 + 2^1 + 1 \\
+        =\ & \ldots \\
+        =\ & 2^{n-2} \left(2 H_{n- \left(n-2\right) + 1} + 1\right) + 2^{n-2} + 2^1 + 1 \\
+        =\ & 2^{n-1} \cdot 1 + 2^{n-2} + \ldots + 2^1 + 1 \\
+        =\ & 2^n - 1
+        \end{multiequality}
+    }
+}
+
+
+
+
+
+\end{document}
