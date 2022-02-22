@@ -35,14 +35,14 @@ PRINTED_VERSION = False
 CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
-COURSES_NAME = ["Analyse-2", "Analyse-2-MethodesDeDemonstration"]
+# COURSES_NAME = ["Analyse-2", "Analyse-2-MethodesDeDemonstration"]
 # COURSES_NAME = ["AICC-2"]
 # COURSES_NAME = ["Analyse-2"]
 # COURSES_NAME = ["Analyse-2-MethodesDeDemonstration"]
-# COURSES_NAME = ["DigitalSystemDesign"]
+COURSES_NAME = ["DigitalSystemDesign"]
 # COURSES_NAME = ["Physics-4-kekw"]
 
-COPY_EXTENSIONS = ["tex", "pdf", "png", "jpg", "jpeg", 'code']
+COPY_EXTENSIONS = ["tex", "pdf", "png", "jpg", "jpeg", 'code', 'svg']
 # FOREWORD_NAME = {'fr': 'foreword_fr.txt', 'en': 'foreword_en.txt'}
 
 
@@ -464,10 +464,12 @@ def create_main_tex(tmp_dir, tex_files, config, summaries):
 
 
 def compile_tex(tmp_dir):
+    beginning_dir = os.getcwd()
+    os.chdir(tmp_dir)
     # latexmk compiles multiple times and all, so that's great
-    compile_cmd = ("latexmk \"" + tmp_dir + "/main.tex\" " +
-                   "-output-directory=\"" + tmp_dir + "\" -pdf -halt-on-error")
+    compile_cmd = ("latexmk main.tex -shell-escape -pdf -halt-on-error")
     completed_process = subprocess.run(compile_cmd, shell=True)
+    os.chdir(beginning_dir)
     return completed_process.returncode
 
 
