@@ -24,8 +24,8 @@ import json
 import shutil
 import datetime
 
-DATE = {"french": r"Bachelor d'informatique --- Semestre 1 \\ Automne 2021",
-        "english": r"Computer science bachelor --- Semester 1 \\ Autumn 2021"}
+DATE = {"french": r"Bachelor d'informatique --- Semestre 2 \\ Printemps 2022",
+        "english": r"Computer science bachelor --- Semester 2 \\ Spring 2022"}
 
 # uses the "temp" folder in this diriectory if true, else uses a temporary
 # directory that gets destroyed after having finished
