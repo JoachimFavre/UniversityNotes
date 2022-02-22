@@ -1,0 +1,138 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-02-22 at 13:53:13.
+
+\usepackage{../../style}
+
+\title{Analyse 2 --- Méthodes de Démonstration}
+\author{Joachim Favre}
+\date{Lundi 21 février 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2022-02-21}{Un cours en deux documents}{
+\begin{itemize}[left=0pt]
+    \item Introduction et définition des concepts de proposition, démonstration et axiomes.
+    \item Explication de la méthode de démonstration dite de la démonstration directe, et celle dite du raisonnement par contraposée.
+\end{itemize}
+}
+
+\section{Méthodes de démonstration et raisonnement mathématique}
+\subsection{Introduction}
+\parag{Définition de proposition}{
+    Une \important{proposition} est un énoncé qui est vrai ou faux.
+
+    \subparag{Exemple}{
+        Considérons les phrases suivantes:
+        \begin{enumerate}
+            \item Il existe une infinité de nombres premiers.
+            \item $\displaystyle \cos\left(0\right) = 0$
+            \item Ouvrez la porte!
+        \end{enumerate}
+
+        On a alors:
+        \begin{enumerate}
+            \item C'est une proposition vraie, démontrée par Euclid (et j'aime beaucoup sa preuve).
+            \item C'est une proposition fausse (on sait tous que $\cos\left(x\right) = 1, \forall x \in \mathbb{R}$).
+            \item Ce n'est pas une proposition.
+        \end{enumerate}
+    }
+}
+
+\parag{Définition de démonstration}{
+    Une \important{démonstration} est une suite d'implications logiques qui sert à dériver la proposition en question à partir des \important{axiomes} (propositions admises comme vraies) et des propositions préalablement obtenues.
+}
+
+\parag{Exemple 1}{
+    Soient $a, b \in \mathbb{R}$, $a, b \geq 0$. Alors: 
+    \[\frac{a + b}{2} \geq \sqrt{ab}\]
+
+    Notez que ceci est l'inégalité AM-GM, et elle est très puissante.
+    
+    \subparag{Démonstration}{
+        Partons de ce que nous voulons démonter: 
+        \[\frac{a + b}{2} \geq \sqrt{ab} \implies a + b \geq 2\sqrt{ab} \implies \left(a + b\right)^2 \geq 4ab\]
+
+        Ce qui implique que: 
+        \[a^2 + 2ab + b^2 \geq 4ab \implies a^2 - 2ab + b^2 \geq 0 \implies \left(a - b\right)^2 \geq 0\]
+        
+        
+        Or, nous savons que pour tout $x \in \mathbb{R}$, nous avons $x^2 \geq 0$, donc notre proposition est vraie.
+
+        Cependant, ceci n'est pas une vraie preuve, nous avons utilisé un argument frauduleux ce qui la rend fallacieuse. En effet, si $P$ et $Q$ sont deux propositions sont telles que $P \implies Q$, et si nous savons que $Q$ est vraie, alors cela n'implique pas nécessairement que $P$ soit vraie. Nous allons voir un exemple d'utilisation de cet argument à tort après la vraie démonstration de ce théorème.
+    }
+
+    \subparag{Vraie démonstration}{
+        Tout ce qu'on a fait n'est cependant pas à jeter, nous pouvons, dans notre cas, faire le chemin dans l'autre sens.
+
+        Soient $a, b \in \mathbb{R}$ où $a, b \geq 0$. Nous avons que $\left(a - b\right)^2 \geq 0$ puisque $x^2 \geq 0$ pour tout $x \in \mathbb{R}$. Alors: 
+        \[\left(a - b\right)^2 \geq 0 \implies a^2 - 2ab + b^2 \geq 0 \implies a^2 + 2ab + b^2\geq 4ab\]
+
+        Ce qui implique que:
+        \[\left(a + b\right)^2 \geq 4ab \over{\implies}{$a, b \geq 0$} \left(a + b\right) \geq 2\sqrt{ab} \implies \frac{a + b}{2} \geq \sqrt{ab}\]
+
+        \qed
+    }
+
+    \subparag{Note personnelle}{
+        Je préfère personnellement faire cette preuve en commençant par $\left(\sqrt{a} - \sqrt{b}\right)^2 \geq 0$, mais l'argument est le même.
+    }
+    
+    
+}
+
+\parag{Exemple}{
+    Disons que nous voulons montrer que $-5 = 0$. Ceci est clairement faux, mais utilisons le même argument fallacieux: 
+    \[-5 = 0 \over{\implies}{$\cdot 0$} 0 = 0\]
+    
+    \subparag{Note personnelle}{
+        Le problème est que nous voulons non pas montrer que $-5 = 0 \implies 0 = 0$, mais $0 = 0 \implies -5 = 0$. Cependant, même si partir de là où on veut arriver peut nous donner un chemin, il faut refaire ce chemin dans l'autre sens pour avoir une preuve formelle. Parfois, nous ne pouvons pas faire ce chemin dans l'autre sens, comme dans ce cas puisqu'il nous faudrait diviser par 0. Il faut aussi faire attention quand on met les deux côté de notre équation au carré puisqu'on la fonction $f\left(x\right) = x^2$ n'est pas bijective, donc: 
+        \[a = b \implies a^2 = b^2\]
+        alors que l'inverse ne tient pas. Si nous voulons que les deux sens fonctionnent, alors nous avons besoin de valeurs absolues: 
+        \[\left|a\right| = \left|b\right| \iff a^2 = b^2\]
+    }
+}
+\subsection{Méthodes de démonstration}
+\parag{Méthode 1: Démonstration directe}{
+    Nous partons de nos conditions données $P$, nous utilisons des implications logiques, des axiomes et des propositions connues, puis nous arrivons à notre proposition désirée $Q$.
+}
+
+\parag{Méthode 2: Raisonnement par contraposée}{
+    On utilise que $P \implies Q$ est équivalent à $\lnot Q \implies \lnot P$ (où $\lnot$ veut dire ``non'').
+}
+
+\parag{Exemple}{
+    Disons que nous voulons montrer que si $r \in \mathbb{R}$ est irrationnel ($P$), alors $\sqrt{r}$ est aussi irrationnel ($Q$).
+
+    \subparag{Démonstration}{
+        Nous voulons montrer ça par la contraposée. La contraposée de notre proposition est que si $\sqrt{r}$ est rationnel ($\lnot Q$), alors $r$ est rationnel ($\lnot P$).
+
+
+        Ainsi, puisque $\sqrt{r}$ est rationnel, on sait que: 
+        \[\sqrt{r} = \frac{p}{q}, \mathspace \text{où } p, q \in \mathbb{N}, q \neq 0\]
+        
+        On sait que $\sqrt{r} > 0$, donc on a bien que $p, q \geq 0$.
+
+        Continuous notre démonstration: 
+        \[\sqrt{r} = \frac{p}{q} \implies r = \frac{p^2}{q^2}\]
+        qui est rationnel puisque $p^2, q^2 \in \mathbb{N}, q^2 \neq 0$.
+
+        Par contraposée, cela implique donc que, si $r \in \mathbb{R}_+$ est irrationnel, alors $\sqrt{r}$ l'est aussi.
+
+        \qed
+    }
+}
+
+\parag{Preuve frauduleuse}{
+    Nous cherchons l'erreur dans l'argument suivant:
+    \[3 > 2 \iff 3\ln\left(\frac{1}{2}\right) > 2\ln\left(\frac{1}{2}\right) \iff \ln\left(\left(\frac{1}{2}\right)^2\right) > \ln\left(\left(\frac{1}{2}\right)^3\right) \iff \frac{1}{8} > \frac{1}{4}\]
+
+    L'erreur est courante lorsqu'on manipule des inégalités: il faut changer le signe de l'implication quand on multiplie par un nombre négatif. Or, on sait que: 
+    \[\ln\left(x\right) < 0, \forall x \in \left]0, 1\right[ \implies \ln\left(\frac{1}{2}\right) < 0\]
+    
+}
+
+
+
+\end{document}

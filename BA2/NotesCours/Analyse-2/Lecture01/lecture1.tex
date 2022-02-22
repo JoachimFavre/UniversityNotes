@@ -1,0 +1,195 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-02-21 at 10:07:54.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Lundi 21 février 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2022-02-21}{Le meilleur sujet}{
+\begin{itemize}[left=0pt]
+    \item Définition des équations différentielles ordinaires.
+    \item Explication d'un petit peu de terminologie autour de ces équations.
+    \item Introduction au théorème de l'existence et de l'unicité d'une solution des EDVS.
+\end{itemize}
+}
+
+\section{Équations différentielles ordinaires}
+\subsection{Définitions et exemples}
+\parag{Exemple 1}{
+    Supposons qu'on a une fonction $y\left(x\right) = y$, où $x \in \mathbb{R}$. De plus, disons que nous savons que: 
+    \[y' = 0, \mathspace \forall x \in \mathbb{R}\]
+    
+    On remarque alors que $y\left(x\right) = 2$ est une solution sur $\mathbb{R}$. De plus, on peut même obtenir une solution plus générale:
+    \[y\left(x\right) = C, \mathspace \text{où } C \in \mathbb{R}, \forall x \in \mathbb{R}\]
+    
+    On verra plus tard que c'est la solution générale à cette équation.
+}
+
+\parag{Définition}{
+    Une \important{équation différentielle ordinaire} est une expression: 
+    \[E\left(x, y, y', \ldots, y^{\left(n\right)}\right) = 0\]
+    où $E$ est une expression fonctionnelle, $n \in \mathbb{N}_0$, et $y = y\left(x\right)$ est une fonction inconnue de $x$.
+
+    On cherche un intervalle ouvert $I \subset \mathbb{R}$ et une fonction $y : I \mapsto \mathbb{R}$ de classe $C^n$ telle que l'équation donnée est satisfaite $\forall x \in I$.
+
+    \subparag{Remarque personnelle}{
+        Cette définition peut paraître très formelle, mais l'idée c'est qu'une équation différentielle ordinaire est une équation où on a une fonction, ses dérivées, et la variable $x$. Cela permet de faire une opposition avec les équations intégrales comme la \textit{Rendering Equation} (où $L_i$ est liée à $L_o$, ce qui fait que c'est bien une équation et non une formule): 
+        \[L_o(x, \bvec{\omega}) = L_e(x, \bvec{\omega}) + \int_\Omega{L_i(x, \bvec{\omega}')}f_r(\bvec{\omega}, x, \bvec{\omega}')\cos(\theta)d\bvec{\omega}'\]
+        
+        Cela permet aussi de faire une différence avec les équations à dérivées partielles, comme l'équation de la chaleur: 
+        \[\frac{\partial T\left(x, t\right)}{\partial t} - k \frac{\partial^2 T\left(x, t\right)}{\partial x^2} = 0\]
+    }
+    
+}
+
+\parag{Exemple 2}{
+    Considérons l'équation différentielle ordinaire suivante: 
+    \[y'' = 0\]
+    
+    On remarque déjà que, nécessairement, $y' = C_1 \in \mathbb{R}$ pour tout $x \in \mathbb{R}$. Ainsi, pour finir, on obtient: 
+    \[y = C_1 x + C_2, \mathspace \forall C_1, C_2 \in \mathbb{R}, \forall x \in \mathbb{R}\]
+}
+
+\parag{Exemple 3}{
+    Prenons maintenant l'équation suivante: 
+    \[y + y' = 0 \iff y' = -y\]
+    
+    On sait que $f\left(x\right) = e^x$ est telle que $f'\left(x\right) = f\left(x\right)$. Il nous suffit donc de la modifier légèrement pour obtenir une solution à notre équation: 
+    \[y = e^{-x}, \mathspace \forall x \in \mathbb{R}\]
+    
+    On peut finalement en déduire la solution générale: 
+    \[y\left(x\right) = Ce^{-x}, \mathspace \forall C \in \mathbb{R}, x \in \mathbb{R}\]
+}
+
+\parag{Équation la plus simple}{
+    On remarque que l'exemple 1 et l'exemple 2 sont de la forme: 
+    \[y^{\left(n\right)} = f\left(x\right)\]
+    où $f\left(x\right)$ est une fonction connue et continue sur $I$.
+    
+    Dans ce cas là, nous pouvons résoudre cette équation par intégration.
+}
+
+\parag{Équation à variables séparées}{
+    On appelle le troisième exemple une \important{équation à variables séparées}. En effet, on peut écrire: 
+    \[\frac{dy}{dx} = y' \implies \frac{dy}{dx} = -y \over{\implies}{$y \neq 0$} \frac{dy}{y} = -dx\]
+
+    Ainsi, nos variables sont séparées: nous avons $y$ d'un côté et $x$ de l'autre. Ceci nous permet d'obtenir une dépendance entre le changement infinitésimal en $y$ et le changement infinitésimal en $x$. Puisque c'est vrai pour tout $x$ sur notre intervalle, on peut intégrer en préservant l'égalité: 
+    \[\int \frac{dy}{y} = -\int dx \implies \log\left|y\right| = -x + C_1\]
+    pour un $C_1 \in \mathbb{R}$ arbitraire.
+
+    On peut continuer notre équation:
+    \[\left|y\right| = e^{-x} \underbrace{e^{C_1}}_{C_2 > 0} \implies y = \pm C_2 e^{-x}\]
+    
+    Finalement, on peut aussi remarque que $y = 0$ est une solution. Tout ceci nous permet d'obtenir la solution générale à notre équation: 
+    \[y\left(x\right) = Ce^{-x}, \mathspace C \in \mathbb{R}, x \in \mathbb{R}\]
+}
+
+\parag{Terminologie}{
+    On appelle $E\left(X, y, \ldots, y^{\left(n\right)}\right) = 0$ une équation différentielle (ED).
+
+    \subparag{Ordre}{
+        Un nombre naturel $n \in \mathbb{N}^*$ est \important{l'ordre} d'une équation différentielle si $n$ est l'ordre maximal de dérivée de $y\left(x\right)$ dans l'équation.
+    }
+
+    \subparag{Équation linéaire}{
+        Si notre équation différentielle est un polynôme linéaire en $y, y', \ldots, y^{\left(n\right)}$, alors l'équation est dite \important{linéaire}.
+    }
+
+    \subparag{Équation autonome}{
+        Si l'expression ne contient pas de $x$, l'équation est dite \important{autonome}.
+    }
+
+    \subparag{Solution générale}{
+        La \important{solution générale} d'une équation différentielle est l'ensemble de toutes les solutions de l'équation.
+    }
+}
+
+\parag{Exemple 4}{
+    Considérons les équations suivantes:
+    \begin{enumerate}
+        \item $\displaystyle y + y' = 5x + 1$ 
+        \item $\displaystyle 2x^2 y + y''' = 0$
+        \item $\displaystyle y' + 3y'' = 0$
+    \end{enumerate}
+    
+    On peut voir les propriétés suivantes:
+    \begin{enumerate}
+        \item Équation différentielle linéaire d'ordre 1 qui n'est pas autonome.
+        \item ED linéaire d'ordre 3 qui n'est pas autonome.
+        \item ED linéaire d'ordre 2 autonome.
+    \end{enumerate}
+}
+
+\parag{Définition du problème de Cauchy}{
+    Résoudre le \important{problème de Cauchy} (équation différentielle avec des conditions initiales) pour l'équation $E\left(x, y, y', \ldots, y^{\left(n\right)}\right) = 0$ consiste à trouver l'intervalle ouvert $I \subset \mathbb{R}$ et une fonction $y : I \mapsto \mathbb{R}$ de classe $C^n\left(I\right)$ telle que $E\left(x, y, \ldots, y^{\left(n\right)}\right) = 0$ sur $I$ et pour laquelle des conditions initiales sont satisfaites:
+    \[y\left(x_0\right) = b_0, y\left(x_1\right) = b_1, y'\left(x_2\right) = b_2, \ldots\]
+    
+    Le nombre des conditions initiales dépend du type de l'équation différentielle.
+}
+
+\parag{Retour à l'exemple 2}{
+    Nous avions trouvé: 
+    \[y'' = 0 \implies y\left(x\right) = C_1 x + C_2, \mathspace \forall C_1, C_2 \in \mathbb{R}, x \in \mathbb{R}\]
+    
+    Résolvons maintenant le problème de Cauchy pour $y'' = 0$ avec les conditions initiales: 
+    \[y\left(0\right) = 1, \mathspace y\left(2\right) = 4\]
+    
+    Nous pouvons mettre ces conditions initiales dans notre solution générale: 
+    \[1 = y\left(0\right) = C_1\cdot 0 + C_2 = C_2 \implies C_2 = 1\]
+    \[4 = y\left(2\right) = C_1 \cdot 2 + C_2 = 2C_1 + 1 \implies C_1 = \frac{3}{2}\]
+    
+    On obtient ainsi la \important{solution particulière} satisfaisant les conditions initiales: 
+    \[y\left(x\right) = \frac{3}{2}x + 1\]
+}
+
+\subsection{Équations différentielles à variables séparées}
+\parag{Définition}{
+    On appelle une \important{équation différentielle à variables séparées} (EDVS) une équation sous la forme: 
+    \[f\left(y\right) \cdot y' = g\left(x\right)\]
+    où $f: I \mapsto \mathbb{R}$ est une fonction continue sur $I \subset \mathbb{R}$ et $g : J \mapsto \mathbb{R}$ est une fonction continue sur $J \in\mathbb{R}$.
+
+    Une fonction $y: J' \subset J \mapsto I$ de classe $C^1$ satisfaisant l'équation $f\left(y\right) y' = g\left(x\right)$ est une solution.
+
+    \subparag{Explication}{
+        Nous pouvons manipuler notre équation de la manière suivante: 
+        \[f\left(y\right) \frac{dy}{dx} = g\left(x\right) \over{\implies}{en gros}  \int f\left(y\right) dy = \int g\left(x\right) dx\]
+
+        Nous verrons pourquoi ceci marche et pourquoi cette méthode est formelle à l'aide d'un théorème ci-après.
+    }
+}
+
+\parag{Exemple}{
+    Par exemple, $y' = -y$ est une EDVS: 
+    \[y' = -y \iff \frac{1}{y} y' = -1 \implies f\left(y\right) = \frac{1}{y}, g\left(x\right) = -1\]
+    
+}
+
+\parag{Théorème (existence et unicité d'une solution des EDVS)}{
+    Soit $f: I \mapsto \mathbb{R}$ une fonction continue telle que $f\left(y\right) \neq 0$ pour tout $y \in I$, et soit $g : J \mapsto \mathbb{R}$ une fonction continue.
+
+    \important{Existence:} Alors, pour tout couple $\left(x_0, b_0\right)$ où $x_0 \in J$ et $b_0 \in I$, l'équation 
+    \[f\left(y\right) y' = g\left(x\right)\]
+    admet une solution $y : J' \subset J \mapsto I$ vérifiant la condition initiale.
+
+    \important{Unicité:} Si $y_1 : J_1 \mapsto I$ et $y_2 : J_2 \mapsto I$ sont deux solutions telles que $y_1\left(x_0\right) = y_2\left(x_0\right) = b_0$, alors: 
+    \[y_1\left(x\right) = y_2\left(x\right), \mathspace \forall x \in J_1 \cap J_2\]
+
+    \subparag{Note personnelle}{
+        Ce théorème implique que si nous pouvons écrire la solution générale à une EDVS de manière complètement générale avec des constantes, alors il y a une et exactement une constante. Par exemple, les ensembles de fonctions suivants ne pourraient pas être les solutions générales d'une EDVS: 
+        \[f\left(x\right) = C_1 \sin\left(x\right) + C_2 \cos\left(x\right), \mathspace g\left(x\right) = x^2\]
+        où $C_1, C_2, \in \mathbb{R}$ et $x \in \mathbb{R}$.
+
+        Cependant, comme on l'a vu plus tôt, l'ensemble de fonctions suivant est la solution générale à l'EDVS $y' = -y$: 
+        \[y\left(x\right) = Ce^{-x}, \mathspace \text{où } C \in \mathbb{R}, x \in \mathbb{R}\]
+        
+    }
+    
+}
+
+\end{document}
