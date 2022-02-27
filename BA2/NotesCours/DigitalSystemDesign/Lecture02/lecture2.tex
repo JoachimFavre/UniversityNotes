@@ -1,0 +1,312 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-02-24 at 17:54:43.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Jeudi 24 février 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2022-02-24}{Karnaugh diagrams}{
+\begin{itemize}[left=0pt]
+    \item List of logic operator properties, and explanation of the theorems of De Morgan.
+    \item Definition of minterms, maxterms, and of the fours canonical forms an expression can take.
+    \item Explanation of the usage of Karnaugh diagrams in order to optimise the number of logic circuit we use.
+\end{itemize}
+
+}
+
+\parag{Properties}{
+    We have the following properties:
+    \begin{center}
+        \begin{tabular}{|c|c|}
+            \hline
+            \textbf{Equivalence} & \textbf{Name} \\
+            \hline
+            $A \cdot A = A$ & \multirow{3}{*}{Elementary properties} \\
+            $A + A = A$ & \\
+            $A \oplus A = 0$ & \\
+            \hline
+            $A \cdot \left(A + B\right) = A$ & \multirow{2}{*}{Absorption properties} \\
+            $A + \left(A \cdot B\right) = A$ & \\
+            \hline
+            $A \cdot 0 = 0$ & \multirow{6}{*}{Constant properties} \\
+            $A \cdot 1 = A$ & \\
+            $A + 0 = A$ & \\
+            $A + 1 = 1$ & \\
+            $A \oplus 0 = A$ & \\
+            $A \oplus 1 = \bar{A}$ & \\
+            \hline
+            $A \cdot \bar{A} = 0$ & \multirow{4}{*}{Complement properties} \\
+            $A + \bar{A} = 1$ & \\
+            $A \oplus \bar{A} = 1$ & \\
+            $\bar{\bar{A}} = A$ & \\
+            \hline
+            $A \cdot B = B \cdot A$ & \multirow{3}{*}{Commutative properties} \\
+            $A + B = B + A$ & \\
+            $A \oplus B = B \oplus A$ & \\
+            \hline
+            $A\cdot\left(B + C\right) = \left(A \cdot B\right) + \left(A \cdot C\right)$ & \multirow{3}{*}{Distributive properties} \\
+            $A + \left(B \cdot C\right) = \left(A + B\right)\cdot\left(A + C\right)$ & \\
+            $A\cdot\left(B \oplus C\right) = \left(A \cdot B\right)\oplus\left(A \cdot C\right)$ & \\
+            \hline
+            $A \cdot \left(B \cdot C\right) = \left(A \cdot B\right)\cdot C$ & \multirow{2}{*}{Associative properties} \\
+            $A + \left(B + C\right) = \left(A + B\right) + C$ & \\
+            $A \oplus \left(B \oplus C\right) = \left(A \oplus B\right) \oplus C$ & \\
+            \hline
+        \end{tabular}
+    \end{center}
+    
+    Note that $A \oplus \left(B \cdot C\right) \neq \left(A \oplus B\right) \cdot \left(A \oplus C\right)$ in general.
+}
+
+\parag{Example 1}{
+    We want to show that $A \oplus 1 = \bar{A}$. Let's use two methods.
+
+    \subparag{Truth table}{
+        We can draw the truth table of this problem:
+        \begin{center}
+        \begin{tabular}{c|c}
+            $A$ & $A \oplus 1$ \\
+            \hline
+            0 & 1 \\
+            1 & 0 \\
+        \end{tabular}
+        \end{center}
+
+        So, we can clearly see that $A \oplus 1 = \bar{A}$.
+    }
+
+    \subparag{Boolean algebra}{
+        We know the following equivalence: 
+        \[A \oplus B = A\cdot \bar{B} + \bar{A} \cdot B\]
+        
+        So: 
+        \[A \oplus 1 = A \cdot \bar{1} + \bar{A} \cdot 1 = A \cdot 0 + \bar{A} \cdot 1 = 0 + \bar{A} = \bar{A}\]
+    }
+}
+
+\parag{Example 2}{
+    We want to show that: 
+    \[A \oplus \left(B \cdot C\right) \neq \left(A \oplus B\right) \cdot\left(A \oplus C\right)\]
+    
+    Let us use the equivalence of the xor operator on the left hand side: 
+    \[A \oplus \left(B \cdot C\right) = \bar{A} \cdot B \cdot C + A \cdot \bar{B \cdot C}\]
+    
+    Let's also use this equivalence on the right hand side:
+    \begin{multiequality}
+    \left(A \oplus B\right) \cdot\left(A \oplus C\right) =\ & \left(\bar{A}\cdot B + A\cdot \bar{B}\right) \cdot \left(\bar{A} \cdot C + A \cdot \bar{C}\right)  \\
+    =\ & \bar{A}\cdot \bar{A} \cdot B \cdot C + \bar{A} \cdot A \cdot B \cdot C + A \cdot \bar{A} \cdot \bar{B} \cdot C + A \cdot A \cdot \bar{B} \cdot \bar{C} \\
+    =\ & \bar{A}\cdot B \cdot C + 0 \cdot B \cdot C + 0 \cdot \bar{B}\cdot C + A \cdot \bar{B}\cdot \bar{C} \\
+    =\ & \bar{A}\cdot B \cdot C + 0 + 0 + A \cdot \bar{B}\cdot \bar{C} \\
+    =\ & \bar{A}\cdot B\cdot C + A \cdot \bar{B} \cdot \bar{C}    
+    \end{multiequality}
+    
+    Since both sides are not equal, we know that our equality does not hold. We can draw a truth table for each side to convince ourselves. The sole differences between the two comes when $A = B = 1$ and $C = 0$, or $A = C = 1$ and $B = 0$.
+}
+
+\parag{Theorems of de Morgan}{
+    De Morgan stated the two following theorems: 
+    \[\bar{A \cdot B} = \bar{A} + \bar{B}\]
+    \[\bar{A + B} = \bar{A} \cdot \bar{B}\]
+    
+    \subparag{Implication}{
+        One of the implications of this theorem is that any logic expression can be formulated with only ``or'' and ``not'', or only with ``and'' and ``not''.
+    }
+}
+
+\parag{Extracting an operator from a table}{
+    Let's say that we have the following table, and that we want to know which logic operator hides behind:
+    \begin{center}
+        \begin{tabular}{c|c|c|c}
+            $A$ & $B$ & $C$ & $Y$ \\
+            \hline
+            0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 1 \\
+            0 & 1 & 0 & 1 \\
+            0 & 1 & 1 & 1 \\
+            1 & 0 & 0 & 1 \\
+            1 & 0 & 1 & 1 \\
+            1 & 1 & 0 & 1 \\
+            1 & 1 & 1 & 1 \\
+        \end{tabular}
+    \end{center}
+    
+
+    We call the \important{minterms} every input combination that makes the result 1. We have 7 of them in this table. If call them $M_x$, then we can easily get our function: 
+    \[y = M_1 + M_2 + \ldots + M_7\]
+
+    Where, for example: 
+    \[M_1 = \bar{A}\cdot \bar{B}\cdot C\]
+    
+    We can also be more efficient. We call \important{maxterms} every input combination that makes the result 0, we have one of them in this table. We can use this idea: 
+    \[\bar{Y} = \bar{A} \cdot \bar{B} \cdot \bar{C} \implies \bar{\bar{Y}} = \bar{\bar{A} \cdot \bar{B} \cdot \bar{C}}\]
+    
+    And so, we get by De Morgan: 
+    \[Y = \bar{\bar{A}} + \bar{\bar{B}} + \bar{\bar{C}} = A + B + C\]
+}
+
+\parag{Canonical forms}{
+    Let the following truth table:
+    \begin{center}
+        \begin{tabular}{c|c|c|c}
+            $A$ & $B$ & $C$ & $Y$ \\
+            \hline
+            0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0 \\
+            0 & 1 & 0 & 1 \\
+            0 & 1 & 1 & 0 \\
+            1 & 0 & 0 & 0 \\
+            1 & 0 & 1 & 0 \\
+            1 & 1 & 0 & 1 \\
+            1 & 1 & 1 & 1 \\
+        \end{tabular}
+    \end{center}
+
+    We can write $Y$ in four different forms. 
+
+    The \important{disjunt form}, or sum of products is:
+    \[Y = \bar{A} \cdot B \cdot \bar{C} + A \cdot B \cdot \bar{C} + A \cdot B \cdot C\]
+
+    We can also see that: 
+    \[Y = \bar{\bar{\bar{A} \cdot B \cdot \bar{C} + A \cdot B \cdot \bar{C} + A \cdot B \cdot C}} = \bar{\bar{\left(\bar{A} \cdot B \cdot \bar{C}\right)} \cdot \bar{\left(A \cdot B \cdot \bar{C}\right)} \cdot \bar{\left(A \cdot B \cdot C\right)}}\]
+
+    This is the second canonical form. We can continue working and get: 
+    \[Y = \bar{\left(A + \bar{B} + C\right) \cdot \left(\bar{A} + \bar{B} + C\right) \cdot \left(\bar{A} + \bar{B} + \bar{C}\right)}\]
+
+    This form is named the \important{conjuct form}, or the product of sums. Again, continuing: 
+    \[Y = \bar{\bar{\left(A + \bar{B} + C\right)} + \bar{\left(\bar{A} + \bar{B} + C\right)} + \bar{\left(\bar{A} + \bar{B} + \bar{C}\right)}}\]
+}
+
+\parag{Optimisation}{
+    Let the following truth table: 
+    \begin{center}
+        \begin{tabular}{c|c|c}
+            $A$ & $B$ & $Y$ \\
+            \hline
+            0 & 0 & 1 \\
+            0 & 1 & 1 \\
+            1 & 0 & 0 \\
+            1 & 1 & 0 \\
+        \end{tabular}
+    \end{center}
+    
+
+    We notice that there is the same number of minterms and of maxterms, so we can take the one which we want, let's pick minterms: 
+    \[Y = \bar{A} \cdot \bar{B} + \bar{A} \cdot B\]
+    
+    The disjunct form does not always provide the smallest equation: 
+    \[Y = \bar{A} \cdot \left(\bar{B} + B\right) = \bar{A} \cdot 1 = \bar{A}\]
+
+    This an important thing to be able to do, since it allows the circuit to be cheaper and cost less money, so we want to find a good way at finding the smallest form. For that, we can use the \important{Karnaugh diagram}.
+}
+
+\parag{Karnaugh diagram}{
+    Let's take the following truth table:
+    \begin{center}
+        \begin{tabular}{c|c|c|c}
+            $A$ & $B$ & $C$ & $Y$ \\
+            \hline
+            0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 1 \\
+            0 & 1 & 0 & 1 \\
+            0 & 1 & 1 & 1 \\
+            1 & 0 & 0 & 0 \\
+            1 & 0 & 1 & 1 \\
+            1 & 1 & 0 & 0 \\
+            1 & 1 & 1 & 1 \\
+        \end{tabular}
+    \end{center}
+
+    We can get the following forms, considering minterms or maxterms: 
+    \[Y = \bar{A} \cdot \bar{B} \cdot C + \bar{A} \cdot B \cdot \bar{C} + \bar{A} \cdot B \cdot C + A\cdot \bar{B} \cdot C + A\cdot B\cdot C\]
+    \[\bar{Y} = \bar{A} \cdot \bar{B} \cdot \bar{C} + A\cdot \bar{B} \cdot \bar{C} + A\cdot B\cdot \bar{C} \implies Y = \left(A + B + C\right) \cdot \left(\bar{A}+ B + C\right) \cdot \left(\bar{A} + \bar{B} + C\right)\]
+    
+    We want to find don't cares in it, to simplify the result. Let's draw the Karnaugh diagram for this function:
+    \imagehere[0.25]{KarnaughDiagramExample1.png}
+
+    Note that we make a grid with $2^3 = 8$ boxes. We also label places where our variables are true (for example, $A$ is true in the second column, but false in the first one). 
+
+    We want to make a group of minterms of size $2^m$. The biggest group we can find is a group of 4:
+    \imagehere[0.25]{KarnaughDiagramExample2.png}
+
+    We see that the group lies half in the region where $A$ is false, and half where it is true, and same for $B$. So, it corresponds to a don't care for them. This group corresponds to the value $C$ since it entirely lies in the region where $C$ is positive. We have a last minterm to take into account. We cannot make any valid group of minterms (we will define valid groups) of size 4 containing it, but we can make a group of 2, corresponding to $\bar{A} B$:
+    \imagehere[0.25]{KarnaughDiagramExample3.png}
+
+    There is no problem in covering twice a box. So, in the end, we get: 
+    \[Y = C + \bar{A} \cdot B\]
+    
+    We could do the same with maxterms, which would have led to: 
+    \[\bar{Y} = \bar{B} \cdot \bar{C} + A\cdot \bar{C}\]
+    
+    \subparag{Analysis of valid groups}{
+        Let's really see what we did with the first group. We can represent it using its $2^m$ minterms:
+        \begin{multiequality}
+        Y =\ & \bar{A} \cdot \bar{B}\cdot C + A \cdot \bar{B} \cdot C + \bar{A} \cdot B \cdot C + A\cdot B\cdot C  \\
+        =\ & C\cdot \left(\bar{A} \cdot \bar{B} + A \cdot \bar{B} + \bar{A} \cdot B + A \cdot B\right)  \\
+        =\ & C\cdot \left(\bar{A}\cdot \left(\bar{B} + B\right) + A \left(\bar{B} + B\right)\right)  \\
+        =\ & C\cdot\left(\left(\bar{B} + B\right) \cdot \left(\bar{A} + A\right)\right)  \\
+        =\ & C\cdot\left(1 \cdot 1\right) \\
+        =\ & C  
+        \end{multiequality}
+
+        So, we have two variables which are don't cares, and one which has impact. More precisely, we can notice that a variable is don't care when exactly one half of the group lies when it is true, and the other half when it is false. Moreover, a variable has impact if the group lies entirely in the region where the variable is true, or the region where the variable is false.
+    }
+}
+
+\parag{Summary}{
+    A group is valid when:
+    \begin{enumerate}
+        \item The group has exactly $2^m$ minterms or $2^m$ maxterms; and
+        \item The group has exactly $m$ variables don't care.
+    \end{enumerate}
+
+    A variable $E$ is don't care when: 
+    \begin{enumerate}
+        \item There are exactly $2^{m-1}$ minterms/maxterms from the group in the region where $E = 1$; and
+        \item There are exactly $2^{m-1}$ minterms/maxterms from the group in the region where $E = 0$ ($\bar{E}$-region).
+    \end{enumerate}
+    
+    A variable $F$ influences the group when either (this one is a or, the two above were ands): 
+    \begin{enumerate}
+        \item All $2^m$ minterms/maxterms from the group are in the region where $F = 1$; or
+        \item All $2^m$ minterms/maxterms from the group are in the region where $F = 0$ ($\bar{F}$-region).
+    \end{enumerate}
+    
+}
+
+\parag{Example 1}{
+    The following group is not valid, since three of the minterms are in the region where $B$ is true, and one where it is false. Thus, there is no symmetry, and it is a problem.
+    \imagehere[0.25]{KarnaughDiagramInvalidGroup.png}
+}
+
+\parag{Example 2}{
+    Let's consider the following Karnaugh diagram:
+    \imagehere[0.3]{KarnaughDiagramExample_2-1.png}
+
+    Let's consider minterms. We notice that there is no valid group of size 8. However, there are three valid groups of size 4. The red group is redondent since all of the maxterms covered by it are already covered by the blue group and the green group, so we get: 
+    \[Y = \bar{A} \cdot D + \bar{B} \cdot \bar{D}\]
+
+    Moreover, doing the same thing on maxterms, we also find no valid group of size 8, and three groups of size 4 where one is redondent, so: 
+    \[\bar{Y} = A\cdot B + \bar{B} \cdot D\]
+    
+    We can use boolean algebra to see that, indeed, the two logic functions are equal.
+    
+    \imagehere[0.7]{KarnaughDiagramExample_2-2.png}
+}
+
+\parag{Incompleted defined functions}{
+    It may occur that an input combination will never occur, so we can optimise it more. We say that we don't care what the function responds. Let us look at the following Karnaugh diagram:
+    \imagehere[0.3]{KarnaughDiagramExample_3.png}
+
+    We notice that if the function gives a 1 at this point it allows us to make a group of 8 minterms, so we choose that and we get: 
+    \[Y = \bar{A} + \bar{B} \cdot \bar{D}\]
+    
+}
+    
+
+\end{document}
