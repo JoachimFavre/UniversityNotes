@@ -1,0 +1,98 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-02-27 at 19:56:59.
+
+\usepackage{../../style}
+
+\title{Analyse II}
+\author{Joachim Favre}
+\date{Dimanche 27 février 2022}
+
+\begin{document}
+\maketitle
+
+\section{Démonstrations à connaître}
+
+\parag{Théorème (existence et unicité d'une solution des EDVS)}{
+    Soit $f: I \mapsto \mathbb{R}$ une fonction continue telle que $f\left(y\right) \neq 0$ pour tout $y \in I$, et soit $g : J \mapsto \mathbb{R}$ une fonction continue.
+
+    \important{Existence:} Alors, pour tout couple $\left(x_0, b_0\right)$ où $x_0 \in J$ et $b_0 \in I$, l'équation
+    \[f\left(y\right) y' = g\left(x\right)\]
+    admet une solution $y : J' \subset J \mapsto I$ vérifiant la condition initiale.
+
+    \important{Unicité:} Si $y_1 : J_1 \mapsto I$ et $y_2 : J_2 \mapsto I$ sont deux solutions telles que $y_1\left(x_0\right) = y_2\left(x_0\right) = b_0$, alors:
+    \[y_1\left(x\right) = y_2\left(x\right), \mathspace \forall x \in J_1 \cap J_2\]
+
+    \subparag{Preuve}{
+        Nous allons seulement montrer l'existence de la solution.
+
+        Soit la fonction suivante:
+        \[F\left(y\right) = \int_{b_0}^{y} f\left(t\right)dt\]
+
+        On sait que $F\left(y\right)$ est dérivable par le théorème fondamental du calcul intégral. De plus, on sait que $F'\left(y\right) = f\left(y\right) \neq 0$ sur $I$, donc $f\left(y\right)$ ne change pas pas de signe et donc $F\left(y\right)$ est monotone. Puisque $F\left(y\right)$ est continue et monotone, on sait qu'elle est inversible sur $I$.
+
+        Soit aussi la fonction suivante:
+        \[G\left(x\right) = \int_{x_0}^{x} g\left(t\right)dt\]
+
+        Par le théorème fondamental du calcul intégral, on sait aussi que $G\left(x_0\right) = 0$ et que $G$ est dérivable sur $J$.
+
+        Définissons aussi la fonction suivante dans un voisinage de $x_0$ (on sait que $F$ est inversible sur $I$, et $F^{-1}\left(G\left(x_0\right)\right) = b_0 \in I$):
+        \[y\left(x\right) = F^{-1}\left(G\left(x\right)\right)\]
+
+        Nous allons démontrer que $y\left(x\right)$ est une solution de l'équation $f\left(y\right) y'\left(x\right) = g\left(x\right)$ dans un voisinage de $x_0 \in J$, et qu'elle satisfait $y\left(x_0\right) = b_0$.
+
+        En manipulant notre définition, on obtient que, dans un voisinage de $x_0 \in J$:
+        \[F\left(y\left(x\right)\right) = G\left(x\right) \over{\implies}{$\frac{d}{dx}$}  F'\left(y\left(x\right)\right) y'\left(x\right) = G'\left(x\right) \implies f\left(y\right)y'\left(x\right) =  g\left(x\right)\]
+
+        De plus, nous savons par la définition de $G$ et $F$ que $G\left(x_0\right) = 0$ et $F\left(b_0\right) = 0$, donc:
+        \[y\left(x_0\right) = F^{-1}\left(G\left(x_0\right)\right) = F^{-1}\left(0\right) = b_0\]
+
+        \qed
+    }
+
+    \subparag{Idée de la preuve}{
+        Nous partons de notre équation:
+        \[g\left(y\right) \frac{dy}{dx} = f\left(x\right)\]
+
+        Et, notre théorème nous dit que c'est plus ou moins équivalent à:
+        \[\int f\left(y\right)dy = \int g\left(x\right) dx \iff F\left(y\right) = G\left(x\right)\]
+    }
+}
+
+\parag{Proposition pour les EDL1}{
+    Soient $p, f : I \mapsto \mathbb{R}$ des fonctions continues. Supposons que $v_0 : I \mapsto \mathbb{R}$ est une solution particulière de l'équation suivante:
+    \[y'\left(x\right) + p\left(x\right) y\left(x\right) = f\left(x\right)\]
+
+    Alors, la solution générale de cette équation est:
+    \[v\left(x\right) = v_0\left(x\right) + Ce^{-P\left(x\right)}, \mathspace \forall C \in \mathbb{R}\]
+    où $P\left(x\right)$ est une primitive de $p\left(x\right)$ sur $I$.
+
+    \subparag{Preuve}{
+        Nous allons montrer que toute solution de cette équation est de la forme $v_0\left(x\right) + Ce^{-P\left(x\right)}$.
+
+        Soit $v_1\left(x\right)$ une solution de $y'\left(x\right) + p\left(x\right)y\left(x\right) = f\left(x\right)$. On a aussi que $v_0\left(x\right)$ est une solution de la même équation.
+
+        Alors, d'après le principe de superposition de solutions, la fonction $v_1\left(x\right) - v_0\left(x\right)$ est une solution de l'équation:
+        \[y'\left(x\right) + p\left(x\right)y\left(x\right) = f\left(x\right) - f\left(x\right) = 0\]
+
+        Ainsi, $v_1\left(x\right) - v_0\left(x\right)$ est une solution de l'équation homogène:
+        \[y'\left(x\right) + p\left(x\right) y\left(x\right) = 0\]
+
+        Cependant, c'est une EDVS, donc nous savons que la solution générale de cette équation homogène est:
+        \[v\left(x\right) = Ce^{-P\left(x\right)}, \mathspace C \in \mathbb{R} \text{ arbitraire}\]
+        où $P\left(x\right)$ est une primitive de $p\left(x\right)$ sur $I$.
+
+        On en déduit qu'il existe une valeur de $C \in \mathbb{R}$ telle que $v_1\left(x\right) - v_0\left(x\right) = Ce^{-P\left(x\right)}$. Ainsi, on obtient que la solution $v_1\left(x\right)$ est de la forme:
+        \[v_1\left(x\right) = v_0\left(x\right) + Ce^{-P\left(x\right)}\]
+
+        Puisque $v_1\left(x\right)$ était une solution arbitraire, nous obtenons que l'ensemble de toutes les solutions de l'équation $y'\left(x\right) + p\left(x\right)y\left(x\right) = f\left(x\right)$ est:
+        \[v\left(x\right) = v_0\left(x\right) + Ce^{-P\left(x\right)}, \mathspace C \in \mathbb{R}, x \in I\]
+
+        Donc, par définition, $v\left(x\right)$ est la solution générale.
+
+        \qed
+    }
+}
+
+
+\end{document}

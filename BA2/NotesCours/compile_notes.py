@@ -29,21 +29,21 @@ DATE = {"french": r"Bachelor d'informatique --- Semestre 2 \\ Printemps 2022",
 
 # uses the "temp" folder in this diriectory if true, else uses a temporary
 # directory that gets destroyed after having finished
-USE_TEMP_FOLDER = False
+USE_TEMP_FOLDER = True
 PRINTED_VERSION = False
 
 CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
-# COURSES_NAME = ["Analyse-2", "Analyse-2-MethodesDeDemonstration"]
+COURSES_NAME = ["AICC-2", "Analyse-2", "Analyse-2-MethodesDeDemonstration", "DigitalSystemDesign"]
 # COURSES_NAME = ["AICC-2"]
 # COURSES_NAME = ["Analyse-2"]
 # COURSES_NAME = ["Analyse-2-MethodesDeDemonstration"]
-COURSES_NAME = ["DigitalSystemDesign"]
-# COURSES_NAME = ["Physics-4-kekw"]
+# COURSES_NAME = ["DigitalSystemDesign"]
 
 COPY_EXTENSIONS = ["tex", "pdf", "png", "jpg", "jpeg", 'code', 'svg']
 # FOREWORD_NAME = {'fr': 'foreword_fr.txt', 'en': 'foreword_en.txt'}
+FRONTMATTER_NAME = "frontmatter.tex"
 
 
 def get_version():
@@ -300,6 +300,9 @@ def verify_parenthesis(content, file_name):
 
 
 def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
+    frontmatter_summary = None
+    frontmatter_tex_file = None
+    
     sorted_summaries = [[]]*len(tex_files)
     sorted_tex_files = [[]]*len(tex_files)
     for relation_index, tex_file in tex_files:
@@ -334,11 +337,15 @@ def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
                                       + relation + "}")
 
         content, summary = extract_lecture_command(content)
-        sorted_summaries[int(summary[0]) - 1] = summary
-        sorted_tex_files[int(summary[0]) - 1] = [relation_index, tex_file]
+        if tex_file == FRONTMATTER_NAME:
+            frontmatter_summary = summary
+            frontmatter_tex_file = [relation_index, tex_file]
+        else:
+            sorted_summaries[int(summary[0]) - 1] = summary
+            sorted_tex_files[int(summary[0]) - 1] = [relation_index, tex_file]
 
-        if summary[3] == "":
-            print("\tNo summary defined in {}.".format(tex_file))
+            if summary[3] == "":
+                print("\tNo summary defined in {}.".format(tex_file))
 
         content = replace_empty_slides_in_a_row_by_double_slides(content)
 
@@ -354,6 +361,13 @@ def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
 
         with open(file_path, 'w', encoding='utf8') as latex_document:
             latex_document.write(content)
+
+    if frontmatter_summary is not None:
+        # Need to move everything to the right and add elements in first pos
+        sorted_tex_files.insert(0, frontmatter_tex_file)
+        sorted_summaries.insert(0, frontmatter_summary)        
+        sorted_tex_files.pop()
+        sorted_summaries.pop()
 
     # automatically sorts by first element (meaning the lecture)
     return sorted_tex_files, sorted_summaries
@@ -443,13 +457,14 @@ def create_main_tex(tmp_dir, tex_files, config, summaries):
                         + "\\chapter{" + summary_lectures + "}\n")
 
     for lecture_no, summary, date, title in summaries:
-        main_tex_content += ("\\lecturetitlesummary{" + str(lecture_no)
-                             + "}{" + date + "}{" + title + "}\n")
-        main_tex_content += "\\vspace{0.5em\n}"
-        main_tex_content += summary + "\n"
-        main_tex_content += "\\vspace{2em}\n"
-        # main_tex_content += "\\parag{Lecture " + str(lecture_no) + "}{\n"
-        # main_tex_content += summary + "}\n"
+        if lecture_no != "0":
+            main_tex_content += ("\\lecturetitlesummary{" + str(lecture_no)
+                                 + "}{" + date + "}{" + title + "}\n")
+            main_tex_content += "\\vspace{0.5em\n}"
+            main_tex_content += summary + "\n"
+            main_tex_content += "\\vspace{2em}\n"
+            # main_tex_content += "\\parag{Lecture " + str(lecture_no) + "}{\n"
+            # main_tex_content += summary + "}\n"
 
     main_tex_content += "\\cleardoublepage"
 
