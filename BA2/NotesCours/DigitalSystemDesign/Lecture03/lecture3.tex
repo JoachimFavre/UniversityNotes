@@ -1,0 +1,148 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-02-28 at 13:00:01.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Lundi 28 février 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2022-02-28}{}{}
+\parag{Example 2}{
+    Let's consider the following Karnaugh diagram:
+    \imagehere[0.3]{KarnaughDiagramExample_2-1.png}
+
+    Let's consider minterms. We notice that there is no valid group of size 8. However, there are three valid groups of size 4. The red group is redondent since all of the maxterms covered by it are already covered by the two yellow groups group, so we get: 
+    \[Y = \bar{A} \cdot D + \bar{B} \cdot \bar{D}\]
+
+    Note tat, amongst our three group, one is splitted. In fact, there is still symmetry since we glued boxes together doing an arbitrary choice in order to draw those Karnaugh diagrams. In other words, we could have exchanged the two columns where $A$ is false and the columns where $A$ is true, making the symmetry of this group come clear.
+
+    Moreover, doing the same thing on maxterms, we also find no valid group of size 8, and three groups of size 4 where one is redondent, so: 
+    \[\bar{Y} = A\cdot B + \bar{B} \cdot D\]
+    
+    \imagehere[0.7]{KarnaughDiagramExample_2-2.png}
+
+    Let's now use boolean algebra to show that the two functions are equal: 
+    \[\bar{Y} = \bar{\bar{A} \cdot B + \bar{B} \cdot\bar{D}} = \left(A + \bar{B}\right)\cdot\left(B + D\right) = A\cdot B + A\cdot D + \bar{B}\cdot B + \bar{B}\cdot D = A\cdot B + A\cdot D + \bar{B}\cdot D\]
+    
+    We have a $A\cdot D$ too much. If we look what it represents on the Karnaugh diagram on the right, we see that it is the redondent group, the red one. Cutting it where $B$ is true and where $B$ is false allows to show perfectly the redondance on this diagram, so let's do that too in boolean algebra: 
+    \[\bar{Y} = A\cdot B + A\cdot D\cdot \underbrace{\left(B + \bar{B}\right)}_{= 1} + \bar{B} D = A\cdot B + A\cdot B\cdot D + A\cdot \bar{B}\cdot D + \bar{B} \cdot D\]
+    
+    We can group terms:
+    \[\bar{Y} = A\cdot B\cdot \underbrace{\left(1 + D\right)}_{= 1} + \underbrace{\left(A + 1\right)}_{=1}\cdot\bar{B} \cdot D = A\cdot B + \bar{B}\cdot D\]
+    as expected.
+
+    All this works shows us that if we want to make a minimal group for maxterms, it is better to directly start with maxterms. Due to transformations, we might introduce redondent groups else.
+}
+
+\parag{Incompletely defined functions}{
+    It may occur that an input combination will never occur, so we can optimise it more. Indeed, we do not care what the function responds. Let us look at the following Karnaugh diagram:
+    \imagehere[0.3]{KarnaughDiagramExample_3.png}
+
+    We notice that if the function gives a 1 at the place where we don't care, it allows us to make a group of 8 minterms, so we choose that and we get: 
+    \[Y = \bar{A} + \bar{B} \cdot \bar{D}\]
+}
+
+\section{Memory}
+\parag{Introduction}{
+    When we press a button calling an elevator, it stays on until the elevator arrives. Thus, we have some kind of logic function which takes two inputs: the button and a detector knowing if the elevator is here. Let's make a time diagram:
+    \imagehere[0.5]{ElevatorTimeDiagram.png}
+
+    Note that, when we press a button, there are some oscillations. This is called ``dender''. This is like hitting a table with a long stick, it will oscillates. 
+
+    Since we are working with digital logic, let us turn this to the ideal scenario (the two purple lines are for right after):
+    \imagehere[0.5]{ElevatorTimeDiagramDigital.png}
+
+    Let us consider the two purple lines. One time, the elevator and the button are 0, but the lamp is 0. Another time, they are both 0 too, but the lamp is 1. Thus, we need something more if we want to make a truth table. Let us also take the lamp as an input to itself; in the logic function, we use what happened right before:
+    \begin{center}
+    \begin{tabular}{ccc|c}
+        Lamp & Elevator & Button & Lamp \\
+        \hline
+        0 & 0 & 0 & 0 \\
+        - & - & 1 & 1 \\
+        1 & 0 & 0 & 1 \\
+        - & 1 & 0 & 0 \\
+    \end{tabular}
+    \end{center}
+    
+    This does represent our 8 entries, so we can fill in the corresponding Karnaugh diagam:
+    \imagehere[0.3]{ElevatorKarnaughDiagram.png}
+
+    This gives us: 
+    \[\text{Lamp} = \text{Button} + \bar{\text{Elevator}} \cdot \text{Lamp}\]
+    
+    We can then draw the corresponding circuit:
+    \imagehere[0.5]{ElevatorCircuit.png}
+
+    This circuit is called a \important{Set-Rest Latch} (SR-Latch). This logic function has memory, and it therefore called a \important{Sequential Logical Function}. Logic functions we cannot memorise are called \important{Combinational Logic Functions}. ``If we don't remember which is which, we can look in the mirror and we see a Combinational Logic Function.''
+
+    We will later define set-reset flip-flop, the two must not be confused.
+}
+
+\parag{Set-reset latch}{
+    Let us define the button from our previous example to be a ``set'', $S$, and our elevator to be a reset, $R$.
+
+    Note that NAND and NOR gate use less transistors, so we prefer them. First, we can see that we can modify the truth table to:
+    \begin{center}
+    \begin{tabular}{cc|c}
+        $R$ & $S$ & Lamp \\
+        \hline
+        0 & 0 & Lamp \\
+        - & 1 & 1 \\
+        1 & 0 & 0 \\
+    \end{tabular}
+    \end{center}
+
+    Then, modifying the formula we got, we can thus see that: 
+    \[\text{Lamp} = S + \bar{R} \cdot \text{Lamp} = \bar{\bar{S + R \cdot \text{Lamp}}} = \bar{\bar{S} \cdot \bar{\bar{R} \cdot \text{Lamp}}}\]
+
+    We can draw this circuit:
+    \imagehere[0.4]{SRLatchYSignal.png}
+
+    Let's draw the following truth table to see what $Y$ is, using boolean Algebra:
+    \begin{center}
+    \begin{tabular}{cc|cc}
+        $R$ & $S$ & Lamp & $Y$ \\
+        \hline
+        0 & 0 & $\bar{Y}$ & $\bar{\text{Lamp}}$ \\
+        0 & 1 & 1 & $\bar{\text{Lamp}} = 0$\\
+        1 & 0 & $\bar{Y} = 0$ & 1\\
+        1 & 1 & 1 & 1\\
+    \end{tabular}
+    \end{center}
+
+    Note that we are, for now, only working with instantaneous gates. This might lead to paradoxes, but there are none with what we are working now.
+
+    In the table, we notice that, except for the last entry, $Y = \bar{\text{Lamp}}$. This last situation is called the ``Forbidden Situation'', because it is the only one which is not the inversion of $Y$.
+    
+    This latch is a Set-Reset Latch with a set priority. This means that if both $S$ and $R$ are 1, the set wins. We could imagine a Set-Reset latch with reset priority, which gives us
+    \begin{center}
+    \begin{tabular}{cc|c}
+        $R$ & $S$ & Lamp \\
+        \hline
+        0 & 0 & Lamp \\
+        0 & 1 & 1 \\
+        1 & 1 & 0 \\
+    \end{tabular}
+    \end{center}
+    
+    The only difference comes from the forbidden state. We can draw its Karnaugh Diagram:
+    \imagehere[0.3]{SRLatchResetPriorityKarnaughDiagram.png}
+
+    Thus, using maxterms, we have: 
+    \[\bar{\text{Lamp}} = R + \bar{S} \cdot \text{Lamp} \implies \text{Lamp} = \bar{R + \bar{S + \text{Lamp}}}\]
+    
+    We see that starting with minterms gives us an implementation using NAND, and maxterms give us an implementation using NOR. Let's make our circuit: 
+    \imagehere[0.4]{SRLatchResetPriorityCircuit.png}
+
+    This one is even cheaper than the previous one, because there are no NOT gate. Depending on the situation, both are really useful.
+}
+
+
+
+
+\end{document}
