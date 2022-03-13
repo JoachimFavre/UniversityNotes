@@ -29,17 +29,17 @@ DATE = {"french": r"Bachelor d'informatique --- Semestre 2 \\ Printemps 2022",
 
 # uses the "temp" folder in this diriectory if true, else uses a temporary
 # directory that gets destroyed after having finished
-USE_TEMP_FOLDER = True
+USE_TEMP_FOLDER = False
 PRINTED_VERSION = False
 
 CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
-COURSES_NAME = ["AICC-2", "Analyse-2", "Analyse-2-MethodesDeDemonstration", "DigitalSystemDesign"]
+# COURSES_NAME = ["AICC-2", "Analyse-2", "Analyse-2-MethodesDeDemonstration", "DigitalSystemDesign"]
 # COURSES_NAME = ["AICC-2"]
 # COURSES_NAME = ["Analyse-2"]
 # COURSES_NAME = ["Analyse-2-MethodesDeDemonstration"]
-# COURSES_NAME = ["DigitalSystemDesign"]
+COURSES_NAME = ["DigitalSystemDesign"]
 
 COPY_EXTENSIONS = ["tex", "pdf", "png", "jpg", "jpeg", 'code', 'svg']
 # FOREWORD_NAME = {'fr': 'foreword_fr.txt', 'en': 'foreword_en.txt'}

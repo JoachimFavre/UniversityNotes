@@ -9,14 +9,14 @@ import time
 import os
 import subprocess
 
-COURSES_NAME = ["AICC-1", "AlgebreLinaire", "Analyse-1"]
+COURSES_NAME = ["AICC-2", "Analyse-2", "Analyse-2-MethodesDeDemonstration", "DigitalSystemDesign"]
 
 
 def compile_tex(dir_path, file_path):
     # latexmk compiles multiple times and all, so that's great
     compile_cmd = ("latexmk \"" + file_path + "\" " +
                    "-output-directory=\"" + dir_path
-                   + "\" -pdf -halt-on-error")
+                   + "\" -pdf -halt-on-error -shell-escape")
     completed_process = subprocess.run(compile_cmd)
     return completed_process.returncode
 

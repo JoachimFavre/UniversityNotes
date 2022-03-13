@@ -1,0 +1,216 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-13 at 10:25:07.
+
+\usepackage{../../style}
+
+\title{AICC-2}
+\author{Joachim Favre}
+\date{Jeudi 10 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2022-03-10}{Using conditional entropy}{
+\begin{itemize}[left=0pt]
+    \item Quick recall of the important notions of last lecture.
+    \item Proof of the chain rule for entropies, using $n$ random variables.
+    \item Explanation of the conditional entropy of a function, and proof that it is always equal to 0.
+    \item Introduction to random processes.
+\end{itemize}
+}
+
+\parag{Recall}{
+    Let's do a quick recall of what we have seen in the last course, since this is important.
+
+    Conditional probability is an important definition. For example, if $Y \in \left\{0, 1\right\}$:
+    \[H\left(X|Y\right) = p\left(Y = 0\right) H\left(X|Y=0\right) + p\left(Y=1\right) H\left(X|Y=1\right)\]
+    
+    We also saw the two following inequalities:
+    \[0 \leq H\left(X | Y=y\right) \leq \log\left|\mathcal{X}\right|\]
+    \[0 \leq H\left(X | Y\right) \leq \log\left|\mathcal{X}\right|\]
+    with equality on the left with a degenerate distribution, and on the right with a uniform distributions.
+
+    The most important inequality was:
+    \[H\left(X|Y\right) \leq H\left(X\right)\]
+    with equality if and only if $X$ is independent of $Y$.
+
+    We also got an important theorem: 
+    \[H\left(X, Y\right) = H\left(X\right) + H\left(Y | X\right)\]
+}
+
+\parag{Theorem: Chain rule for entropies}{
+    Let $S_1, \ldots, S_n$ be random variables. Then: 
+    \[H_D\left(S_1, \ldots, S_n\right) = H_D\left(S_1\right) + H_D\left(S_2 | S_1\right) + \ldots + H_D\left(S_n|S_1, \ldots, S_{n-1}\right)\]
+    
+    \subparag{Proof}{
+        Let's use our expected value definition: 
+        \begin{multiequality}
+        & H\left(S_1, \ldots, S_n\right)  \\
+        =\ & \exval\left[-\log\left(p\left(S_{1}, \ldots, S_n\right)\right)\right] \\
+        =\ & \exval\left[-\log\left(p\left(S_1\right)\right) - \log\left(p\left(S_2 | S_1\right)\right) - \ldots - \log\left(p\left(S_n | S_{1}, \ldots S_n\right)\right)\right] 
+        \end{multiequality}
+        
+         And, since the expected value is linear:
+         \begin{multiequality}
+          & H\left(S_1, \ldots, S_n\right) \\
+          =\ & \exval\left[-\log\left(p\left(S_1\right)\right)\right] + \ldots + \exval\left[-\log\left(p\left(S_n | S_{1}, \ldots S_n\right)\right)\right]  \\
+          =\ & H_D\left(S_1\right) + H_D\left(S_2 | S_1\right) + \ldots + H_D\left(S_n|S_1, \ldots, S_{n-1}\right) 
+         \end{multiequality}
+
+         \qed
+    }
+
+    \subparag{Remark}{
+        We observe that: 
+        \[H\left(S_4 | S_3, S_2, S_1\right) = H\left(S_4 | S_1, S_2, S_3\right)\]
+        
+        Indeed, knowing that $\left(S_3 = s_3\right)  \land \left(S_2 = s_2\right) \land \left(S_1 = s_1\right)$ is equivalent to knowing that $\left(S_1 = s_1\right) \land \left(S_2 = s_2\right) \land \left(S_3 = s_3\right)$.
+    }
+    
+}
+
+\parag{Conditional entropy of a function}{
+    Let $X$ be an arbitrary random variable. Let $f\left(X\right)$ be a (deterministic) function of $X$. We want to analyse $H\left(f\left(X\right)|X\right)$.
+
+    Let's take $X \in \left\{0, 1, 2, 3\right\}$ and: 
+    \begin{functionbypart}{f\left(X\right) = X \Mod 2}
+    0, \mathspace  \text{if } X = 0,2 \\
+    1, \mathspace \text{if } X = 1, 3
+    \end{functionbypart}
+
+    We see that: 
+    \[H\left(f\left(X\right) |X = 0\right) = 0\]
+    since we know with certainty that, if $X = 0$, then $f\left(X\right) = 0$.
+
+    Thus, in this example, we have: 
+    \[H\left(f\left(X\right) | X\right) = 0\]
+
+    In fact, this is completely general.
+}
+
+\parag{Theorem}{
+    Let $X$ be an arbitrary random variable. Let $f\left(X\right)$ be a (deterministic) function of $X$. Then: 
+    \[H\left(f\left(X\right) | X\right) = 0\]
+    
+    \subparag{Proof}{
+        Let $Y = f\left(X\right)$. Then, we see that:
+        \begin{functionbypart}{p\left(y|x\right)}
+            1, \mathspace \text{if } y = f \left(x\right) \\
+            0, \mathspace \text{otherwise}
+        \end{functionbypart}
+
+        We know that when a probability distribution is degenerate, we have that: 
+        \[H\left(Y |X = x\right) = 0, \mathspace \forall x\]
+        
+        And thus: 
+        \[H\left(Y | X\right) = 0\]
+        
+        \qed
+    }
+}
+
+\parag{Example: Crypto Lemma}{
+    Let $X, Y \in \left\{0, 1\right\}$ be a uniformly distributed random variable. Let $Z = X \oplus Y$. We want to compute $H\left(X, Y, Z\right)$.
+
+    We can use our chain rule. We have many ways of computing it, some are easier than others: 
+    \[H\left(X, Y, Z\right) = H\left(X, Y\right) + \underbrace{H\left(Z | X, Y\right)}_{= 0} = H\left(X, Y\right)\]
+    since $Z$ is a function of $X$ and $Y$.
+
+    Moreover, we see that, since $X$ and $Y$ are independent: 
+    \[H\left(X, Y, Z\right) = H\left(X, Y\right) = H\left(X\right) + H\left(Y|X\right) = H\left(X\right) + H\left(Y\right) = \SI{1}{\bit} + \SI{1}{\bit} = \SI{2}{\bit}\]
+    
+    Let's start differently: 
+    \[\SI{2}{\bit} = H\left(X, Y, Z\right) = \underbrace{H\left(X\right)}_{= 1} + H\left(Z|X\right) + \underbrace{H\left(Y | X, Z\right)}_{= 0}\]
+    
+    Indeed, $Z$ is an invertible function for every $X$. Thus, we get that: 
+    \[H\left(Z|X\right) = \SI{1}{\bit} = H\left(Z\right)\]
+    
+    Which allows us to say that $X$ and $Z$ are independent.
+}
+
+\parag{Theorem}{
+    Let $S_1, \ldots, S_n$ be discrete  random variables. Then: 
+    \[H\left(S_1, \ldots, S_n\right) \leq H\left(S_1\right) + \ldots + H\left(S_n\right)\]
+    with equality if and only if $S_1, \ldots, S_n$ are independent.
+    
+    \subparag{Proof}{
+        By the chain rule, we know that: 
+        \begin{multiequality}
+        H\left(S_1, \ldots, S_n\right) =\ & H\left(S_1\right) + H\left(S_2|S_1\right) + \ldots H\left(S_n | S_1, \ldots, S_{n-1}\right)  \\
+        \leq\ & H\left(S_1\right) + H\left(S_2\right) + \ldots + H\left(S_n\right)  
+        \end{multiequality}
+        
+        \qed
+    }
+    
+}
+
+\parag{Corollary}{
+    We get the two following inequalities: 
+    \[H\left(X, Y\right) \geq H\left(X\right)\] 
+    \[H\left(X, Y\right) \geq H\left(Y\right)\]
+    
+    \subparag{Proof}{
+        Let's do a direct proof: 
+        \[H\left(X, Y\right) = H\left(X\right) + H\left(Y |X\right) \geq H\left(X\right)\]
+        since entropies can never be negative.
+    }
+}
+
+\parag{Example}{
+    Let's go back to the dice example, and their digits. Recall that we had two random variables $S_1, S_2 \in \left\{1, 2, \ldots 6\right\}$ which represent the result of two dice rolls, and two other random variables $L_1, L_2$ which represent the digits of the sum.
+
+    We know that $H\left(L_1, L_2 | S_1, S_2\right) = 0$, since $L_1$ and $L_2$ are functions of $S_1$ and $S_2$.
+
+    We now want to compute $H\left(S_1, S_2 | L_1, L_2\right)$. We have already computed that: 
+    \[H\left(S_1, S_2\right) = \SI{5.1699}{\bit}, \mathspace H\left(L_1, L_2\right) = \SI{3.2744}{\bit}\]
+    
+    Using the chain rule for entropy:
+    \[H\left(S_1, S_2, L_1, L_2\right) = H\left(S_1, S_2\right) + \underbrace{H\left(L_1, L_2 | S_1, S_2\right)}_{= 0}\]
+    \[H\left(S_1, S_2, L_1, L_2\right) = H\left(L_1, L_2\right) + H\left(S_1, S_2 | L_1, L_2\right)\]
+    
+    Thus, from it we get: 
+    \[H\left(S_1, S_2 | L_1, L_2\right) = H\left(S_1, S_2\right) - H\left(L_1, L_2\right) = \SI{1.896}{\bit}\]
+    
+    In other words, when we have a function, we can easily get the entropy for its inverse.
+}
+
+\subsection{Random processes}
+\parag{Introduction}{
+    Let's say we have a thousand random variables: $S_1, \ldots S_{1000}$. Then, conceptually, it works exactly as what we have done so far, we only need to get the joint distribution.
+
+    However, it is much more interesting if we let the string evolve indefinitely (it goes to infinity). Let $I$ be a \textit{finite} subset of the integers, for instance: 
+    \[I_{1} = \left\{1, 5, 6, 10, 12\right\}\]
+    
+    Then we define a new string $s_I$ such as: 
+    \[s_I = \left(S_i\right)_{i \in I}\]
+    
+    In our example, we would have:  
+    \[s_{I_1} = \left(S_1, S_5, S_6, S_{10}, S_{12}\right)\]
+    
+    Then we specify the probability distribution of $s_I$. For example, if $S_i \in \left\{0, 1\right\}$, we could have: 
+    \[p_{s_{I_1}}\left(0, 0, 0, 0, 0\right) = 0.15\]
+    \[p_{s_{I_1}}\left(0, 0, 0, 0, 1\right) = 0.0001\]
+    \[\vdots\]
+
+    We then do this for all finite subsets $I \subset \mathbb{Z}$. This is how we consider infinite strings.
+}
+
+\parag{Example 1 : Coin-Flip source}{
+    The source models a sequence $S_1, \ldots, S_n$ of $n$ coin flips. So, $S_i \in \mathcal{A} = \left\{H, T\right\}$ for $i = 1, 2, \ldots, n$.
+
+    We know that $p_{S_i}\left(H\right) = p_{S_i}\left(T\right) = \frac{1}{2}$ for all $i$, and that coinflips are independent. Thus: 
+    \[p_{S_1, \ldots, S_n} \left(s_1, \ldots, s_n\right) = \frac{1}{2^{n}}, \mathspace \forall \left(s_1, \ldots, s_n\right) \in \mathcal{A}^{n}\]
+    
+    This does specify the joint distribution for each $I \subset \mathbb{Z}$. Indeed, for example: 
+    \[p_{S_1, S_2}\left(s_1, s_2\right) = p_{S_1}\left(s_1\right) p_{S_2}\left(s_2\right) = \frac{1}{4}\]
+    
+    Also: 
+    \[p_{S_i | S_{i-1}, \ldots}\left(s | s', s'', \ldots\right) = \frac{1}{2}, \mathspace \forall i, \forall s\]
+    since they are independent.
+}
+
+
+
+\end{document}

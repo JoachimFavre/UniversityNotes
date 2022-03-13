@@ -1,0 +1,250 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-03 at 08:19:46.
+
+\usepackage{../../style}
+
+\title{AICC 2}
+\author{Joachim Favre}
+\date{Jeudi 03 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2022-03-03}{Huffman codes}{
+\begin{itemize}[left=0pt]
+    \item Definition of average codeword-length, and search for its minimisation.
+    \item Proof of entropy being a lower bound of average codeword-length.
+    \item Definition of $D$-ary Shannon-Fano codes.
+    \item Definition of Huffman codes, and proof of their optimality.
+\end{itemize}
+}
+
+\parag{Advantage of prefix free code}{
+    We will focus on prefix free codes because there is no loss of optimality. Indeed, codewords can be as short as for any uniquely decodable code, and a prefix-free codeword is recognised as son as its last digit is seen.
+}
+
+\parag{Definition: Average Codeword Length}{
+    Let $\ell \left(\Gamma\left(s\right)\right)$ be the length of the codeword associated to $s \in \mathcal{A}$. The \important{average codeword-length} is: 
+    \[L\left(S, \Gamma\right) = \sum_{s \in \mathcal{A}}^{} p_S\left(s\right) \ell \left(\Gamma\left(s\right)\right)\]
+    
+
+    \subparag{Remark}{
+        The unit of this value is code symbols. Thus, if $D = 2$, then it is bits, and it would represent the average number of bits required on a hard drive. 
+    }
+}
+
+\parag{Example}{
+   Let's take back our previous example, defining a new code $\Gamma_{B'}$. Also, let's say that we know that the letters of our alphabet have a certain probability to appear:
+    \begin{center}
+    \begin{tabular}{c|c|ccccc}
+        $\mathcal{A}$ & $p_S\left(s\right)$ & $\Gamma_O$ & $\Gamma_A$ & $\Gamma_B$ & $\Gamma_{B'}$ & $\Gamma_C$  \\
+        \hline
+        $a$ & 0.05 & 00 & 0 & 0 & 1110 & 0 \\
+        $b$ & 0.05 & 01 & 01 & 10 & 110 & 01 \\
+        $c$ & 0.1  & 10 & 10 & 110 & 10 & 011 \\
+        $d$ & 0.8  & 11 & 11 & 1110 & 0 & 01111
+    \end{tabular}
+    \end{center}
+
+    Let's compute the average codeword-length of $\Gamma_B$ and $\Gamma_{B'}$:
+    \[L\left(S, \Gamma_B\right) = 0.05\cdot 1 + 0.05\cdot 2 + 0.1\cdot 3 + 0.8+4 = 3.65\]
+    \[L\left(S, \Gamma_{B'}\right) = 0.05\cdot 4 + 0.05\cdot 3 + 0.1\cdot 2 + 0.8\cdot 1 = 1.35\]
+
+    If we compute all of them, we get the following inequality: 
+    \[L\left(\Gamma_{B'}\right) < L\left(\Gamma_O\right) < L\left(\Gamma_B\right) = L\left(\Gamma_C\right)\]
+    
+    This leads us to wonder if there are bounds to the average codeword-length.
+}
+
+\parag{Theorem}{
+    Let $\Gamma : \mathcal{A} \mapsto \mathcal{C}$ be the encoding map of a $D$-ary code for the random variable $S \in \mathcal{A}$. 
+
+    If the code is uniquely decodable, then: 
+    \[H_{D}\left(S\right) \leq L\left(S, \Gamma\right)\]
+    with equality if and only if $p_s\left(s\right) = D^{-\ell\left(\Gamma\left(s\right)\right)} \iff \ell \left(\Gamma\left(s\right)\right)$ for all $s \in \mathcal{A}$. 
+
+    Note that an equivalent condition is $\ell\left(\Gamma\left(s\right)\right) = \log_D\left(\frac{1}{p_S\left(s\right)}\right)$ for all $s \in \mathcal{A}$
+    
+    \subparag{Proof}{
+        Let us start with the following difference, we want to show that it is less than 0: 
+        \begin{multiequality}
+            H_D\left(S\right) - L\left(S, \Gamma\right) =\ & \sum_{i}^{} p_i \log_D \left(\frac{1}{p_i}\right) - \sum_{i}^{} p_i \ell_i  \\
+        =\ & \sum_{i}^{} p_i \log_D\left(\frac{1}{p_i}\right) - \sum_{i}^{} p_i \log_D\left(D^{\ell_i}\right)  \\
+        =\ & \sum_{i}^{} p_i \log_D\left(\frac{1}{p_i D^{\ell_i}}\right)  \\
+        \over{\leq}{IT}\ & \left[\sum_{i}^{} p_i \left(\frac{1}{p_i D^{\ell_i}} - 1\right)\right]\log_D\left(e\right) \\
+        =\ & \left[\sum_{i}^{} \left(D^{-\ell_i} - p_i\right)\right] \log_D\left(e\right)  \\
+        =\ & \left[\left(\sum_{i}^{} D^{-\ell_i}\right) - 1\right]\log_D\left(e\right)  \\
+        \over{\leq}{Kraft}\ & \left[1 - 1\right] \log_D\left(e\right)  \\
+        =\ & 0 
+        \end{multiequality}
+        
+
+        We sum over $l_i$ and $p_i$ instead of $l\left(s\right)$ and $p\left(s\right)$ to have a lighter notation.
+
+        We can also look at the two conditions for equality, and it ends our proof.
+
+        \qed
+    }
+
+    \subparag{Remark}{
+        We notice that, if $D = 2$, then we have equality if and only if all $p_i$ are of the form $\frac{1}{2^k}$ for some $k \in \mathbb{Z}_+$.
+    }
+}
+
+\parag{Example}{
+    We can compute entropy: 
+    \[H_2\left(S\right) = -2\cdot 0.05 \cdot \log\left(0.05\right) - 0.1\cdot \log\left(0.1\right) - 0.8\cdot \log\left(0.8\right) = 1.022\]
+    
+    Our equality is indeed preserved with what we have seen before, we do have that $H_2\left(S\right) = 1.022 \leq 1.35 = L\left(\Gamma_{B'}\right)$.
+}
+
+\parag{Observation}{
+    We notice that we defined: 
+    \[L\left(S, \Gamma\right) = \sum_{s \in A}^{} p\left(s\right) \ell\left(\Gamma\left(s\right)\right)\]
+    \[H_D\left(S\right) = \sum_{s \in A}^{} p\left(s\right) \log_D\left(\frac{1}{p_S\left(s\right)}\right)\]
+
+    Thus, they are identical if $\ell\left(\Gamma\left(s\right)\right) = \log_D\left(\frac{1}{p_S\left(s\right)}\right)$, just like we have seen with our theorem. Unfortunately, we will often not be able to choose lengths such that this is respected, because we want an integer. 
+}
+
+\parag{Theorem}{
+    For every random variable $S \in \mathcal{A}$ and every integer $D \geq 2$, there exists a prefix-free $D$-ary code for $S$ such that, for all $s \in \mathcal{A}$:
+    \[\ell\left(\Gamma\left(s\right)\right) = \left\lceil \log_D\left(\frac{1}{p_S\left(s\right)}\right) \right\rceil\]
+
+    Such codes are called \important{$D$-ary Shannon-Fano codes}.
+
+    \subparag{Proof}{
+        We want to prove that the proposed lengths satisfy Kraft inequality: 
+        \begin{multiequality}
+        & D^{-\left\lceil -\log_D\left(p_1\right) \right\rceil } + D^{-\left\lceil -\log_D\left(p_2\right) \right\rceil } + \ldots \\
+        \leq\ & D^{-\left(-\log_D\left(p_1\right)\right)} + D^{-\left(-\log_D\left(p_2\right)\right)} + \ldots  \\
+        =\ & p_1 + p_2 + \ldots   \\
+        =\ & 1 
+        \end{multiequality}
+        
+        \qed
+    }
+}
+
+\parag{Example}{
+    We can make the following table, corresponding to our regular example:
+    \begin{center}
+    \begin{tabular}{c|c|c}
+        $s \in \mathcal{A}$ & $p_S\left(s\right)$ & $\left\lceil -\log_2 p_S\left(s\right) \right\rceil $ \\
+        \hline
+        $a$ & 0.05  & 5\\
+        $b$ & 0.05 & 5 \\
+        $c$ & 0.1 & 4 \\
+        $d$ & 0.08 & 1 \\
+    \end{tabular}
+    \end{center}
+    
+    We can construct a tree to make our code. On the left, we have this code, on the right we have the same code, from which we removed useless branches:
+    \imagehere[0.7]{ShanonFanoCodeExampleTree.png}
+
+    We observe that Shannon-Fano code are not too bad, but they are not optimal. Also, they are definitely not unique either.
+}
+
+\parag{Theorem}{
+    The average codeword-length of a $D$-ary Shannon-Fano code for the random variable $S$ fulfills: 
+    \[H_D\left(S\right) \leq L\left(S, \Gamma_{SF}\right) < H_D\left(S\right) + 1\]
+
+    \subparag{Proof}{
+        We have already seen the left side of the equation, so let us prove the right hand side: 
+        \begin{multiequality}
+            L\left(S, \Gamma_{SF}\right) =\ & \sum_{i}^{} p_i \left\lceil -\log_D \left(p_i\right) \right\rceil < \sum_{i}^{} p_i \left(-\log_D \left(p_i\right) + 1\right)  \\
+        =\ & -\sum_{i}^{} p_i \log_D\left(p_i\right) + \sum_{i}^{} p_i = -\sum_{i}^{} p_i\left(\log_D\left(p_i\right)\right) + 1 
+        \end{multiequality}
+    }
+}
+
+\parag{Optimal Code: Huffman Code}{
+    We want to construct an optimal code. An idea would be to put the highest probability at the highest position on the tree, and the continue with less and less probability. However, this is not optimal.
+
+    Let's instead start from the leaf. We merge the two least likely, compute the sum of the probability, and treat this as a new symbol. Then, we can begin again recursively:
+    \imagehere{HuffmanCodeTreeExample.png}
+
+    When we have our tree, we can put our 0 and 1 where we want on the tree, but it's better to be consistent for simplicity.
+
+    Note that, we can have the following tree if the probabilities are different:
+    \imagehere[0.25]{HuffmanCodeTreeExample2.png}
+
+    We can also observe that they are not unique. We can choose where we put 0s and 1s when our tree is built, but can also sometimes choose which probabilities to link together (if three of them are the lowest, we can pick the two that we want).
+
+    Finally, we will prove that such codes are optimal, but they do not go to entropy if the probabilities are not powers of 2.
+}
+
+\parag{Definition: Tree with probabilities}{
+    Let's consider a tree with probabilities assigned to leaf nodes, like decoding tree of a prefix-free code. The probabilities of the leaf nodes induce probabilities to the intermediate nodes (like in Huffman's construction). The result is called a \important{tree with probabilities} (the two pictures above are such trees).
+}
+
+\parag{Path-length lemma}{
+    The average path length of a tree with probabilities is the sum of probabilities of the intermediate nodes (root included): 
+    \[\sum_{i}^{} p_i \ell_i = \sum_{j}^{} q_j\]
+    where $p_i$ is the probability of the $i$\Th leaf, $\ell_i$ the distance of the $i$\Th leaf, and $q_j$ the probability of the $j$\Th node (except for leafs).
+
+    \subparag{Example}{
+        In the picture right before, we can compute: 
+        \[\sum_{i}^{} p_i \ell_i = 0.2 + 0.6 + 0.4 + 1 = 2.2\]
+        which is very fast to compute.
+    }
+    
+
+    \subparag{Proof}{
+        Let's first define the following function:
+        \begin{functionbypart}{\mathds{1}_{j,i}}
+            1, \mathspace \text{if node $j$ is on the path to leaf $i$} \\
+            0, \mathspace \text{otherwise}
+        \end{functionbypart}
+
+        We observe that: 
+        \[q_j = \sum_{i}^{} \mathds{1}_{j,i} p_i\]
+        
+        So, we get that: 
+        \[\sum_{j}^{} q_j = \sum_{j}^{} \sum_{i}^{} \mathds{1}_{j,i} p_i = \sum_{i}^{} \sum_{j}^{} p_i \mathds{1}_{j,i} = \sum_{i}^{} p_i \underbrace{\sum_{j}^{} \mathds{1}_{j,i}}_{\ell_i} = \sum_{i}^{} p_i \ell_i\]
+        
+        The following diagram explains this proof:
+        \imagehere[0.5]{PathLengthLemmaDiagram.png}
+
+        \begin{center}
+        \begin{tabular}{c@{\,}c@{\,}c@{\,}c@{\,}c@{\,}c@{\,}c@{\,}c@{\,}c@{\,}}
+            $q_1$ & $=$ & $p_1$ & $+$ & $p_2$ & $+$ & $p_3$ & $+$ & $p_4$  \\
+            $q_2$ & $=$ &    &   & $p_2$ & $+$ & $p_3$ & $+$ & $p_4$  \\
+            $q_3$ & $=$ &    &   &    &   & $p_3$ & $+$ & $p_4$  \\
+            \hline
+            $q_1 + q_2 + q_3$ & $=$ & $p_1 \cdot 1$ & $+$ & $p_2 \cdot 2$ & $+$ & $p_3 \cdot 3$ & $+$ & $p_4 \cdot 3$  \\
+            & $=$ & $p_1 \cdot \ell_1$ & $+$ & $p_2 \cdot \ell_2$ & $+$ & $p_3 \cdot \ell_3$ & $+$ & $p_4 \cdot \ell_4$ 
+        \end{tabular}
+        \end{center}
+        
+
+        \qed
+    }
+}
+
+\parag{Theorem: Huffman Code optimality}{
+    Huffman code are optimal. In other words, if $\Gamma_H$ is a Huffman code (which is prefix-free by construction) and $\Gamma$ is another uniquely decodable code for the same source $S$, then it is guaranteed that: 
+    \[L\left(S, \Gamma_H\right) \leq L\left(S, \Gamma\right)\]
+
+    \subparag{Proof}{
+        For simplicity, we will consider only binary codes. Let $L = \max_i l_i$. We can see the following three facts.
+
+        \begin{enumerate}[left=0pt]
+        \item First, in the decoding tree of an optimal binary code, each intermediate node has exactly two offsprings. Indeed, else we could decrease the least distance. In particular, it means that any leaf at depth $L$ has a sibling. We can take the following example, where the two first trees are optimal, but not the third one:
+            \imagehere[0.9]{HuffmanCodeOptimalityProofExampleFact1.png}
+
+        \item Second, an optimal encoder assigns shorter codewords to higher probability letters. Indeed, else we could just swap the probabilities that are badly ordered.
+
+    \item Third, we may require that two of the least-likely leaves are siblings at depth $L$. Indeed, the first and the second fact imply that two of the least likely codewords have length $L$. Then, without loss of generality, we can take them to be adjacent.        \end{enumerate}
+        
+        Let's now use those facts, we seek an optimal (minimum average-length) code for the given probabilities. Let's say that they are in increasing order: $p_M \leq \ldots \leq p_1$. We can merge the two least probability leafs, and take $q_1 = p_M + p_{M-1}$. Now, we want to construct a code $\widetilde{\Gamma}$ for $q_1, p_{M-2}, \ldots, p_1$. Note that, in $\widetilde{\Gamma}$, $q_1$ is a leaf node. We notice that, a code for $\Gamma$ directly results from a code for $\widetilde{\Gamma}$. The third fact hereinabove guarantees us the existence of a code $\widetilde{\Gamma}$ such that $\Gamma$ is optimal.
+
+        By the path-length lemma, we know $L = \widetilde{L} + q_1$. Since $q_1$ is fixed (it is not up for optimisation, as we have seen with our facts), we want to minimise $\widetilde{L}$. We are done if find an optimal code $\widetilde{\Gamma}$ for $q_1, p_{M-2}, \ldots, p_1$. We have reduced the size of the alphabet by 1, so we can use recursion. For the initial case, when only two elements are left, there are no other way than linking them two.
+
+        Thus, this Huffman codes are optimal.
+
+        \qed
+    }
+}
+
+\end{document}
