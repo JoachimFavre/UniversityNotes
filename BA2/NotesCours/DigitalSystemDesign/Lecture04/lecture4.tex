@@ -1,0 +1,114 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-05 at 14:42:05.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Jeudi 03 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2022-03-03}{D-Latch and D-FlipFlop}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the D-Latch circuit.
+    \item Explanation of the timing diagrams.
+    \item Explanation of the D-FlipFlop circuit.
+    \item Explanation of the concept of clock.
+\end{itemize}
+
+}
+
+\parag{D-Latch}{
+    Let's take the following timing diagram:
+    \imagehere[0.8]{DLatchExampleTimeDiagram.png}
+
+    First, we want to divide the timing diagram where the signals are stable. We then notice the different areas, and we must be careful not to top before the end. On the following pictures, we see that memory actions are needed:     
+    \imagehere[0.8]{DLatchExampleTimeDiagramMemoryAction.png}
+
+    We find the following table:
+    \begin{center}
+        \begin{tabular}{c|c|c}
+            $D$ & $E$ & $Q$ \\
+            \hline
+            0 & 0 & $Q$ \\
+            0 & 1 & $0$ \\
+            1 & 0 & $Q$ \\
+            1 & 1 & $1$ \\
+        \end{tabular}
+    \end{center}
+
+    We can now make a Karnaugh diagram from this table. Note that $Q$ also shows up as a variable:
+    \imagehere[0.25]{DLatchKarnaughDiagram.png}
+
+    We get: 
+    \[Q = \bar{E} \cdot Q + E\cdot D\]
+    
+    We can make a circuit from that: 
+    \imagehere[0.5]{DLatchCircuit.png}
+
+    This circuit also has a specific symbol:
+    \imagehere[0.15]{DLatchCircuitSymbol.png}
+
+    This is called \important{D-Latch}. To understand its real utility, let's simplify our truthtable more:
+    \begin{center}
+        \begin{tabular}{c|c}
+            $E$ & $Q$ \\
+            \hline
+            1 & $D$ \\
+            0 & $Q$ \\
+        \end{tabular}
+    \end{center}
+
+    When $E = 1$, we call that the \important{transparent mode}. $Q$ takes the exact output of $D$. When $E = 0$, $Q$ stays in its value and does not change, and we call it the \important{memorisation mode.}
+}
+
+\parag{Timing diagrams}{
+    In timing diagrams, logic functions can have a logic level 0 or 1, which are resented by horizontal bars called levels. When the function changes from a logic level 0 to a logic level 1, we draw a vertical bar called a positive edge; if it goes from 1 to 0, we call this bar a negative edge.
+    \imagehere[0.6]{PositiveNegativeEdgeLevelDefinition.png}
+}
+
+\parag{D-Flipflop}{
+    Let's take the following circuit:
+    \imagehere[0.6]{DFlipFlopCircuit.png}
+
+    We want to complete the following timing diagram:
+    \imagehere{DFlipFlopTimingDiagram.png}
+
+    Defining intermediate values ($E_1$ right after the first NOT gate, $E_2$ right after the second one, and $Q_i$ between the two D-Latch), we can complete our diagram:
+    \imagehere{DFlipFlopCompletedTimingDiagram.png}
+
+    Note that we do not know what the circuit memorised before the beginning of the circuit, so there are two possible values for $Q$ at first. We can see something very interesting: $Q$ only changes when $C$ has a positive edge (see the highlighted parts). We call this a \important{D-flipflop}. We can draw the following functional table:
+    \imagehere[0.15]{DFlipFlopFunctionalTable.png}
+
+    Note that this is not a truth table since there are timing information. Its symbol is given by:
+    \imagehere[0.15]{DFlipFlopCircuitSymbol.png}
+
+     The D-Latch is level sensitive, whereas the D-Flipflop is edge sensitive. In other words, the latter only reacts when there is a positive edge; it reacts at exactly one point in time. Note that we call the signal $E$ in a D-Latch an \important{enable}, and the signal $C$ in a D-Flipflop a \important{clock}.
+
+}
+
+\parag{Clock}{
+    A clock is a signal changing over time; it has a period $T_1$ where it says at logic level 1, and period $T_0$ where it stays at 0. We get that it repeats its pattern every $T_p = T_1 + T_0$, and that the frequency of this signal is $f_{clock} = \frac{1}{T_p}$. We can also define the duty cycle as $\frac{T_1}{T_p}$ (in percentage).
+    
+    \imagehere{clockDiagram.png}
+} 
+
+\parag{Example}{
+    Let's take the following circuit:
+    \imagehere{ExampleDLatchDFlipFlopCircuit.png}
+
+    We want to complete the following timing diagram, knowing that, at $t = 0$, the value stored in the memories is a logic level 1: 
+    \imagehere[0.6]{ExampleDLatchDFlipFlopTimingDiagram.png}
+
+    $Q_1$ changes only when $A$ reaches a positive edge, whereas $Q_2$ changes when $A = 1$. Also, the NAND gate make $Q_3$ oscillate when $A = 1$. So:
+    \imagehere[0.6]{ExampleDLatchDFlipFlopCompletedTimingDiagram.png}
+
+}
+
+
+
+
+\end{document}

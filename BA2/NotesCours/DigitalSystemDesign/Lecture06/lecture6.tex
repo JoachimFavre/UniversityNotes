@@ -1,0 +1,212 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-10 at 11:08:32.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Jeudi 10 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2022-03-10}{Integers and rational numbers}{
+\begin{itemize}[left=0pt]
+    \item Explanation of one's complement, two's complement and excess-$N$ systems for integers.
+    \item Explanation of the multiplication and division pen-and-paper algorithms, and how to apply them to binary.
+    \item Explanation of fixed point and floating point representations for ration numbers.
+\end{itemize}
+
+}
+
+\parag{Set of integer}{
+    The set of integers $\mathbb{Z}$ contains the natural numbers $\mathbb{N} \subset \mathbb{Z}$ and their negatives $-0, -1, \ldots$. In the decimal system, we use the sign-and-magnitiude notation: $+4$ and $-4$, for example. Note that the $+$ is often omitted.
+
+    It's important to note that the sign-and-magnitude notation has two 0's, namely $+0$ and $-0$. 
+
+    In the binary system, we do not have a $+$ and $-$, we only have 0s and 1s. However, by the introduction of the MSB as the sign-bit, we can create a binary form of the sign-and-magnitude representation by interpreting $0 = +$ and $1 = -$: 
+    \[0010_b = +2 = \hex{2}, \mathspace 1010_b = -2 = \hex{A}\]
+    
+    We know that, for a decimal substraction $z = a - b$, we rewrite it to a decimal addition $z = a + c$, where $c = -b$. This can easily be accomplished by changing the MSB. However, there is a problem with this: it becomes very complicated. For example, see the four different following results: 
+    \[5 + 3 = 8, \mathspace 5 - 3 = 2, \mathspace -5 + 3 = -2, \mathspace -5 + 3 = -2, \mathspace -5 - 3 = -8\]
+    
+    We notice that if the signs are the same, then we add the magnitudes and add the sign in front. If they are different, then we look what it the greater magnitude, look what is its sign and put it at the end; the magnitude of the result is then the absolute difference of the two numbers. We can put all that in a table:
+    \begin{center}
+    \begin{tabular}{|c|c||c||c|c|}
+        \hline
+        $\sgn\left(a\right)$ & $\sgn\left(b\right)$ & Condition & $\sgn\left(z\right)$ & $\left|z\right| = \left|a + c\right|$ \\
+        \hline
+        $+$ & $+$ &  & $+$ & $\left|a\right| + \left|c\right|$ \\
+        \hline
+        $-$ & $-$ &  & $-$ & $\left|a\right| + \left|c\right|$ \\
+        \hline
+        \multirow{2}{*}{$+$} & \multirow{2}{*}{$-$} & $\left|a\right|\geq \left|c\right|$ & $+$ & $\left|a\right| - \left|c\right|$ \\
+        \hhline{|~|~||-||-|-|}
+                             & & $\left|a\right| < \left|c\right|$ & $-$ & $\left|c\right| - \left|a\right|$ \\
+        \hline
+        \multirow{2}{*}{$-$} & \multirow{2}{*}{$+$} & $\left|a\right|\geq \left|c\right|$ & $-$ & $\left|c\right| - \left|a\right|$ \\
+        \hhline{|~|~||-||-|-|}
+                             & & $\left|a\right| \geq \left|c\right|$ & $+$ & $\left|a\right| - \left|c\right|$ \\
+        \hline
+    \end{tabular}
+    \end{center}
+    
+
+    If we want to make a circuit out of it, we would need to do a sign comparaison, a magnitude addition, a magnitude comparison, a sign selector and a conditional magnitude substractor. This is not doable, so we have to go to another representation.
+}
+
+\parag{One's complement}{
+    Let's now invert all bits to negate our number: 
+    \begin{center}
+    \begin{tabular}{c|c}
+        Decimal & One's complement  \\
+        \hline
+        3 & 011 \\
+        2 & 010 \\
+        1 & 001 \\
+        0 & 000 \\
+        $-0$ & $111$ \\
+        $-1$ & $110$ \\
+        $-2$ & $101$ \\
+        $-3$ & $100$
+    \end{tabular}
+    \end{center}
+    
+
+    Note that 0 is also represented twice.
+
+    To compute $-1 + \left(-2\right)$ in this system, we can add their one's-complement representation $110_b + 101_b$. However, if it gives us an overflow carry, then we must add it to the LSB position. This is called the \important{end-arround} carry addition. For example: 
+    \[-2 + \left(-1\right) = 101_b + 110_b = 011_b {\color{red}+ 001_b} = 100_b = -3\]
+
+    One's-complement is great, but it is a bit slow since it requires two additions. They noticed that the end-arround carry only appears when there are negative values, so they searched to encode it directly in them.
+}
+
+\parag{Two's complement}{
+    In \important{two's complement}, to represent the negation of a number, we take its complement and add one to it. We can make the following table:
+    \begin{center}
+    \begin{tabular}{c|c}
+        Decimal & Two's complement  \\
+        \hline
+        3 & 011 \\
+        2 & 010 \\
+        1 & 001 \\
+        0 & 000 \\
+        $-0$ & $000$ \\
+        $-1$ & $111$ \\
+        $-2$ & $110$ \\
+        $-3$ & $101$ \\
+        $-4$ & $100$
+    \end{tabular}
+    \end{center}
+
+    Note that, now, $+0$ and $-0$ map on the same value, $0$. Also, there is some asymmetry: there is one negative number more than positive numbers. This representation is great since we only have to do a single addition.
+
+    \subparag{Personal note}{
+        Note that there si another easy way to understand this system. We can see it as regular binary system, but where the MSB has a negative value. For example: 
+        \[110_b = -1\cdot2^2 + 1\cdot2^1 + 0\cdot2^0 = -4 + 1 = -3\]
+    }
+    
+}
+
+\parag{Integers excess-N representation}{
+    The two's complement representation is commonly used to represent integers. However, there also exists another representation: the \important{excess-N} representation, also called the \important{biased representation}. It uses a pre-specified number $N$ as biasing value, so that $-N$ is represented by all 0s. For example, excess-3 would look like:
+    \begin{center}
+    \begin{tabular}{c|c}
+        Excess-3 & Decimal \\
+        \hline
+        $111_b$ & $4$ \\
+        $110_b$ & $3$ \\
+        $101_b$ & $2$ \\
+        $100_b$ & $1$ \\
+        $011_b$ & $0$ \\
+        $010_b$ & $-1$ \\
+        $001_b$ & $-2$ \\
+        $000_b$ & $-3$ \\
+    \end{tabular}
+    \end{center}
+
+    It allows to have a lot of asymmetry, which can for example be useful to represent temperatures in Switzerland: which maybe range between -10°C and 40°C (taking good margins). Note that, in system, we also only have one 0.
+
+    Performing computations with those representation is out of the scope of this course.
+}
+
+\parag{Overflow and underflow}{
+    Overflows and underflows naturally keep happening since we have only a limited number of bits to represent them.
+
+    We can draw the following schema of the range of our different systems:
+    \imagehere[0.5]{NegativeEncodingSystems.png}
+
+
+    Note that the two's complement and excess-$N$ representation have an asymmetric range since they only have one $0$.
+}
+
+\parag{Example}{
+    Let's compute the decimal representation of the number $10111_b$ in different systems.
+
+    \begin{itemize}[left=0pt]
+        \item Binary: $10111_b = 2^4 + 2^2 + 2^1 + 2^0 = 16 + 4 + 2 + 1 = 23$
+        \item Two's complement: $10111_b = -2^4 + 2^2 + 2^1 + 2^0 = -16 + 4 + 2 + 1 = -9$
+        \item Sign and magnitude: $10111_b = -\left(2^2 + 2^1 + 2^0\right) = -7$
+        \item Excess-7: $10111_b = 23 - 7 = 16$
+    \end{itemize}
+    
+    
+}
+
+\parag{Multiplication}{
+    For multiplications and divisions, we will not consider signs. 
+
+    Let's get inspiration from how we do pen-and-paper multiplications:
+    \begin{center}
+    \begin{tabular}{r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}}
+        & & & & & & 2 & 4  \\
+        $\cdot$ & & & & & & 1 & 8  \\
+        \hline
+        & & & & & & 3 & 2  \\
+        & & & & & 1 & 6 & 0  \\
+        & & & & & & 4 & $\bullet$ \\
+        + & & & & & 2 & 0 & $\bullet$ \\
+        \hline
+          & &  & & & 4 & 3 & 2
+    \end{tabular}
+    \end{center}
+
+    We first compute four partials products, which we add to get our result. We can do the same things for binary, since it is very simple. In fact, this even come downs to an AND gate since $1_b\cdot 1_b = 1_b$ and $1_b\cdot 0_b = 0_b$.
+
+    Note that the circuit for multiplication get quickly very complex.
+}
+
+\parag{Division}{
+    Let's again get inspiration from how we do pen-and-paper divisions. To divide 414 by 18, we see that 18 goes 0 time in 4, thus our first digit is 0. Then, taking one more number, we see that $41 - 18 = 23$ and $23 - 18 = 5$, thus the second digit is 2. Then, keeping the 5 we've just got, we concatenate the last digit, getting 54. We see that $54 - 18 = 36$, $36 - 18 = 18$, $18 - 18 = 0$. Thus, our third digit is 3. In the end, we get that $\frac{414}{18} = 023 = 23$ with rest 0  (since we got a 0 in the end).
+
+    In binary, it is much simpler since we know that numbers will only fit in once or zero times in the number. Moreover, when performing a difference, we have an underflow bit telling us if we could do it, and thus we can just invert this bit to get the corresponding result digit. When the substraction could not be performed we do not keep the result, and revert to the previous one. Every step, we remove the leftmost bit and concatenate the next bit on the right.
+
+    The circuit for divisions is even more complex than the one for multiplication.
+}
+
+
+\parag{Fixed point representation}{
+    The set of real numbers $\mathbb{R}$ contains all integers $\mathbb{Z} \subset \mathbb{R}$ and all fractions $\frac{m}{n}$. They are normally noted in the decimal system by placing a decimal point $321.535$.
+
+    For example: 
+    \[123.2_{B=4} = 1\cdot 2^4 + 2\cdot 4^1 + 3\cdot 4^0 + 2\cdot 4^{-1} = 27.5\]
+    
+    Doing it in the other direction, if we want to turn $17.3$ into base 5, we can do two steps. First, using algorithms we have already seen, we get $17 = 32_{B=5}$. To get the decimal part, we do multiplications. We see that $0.3\cdot 5 = 1.3$, so we have the $1$ after the coma, and then we continue our multiplications on the rest, $0.3$. If we get a 0, we are done (we will never get a 0 here, we would have a periodic decimal).
+}
+
+\parag{Floating point representation}{
+    Let's now go to extremes, and consider very big and very small numbers. We can write them in \important{floating point representation}, also known as scientific notation: 
+    \[845\,294\,294\,967\,295.85321 \approx 0.84529 \cdot 10^{15} = 0.84529\text{E15}\]
+    \[0.00000000000000012 = 0.12\cdot 10^{-15} = 0.12\text{E-15}\]
+    
+    A number $R$ is represented by a \important{mantissa} and an \important{exponent}. The mantissa is in a fixed-point representation, whilst the exponent is in a place-and-value representation. We usually have $\text{mantissa} \in \left]-1, 1\right[ $ and $\text{exponent} \in \left]-\infty, +\infty\right[ $.
+
+    The following paragraph is out of the scope of the course, but it is still interesting. The IEEE754 standar is used for computers to represent float, double, and so on. The first bit is the sign. The next 8 bits are coded excess-127. Then, the last bits are the mantissa, such that $1 \leq \text{mantissa} < 2$.
+}
+
+
+
+
+
+\end{document}
