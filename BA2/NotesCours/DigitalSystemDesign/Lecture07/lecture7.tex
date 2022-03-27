@@ -1,0 +1,121 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-14 at 13:14:05.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Lundi 14 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2022-03-14}{M.+ Finite State MAchine}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the Medvedev Finite State Machine.
+    \item Explanation of the Moore Finite State Machine.
+    \item Explanation of the Mealy Finite State Machine.
+\end{itemize}
+}
+
+\section{Finite state machines}
+\parag{Medvedev FSM}{
+    Let's say we want to model a traffic system.
+
+    The light is green and stays green until the button is pressed. When it is pressed, the traffic light goes yellow and then red. As long as the button on the other side is not pressed, the traffic light stays in that state. When it the button is pressed, it goes in state red-yellow, and then green. We can make the following \important{state diagram}:
+    \imagehere[0.5]{TrafficSystemStateDiagram.png}
+
+    We can see two things on this diagram: states, and transitions. Some transitions are conditional, other are unconditional.
+
+    To represent this circuit, we need to remember which state we are in, thus we are making a sequential logic function. We are also using a clock to update everything at a regular rate. We are using $D$-flipflops: we use the current state out of the $Q$, compute what is the next state using a logic function, called \important{transition logic}, which we input in the $D$. Then, we want to modify the state at only one point in time: at positive edges of the clock. We thus make a synchronous system, which is synchronised on the positive edges of the clock (the circuit below models this idea).
+
+    For the transition logic, we need multiple informations. First, we need to know in which state we are. We also maybe need an external input, such a sa button.
+
+    We also need to invent a coding. We have 4 states, thus we need at least 2 bits, but we are also allowed to take more bits if we want. We need to make a \important{code table}, to be able to remember what we did. For example:
+    \imagehere[0.25]{TrafficSystemCodeTable.png}
+    
+    We can now draw our circuit:
+    \imagehere[0.8]{TrafficSystemCircuit.png}
+
+    We can determine the transition logic using a truthtable, named the \important{transition table}. We can base ourselves on our state diagram. Note that, for unconditional transitions, $B$ is a don't care:
+    \begin{center}
+    \begin{tabular}{ccc|cc}
+        $B$ & $C_1$ & $C_0$ & $D_1$ & $D_0$ \\
+        \hline
+        0 & 0 & 0 & 0 & 0 \\
+        1 & 0 & 0 & 0 & 1 \\
+        - & 0 & 1 & 1 & 0 \\
+        0 & 1 & 0 & 1 & 0 \\
+        1 & 1 & 0 & 1 & 1 \\
+        - & 1 & 1 & 0 & 0 \\
+    \end{tabular}
+    \end{center}
+    
+    We can make our two Karnaugh diagrams:
+    \imagehere[0.6]{TrafficSystemTransitionTableKarnaughDiagram.png}
+
+    Note that, in the first diagram, we have some kind of checkerboard. When we see this kind of patter, there almost always a XOR or a XNOR behind. We get:
+    \[D_1 = C_0 \oplus C_1, \mathspace D_0 = \bar{C_0} \cdot B\]
+
+    The machine we have juste build is named a \important{Medvedev Finite State Machine} (FSM).
+}
+
+\parag{Moore FSM}{
+    Now, let's upgrade our circuit by adding the output logic, which turns the code of our finite state machine into an output. Here, we want to turn the state to the three colours of a circulation light. 
+
+    \imagehere[0.8]{TrafficSystemCircuitMoore.png}
+
+    We can make the following truth table:
+    \begin{center}
+    \begin{tabular}{cc|ccc}
+        $C_1$ & $C_0$ & Red & Yellow & Green \\
+        \hline
+        0 & 0 & 0 & 0 & 1 \\
+        0 & 1 & 0 & 1 & 0 \\
+        1 & 0 & 1 & 0 & 0 \\
+        1 & 1 & 1 & 1 & 0
+    \end{tabular}
+    \end{center}
+
+    This table is called the \important{output table}. Again, making Karnaugh diagrams, we get: 
+    \[R = C_1, \mathspace Y = C_0, \mathspace G = \bar{C}_1 \cdot \bar{C}_0 = \bar{C_1 + C_0}\]
+    
+    This is called a \important{Moore Finite State Machine} (the sole difference with the Medvedev is the output logic circuit). 
+}
+
+\parag{Mealy FSM}{
+    Let's now also add a squirrel launching rotten potatoes using a bazooka if a car passes when the light is red. Note that, we have a new input $S$, a car sensor, and a new output $P$, a potato bazooka. Also note that, the sensor should have a direct influence, without waiting for the clock update.
+
+    \imagehere[0.8]{TrafficSystemCircuitMealy.png}
+
+    We only have to modify the output table:
+    \begin{center}
+    \begin{tabular}{ccc|cccc}
+        $S$ & $C_1$ & $C_0$ & Red & Yellow & Green & Bazooka\\
+        \hline
+        0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+        0 & 0 & 1 & 0 & 1 & 0 & 0 \\
+        0 & 1 & 0 & 1 & 0 & 0 & 0 \\
+        0 & 1 & 1 & 1 & 1 & 0 & 0 \\
+        1 & 0 & 0 & 0 & 0 & 1 & 0 \\
+        1 & 0 & 1 & 0 & 1 & 0 & 0 \\
+        1 & 1 & 0 & 1 & 0 & 0 & 1 \\
+        1 & 1 & 1 & 1 & 1 & 0 & 0 \\
+    \end{tabular}
+    \end{center}
+
+    The light circuits were not changed by the $S$, since they do not depend on it, it is a don't care for them. We only need to add an element to our output logic: 
+    \[A = S \cdot C_1 \cdot \bar{C}_0\]
+    
+    This FSM is called the \important{Mealy Finite State Machine}. The difference with the Moore FSM, is that the Mealy also has an asynchronous action; some outputs can react directly without a clock update.
+}
+
+\parag{Example}{
+    Let's say we want to make our Moore FSM using the Medvedev FSM architecture. We can basically modify our code table by encoding it on three bits: one for the green light, one for the yellow light, one for the red light. Then, there is no output logic.
+}
+
+
+
+
+\end{document}

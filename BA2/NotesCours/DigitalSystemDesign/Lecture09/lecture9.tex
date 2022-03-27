@@ -1,0 +1,79 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-21 at 14:11:44.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Lundi 21 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2022-03-21}{}{}
+\parag{Technology}{
+    Today, all gates are implemented in semiconductor material. There are two kinds of transitors used: Transistor to Transistor Logic (TTL) and Complementary Metal-Oxide-Semiconductor (CMOS). The gates come in the form of an Integrate Circuit (IC).
+
+    For example, the IC 7402, which is a classical TTL, looks like:
+    \imagehere[0.7]{IC7402Circuit.png}
+
+    Let's look more deeply into the NOR-gate. It has two inputs and one output. In both TTL-technology and CMOS-technology, it is made using 4 transistors. Thus, in both cases there are capacitors, which create a delay in the gates. 
+}
+
+\parag{Hazards}{
+    For now, let's assume each gate has the same gate delay (this is not completely true, even for two NOR-gates).
+
+    Let's look at the following circuit (the circuit of a XOR gate):
+    \imagehere[0.5]{XorGateHazardCircuit.png}
+
+    Then, we can make the following time-diagram:
+    \imagehere[0.7]{XorGateHazardZeroDelayTimingDiagram.png}
+
+    This is the \important{zero-delay} model. In the real world, assuming that al gates have the same gate delay, it would look like:
+    \imagehere[0.8]{XorGateHazardTimingDiagramHazards.png}
+
+    We can see multiple effects. First, $Y$ is shifted a bit to the right. Second, much worse, there are 0 levels that appear in between. We call those \important{hazards}.
+}
+
+\parag{Gated clocks}{
+    Because of the hazards, we must not do gated clocks. Indeed, let us consider the following circuit:
+    \imagehere[0.5]{GatedClockExample.png}
+
+    Since the clock of the D-flipflop is not directly connected to the clock of the circuit, we call this a gated clock. In the zero-delay model, we are expecting it to have 2 positive edges on the timing diagram above. However, in the real world it would have hazards, and thus we would have 4 positive edges. This is thus clearly a problem to do a gated clock..
+
+    Such hazards are no problem if there is no gated clocks, if they arrive in between two positive edges.
+}
+
+\parag{Real memory}{
+    Let's now look at real D-FlipFlops. We can compare the zero-dely model, and what happens in the real world:
+    \imagehere[0.7]{RealWorldDFlipFlop.png}
+
+    However, there is also another problem, which is much bigger. Let's zoom on a positive edge. There are two regions before and after the positive edge of the clock: the setup and the hold region, respectively. During those two regions, the value of $D$ is not allowed to change.
+    \imagehere[0.5]{SetupTimeHoldTimeDFlipFlop.png}
+
+    However, if $D$ changes, some uncontrolled oscillations, called \important{metastable state}, leading to a random 1 or 0 (independent of the value of $D$).
+    \imagehere[0.5]{MetstableStateDFlipFlop.png}
+
+    We can sum up metastability with the following timing diagram:
+    \imagehere{MetaStabilityDFlipFlopSummary.png}
+
+    The clock must not give a positive edge during the time of \important{the critical path}, the longest time of the different paths in the transition logic. Thus, the period of the clock must be at least $t_{hold} + t_{criticalPath} + t_{setup}$. Clocking the circuit slower is always good, but faster is not possible.
+
+    \subparag{Implications}{
+        Because of such effect, a FSM can jump into a ghost state.
+
+        This is also why we cannot overclock computers to infinity. If the positive edge happens during before the end of the critical path, the value entering the D-flipflop may be stable, but it may be a hazard. Also, the D may change when the clock triggers, because all possible ways in the transition logic did not have time to take place. In both cases, random things appear.
+    }
+}
+
+\parag{NAME}{
+    \later{Name}
+
+    Let's say we have two circuits linked on two clocks, which are both of the same frequency. We cannot make them communicate directly. Indeed, the clocks are not synchronised (they may not have the same phase), and clocks have some kind of jitter: their frequency does not remain exactly constant.
+
+    For some practical limitations, we cannot link both of them to the same clock. To bypass the problem, we can put two D-flipflop in series. The higher our clock frequency is, the more D flip-flops we can put in series.
+}
+
+
+\end{document}

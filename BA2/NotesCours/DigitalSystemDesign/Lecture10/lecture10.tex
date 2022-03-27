@@ -1,0 +1,109 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-24 at 11:40:20.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Jeudi 24 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2022-03-24}{Multiplexer and shift register}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the multiplexer.
+    \item Explanation of the shift register.
+\end{itemize}
+
+}
+
+\parag{Multiplexer}{
+    We want to design a system with three inputs~---~$A, B, C$~---~and one output~---~$Y$. The system should be designed such that the output $Y$ equals $A$ when the input $C = 0$, and equals $B$ when the input $C = 1$.
+
+    Let's first make a truth table. We can make it in three (equivalent) ways:
+    \begin{center}
+        \begin{tabular}{ccc|c}
+            $A$ & $B$ & $C$ & $Y$ \\
+            \hline
+            0 & 0 & 0 & 0 \\
+            0 & 0 & 1 & 0 \\
+            0 & 1 & 0 & 0 \\
+            0 & 1 & 1 & 1 \\
+            1 & 0 & 0 & 1 \\
+            1 & 0 & 1 & 0 \\
+            1 & 1 & 0 & 1 \\
+            1 & 1 & 1 & 1 \\
+        \end{tabular}
+        \hspace{2em}
+        \begin{tabular}{ccc|c}
+            $A$ & $B$ & $C$ & $Y$ \\
+            \hline
+            0 & - & 0 & 0 \\
+            1 & - & 0 & 1 \\
+            - & 0 & 1 & 0 \\
+            - & 1 & 1 & 1 \\
+        \end{tabular}
+        \hspace{2em}
+        \begin{tabular}{c|c}
+            $C$ & $Y$ \\
+            \hline
+            0 & $A$ \\
+            1 & $B$ \\
+        \end{tabular}
+    \end{center}
+
+    Making a Karnaugh diagram, we get that: 
+    \[Y =  B\cdot C + A\cdot \bar{C}\]
+    
+    This is called a \important{multiplexer}, and has the following symbol:
+    \imagehere[0.15]{MultiplexerSymbol.png}
+
+    $C$ is named the \important{selector}
+}
+
+\parag{Shift register}{
+    Let's consider the following circuit:
+    \imagehere{ShiftRegisterCircuit.png}
+
+    We see it is a Medvedev finite state machine. Indeed, let us draw its state diagram. First, let's us see that, with $Q = Q_2 Q_1 Q_0$ and $D = D_2 D_1 D_0$, we have:
+    \[D_0 = D_{in}, \mathspace D_1 = Q_0, \mathspace D_2 = Q_1, \mathspace Q_2 = Q_{out}\]
+
+    Let us now draw the transition table:
+    \begin{center}
+    \begin{tabular}{cc|c}
+        $D_{in}$ & $Q$ & $D$ \\
+        \hline
+        0 & 000 & 000 \\
+        0 & 001 & 010 \\
+        0 & 010 & 100 \\
+        0 & 011 & 110 \\
+        0 & 100 & 000 \\
+        0 & 101 & 010 \\
+        0 & 110 & 100 \\
+        0 & 111 & 110 \\
+    \end{tabular}
+    \hspace{1em}
+    \begin{tabular}{cc|c}
+        $D_{in}$ & $Q$ & $D$ \\
+        \hline
+        1 & 000 & 001 \\
+        1 & 001 & 011 \\
+        1 & 010 & 101 \\
+        1 & 011 & 111 \\
+        1 & 100 & 001 \\
+        1 & 101 & 011 \\
+        1 & 110 & 101 \\
+        1 & 111 & 111 \\
+    \end{tabular}
+    \end{center}
+
+    Thus, we can now draw the state diagram, while being careful not to forget the power on reset:
+    \imagehere[0.6]{ShiftRegisterStateDiagram.png}
+    
+    In fact, we see that it shifts the value of $D$ to left, by setting the weakest bit to the value of $Q_{in}$. This circuit is called a \important{shift-register}.
+}
+
+
+\end{document}

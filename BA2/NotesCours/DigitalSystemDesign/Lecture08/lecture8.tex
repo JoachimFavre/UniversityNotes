@@ -1,0 +1,98 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-17 at 11:01:14.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Jeudi 17 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2022-03-17}{Designing Finite State Machines}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the different steps done in order to design a finite state machine: verify that all our states are complete and consistent, make a code table, make a transition table while keeping care of the ghost states, and make a power on reset.
+\end{itemize}
+
+}
+
+\parag{Designing}{
+    Let's say we want to design a Medvedev state machine. 
+
+    The first step is to define the different states, and the transitions (conditional and unconditional ones). Those transitions define the input of our Finite State Machine. For example, we can make the following state diagram:
+    \imagehere[0.7]{FSMDesigningStateDiagram.png}
+
+    \subparag{Completeness and consistency}{
+        To be able to make our FSM, we need to be sure that all our states are \important{complete} and \important{consistent}. Complete means that, for any combination of the input, there is at least one (outgoing) transition active. In other words, if we have three transitions $\alpha$, $\beta$ and $\gamma$, then we want to verify that $\alpha + \beta + \gamma$ is always equal to 1. More easily, we can also draw a truth table of the inputs and the possible transitions and verify there is at least a one in each line. In our example, the truth table of the Beer state is (picking $\alpha = L$, $\beta = \bar{L} \cdot T$, and $\gamma = \bar{L} \cdot \bar{T}$):
+        \begin{center}
+        \begin{tabular}{ccc|ccc}
+            $S$ & $T$ & $L$ & $\alpha$ & $\beta$ & $\gamma$ \\
+            \hline
+            0 & 0 & 0 & 0 & 0 & 1 \\
+            0 & 0 & 1 & 1 & 0 & 0 \\
+            0 & 1 & 0 & 0 & 1 & 0 \\
+            0 & 1 & 1 & 1 & 0 & 0 \\
+            1 & 0 & 0 & 0 & 0 & 1 \\
+            1 & 0 & 1 & 1 & 0 & 0 \\
+            1 & 1 & 0 & 0 & 1 & 0 \\
+            1 & 1 & 1 & 1 & 0 & 0 \\
+        \end{tabular}
+        \end{center}
+        
+        Since there is at least one 1 in the output variables of each line, this state is indeed complete. We can also verify it using boolean algebra laws: 
+        \[\alpha + \beta + \gamma = L + \bar{L} \cdot T + \bar{L} \cdot \bar{T} = L + \bar{L}\cdot\left(T + \bar{T}\right) = L + \bar{L} = 1\]
+        
+        If a state is incomplete, we have to add some possibilities to a transition. This is dictated by what we want to do with our FSM.
+
+        A state is consistent when, for any combination of the inputs, there is at most one (outgoing) transition active. Note that, looking at our truth table above, we can see that our Beer state is also consistent. To be able to use boolean algebra, again with three transitions $\alpha$, $\beta$ and $\gamma$, we have to check that :
+        \[\alpha \cdot \beta = 0, \mathspace \alpha \cdot \gamma = 0, \mathspace \beta \cdot \gamma = 0\]
+
+        If a state is inconsistent, we have to deactivate some of the transitions. This is dictated by what we want to do with our FSM.
+
+        Note that using a truth table to prove that a state is complete and consistent is usually easier.
+    }
+    
+    \subparag{Code table}{
+        Now we need to make a code table for our FSM. We notice that with $n$ bits, we can encode at most $2^{n}$ states. Thus, if we want to encode $\ell$ states:
+        \[2^n \geq \ell \implies n \geq \left\lceil \log_2\left(\ell\right) \right\rceil \]
+        
+        So, for our 5 states, we need at least 3 bits (we could also use more if we want). We can make the following coding table:
+        \imagehere[0.3]{FSMDesigningCodeTable.png}
+
+        Note that using binary a binary encoding (000 for the first, 001 for the second one, and so on) is not always the best idea, and that sometimes we can make our circuit faster with a better encoding.
+
+        With our 3 bits, we can encode 8 states, thus there are unused codes. We call them \important{ghost states}. We can ignore them and treat them as don't care. However, it might also be a critical application (such as making a pacemaker), where getting stuck in a ghost state might kill the patient. In this kind of applications, we may want to make all the ghost states point on a save state, the default one of the FSM for example. Obviously, doing so complexifies the transition logic.
+    }
+
+    \subparag{Transition table}{
+        Now that we have our coding and our state diagrams, we can make the transition table. The table on the left consider ghost states as don't care, and the one on the right makes them go to the state sleep:
+        \imagehere{FSMDesigningTranstitionTable.png}
+
+        Note that the circuit realisation of the truth table on the left is much smaller than the one on the right; as mentioned before.
+    }
+
+    \subparag{Reset}{
+        When we power on our FSM, the values stored in the D-Flipflop are random. To bypass this problem, we use a Power-On-Reset circuit. This has the following time diagram:
+        \imagehere[1]{PowerOnResetTimeDiagram.png}
+
+        Note that, on Logisim, such a Power-On-Reset element exists, but we cannot download it unto the Gecko4Education. Thus, replacing it with a button does the trick.
+
+        Let's say we want to make an asynchronous reset. To do that, we an use the asynchronous set and reset inputs on a D-flipflop (they work just like the ones on a SR-latch; the set is at the top of the circuit, the reset at the bottom). We can identify our reset state, and connect our power on reset to the asynchronous set or reset of the corresponding D-flipflop. We need to add this asynchronous reset to our state diagram:
+        \imagehere{FSMDesigningStateDiagramAsynchronousReset.png}
+
+        Let's now make a synchronous reset. Let's modify our state diagram:
+        \imagehere{FSMDesigningStateDiagramSynchronousReset.png}
+
+        Note that the reset state (the default state, sleep here) has a transition to itself when the power on reset is activated. We naturally also have to verify that our states still are complete and consistency.
+
+        Even though it seems more complicated, synchronous reset are used more often, since they allow to avoid trouble with gate delay and small currents passing by.
+    }
+    
+    
+    
+}
+
+
+\end{document}
