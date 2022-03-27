@@ -1,0 +1,292 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-21 at 17:23:50.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Mercredi 23 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2022-03-23}{Le retour des gendarmes}{
+\begin{itemize}[left=0pt]
+    \item Explication de la méthode de calcul de limites par changement de coordonnées vers le système polaire.
+    \item Preuve du théorème des deux gendarmes.
+    \item Explication de la méthode de calcul de limites par la continuité d'une fonction composée.
+    \item Définition des minimum et maximum d'une fonction, et démonstration qu'une fonction continue sur un sous-ensemble compact atteint son minimum et son maximum.
+\end{itemize}
+
+}
+
+\parag{Exemple 2}{
+    Soit la fonction $f: \mathbb{R}^2 \mapsto \mathbb{R}$ définie par: 
+    \begin{functionbypart}{f\left(x\right)}
+        \frac{x^3 + y^3}{x^2 + y^2}, \mathspace \text{si } \left(x, y\right) \neq \left(0, 0\right) \\
+        0, \mathspace \text{autrement}
+    \end{functionbypart}
+
+    Utilisons nos deux mêmes limites: $\left\{\bvec{a_k}\right\} = \left(\frac{1}{k}, 0\right)$ et $\left\{\bvec{b}_k\right\} = \left(\frac{1}{k}, \frac{1}{k}\right)$: 
+    \[\lim_{k \to \infty} f\left(\bvec{a_k}\right) = \lim_{k \to \infty} \frac{\frac{1}{k^3}}{\frac{1}{k^2}} = \lim_{k \to \infty} \frac{\frac{1}{k}}{1} = 0\]
+    \[\lim_{k \to \infty} f\left(\bvec{b_k}\right) = \lim_{k \to \infty} \frac{\frac{1}{k^3} + \frac{1}{k^3}}{\frac{2}{k^2}} = \lim_{k \to \infty} \frac{\frac{2}{k}}{1} = 0\]
+    
+    Nous décidons donc formuler l'hypothèse que $\lim_{\left(x, y\right) \to \left(0, 0\right)} = 0$. 
+
+    \subparag{Preuve par changement de coordonnées}{
+        Il est possible de démontrer cette limite par la définition. Cependant, une deuxième manière beaucoup plus efficace consiste à utiliser un changement de variable vers les coordonnées polaires. 
+        \imagehere[0.5]{ChangementVariableCoordonneesPolaires.png}
+   
+        Ce changement de variable nous donne: 
+        \[x = r\cos\left(\phi\right), \mathspace y = r\sin\left(\phi\right)\]
+        où $r \in \mathbb{R}_{\geq 0}$ et, si $r \neq 0$, $\phi \in \left[0, 2\pi\right[$. 
+
+        Ainsi, on obtient que notre fonction \textit{est égale} à: 
+        \begin{multiequality}
+        f\left(r, \phi\right) =\ & \frac{r^3 \cos^3\left(\phi\right) + r^3 \sin^3\left(\phi\right)}{r^2 \cos^2\left(\phi\right) + r^2 \sin^2\left(\phi\right)}  \\
+        =\ & \frac{r^3 \left(\cos^3\left(\phi\right) + \sin^3\left(\phi\right)\right)}{r^2} \\
+        =\ & r\left(\cos^3\left(\phi\right) + \sin^3\left(\phi\right)\right) 
+        \end{multiequality}
+        
+        Or, nous savons que $\left(x, y\right) \to \left(0, 0\right)$ est équivalent à dire que $r = \sqrt{x^2 + y^2} \to 0$ et $\phi$ est une fonction inconnue de $r$. Ceci nous donne que: 
+        \[\lim_{r \to 0} \left|f\left(r, \phi\right)\right| = \lim_{r \to 0} \underbrace{r}_{\to 0}\underbrace{\left|\cos^3\left(\phi\right) + \sin^3\left(\phi\right)\right|}_{\leq 2} = 0\]
+
+        On en déduit donc que: 
+        \[\lim_{\left(x, y\right) \to \left(0, 0\right)} f\left(x, y\right) = 0\]
+
+        Cette méthode est souvent efficace (mais pas toujours) pour montrer l'existence des limites à l'origine. Elle est à retenir.
+        
+        \qed
+    }
+}
+
+\parag{Remarque 1}{
+    Nous ne pouvons pas calculer la limite d'une fonction de plusieurs variables de la façon suivante: 
+    \[\lim_{\left(x, y\right) \to \left(x_0, y_0\right)} f\left(x, y\right) \neq \lim_{x \to x_0} \left(\lim_{y \to y_0} f\left(x, y\right)\right)\]
+        
+    En effet, si on considère à nouveau l'exemple 1:
+    \begin{functionbypart}{f\left(x, y\right)}
+        \frac{xy}{x^2 + y^2}, \mathspace \text{si } \left(x, y\right) \neq \left(0, 0\right) \\
+        0, \mathspace \text{si } \left(x, y\right) = \left(0, 0\right)
+    \end{functionbypart}
+
+    Considérons d'abord la limite de $y \to 0$, si $x \neq 0$:
+    \[\lim_{y \to 0} f\left(x, y\right) = \lim_{y \to 0} \frac{\overbrace{xy}^{\to 0}}{\underbrace{x^2}_{\neq 0} + y^2} = 0\]
+    
+    Ainsi: 
+    \[\lim_{x \to 0} \lim_{y \to 0} f\left(x, y\right) = \lim_{x \to 0} 0 = 0\]
+    
+    Alors que $\lim_{\left(x, y\right) \to \left(0, 0\right)} f\left(x, y\right)$ n'existe pas. Nous arrivons au même problème si nous commençons par la limite selon $x$.
+}
+
+\parag{Remarque 2}{
+    Si la limite $\lim_{\left(x, y\right) \to \left(a, b\right)} f\left(x, y\right)$ existe, et les limites par rapport à chaque variables existent pour tout $x$ et tout $y$ dans le domaine de $f$, alors on peut échanger l'ordre des limites: 
+    \[\lim_{x \to a} \left(\lim_{y \to b} f\left(x, y\right)\right) = \lim_{y \to b} \left(\lim_{x \to a} f\left(x, y\right)\right)\]
+}
+
+\parag{Remarque 3}{
+    L'existence de la limite $\lim_{\left(x, y\right) \to \left(a, b\right)} f\left(x, y\right)$ n'implique pas en général l'existence des limites $\lim_{x \to a} f\left(x, y\right)$ et $\lim_{y \to b} f\left(x, y\right)$.
+
+    \subparag{Exemple}{
+        Voici un exemple tiré du livre Douchet-Swahlen, qui ne nous est probablement pas demandé de savoir pour l'examen puisqu'il n'a pas été donné pendant le cours.
+
+        Soit la fonction d'une variable suivante:
+        \begin{functionbypart}{h\left(t\right)}
+        1, \mathspace \text{si } t \in \mathbb{Q} \\
+        0, \mathspace \text{si } t \not\in \mathbb{Q}
+        \end{functionbypart}
+
+        Prenons aussi la fonction suivante: 
+        \[f\left(x, y\right) = xh\left(y\right) + yh\left(x\right)\]
+        
+        Nous trouvons que $\lim_{\left(x, y\right) \to \left(0, 0\right)} f\left(x, y\right) = 0$, alors que les limites par rapport à une seule variable n'existent pas.
+    }
+}
+
+\parag{Théorème des 2 gendarmes}{
+    Soient $f, g, h : E \mapsto \mathbb{R}$, où $E \subset \mathbb{R}^n$, telles que:
+    \begin{enumerate}
+        \item $\displaystyle \lim_{\bvec{x} \to \bvec{x_0}} = \lim_{\bvec{x} \to \bvec{x_0}} g\left(\bvec{x}\right) = \ell$
+        \item Il existe un $\alpha > 0$ tel que pour tout $x \in \left\{x \in E : 0 < \left\|\bvec{x} - \bvec{x_0}\right\| \leq \alpha\right\} = \bar{B\left(\bvec{x_0}, \alpha\right)} \setminus \left\{\bvec{x_0}\right\}$, on a:
+            \[f\left(\bvec{x}\right) \leq h\left(\bvec{x}\right) \leq g\left(\bvec{x}\right)\]
+    \end{enumerate}
+    
+    Alors: 
+    \[\lim_{\bvec{x} \to \bvec{x_0}} h\left(\bvec{x}\right) = \ell\]
+    
+    \subparag{Preuve}{
+        Soit $\left\{\bvec{a_k}\right\} \subset E$ une suite arbitraire telle que $\lim_{k \to \infty} \bvec{a_k} = \bvec{x_0}$. Alors, la première hypothèse nous donne par la caractérisation à partir des suites que: 
+        \[\lim_{k \to \infty} f\left(\bvec{a_k}\right) = \lim_{k \to \infty} g\left(\bvec{a_k}\right) = \ell\]
+        
+        De plus, la deuxième hypothèse nous dit qu'il existe un $k_0 \in \mathbb{N}$ tel que:
+        \[f\left(\bvec{a_k}\right) \leq h\left(\bvec{a_k}\right) \leq g\left(\bvec{a_k}\right), \ \forall k \geq k_0\]
+
+        Et donc par le théorème des 2 gendarmes pour les suites, cela implique que: 
+        \[\exists\lim_{k \to \infty} h\left(\bvec{a_k}\right) = \ell \in \mathbb{R}\]
+        
+        On en déduit donc que, puisque $\left\{\bvec{a_k}\right\} \to \bvec{x_0}$ est une suite arbitraire convergente vers $\bvec{x_0}$, par la caractérisation à partir des suites: 
+        \[\lim_{\bvec{x} \to \bvec{x_0}} h\left(\bvec{x}\right) = \ell \]
+
+        \qed
+    }
+}
+
+\parag{Exemple}{
+    Soit la fonction suivante: 
+    \begin{functionbypart}{f\left(x, y\right)}
+        xy \log\left(\left|x\right| + \left|y\right|\right), \mathspace \text{si } \left(x, y\right) \neq \left(0, 0\right) \\
+        0, \mathspace \text{si } \left(x, y\right) = \left(0, 0\right)
+    \end{functionbypart}
+    
+    On cherche une fonction $g\left(x, y\right)$ telle que $0 \leq \left|f\left(x, y\right) - 0\right| \leq g\left(x, y\right)$ pour $\left(x, y\right)$ au voisinage de $\left(0, 0\right)$, et telle que: 
+    \[\lim_{\left(x, y\right) \to \left(0, 0\right)} g\left(x, y\right) = 0\]
+    
+    Soit $\left(x, y\right) \in \bar{B\left(\left(0, 0\right), 1\right)}$. Cela donne donc que $\sqrt{x^2 + y^2} \leq 1$, ce qui nous permet d'obtenir les inégalités suivantes:
+    \[\left|xy\right| = \left|x\right|\left|y\right| = \left|x\right| \sqrt{y^2} \leq \left|x\right|\sqrt{x^2 + y^2} \leq \left|x\right|\]
+    \[\left|xy\right| = \left|x\right|\left|y\right| = \sqrt{x^2} \left|y\right| \leq \sqrt{x^2 + y^2}\left|y\right| \leq \left|y\right|\]
+
+    Nous savons donc que $\forall \left(x, y\right)$ tels que $\sqrt{x^2 + y^2} \leq 1$, nous avons: 
+    \[0 \leq \left|xy \log\left(\left|x\right| + \left|y\right|\right)\right| \leq \frac{1}{2} \left(\left|x\right| + \left|y\right|\right)\log\left(\left|x\right| + \left|y\right|\right) = g\left(x, y\right)\]
+    
+    Or, puisque $0 \leq \left|x\right| + \left|y\right| \leq 2\sqrt{x^2 + y^2}$, et puisque $\sqrt{x^2 + y^2} \to 0$, nous savons que $\left|x\right| + \left|y\right| \to 0$, par le théorème des 2 gendarmes.
+    
+    Prenons maintenant $t = \left|x\right| + \left|y\right|$. Nous avons: 
+    \begin{multiequality}
+    \lim_{\left(x, y\right) \to \left(0, 0\right)} g\left(x, y\right) =\ & \lim_{t \to 0^+} g\left(t\right) = \lim_{t \to 0^+} \frac{1}{2} t \left|\underbrace{\log\left(t\right)}_{-\infty}\right| = -\lim_{t \to 0^+} \frac{1}{2} t \log\left(t\right) \\
+    \over{=}{$s = \frac{1}{t}$}\ &  -\frac{1}{2} \lim_{s \to \infty} \frac{-\log\left(s\right)}{s} \over{=}{$\frac{\infty}{\infty}$} \frac{1}{2} \lim_{s \to \infty} \frac{\frac{1}{s}}{1} = 0 
+    \end{multiequality}
+    
+    Nous pouvons en déduire par les 2 gendarmes que: 
+    \[\lim_{\left(x, y\right) \to \left(0, 0\right)} f\left(x, y\right) = 0\]
+}
+
+\parag{Proposition: Continuité d'une fonction composée}{
+    Soient 2 sous-ensembles ensembles $A \subset \mathbb{R}^n$, $B \subset \mathbb{R}^p$. De plus, soient deux fonctions $\bvec{g} : A \mapsto B$ et $f: B \mapsto \mathbb{R}$ où: 
+    \[\bvec{g}\left(\bvec{x}\right) = \left(g_1\left(\bvec{x}\right), \ldots, g_p\left(\bvec{x}\right)\right)\]
+    
+    Si $g_1, \ldots, g_p$ sont continues en $\bvec{a} \in A$, et $f\left(\bvec{y}\right)$ est continue en $\left(g_1\left(\bvec{a}\right), \ldots, g_p\left(\bvec{a}\right)\right)$, alors $f \circ \bvec{g}\left(\bvec{x}\right)$ est continue en $\bvec{x} = \bvec{a}$.
+}
+
+\parag{Exemple 1}{
+    Soit la fonction suivante: 
+    \[h\left(x, y\right) = \sin\left(xy\right)\cos\left(xy\right), \mathspace \forall \left(x, y\right) \in \mathbb{R}^2\]
+    
+    On remarque que $g\left(x, y\right) = xy$ est continue sur $\mathbb{R}^2$, et $f\left(t\right) = \sin\left(t\right)\cos\left(t\right)$ est continue sur $\mathbb{R}$. Ainsi, $f\circ g\left(x, y\right) = \sin\left(xy\right)\cos\left(xy\right) = h\left(x, y\right)$ est continue sur $\mathbb{R}^2$ par la proposition.
+}
+ 
+\parag{Exemple 2}{
+    Soit la fonction suivante:
+    \begin{functionbypart}{f\left(x, y\right)}
+        \frac{\sin\left(xy\right)}{xy}, \mathspace x \neq 0 \text{ et } y \neq 0 \\
+        1, \mathspace \text{autrement}
+    \end{functionbypart}
+
+    Prenons $g\left(x, y\right) = xy$ et:
+    \begin{functionbypart}{h\left(t\right)}
+        \frac{\sin\left(t\right)}{t}, \mathspace t\neq 0 \\
+        1, \mathspace t = 0
+    \end{functionbypart}
+
+    On sait que $g\left(x, y\right)$ est continue sur $\mathbb{R}^2$ puisque c'est un polynôme, et nous savons que $h\left(t\right)$ est continue sur $\mathbb{R}$ puisque $\lim_{t \to 0} \frac{\sin\left(t\right)}{t} = 1$.
+
+    Ainsi, par notre proposition, $f\left(x, y\right) = h \circ g\left(x, y\right)$ est continue sur $\mathbb{R}^2$.
+}
+
+\parag{Exemple 3}{
+    Considérons la limite suivante: 
+    \[\lim_{\left(x, y\right) \to \left(1, 0\right)} \frac{\left(x - 1\right)^2 \log\left(x\right)}{\left(x - 1\right)^2 + y^2}\]
+    
+    Cette limite est de la forme $\frac{0}{0}$, nous devons donc faire plus de travail. Nous formulons l'hypothèse que la limite existe. Le changement de variables vers coordonnées polaires semble ne pas être efficace car des choses peut agréables se passeraient avec le logarithme. Utilisons plutôt le théorème des deux gendarmes; nous cherchons une fonction $g\left(x, y\right)$ telle que, au voisinage de $\left(1, 0\right)$:
+    \[0 \leq \left|f\left(x, y\right) - 0\right| \leq g\left(x, y\right) \mathspace \text{ et } \mathspace \lim_{\left(x, y\right) \to \left(1, 0\right)} = 0\]
+
+    Remarquons que: 
+    \[0 \leq \left|f\left(x, y\right) - 0\right| = \left|\frac{\left(x - 1\right)^2 \log\left(x\right)}{\left(x - 1\right)^2 + \underbrace{y^2}_{\geq 0}}\right| \leq \frac{\left(x - 1\right)^2 \left|\log\left(x\right)\right|}{\left(x-1\right)^2} = \left|\log\left(x\right)\right|\]
+    
+    Nous avons donc obtenu: 
+    \[0 \leq f\left(x, y\right) \leq \left|\log\left(x\right)\right| = g\left(x, y\right)\]
+    
+    Or, nous remarquons que: 
+    \[\lim_{\left(x, y\right) \to \left(1, 0\right)} g\left(x, y\right) = \lim_{\left(x, y\right) \to \left(1, 0\right)} \left|\log\left(x\right)\right| = \lim_{x \to 1} \left|\log\left(x\right)\right| = 0\]
+    
+    Ainsi, par les deux gendarmes: 
+    \[\lim_{\left(x, y\right) \to \left(1, 0\right)} \frac{\left(x - 1\right)^2 \log\left(x\right)}{\left(x - 1\right)^2 + y^2} = 0\]
+}
+
+\subsection{Maximum et minimum d'une fonction sur un ensemble compact}
+\parag{Définition: Maximum}{
+    Soit la fonction $f: E \mapsto \mathbb{R}$, où $E \subset \mathbb{R}^n$. 
+
+    Si $M \in \mathbb{R}$ satisfait:
+    \begin{enumerate}
+        \item $\displaystyle f\left(\bvec{x}\right) \leq M$ pour tout $\bvec{x} \in E$
+        \item $\displaystyle M \in f\left(E\right)$
+    \end{enumerate}
+    
+    Alors $M$ est le \important{maximum} de la fonction $f$ sur $E$.
+}
+
+\parag{Définition: Minimum}{
+    Soit la fonction $f: E \mapsto \mathbb{R}$, où $E \subset \mathbb{R}^n$. 
+
+    Si $m \in \mathbb{R}$ satisfait:
+    \begin{enumerate}
+        \item $\displaystyle f\left(\bvec{x}\right)\ {\color{red}\geq}\ m$ pour tout $\bvec{x} \in E$
+        \item $\displaystyle m \in f\left(E\right)$
+    \end{enumerate}
+    
+    Alors $m$ est le \important{minimum} de la fonction $f$ sur $E$.
+}
+
+\parag{Exemple}{
+    Soit la fonction suivante, définie sur $f: \mathbb{R}^2 \mapsto \mathbb{R}$: 
+    \[f\left(x, y\right) = \sin\left(x^2 + y\right)\]
+    
+    Alors, nous avons: 
+    \[\max_{\left(x, y\right) \in \mathbb{R}^2} f\left(x, y\right) = 1, \mathspace \min_{\left(x, y\right) \in \mathbb{R}^2} f\left(x, y\right) = -1\]
+}
+
+\parag{Théorème du min et du max sur un compact}{
+    Une fonction continue sur un sous-ensemble compact $E \subset \mathbb{R}^2$ atteint son maximum et son minimum, i.e.: 
+    \[\exists \max_{\bvec{x} \in E} f\left(\bvec{x}\right), \mathspace \exists \min_{\bvec{x} \in E} f\left(\bvec{x}\right)\]
+
+    \demonstrationaconnaitre
+    
+    \subparag{Preuve $f\left(E\right)$ est borné}{
+        Nous voulons commencer par montrer que $\left\{f\left(\bvec{x}\right)\right\}_{\bvec{x} \in E}$ est borné. 
+
+        Supposons par l'absurde que $f\left(E\right)$ n'est pas borné, c'est à dire que pour tout $k \geq 0$, il existe un $\bvec{x_k} \in E$ tel que $\left|f\left(\bvec{x_k}\right)\right| \geq k$. Ceci nous donne une suite $\left\{\bvec{x_k}\right\} \in E$. 
+
+        Puisque $E$ est un ensemble compact, nous savons qu'il est borné, et donc $\left\{\bvec{x_k}\right\}$ est bornée. Ainsi, par le théorème de Bolzano-Weierstrass, nous pouvons trouver une sous suite convergente $\left\{\bvec{x_{k_{p}}}\right\}$, qui a pour limite un vecteur $\bvec{x_0} \in \mathbb{R}^n$. Puisque $E$ est compact (et donc fermé), nous savons que $\bvec{x_0} \in E$.
+
+        Puisque $f$ est continue, nous savons que: 
+        \[\lim_{p \to \infty} f\left(\bvec{x_{k_{p}}}\right) = f\left(\bvec{x_0}\right) \in\mathbb{R}\]
+        
+        Mais, par construction, $\left|f\left(\bvec{x_k}\right)\right| \geq k$ pour tout $k \in \mathbb{N}$, ce qui est notre contradiction. Nous en concluons que $f$ est bornée.
+    }
+
+    \subparag{Preuve $f$ atteint ses extremum}{
+        Nous voulons montrer que $f$ atteint son minimum et son maximum sur $E$. 
+
+        Par ce que nous venons de démontrer, nous savons que $f\left(E\right)$ est un sous-ensemble borné. Ainsi: 
+        \[\exists M = \sup\left\{f\left(\bvec{x}\right), \bvec{x} \in E\right\}, \mathspace \exists m = \inf\left\{f\left(\bvec{x}\right), \bvec{x} \in E\right\}\]
+        
+        Par la définition du supremum et de l'infimum, nous pouvons nous en rapprocher arbitrairement, donc cela implique qu'il existe deux suites $\left\{\bvec{a_k}\right\}, \left\{\bvec{b_k}\right\} \in E$ telles que: 
+        \[\lim_{k \to \infty} f\left(\bvec{a_k}\right) = m, \mathspace \lim_{k \to \infty} f\left(\bvec{b_k}\right) = M\]
+
+        Or, puisque $\left\{\bvec{a_k}\right\}, \left\{\bvec{b_k}\right\} \in E$ (qui est borné), ce sont des suites bornées, et donc il existe des sous-suites convergentes. En d'autres mots: 
+        \[\bvec{a_{k_p}} \to \bvec{a} \in \mathbb{R}^n, \mathspace \bvec{b_{k_p}} \to \bvec{b} \in \mathbb{R}^n\]
+        
+        De plus, puisque $E$ est compact (et donc fermé), nous savons que $\bvec{a} \in E$ et $\bvec{b} \in E$. Ainsi, par la continuité de $f$: 
+        \[m = \lim_{k \to \infty} f\left(\bvec{a_k}\right) = \lim_{p \to \infty} f\left(\bvec{a_{k_p}}\right) = f\left(\bvec{a}\right)\]
+        \[M = \lim_{k \to \infty} f\left(\bvec{b_k}\right) = \lim_{p \to \infty} f\left(\bvec{b_{k_p}}\right) = f\left(\bvec{b}\right)\]
+
+        Ainsi, nous savons qu'il existe $\bvec{a}, \bvec{b} \in E$ tels que: 
+        \[f\left(\bvec{a}\right) = m = \min_{\bvec{x} \in E} f\left(\bvec{x}\right)\]
+        \[f\left(\bvec{b}\right) = M = \max_{\bvec{x} \in E} f\left(\bvec{x}\right)\]
+
+        \qed
+    }
+}
+
+\end{document}

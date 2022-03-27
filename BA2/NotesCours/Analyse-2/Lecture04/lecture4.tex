@@ -1,0 +1,264 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-01 at 13:04:22.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Mardi 02 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2022-03-02}{On rajoute un prime}{
+\begin{itemize}[left=0pt]
+    \item Définition des équations différentielles linéaires du second ordre.
+    \item Résolution générale des EDL2 homogènes à coefficients constants.
+    \item Explication de la méthode pour trouver une solution linéairement indépendante à partir d'une autre solution à une EDL2 homogène.
+    \item Explication de la méthode pour trouver une solution générale d'une EDL2 homogène à partir de deux solutions linéairement indépendantes.
+\end{itemize}
+
+}
+
+\subsection{Équations différentielles linéaires du second ordre}
+\parag{Définition: EDL2}{
+    Soit $I$ un intervalle ouvert. On appelle \important{équation différentielle linéaire du second ordre} (EDL2) une équation de la forme: 
+    \[y''\left(x\right) + p\left(x\right)y'\left(x\right) + q\left(x\right)y\left(x\right) = f\left(x\right)\]
+    où $p, q, f: I \mapsto \mathbb{R}$ sont des fonctions continues.
+    
+    Nous appelons \important{EDL2 homogène} une équation de la forme suivante:
+    \[y''\left(x\right) + p\left(x\right)y'\left(x\right) + q\left(x\right)y\left(x\right) = 0\]
+
+    Nous cherchons une solution de cette équation de classe $C^2\left(I, \mathbb{R}\right)$.
+}
+
+\parag{Exemple}{
+    Prenons l'EDL2 homgène suivante: 
+    \[y'' = 0\]
+    
+    En intégrant deux fois, on trouve que: 
+    \[y\left(x\right) = C_1 x + C_2, \mathspace C_1, C_2 \in \mathbb{R}, \forall x \in \mathbb{R}\]
+}
+
+\parag{EDL2 homogène à coefficients constants}{
+    Considérons les \important{EDL2 homogène à coefficients constants}. En d'autres mots, soit l'équation différentielle suivante: 
+    \[y''\left(x\right) + py'\left(x\right) + qy\left(x\right) = 0, \mathspace p, q \in \mathbb{R}\]
+    
+    Construisons un polynôme $\lambda^2 + p\lambda + q = 0$. Par le théorème fondamental de l'algèbre, on sait qu'il existe deux solutions complexes $a$ et $b$ tel que $\lambda^2 + p\lambda + q = \left(\lambda - a\right)\left(\lambda - b\right) = \lambda^2 - \left(a + b\right)\lambda + ab$. On obtient donc que $p = -\left(a + b\right)$ et $q = ab$, ce qu'on peut remplacer dans notre équation:
+    \[y''\left(x\right) - \left(a + b\right)y'\left(x\right) + aby\left(x\right) = 0, \mathspace a, b \in \mathbb{C}\]
+
+    Nous pouvons voir que notre équation est équivalente à: 
+    \[\left(y'\left(x\right) - ay\left(x\right)\right)' - b\left(y'\left(x\right) - ay\left(x\right)\right) = 0\]
+
+    Ainsi, nous pouvons prendre le changement de variable $z\left(x\right) = y'\left(x\right) - ay\left(x\right)$, ce qui nous donne une EDL1 homogène: 
+    \[z'\left(x\right) - bz\left(x\right) = 0 \implies z\left(x\right) = C_1 e^{bx}, \mathspace x \in \mathbb{R}, C \text{ arbitraire}\]
+    
+    Puisque $z\left(x\right) = y'\left(x\right) - ay\left(x\right)$, on obtient une EDL1 pour $y$: 
+    \[y'\left(x\right) \underbrace{- a}_{p\left(x\right)}y\left(x\right) = \underbrace{C_1e^{bx}}_{f\left(x\right)}\]
+    
+    \subparag{Résolution de l'EDL1}{
+    Nous pouvons trouver une primitive de $p\left(x\right)$: 
+    \[P\left(x\right) = \int -a dx = -ax\]
+    
+    Ainsi, cela nous donne la solution à l'équation homogène associée: 
+    \[y_{hom}\left(x\right) = C_2e^{ax}\]
+    
+    Nous pouvons utiliser la méthode de la variation de la constante: 
+    \[C\left(x\right) = \int f\left(x\right)e^{P\left(x\right)}dx = \int C_1e^{bx} e^{-ax} dx = C_1 \int e^{\left(b-a\right)x}dx\]
+    
+    Nous avons deux possibilitiés:
+    \begin{functionbypart}{C\left(x\right)}
+        \frac{1}{b-a} C_1 e^{\left(b - a\right)x}, \mathspace \text{ si } b \neq a \\
+        C_1 x, \mathspace \text{ si } b = a
+    \end{functionbypart}
+
+    On obtient donc une solution particulière à notre équation: 
+    \begin{functionbypart}{y_{part}\left(x\right)}
+        C_1 e^{\left(b - a\right)x} e^{ax} = C_1 e^{bx}, \mathspace \text{ si } b \neq a \\
+        C_1 x e^{a x}, \mathspace \text{ si } b = a
+    \end{functionbypart}
+    }
+    
+    \subparag{Solution générale}{
+        Tout ceci nous permet d'obtenir la solution générale à notre équation: 
+        \begin{functionbypart}{y\left(x\right)}
+        C_2 e^{ax} + C_1 e^{bx}, \mathspace \text{ si } a \neq b \\
+        C_2 e^{ax} + C_1 x e^{ax}, \mathspace \text{ si } a = b
+        \end{functionbypart}
+        où $C_1$ et $C_2$ sont deux constantes arbitraires, et $a$ et $b$ sont des racines de l'équation caractéristique $\lambda^2 + p\lambda + q = 0$, $\forall x \in \mathbb{R}$.
+
+        Il nous reste un problème, c'est que nous faisons de l'analyse réelle, mais $C_1$ et $C_2$ sont des constantes complexes arbitraires et $a$ et $b$ sont potentielle complexes. Il faut donc encore qu'on traite cette question.
+
+         Si $a \neq b$ sont des racines complexes, telles que $a, b \not\in \mathbb{R}$, alors nous savons que $a = \bar{b}$. De plus, prenons $C_1 = C$ et $C_2 = \bar{C}$ afin d'obtenir une solution réelle:
+        \[y\left(x\right) = C e^{ax} + \bar{C} e^{\bar{a} x} \]
+        
+        Nous pouvons prendre $a = \alpha + i\beta$ où $\alpha, \beta \in \mathbb{R}$ et $\beta \neq 0$. De plus, prenons $C = \frac{1}{2} \left(C_3 - i C_4\right)$. Ceci nous donne: 
+        \begin{multiequality}
+            y\left(x\right) =\ & Ce^{ax} + \bar{C}e^{\bar{a} x}  \\
+            =\ & \frac{1}{2}\left(C_3 - iC_4\right) e^{\alpha x} e^{i \beta x} + \frac{1}{2} \left(C_3 + i C_4\right)e^{\alpha x} e^{-i \beta x}  \\
+            =\ & C_3 e^{\alpha x} \frac{e^{i \beta x} + e^{-i \beta x}}{2} + C_4 e^{\alpha x} \frac{e^{i \beta x} - e^{-i \beta x}}{2i}  \\
+            =\ & C_3 e^{\alpha x} \cos\left(\beta x\right) + C_4 e^{\alpha x} \sin\left(\beta x\right), \mathspace \text{où } C_3, C_4 \in \mathbb{R}, x \in \mathbb{R} 
+        \end{multiequality}
+        puisque $-i = \frac{1}{i}$.
+
+        C'est la solution générale réelle de l'équation si $b = \bar{a} \not\in \mathbb{R}$.
+    }
+    
+    \subparag{Résumé}{
+        Nous commençons avec une équation de la forme: 
+        \[y''\left(x\right) + py'\left(x\right) + qy\left(x\right) = 0, \mathspace p, q \in \mathbb{R}\]
+
+        Soient $a, b \in \mathbb{C}$ les racines de l'équation $\lambda^2 + p\lambda + q = 0$. Alors, la solution générale est:
+        \begin{functionbypart}{y\left(x\right)}
+        C_1 e^{ax} + C_2 e^{bx}, \mathspace \text{ si } a, b \in \mathbb{R}, a \neq b \\
+        C_1 e^{ax} + C_2 xe^{ax}, \mathspace \text{ si } a = b \\
+        C_1 e^{\alpha x} \cos\left(\beta x\right) + C_2 e^{\alpha x} \sin\left(\beta x\right), \mathspace \text{ si } a = \alpha + i\beta = \bar{b} \not \in \mathbb{R}
+        \end{functionbypart}
+        pour des constantes arbitraires $C_1, C_2 \in \mathbb{R}$ et pour tout $x \in \mathbb{R}$.
+    }
+
+    \subparag{Note personnelle: Intuition}{
+        Il peut paraitre très bizarre de cherchez les racines du polynôme au départ. Cela fonctionne, mais il est aussi intéressant de savoir comment est-ce que les mathématiciens l'ont deviné aux premiers abords.
+
+        Nous avons donc l'équation suivante:
+        \[y''\left(x\right) + py'\left(x\right) + qy\left(x\right) = 0, \mathspace p, q \in \mathbb{R}\]
+
+        Nous savons que l'exponentielle est très pratique, donc faisons l'\textit{Ansatz} $y\left(x\right) = e^{\lambda x}$. Cela nous donne: 
+        \[\lambda^2 e^{\lambda x} + p \lambda e^{\lambda x} + q e^{\lambda x} = 0 \implies e^{\lambda x} \left(\lambda^2 + p\lambda + q\right) = 0\]
+        
+        Or, puisque l'exponentielle est non-nulle pour tout $x$, nécessairement, $\lambda^2 + p\lambda + q = 0$. Les deux solutions à cette équation nous donnent deux solutions linéairement indépendantes (nous allons définir ce concept juste après) à notre équation différentielle, sauf si $a = b$. Dans le cas où les solutions sont réelles, nous avons terminé, dans le cas où elles sont complexes nous pouvons les modifier de manière à obtenir un sinus et un cosinus. 
+
+        Notes que l'équation du mouvement d'un oscillateur harmonique amorti (un pendule avec des frottements de l'air, par exemple). Les trois possibilités de solutions correspondent aux trois régimes des oscillateurs harmoniques amortis: \textit{overdamped}, \textit{underdamped} et \textit{critically damped}.
+    }
+    
+}
+
+\parag{Exemple}{
+    Considérons l'équation différentielle suivante: 
+    \[y'' + 2y' + y = 0\]
+    
+    C'est une EDL2 homogène, donc nous cherchons les racines de l'équation caractéristique: 
+    \[\lambda^2 + 2\lambda + 1 = 0 \implies \left(\lambda + 1\right)^2 = 0 \implies a = b = -1\]
+    
+    On trouve alors que las solution générale est donnée par: 
+    \[y\left(x\right) = C_1e^{-x} + C_2 xe^{-x}, \mathspace \forall x \in \mathbb{R}, \forall x \in \mathbb{R}\]
+}
+
+
+\parag{EDL2 homogène}{
+    Considérons l'équation suivante: 
+    \[y''\left(x\right) + p\left(x\right) y'\left(x\right) + q\left(x\right) y\left(x\right) = 0, \mathspace p, q : I \mapsto \mathbb{R}\]
+
+    Nous pouvons faire les observations suivantes:
+    \begin{enumerate}
+        \item La solution générale d'une EDL2 homogène à coefficients constants contient 2 constantes arbitraires. En fait, c'est le cas pour les EDL2 homogènes en générale. Ce point est difficile à démontrer, et nous ne le feront pas dans ce cours.
+        \item Si $y_1\left(x\right)$ et $y_2\left(x\right)$ sont deux solutions d'une EDL2 homogène, alors la fonction suivante est aussi une solution: 
+            \[y\left(x\right) = A y_1\left(x\right) + By_2\left(x\right), \mathspace \text{où } A, B \in \mathbb{R}\]
+        
+            En effet, nous pouvons le vérifier trivialement \textit{(j'adore ce mot)}: 
+            \begin{multiequality}
+            & \left(A y_1\left(x\right) + By_2\left(x\right)\right)'' + p\left(x\right) \left(A y_1\left(x\right) + By_2\left(x\right)\right)' + q\left(x\right)\left(A y_1\left(x\right) + By_2\left(x\right)\right)  \\
+            =\ & A\underbrace{\left(y_1''\left(x\right) + p\left(x\right) y_1'\left(x\right) + q\left(x\right) y_1\left(x\right)\right)}_{= 0} + B\underbrace{\left(y_2''\left(x\right) + p\left(x\right) y_2'\left(x\right) + q\left(x\right)y_2\left(x\right)\right)}_{= 0} \\
+            =\ & 0 
+            \end{multiequality}
+            puisque $y_1\left(x\right)$ et $y_2\left(x\right)$ sont des solutions.
+    \end{enumerate}
+}
+
+\parag{Théorème}{
+    Une EDL2 homogène admet \textit{une seule solution} $y\left(x\right) : I \mapsto \mathbb{R}$ de classe $C^2$ telle que $y\left(x_0\right) = t$ et $y'\left(x_0\right) = s$ pour un $x_0 \in I$ et les nombres arbitraires $s, t \in \mathbb{R}$.
+
+    \subparag{Preuve}{
+        Nous acceptons ce théorème sans preuve dans ce cours, mais il est cohérent avec ce que nous avons trouvé jusque là (notamment avec l'observation qu'une solution a deux constantes).
+    }
+}
+
+\parag{Définition: indépendance linéaire}{
+    Deux solutions $y_1\left(x\right), y_2\left(x\right) : I \mapsto \mathbb{R}$ sont \important{linéairement indépendantes} s'il n'existe pas de constante $C \in \mathbb{R}$ telle que: 
+    \[y_2\left(x\right) = Cy_1\left(x\right) \text{ ou } y_1\left(x\right) = Cy_2\left(x\right), \mathspace \forall x \in I\]
+    
+    En particulier, cela implique que $y_1\left(x\right)$ et $y_2\left(x\right)$ ne sont pas des fonctions constantes égales à 0 sur $I$.
+
+    \subparag{Remarque}{
+        Le théorème que nous avons vu juste avant nous dit que les EDL2 homogènes possèdent exactement deux solutions linéairement indépendantes. En effet, il nous faut exactement deux constantes pour qu'il y ait exactement une solution qui respecte deux conditions initiales.
+    }
+}
+
+\parag{Construction d'une deuxième solution}{
+        Supposons que $v_1\left(x\right)$ est une solution de $y''\left(x\right) + p\left(x\right)y'\left(x\right) + q\left(x\right) y\left(x\right) = 0$ telle que $v_1\left(x\right) \neq 0$ pour tout $x \in I$. Nous nous demandons comment trouver une autre solution linéairement indépendante.
+
+        Prenons l'\textit{Ansatz} $v_2\left(x\right) = c\left(x\right) v_1\left(x\right)$ telle que $c\left(x\right)$ n'est pas constante (sinon la solution serait linéairement dépendante). Alors, on obtient que: 
+        \[v_2'\left(x\right) = c'\left(x\right) v_1\left(x\right) + c\left(x\right) v_1'\left(x\right)\]
+        \[v_2''\left(x\right) = c''\left(x\right) v_1\left(x\right) + 2c'\left(x\right)v_1'\left(x\right) + c\left(x\right)v_1''\left(x\right)\]
+
+        Ainsi, nous pouvons remplacer notre solution dans notre équation: 
+        \[c''\left(x\right) v_1\left(x\right) + 2c'\left(x\right) v_1'\left(x\right) + {\color{red}c\left(x\right)v_1''\left(x\right)} + p\left(x\right)c'\left(x\right) v_1\left(x\right) + {\color{red}p\left(x\right) c\left(x\right) v_1'\left(x\right) + q\left(x\right) c\left(x\right) v_1\left(x\right)} = 0\]
+
+        Les termes en rouge sont déjà égaux à 0 puisque $v_1\left(x\right)$ est une solution. Cela nous permet donc de simplifier notre équation en: 
+        \[c''\left(x\right)v_1\left(x\right) + 2c'\left(x\right) v_1'\left(x\right) + p\left(x\right)c'\left(x\right) v_1\left(x\right) = 0\]
+        
+        On suppose maintenant aussi que $v_1\left(x\right) \neq 0$ sur $I$ et $c'\left(x\right) \neq 0$ sur $I$ (ils ne s'annulent pas en aucun point de l'intervalle). Ceci nous donne donc que: 
+        \[\frac{c''\left(x\right)}{c'\left(x\right)} = -p\left(x\right) - 2 \frac{v_1'\left(x\right)}{v_1\left(x\right)}\]
+        qui est une EDVS pour $c'\left(x\right)$.
+
+        Nous pouvons intégrer des deux côté, en prenant $\log\left(C\right)$ comme constante: 
+        \[\log\left|c'\left(x\right)\right| = -P\left(x\right) - 2\log\left|v_1\left(x\right)\right| + \log\left(C\right) = \log\left(\frac{Ce^{-P\left(x\right)}}{v_1^2\left(x\right)}\right)\]
+        
+        Or, puisque le logarithme est une fonction bijective: 
+        \[c'\left(x\right) = \pm C \frac{e^{-P\left(x\right)}}{v_1^2\left(x\right)} = C_1 \frac{e^{-P\left(x\right)}}{v_1^2\left(x\right)}, \mathspace C_1 \in \mathbb{R}^*, C_1 = \pm C\]
+        
+        Nous pouvons maintenant intégrer: 
+        \[c\left(x\right) = \int c_1 \frac{e^{-P\left(x\right)}}{v_1^2\left(x\right)}dx + C_2, \mathspace C_2 \in \mathbb{R}\]
+        
+        On obtient alors que $v_2\left(x\right) = c\left(x\right) v_1\left(x\right)$ est une solution. Par exemple, nous pouvons prendre $C_1 = 1$ et $C_2 = 0$, ce qui nous donne une solution telle que $v_2\left(x\right)$ et $v_1\left(x\right)$ sont linéairement indépendantes: 
+        \[v_2\left(x\right) = c\left(x\right)v_1\left(x\right) = v_1\left(x\right) \int \frac{e^{-P\left(x\right)}}{v_1^2\left(x\right)}dx\]
+
+        Ainsi, à partir du moment où on trouve une solution particulière, nous sommes capable de trouver la solution générale.
+}
+
+\parag{Exemple}{
+    Prenons l'EDL2 homogène suivante: 
+    \[y'' + 2y' + y = 0\]
+    
+    \subparag{Solution 1}{
+        On remarque que $v_1\left(x\right) = e^{-x}$ est une solution pour $x \in \mathbb{R}$ telle que $v_1\left(x\right) \neq 0$ sur $\mathbb{R}$. On cherche une autre solution linéairement indépendante: 
+        \[p\left(x\right) = 2 \implies P\left(x\right) = 2x\]
+        \[v_2\left(x\right) = v_1\left(x\right) \int \frac{e^{-P\left(x\right)}}{v_1^2\left(x\right)}dx = e^{-x} \int \frac{e^{-2x}}{\left(e^{-x}\right)^2} = e^{-x} \int 1 dx = e^{-x} x\]
+
+        Nous avons donc obtenu que $v_1\left(x\right) = e^{-x}$ et $v_2\left(x\right) = xe^{-x}$ sont deux solutions linéairement indépendantes sur $\mathbb{R}$. Ainsi, d'après notre théorème, la solution générale de cette équation est: 
+        \[v\left(x\right) = C_1e^{-x} + C_2xe^{-x}, \mathspace C_1, C_2 \in\mathbb{R}, \forall x \in\mathbb{R}\]
+        
+        Notre solution est cohérente avec celle qu'on avait trouvée en utilisant la méthode de l'équation caractéristique.
+    }
+
+    \subparag{Solution 2}{
+        Cette fois, nous partons de $v_1\left(x\right) = xe^{-x}$ comme première solution, et nous essayons de trouver $v_2\left(x\right)$ linéairement indépendante. 
+
+        Prenons la solution de telle manière à ce qu'elle soit jamais égale à 0: 
+        \[v_1\left(x\right) = xe^{-x} \mathspace \text{sur } \left]-\infty, 0\right[ \text{ et } \left]0, +\infty\right[ \]
+        
+        Alors, on obtient: 
+        \[v_2\left(x\right) = c\left(x\right)v_1\left(x\right) = xe^{-x} \int \frac{e^{-P\left(x\right)}}{v_1^2\left(x\right)}dx = xe^{-x} \int \frac{e^{-2x}}{x^2 e^{-2x}} dx \]
+
+        Ce qu'on peut simplifier en:
+        \[v_2\left(x\right) = x e^{-x} \left(-\frac{1}{x}\right) = -e^{-x}, \mathspace \text{sur } \left]-\infty, 0\right[ \text{ et } \left]0, \infty\right[\]
+        
+
+        Cependant, puisque $e^{-x}$ est de classe $C^2$ sur $\mathbb{R}$ (elle est même de classe $C^{\infty}$), on peut coller nos deux solutions sans obtenir de singularité en 0, et on obtient alors: 
+        \[v_2\left(x\right) = -e^{-x}, \mathspace\forall x \in \mathbb{R}\]
+        
+        Nous avons donc obtenu les deux mêmes solutions linéairement indépendantes $v_1\left(x\right) = xe^{-x}$ et $v_2\left(x\right) = -e^{-x}$. Ainsi, la solution générale sur $\mathbb{R}$ est: 
+        \[v\left(x\right) = C_1 x e^{-x} + C_2e^{-x}\]
+
+        On a obtenu la même solution générale (et heureusement).
+    }
+
+    \subparag{Remarque}{
+        À l'examen, on ne va jamais nous demander de deviner une solution (contrairement aux exercices). Si nous avons besoin d'en obtenir une, alors elle nous sera donnée.
+    }
+    
+}
+
+
+\end{document}

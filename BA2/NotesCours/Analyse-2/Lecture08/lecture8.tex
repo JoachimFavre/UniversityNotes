@@ -1,0 +1,288 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-15 at 13:45:36.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Mardi 15 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2022-03-15}{J'ai failli ajouter un d à ce nom de théorème}{
+\begin{itemize}[left=0pt]
+    \item Définition d'adhérence et de frontière.
+    \item Définition des suites dans $\mathbb{R}^n$, de leur convergence, et du concept de suite bornée. 
+    \item Explication du théorème de Bolzano-Weierstrass.
+    \item Explication et preuve du théorème qui fait un lien entre les suites dans $\mathbb{R}^n$ et la topologie.
+    \item Définition d'ensemble borné, d'ensemble compact, et de recouvrement.
+    \item Explication du théorème de Heine-Borel-Lebesgue.
+\end{itemize}
+}
+
+\parag{Définition: Adhérence}{
+    Soit $E \subset \mathbb{R}^n$ un sous-ensemble non-vide.
+
+    L'intersection de tous les sous-ensembles fermés contenant $E$ est appelée \important{l'adhérence} de $E$. $\bar{E}$ est la notation de l'adhérence de $E$ dans $\mathbb{R}^n$.
+
+    \subparag{Remarque}{
+        On voit que si $E \subset \mathbb{R}^n$ est fermé, alors on a $E = \bar{E}$ par définition.
+    }
+
+    \subparag{Note personnelle: Intuition}{
+        Nous pouvons considérer $\mathbb{R}^1 = \mathbb{R}$.
+
+        Prenons par exemple $E = \left]1, 2\right] \cup \left\{6\right\}$. Alors, son adhérence est donnée par: 
+        \[\bar{E} = \left[1, 2\right] \cup \left\{6\right\}\]
+        
+        L'adhérence est donnée par l'ensemble en union avec sa frontière (concept qu'on va définir juste après).
+    }
+}
+
+\parag{Définition: Frontière}{
+    Soit un ensemble $E \subset \mathbb{R}^n$ non vide, où $E \neq \mathbb{R}^n$. 
+
+    Un point $\bvec{x} \in \mathbb{R}^n$ est un \important{point de frontière} de $E$ si toute boule ouverte de centre $\bvec{x}$ contient au moins un point de $E$ et au moins un point de $CE$.
+
+    L'ensemble des points de frontière de $E$ s'appelle la \important{frontière} de $E$, notée $\partial E$.
+
+    Nous définissons aussi les deux frontières suivantes: 
+    \[\partial \o = \o, \mathspace \partial \mathbb{R}^n = \o\]
+    
+}
+
+\parag{Exemple}{
+    Prenons le sous-ensemble suivant: 
+    \[E = \left\{\bvec{x} \in \mathbb{R}^n \telque x_i > 0, i = 1, \ldots, n\right\}\]
+    
+    C'est un sous-ensemble ouvert, comme nous l'avons déjà montré.
+
+    Pour trouver l'adhérence, nous pouvons prendre le plus petit sous-ensemble fermé de $E$: 
+    \[\bar{E} = \left\{\bvec{x} \in \mathbb{R}^n \telque x_i \geq 0, i = 1, \ldots n\right\}\]
+    
+    Nous pouvons aussi trouver la frontière: 
+    \[\partial E = \left\{\bvec{x} \in \mathbb{R}^n \telque \exists i\ x_i \neq 0, \forall j \neq i\ x_j \geq 0\right\}\]
+}
+
+\parag{Propriétés}{
+    Soit $E \subset \mathbb{R}^n$ non-vide. Alors, nous avons les propriétés suivantes:
+    \begin{enumerate}
+        \item $\mathring{E} \cap \partial E = \o$
+        \item $\mathring{E} \cup \partial E = \bar{E}$
+        \item $\partial E = \bar{E} \setminus \mathring{E}$
+    \end{enumerate}
+}
+
+\subsection{Suites dans $\mathbb{R}^n$}
+\parag{Définition: Suite dans $\mathbb{R}^n$}{
+    Une suite d'éléments de $\mathbb{R}^n$ est une application $f: \mathbb{N} \mapsto \mathbb{R}^n$: 
+    \[f: k \mapsto \bvec{x_k} = \begin{pmatrix} x_{1k} & \cdots & x_{nk} \end{pmatrix} \in \mathbb{R}^n\]
+    
+    $\left\{\bvec{x_k}\right\}_{k=0}^{\infty}$ est une suite d'éléments de $\mathbb{R}^n$.
+}
+
+\parag{Définition: Convergence}{
+    Une suite $\left\{x_k\right\}_{k=0}^{\infty}$ est \important{convergente} et admet pour \important{limite} $\bvec{x} \in \mathbb{R}^n$ si pour tout $\epsilon > 0$, il existe $k_0 \in \mathbb{N}$ tel que $\forall k \geq k_0$, nous avons: 
+    \[\left\|\bvec{x_k} - \bvec{x}\right\| \leq \epsilon\]
+    
+    Nous notons: 
+    \[\lim_{k \to \infty} \bvec{x_k} = \bvec{x}\]
+
+    \subparag{Remarque}{
+        Notez que $\left\|\bvec{x_k} - \bvec{x}\right\| \leq \epsilon$ est équivalent à $\bvec{x_k} \in \bar{B\left(\bvec{x}, \epsilon\right)}$.
+    }
+}
+
+\parag{Proposition}{
+    Soit $\bvec{x} = \begin{pmatrix} x_1 & \cdots & x_n \end{pmatrix} \in \mathbb{R}^n$. Alors:
+    \[\lim_{k \to \infty} \bvec{x_k} = \bvec{x} \iff \lim_{k \to \infty} x_{j, k} = x_j, \mathspace \forall j = 1, \ldots, n\]
+
+
+    \subparag{Preuve}{
+        En effet, nous savons que: 
+        \[\epsilon \geq \left\|\bvec{x_k} - \bvec{x}\right\| = \left(\sum_{j=1}^{n} \left(x_{j, k} - x_{j}\right)^2\right)^{\frac{1}{2}}\]
+
+        Puisque c'est une somme, de termes positifs, nous avons $\left(x_{j, k} - x_{j}\right)^2 \leq \epsilon_j \leq \epsilon$. Ainsi, nous pouvons rendre $x_{j,k}$ et $x_j$ arbitrairement proches en augmentant $k$, ce qui est la définition de la limite.
+
+        \qed
+    }
+}
+
+
+\parag{Définition: Suite bornée}{
+    Une suite $\left\{\bvec{x_k}\right\}$ est \important{bornée} s'il existe un $M > 0$ tel que $\left\{\bvec{x_k}\right\}$ est contenue dans la boule fermée $\bar{B\left(\bvec{0}, M\right)}$.
+}
+
+
+\parag{Propriétés}{
+    \begin{enumerate}[left=0pt]
+        \item La liste d'une suite $\left\{\bvec{x_k}\right\}$, si elle existe, est unique.
+        \item Toute suite convergente $\left\{\bvec{x_k}\right\}$ est bornée.
+    \end{enumerate}
+    
+    \subparag{Justification de la propriété 2}{
+        Par définition, si une suite est convergente, alors $\lim_{k \to \infty} \bvec{x_k} = \bvec{x}$. Cela implique donc que, pour $\epsilon = 1$ par exemple, il existe $k_0 \in \mathbb{N}$ tel que pour tout $k \geq k_0$, nous avons $\left\|\bvec{x_k} - \bvec{x}\right\| \leq\epsilon = 1$, donc que pour $k \geq k_0$, $x_k \in \bar{B\left(\bvec{x}, \epsilon\right)}$. Puisqu'il y a un un nombre fini de points $\bvec{x_0}, \ldots, \bvec{x_{k_{0} - 1}}$. En prenant en compte la distance maximale à l'origine de cette boule, et la distance maximale de ces points (qui existe puisqu'il y en a un nombre finis), nous avons trouvé un $M > 0$ tel que $\bvec{x_k} \in \bar{B\left(\bvec{0}, M\right)}$.
+
+        \imagehere[0.7]{SuiteConvergenteEstBorneeDansRn.png}
+    }
+}
+
+\parag{Théorème de Bolzano-Weierstrass}{
+    Nous pouvons extraire une sous-suite convergente de toute suite bornée $\left\{\bvec{x_k}\right\} \subset \mathbb{R}^n$.
+}
+
+\parag{Théorème: Lien entre les suites dans $\mathbb{R}^n$ et la topologie}{
+    Un sous-ensemble non-vide $E \subset \mathbb{R}^n$ est fermé si et seulement si toute suite $\left\{\bvec{x_k}\right\} \subset E$ d'éléments de $E$ qui converge a pour limite un élément de $E$.
+
+    \demonstrationaconnaitre
+
+    \subparag{Preuve $\implies$}{
+        Nous supposons que $E \subset \mathbb{R}^n$ est fermé.
+
+        Supposons par l'absurde qu'il existe une suite $\left\{\bvec{x_k}\right\} \subset E$ d'éléments de $E$ qui converge et qui a pour limite $\bvec{x} \not\in E$. Ainsi, on sait que $\bvec{x} \in CE$, qui est un ensemble ouvert dans $\mathbb{R}^n$ (puisque $E$ est fermé par hypothèse). Puisque cet ensemble ouvert nous savons, par définition, que $\exists \delta > 0$ tel que: 
+        \[B\left(\bvec{x}, \delta\right) \subset CE\]
+      
+        Or, cela implique que: 
+        \[\underbrace{\left\{\bvec{x_k}\ \forall k \in \mathbb{N}\right\}}_{\subset E} \cap \underbrace{B\left(\bvec{x}, \delta\right)}_{\subset CE} = \o\]
+
+        En d'autres mots, aucun élément de la suite ne fait partie de cette boule ouverte.
+
+        De l'autre côté, puisque $\lim_{k \to \infty} \bvec{x_k}$, nous avons qu'il existe un $k_0 \in \mathbb{N}$ tel que pour tout $k \geq k_0$: 
+        \[\bvec{x_k} \in \bar{B\left(\bvec{x}, \frac{\delta}{2}\right)} \subset B\left(\bvec{x}, \delta\right)\]
+
+        En d'autres mots, pour $k \geq k_0$, $\bvec{x_k}$ fait partie de notre boule ouverte. Ceci entre en contradiction avec ce que nous avions vu ci-dessus.
+
+        \qed
+    }
+    
+    \subparag{Preuve $\impliedby$}{
+        Nous allons démontrer notre proposition par la contraposée: nous voulons montrer que si $E \subset \mathbb{R}^n$ n'est pas fermé, alors il existe une suite $\left\{\bvec{x_k} \subset E\right\}$ d'éléments de $E$ qui converge et qui a pour un limite un élément qui n'est pas dans $E$.
+
+        Puisque nous savons que $E$ n'est pas fermé, nous savons que $CE$ n'est pas ouvert. Ainsi, $\exists \bvec{y} \in CE$ tel que, pour tout $\epsilon > 0$:  
+        \[B\left(\bvec{y}, \epsilon\right) \cap E \neq \o\]
+        
+        Plus précisément, on peut prendre $\epsilon = \frac{1}{k}$, ce qui nous donne:
+        \[\forall k \in \mathbb{N}_+, \ B\left(\bvec{y}, \frac{1}{k}\right)\]
+        
+        Ceci implique que, pour tout $k$, on sait qu'il existe un $\bvec{y_k}$ tel que $\bvec{y_k} \in B\left(\bvec{y}, \frac{1}{k}\right)$ et $\bvec{y_k} \in E$. Ceci nous donne une suite $\left\{\bvec{y_k}\right\}_{k \in \mathbb{N}_+} \subset E$ telle que $\lim_{k \to \infty} \bvec{y_k} = \bvec{y} \in CE$, et donc $\bvec{y} \not\in E$.
+
+        \qed
+    }
+}
+
+\parag{Remarque}{
+    Pour construire l'adhérence $\bar{E}$ d'un sous-ensemble non-vide $E \subset \mathbb{R}^n$, il faut et il suffit d'ajouter les limites de toutes suites convergentes d'éléments de $E$.
+
+    \subparag{Exemple}{
+        Dans $\mathbb{R}^1 = \mathbb{R}$, si on prend toutes les suites d'éléments de $\left[0, 1\right[ $, il y a des suites qui convergent vers toutes les valeurs entre 0 et 1, compris.
+    }
+}
+
+\parag{Définition: Ensemble borné}{
+    Un ensemble $E \subset \mathbb{R}^n$ est \important{borné} s'il existe un $M > 0$ tel que: 
+    \[E \subset \bar{B\left(\bvec{0}, M\right)}\]
+    
+}
+
+
+\parag{Définition: Ensemble compact}{
+    Un sous-ensemble non-vide $E \subset \mathbb{R}^n$ est \important{compact} s'il est fermé et borné.
+}
+
+\parag{Exemple 1}{
+    Prenons une boule fermée quelconque: 
+    \[\bar{B\left(\bvec{x}, \delta\right)} = \left\{\bvec{y} \in \mathbb{R}^n \telque \left\|\bvec{x} - \bvec{y}\right\| \leq \delta\right\}\]
+    
+    Nous savons qu'elle est bornée car: 
+    \[\bar{B\left(\bvec{x} , \delta\right)} \subset \bar{B\left(\bvec{0}, \left\|\bvec{x}\right\| + \delta\right)}\]
+    
+    On peut donc en déduire qu'une boule fermée est compacte.
+}
+
+\parag{Exemple 2}{
+    Prenons l'ensemble suivant, où $n \geq 2$: 
+    \[E = \left\{\bvec{x} \in \mathbb{R}^n \telque x_1 = 0\right\}\]
+
+    Il est clairement fermé, on peut prendre n'importe quelle boule centrée sur la droite définie par $CE$ ($x_1 = 0$), il est impossible de trouver un $\delta$ qui fait qu'elle est entièrement inclue dans $CE$.
+
+    Cependant, nous pouvons aussi voir que $E$ n'est pas borné. Prenons la suite suivante: 
+    \[\left\{\bvec{a_k} = \left(0, k, 0, 0, \cdots\right)\right\}_{k \in \mathbb{N}} \subset E\]
+    
+    Les normes forment la suite $\left\|\bvec{a_k}\right\| = k \in \mathbb{N}$. La distance entre l'origine et les éléments de $\left(\bvec{a_k}\right)$ n'est donc pas bornée, ce qui nous permet d'en déduire que $E$ n'est pas borné. Ainsi, $E$ n'est pas compact.
+}
+
+\parag{Définition: Recouvrement}{
+    Un \important{recouvrement} d'un ensemble $E$ est défini par: 
+    \[E \subset \bigcup_{i \in I} A_i, \mathspace A_i \subset \mathbb{R}^n \text{ ouverts}\]
+
+    Notez que $I$ peut être innombrable.
+
+    \svghere[0.5]{DefinitionRecouvrement.svg}
+}
+
+
+\parag{Théorème de Heine-Borel-Lebesgue}{
+    Un sous-ensemble non-vide $E \subset \mathbb{R}^n$ est compact si et seulement si de \textit{tout} recouvrement de $E$ par des sous-ensembles ouverts dans $\mathbb{R}^n$ on peut extraire une famille finie d'ensembles qui forment un recouvrement de $E$.
+}
+
+\parag{Exemple 1.1}{
+    Une droite dans $\mathbb{R}^n$, où $n \geq 2$, est fermée mais pas bornée, et donc pas compacte.
+
+    Prenons une origine quelconque sur la droite, et numérotons là comme la droite des réelles. Alors, nous pouvons prendre le recouvrement suivant: 
+    \[E \subset \bigcup_{n \in \mathbb{Z}} B\left(n, \frac{2}{3}\right)\]
+
+    \imagehere[1]{HeineBorelLebesgueNonExample1.png}
+    
+    On ne peut clairement pas choisir de sous-recouvrement fini qui recouvre $E$. Si on jette une-seule boule, ce qui reste ne couvrira pas notre ensemble.
+}
+
+\parag{Exemple 1.2}{
+    Un intervalle ouvert dans $\mathbb{R}^1 = \mathbb{R}$, $E = \left]0, 1\right[ \subset \mathbb{R}$ n'est pas compact. Il est bien borné, mais pas fermé.
+
+    Prenons le recouvrement suivant: 
+    \[E \subset \bigcup_{i \in \mathbb{N}_+} \left]0, \frac{i}{i+1}\right[ \]
+    
+    \imagehere{HeineBorelLebesgueNonExample2.png}
+
+    Il est aussi impossible de choisir un sous-recouvrement fini. En effet, avec un nombre fini d'intervalles, alors il existe un $i$ qui est le plus grand, et donc nous n'atteignons pas les valeurs entre $\frac{i}{i+1}$ et $1$.
+}
+
+\parag{Exemple 2.1}{
+    Prenons l'ensemble suivant: 
+    \[A = \left\{\left(x, y\right) \in \mathbb{R}^2 \telque 1 > \sin\left(x + y\right) \geq -2\right\}\]
+
+    Nous remarquons que $\sin\left(x + y\right) \geq -2$ tient toujours, $\forall \left(x, y\right) \in \mathbb{R}^2$. Pour l'autre condition, nous avons besoin de: 
+    \[\sin\left(x + y\right) \neq 1 \iff x + y \neq \frac{\pi}{2} + 2k\pi \iff y \neq -x + \frac{\pi}{2} + 2k\pi\]
+    
+    On obtient donc que: 
+    \[CA = \left\{\left(x, y\right) \in \mathbb{R}^2 \telque y = -x + \frac{\pi}{2} + 2k\pi\right\}\]
+    
+    Or, c'est une union de droites, donc il est clairement fermé. On obtient ainsi que $A$ est ouvert.
+
+}
+
+\parag{Exemple 2.2}{
+    Prenons l'ensemble suivant: 
+    \[B = \left\{\left(x, y\right)\in \mathbb{R}^2 \telque \sqrt{xy} < 2\right\}\]
+    
+    Pour que $\sqrt{xy}$ existe, nous avons besoin de $xy \geq 0$. De plus, nous avons aussi la condition $\sqrt{xy} < 2 \implies xy < 4$.
+
+    Nous avons donc deux cas. Si $x > 0$, alors $y \geq 0$ et: 
+    \[xy < 4 \iff y < \frac{4}{x}\]
+    
+    Si $x < 0$, alors $y \leq 0$ et: 
+    \[xy < 4 \iff y > \frac{4}{x}\]
+    
+    Si $x = 0$, alors $y$ est arbitraire.
+
+    \imagehere[0.5]{TopologieExempleOuvertsFermes.png}
+
+    Les axes sont inclus dans notre sous-ensembles, mais pas les courbes. Ainsi, $B$ n'est ni ouvert ni fermé.
+}
+
+
+
+
+\end{document}

@@ -1,0 +1,317 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-14 at 10:16:46.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Lundi 14 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2022-03-14}{On introduit pleins de symboles marrants}{
+\begin{itemize}[left=0pt]
+    \item Définition des opérations, de la base canonique, du produit scalaire, de la norme Euclidienne et de la distance dans $\mathbb{R}^n$; et démonstration de certaines de leurs propriétés.
+    \item Introduction à la topologie dans $\mathbb{R}^n$. Ainsi, définition d'une boule ouverte, d'un ensemble ouvert, d'un point intérieur, de l'intérieur d'un ensemble, du complémentaire d'un ensemble et d'un ensemble fermé; et démonstration de certaines de leurs propriétés. 
+    \item Beaucoup d'exemple d'ensembles ouverts, fermés, et ni l'un ni l'autre.
+\end{itemize}
+
+}
+
+\section{Espace $\mathbb{R}^n$}
+\subsection{$\mathbb{R}^n$ est un espace vectoriel normé}
+\parag{Définition}{
+    $\mathbb{R}^n$ est un ensemble de tous les $n$-tuples ordonnés de nombres réels. 
+    \[\bvec{x} = \begin{pmatrix} x_1 & \cdots & x_n \end{pmatrix} = \begin{pmatrix} x_1 \\ \vdots \\ x_n \end{pmatrix} \in \mathbb{R}^{n}\]
+    
+    On dit parfois que $\bvec{x}$ est un point (élément) de $\mathbb{R}^n$.
+}
+
+\parag{Opérations de $\mathbb{R}^n$}{
+    $\mathbb{R}^n$ est muni de deux opérations. La première est l'addition $+$: 
+    \[\bvec{x} = \begin{pmatrix} x_1 & \cdots & x_n \end{pmatrix}, \bvec{y} = \begin{pmatrix} y_1 & \cdots & y_n \end{pmatrix} \implies \bvec{x} + \bvec{y} \over{=}{déf} \begin{pmatrix} x_1 + y_1 & \cdots & x_n + y_n \end{pmatrix}\]
+    
+    La deuxième est la multiplication par un nombre réel $\lambda \in \mathbb{R}$: 
+    \[\bvec{x} = \begin{pmatrix} x_1 & \cdots & x_n \end{pmatrix} \implies \lambda \bvec{x} \over{=}{déf} \begin{pmatrix} \lambda x_1 & \cdots & \lambda x_n \end{pmatrix}\]
+
+    \subparag{Propriétés}{
+        On remarque que les opérations satisfont les propriétés suivantes, pour tout $\bvec{x}, \bvec{y} \in \mathbb{R}^n$, $\lambda, \lambda_1, \lambda_2 \in \mathbb{R}$.
+        \begin{itemize}
+            \item $\left(\lambda_1 \lambda_2\right) \bvec{x} = \lambda_1 \left(\lambda_2 \bvec{x}\right) = \lambda_2 \left(\lambda_1 \bvec{x}\right)$
+            \item $0 \bvec{x} = \begin{pmatrix} 0 & \cdots & 0 \end{pmatrix} = \bvec{0}$
+            \item $1 \bvec{x}= \bvec{x}$
+            \item $\left(\lambda_1 + \lambda_2\right)\bvec{x} = \lambda_1 \bvec{x} + \lambda_2 \bvec{x}$
+            \item $\lambda\left(\bvec{x} + \bvec{y}\right) = \lambda \bvec{x} + \lambda \bvec{y}$
+        \end{itemize}
+    }
+    
+}
+
+\parag{Base}{
+    Nous avons défini $\mathbb{R}^n$ comme des $n$-tuples ordonnés de nombres réels (et non de manière géométrique). Nous pouvons donc prendre la base: 
+    \[\left\{\bvec{e}_i = \begin{pmatrix} 0 & \cdots & 0 & 1 & 0 & \cdots & 0 \end{pmatrix} \right\}_{i=1^n} \implies \bvec{e}_i \in \mathbb{R}^{n}, \mathspace i = 1, \ldots, n\]
+    où $\bvec{e}_i$ a uniquement un 1 à la $i$-ème position.
+
+    On remarque que n'importe quel élément de $\mathbb{R}^n$ peut s'écrire comme combinaison linéaire de cette base: 
+    \[\bvec{x} = \sum_{i=1}^{n} x_i \bvec{e}_i = \begin{pmatrix} x_1 & \cdots & x_n \end{pmatrix} \]
+}
+
+\parag{Définition: Produit scalaire}{
+    Nous définissons \important{le produit scalaire} comme: 
+    \[\left<\bvec{x}, \bvec{y}\right> \over{=}{déf} \sum_{i=1}^{n}  x_i y_i = x_1 y_1 + \ldots + x_n y_n \]
+}
+
+\parag{Définition: Norme Euclidienne}{
+    Nous définissons la norme Euclidienne comme: 
+    \[\left\|\bvec{x}\right\| \over{=}{déf} \sqrt{\left<\bvec{x}, \bvec{x}\right>} = \sqrt{\sum_{i=1}^{n} x_i^2}\]
+    
+    \subparag{Propriétés}{
+        \begin{enumerate}[left=0pt]
+            \item La norme est toujours positive:
+            \[\left\|\bvec{x}\right\| \geq 0 \mathspace \forall \bvec{x} \in \mathbb{R}^n\]
+
+            \item Si $\left\|\bvec{x}\right\| = 0$, alors: 
+            \[\bvec{x} = \bvec{0}\]
+            
+            \item Linéarité: 
+            \[\left\|\lambda \bvec{x}\right\| = \left|\lambda\right| \left\|\bvec{x}\right\|, \mathspace \bvec{x} \in \mathbb{R}^n, \lambda \in \mathbb{R}\]
+
+            \item Inégalité de Cauchy-Schwartz: 
+            \[\left|\left<\bvec{x}, \bvec{y}\right>\right| \leq \left\|\bvec{x}\right\|\cdot \left\|\bvec{y}\right\|\]
+
+            \item Inégalité triangulaire 1: 
+            \[\left\|\bvec{x} + \bvec{y}\right\| \leq \left\|\bvec{x}\right\| + \left\|\bvec{y}\right\|, \mathspace \forall \bvec{x}, \bvec{y} \in \mathbb{R}^n\]
+
+            \item Inégalité triangulaire 2: 
+            \[\left\|\bvec{x} - \bvec{y}\right\| \geq \left|\left\|\bvec{x}\right\| - \left\|\bvec{y}\right\|\right|\]
+        \end{enumerate}
+        
+    }
+
+    \subparag{Preuve de l'inégalité de Cauchy-Schwartz}{
+        Soit $\lambda\in \mathbb{R}$. Considérons la somme $\sum_{i=1}^{n} \left(\lambda x_i + y_i\right)^2$.
+
+        Nous savons que $\sum_{i=1}^{n} \left(\lambda x_i + y_i\right)^2 \geq 0$, puisque c'est une somme de termes positifs: 
+        \[0 \leq \sum_{i=1}^{n} \left(\lambda x_i + y_i\right)^2 = \sum_{i=1}^{n} \left(\lambda^2 x_i^2 + 2x_i y_i + y_i^2\right)\]
+        Et donc: 
+        \[0 \leq \underbrace{\left(\sum_{i=1}^{n} x_i^2\right)}_{a}\lambda^2 + \underbrace{2\left(\sum_{i=1}^{n} x_i y_i\right)}_{b} \lambda + \underbrace{\left(\sum_{i=1}^{n} y_i^2\right)}_{c}, \mathspace \forall \lambda \in \mathbb{R}\]
+
+        On obtient ainsi une équation quadratique selon $\lambda$ qui est toujours positive. Ainsi, on remarque qu'il est impossible que cette équation ait deux racines, sinon, par le théorèmes des valeurs intermédiaires, elle serait négatives en certain point. En d'autres mots, elle a donc un discriminant négatif:
+        \[b^2 - 4ac \leq 0 \implies 4\underbrace{\left(\sum_{i=1}^{n} x_i y_i\right)^2}_{= \left<\bvec{x}, \bvec{y}\right>^2} - 4\underbrace{\left(\sum_{i=1}^{n} x_i^2\right)}_{= \left\|\bvec{x}\right\|^2}\underbrace{\left(\sum_{i=1}^{n} y_i^2\right)}_{= \left\|\bvec{y}\right\|^2} \leq 0\]
+
+        Ce qui implique que: 
+        \[\left\|\bvec{x}\right\|^2 \cdot \left\|\bvec{y}\right\|^2 = \left<\bvec{x}, \bvec{y}\right>^2 \implies \left\|\bvec{x}\right\| \cdot \left\|\bvec{y}\right\| \geq \left|\left<\bvec{x}, \bvec{y}\right>\right|\]
+        
+        Puisque $\left\|\bvec{x}\right\|$ et $\left\|\bvec{y}\right\|$ sont positifs, nous pouvons enlever leur valeur absolue. Cependant, nous ne pouvons pas enlever celle du produit scalaire, car elle peut être négative.
+
+        \qed
+    }
+    
+    \subparag{Preuve de l'inégalité triangulaire 1}{
+        Nous savons que: 
+        \[\left\|\bvec{x} + \bvec{y}\right\|^2 = \left<\bvec{x}, \bvec{x}\right> + 2\left<\bvec{x}, \bvec{y}\right> + \left<\bvec{y}, \bvec{y}\right>\]
+
+        Aussi:
+        \[\left(\bvec{x} + \bvec{y}\right)^2 = \left<\bvec{x}, \bvec{x}\right> + 2\left\|\bvec{x}\right\|\left\|\bvec{y}\right\| - \left<\bvec{y}, \bvec{y}\right>\]
+
+        Ainsi, si on regarde la différence entre ces deux équations: 
+        \[\left\|\bvec{x} + \bvec{y}\right\|^2 - \left(\bvec{x} + \bvec{y}\right)^2 = 2\left<x, y\right> - 2\left\|\bvec{x}\right\|\left\|\bvec{y}\right\| \leq 0\]
+        par Cauchy-Schwartz.
+
+        Puisque les deux termes sont positifs, nous pouvons prendre une racine carrée sans valeur absolue, ce qui nous donne:
+        \[\left\|\bvec{x} + \bvec{y}\right\| \leq \left\|\bvec{x}\right\| + \left\|\bvec{y}\right\|\]
+
+        \qed
+    }
+}
+
+\parag{Définition: Distance}{
+    L'expression $\left\|\bvec{x} - \bvec{y}\right\| = d\left(\bvec{x}, \bvec{y}\right)$ est appelée \important{la distance} entre $\bvec{x}$ et $\bvec{y}$ dans $\mathbb{R}^n$.
+
+    \subparag{Propriétés}{
+        \begin{enumerate}[left=0pt]
+            \item $d\left(\bvec{x}, \bvec{y}\right) = d\left(\bvec{y}, \bvec{x}\right)$
+            \item $d\left(\bvec{x}, \bvec{y}\right) = 0 \iff \bvec{x} = \bvec{y}$
+            \item $d\left(\bvec{x}, \bvec{y}\right) \leq d\left(\bvec{x}, \bvec{z}\right) + d\left(\bvec{z}, \bvec{y}\right)$
+        \end{enumerate}
+    }
+}
+
+\subsection{Topologie dans $\mathbb{R}^n$}
+\parag{Définition: Boule ouverte}{
+    Pour tout $\bvec{x} \in \mathbb{R}^n$ et nombre réel $\delta > 0$, soit:
+    \[B\left(\bvec{x}, \delta\right) = \left\{\bvec{y} \in\mathbb{R}^n \telque \left|\bvec{x} - \bvec{y}\right| < \delta\right\}\]
+
+    $B\left(\bvec{x}, \delta\right) \subset \mathbb{R}^n$ est appelé la \important{boule ouverte} de centre $\bvec{x}$ et rayon $\delta$.
+
+    \imagehere[0.5]{DefinitionBouleOuverte.png}
+}
+
+\parag{Définition: Ensemble ouvert}{
+    Nous définissons que $E \subset \mathbb{R}^n$ est \important{ouvert} si et seulement si:
+    \[\forall \bvec{x}\in E\ \exists \delta > 0 \telque B\left(\bvec{x}, \delta\right) \subset E\]
+
+    \subparag{Remarque}{
+        Notez que, selon cette définition, $\o$ est un ensemble ouvert. En effet, $\forall x \in \o\ P\left(x\right)$ est une tautologie, peu importe $P\left(x\right)$.
+    }
+}
+
+\parag{Définition: Point intérieur}{
+    Soit $E \subset \mathbb{R}^n$ non-vide. Alors, $\bvec{x} \in E$ est un \important{point intérieur} de $E$ s'il existe $\delta > 0$ tel que $B\left(\bvec{x}, \delta\right) \subset E$.
+
+    L'ensemble des points intérieurs de $E$ est appelé \important{l'intérieur} de $E$, noté $\mathring{E}$.
+
+    Clairement: 
+    \[\mathring{E} \subset E\]
+    
+    \subparag{Observation}{
+        Soit $E \subset\mathbb{R}^n$ non-vide.
+
+        On remarque que $E \subset\mathbb{R}^n$ est ouvert si et seulement si $\mathring{E} = E$.
+    }
+
+    \subparag{Note personnelle: 1D}{
+        Regardons cette définitions en une dimension, dans $\mathbb{R}^1 = \mathbb{R}$. Nous obtenons par exemple que l'intérieur de $\left]1, 2\right] \cup \left[5, 7\right[ \cup \left\{9\right\}$ est: 
+        \[\left]1, 2\right[ \cup \left]5, 7\right[ \]
+    }
+}
+
+\parag{Proposition}{
+    La boule ouverte $B\left(\bvec{x}, \delta\right)$ est un ensemble ouvert.
+
+    \subparag{Preuve}{
+        Prenons $\widetilde{\delta} = \delta - \left\|\bvec{x} - \bvec{y}\right\|$, la distance entre $\bvec{y}$ et le bord de la boule. Par la définition de la boule ouverte, on sait que:
+        \[\left|\bvec{x} - \bvec{y}\right| < \delta \implies \widetilde{\delta} = \delta - \left\|\bvec{x} - \bvec{y}\right\| > 0\]
+
+        Nous pouvons prendre une boule ouverte $B\left(\bvec{y}, \frac{\widetilde{\delta}}{2}\right)$ qui est clairement inclue dans $B\left(\bvec{x}, \delta\right)$.
+
+        Ansi, on ne déduit que $B\left(\bvec{x}, \delta\right) \subset \mathbb{R}^n$ est un sous-ensemble ouvert de $\mathbb{R}^n$ pour tout $\bvec{x}\in \mathbb{R}^n$ et pour tout $\delta > 0$.
+
+        \imagehere[0.75]{BouleOuverteEstOuverte.png}
+    }
+}
+
+\parag{Exemple 1}{
+    Nous voulons montrer que l'ensemble suivant est ouvert:
+    \[E = \left\{\bvec{x} \in\mathbb{R}^n \telque x_i > 0, \forall i = 1, \ldots, n\right\}\]
+
+    Soit $\bvec{y} \in E$. Alors, nous pouvons prendre $B\left(\bvec{y}, \min\left(y_i\right)\right) \subset E$. 
+
+    \imagehere[0.5]{TopologieEnsembleOuvertExemple1.png}
+}
+
+\parag{Exemple 2}{
+    Nous savons déjà que $\o \subset \mathbb{R}^n$ est ouvert par définition. Nous voulons aussi montrer que $\mathbb{R}^n \subset\mathbb{R}^n$ est un sous-ensemble ouvert.
+
+    Soit $x \in \mathbb{R}^n$. Nous pouvons prendre n'importe quel $\delta > 0$, et nous avons $B\left(\bvec{x}, \delta\right) \subset\mathbb{R}^n$.
+}
+
+\parag{Exemple 3}{
+    Soit $n \geq 2$. Nous définissons l'ensemble suivant: 
+    \[E = \left\{\bvec{x} \in \mathbb{R}^n \telque x_1 = 0, x_i > 0, i = 2, ..., n\right\}\]
+    
+    Nous voulons montrer qu'il n'est pas ouvert. 
+
+    Prenons le point $\bvec{y} = \begin{pmatrix} 0 & y_2 & \cdots & y_n \end{pmatrix} $ où $y_2, \ldots, y_n > 0$. Alors, pour tout $\delta > 0$:
+    \[B\left(\bvec{x}, \delta\right) \ni \begin{pmatrix} \frac{\delta}{2} & y_2 & \cdots & y_n \end{pmatrix} \not\in E\]
+}
+
+\parag{Propriétés}{
+    \begin{enumerate}[left=0pt]
+        \item Toute réunion (même infinie) $\bigcup_{i \in I} E_i$ de sous-ensembles ouverts est un sous-ensemble ouvert. 
+        \item Toute intersection \textit{finie} $\bigcap_{i=1}^n E_i$ de sous-ensembles ouverts est un sous-ensemble ouvert. 
+    \end{enumerate}
+
+    \subparag{Preuve de la propriété 1}{
+        Si $\bvec{x} \in \bigcup_{i \in I} E_i$, alors nous savons que $\bvec{x} \in E_j$ pour un indice $j$. Or, puisque $E_j$ est ouvert, il existe un $\delta > 0$ tel que $B\left(\bvec{x}, \delta\right) \subset E_j \subset \bigcup_{i \in I} E_i$.
+
+        \qed
+    }
+    
+    \subparag{Preuve de la propriété 2}{
+            Soit $\bvec{x} \in \bigcap_{i=1}^n E_i$. Alors, nous savons que pour tout $j$, $\bvec{x} \in E_j$. Puisque $E_j$ est ouvert pour tout $j$, il existe $\delta_j > 0$ tel que $B\left(\bvec{x}, \delta_j\right) \subset E_j$. Puisqu'on a un nombre fini d'éléments, nous savons que $\min_j \delta_j$ existe. Donc: 
+            \[B\left(\bvec{x}, \min_j \delta_j\right) \subset E_j\ \forall j \implies B\left(\bvec{x}, \min_j \delta_j\right) \subset \bigcap_{i=1}^n E_i = E\]
+
+            \qed
+
+
+            Nous pouvons aussi remarquer qu'une intersection infinie de sous-ensembles ouverts de $\mathbb{R}^n$ n'est pas nécessairement ouvert: 
+            \[\bigcap_{k=1}^{\infty} B\left(\bvec{0}, \frac{1}{k}\right) = \left\{\bvec{0}\right\} \subset \mathbb{R}^n\]
+    }
+}
+
+\parag{Définition: Complémentaire d'un ensemble}{
+    Soit $E \subset \mathbb{R}^n$. Son \important{complémentaire}, noté $CE$, est défini par: 
+    \[CE \over{=}{déf} \left\{\bvec{x} \in \mathbb{R}^n \telque \bvec{x} \not\in E\right\} = \mathbb{R}^n \setminus E\]
+}
+
+
+\parag{Définition: Ensemble fermé}{
+    Soit $E \subset \mathbb{R}^n$ un sous-ensemble. $E$ est \important{fermé} dans $\mathbb{R}^n$ si son complémentaire $CE$ est ouvert.
+}
+
+
+\parag{Exemple 1}{
+    Nous savons que l'ensemble suivant est fermé:
+    \[E = \left\{\bvec{y} \in \mathbb{R}^n \telque \left\|\bvec{x} - \bvec{y}\right\| \geq \delta\right\}\]
+
+    En effet, $E = CB\left(\bvec{x}, \delta\right) \subset \mathbb{R}^n$, et nous savons que $B\left(\bvec{x}, \delta\right)$ est un sous-ensemble ouvert.
+}
+
+\parag{Exemple 2}{
+    Soit $E = \left\{\bvec{x}\right\} \in \mathbb{R}^n$. Nous voulons montrer qu'il est fermé. Ceci est équivalent à montrer que son complémentaire est ouvert: 
+    \[CE = \left\{\bvec{y} \in \mathbb{R}^n \telque\left\|\bvec{y} - \bvec{x}\right\| > 0\right\}\]
+    
+    Pour tout $\bvec{y} \in CE$, nous pouvons prendre la boule: 
+    \[B\left(\bvec{y}, \frac{1}{2} \left\|\bvec{y} - \bvec{x}\right\|\right) \subset CE\]
+}
+
+\parag{Exemple 3}{
+    Nous voulons montrer que l'ensemble suivant est fermé: 
+    \[E = \left\{\bvec{x} \in\mathbb{R}^n \telque x_1 = 0\right\} \implies CE = \left\{\bvec{x} \in \mathbb{R}^n \telque x_1 \neq 0\right\}\]
+    
+    Montrons que $CE$ est ouvert. Soit $\bvec{z} \in CE$, donc $z_1 \neq 0$. Alors, nous pouvons prendre: 
+    \[B\left(\bvec{z}, \frac{1}{2} \left|z_1\right|\right) \subset CE\]
+}
+
+\parag{Exemple 4}{
+    Soit l'ensemble suivant, où $n \geq 2$: 
+    \[E = \left\{\bvec{x} \in \mathbb{R}^n \telque x_1 = 0, x_i > 0,  i = 2, \ldots, n\right\}\]
+
+    Son complémentaire est donné par: 
+    \[CE = \left\{\bvec{x} \in \mathbb{R}^n \telque x_1 \neq0\right\} \cup \bigcup_{i=2}^n \left\{\bvec{x} \in \mathbb{R}^n \telque x_i \leq 0\right\}\]
+    
+    Nous allons montrer que $CE$ n'est pas ouvert. Soit $\bvec{y} = \begin{pmatrix} 0 & 0 & y_3 & \cdots & y_n \end{pmatrix} \in CE$. Pour tout $\delta > 0$, $B\left(\bvec{y}, \delta\right)$ contient: 
+    \[\bvec{p} = \begin{pmatrix} 0 & \frac{\delta}{2} & y_3 & \cdots & y_4 \end{pmatrix} \in B\left(\bvec{y}, \delta\right) \text{ et } \bvec{p}\in E\]
+    
+    Cependant, cela implique que $\bvec{p} \not\in CE$ pour tout $\delta > 0$. Ainsi, on obtient que $CE$ n'est pas fermé et donc que $E$ n'est pas ouvert.
+
+    On avait déjà démontré que $E$ n'était pas fermé. C'est donc un ensemble qui est ni ouvert ni fermé.
+}
+
+\parag{Exemple 5}{
+    Nous pouvons démontrer que $\o$ et $\mathbb{R}^n$ sont fermés car $C\o = \mathbb{R}^n$ et $C\mathbb{R}^n = \o$ qui sont ouverts.
+
+    Plus généralement, il est possible de démontrer que les seuls sous-ensembles de $\mathbb{R}^n$ fermés et ouverts à la fois sont $\o$ et $\mathbb{R}^n$.
+}
+
+\parag{Propriétés}{
+    \begin{enumerate}[left=0pt]
+        \item Toute intersection (même infinie) de sous-ensembles fermés est un sous-ensemble fermé.
+        \item Toute réunion finie de sous-ensembles fermés est un sous-ensemble fermé.
+    \end{enumerate}
+
+    \subparag{Preuve}{
+        Pour démontrer ces propriétés, nous pouvons utilises les propriétés des sous-ensembles ouverts, et en voyant que:
+        \[C \bigcap_{i \in I} E_i = \bigcup_{i \in I} C E_i\]
+        \[C \bigcup_{i =1}^n E_i = \bigcap_{i =1}^n C E_i\]
+    }
+}
+
+
+
+
+
+\end{document}

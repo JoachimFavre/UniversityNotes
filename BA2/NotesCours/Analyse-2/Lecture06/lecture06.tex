@@ -1,0 +1,197 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-08 at 13:18:32.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Mercredi 09 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2022-03-09}{Fin des équations différentielles}{
+\begin{itemize}[left=0pt]
+    \item Explication de la méthode des coefficients indéterminés.
+    \item Résumé des méthodes pour résoudre les équations différentielles que nous avons vues.
+\end{itemize}
+}
+
+\parag{Méthode des coefficients indéterminés}{
+    Cette méthode permet de trouver une solution particulière à l'équation $y''\left(x\right) + p y'\left(x\right) + qy\left(x\right) = f\left(x\right), \mathspace p, q \in \mathbb{R}$
+
+    Pour que cette méthode fonctionne, il faut que $f\left(x\right)$ soit une combinaison linéaire de:
+    \[e^{cx} R_n\left(x\right) \mathspace \text{ et } \mathspace e^{ax}\left(\cos\left(bx\right) P_n\left(x\right) + \sin\left(bx\right)Q_m\left(x\right)\right)\]
+    où $R_n\left(x\right), P_n\left(x\right), Q_m\left(x\right)$ sont des polynômes de degré $n$ et $m$, et $c, a, b \in \mathbb{R}$.
+
+    Ainsi, si $f\left(x\right)$ est une combinaison linéaire de ces deux fonctions, disons $f\left(x\right) = c_1 f_1\left(x\right) + c_2 f_2\left(x\right)$, nous avons seulement besoin de trouver une méthode pour trouver une solution pour $f_1\left(x\right)$ et pour $f_2\left(x\right)$, puis utiliser le principe de la superposition des solutions.
+
+    Si $f\left(x\right) = e^{cx} R_n\left(x\right)$:
+    \begin{center}
+    \begin{tabularx}{\textwidth}{|>{\hsize=.25\textwidth}C|C|}
+        \hline
+        $c$ est une racine de $\lambda^2 + p\lambda + q = 0$ & Ansatz \\
+        \hhline{|=|=|}
+         Non & $y_{part} = e^{cx} T_n\left(x\right)$  \\
+         \hline
+         Oui & $y_{part} = x^r e^{cx} T_n\left(x\right)$ \\
+        \hline
+    \end{tabularx}
+    \end{center}
+    où $r$ est la multiplicité de la racine $\lambda = c$, et $T_n\left(x\right)$ est polynôme de degré $n$ à coefficients indéterminé.
+
+    Si $f\left(x\right) = e^{ax}\left(\cos\left(bx\right) P_n\left(x\right) + \sin\left(bx\right) Q_n\left(x\right)\right)$:
+    \begin{center}
+    \begin{tabularx}{\textwidth}{|>{\hsize=.25\textwidth}C|C|}
+        \hline
+        $a + ib$ est une racine de $\lambda^2 + p\lambda + q = 0$ & Ansatz \\
+        \hhline{|=|=|}
+        Non & $y_{part} = e^{ax} \left(T_N\left(x\right) \cos\left(bx\right) + S_N\left(x\right) \sin\left(bx\right)\right)$  \\
+         \hline
+         Oui & $y_{part} = xe^{ax} \left(T_N\left(x\right) \cos\left(bx\right) + S_N\left(x\right) \sin\left(bx\right)\right)$ \\
+        \hline
+    \end{tabularx}
+    \end{center}
+    où $N = \max\left(n, m\right)$, et $T_N\left(x\right)$ et $S_N\left(x\right)$ sont des polynômes de degré $N$ à coefficients indéterminés.
+
+    \subparag{Note personnelle: Mnémotechnie}{
+        Dans les quatre cas, nous prenons exactement l'équation en tant qu'\textit{Ansatz}, dans laquelle nous remplaçons les polynômes par des polynômes inconnus, et nous multiplions par la multiplicité d'une solution potentielle.
+
+        En effet, on remarque que, si $c$ n'est pas une racine de $\lambda^2 + p\lambda + q = 0$, alors c'est tout comme si c'était une racine de multiplicité 0 (bien évidemment, ne jamais dire cette phrase à un oral d'analyse). Ainsi, $x^r = 1$. Nous pouvons faire le même raisonnement pour la deuxième fonction, mais nous pouvons aussi voir qu'il est impossible que $a + ib$ ait une multiplicité 2 (sinon cela voudrait dire que $b = 0$, puisque $z$ et $\bar{z}$ sont des solutions pour les nombres complexes, et donc nous serions dans le premier scénario). En d'autres mots, on obtient donc qu'on doit multiplier par $x$ et non pas $x^r$.
+
+        Par rapport à la valeur pour laquelle on doit considérer la multiplicité de la racine, nous pouvons faire deux observations. Premièrement, dans la deuxième fonction, si $b = 0$, alors nous sommes de retour dans la première fonction. Deuxièmement, il est probable qu'il y ait un lien avec l'exponentielle complexe, qui a une forme similaire, et que nous avons déjà utilisée pour résoudre ce genre de problèmes:
+        \[e^{a + ib} = e^{a} \left(\cos\left(b\right) + i\sin\left(b\right)\right)\]
+
+        Pour l'intuition derrière cette méthode, il est probable que tout cela découle du fait qu'il est impossible de ``tuer'' l'exponentielle et les fonctions trigonométriques basiques en les dérivant (elles tournent en rond), alors que les polynômes descendent en degré.
+    }
+
+}
+
+\parag{Exemple}{
+    Nous voulons trouver la solution générale de l'équation suivante, avec $x \in \mathbb{R}$:
+    \[2y'' - y' - y = 100x e^{2x}\]
+
+    \subparag{Équation homogène associée}{
+        Commençons par résoudre l'équation homogène associée:
+        \[y'' - \frac{1}{2} y' - \frac{1}{2}y = 0\]
+
+        L'équation caractéristique est $\lambda^2 - \frac{1}{2}\lambda - \frac{1}{2} = 0$, et ses solutions sont $\lambda = 1, -\frac{1}{2}$. On obtient donc:
+        \[y_{hom} = C_1 e^{x} + C_2 e^{\frac{-x}{2}}, \mathspace C_1, C_2 \in \mathbb{R}, x \in \mathbb{R}\]
+
+    }
+
+    \subparag{Solution particulière équation complète}{
+        Cherchons une solution particulière de l'équation complète par la méthode de coefficients indéterminés.
+
+        On remarque que $f\left(x\right) = 50xe^{2x}$ est de la forme $R_n\left(x\right) e^{cx}$ où $R_n\left(x\right) = 50x$ et $n = 1, c = 2$. Ainsi, $f\left(x\right)$ est de forme acceptée par la méthode des coefficients indéterminés.
+
+        On remarque que $c = 2$ n'est pas une racine de l'équation caractéristique $\lambda^2 - \frac{1}{2} \lambda - \frac{1}{2} = 0$. Ainsi, nous pouvons prendre l'\textit{Ansatz}:
+        \[y_{part} = \left(Ax + B\right)e^{2x}\]
+        \[\implies y'_{part} = Ae^{2x} + 2\left(Ax + B\right) e^{2x}\]
+        \[\implies y''_{part} = 2Ae^{2x} + 2Ae^{2x} + 4\left(Ax + B\right) e^{2x}\]
+
+        Remplaçons la dans l'équation pour obtenir des contraintes sur $A$ et $B$:
+        \[\underbrace{4Ae^{2x} + 4\left(Ax + B\right) e^{2x}}_{y''_{part}} \underbrace{- \frac{1}{2} Ae^{2x} - \left(Ax + B\right) e^{2x}}_{-\frac{1}{2} y_{part}'} \underbrace{- \frac{1}{2}\left(ax + B\right)e^{2x}}_{\frac{-1}{2} y_{part}} = 50xe^{2x}\]
+
+        Ainsi, nous obtenons que:
+        \[xe^{2x} \left(4 - 1 - \frac{1}{2}\right)A + e^{2x} \left(\left(4 - \frac{1}{2}\right)A + \left(4 - 1 - \frac{1}{2}\right)B\right) = 50x e^{2x}\]
+
+        Ce qui implique que:
+        \[xe^{2x} \left(\frac{5}{2} A\right) + e^{2x} \left(\frac{7}{2}A + \frac{5}{2} B\right) = 50x e^{2x}\]
+
+
+        Ceci nous donne le système d'équations suivant:
+        \begin{systemofequations}{}
+        &\ \frac{5}{2} A = 50 \\
+        &\ \frac{7}{2} A + \frac{5}{2}B = 0
+        \end{systemofequations}
+
+        Ce qui nous permet de trouver que:
+        \[A = 20, \mathspace B = -28\]
+
+        C'est ensuite une bonne idée de vérifier le résultat.
+    }
+
+    \subparag{Solution générale}{
+        Nous trouvons finalement que la solution générale de $2x'' - y'- y = 100xe^{2x}$ est:
+        \[y\left(x\right) = C_1e^{x} + C_2e^{\frac{-x}{2}} + \left(20x - 28\right)e^{2x}, \mathspace C_1, C_2 \in \mathbb{R}, x \in \mathbb{R}\]
+    }
+
+    \subparag{Méthode de la variation de la constante}{
+        Nous pouvons trouver le même résultat en utilisant la méthode de la variation de la constante.
+
+        Nous savons que $v_1\left(x\right) = e^{x}$ et $v_2\left(x\right) = e^{-\frac{x}{2}}$ sont deux solutions linéairement indépendantes de l'équation homogène. Calculons leur Wronskien:
+        \[W\left[v_1, v_2\right]\left(x\right) = \det\begin{pmatrix} e^{x} & e^{-\frac{x}{2}} \\ e^{x} & -\frac{1}{2}e^{-\frac{x}{2}} \end{pmatrix} = -\frac{1}{2}e^{\frac{x}{2}} - e^{\frac{x}{2}} = -\frac{3}{2} e^{\frac{x}{2}} \]
+
+        Nous devons maintenant calculer $c_1\left(x\right)$ et $c_2\left(x\right)$:
+        \[c_1\left(x\right) = - \int \frac{f\left(x\right) v_2\left(x\right)}{W\left[v_1, v_2\right]} dx = - \int \frac{50x e^{2x} e^{-\frac{x}{2}}}{- \frac{3}{2} e^{\frac{x}{2}}} dx = \ldots = \frac{100}{3} \left(x - 1\right)e^{x}\]
+        \[c_2\left(x\right) = \int \frac{f\left(x\right) v_1\left(x\right)}{W\left[v_1, v_2\right]\left(x\right)}dx = \int \frac{50x e^{2x} e^{x}}{-\frac{3}{2} e^{\frac{x}{2}}}dx = \ldots = -\frac{40}{3} xe^{\frac{5}{2}x} + \frac{16}{3} e^{\frac{5}{2}}x\]
+
+        Ainsi, on obtient:
+        \[v_0\left(x\right) = c_1\left(x\right)v_1\left(x\right) + c_2\left(x\right) v_2\left(x\right) = \ldots = 20x e^{2x} - 28e^{2x}\]
+        comme attendu.
+    }
+}
+
+\parag{Note personnelle: Résumé}{
+    \subparag{EDVS}{
+        Une équation de la forme $f\left(y\right)y' = g\left(x\right)$ se résout en séparant les variables:
+        \[f\left(y\right) \frac{dy}{dx} = g\left(x\right) \implies f\left(y\right) dy = g\left(x\right) dx \implies \int f\left(y\right) dy = \int g\left(x\right)dx\]
+    }
+
+    \subparag{EDL1 homogène}{
+        La solution générale d'une EDL1 homogène $y'\left(x\right) + p\left(x\right) y\left(x\right) = 0$ est donnée par:
+        \[y\left(x\right) = Ce^{-P\left(x\right)}, \mathspace C \in\mathbb{R}\]
+        où $P\left(x\right)$ est une primitive (sans la constante) de $p\left(x\right)$.
+    }
+
+    \subparag{EDL1 complète}{
+        Pour résoudre une EDL1 complète, $y'\left(x\right) + p\left(x\right)y\left(x\right) = f\left(x\right)$, nous utilisons plusieurs principes. La méthode de la variation de la constante nous donne une solution particulière:
+        \[v\left(x\right) = c\left(x\right)e^{-P\left(x\right)}, \mathspace \text{avec } c\left(x\right) = \int f\left(x\right) e^{P\left(x\right)}\]
+        où $P\left(x\right)$ est une primitive (sans la constante) de $p\left(x\right)$.
+
+        Ensuite, en trouvant $v_0\left(x\right)$, la solution générale à l'équation homogène associée, nous utilisons le principe de superposition des solutions pour trouver la solution générale à notre équation:
+        \[y\left(x\right) = v\left(x\right) + v_0\left(x\right)\]
+    }
+
+    \subparag{EDL2 homogène à coefficients constants}{
+        Pour résoudre une EDL2 homogène à coefficients constants, $y''\left(x\right) + py\left(x\right) + qy\left(x\right) = 0$ où $p, q \in \mathbb{R}$, nous cherchons les racines $a, b \in \mathbb{C}$ du polynôme caractéristique:
+        \[\lambda^2 + p\lambda + q = 0\]
+
+        \begin{functionbypart}{y\left(x\right)}
+        C_1 e^{ax} + C_2 e^{bx}, \mathspace \text{ si } a, b \in \mathbb{R}, a \neq b \\
+        C_1 e^{ax} + C_2 xe^{ax}, \mathspace \text{ si } a = b \\
+        C_1 e^{\alpha x} \cos\left(\beta x\right) + C_2 e^{\alpha x} \sin\left(\beta x\right), \mathspace \text{ si } a = \alpha + i\beta = \bar{b} \not \in \mathbb{R}
+        \end{functionbypart}
+    }
+
+    \subparag{EDL2 homogène}{
+        Pour résoudre une EDL2 homogène, $y''\left(x\right) + p\left(x\right)y'\left(x\right) + q\left(x\right)y\left(x\right) = 0$, nous avons besoin de deviner une solution particulière $v_1\left(x\right)$. De là, nous pouvons calculer une deuxième solution linéairement indépendante:
+        \[v_2\left(x\right) = c\left(x\right) v_1\left(x\right), \mathspace \text{avec } c\left(x\right) = \int \frac{e^{-P\left(x\right)}}{v_1^2\left(x\right)}dx\]
+        où $P\left(x\right)$ est une primitive (sans la constante) de $p\left(x\right)$.
+
+        Finalement, la solution générale est donnée par:
+        \[y\left(x\right) = C_1 v_1\left(x\right) + C_2 v_2\left(x\right), \mathspace \forall C_1, C_2 \in \mathbb{R}\]
+    }
+
+    \subparag{EDL2 à coefficients constants}{
+        Pour résoudre une EDL2 à coefficients constants, $y''\left(x\right) + py'\left(x\right) + qy\left(x\right) = f\left(x\right)$ où $p, q \in \mathbb{R}$, nous pouvons parfois aller plus vite que la méthode de la variation de la constante en utilisant la méthode des coefficients indéterminés, si $f\left(x\right)$ a une forme particulière.
+    }
+
+    \subparag{EDL2 complète}{
+        Pour résoudre une EDL2 complète, $y''\left(x\right) + p\left(x\right)y'\left(x\right) + q\left(x\right)y\left(x\right) = f\left(x\right)$, nous cherchons d'abord deux solutions particulières linéairement indépendantes à l'EDL2 homogène associée $v_1\left(x\right)$ et $v_2\left(x\right)$ (qui nous donnent donc aussi la solution générale à cette EDL2 homogène associée). De là, nous obtenons une solution particulière à notre EDL2 complète à l'aide de la méthode de la variation de la constante:
+        \[v\left(x\right) = c_1\left(x\right) v_1\left(x\right) + c_2\left(x\right) v_2\left(x\right)\]
+
+        Avec:
+        \[c_1\left(x\right) = - \int \frac{f\left(x\right)v_2\left(x\right)}{W\left[v_1, v_2\right]\left(x\right)}dx\]
+        \[c_2\left(x\right) = \int \frac{f\left(x\right) v_1\left(x\right)}{W\left[v_1, v_2\right]\left(x\right)}dx\]
+        \[W\left[v_1, v_2\right]\left(x\right) = \det\begin{pmatrix} v_1\left(x\right) & v_2\left(x\right) \\ v_1'\left(x\right) & v_2'\left(x\right) \end{pmatrix} \]
+
+        De là, nous pouvons trouver notre solution générale:
+        \[y\left(x\right) = C_1 v_1\left(x\right) + C_2 v_2\left(x\right) + v\left(x\right), \mathspace \forall C_1, C_2 \in\mathbb{R}\]
+    }
+}
+
+
+\end{document}

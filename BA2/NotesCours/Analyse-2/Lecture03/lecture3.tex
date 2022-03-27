@@ -1,0 +1,181 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-02-28 at 10:16:29.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Lundi 28 février 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2022-02-28}{Place aux exemples}{
+\begin{itemize}[left=0pt]
+    \item Deux gros exemples de résolution d'EDL1.
+    \item Exemple d'application d'équations différentielles pour modéliser des phénomènes physiques.
+\end{itemize}
+}
+
+\parag{Types d'équations}{
+    Regardons les équations différentielles suivantes:
+    \begin{enumerate}
+        \item $e^x y' = y^3 + y$
+        \item $\left(1 + \sin^2 x\right)y^2 y' = \cos\left(x\right)$
+        \item $2y' - 2x = y$
+        \item $y' = \left(3x + y\right)^2$
+    \end{enumerate}
+
+    Étudions le type de ces équations:
+    \begin{enumerate}
+        \item Puisqu'il y a un $y^3$, elle n'est clairement pas linéaire. Cependant, c'est une EDVS car elle est équivalente à: 
+        \[\frac{dy}{y^3 + y} = e^{-x} dx\]
+
+        Il ne faut oublier non plus que $y = 0$ est une solution, puisqu'on a divisé par $y$.        
+
+        \item Cela ne peut non plus pas être une équation linéaire puisqu'on a $y^2$. Cependant, elle est équivalente à: 
+            \[y^2 dy = \frac{\cos\left(x\right)dx}{1 + \sin^2\left(x\right)}\]
+        
+        \item C'est une EDL1, et il est impossible de l'écrire sous la forme d'une équation différentielle à variable séparée.
+        \[y' - \frac{1}{2}y = x, \mathspace p\left(x\right) = -\frac{1}{2}, f\left(x\right) = x\]
+        
+        \item Cela ne peut pas être linéaire car il y a un carré. Il semble aussi compliqué de séparer les variables. Cependant, en prenant $z = 3x + y \implies z' = y' + 3$, notre équation devient: 
+        \[z' - 3 = z^2 \implies \frac{dz}{z^2 + 3} = dx\]
+        
+        On arrive donc bien à une équation différentielle à variable séparée.
+    \end{enumerate}
+}
+
+\parag{Exemple 1}{
+    Prenons l'équation différentielle linéaire d'ordre 1 suivante: 
+    \[y' - \frac{2}{x} y = \frac{x}{2}, \mathspace p\left(x\right) = -\frac{2}{x}, f\left(x\right) = \frac{x}{2}\]
+    
+    On remarque que $p$ est continue sur $\left]-\infty, 0\right[$ ou sur $\left]0, +\infty\right[ $, et $f$ est continue sur $\mathbb{R}$.
+
+    \subparag{Équation homogène}{
+        Premièrement, on cherche la solution générale de l'équation homogène associée: 
+        \[y' - \frac{2}{x}y = 0, \mathspace \text{sur } \left]-\infty, 0\right[ \text{ et } \left]0, \infty\right[ \]
+        
+        Pour cela, on cherche une primitive de $p\left(x\right)$: 
+        \[P\left(x\right) = \int -\frac{2}{x} dx = -2 \log\left|x\right| = -\log\left(x^2\right), \mathspace x\neq 0\]
+        
+        Ainsi, la solution de notre équation homogène est: 
+        \[y_{hom}\left(x\right) = Ce^{-P\left(x\right)} = Ce^{-\left(-\log\left(x^2\right)\right)} = Cx^2\]
+        sur $\left]-\infty, 0\right[$ et $\left]0, \infty\right[$.
+
+        On peut facilement vérifier que notre solution fonctionne bien.
+    }
+
+    \subparag{Solution particulière}{
+        Deuxièmement, nous cherchons une solution particulière de l'équation complète: 
+        \[y' - \frac{2}{x} y = \frac{x}{2}\]
+        
+        Calculons l'intégrale suivante: 
+        \[\int f\left(x\right) e^{P\left(x\right)}dx = - \int \frac{x}{2} e^{- \log\left(x^2\right)} dx = \int \frac{x}{2} \frac{1}{x^2} dx = \int \frac{dx}{2x} = \frac{1}{2} \log\left|x\right|\]
+        où $x \neq 0$.
+        
+        On obtient que la solution particulière à notre équation est donnée par: 
+        \[y_{part}\left(x\right) = \frac{1}{2} \log\left|x\right| e^{\log\left(x^2\right)} = \frac{1}{2}x^2 \log\left|x\right|, \mathspace x \neq 0\]
+        
+        On peut vérifier que notre solution fonctionne bien, prenons $x \in \left]-\infty, 0\right[ $ par exemple. Sur cet ensemble, notre solution est:
+        \[y_{part}\left(x\right) = \frac{1}{2}x^2 \log\left(-x\right)\]
+        
+        Et donc:
+        \begin{multiequality}
+        y' - \frac{2}{x}y =\ & \left(\frac{x^2}{2} \log\left(-x\right)\right)' - \frac{2}{x} \left(\frac{x^2}{2} \log\left(-x\right)\right)  \\
+        =\ & x \log\left(-x\right) + \frac{x^2}{2} \frac{1}{-x} \left(-1\right) - x \log\left(-x\right)  \\
+        =\ & \frac{x}{2} 
+        \end{multiequality}
+        
+        Nous pouvons aussi vérifier que cela fonctionne sur $\left]0, +\infty\right[ $ de manière similaire.
+    }
+
+
+    \subparag{Solution générale}{
+        Troisièmement, on sait que la solution générale de l'EDL1 est donnée par: 
+        \[y\left(x\right) = y_{hom}\left(x\right) + y_{part}\left(x\right) \]
+        
+        On trouve donc que:
+        \begin{functionbypart}{y\left(x\right)}
+            Cx^2 + \frac{x^2}{2} \log\left(x\right), \mathspace x \in \left]0, \infty\right[, C \in \mathbb{R} \\
+            Cx^2 + \frac{x^2}{2} \log\left(-x\right), \mathspace x \in \left]-\infty, 0\right[, C \in \mathbb{R}
+        \end{functionbypart}
+    }
+}
+
+\parag{Exemple 2}{
+    Prenons l'EDL1 suivante: 
+    \[y' \underbrace{- \tan\left(x\right)}_{p\left(x\right)} y = \underbrace{\cos\left(x\right)}_{f\left(x\right)}\]
+
+    Nous volons trouver la solution maximale avec la condition initiale $y\left(0\right) = 3$.
+
+    Cette information est importante, car cela nous dit que 0 doit être dans l'intervalle (il y a une infinité d'intervalles où tangente est continue). Nous allons donc considérer cette équation sur $\left]\frac{-\pi}{2}, \frac{\pi}{2}\right[ $. En d'autres mots, on prend $p, f : \left] \frac{-\pi}{2}, \frac{\pi}{2}\right[ \mapsto \mathbb{R}$.
+
+    \subparag{Équation homogène}{
+        Premièrement, nous cherchons la solution générale de l'équation homogène associée: 
+        \[y' - \tan\left(x\right) y = 0\]
+
+        Calculons une primitive de $p\left(x\right)$: 
+        \[P\left(x\right) = - \int \tan\left(x\right)dx = -\int \frac{\sin\left(x\right)}{\cos\left(x\right)}dx\]
+        
+        Nous pouvons remarque que $\sin\left(x\right)$ est la dérivée de $\cos\left(x\right)$ à une constante près, et donc nous pouvons prendre un changement de variable:
+        \[P\left(x\right) = \int \frac{d\left(\cos x\right)}{\cos\left(x\right)} = \log\left|\cos\left(x\right)\right| = \log\left(\cos\left(x\right)\right)\]
+
+        Nous pouvons bien enlever la valeur absolue car, sur $\left]\frac{-\pi}{2}, \frac{\pi}{2}\right[ $, $\cos\left(x\right)$ est positif.
+
+        On obtient donc que la solution à l'équation homogène est: 
+        \[y_{hom}\left(x\right) = Ce^{-P\left(x\right)} = Ce^{-\log\left(\cos\left(x\right)\right)} = \frac{C}{\cos\left(x\right)}, \mathspace x \in \left] \frac{-\pi}{2}, \frac{\pi}{2}\right[, C \in \mathbb{R}\]
+    }
+    
+    \subparag{Solution particulière}{
+        Deuxièmement, nous cherchons une solution particulière de l'équation complète. Calculons l'intégrale suivante: 
+        \[\int f\left(x\right) e^{P\left(x\right)} dx = \int \cos\left(x\right) e^{\log\left(\cos\left(x\right)\right)} dx = \int \cos^2\left(x\right)dx\]
+        
+        On sait que $\cos\left(2x\right) = \cos^2\left(x\right) - \sin^2\left(x\right)$, donc notre intégrale est donnée par:
+        \[\int f\left(x\right) e^{P\left(x\right)} dx = \int \frac{1}{2}\left(1 + \cos\left(2x\right)\right)dx = \frac{1}{2}x + \frac{1}{4} \sin\left(2x\right)\]
+
+        Ce qui nous permet d'obtenir une solution particulière à notre équation: 
+        \begin{multiequality}
+        y_{part}\left(x\right) =\ & \left(\frac{1}{2} x + \frac{1}{4} \sin\left(2x\right)\right)e^{-P\left(x\right)}  \\
+        =\ & \left(\frac{1}{2}x + \frac{1}{4}x \sin\left(2x\right)\right) \frac{1}{\cos\left(x\right)}  \\
+        =\ & \frac{x}{2\cos\left(x\right)} + \frac{\sin\left(x\right)}{2} 
+        \end{multiequality}
+        puisque $\sin\left(2x\right) = 2\sin\left(x\right)\cos\left(x\right)$.
+    }
+
+    \subparag{Solution générale}{
+        Troisièmement, nous obtenons la solution générale: 
+        \[y\left(x\right) = y_{hom} + y_{part} = \frac{C}{\cos\left(x\right)} + \frac{x}{2\cos\left(x\right)} + \frac{\sin\left(x\right)}{2}, \mathspace x \in \left]-\frac{\pi}{2}, \frac{\pi}{2}\right[\]
+        pour $C \in \mathbb{R}$, une constante arbitraire.
+    }
+    
+    \subparag{Condition initiale}{
+        Quatrièmement, nous devons mettre notre condition initiale dans notre solution: 
+        \[y\left(0\right) = 3 \implies 3 = y\left(0\right) = C + 0 + 0 = C \implies C = 3\]
+        
+        On obtient donc que la solution maximale satisfaisant la condition initiale est: 
+        \[y\left(x\right) = \frac{3}{\cos\left(x\right)} + \frac{x}{2\cos\left(x\right)} + \frac{1}{2\sin\left(x\right)}, \mathspace x \in \left] \frac{-\pi}{2}, \frac{\pi}{2}\right[ \]
+        
+    }
+}
+
+\parag{Application des EDVS}{
+    Les équations différentielles permettent typiquement de décrire des phénomènes physiques. Un exemple commun est que la croissance ou la décroissance de quelque chose est proportionnel à la taille de ce quelque chose. En d'autres mots: 
+    \[y'\left(t\right) = ky\left(t\right), \mathspace k \in \mathbb{R}\]
+    
+    Une population de bactérie avec de la nourriture et de la place infinie ou la masse d'un objet subissant une désintégration radioactive suivent typiquement cette loi. La première a $k > 0$, alors que la deuxième a $k < 0$. D'autres phénomènes, comme la propagation d'un virus au sein d'une population, suivent cette loi sur un temps restreint.
+
+    Résolvons notre équation différentielle. On remarque que $y = 0$. De plus, c'est une EDVS, donc:
+    \[\int \frac{dy}{y} = \int k dt \implies \log\left|y\right| = kt + C_1 \implies \left|y\right| = \underbrace{e^{C_1}}_{>0} e^{kt} \implies y\left(t\right) = Ce^{kt}, \mathspace C \in \mathbb{R}\]
+    
+    Supposons que nous savons que $y\left(0\right) = y_0 > 0$, alors: 
+    \[y_0 = y\left(0\right) = Ce^{k\cdot0} = C\]
+    
+    On obtient donc que la solution maximale satisfaisant la condition initiale $y\left(0\right) = y_0$ est: 
+    \[y\left(t\right) = y_0 e^{kt}\]
+
+    Ce qui est cohérent avec ce à quoi nous pouvions nous attendre. 
+}
+
+\end{document}
