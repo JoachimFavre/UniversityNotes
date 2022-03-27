@@ -1,0 +1,261 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-22 at 15:17:58.
+
+\usepackage{../../style}
+
+\title{AICC-2}
+\author{Joachim Favre}
+\date{Mardi 22 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2022-03-22}{Alice and Bob}{
+\begin{itemize}[left=0pt]
+    \item Introduction to cryptography.
+    \item Explanation of Caesar's cipher, generic monoalphabetic cipher, and Vigenère cipher.
+    \item Explanation of the different attacks one a cryptanalyst can do.
+    \item Explanation of the one-time pad, and proof that it is perfectly secret.
+    \item Proof that, for a perfect secret code, the entropy of the key is greater than or equal to the entropy of the plain text.
+\end{itemize}
+
+}
+
+\section{Cryptography}
+\parag{Introduction}{
+    Cryptography serves multiple purposes. The first one is privacy, confidentiality; its goal is to hide our communication, block others from seeing what's going on. The second one is authenticity; we want to be sure that the message comes from who it claims to be. The third one is message integrity; we want to be sure we get the full unchanged message, and nothing more.
+
+    In other words, cryptography gives us the tools to authenticate the sender and the receiver, verify the integrity of the message, and keep the message confidential. There are other problems of course: if someone can see we sent a message, this is already information they get, and it's even worse if they can follow the message and see to whom we sent it. This is for example what Tor allows us to avoid.
+
+    In the systems we usually use, the three problems are very linked. However, with quantum for example, they may need different ideas; we may not always be able to kill our three mockingbirds with one stone.
+
+    Cryptography began to be really important in the 1980s-1990s, with the invention of the internet. Nowadays, everyone need cryptography. Before, basically only generals and diplomats needed it, ``common'' people used regular mail and it was enough (privacy came from the closed (and sometimes sealed) enveloped, and authenticity and message integrity came from the postal service).
+}
+
+\parag{Basic setup for confidentiality}{
+    We can make the following diagram:
+    \imagehere{BasicSetupForConfidentiality.png}
+
+    $t$ is the \important{plain text} and $c$ is the \important{cipertext or the cryptogram}. For our encryption and decryption algorithms, we also have a key $k_A$ and $k_B$. We finally have the two functions: 
+    \[E_{k_A}\left(t\right) = c, \mathspace D_{k_{B}}\left(c\right) = t\]
+}
+
+\parag{Terminology}{
+    \begin{itemize}[left=0pt]
+        \item \important{Cryptography} is the art of composing cryptograms.
+        \item \important{Cryptanalysis} is the art of breaking cryptograms.
+        \item A \important{cryptanalyst} has \important{broken} the system when she can \textit{quickly} determine the plain text.
+        \item An \important{attacker} is a \important{cryptanalyst}.
+    \end{itemize}
+
+    \subparag{Personal note: French terminology}{
+        There is a big mistake many people do in French: one must not mix ``chiffrer, déchiffrer'' and ``crypter, décrypter''. Indeed, the first ones mean ciphering or deciphering using the key, and the second ones mean ciphering or deciphering without having the key. 
+
+        This is an important distinction. Indeed, it means that the word ``crypter'' should \textit{never} be used; we cannot cipher a message without having the key. Do not make this mistake!
+    }
+    
+}
+
+\parag{Caesar's cipher}{
+    This cipher is named that way because there are rumours saying Caesar used it. 
+
+    We are using the concept of permutation, doing a cyclic shift. Ceasar liked doing a shift of 3, which gives:
+    \begin{center}
+    \begin{tabular}{c|cccccccc}
+        Plain text & A & B & C & D & \ldots & X & Y & Z \\
+        \hline
+        Cryptogram & D & E & F & G & \ldots & A & B & C \\
+    \end{tabular}
+    \end{center}
+    
+    For example, ALEA becomes DOHD.
+
+    Another way of seeing this is considering that our alphabet is linked to numbers: 
+    \begin{center}
+    \begin{tabular}{cccccccccccc}
+        A & B & C & \ldots & X & Y & Z &  & , & . \\
+        0 & 1 & 2 & \ldots & 23 & 24 & 25 & 26 & 27 & 28
+    \end{tabular}
+    \end{center}
+    where the \nth{26} character is a space.
+    
+    Then our algorithm becomes: 
+    \[E_{k} = t + k \Mod 29, \mathspace D_k = t - k \Mod 29, \mathspace k \in \left\{0, \ldots, 28\right\}\]
+
+    We can even make a rotating disk that allows to encode and decode very easily. Many picture of them can be found online.
+}
+
+\parag{Monoalphabetic cipher}{
+    More generally than a Caesar cipher, a monoalphabetic cipher is an arbitrary permutation of the alphabet. For example: 
+    \begin{center}
+    \begin{tabular}{cccc}
+        A & B & C & \ldots \\
+        P & V & X & \ldots 
+    \end{tabular}
+    \end{center}
+
+    We have to make sure that this is a permutation, so we can go in both directions. Note that instead we can do a permutation of all possible words, or all possible sentences. Another observation we can make is that it is complicated to take a completely arbitrary permutation since then we are forced to have both people exchanging a message to have the permutation table.
+
+    The ``monoalphabetic'' is here since we are using the same permutation table for every letter.
+}
+
+\parag{Vigenère Cipher}{
+    This cipher is linked to Giovan Batista Bellaso, who maybe invented it. In cryptography, it is hard to really say who invented a code, since they wanted to be secret, they did not want to be know for their code.
+
+    The idea of Vigenère Cipher is to use Caesar cipher, but with a different key for every letter. For example, having $k = 3$, $k = 1$, $k = 10$, $k = 4$, makes ALEA become DMOE. If we have more letters to encode than keys, then we begin the sequence of keys again. Remembering the sequence of key can be complicated, so we sometimes use a word instead (abc to mean $k_1 = 0$, $k_2 = 1$ and $k_3 = 2$, for example). If we have a word of 7 letters and a key of 4 letters, our algorithm can be summed up as:
+    \begin{multiequality}
+    V_K\left(t\right) =\ & V_{k_1, k_2, k_3, k_4}\left(t_1, t_2, t_3, t_4, t_5, t_6, t_7\right)  \\
+    =\ & \left(t_1 \oplus k_1, t_2 \oplus k_2, t_3 \oplus k_3, t_4 \oplus k_4, t_5 \oplus k_1, t_6 \oplus k_2, t_7 \oplus k_3\right) 
+    \end{multiequality}
+    where $\oplus$ is an addition modulo.
+}
+
+\parag{Key assumption (lol)}{
+    In modern cryptography, we consider that the algorithm is public, but the key is private. We must not base our cryptographic secrecy on the algorithm. Indeed, when the algorithm is out, it is out, whereas if our key is out, we can change it.
+}
+
+\parag{Attacks}{
+    We can differentiate three categories of attacks a cryptanalyst can do. 
+    \begin{enumerate}[left=0pt]
+        \item The first one is the most complicated one: we only have access to some cryptograms, which have been encoded with the same key. This is named the \important{ciphertext-only} attack.
+        \item The second one is named the \important{known plaintext} attack: we have access to some plaintexts and their resulting cryptograms, which have all been encoded using the same key.
+        \item The third one is named the \important{chosen plaintext} attack. We can obtain the ciphertext for arbitrary ciphertexts, with the same key every time.
+    \end{enumerate}
+
+    Clearly, every cryptographic system should be secure against a ciphertext-only attack. Ideally, it should even be secure against a chosen plaintext attack.
+
+    \subparag{Caesar system}{
+        This is really a bad code. For the ciphertext-only attack, we can try all the 29 possible keys. For a known plaintext attack, we can compare one letter in the ciphertext and in the plaintext, and we get the key. For the chosen plaintext attack, we can ask to cipher the letter A, which gives us the key instantly. 
+    }
+    
+    \subparag{Generic monoalphabetic}{
+        A generic monoalphabetic cipher is already more secure. Indeed, a ciphertext-only attack cannot be reached through brute-force since $29! \approx 10^{31}$ is too much. However, we can be more intelligent than that: for a given language, we know the frequency of each letter, the probability to have a letter following another, and so on. Using those, this attack becomes doable.
+
+        As for the Ceasar system, the generic monoalphabetic cipher is very bad against the two other attacks. For a known plaintext attack, we can compare input and outputs over a text that uses all letters; and for a chosen plaintext attack, we can decide to encrypt each letter of the alphabet.
+    }
+
+    \subparag{Vigenère}{
+        This code is already much more robust. Indeed, a ciphertext-only attacks is very complicated. Even if we know the length of the key, we must compute $29^n$ to do bruteforce, and letter frequency analysis cannot be done. The only possibility to decipher this code is to have a plaintext-length to key-length ratio sufficiently large. That way, we can partition our text into $n$ sub-texts, which are all Ceasar cipher with their own key, and we can begin to do some letter-frequency approach. However, the larger the key becomes, the harder it becomes to do this attack (which will bring us to a good code in the following paragraph).
+
+        As for the other codes we have seen, this code is not robust against the two other attacks. A known plaintext attack can be done by comparing input and outputs until we get the $n$-length key; and a chosen plain text attack can be done by encoding ``AAAAAA\ldots'', which gives us the key.
+    }
+}
+
+\parag{One-time pad}{
+    The ``one-time pad'' is a crypto that was used --- and is still used --- by diplomats.
+
+    Let's assume that we are using binary, for simplicity. We take our key to be as long as our ciphertext, thus: 
+    \[t, k, c \in \left\{0, 1\right\}^{n}\]
+    
+    Moreover, we also take $k$ so that it is a \textit{random} (uniform) IID sequence. The encryption is $c = k + t$, and the decryption is $t = c - k = k + c$, since we are using $n$-bits encryption ($\congruent{b + b}{0}{2}$ for $b \in \left\{0, 1\right\}$).
+   
+    We notice that this is exactly Vigenère's code, where the key and the plain text are of the same length, and $k$ is random.
+}
+
+\parag{Definition: perfect secrecy}{
+    \important{Perfect secrecy} is reached when the plaintext $t$ and $c$ are statistically independent.
+}
+
+\parag{Lemma: entropy}{
+    We will need for the next theorem to see that if we have $n$ IID random variables uniformly distributed over $\mathcal{A}$, $K_1, \ldots, K_n$, then: 
+    \[H\left(K_1, \ldots, K_n\right) = n\log_2\left|\mathcal{A}\right|\]
+    
+    More precisely, if we are working over binary: 
+    \[H\left(K_1, \ldots, K_n\right) = n\]
+    
+    \subparag{Proof}{
+        Let us take $K_1$, to be a random variable uniformly distributed over: 
+        \[\mathcal{A} = \left\{0, 1, \ldots, \left|\mathcal{A}\right| - 1\right\}\]
+        
+        Then, we can compute its entropy easily: 
+        \[H\left(K_1\right) = \log_2\left|\mathcal{A}\right|\]
+        
+        Let's now consider more more random variables: $K_1, \ldots, K_n$ IID and uniformly distributed over $\mathcal{A}$. Then, by the chain rule of entropy: 
+        \begin{multiequality}
+        H\left(K_1, \ldots, K_n\right) =\ & H\left(K_1\right) + H\left(K_2 | K_1\right) + \ldots + H\left(K_n |K_1, \ldots, K_n\right)  \\
+        =\ & H\left(K_1\right) + \ldots + H\left(K_n\right)  \\
+        =\ & nH\left(K_1\right) 
+        \end{multiequality}
+        
+        since those random variables are IID.
+        
+        \qed
+    }
+}
+
+\parag{Theorem}{
+    The one-time pad is perfectly secret.
+
+    \subparag{Proof 1}{
+        We notice that, since $c = t \oplus k \iff k = c \ominus t$, we have: 
+        \[p_{C|T}\left(c|t\right) = p_{K|T}\left(c \ominus t | t\right)\]
+        
+        Moreover, since the key and the plaintext are independent, this is equal to:
+        \[p_{K}\left(c \ominus t\right) = \frac{1}{2^n}\]
+
+        However, this is also exactly equal to $p_C\left(c\right)$. In other words, $C$ and $T$ are independent.
+
+        \qed
+    }
+
+    \subparag{Proof 2}{
+        We have already seen the crypto lemma. This states that, if $Z = X \oplus Y$, and if $X$ and $Y$ are uniformly distributed and independent, then $Z$ and $X$ are independent.
+
+        Here, we know that $C = T\oplus K$, and we assume that $T$ and $K$ are independent and uniformly distributed. Thus, $C$ and $T$ are independent.
+
+        To do a similar proof to the one we saw for the crypto lemma, let us start with the following entropy: 
+        \begin{multiequality}
+        H\left(T, K, C\right) =\ & H\left(T, K\right) + \underbrace{H\left(C| T, K\right)}_{= 0} = H\left(T\right) + H\left(K|T\right) \\
+        =\ & H\left(T\right) + H\left(K\right) = H\left(T\right) + n 
+        \end{multiequality}
+        by our lemma.
+        
+        Using the chain rule for entropy in a different way, we get that our entropy is also: 
+        \[H\left(T, K, C\right) = H\left(T\right) + H\left(C | T\right) + \underbrace{H\left(K | C, T\right)}_{= 0} = H\left(T\right) + H\left(C|T\right)\]
+
+        By comparison between our two results, we get that, necessarily: 
+        \[H\left(C|T\right) = n\]
+        
+        Thus, $C$ and $T$ must be independent.
+
+        \qed
+    }
+    
+
+    \subparag{Remark}{
+        The problem for this code is that we need a huge amount of huge keys.
+    }
+}
+
+\parag{Theorem}{
+    If we have perfect secrecy, then: 
+    \[H\left(T\right) \leq H\left(K\right)\]
+    
+    \subparag{Proof}{
+        Since we have perfect secrecy, we know that $H\left(T|C\right) = H\left(T\right)$. A friend of mine told me to begin with $H\left(C\right) + H\left(T\right)$:
+        \begin{multiequality}
+        H\left(C\right) + H\left(T\right) =\ & H\left(C\right) + H\left(T|C\right) \\
+        =\ & H\left(T, C\right)  \\
+        \leq\ & H\left(T, C\right) + \underbrace{H\left(K|T,C\right)}_{\geq 0}  \\
+        =\ & H\left(T, C, K\right) \\
+        =\ & H\left(C\right) + H\left(K|C\right) + \underbrace{H\left(T|K, C\right)}_{= 0}  \\
+        \leq\ & H\left(C\right) + H\left(K\right) 
+        \end{multiequality}
+       
+        $H\left(T|K, C\right) = 0$ since we $T$ is a function of $K$ and $C$, else our cryptography system cannot be deciphered.
+
+       Subbing $H\left(C\right)$ on both side, we have:
+        \[H\left(T\right) \leq H\left(K\right)\]
+
+        \qed
+    }
+
+    \subparag{Implication}{
+        This implies that if we have a message of 100 bits, then we need a key of at least 100 bits to reach perfect secrecy.
+    }
+    
+}
+
+
+\end{document}

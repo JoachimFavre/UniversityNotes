@@ -1,0 +1,220 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-17 at 11:42:39.
+
+\usepackage{../../style}
+
+\title{AICC 2}
+\author{Joachim Favre}
+\date{Jeudi 17 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2022-03-17}{Let's play games}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of the fundamental theorem of source coding.
+    \item Application of entropy to solve games and algorithmic questions, such as finding the optimal strategy to the Twenty Questions game, finding a lower bound to sorting algorithms efficiency, and finding the least number of weights to find a ball of different weight.
+\end{itemize}
+
+}
+
+\parag{Fundamental theorem of Source Coding}{
+    For the compression of a source $S_1, S_2, \ldots$ the fundamental limit is:
+    \[\lim_{n \to \infty} \frac{H_D\left(S_1, \ldots, S_n\right)}{n} = H_D^*\left(\mathcal{S}\right)\]
+    if this limit exists (if it does not, then we do not know anything).
+
+    In other words, there exist uniquely decodable codes which average codeword-length per symbol gets arbitrarily close to $H^*_D\left(\mathcal{S}\right)$ (such as the Huffman code), and no uniquely decodable code can go below.
+
+    \subparag{Proof}{
+        We saw that, if $\Gamma_H$ is a Huffman $D$-ary code and $\Gamma_{SF}$ is a Shannon-Fano $D$-ary code for the random variable $S$, their average codeword-lengths satisfy:
+        \[H_D\left(S\right) \leq L\left(S, \Gamma_H\right) \leq L\left(S, \Gamma_{SF}\right) < H_D\left(S\right) + 1\]
+
+        Then, if we apply this to a block $S = \left(S_1, \ldots, S_n\right)$ of $n$ source symbols, we had:
+        \[\frac{H_D\left(S\right)}{n} \leq \frac{L\left(S, \Gamma_{H}\right)}{n} \leq \frac{L\left(S, \Gamma_{SF}\right)}{n} < \frac{H_D\left(S\right)}{n} + \frac{1}{n}\]
+
+        So, when $n$ tends towards infinity, we get that:
+        \[\lim_{n  \to \infty} \frac{L\left(S, \Gamma_{H}\right)}{n} = \lim_{n \to \infty} \frac{H_D\left(S\right)}{n} = H_D^*\left(\mathcal{S}\right)\]
+        using the sandwich theorem and the theorem we saw last lecture, since the limit exists by hypothesis.
+
+        \qed
+    }
+
+
+    \subparag{Existence}{
+        Note that we know that this limit exists for sure for Independent and Identically Distributed (IID) sources (such as the Coin-Flip source) and stationary sources.
+
+        For IID sources, we can simply see that:
+        \[H_D\left(S_1, \ldots, S_n\right) = nH_D\left(S_1\right) \implies \frac{H_D\left(S_1, \ldots, S_n\right)}{n} = H_D\left(S_1\right)\]
+
+        We already know that stationary sources are regular, and thus that this limit exists.
+    }
+
+    \subparag{Remark}{
+        This justifies that $H_D^*\left(\mathcal{S}\right)$ can be interpreted as a measure of information.
+    }
+}
+
+\parag{Example}{
+    Let's take the following encoding:
+    \begin{center}
+    \begin{tabular}{c|c|cc}
+        $\mathcal{A}$ & $p_S\left(s\right)$ & Direct encoding & Huffman Code \\
+        \hline
+        $a$ & 0.5 & 00 & 0 \\
+        $b$ & 0.25 & 10 & 10 \\
+        $c$ & 0.125 & 01 & 110 \\
+        $d$ & 0.125 & 11 & 111
+    \end{tabular}
+    \end{center}
+
+    We want the full probability distribution of the Huffman-coded string $Z$. We know that the first characters is uniform: it is a 0 if $a$ (probability $\frac{1}{2}$) and 1 else (probability $\frac{1}{2}$). Thus:
+    \[p_{Z_1}\left(z\right) = \frac{1}{2}, \mathspace z \in \left\{0, 1\right\}\]
+
+    Now, let's look at the probability distribution of the second bit, knowing the first bit is a 0. Since the first character was a 0, then necessarily it hit a $a$, and we restart fresh, thus:
+    \[p_{Z_2|Z_1}\left(z|0\right) = p_{Z_2}\left(z\right) = \frac{1}{2}\]
+
+    If we know the first bit was a 1, then there is probability $\frac{1}{2}$ to have a $b$, and probability $\frac{1}{2}$ to have a $c$ or $d$, thus:
+    \[p_{Z_2 |Z_1}\left(z | 1\right) = \frac{1}{2}\]
+
+    Let's say we know the first two bits were 0s, then those were two $a$, so we again are in the first situation:
+    \[p_{Z_3|Z_1, Z_2}\left(z |00\right) = \frac{1}{2}\]
+
+    If we know the first two bits were 11, then:
+    \[p_{Z_3|Z_1, Z_2}\left(z | 11\right) = \frac{1}{2}\]
+
+    In fact, if we continue doing this, we notice that the probabilities all have  probability $\frac{1}{2}$. The bits in the Huffman-coded string are independent of each other, and uniformly distributed. That is, they have the maximum possible entropy.
+}
+
+\parag{Compressing data}{
+    We want to know what happens to the entropy when we compress data.
+
+   There is a one-to-one correspondance between $\widetilde{S}^n$, the $n$ characters string encoded using the direct encoding, and $Z^k$, the $k$ characters string (where $k \leq n$ since Huffman codes are optimal) encoded using the Huffman code; if we know one, we can get the others (they are both uniquely decodable code). Thus, necessarily $H\left(\widetilde{S}^n\right) = H\left(Z^k\right)$. However, since the Huffman code is shorter on expectation, then it must have higher entropy per symbol. This is why when we compress data, entropy per symbol goes up (see the \nth{2} series of \textit{Pratiques de la Programmation Orientée objet} course).
+}
+
+
+\parag{Additional questions}{
+    We have some more questions. For example, what if the source-alphabet is not finite? Also, what if we do not know the source distribution $p_X\left(x\right)$ (doing universal source coding)?
+
+    To have some intuition on this subject, let's try to make a uniquely decodable binary code to encode the integers, thus working on an infinite source-alphabet. Since it is infinite, we cannot use Huffman's algorithm. We note that converting the number into binary does not work, since there would be no way to tell if $11$ is 3 or a 1 followed by a 1 (thus it is not uniquely decodable). However, we can also notice that every number begins by a 1. Thus, we can add some 0s before our number, corresponding to the length of the number: we add $\ell - 1$ 0s if the numbers is $\ell$ digits long. This allows us to get a prefix free code:
+    \begin{center}
+    \begin{tabular}{c|c}
+        $n$ & $c_1\left(n\right)$ \\
+        \hline
+        1 & 1 \\
+        2 & \textcolor{red}{0}10 \\
+        3 & \textcolor{red}{0}11 \\
+        4 & \textcolor{red}{00}100 \\
+        5 & \textcolor{red}{00}101 \\
+        $\vdots$ & $\vdots$
+    \end{tabular}
+    \end{center}
+
+    This is called the Elias Gamma Coding, and it gives us a length $\ell\left(n\right) = \left\lfloor \log_{2}\left(n\right) \right\rfloor + 1$ for a number $n$. Note that we can do better by encoding the prefix 0s using Elias Code 1 and removing the 1 at the beginning of the number; this yields Elias Delta Coding. There also exists an Elias Omega Coding, working recursively.
+}
+
+\subsection{Entropy and algorithms}
+\parag{Twenty questions}{
+    Twenty questions is a game in which someone thinks to something, and someone else must guess what they are thinking by asking us 20 yes/no questions to identify it.
+
+    Let $X$ be a random variable representing what the person thinks about. We wonder what is the minimum number of yes/no questions needed identify $X$, and which questions we should ask.
+
+    \subparag{Strategy}{
+        Let's consider a binary code $\Gamma$ for $X \in \mathcal{X}$. Once $\Gamma$ is fixed, we know $x \in \mathcal{X}$ if and only if we know the codeword $\Gamma\left(x\right)$. The strategy consists in asking the $i$\Th question so as to obtain the $i$\Th bit of this codeword. The average number of questions is $L\left(X, \Gamma\right)$, which is minimised if $\Gamma$ is the encoding map of a Huffman code. We will see that we cannot do better.
+
+        For example, let $X$ be a random variable in $\mathcal{A} = \left\{a, b, c, d, e\right\}$ having the following distribution:
+        \begin{center}
+        \begin{tabular}{c|ccccc}
+            $X$ & $a$ & $b$ & $c$ & $d$ & $e$ \\
+            \hline
+            $p_X$ & 0.1 & 0.1 & 0.2 & 0.2 & 0.4
+        \end{tabular}
+        \end{center}
+
+        Let's do the regular Huffman algorithm on this probability distribution:
+        \imagehere[0.4]{20QuestionsHuffmanCode.png}
+
+        Which yields:
+        \begin{center}
+        \begin{tabular}{c|ccccc}
+            $\mathcal{A}$ & $a$ & $b$ & $c$ & $d$ & $e$ \\
+            \hline
+            $\Gamma_H$ & 000 & 001 & 010 & 011 & 1
+        \end{tabular}
+        \end{center}
+
+        Let's suppose that the realisation is $X = b$ (but we do not it). The first question is: is $x = e$? Since the answer is no, we know the first bit is 0. Then, we can ask ``is $x \in \left\{c, d\right\}$?'' And so on.
+    }
+
+    \subparag{Proof of optimality}{
+        We have seen that a prefix-free code for $X \in \mathcal{X}$ leads to a querying strategy to find the realisation of $X$. Similarly, any deterministic querying strategy leads to a binary prefix free code for $X$. Indeed, before the first question we know that $x \in \mathcal{X}$. Then, the first question can be formulated as ``is $x \in A$?'', where $A \subset \mathcal{X}$ is given by our strategy. If the answer is yes, we know $x \in A \subset \mathcal{X}$, if it is no we know that $x \in A^C \subset \mathcal{X}$. In both cases, we have reduced the size of the set that contains $x$. We continue asking similar questions until the value of $x$ is fully determined, then we stop. The sequence of yes/no answers is a binary codeword associated to $x$. The code obtained when we consider all possible values of $x$ is a binary prefix-free code. Since the tree is prefix-free, its average codeword-length cannot be smaller than that of a Huffman code.
+    }
+}
+
+\parag{Sorting}{
+    We want to sort $n$ elements by doing pairwise comparisons with binary output. That is, for each comparison, we either get ``$<$'' or ``$\geq$''. We wonder how many binary comparisons are needed.
+
+   For any strategy, we need to compare two positions, and swap them if they are smaller. Then, we compare other positions, depending on whether we found one is greater than another. Again after them, we will have two other possibilities, and so on. Thus, we necessarily have a tree.
+
+   We notice that the pairwise comparisons must identify exactly the order in the unordered list. Moreover, since we have a tree, the pairwise comparisons are representing a prefix-free binary code for all possible permutations.
+
+   Thus, the average number of comparions must satisfy:
+   \[H\left(X\right) \leq \exval\left[\text{comparisons}\right]\]
+
+   Indeed, $\exval\left[\text{comparisons}\right]$ is the expected codeword length of our prefix-free binary code.
+
+   $X$ is in the set of all permutations of $n$ elements, $\mathcal{X}$, thus $\left|\mathcal{X}\right| = n!$. We can argue that the distribution is uniform (this assumption is typical for sorting algorithms), and this gives us the worst-case scenario (since the entropy is highest). So, we get:
+   \[H\left(X\right) = \log_2\left(\left|\mathcal{X}\right|\right) = \log_2\left(n!\right)\]
+
+   We know the following bounds on the factorial:
+   \[\frac{n^n}{e^{n-1}} \leq n! \leq \frac{n^{n+1}}{e^{n-1}}\]
+
+   Thus:
+   \[H\left(X\right) \approx \log\left(\frac{n^n}{e^{n-1}}\right) = n\log\left(n\right) - \left(n-1\right)\log\left(e\right)\]
+
+   The dominant term is $n\log\left(n\right)$, which means that there cannot be any sorting algorithm being better than $\Omega\left(n\log\left(n\right)\right)$ if we do not have any other assumptions (and want to keep every element in the list, I see you Stalin sort and Nagasaki sort).
+}
+
+\parag{Billiard balls}{
+    There are 14 billiard balls numbered from 0 to 13. Amongst ball 1 to 13, at most one could be heavier or lighter than the others, and we know 0 is a regular ball. We wonder what is the minimum number of weightings (using a scale that only tells us if the left side is heavier, lighter or of equal weight to the right one) to determine if one ball is different, if so which one and whether it is heavier or lighter.
+
+    Let $X$ be a random variable, stating the solution. We can encode it the following way. If all balls are equal, then $x = 0$. If ball $k$ is heavier, then $x = k$. If ball $k$ is lighter, then $x = -k$. Thus, for example, if ball 2 is lighter, then $x = -2$.  This gives us:
+    \[X \in \left\{-13, -12, \ldots, -1, 0, 1, \ldots, 12, 13\right\} = \mathcal{X}\]
+
+    Note that $\left|\mathcal{X}\right| = 27$.
+
+    We notice that any strategy consists in comparing elements, yielding us three outputs (left side equals in weight the right side, it is heavier, or it is lighter). Again, this yields a tree, which is a ternary prefix-free code ($D = 3$).
+
+    Again, we observe that the sequence of weightings uniquely specify $X$. Moreover, we also specify a prefix-free ternary code, which average length respects the inequality:
+    \[H_3\left(X\right) \leq \exval\left[\text{number of weightings}\right]\]
+
+    Let's say $X$ is uniform, since it makes sense. Then:
+    \[H_3\left(X\right) = \log_3\left|\mathcal{X}\right| = 3\]
+
+    Now, we have to show that this 3 is achievable. Let $S_1, S_2, S_3 \in \left\{-1, 0, 1\right\}$ be three weightings, where $s = -1$ if the left side is heavier, $s = 0$ if both side have equal weight, and $s = 1$ is the left side is lighter. If it should work, we must have:
+    \[H_3\left(X\right) = H_3\left(S_1, S_2, S_3\right)\]
+
+    Indeed, we can use $X$ to identify $S_1, S_2$ and $S_3$, and vice-versa. We can prove this mathematically:
+    \[H\left(X, S_1, S_2, S_3\right) = H\left(X\right) + \underbrace{H\left(S_1, S_2, S_3 | X\right)}_{= 0} = H\left(X\right)\]
+    \[H\left(X, S_1, S_2, S_3\right) = H\left(S_1, S_2, S_3\right) + \underbrace{H\left(X|S_1, S_2, S_3\right)}_{= 0} = H\left(S_1, S_2, S_3\right)\]
+
+    From this, we can conclude that $H_3\left(S_1, S_2, S_3\right) = 3$. We must thus have $S_1, S_2, S_3$ to be independent and uniform. Indeed:
+    \begin{multiequality}
+    H\left(S_1, S_2, S_3\right) =\ & H_3\left(S_1\right) + H_3\left(S_2 | S_1\right) + H_3\left(S_3|S_1, S_2\right) \\
+    \leq\ & H_3\left(S_1\right) + H_3\left(S_2\right) + H_3\left(S_3\right)  \\
+    \leq\ & 1 + 1 + 1  \\
+    =\ & 3
+    \end{multiequality}
+
+    Since we need both inequalities to be equalities, the first tells us they are independent, and the second tells us they are uniform.
+
+    We can use this information to construct our solution. For $S_1$, let us weight $0, 1, 2, 3, 4$ and $5, 6, 7, 8, 9$. Then:
+    \[S_1 = 1 \implies X \in \left\{+1, +2, +3, +4, -5, -6, -7, -8, -9\right\}\]
+    \[S_1 = 0 \implies X \in \left\{0, +10, +11, +12, +13, -10, -11, -12, -13\right\}\]
+    \[S_1 = -1 \implies X \in \left\{-1, -2, -3, -4, 5, 6, 7, 8, 9\right\}\]
+
+    In all three cases, we get 7 cases left after our first weight. Thus, it is indeed uniform. If $S_1 = 0$, then we can consider weighting 0, 10 and 11, 12. Again, we get uniform distributions. We can continue this way, and we find that 3 is indeed achievable.
+}
+
+
+\end{document}

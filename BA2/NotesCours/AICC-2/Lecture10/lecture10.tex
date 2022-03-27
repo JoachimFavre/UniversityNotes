@@ -1,0 +1,185 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-24 at 17:37:31.
+
+\usepackage{../../style}
+
+\title{AICC-2}
+\author{Joachim Favre}
+\date{Jeudi 24 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2022-03-24}{Diagrams which took me way too much time}{
+\begin{itemize}[left=0pt]
+    \item Introduction to sending ciphered message to someone we never met.
+    \item Explanation of the Deffie-Hellman cryptosystem.
+    \item Definition of trapdoor one-way function.
+    \item Explanation of El Gammal's cryptosystem.
+\end{itemize}
+
+}
+
+\parag{One-time pad}{
+    One-time pad is being used in practice, but it's very expensive. The key is very long, and it has to be sent every time. Moreover, the key has to be sent (and we cannot do it over a public channel), this can be a complicated task.
+
+    We reach the minimum length of a key for any binary crpytosystem if the plaintext cannot be compressed and is of length $n$, and we want perfect secrecy. Then, since $H\left(K\right) \geq H\left(T\right)$, we need at least $n$ bits. Thus, the one-time pad is optimal for perfect secrecy.
+
+    This leads to the key distribution problem. If we have $N$ users, then each need $N - 1$ keys, which often need to be refreshed. This does not seem doable.
+}
+
+\subsection{Public channel}
+\parag{Public channel}{
+    We wonder if two people who have never met agree on a secret key over a public channel. We cannot give a key, since other people would be able to see it.
+}
+
+\parag{Definition}{
+    Let $p$ be a prime number. If $\left\{g^i : i = 0, 1, \ldots, p-2\right\}$ is a permutation of $\left\{1, 2, \ldots, p-1\right\}$, then $g$ is called a \important{generator}.
+
+    \subparag{Examples}{
+        Let's pick $p = 7$. Then, our alphabet is:
+        \[\mathcal{A} = \left\{0, 1, \ldots, p-1\right\} = \left\{0, 1, 2, 3, 4, 5, 6\right\}\]
+
+        Let's pick $g = 2$. Then we compute $g^i \Mod \mathcal{A}$:
+        \begin{center}
+        \begin{tabular}{c|c}
+            $i$ & $g^i \Mod \mathcal{A} = 2^i \Mod 7$ \\
+            \hline
+            0 & 1 \\
+            1 & 2 \\
+            2 & 4 \\
+            3 & 1 \\
+            4 & 2 \\
+            5 & 4 \\
+        \end{tabular}
+        \end{center}
+
+        We see a pattern emerging. However, all numbers do not show up, so $g = 2$ is not a generator. Let's now take $g = 3$:
+        \begin{center}
+        \begin{tabular}{c|c}
+            $i$ & $g^i \Mod \mathcal{A} = 3^i \Mod 7$ \\
+            \hline
+            0 & 1 \\
+            1 & 3 \\
+            2 & 2 \\
+            3 & 6 \\
+            4 & 4 \\
+            5 & 5 \\
+            6 & 1 \\
+            6 & 3
+        \end{tabular}
+        \end{center}
+
+        We also see a pattern, but it is even more interesting. Indeed, for $g = 3$, we have a permutation of the non-zero elements of $\mathcal{A}$. Thus, $g = 3$ is a generator.
+    }
+
+}
+
+\parag{Diffie-Hellman cryptosystem}{
+   First, Alice and Bob agree publicly on a prime number $p$ and a generator $g$. Then, Alice picks a secret $a \in \left\{0, 1, \ldots, p-1\right\} = \mathcal{A}$, and calculates $A = g^a \Mod p$. Similarly, Bob picks a secret $b \in \mathcal{A}$, and calculates $B = g^b \Mod p$. Then, both write $A$ and $B$ in a public directory.
+
+    Now, Alice gets $B$ from the directory, and she computes:
+    \[B^a = \left(g^{b}\right)^{a} \Mod p = g^{ab} \Mod p\]
+
+    Similarly, Bob get $A$ from the directory, and computes:
+    \[A^b = \left(g^{a}\right)^{b} \Mod p = g^{ab} \Mod p\]
+
+    They thus get the same key, and can use it for sending private messages.
+
+    \svghere{DiffieHellmanSystem.svg}
+
+    \subparag{Breaking the code}{
+        This cryptosystem is really easy to break if we observe that:
+        \[b = \log_g\left(B\right), \mathspace a = \log_g\left(A\right)\]
+
+        However, if $a$ and $b$ are big enough (so $p$ had to be big enough in the beginning), then this becomes to be interesting. Indeed, this cryptosystem is based on the assumption that it is really hard to compute a logarithm. By doing more maths, we can even see that this algorithm works really well if $p-1$ has large prime factors.
+
+        Let's take an example. If we pick $p = 2^{2048}$ to have a 2048-bit number (it is not prime, but it is not a problem). Then, Alice needs around 4095 multiplications to compute $A = g^a$. To compute $\log_g\left(A\right)$, one would need around $10^{35}$ multiplications (as a comparison point, the age of the universe is around $\SI{4.3 \cdot 10^{17}}{\second }$).
+
+        This makes us come to the following definition
+    }
+
+}
+
+\parag{Definition: One-way function}{
+    A \important{one-way function} is a function so for which one way is easy to compute, but its reciprocal is really hard.
+
+    \subparag{Example}{
+        $g^a$, where $g$ is known but $a$ is unknown, is conjectured to be one-way. This is not completely proven yet, but we think (and we hope) that it is true.
+    }
+
+    \subparag{Observation}{
+        For a cryptographer, just having a one-way function is not enough to create a code. We need a trapdoor one-way function.
+    }
+
+}
+
+\parag{Definition: Trapdoor one-way function}{
+    A \important{trapdoor one-way function} is a one-way function, but for which the reciprocal is easy to compute when we have the key $k$ to a trapdoor.
+
+    \subparag{Remark}{
+        $g^a$, where $g$ is known but $a$ is unknown, is \textit{not} a trapdoor one-way function.
+    }
+}
+
+\parag{Observation}{
+    A trapdoor one-way function is great to create a code. Indeed, Bob can create a private key $k_B$, which he keeps secret. Then, he publishes a trapdoor one-way function, with trapdoor $k_B$. Alice can use this function to send her message, which nobody else than Bob can decipher, since it is a one-way function. However, since Bob has his private key $k_B$ being a key to the trapdoor of the function, he can decipher the message Alice sent him.
+
+    \svghere{TrapdoorOneWayFunction.svg}
+
+    \subparag{Remark}{
+        The RSA ciphering system works that way, but we will need two more weeks of theory to build it.
+    }
+}
+
+\parag{Multiplicative inverse}{
+    If $a \cdot i = 1 \Mod m$, then we say that $a$ is the \important{multiplicative inverse} of $i$.
+
+    \subparag{Observation}{
+        Let's consider the following alphabet:
+        \[\mathcal{A} = \left\{0, 1, \ldots, p-1\right\}, \mathspace p \in \mathbb{N}\]
+
+        We notice something really interesting. If $p$ is prime, then every \textit{non-zero} number of $\mathcal{A}$ have a multiplicative inverse. We will prove this fact later.
+
+        Let's consider $p = 7$ for example:
+        \begin{center}
+        \begin{tabular}{c|c}
+            $i$ & inverse \\
+            \hline
+            0 & --- \\
+            1 & 1 \\
+            2 & 4 \\
+            3 & 5 \\
+            4 & 2 \\
+            5 & 3 \\
+            6 & 6
+        \end{tabular}
+        \end{center}
+
+        However, if $q = 6$, it does not work:
+        \begin{center}
+        \begin{tabular}{c|c}
+            $i$ & inverse \\
+            \hline
+            0 & --- \\
+            1 & 1 \\
+            2 & --- \\
+            3 & --- \\
+            4 & --- \\
+            5 & 5 \\
+        \end{tabular}
+        \end{center}
+    }
+}
+
+\parag{El Gammal's cryptosystem}{
+    There is a ciphering system other than RSA that works with trapdoor one-way functions, named \important{El Gammal's crypto}.
+
+    Alice and Bob choose a $g$ publicly. Then, Alice picks a random number $y$, and Bob a random number $x$. Alice publishes $g^y$ and Bob $g^x$. If Alice wants to send her message, she can compute $c = g^{xy}t\ \Mod\ \left|\mathcal{A}\right|$, where $g^{xy}$ can be easily computed as in the Diffie-Hellman cryptosystem. Then, Bob can decipher the message by using the multiplicative inverse of $g^{xy}$. Indeed, if $a$ is the multiplicative inverse of $g^{xy}$:
+    \[ac = a\left(g^{xy} t\right) = a g^{xy} t = t\]
+}
+
+
+
+\end{document}
