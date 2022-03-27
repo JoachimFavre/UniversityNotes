@@ -13,7 +13,7 @@
 
 \section{Démonstrations à connaître}
 
-\parag{Théorème (existence et unicité d'une solution des EDVS)}{
+\parag{Théorème: Existence et unicité d'une solution des EDVS}{
     Soit $f: I \mapsto \mathbb{R}$ une fonction continue telle que $f\left(y\right) \neq 0$ pour tout $y \in I$, et soit $g : J \mapsto \mathbb{R}$ une fonction continue.
 
     \important{Existence:} Alors, pour tout couple $\left(x_0, b_0\right)$ où $x_0 \in J$ et $b_0 \in I$, l'équation
@@ -94,5 +94,194 @@
     }
 }
 
+\parag{Proposition pour le Wronskien}{
+    Soient $v_1, v_2 : O \mapsto \mathbb{R}$ deux solutions de l'équation $y''\left(x\right) + p\left(x\right)y'\left(x\right) + q\left(x\right)y\left(x\right) = 0$ (EDL2 homogène).
+
+    $v_1\left(x\right)$ et $v_2\left(x\right)$ sont linéairement indépendants si $W\left[v_1, v_2\right]\left(x\right) \neq 0$ pour tout $x \in I$.
+
+    \subparag{Preuve $\impliedby$}{
+        Démontrons ce point par la contraposée. Nous voulons donc montrer que les solutions sont linéairement dépendantes implique qu'il existe $x \in I$ tel que $W\left[v_1, v_2\right]\left(x\right) = 0$.
+
+        Puisque nos deux solutions sont linéairement dépendantes, nous pouvons prendre sans perte de généralité qu'il existe $c \in \mathbb{R}$ tel que $v_1\left(x\right) = cv_2\left(x\right)$ (si plutôt $v_2\left(x\right) = c v_1\left(x\right)$, nous pourrions juste échanger les noms, d'où le ``sans perte de généralité'').
+
+        Ainsi, nous avons:
+        \begin{multiequality}
+        W\left[v_1, v_2\right]\left(x\right) =\ & \det\begin{pmatrix} v_1\left(x\right) & cv_1\left(x\right) \\ v_1'\left(x\right) & cv_1'\left(x\right) \end{pmatrix}  \\
+        =\ & cv_1\left(x\right) v_1'\left(x\right) - cv_1\left(x\right) v_1'\left(x\right) \\
+        =\ & 0, \mathspace \forall x \in I
+        \end{multiequality}
+
+        Nous avons donc trouvé que le Wronskien est nul pour tout $x$ sur cet intervalle, donc il existe bien un $x$ pour lequel il est égal à 0.
+    }
+
+    \subparag{Preuve $\implies$}{
+        Prouvons aussi cette affirmation par la contraposée. Nous voulons donc montrer que, s'il existe $x_0 \in I$ tel que $W\left[v_1, v_2\right]\left(x_0\right) = 0$, alors $v_1\left(x\right)$ et $v_2\left(x\right)$ sont linéairement dépendantes.
+
+        Puisqu'il existe un tel $x_0 \in I$, nous savons que:
+        \[\det\begin{pmatrix} v_1\left(x_0\right) & v_2\left(x_0\right) \\ v_1'\left(x_0\right) & v_2'\left(x_0\right) \end{pmatrix} = 0\]
+
+        Ainsi, le kernel de cette matrice est est non-trivial (il n'est pas de dimension 0), donc il existe un vecteur non nul $\binom{a}{b} \in \mathbb{R}^2$ tel que:
+        \[\begin{bmatrix} v_1\left(x_0\right) & v_2\left(x_0\right) \\ v_1'\left(x_0\right) & v_2'\left(x_0\right) \end{bmatrix} \begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} 0 \\ 0 \end{pmatrix} \]
+
+        Ainsi:
+        \begin{systemofequations}{}
+        &\ a v_1\left(x_0\right) + b v_2\left(x_0\right) = 0 \\
+        &\ a v_1'\left(x_0\right) + b v_2'\left(x_0\right) = 0
+        \end{systemofequations}
+
+    Soit $v\left(x\right) = av_1\left(x\right) + bv_2\left(x\right)$. Alors, $v\left(x\right)$ est une solution de l'équation donnée par la superposition des solutions. De plus, par le système d'équations que nous venons de trouver, nous avons $v\left(x_0\right) = 0$ et $v'\left(x_0\right) = 0$. Par le théorème de l'existence et unicité d'une solution de l'équation $y''\left(x\right) + p\left(x\right)y'\left(x\right) + q\left(x\right)y\left(x\right) = 0$, cette équation admet une seule solution satisfaisant $y\left(x_0\right) = 0$ et $y'\left(x_0\right) = 0$. Puisque la solution triviale $y\left(x\right) = 0 \ \forall x \in I$ satisfait l'équation et les conditions initiale, alors nécessairement:
+    \[v\left(x\right) = av_1\left(x\right) + bv_2\left(x\right) = 0, \mathspace \forall x \in I\]
+
+    Puisque $a$ et $b$ ne sont pas les deux nuls, soit nous avons $v_1\left(x\right) = \frac{-b}{a} v_2\left(x\right)$ pour tout $x \in I$, soit nous avons $v_2\left(x\right) = -\frac{a}{b} v_1\left(x\right)$ pour tout $x \in I$ (soit les deux).
+
+    Nous avons donc bien trouvé que $v_1\left(x\right)$ et $v_2\left(x\right)$ sont linéairement dépendantes sur $I$.
+
+    \qed
+    }
+
+    \subparag{Idée de la preuve}{
+        On démontre que $Q \implies P$ et $P \implies Q$ par la contraposée car $P$ et $Q$ sont des propositions ``négatives'': il est beaucoup plus simple d'avoir une fonction qui est parfois égale à 0, ou deux fonctions qui sont linéairement dépendantes.
+    }
+}
+
+\parag{Théorème: Forme des solutions aux EDL2 homogènes}{
+    Soient $v_1, v_2 : I \mapsto \mathbb{R}$ deux solutions linéairement indépendantes de l'équation $y''\left(x\right) + p\left(x\right) y'\left(x\right) + q\left(x\right) y\left(x\right) = 0$.
+
+    Alors, la solution générale de cette équation est de la forme:
+    \[v\left(x\right) = C_1 v_1\left(x\right) + C_2 v_2\left(x\right), \mathspace C_1, C_2 \in \mathbb{R}, x \in I\]
+
+    \subparag{Preuve}{
+        Soit $\widetilde{v}\left(x\right)$ une solution de l'équation donnée, et $x_0 \in I$. Alors, nous savons que $\widetilde{v}\left(x_0\right) = a_0 \in \mathbb{R}$ et $\widetilde{v}\left(x_0\right) = b_0 \in \mathbb{R}$.
+
+        Nous avons deux solutions linéairement indépendantes $v_1, v_2 : I \mapsto \mathbb{R}$. Ainsi, par la caractérisation, nous savons que $W\left[v_1, v_2\right]\left(x\right) \neq 0$ pour tout $x \in I$, ce qui implique que $W\left[v_1, v_2\right]\left(x_0\right) \neq 0$.
+
+        Or, quand le déterminant d'une matrice est non-nul (la matrice est dite \textit{dégénérée}), nous savons qu'une équation l'utilisant a une solution unique. Ainsi, nous savons qu'il existe d'uniques constantes $C_1, C_2 \in \mathbb{R}$ telles que:
+        \begin{systemofequations}{}
+        &\ C_1 v_1\left(x_0\right) + C_2 v_2\left(x_0\right) = a_0 \\
+        &\ C_1 v_1'\left(x_0\right) + C_2 v_2'\left(x_0\right) = b_0
+        \end{systemofequations}
+
+        Considérons la fonction $v\left(x\right) = C_1 v_1\left(x\right) + C_2 v_2\left(x\right)$. Nous pouvons en déduire deux informations. La première est que $v\left(x\right)$ est une solution de l'équation (puisque $v_1\left(x\right)$ et $v_2\left(x\right)$ sont des solutions). La deuxième est que $v\left(x_0\right) = a_0$ et $v'\left(x_0\right) = b_0$.
+
+        Par le théorème de l'existence et unicité d'une solution des EDL2 homogènes satisfaisant des conditions initiales données $v\left(x_0\right)= a_0$ et $v'\left(x_0\right)= b_0$, on a $\widetilde{v}\left(x\right) = v\left(x\right)$ pour tout $x \in I$.
+
+        \qed
+    }
+}
+
+\parag{Théorème: Lien entre les suites dans $\mathbb{R}^n$ et la topologie}{
+    Un sous-ensemble non-vide $E \subset \mathbb{R}^n$ est fermé si et seulement si toute suite $\left\{\bvec{x_k}\right\} \subset E$ d'éléments de $E$ qui converge a pour limite un élément de $E$.
+
+    \subparag{Preuve $\implies$}{
+        Nous supposons que $E \subset \mathbb{R}^n$ est fermé.
+
+        Supposons par l'absurde qu'il existe une suite $\left\{\bvec{x_k}\right\} \subset E$ d'éléments de $E$ qui converge et qui a pour limite $\bvec{x} \not\in E$. Ainsi, on sait que $\bvec{x} \in CE$, qui est un ensemble ouvert dans $\mathbb{R}^n$ (puisque $E$ est fermé par hypothèse). Puisque cet ensemble ouvert nous savons, par définition, que $\exists \delta > 0$ tel que:
+        \[B\left(\bvec{x}, \delta\right) \subset CE\]
+
+        Or, cela implique que:
+        \[\underbrace{\left\{\bvec{x_k}\ \forall k \in \mathbb{N}\right\}}_{\subset E} \cap \underbrace{B\left(\bvec{x}, \delta\right)}_{\subset CE} = \o\]
+
+        En d'autres mots, aucun élément de la suite ne fait partie de cette boule ouverte.
+
+        De l'autre côté, puisque $\lim_{k \to \infty} \bvec{x_k}$, nous avons qu'il existe un $k_0 \in \mathbb{N}$ tel que pour tout $k \geq k_0$:
+        \[\bvec{x_k} \in \bar{B\left(\bvec{x}, \frac{\delta}{2}\right)} \subset B\left(\bvec{x}, \delta\right)\]
+
+        En d'autres mots, pour $k \geq k_0$, $\bvec{x_k}$ fait partie de notre boule ouverte. Ceci entre en contradiction avec ce que nous avions vu ci-dessus.
+
+        \qed
+    }
+
+    \subparag{Preuve $\impliedby$}{
+        Nous allons démontrer notre proposition par la contraposée: nous voulons montrer que si $E \subset \mathbb{R}^n$ n'est pas fermé, alors il existe une suite $\left\{\bvec{x_k} \subset E\right\}$ d'éléments de $E$ qui converge et qui a pour un limite un élément qui n'est pas dans $E$.
+
+        Puisque nous savons que $E$ n'est pas fermé, nous savons que $CE$ n'est pas ouvert. Ainsi, $\exists \bvec{y} \in CE$ tel que, pour tout $\epsilon > 0$:
+        \[B\left(\bvec{y}, \epsilon\right) \cap E \neq \o\]
+
+        Plus précisément, on peut prendre $\epsilon = \frac{1}{k}$, ce qui nous donne:
+        \[\forall k \in \mathbb{N}_+, \ B\left(\bvec{y}, \frac{1}{k}\right)\]
+
+        Ceci implique que, pour tout $k$, on sait qu'il existe un $\bvec{y_k}$ tel que $\bvec{y_k} \in B\left(\bvec{y}, \frac{1}{k}\right)$ et $\bvec{y_k} \in E$. Ceci nous donne une suite $\left\{\bvec{y_k}\right\}_{k \in \mathbb{N}_+} \subset E$ telle que $\lim_{k \to \infty} \bvec{y_k} = \bvec{y} \in CE$, et donc $\bvec{y} \not\in E$.
+
+        \qed
+    }
+}
+
+
+\parag{Théorème: Caractérisation des limites à partir des suites convergentes}{
+    Une fonction $f: E \mapsto \mathbb{R}$ définie au voisinage de $\bvec{x_0}$ admet pour limite $\ell \in \mathbb{R}$ lorsque $\bvec{x} \to \bvec{x_0}$ si et seulement si \textit{pour toute} suite d'éléments $\left\{\bvec{a_k}\right\}$ de $\left\{\bvec{x} \in E \telque \bvec{x} \neq \bvec{x_0}\right\}$, qui converge vers $\bvec{x_0}$, la suite $\left\{f\left(\bvec{a_k}\right)\right\}$ converge vers $\ell$.
+
+    En d'autres mots:
+    \[\left(\lim_{\bvec{x} \to \bvec{x_0}} f\left(\bvec{x}\right) = \ell\right) \iff \left(\lim_{k \to \infty} f\left(\bvec{a_k}\right) = \ell,\ \forall \left\{\bvec{a_k}\right\} \subset E \setminus \left\{\bvec{x_0}\right\} \text{ telle que } \lim_{k \to \infty} \bvec{a_k} = \bvec{x_0}\right)\]
+
+    \subparag{Preuve $\implies$}{
+        Nous savons par hypothèse que $\lim_{\bvec{x} \to \bvec{x_0}} f\left(\bvec{x}\right) = \ell$. Ainsi, par la définition de la limite, on sait que, pour tout $\epsilon > 0$, il existe $\delta > 0$ tel que:
+        \[0 < \left\|\bvec{x} - \bvec{x_0}\right\| \leq \delta \implies \left|f\left(\bvec{x}\right) - \ell\right| \leq \epsilon\]
+
+        Soit une suite arbitraire $\left\{\bvec{a_k}\right\} \subset E \setminus \left\{\bvec{x_0}\right\}$ telle que $\lim_{k \to \infty} \bvec{a_k} = \bvec{x_0}$. Puisque la définition des limites pour les suites marche pour tout $\widetilde{\epsilon}$, nous pouvons prendre $\widetilde{\epsilon} = \delta$. Ainsi, par définition, pour $\widetilde{\epsilon} = \delta > 0$, nous savons que $\exists k_0$ tel que, pour tout $k \geq k_0$, on a:
+        \[\left\|\bvec{a_k} - \bvec{x_0}\right\| \leq \delta\]
+
+        Or, puisque $\left\{\bvec{a_k}\right\} \subset E \setminus \left\{\bvec{x}_0\right\}$, nous savons que $\bvec{a_k} - \bvec{x_0}\neq 0$. Ainsi, pour tout $k \geq k_0$, $0 < \left\|\bvec{a_k} - \bvec{x_0}\right\| \leq \delta$. Cependant, cela implique par la première implication que:
+        \[\left|f\left(\bvec{a_k}\right) - \ell\right| \leq \epsilon\]
+
+        Ainsi, nous avons démontré que pour tout $\epsilon > 0$, il existe $k_0$ tel que pour tout $k \geq k_0$ on a $\left|f\left(\bvec{a_k}\right) - \ell\right| \leq \epsilon$. En d'autres mots, nous avons montré que:
+        \[\lim_{k \to \infty} f\left(\bvec{a_k}\right) = \ell\]
+    }
+
+    \subparag{Preuve $\impliedby$}{
+        Nous allons faire cette preuve par la contraposée. Ainsi, nous supposons par hypothèse que $\lim_{\bvec{x} \to \bvec{x_0}} f\left(\bvec{x}\right) \neq \ell$.
+
+        Par la définition de la limite, on obtient que $\exists \epsilon > 0$ tel que $\forall \delta > 0$, $\exists \bvec{x_\delta}$ tel que:
+        \[\left\|\bvec{x_{\delta}} - \bvec{x_0}\right\| \leq \delta \mathspace \text{et} \mathspace \left|f\left(\bvec{x_{\delta}}\right) - \ell\right| > \epsilon\]
+
+        Puisque c'est vrai pour tout $\delta$, alors c'est aussi vrai pour le cas particulier où $\delta = \frac{1}{k}$, $k \in \mathbb{N}_+$. Ainsi, pour le $\epsilon$ dont nous connaissons l'existence, pour tout $k \in \mathbb{N}_+$, il existe $\bvec{x_k} \in E$ tel que:
+        \[\left\|\bvec{x_k} - \bvec{x_0}\right\| \leq \frac{1}{k} \mathspace \text{et} \mathspace \left|f\left(\bvec{x_k}\right) - \ell\right| > \epsilon\]
+
+        On obtient la suite $\left\{\bvec{x_k}\right\}_{k=1}^{\infty}$ qui est telle que, par la définition, $\lim_{k \to \infty} \bvec{x_k} = \bvec{x_0}$. Cependant, cette suite est aussi telle que $\left|f\left(\bvec{x_k}\right) - \ell\right| > \epsilon$ pour tout $k \in \mathbb{N}_+$, ce qui implique que:
+        \[\lim_{k \to \infty} f\left(\bvec{x_k}\right) \neq \ell\]
+
+        \qed
+    }
+}
+
+\parag{Théorème du min et du max sur un compact}{
+    Une fonction continue sur un sous-ensemble compact $E \subset \mathbb{R}^2$ atteint son maximum et son minimum, i.e.: 
+    \[\exists \max_{\bvec{x} \in E} f\left(\bvec{x}\right), \mathspace \exists \min_{\bvec{x} \in E} f\left(\bvec{x}\right)\]
+
+    \subparag{Preuve $f\left(E\right)$ est borné}{
+        Nous voulons commencer par montrer que $\left\{f\left(\bvec{x}\right)\right\}_{\bvec{x} \in E}$ est borné. 
+
+        Supposons par l'absurde que $f\left(E\right)$ n'est pas borné, c'est à dire que pour tout $k \geq 0$, il existe un $\bvec{x_k} \in E$ tel que $\left|f\left(\bvec{x_k}\right)\right| \geq k$. Ceci nous donne une suite $\left\{\bvec{x_k}\right\} \in E$. 
+
+        Puisque $E$ est un ensemble compact, nous savons qu'il est borné, et donc $\left\{\bvec{x_k}\right\}$ est bornée. Ainsi, par le théorème de Bolzano-Weierstrass, nous pouvons trouver une sous suite convergente $\left\{\bvec{x_{k_{p}}}\right\}$, qui a pour limite un vecteur $\bvec{x_0} \in \mathbb{R}^n$. Puisque $E$ est compact (et donc fermé), nous savons que $\bvec{x_0} \in E$.
+
+        Puisque $f$ est continue, nous savons que: 
+        \[\lim_{p \to \infty} f\left(\bvec{x_{k_{p}}}\right) = f\left(\bvec{x_0}\right) \in\mathbb{R}\]
+        
+        Mais, par construction, $\left|f\left(\bvec{x_k}\right)\right| \geq k$ pour tout $k \in \mathbb{N}$, ce qui est notre contradiction. Nous en concluons que $f$ est bornée.
+    }
+
+    \subparag{Preuve $f$ atteint ses extremum}{
+        Nous voulons montrer que $f$ atteint son minimum et son maximum sur $E$. 
+
+        Par ce que nous venons de démontrer, nous savons que $f\left(E\right)$ est un sous-ensemble borné. Ainsi: 
+        \[\exists M = \sup\left\{f\left(\bvec{x}\right), \bvec{x} \in E\right\}, \mathspace \exists m = \inf\left\{f\left(\bvec{x}\right), \bvec{x} \in E\right\}\]
+        
+        Par la définition du supremum et de l'infimum, nous pouvons nous en rapprocher arbitrairement, donc cela implique qu'il existe deux suites $\left\{\bvec{a_k}\right\}, \left\{\bvec{b_k}\right\} \in E$ telles que: 
+        \[\lim_{k \to \infty} f\left(\bvec{a_k}\right) = m, \mathspace \lim_{k \to \infty} f\left(\bvec{b_k}\right) = M\]
+
+        Or, puisque $\left\{\bvec{a_k}\right\}, \left\{\bvec{b_k}\right\} \in E$ (qui est borné), ce sont des suites bornées, et donc il existe des sous-suites convergentes. En d'autres mots: 
+        \[\bvec{a_{k_p}} \to \bvec{a} \in \mathbb{R}^n, \mathspace \bvec{b_{k_p}} \to \bvec{b} \in \mathbb{R}^n\]
+        
+        De plus, puisque $E$ est compact (et donc fermé), nous savons que $\bvec{a} \in E$ et $\bvec{b} \in E$. Ainsi, par la continuité de $f$: 
+        \[m = \lim_{k \to \infty} f\left(\bvec{a_k}\right) = \lim_{p \to \infty} f\left(\bvec{a_{k_p}}\right) = f\left(\bvec{a}\right)\]
+        \[M = \lim_{k \to \infty} f\left(\bvec{b_k}\right) = \lim_{p \to \infty} f\left(\bvec{b_{k_p}}\right) = f\left(\bvec{b}\right)\]
+
+        Ainsi, nous savons qu'il existe $\bvec{a}, \bvec{b} \in E$ tels que: 
+        \[f\left(\bvec{a}\right) = m = \min_{\bvec{x} \in E} f\left(\bvec{x}\right)\]
+        \[f\left(\bvec{b}\right) = M = \max_{\bvec{x} \in E} f\left(\bvec{x}\right)\]
+
+        \qed
+    }
+}
 
 \end{document}

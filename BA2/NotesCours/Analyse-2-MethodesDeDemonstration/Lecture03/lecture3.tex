@@ -1,0 +1,136 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-02-28 at 11:30:52.
+
+\usepackage{../../style}
+
+\title{Méthodes de démonstration}
+\author{Joachim Favre}
+\date{Lundi 28 février 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2022-02-28}{Dsiijonctions de cas}{
+\begin{itemize}[left=0pt]
+    \item Explication de la méthode de démonstration par disjonctions de cas.
+    \item Explication de la méthode de démonstration pour les preuves si et seulement si.
+\end{itemize}
+}
+
+\parag{Méthode 3: Raisonnement par disjonction des cas}{
+    Soient $P, Q$ deux propositions. Pour montrer que $P \implies Q$, on sépare l'hypothèse de $P$ de départ en différents cas possibles et on montre l'implication est vraie dans chacun des cas. Il est très important de considérer tous les cas possibles.
+}
+
+\parag{Exemple 1}{
+    Soit $n \in \mathbb{Z}$. Alors, $n^2 \geq n$.
+
+    \subparag{Preuve}{
+        Nous savons que: 
+        \[n^2 \geq n \iff n\left(n - 1\right) \geq 0\]
+        
+        Nous pouvons donc démontrer la deuxième propriété pour démontrer la première. 
+
+        Premièrement, considérons $n \geq 1$. Alors. 
+        \[\underbrace{n}_{> 0}\underbrace{\left(n - 1\right)}_{\geq 0} \geq 0\]
+
+        Deuxièmement, prenons $n \leq 0$: 
+        \[\underbrace{n}_{\leq 0}\underbrace{\left(n-1\right)}_{< 0} \geq 0\]
+
+        Or, on sait bien que:
+        \[\mathbb{Z} = \left\{n \in \mathbb{Z} : n \geq 1\right\} \cup \left\{n \in \mathbb{Z} : n \leq 0\right\}\]
+
+        Tout ceci nous permet de conclure que notre inégalité est vraie pour tout $n \in \mathbb{Z}$.
+
+        \qed
+    }
+}
+
+\parag{Exemple 2}{
+    Soit $n, m \in \mathbb{Z}$. Alors: 
+    \[t = \frac{nm\left(n - m\right)\left(n + m\right)}{3} \in \mathbb{Z}\]
+     
+    \subparag{Preuve}{
+        \begin{enumerate}[left=0pt]
+            \item On remarque que pour $n = 3k$, $k \in \mathbb{Z}$, on voit clairement que $t \in \mathbb{Z}$.
+            \item De manière similaire, si $m = 3k$, $k \in \mathbb{Z}$, alors $t \in \mathbb{Z}$.
+            \item Nous considérons que ni $m$ ni $n$ n'est divisible par 3. Nous pouvons maintenant considérer deux sous cas: 
+                \begin{enumerate}[left=0pt]
+                    \item Supposons que $m$ et $n$ ont les même restes de division par 3. Alors, $n - m = 3k$, donc $t \in \mathbb{Z}$.
+                    \item Supposons que les restes de division par 3 de $n$ $m$ sont différents. Alors, $n + m =  3k, k \in \mathbb{Z}$ donc $t \in \mathbb{Z}$.
+                \end{enumerate}
+        \end{enumerate}
+        
+         Nous avons démontré tous nos cas, ce qui conclut notre preuve.
+
+         \qed
+    }
+}
+
+\parag{Méthode 4: Démonstrations ssi}{
+    Nous cherchons à démontrer les propositions de la forme: 
+    \[P \iff Q\]
+    
+    La première méthode consiste à démontrer que: 
+    \[P \implies Q \mathspace \text{ et } \mathspace Q \implies P\]
+    
+    Plus rarement, on peut aussi faire une suite d'équivalences entre $P$ et $Q$: 
+    \[P \iff R_1 \iff \ldots \iff R_n \iff Q\]
+
+    Pour cette deuxième méthode, il faut faire attention au fait que chaque implication est une équivalence.
+}
+
+\parag{Exemple 1}{
+    Soient $a, b \in \mathbb{N}$. Alors: 
+    \[ab + 1 = c^2, c \in \mathbb{N}^* \iff a = b \pm 2\]
+    
+    \subparag{Preuve}{
+        Regardons la suite d'équivalence suivante: 
+        \[ab + 1 = c^2 \iff ab = c^2 - 1 \iff ab = \left(c - 1\right)\left(c + 1\right)\]
+        
+        Ce qui est équivalent à soit $a = c-1$ et $b = c+1$, soit l'inverse. Dans le premier cas, $a = b - 2$, dans le deuxième $a = b + 2$. 
+
+        \vspace{2em}
+
+        En fait, cette dernière phrase est fausse, on pourrait avoir $ab = 4\cdot 9$ avec $a = 2$ et $b = 18$. En fait, l'affirmation que nus voulions montrer est uniquement vraie pour $\impliedby$. On peut par exemple trouver le contre-exemple $a = 3$ et $b = 8$.
+    }
+
+    \subparag{Preuve correcte}{
+        Nous voulons montrer que: 
+        \[a = b \pm 2 \implies ab + 1 = c^2, c \in \mathbb{N}\]
+        
+        Partons du début de notre implication: 
+        \begin{multiequation}
+        & a = b \pm2 \in\mathbb{N}  \\
+        \implies & ab +  1 = b\left(b \pm 2\right) + 1 = b^2 \pm 2b + 1 = \left(b \pm 1\right)^2 = c^2  \\
+        \implies & c = b \pm 1 \in\mathbb{N}
+        \end{multiequation}
+
+        \qed
+    }
+}
+
+\parag{Exemple 2}{
+    Soient $z = \rho e^{i\phi} \in \mathbb{C}^*$. Nous prenons les propositions suivantes: 
+    \[P : \left\{z^{2} \in \mathbb{R}^*\right\}, \mathspace Q : \left\{\phi = \frac{\pi k}{2}, k \in\mathbb{Z}\right\}\]
+    
+    Nous nous demandons quelle proposition implique laquelle. Nous allons montrer que c'est un si et seulement si.
+
+    \subparag{Preuve $\impliedby$}{
+        Soit $z = \rho e^{i\phi}$ où $\phi = \frac{k\pi}{2}$. Ainsi: 
+        \[z^2 = \rho^2 e^{2i \frac{k\pi}{2}} = \rho^2 e^{i\pi k} = \rho^2\left(\cos\left(\pi k\right) + i \sin\left(\pi k\right)\right) = \rho^2\left(\pm 1\right) \in \mathbb{R}^*\]
+    }
+
+    \subparag{Preuve $\implies$}{
+        Soit $z = \rho e^{i \phi}$ tel que $z^2 \in \mathbb{R}^*$. Alors: 
+        \[z^2 = \rho^2 e^{2i\phi} = \rho^{2} \left(\cos\left(2\phi\right) + i\underbrace{\sin\left(2\phi\right)}_{= 0}\right) \in \mathbb{R}^*\]
+        
+        La partie imaginaire, le sinus, est nulle par hypothèse. Ainsi: 
+        \[\sin\left(2\phi\right) = 0 \implies 2\phi = k\pi \implies \phi = \frac{k\pi}{2}\]
+        où $k \in\mathbb{Z}$.
+
+        \qed
+    }
+}
+
+\end{document}

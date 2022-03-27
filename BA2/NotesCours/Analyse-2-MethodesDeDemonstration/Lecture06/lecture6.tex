@@ -1,0 +1,89 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-08 at 13:53:14.
+
+\usepackage{../../style}
+
+\title{Méthodes de démonstration}
+\author{Joachim Favre}
+\date{Mercredi 09 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2022-03-09}{Le meilleur mathématicien}{
+\begin{itemize}[left=0pt]
+    \item Explication de la méthode de démonstration dite par l'absurde.
+\end{itemize}
+}
+
+\parag{Méthode 5: Démonstration par l'absurde}{
+    Pour démontrer une proposition $P$, on essaie de démontrer que $\lnot P$ implique une proposition fausse bien connue $F$. En d'autres mots, on obtient $\lnot P \implies F$ qui est contradictoire aux axiomes, ou aux propositions vraies préalablement établies.
+
+    \subparag{Comparaison avec la contraposée}{
+        Par la contraposée, on démontre que $\lnot Q \implies \lnot P$, qui est équivalent à $P \implies Q$.
+
+        Par l'absurde, on démontre qu'une proposition $P$ est fausse, en montrant que $\lnot P \implies F$ est évidemment fausse. Notez que, pour une démonstration par l'absurde, nous n'avons pas besoin d'avoir un théorème sous la forme d'une implication $P \implies Q$.
+    }
+    
+}
+
+\parag{Exemple 1}{
+    Il existe une infinité de nombres premiers.
+
+    La démonstration qui suit a été imaginée par Euclid (le best).
+
+    \subparag{Preuve}{
+        Supposons par l'absurde qu'il existe seulement un nombre fini $n \in \mathbb{N}$ de nombres premiers: $p_1, \ldots, p_n$. 
+
+        Considérons le nombre $K = p_1 p_2 \cdots p_n + 1$. On remarque que $K > p_i$ pour tout $p_i \in \left\{p_1, \ldots, p_n\right\}$, ainsi $K \neq p_i$ pour tout $i = 1, \ldots, n$. Nous pouvons déduire de ce fait que $K$ n'est pas un nombre premier car il est plus grand que 1 par construction, et ne fait pas partie de la liste. Ainsi, par définition des nombres premiers, cela implique que $K$ est divisible par un nombre premier, disons $p_i$.
+
+        Clairement, $p_1 p_2 \cdots p_n$ est aussi divisible par $p_i$. Ainsi, $K - p_1 p_2 \cdots p_n$ est aussi divisible par $p_i$. Cependant, $K - p_1 p_2 \cdots p_n = 1$, mais 1 n'est divisible par aucun nombre premier, ce qui est notre contradiction.
+
+        \qed
+    }
+}
+
+\parag{Exemple 2}{
+    $\sqrt{3}$ est irrationnel.
+
+    La démonstration qui suit a aussi été imaginée par Euclid (le best, ça change pas).
+
+    \subparag{Preuve}{
+        Supposons par l'absurde que $\sqrt{3} = \frac{p}{q} \in \mathbb{Q}$ où $p, q \in \mathbb{N}, q \neq 0$, tel que $q$ est le plus petit possible (on utilise l'axiome de bon ordre: tout sous-ensemble non-vide de $\mathbb{N}$ possède un plus petit élément, ici les dénominateur des fractions forment un sous-ensemble, donc nous pouvons appliquer ce principe ici).
+
+        Alors, on obtient que: 
+        \begin{multiequation}
+        & 3 = \frac{p^2}{q^2}  \\
+        \implies & 3q^2 = p^2  \\
+        \implies & p^2 \text{ est divisible par } 3  \\
+        \over{\implies}{$\dagger$}  & p \text{ est divisible par } 3
+        \end{multiequation}
+
+        L'implication $\dagger$ est démontrée dans le sous-paragraphe suivant. 
+
+        Puisque $p$ est divisible par $3$, nous pouvons écrire $p = 3m$ où $m \in \mathbb{N}$, et donc: 
+        \[3q^2 = \left(3m\right)^2 = 9m^2 \implies q^2 = 3m^2\]
+        
+        Ainsi, par le même argument, $q$ est divisible par $3$. Nous trouvons donc que $q = 3n$, pour $n \in \mathbb{N}^*$. Cela nous donne que: 
+        \[\frac{p}{q} = \frac{3m}{3n} = \frac{m}{n}, \mathspace \text{où } n < q\]
+        
+        Cependant, c'est une contradiction au principe de bon ordre. 
+
+        \qed
+    }
+
+    \subparag{Implication $\dagger$}{
+        Soit $p = 3k + r$, où $r \in \left\{1, 2\right\}$. Alors, nous avons: 
+        \[p^2 = \left(3k + r\right)^2 = 9k^2 + 6kr + r^2, \mathspace \text{où } r^2 \in \left\{1, 4\right\}\]
+        
+        Ainsi, bon obtient que $p$ n'est pas divisible par 3 implique que $p^2$ n'est pas divisible par 3. Par la contraposée, cela veut dire que $p^2$ est divisible par 3 implique que $p$ est divisible par 3.
+    }
+    
+    
+}
+
+
+
+
+\end{document}
