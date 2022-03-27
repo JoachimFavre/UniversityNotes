@@ -36,10 +36,10 @@ CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
 # COURSES_NAME = ["AICC-2", "Analyse-2", "Analyse-2-MethodesDeDemonstration", "DigitalSystemDesign"]
-# COURSES_NAME = ["AICC-2"]
+COURSES_NAME = ["AICC-2"]
 # COURSES_NAME = ["Analyse-2"]
 # COURSES_NAME = ["Analyse-2-MethodesDeDemonstration"]
-COURSES_NAME = ["DigitalSystemDesign"]
+# COURSES_NAME = ["DigitalSystemDesign"]
 
 COPY_EXTENSIONS = ["tex", "pdf", "png", "jpg", "jpeg", 'code', 'svg']
 # FOREWORD_NAME = {'fr': 'foreword_fr.txt', 'en': 'foreword_en.txt'}
@@ -91,7 +91,7 @@ def extract_lecture_command(content):
     in_summary = False
     summary = ""
     title = ""
-    lecture_no = "0"
+    lecture_no = 0
     date = "1970-01-01"
     temp = ""
     for line in content.split("\n"):
@@ -143,7 +143,7 @@ def extract_lecture_command(content):
     if temp != "":  # should never happen
         result += temp
 
-    return result, [lecture_no, summary, date, title]
+    return result, [int(lecture_no), summary, date, title]
 
 
 def replace_empty_slides_in_a_row_by_double_slides(content):
@@ -303,8 +303,7 @@ def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
     frontmatter_summary = None
     frontmatter_tex_file = None
     
-    sorted_summaries = [[]]*len(tex_files)
-    sorted_tex_files = [[]]*len(tex_files)
+    informations = []
     for relation_index, tex_file in tex_files:
         file_path = tmp_dir + "/" + tex_file
         with open(file_path, 'r', encoding='utf8') as latex_document:
@@ -341,8 +340,7 @@ def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
             frontmatter_summary = summary
             frontmatter_tex_file = [relation_index, tex_file]
         else:
-            sorted_summaries[int(summary[0]) - 1] = summary
-            sorted_tex_files[int(summary[0]) - 1] = [relation_index, tex_file]
+            informations.append([summary, relation_index, tex_file])
 
             if summary[3] == "":
                 print("\tNo summary defined in {}.".format(tex_file))
@@ -362,14 +360,18 @@ def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
         with open(file_path, 'w', encoding='utf8') as latex_document:
             latex_document.write(content)
 
-    if frontmatter_summary is not None:
-        # Need to move everything to the right and add elements in first pos
-        sorted_tex_files.insert(0, frontmatter_tex_file)
-        sorted_summaries.insert(0, frontmatter_summary)        
-        sorted_tex_files.pop()
-        sorted_summaries.pop()
+    # sorted by first element of summary: lecture number
+    informations = sorted(informations)
+    sorted_tex_files = []
+    sorted_summaries = []
+    for summary, relation_index, tex_file in informations:
+        sorted_tex_files.append([relation_index, tex_file])
+        sorted_summaries.append(summary)
 
-    # automatically sorts by first element (meaning the lecture)
+    if frontmatter_summary is not None:
+        sorted_tex_files.insert(0, frontmatter_tex_file)
+        sorted_summaries.insert(0, frontmatter_summary)
+
     return sorted_tex_files, sorted_summaries
 
 
