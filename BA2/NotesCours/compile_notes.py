@@ -289,7 +289,7 @@ def correct_spaces(content, is_english):
     return result
 
 
-def verify_parenthesis(content, file_name):
+def verify_content(content, file_name):
     n_opening_parenthesis = (content.count("(") - content.count("\\left(")
                              - content.count("\\right("))
     n_closing_parenthesis = (content.count(")") - content.count("\\left)")
@@ -297,6 +297,12 @@ def verify_parenthesis(content, file_name):
     if n_opening_parenthesis != n_closing_parenthesis:
         print("\tThe number of opening parenthesis is not the same one "
               "as the number of closing parenthesis in {}.".format(file_name))
+        
+    if content.count("\\later") > 0:
+        print("\tA note for later was left in {}.".format(file_name))
+        
+    if content.count("bmatrix") > 0:
+        print("\tA bmatrix was left in {}.".format(file_name))
 
 
 def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
@@ -320,10 +326,11 @@ def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
         content = content.replace("\\subsection", "\\section")
         content = content.replace("\\subsubsection", "\\subsection")
         content = content.replace("\\maketitle", "")
-        content = content.replace("\\label{", "\\label{" + str(relation_index))
-        content = content.replace("\\ref{", "\\ref{" + str(relation_index))
-        content = content.replace("\\pageref{",
-                                  "\\pageref{" + str(relation_index))
+        # content = content.replace("\\label{", "\\label{" + str(relation_index))
+        content = content.replace("\\label{", "\\phantomsection\\label{")
+        # content = content.replace("\\ref{", "\\ref{" + str(relation_index))
+        # content = content.replace("\\pageref{",
+        #                           "\\pageref{" + str(relation_index))
 
         for relation in relations[relation_index]:
             # If do the following, it will also replace the name in sections
@@ -355,7 +362,7 @@ def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
 
         # content = correct_spaces(content, is_english)
 
-        verify_parenthesis(content, tex_file)
+        verify_content(content, tex_file)
 
         with open(file_path, 'w', encoding='utf8') as latex_document:
             latex_document.write(content)
