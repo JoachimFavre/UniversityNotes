@@ -11,7 +11,16 @@
 \begin{document}
 \maketitle
 
-\lecture{9}{2022-03-21}{}{}
+\lecture{9}{2022-03-21}{Hazards}{
+\begin{itemize}[left=0pt]
+    \item Explanation on how technology works, introducing gate delays.
+    \item Example of gate delays leading to hazards, and explanation why we should not use gated clocks.
+    \item Explanation on setup on hold time of D-FlipFlop, and explanation of the metastable state.
+    \item Explanation of the concept of synchroniser.
+\end{itemize}
+}
+
+\section{Hazards}
 \parag{Technology}{
     Today, all gates are implemented in semiconductor material. There are two kinds of transitors used: Transistor to Transistor Logic (TTL) and Complementary Metal-Oxide-Semiconductor (CMOS). The gates come in the form of an Integrate Circuit (IC).
 
@@ -40,7 +49,7 @@
     Because of the hazards, we must not do gated clocks. Indeed, let us consider the following circuit:
     \imagehere[0.5]{GatedClockExample.png}
 
-    Since the clock of the D-flipflop is not directly connected to the clock of the circuit, we call this a gated clock. In the zero-delay model, we are expecting it to have 2 positive edges on the timing diagram above. However, in the real world it would have hazards, and thus we would have 4 positive edges. This is thus clearly a problem to do a gated clock..
+    Since the clock of the D-flipflop is not directly connected to the clock of the circuit, we call this a gated clock. In the zero-delay model, we are expecting it to have 2 positive edges on the timing diagram above. However, in the real world it would have hazards, and thus we would have 4 positive edges. This is thus clearly a problem to do a gated clock.
 
     Such hazards are no problem if there is no gated clocks, if they arrive in between two positive edges.
 }
@@ -67,12 +76,12 @@
     }
 }
 
-\parag{NAME}{
-    \later{Name}
-
+\parag{Synchroniser}{
     Let's say we have two circuits linked on two clocks, which are both of the same frequency. We cannot make them communicate directly. Indeed, the clocks are not synchronised (they may not have the same phase), and clocks have some kind of jitter: their frequency does not remain exactly constant.
 
-    For some practical limitations, we cannot link both of them to the same clock. To bypass the problem, we can put two D-flipflop in series. The higher our clock frequency is, the more D flip-flops we can put in series.
+    To bypass the problem, we can put two D-flipflop in series. The higher our clock frequency is, the more D flip-flops we can put in series. The idea is that we are putting the value the first circuit yields in ``quarantine''. If there is no problem of metastability, then we will get its value. However, if there is a metastable state happening, then it will yield a random result, but which is at least stable (if we get a metastable as an input, then it breaks everything). Note that we are never 100\% sure that we will get a stable state at the end, but the probability to have a metastable state decreases exponentially as the quarantine time increases (the more D flip flops we put in series).
+
+    \svghere[0.95]{synchroniser.svg}
 }
 
 
