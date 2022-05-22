@@ -1,0 +1,216 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-03 at 15:24:43.
+
+\usepackage{../../style}
+
+\title{AICC 2}
+\author{Joachim Favre}
+\date{Mardi 03 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{19}{2022-05-03}{Error detection and correction}{
+\begin{itemize}[left=0pt]
+    \item Definition of erasure channels and of error channels.
+    \item Explanation of terminology in this subject.
+    \item Definition of the Hamming distance, and proof that it is a distance.
+\end{itemize}
+
+}
+
+\section{Error detection and error correction codes}
+\subsection{Introduction}
+\parag{Introduction}{
+    We have a channel which takes an input and gives an output, which is not generally the same. The result can have some bit flipped, some bit added or removed, and so on.
+
+    \svghere[0.8]{ChannelSchema.svg}
+}
+
+\parag{Channel}{
+    Now, to work on this, we need to understand how the channel maps the input to the output. In this course, we will only consider two models for channels.
+
+    \subparag{Erasure channel}{
+        An erasure channel takes a sequence of bits as input, and maps it to some sequence where some of the bits were replaced by a question mark. For instance, we could have: 
+        \[0100111 \mapsto 0{\color{red}?}001{\color{red}?}1\]
+        
+        Disks and flash drives are real world representations of such channels: heat might destroy some data, we know that it was here, but we do not what was here. Similarly, on the internet, when there is package loss (packages that are dropped by the routers because of congestion), we know there was a package (since they are numbered), but we do not know what they contained. Wireless connections is another examples, if there is a truck goes by when we are sending data to a 4G antenna, then some data will not be received by the antenna. Also, another example, is data centers. At their scale, there are disks dying every days, loosing their data. Recovering such data might be interesting.
+    }
+    
+    \subparag{Error channel}{
+        This channel takes a sequence of bits as input, and flips some of them. For instance, we could have: 
+        \[0100111 \mapsto {\color{red}1}10{\color{red}10}11\]
+        
+        The difference with the erasure channel is that we do not know which bits are incorrect. In fact, the user may have sent $1101011$ directly.
+
+        Noise is a real world representation of such channel: there is a lot of electromagnetic noise, so there might be noise in the receive electronics. Another example is interferences in wireless, if we mix our transmission with the one of someone else, then some bits might be switched with the other person. Data storage is another example, since some bits may get flipped.
+    }
+    
+}
+
+\parag{Definition: Erasure weight}{
+    The number of erasures done in an erasure channel is the \important{erasure weight}, $p$. 
+
+    \subparag{Example}{
+        If $0100111$ gets turned to $0{\color{red}?}001{\color{red}?}1$ in an erasure channel, then the erasure weight is $p = 2$.
+    }
+}
+
+\parag{Definition: Error weight}{
+    The number of errors done in an error channel is the \important{error weight}, $p$.
+
+    \subparag{Example}{
+        If $0100111$ gets turned to ${\color{red}1}10{\color{red}10}11$ in an error channel, then the error weight is $p = 3$.
+    }
+}
+
+\subsection{Channel coding}
+
+
+\parag{Key idea: Channel coding}{
+    The key idea for our task is channel coding: to have an encoder before the channel and a decoder after it.
+
+    The goal of the decoder is to do \important{error detection} (conclude that something bad, errors or erasures happened on the channel; this is useful to ask for retransmission) and \important{error correction} (fix the error or erasure that happened, this is better than needing to ask for a retransmission, especially for ``live'' applications such as Zoom, Twitch or YouTube).
+
+    We notice that error detection is trivial in an erasure channel.
+
+}
+
+\parag{Example: Repetition encoding}{
+    Let's say that we have the following encoder, named repetition encoding:
+    \begin{center}
+    \begin{tabular}{c|cccc}
+        Before encoding & 00 & 01 & 10 & 11 \\
+        \hline
+        After encoding & 000000 & 000111 & 111000 & 111111
+    \end{tabular}
+    \end{center}
+    
+    So, if we want to transmit 01, then the encoder will turn it to 000111, and then this will be transmitted through the channel.
+
+    Let's say we are sending it through an erasure channel, getting turned to $0??111$, then the decoder can deduce that the first code was $01$, even though there was some mistake.
+
+    Let's now say that we are sending it through an error channel, and that our number (still 000111) gets turned to 000101. We can detect that there is an error. We cannot be certain where the error was, but it seems reasonable to say that 000111 was sent (it is more likely that less bits were flipped). Also, we can see that if we had received 000000, we would not even know that there had been a problem. 
+}
+
+\parag{Terminology (binary case)}{
+    \begin{itemize}[left=0pt]
+        \item The \important{code} is the set of all codewords: 
+        \[\mathcal{C} \subseteq \left\{0, 1\right\}^n\]
+        \item $n$ is called the \important{block length}.
+        \item $k$ is the \important{number of information symbols}, the number of symbols we are really transmitting. This can be computed by doing:
+        \[k = \log_2 \left|\mathcal{C}\right|\]
+        \item The \important{rate} of the code is: 
+        \[R = \frac{k}{n}\]
+        This represents the amount of redundancy we have.
+    \end{itemize}
+    
+    \subparag{Example}{
+        In our previous example, we have: 
+        \[\mathcal{C} = \left\{000000, 000111, 111000, 111111\right\}\] 
+        \[n = 6, \mathspace k = \log_2\left(4\right) = 2, \mathspace R = \frac{k}{n} = \frac{1}{3}\]
+
+        $k = 2$ represents the fact that we are using words of 2 symbols, $\left\{00, 01, 10, 11\right\}$, and $R = \frac{1}{3}$ represents the fact that we are sending every bit three times.
+    }
+}
+
+\parag{Exemple}{
+    Let's take the following encoder, where $k = 3$ and $n = 7$: 
+    \begin{center}
+    \begin{tabular}{cccc}
+        000 & $\mapsto$ & $0000000$ \\
+        001 & $\mapsto$ & $0011100$ \\
+        010 & $\mapsto$ & $0111011$ \\
+        011 & $\mapsto$ & $1110100$ \\
+        100 & $\mapsto$ & $0100111$ \\
+        101 & $\mapsto$ & $1101000$ \\
+        110 & $\mapsto$ & $1001111$ \\
+        111 & $\mapsto$ & $1010011$ 
+    \end{tabular}
+    \end{center}
+    
+    We can see that:
+    \[\left|C\right| = 8 \implies k = 3 = \log_2 \left|\mathcal{C}\right| = \log_2\left(8\right) = 3 \text{ as expected}\]
+}
+
+\parag{Terminology (general case)}{
+    \begin{itemize}[left=0pt]
+        \item The \important{code} is the set of all codewords: 
+        \[\mathcal{C} \subseteq {\color{red}\mathcal{A}}^n\]
+        \item $n$ is called the \important{block length}.
+        \item $k$ is the \important{number of information symbol}, the number of symbols we are really sending. \textcolor{red}{This is defined to be}:
+        \[k \over{=}{def}  {\color{red}\log_{\left|\mathcal{A}\right|} \left|\mathcal{C}\right|}\]
+        \item The \important{rate} of the code is: 
+        \[R = \frac{k}{n}\]
+        This represents the amount of redundancy we have.
+    \end{itemize}
+}
+
+\parag{Example}{
+    Let $\mathcal{A} = \left\{0, 1, 2, 3\right\}$, and let the following mapping: 
+    \begin{center}
+    \begin{tabular}{ccc}
+        00 & $\mapsto$ &  $000000000$  \\
+        01 & $\mapsto$ & $002310312$ \\
+        $\vdots$ & & $\vdots$ \\
+        33 & $\mapsto$ & $332000011$
+    \end{tabular}
+    \end{center}
+    
+    Then, we have $n = 9$, $\left|\mathcal{C}\right| = 16$, $k = \log_4\left(16\right) = 2$.
+}
+
+\parag{Definition: Hamming distance}{
+    Let $x$ and $y$ be sequences of the same length.
+
+    Then, the \important{hamming distance} between $x$ and $y$, $d\left(x, y\right)$, is the number of places where $x$ and $y$ differ.
+
+
+    \subparag{Example}{
+        For instance: 
+        \[x = 01001, y = 11111 \implies d\left(x, y\right) = 3\] 
+        \[x = 12345, y = 12435 \implies d\left(x, y\right) = 2\]
+    }
+}
+    
+\parag{Remark: Distance}{
+    In math, a function of two variables $x$ and $y$ is a \important{distance}, if it satisfies: 
+    \begin{enumerate}
+        \item $d\left(x, y\right) \geq 0, \forall x, y$
+        \item $d\left(x, y\right) = 0 \iff x = y$
+        \item Symmetry: $d\left(x, y\right) = d\left(y, x\right)$ 
+        \item Triangle inequality (taking a detour cannot be faster than the direct path): 
+            \[d\left(x, y\right) \leq d\left(x, z\right) + d\left(z, y\right)\]
+    \end{enumerate}
+}
+
+\parag{Theorem}{
+    The Hamming distance is a distance.
+
+    \subparag{Proof}{
+        Part 1, 2 and 3 are considered trivial and left as an exercise to the reader.
+
+        Let's do part 4. We can write our values as vectors: 
+        \[x = \left(x_1, \ldots, x_n\right), \mathspace y = \left(y_1, \ldots, y_n\right), \mathspace z = \left(z_1, \ldots, z_n\right)\]
+        
+        We can see that: 
+        \[d\left(x, y\right) = \sum_{i=1}^{n} \underbrace{d\left(x_i, y_i\right)}_{\in \left\{0, 1\right\}} \]
+        
+        Let's split our proof in cases. If $d\left(x_i, y_i\right) = 0$, then:
+        \[d\left(x_i, z_i\right) + d\left(z_i, y_i\right) \geq \underbrace{0}_{d\left(x_i, y_i\right)} \iff d\left(x_i, z_i\right) + d\left(z_i, y_i\right) \geq d\left(x_i, y_i\right)\]
+        
+        Else (if $d\left(x_i, y_i\right) = 1$), then we cannot have $x_i = z_i$ and $z_i = y_i$ (since it would imply $x_i = y_i$ and thus $d\left(x_i, y_i\right) = 0$). Thus, at least one of $d\left(x_i, z_i\right)$ or $d\left(z_i, y_i\right)$ must be equal to $1$. Hence: 
+        \[d\left(x_i, z_i\right) + d\left(z_i, y_i\right) \geq \underbrace{1}_{d\left(x_i, y_i\right)} \iff d\left(x_i, z_i\right) + d\left(z_i, y_i\right) \geq d\left(x_i, y_i\right)\]
+
+        Combining both, we see that $d\left(x_i, y_i\right) \leq d\left(x_i, z_i\right) + d\left(z_i, y_i\right)$, and thus: 
+        \begin{multiequality}
+        d\left(x, y\right) =\ & \sum_{i=1}^{n} d\left(x_i, y_i\right) \leq \sum_{i=1}^{n} d\left(x_i, z_i\right) + d\left(z_i, y_i\right) \\
+        =\ & \sum_{i=1}^{n} d\left(x_i, z_i\right) + \sum_{i=1}^{n} d\left(z_i, y_i\right) = d\left(x, z\right) + d\left(z, y\right) 
+        \end{multiequality}
+
+        \qed
+    }
+}
+
+\end{document}

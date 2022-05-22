@@ -1,0 +1,342 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-17 at 15:17:49.
+
+\usepackage{../../style}
+
+\title{AICC2}
+\author{Joachim Favre}
+\date{Mardi 17 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{23}{2022-05-17}{Linear codes}{
+\begin{itemize}[left=0pt]
+    \item Definition of linear code.
+    \item Definition of the Hamming weight, and proof that, in a linear code, the minimum Hamming weight is the minimum distance.
+    \item Definition of Generator matrix.
+    \item Definition of systematic generator matrix, explanation on how to find them, and discussion of their existence.
+\end{itemize}
+
+}
+
+\parag{Example 2}{
+    Let's consider the following subspace of $\mathbb{F}_7^3$:
+    \[S = \left\{\bvec{v} \in \mathbb{F}_7^3 : \bvec{v} = a\left(1, 0, 4\right) + b\left(0, 1, 5\right), \mathspace a, b \in \mathbb{F}_7\right\}\]
+
+    We want to find the equations that $\bvec{v}$ must fulfill. We see that the dimension of the subspace is $k = 2$ (since it is spanned by two linearly independent vectors), and thus we need $m = n -k = 3 - 2 = 1$ equations.
+
+    So, we are looking for $A = \begin{pmatrix} c_1 & c_2 & c_3 \end{pmatrix} $ such that:
+    \[\begin{systemofequations} \left(1, 0, 4\right)A^T = \bvec{0} \\ \left(0, 1, 5\right)A^T = \bvec{0} \end{systemofequations} \implies \begin{systemofequations} c_1 + 4c_3 = 0 \\ c_2 + 5c_3 = 0 \end{systemofequations}\]
+
+    This is not surprising that we have some level of freedom, thus let us pick $c_1 = 1$:
+    \[c_1 = 1 \implies c_3 = 5 \implies c_2 = 3\]
+
+    This means that we get:
+    \[A = \left(1, 3, 5\right)\]
+
+    We notice that it is coherent with what we have just found in the last example, by multiplying this matrix by 3 (they are the same vector space!).
+}
+
+\parag{Summary}{
+    From now on, we will work on $\mathbb{F}_p^n$, where $p$ is a prime number. This contains $p^n$ vectors.
+
+    We can do everything we did in Linear Algebra: linear independence, subspaces, matrices rank, and so on. The only thing we do not have is dot product. Indeed, for instance, $\mathbb{F}_2^n$ if we attempted to define it as:
+    \[\bvec{x}\dotprod \bvec{y} = \sum_{i=1}^{n} x_i y_i\]
+
+    Then, if we compute $\bvec{x}\dotprod \bvec{x}$, we get:
+    \[\bvec{x} \dotprod \bvec{x} = \sum_{i=1}^{n} x_i \cdot  x_i = \sum_{i=1}^{n} x_i = \begin{systemofequations} 1, \mathspace \text{if } n \text{ is even} \\ 0, \mathspace \text{else} \end{systemofequations}\]
+
+    Thus, if $n$ is even, then every vector is orthogonal to itself, which makes no sense.
+}
+
+
+\subsection{Linear codes}
+\parag{Review}{
+    The important part we need to remember from what we just did is that there is two ways of describing the same vector space: 
+    \[S = \left\{\bvec{v} \in \mathbb{F}^n : \bvec{v} = \lambda_1 \bvec{b_1} + \ldots + \lambda_k \bvec{b_k}\right\} = \left\{\bvec{v} \in \mathbb{F}^n : \bvec{v} A^T = \bvec{0}\right\} \subseteq \mathbb{F}^n\]
+    where $k = \dim\left(A\right)$, $\bvec{b_1}, \ldots, \bvec{b_k}$ is a basis, $\lambda_1, \ldots, \lambda_k \in \mathbb{R}$, and $A \in \mathbb{F}^{\left(n-k\right)\times n}$ is a $\left(n - k\right) \times n$ matrix.
+}
+
+\parag{Definition: Linear code}{
+    A code $\mathcal{C} \subseteq \mathbb{F}^n$ is \important{linear} if $\mathcal{C}$ is a subspace of $\mathbb{F}^n$.
+
+    \subparag{Observations}{
+        \begin{enumerate}[left=0pt]
+            \item A linear code must contain the all-zero sequence $\bvec{c} = \left(0, 0, \ldots, 0\right)$.
+            \item The sum of two codewords is again a codeword.
+            \item Scaled versions of codewords are again codewords.
+        \end{enumerate}
+    }
+
+    \subparag{Terminology}{
+        We call a $\left(n, k\right)$ linear block code over $\mathbb{F}_p$ to be a $k$-dimensional subspace of $\mathbb{F}_p^n$.
+    }
+    
+}
+
+\parag{Definition: Dimension}{
+    The \important{dimension} of a linear code $\mathcal{C} \subseteq \mathbb{F}^n$ is the dimension of the subspace $\mathcal{C}.$
+}
+
+\parag{Lemma}{
+    The number of codewords in a linear code $\mathcal{C} \subseteq \mathbb{F}_q^n$ must be of the form $q^k$ for some $k \in \left\{0, 1, 2, \ldots, n\right\}$ (where $q$ must be a prime power, meaning it is of the form $q = p^m$ for $p$ being a prime number and $m \in \mathbb{Z}_+$).
+
+    \subparag{Proof}{
+        Let $k$ be the dimension of our code $\mathcal{C} \subseteq \mathbb{F}_q^n$. By a theorem we saw in the last lesson, we know that: 
+        \[\left|\mathcal{C}\right| = \left|\mathbb{F}_q\right|^k = q^k\]
+        
+        \qed
+    }
+}
+
+\parag{Definition: Hamming weight}{
+    Let $\bvec{x} \in \mathbb{F}^n$. The \important{Hamming weight} of $\bvec{x}$ is:
+    \[w\left(\bvec{x}\right) = d\left(\bvec{x}, \bvec{0}\right)\]
+
+    In other words, $w\left(\bvec{x}\right)$ is the number of non-zero positions in $\bvec{x}$.
+
+    \subparag{Remark}{
+        Notice that we know that $\bvec{0}$ is in $\mathbb{F}^n$.
+    }
+
+    \subparag{Example}{
+        For instance:
+        \[\bvec{x} = \left(0, 1, 1, 0, 1, 0\right) \in \mathbb{F}_2^6 \implies w\left(\bvec{x}\right) = 3\]
+        \[\bvec{x} = \left(0, 2, 1, 0, 0, 1, 2\right) \in \mathbb{F}_3^7 \implies w\left(\bvec{x}\right) = 4\]
+
+    }
+
+    \subparag{Property}{
+        We can see that $w\left(\bvec{x} - \bvec{u}\right)= d\left(\bvec{x}, \bvec{u}\right)$.
+
+        Indeed, first, we are working in a field, thus the additive inverse does exist. Also we can see that $w\left(\bvec{x} - \bvec{u}\right)$ counts the number of places where $\bvec{x} - \bvec{u}$ is not zero, meaning the number of places where $\bvec{x}$ and $\bvec{u}$ differ. However, this is exactly the definition of the Hamming distance. 
+    }
+}
+
+\parag{Theorem}{
+    Let $\mathcal{C} \subseteq \mathbb{F}^n$ be a linear code. Then: 
+    \[d_{min}\left(\mathcal{C}\right) = \min_{\bvec{x} \in \mathcal{C} \setminus \left\{\bvec{0}\right\}} w\left(\bvec{x}\right)\]
+
+    \subparag{Proof}{
+        To proof this, we will first show that $\min w\left(\bvec{x}\right) \geq d_{min}\left(\mathcal{C}\right)$, and then $\min w\left(\bvec{x}\right) \leq d_{min}\left(\mathcal{C}\right)$.
+
+        Let's begin with the first inequality. We know that, by definition, $w\left(\bvec{x}\right) = d\left(\bvec{x}, \bvec{0}\right)$. Thus:
+        \[\min_{\bvec{x} \in \mathcal{C} \setminus \left\{\bvec{0}\right\}} w\left(\bvec{x}\right) \geq \min_{\substack{\bvec{x} \in \mathcal{C} \setminus \left\{\bvec{0}\right\} \\ \bvec{y} \in \mathcal{C} \\ \bvec{x} \neq \bvec{y}}} d\left(\bvec{x}, \bvec{y}\right) \geq \overbrace{\min_{\substack{\bvec{y}, \bvec{x} \in \mathcal{C} \\ \bvec{y} \neq \bvec{x}}} d\left(\bvec{x}, \bvec{y}\right)}^{d_{min}\left(\mathcal{C}\right)}\]
+
+        Indeed, for the first inequality we know that $\bvec{0} \in\mathcal{C}$, thus we are taking the minimum of a greater set. This is the same idea for the second inequality.
+
+        \vspace{1.5em}
+
+        Let's now do the second inequality. Using our Hamming weight property, we have:
+        \[d_{min}\left(\mathcal{C}\right) = \min_{\substack{\bvec{u}, \bvec{v} \in \mathcal{C} \\ \bvec{u} \neq \bvec{v}}} d\left(\bvec{u}, \bvec{v}\right) = \min_{\substack{\bvec{u}, \bvec{v} \in \mathcal{C} \\ \bvec{u} \neq \bvec{v}}} w\left(\bvec{u} - \bvec{v}\right) \geq \min_{\substack{\bvec{c} \in \mathcal{C} \\ \bvec{c} \neq \bvec{0}}} w\left(\bvec{c}\right)\]
+        since $\bvec{u} - \bvec{v} = \bvec{c}$ is also codeword.
+
+        \qed
+    }
+}
+
+
+\parag{Example 1}{
+    Let's consider the code $\mathcal{C} \subseteq \mathbb{F}_2^7$ defined as:
+    \[\mathcal{C} = \left\{0000000, 001110, 0111011, 1110100, 0100111, 1101000, 1001111, 1010011\right\}\]
+
+    We notice that $\left|\mathcal{C}\right| = 8 = 2^3 = q^k$, thus it may be a linear code, where its dimension is 3. To be sure, we would need to look for a basis.
+
+    Let's compute the weight of the codewords:
+    \begin{center}
+    \begin{tabular}{cc}
+        $\bvec{c_i}$ & $w\left(\bvec{c_i}\right)$ \\
+        \hline
+        0000000 & 0 \\
+        0011100 & 3 \\
+        0111011 & 5 \\
+        1110100 & 4 \\
+        0100111 & 4 \\
+        1101000 & 3 \\
+        1001111 & 5 \\
+        1010011 & 4
+    \end{tabular}
+    \end{center}
+
+    Thus, we get that the minimum distance is 3.
+}
+
+\parag{Example 2}{
+    Let's consider the ``Binary Parity Check Code'' $\mathcal{C} \subset \mathbb{F}_2^n$, defined as:
+    \[\mathcal{C} = \left\{\bvec{c} = \left(c_1, \ldots, c_n\right) \in \mathbb{F}_2^{n} c_1 + \ldots + c_n = 0\right\}\]
+
+    This is clearly a subspace defined by one homogeneous equation. We thus see that its dimension is $k = n- 1$, and thus that there are $2^k = 2^{n-1}$ codewords.
+
+    We can also compute $d_{min}\left(\mathcal{C}\right)$ knowing that it is the minimum weight. Since we cannot have one 1 in a codeword, we need at least two 1, and thus we have that $d_{min}\left(\mathcal{C}\right) = 2$.
+
+    To see if this is a good code, we can look at the Singleton' bound:
+    \[d_{min} = 2 \leq n - k + 1 = n + \left(n-1\right) + 1 = 2\]
+
+    Thus, this is a MDS code.
+}
+
+\parag{Example 3}{
+    Let's consider the following code $\mathcal{C} \subseteq \mathbb{F}_2^n$ (where $n \geq 2$):
+    \[\mathcal{C} = \left\{\left(0, 0, \ldots, 0\right), \left(1, 1, \ldots, 1\right)\right\}\]
+
+    This is a linear code, with basis $\left\{\left(1, 1, \ldots, 1\right)\right\}$. Its dimension is 1, $d_{min}\left(\mathcal{C}\right) = n$.
+
+    Also, we can see that the Singleton's inequality is reached with equality.
+}
+
+\parag{Example 4}{
+    Let's consider the code $\mathcal{C} = \mathbb{F}_2^n$.
+
+    We notice that this is a linear code, with $\left|\mathcal{C}\right| = 2^n$, $k = n$ and $d_{min}\left(\mathcal{C}\right) = 1$. This is also a MDS ``code''.
+}
+
+\parag{Observation}{
+    The three last examples we saw are the only binary linear codes that are MDS.
+
+    \subparag{Remark}{
+        There are other non-binary linear codes which are MDS (such as Reed-Solomon Codes), and some binary non-linear codes that are MDS (as we will see in the following example).
+    }
+}
+
+\parag{Example}{
+    Let's consider the following code:
+    \[\mathcal{C} = \left\{\left(1, 0, 0, \ldots, 0\right), \left(0, 1, 1, \ldots, 1\right)\right\}\]
+
+    This is a MDS code. However, since it is not linear, this is fine with our observation.
+}
+
+\parag{Definition: Generator matrix}{
+    We know a linear code can be described by a basis $\left\{\bvec{c_1}, \ldots, \bvec{c_k}\right\}$. 
+
+    We define the following matrix to be the \important{generator matrix} of the code:
+    \[G = \begin{pmatrix} & & \bvec{c_1} & & \\ & & \vdots & & \\  & & \bvec{c_k} &  & \end{pmatrix} \in \mathbb{F}^{k \times n} \]
+
+    \subparag{Observation}{
+        A generator matrix of a code $\mathcal{C}$ specifies an encoding map:
+        \[\begin{split}
+        f: \mathbb{F}^k &\longmapsto \mathbb{F}^n \\
+        \bvec{u} &\longmapsto \bvec{c} = \bvec{u} G
+        \end{split}\]
+        where $\bvec{u}$ gives the information symbols.
+
+        We observe that the basis is not unique, and thus the generator matrix is not unique.
+    }
+
+    \subparag{Remark}{
+        Let $\bvec{c_1}, \ldots, \bvec{c_k}$ be a basis, and $G$ be its associated generator matrix.
+
+        We know that any codeword can be written \textit{uniquely} as: 
+        \[\bvec{c} = \sum_{i=1}^{k} u_k \bvec{c_k}\]
+        
+        Equivalently, there exists a unique $\bvec{u} = \left(u_1, \ldots, u_k\right)$ such that: 
+        \[\bvec{c} = \left(u_1, \ldots, u_k\right) \begin{pmatrix}  &  & \bvec{c_1} &  &  \\  &  & \vdots &  &  \\  &  & \bvec{c_k} &  &  \end{pmatrix} = \bvec{u} G\]
+    }
+}
+
+\parag{Example}{
+    Let's consider again the following code:
+    \[\mathcal{C} = \left\{0000000, 001110, 0111011, 1110100, 0100111, 1101000, 1001111, 1010011\right\}\]
+
+    To find three linearly independent vectors, we can only look at the first three digits. This gives us the following generator matrix:
+    \[G = \begin{pmatrix} 0 & 0 & 1 & 1 & 1 & 0 & 0 \\ 0 & 1 & 1 & 1 & 0 & 1 & 1 \\ 1 & 1 & 1 & 0 & 1 & 0 & 0 \end{pmatrix} \]
+
+    Let us now pick $\bvec{u} = \begin{pmatrix} 1 & 1 & 0 \end{pmatrix} $, giving us:
+    \[\bvec{c} = \begin{pmatrix} 1 & 1 & 0 \end{pmatrix} \begin{pmatrix} 0 & 0 & 1 & 1 & 1 & 0 & 0 \\ 0 & 1 & 1 & 1 & 0 & 1 & 1 \\ 1 & 1 & 1 & 0 & 1 & 0 & 0 \end{pmatrix} = \begin{pmatrix} 0 & 1 & 0 & 0 & 1 & 1 & 1 \end{pmatrix} = \bvec{c_4}\]
+
+    Let us pick another generator matrix for fun:
+    \[G = \begin{pmatrix} 0 & 1 & 0 & 0 & 1 & 1 & 1 \\ 1 & 1 & 0 & 1 & 0 & 0 & 0 \\ 1 & 0 & 1 & 0 & 0 & 1 & 1 \end{pmatrix} \]
+
+    Taking again te same $\bvec{u}$, we get:
+    \[\bvec{c} = \begin{pmatrix} 1 & 1 & 0 \end{pmatrix} \begin{pmatrix} 0 & 1 & 0 & 0 & 1 & 1 & 1 \\ 1 & 1 & 0 & 1 & 0 & 0 & 0 \\ 1 & 0 & 1 & 0 & 0 & 1 & 1 \end{pmatrix} = \begin{pmatrix} 1 & 0 & 0 & 1 & 1 & 1 & 1 \end{pmatrix} \bvec{c_6}\]
+
+    Thus, the generator matrice represents the same code, but by doing another mapping (a different codeword corresponds to the same sequence).
+}
+
+\parag{Number of generator matrices}{
+    We wonder how many different generator matrices there are for a certain code $\mathcal{C} \in \mathbb{F}_q^n$ of dimension $k$.
+
+    We need to select the $k$ elements of our code that will make our matrix. For the first one, we have $q^k - 1$ possibilities since any vector of our subspace works except for the zero vector. For the second element, we have $q^k - q$ possibilities, since any vector works except for a multiple of the first vector. For the third element, we have $q^k - q^2$ since any vector works except for a linear combination of the first two vectors. We can continue that way to get that our number is given by: 
+    \[\left(q^k - 1\right)\left(q^k - q\right)\left(q^k - q^2\right)\cdots\left(q^k - q^{k-1}\right)\]
+
+    \subparag{Example}{
+        For instance, picking a subspace of dimension $k = 3$ of $\mathbb{F}_2^n$, we have: 
+        \[\left(2^3 - 1\right)\left(2^3 - 2\right)\left(2^3 - 2^2\right) = 7\cdot 6\cdot 4 = 168 \text{ choices}\]
+    }
+    
+}
+
+\parag{Definition: Echelon form}{
+    A matrix is said to be of \important{echelon form} if it is of the form: 
+    \[\begin{pmatrix} \star & \times & \times & \times & \times & \times \\ 0 & \star & \times & \times & \times & \times \\ 0 & 0 & 0 & \star & \times & \times \\ 0 & 0 & 0 & 0 & \star & \times \end{pmatrix} \]
+    where the $\times$ represent any number and the $\star$ represent non-zero numbers, named pivots.
+
+    A matrix is said to be of \important{reduced echelon form} if it is of the form:
+    \[\begin{pmatrix} 1 & 0 & \times & 0 & 0 & \times \\ 0 & 1 & \times & 0 & 0 & \times \\ 0 & 0 & 0 & 1 & 0 & \times \\ 0 & 0 & 0 & 0 & 1 & \times \end{pmatrix}\]
+}
+
+\parag{Theorem}{
+    Any matrix can be transformed into a unique reduced echelon form through the Gaussian elimination algorithm.
+}
+
+\parag{Remark}{
+    We know that the subset we are working over is the set of $\bvec{v}$ such that:
+    \[\bvec{v} = \bvec{u} G \iff \bvec{v}^T = G^T \bvec{u}^T\]
+
+    Thus, considering column vectors, we are clearly working on what we defined as the line space in our Linear Algebra course. However, we know that the line space of a matrix in echelon form is equal to the line space of the matrix (see the end of course 13 in my notes of \textit{Algèbre Linéaire} of the first semester). Thus, we can use the Gaussian elimination algorithm to turn our generator matrix into another matrix generating the same space but which may be easier to use.
+}
+
+\parag{Definition: Systematic generator matrices}{
+    A \important{systematic generator matrix} is a generator matrix such that its first $k$ columns represent the identity matrix.
+    \[G = \begin{pmatrix}  &  &  &  &  &  \\  & I_k &  &  & P &  \\  &  &  &  &  &  \end{pmatrix} \]
+
+    The identity matrix takes $k$ columns, and the matrix $P$, sometimes called the parity check, takes $n-k$ columns. We can notice that such a matrix is in its reduced echelon form.
+
+    \subparag{Observation 1}{
+        A systematic generator matrix does not always exist, since the reduced echelon form may not always have the form above.
+
+        For instance, the following code is linear, but we cannot make any systematic generator matrix.
+        \[\mathcal{C} = \left\{000, 110, 001, 111\right\}\]
+
+        Indeed, the first two bits are always equal, thus we cannot have any codeword beginning with $01$. Thus, its reduced echelon form matrix does not have the right form: 
+        \[\widetilde{G} = \begin{pmatrix} 1 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix} \]
+
+        We say that such a code is \important{not systematic}
+    }
+
+    \subparag{Observation 2}{
+        If we are allowed to swap columns, then a systematic generator matrix always exists. Indeed, any generator matrix has a dimension equal to its number of row by construction, thus it has a pivot in every row. This means that, if we are allowed to, we can reorder the pivots of the reduced echelon form (and of the code at the same time) to get the identity matrix.
+
+        For instance, we can switch the two last columns so the code in our first observation becomes:
+        \[\mathcal{C}' = \left\{000, 101, 010, 111\right\}\]
+
+        This makes sense to say that they are (almost) the same code, since they have the same efficiency (they have the same block length, the same dimension and the same minimum distance). This gives us the following generator matrix:
+        \[\widetilde{G}' = \begin{pmatrix} 1 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix} \]
+    }
+
+    \subparag{Remark}{
+        Note that if we have the list of all codewords, we can also pick basis vectors wisely to make this generator matrix. This is often not possible (since this list is not cheap), but it may make us gain some time in some exercises.
+    }
+    
+}
+
+\parag{Example 1}{
+    For instance, for our last code, we can have:
+    \[G = \begin{pmatrix} 1 & 0 & 0 & 1 & 1 & 1 & 1 \\ 0 & 1 & 0 & 0 & 1 & 1 & 1 \\ 0 & 0 & 1 & 1 & 1 & 0 & 0 \end{pmatrix} \]
+
+    Let's for instance pick $\bvec{u} = \begin{pmatrix} 1 & 1 & 0 \end{pmatrix} $:
+    \[\bvec{c} = \begin{pmatrix} 1 & 1 & 0 \end{pmatrix} \begin{pmatrix} 1 & 0 & 0 & 1 & 1 & 1 & 1 \\ 0 & 1 & 0 & 0 & 1 & 1 & 1 \\ 0 & 0 & 1 & 1 & 1 & 0 & 0 \end{pmatrix} = \begin{pmatrix} 1 & 1 & 0 & 1 & 0 & 0 & 0 \end{pmatrix} \]
+
+    We notice that the first three bits are exactly $\bvec{u}$, and then the following bits show the partis of the different bits of $\bvec{u}$ (for instance, the fourth bit is the parity of the first bit plus the second bit).
+}
+
+\parag{Example 2}{
+    Let's consider the following generator matrix, in $\mathbb{F}_3^3$:
+    \[G = \begin{pmatrix} 1 & 1 & 1 \\ 1 & 1 & 2 \end{pmatrix} \mapsto \begin{pmatrix} 1 & 1 & 1 \\ 0 & 0 & 1 \end{pmatrix} \mapsto \begin{pmatrix} 1 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix} \]
+
+    In this case, we would need to swap the last two columns, giving us: 
+    \[\widetilde{G} = \begin{pmatrix} 1 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix} \]
+}
+
+\end{document}

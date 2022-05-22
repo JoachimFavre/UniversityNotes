@@ -1,0 +1,107 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-04-28 at 14:29:30.
+
+\usepackage{../../style}
+
+\title{AICC-2}
+\author{Joachim Favre}
+\date{Jeudi 28 avril 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{18}{2022-04-28}{Summing everything up}{
+\begin{itemize}[left=0pt]
+    \item Example of the algorithms we saw on real world applications: Apple's iMessage and HTTPS.
+    \item Explanation of the concept of cyclic groups.
+    \item Summary of the cryptography algorithms we saw.
+\end{itemize}
+
+}
+
+\parag{AES}{
+    As mentioned in last the lecture, AES is an encryption standard that gives symmetric-key encryption. It is not important to understand how it works, the only concept we need to grasp is symmetric-key encryption.
+
+    We have already seen such encryption types, with Vigenère's code for instance. The idea is that we use the same key for encryption and decryption, thus there is no public and private key. This means that we need to have had a discussion beforehand to agree on a key.
+
+    This algorithm offers less protection that RSA, but it is much faster and less memory consuming.
+}
+
+
+\parag{Example: Apple}{
+    Let's consider the example of sending a message on Apple's iMessage service.
+
+    When this service is enabled on Bob's Apple device, the device produces RSA keys (of 1280 bits) and the ECDSA keys (256 bits). Then, the two public keys are sent to the IDS (Apple's Directory Service, a trusted agency). IDS associates the keys to the device's APN (Apple's Push Notification Service, where outgoing short messages are sent) address, which are linked to Bob's email address (or phone number) and different for each device.
+
+    When Alice launches the messaging app, the app finds the public keys of her recipients, creates randomly a key $k_{AES}$, and ciphers her text using this $k_{AES}$ key, getting $c_t$. The app then ciphers this key using the public RSA key of Bob, yielding $c_{k_{AES}}$. After that, for the signature, the app considers $\left(c_t, c_{k_{AES}}\right)$, hash it, and cipher it using Alice's $k_{ECDSA}$ private key, getting $s$. Finally, it sends $\left(c_t, c_{k_{AES}}, s\right)$.
+
+    The main idea we can keep of this is that RSA is expensive, thus we only use it to agree on a symmetric key with the person we want to talk to.
+}
+
+\parag{Example: HTTPS}{
+    HTTPS stands for Hyper Text Transfer Protocol \textit{Secure}. This is the protocol used to exchange data between a browser and a web server. 
+
+    At some point, the web server sends us its certificate (we have to do some verifications, using trusted agencies and so on, but let's not go into details), containing its public key. We generate a symmetric key (using AES), and send it by ciphering it using the server's public key. Then, the browser and the web server can have all their discussions using the AES key. 
+
+    We have the exact same idea as in the last paragraph.
+}
+
+\subsection{Fun fact and summary}
+\parag{Cyclic groups}{
+    We proved that, in a group, for all $a \in G$, there exists a $\ell \in \mathbb{N}^*$ such that $a^\ell = e$, the identity element. The smallest one is named the order of this element. We also proved that, necessarily, $a^{\left|G\right|} = e$.
+    
+    Thus, we can see that the following definition may be interesting.
+
+    \subparag{Definition}{
+        If there exists a $g \in G$  such that $\left\{g, g^2, \ldots, g^{\left|G\right| - 1}, e\right\} = G$, then $\left(G, \star\right)$ is called a \important{cyclic group}. $g$ is named a \important{generator}.
+
+        In other words, the generator has order $\left|G\right|$.
+    }
+
+    \subparag{Example}{
+        For instance, the group $\left(\mathbb{Z} / m\mathbb{Z}, +\right)$ is cyclic. We can for instance pick $g = 1$: 
+        \[g^2 = g + g = 2,\ \ldots,\ g^{m-1} = \left(m-1\right),\ g^m = m = 0 = e\]
+    }
+    
+    \subparag{Observations}{
+        We can see that if a group is cyclic, then, in general, not all numbers are generators. For instance, in $\left(\mathbb{Z} / 4\mathbb{Z}, +\right)$, 2 is not a generator.
+
+        Also, not all groups are cyclic. For instance, $\left(\mathbb{Z} / 24 \mathbb{Z}^*, \cdot\right)$ is not. By the way, this group is very interesting since all elements are their own inverse.
+    }
+    
+
+    \subparag{Theorem}{
+        All cyclic groups that have the same order (meaning that $G$ has the same cardinality) are isomorphic. 
+
+        In other words, there is only one cyclic group of order $n$.
+    }
+}
+
+\parag{Summary}{
+    We have seen three main cryptography algorithms: one-time pad (used by secret agences), Diffie-Hellman and El Gamal, and RSA. 
+
+    \subparag{One-time-pad}{
+        Alice and Bob have a common private key $k$ (that they need to have shared at some point) which is as long as the text $t$ Alice wants to send. Alice publishes $c = t \oplus k$, and Bob can decipher by doing $c \ominus k = t$. $k$ needs to be completely random, leading to perfect secrecy: nobody can distinguish $c$ from a sequence of coin flips, the cryptogram and the plaintext are independent (the cryptogram holds no information on the plaintext).
+    }
+
+    \subparag{Diffie-Hellman and El Gamal}{
+        Alice picks a number $a$ and Bob picks a number $b$. They choose publicly a $m$ and a $g$, and they publish $A = g^a$ and $B = g^b$ respectively. This allows both of them to compute $K = g^{ab} = \left(g^a\right)^b = \left(g^b\right)^a$, which gives them a common key. This is Diffie-Hellman.
+
+        El Gamal adds a text $t$, which Alice wants to send. She computes and publishes $K t$, and Bob can compute $K^{-1} K t$ to recover the text, everything mod $m$.
+
+        This is secret, as long as discrete logs stay impossible to compute.
+    }
+
+    \subparag{RSA}{
+        Bob secretly chooses $m = pq$ and $d$, and publishes $\left(m, e\right)$. Alice can publish $c = \left[t^e\right]_m$, and Bob can recover it by doing $t = \left[c^d\right]_m$.
+
+        This is secret, as long as factoring and discrete logs stay impossible to compute.
+    }
+}
+
+
+
+
+
+\end{document}

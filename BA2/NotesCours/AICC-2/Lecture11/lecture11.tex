@@ -1,0 +1,225 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-29 at 15:31:42.
+
+\usepackage{../../style}
+
+\title{AICC-2}
+\author{Joachim Favre}
+\date{Mardi 29 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2022-03-29}{Differences in Analysis, now divisions in AICC\ldots}{
+\begin{itemize}[left=0pt]
+    \item Explanation of Euclid's Division algorithm, and definition of the modulo operation.
+    \item Definition of the congruence, and proof of it being an equivalence relation.
+    \item Proof of the properties of modulos and congruences.
+\end{itemize}
+
+}
+
+\subsection{Modulo arithmetic}
+\parag{Introduction}{
+    We notice that in the set of integers, $\mathbb{Z}$, we can add, subtract and multiply, but we cannot divide (in general). We will dig deeper in this question.
+}
+
+\parag{Euclid's Division Algorithm}{
+    For all integers $a$ and $m \neq 0$, there exist unique integers $q$ (the quotient) and $r$ (the remainder) such that: 
+    \[a = mq + r\]
+    where $0 \leq r < \left|m\right|$
+    
+    \subparag{Example}{
+        Let's take $m = 4$, then:
+        \[7 = 4\cdot 1 + 3\] 
+        \[-2 = 4\left(-1\right) + 2\]
+    }
+}
+
+
+\parag{Signs}{
+    Let's do some Euclidean divisions. Let's divide 8 by 3, then $-8$ by 3, then $8$ by $-3$, and finally $-8$ by $-3$:
+    \[{\color{red}8} = {\color{red}3} \cdot 2 + 2, \mathspace {\color{red}-8} = {\color{red}3} \cdot \left(-3\right) + 1\]
+    \[{\color{red}8} = {\color{red}\left(-3\right)} \cdot \left(-2\right) + 2, \mathspace {\color{red}-8} = {\color{red}\left(-3\right)} \cdot 3 + 1\]
+    
+    To do those divisions, we know the red numbers, and we look for our quotient and remainder, such that $0 \leq r < \left|m\right|$.
+
+    \subparag{Remark}{
+        Note that, in many programming languages, the signs are not always implemented the same way. Thus, if $a$ and $m$ are positive, there is no problem, but if one of them is negative, then the result may be positive or negative depending on the language.
+
+        Indeed, we could say: 
+        \[8 = 3\cdot 3 - 1, \mathspace -8 = 3\left(-2\right) - 2\]
+        \[8 = \left(-3\right)\left(-3\right) - 1, \mathspace -8 = \left(-3\right)\cdot 2 - 2\]
+
+        This goes against our definition, since we want $0 \leq r < \left|m\right|$, but this could also be a definition that makes sense.
+    }
+}
+
+\parag{Mod operation}{
+    By $r = a \Mod m$, we denote the remainder when dividing $a$ by $m$. Thus: 
+    \[a = mq + r \implies a \Mod m = r\]
+}
+
+\parag{Example 1}{
+    If we split a pie with 8 slices for 3 people, then $8 \Mod 3 = 2$ slices will be left over.
+}
+
+\parag{Example 2}{
+    If someone leaves home at 7am for a 40-hour trip, they arrive at $\left(7 + 40\right) \Mod 24 = 23$ the day after.
+}
+
+\parag{Congruence}{
+    Two integers $a$ and $b$ are called \important{congruent} modulo $m$ if $m \divides a - b$, i.e. if $m$ divides $a - b$. This is denoted by: 
+    \[\congruent{a}{b}{m}\]
+    
+    \subparag{Equivalent definitions}{
+        In fact, we can see that all the following statements are equivalent:
+        \begin{itemize}
+            \item $\congruent{a}{b}{m}$
+            \item $\left(a - b\right) \Mod m = 0$
+            \item $a \Mod m = b \Mod m$
+            \item $r_a = r_b$
+        \end{itemize}
+    }
+
+    \subparag{Example}{
+        Let us take $m = 4$. Then, we can draw the following number line, where numbers of the same colour belong to the same class:
+        \svghere{CongruenceClassNumberLine.svg}
+    }
+}
+
+\parag{Example}{
+    If we know that $\congruent{x}{3}{5}$, then clearly $x$ is not a multiple of $5$. Indeed, $x \Mod 5 = 3 \neq 0$.
+
+    However, clearly, if $\congruent{x}{25}{5}$, then $x$ is a multiple of 5 since $\congruent{25}{0}{5}$.
+}
+
+\parag{Definition: Equivalence relation}{
+    On a set, a \important{equivalence relation} is a relation (denoted by $\sim$) which satisfies:
+    \begin{enumerate}
+        \item Reflexivity: $a \sim a$
+        \item Symmetry: $a \sim b \implies b \sim a$
+        \item Transitivity: $a \sim b \land b \sim c \implies a \sim c$
+    \end{enumerate}
+}
+
+\parag{Lemma: Equivalence relation}{
+    Congruence modulo $m$ is an equivalence relation on the set of integers.
+}
+
+\parag{Theorem: Properties}{
+    If $\congruent{a}{a'}{m}$ and $\congruent{b}{b'}{m}$, then:
+    \begin{enumerate}
+        \item $\congruent{a + b}{a' + b'}{m}$
+        \item $\congruent{ab}{a'b'}{m}$
+        \item $\congruent{a^n}{\left(a'\right)^n}{m}$
+    \end{enumerate}
+
+    \vspace{1em}
+
+    An equivalent stating of this theorem is: 
+    \begin{enumerate}
+        \item $\left(a + b\right) \Mod m = \left(a \Mod m + b \Mod m\right) \Mod m$
+        \item $\left(ab\right) \Mod m = \left(\left(a \Mod m\right)\left(b \Mod m\right)\right) \Mod m$
+        \item $a^n \Mod m = \left(\left(a \Mod m\right)^n\right) \Mod m$
+    \end{enumerate}
+
+    We have to be careful to see that the mod does not get distributed into the $n$ of the exponent.
+
+    \subparag{Proof}{
+        First, looking at the number line, we realise that $a \Mod m = \left(a + m k\right) \Mod m$.
+
+        Then, we can write $a = m q_a + r_a$ and $b = m q_b + r_b$, which gives us: 
+        \begin{multiequality}
+        \left(a + b\right) \Mod m =\ & \left(m\left(q_a + q_b\right) + r_a + r_b\right) \Mod m  \\
+        =\ & \left(r_a + r_b\right) \Mod m  \\
+        =\ & \left(a \Mod m + b \Mod m\right) \Mod m 
+        \end{multiequality}
+        
+        Doing something similar with multiplications: 
+        \begin{multiequality}
+        \left(ab\right) \Mod m =\ & \left(\left(m q_a + r_a\right)\left(m q_b + r_b\right)\right) \Mod m  \\
+        =\ & \left(m^2 q_a q_b + mq_a r_b + mq_b r_a + r_a r_b\right) \Mod m  \\
+        =\ & \left(m\left(m q_a q_b + q_a r_b + q_b r_a\right) + r_a r_b\right) \Mod m  \\
+        =\ & \left(r_a r_b\right)\Mod m  \\
+        =\ & \left(\left(a \Mod m\right)\left(b \Mod m\right)\right) \Mod m
+        \end{multiequality}
+
+        Finally, for the powers, we can use what we have just found (since $n \in \mathbb{N}$):
+        \begin{multiequality}
+        a^{n} \Mod m =\ & a\cdot a \cdots a \Mod m  \\
+        =\ & \left(a \Mod m\right)\left(a \Mod m\right)\cdots\left(a \Mod m\right) \Mod m  \\
+        =\ & \left(a \Mod m\right)^n \Mod m 
+        \end{multiequality}
+
+        \qed
+    }
+}
+
+\parag{Example}{
+    For example: 
+    \[\left(123\cdot 97\right)\Mod 2 = \left(\left(123 \Mod 2\right) \left(97 \Mod 2\right)\right) \Mod 2 = \left(1 \cdot 1\right)\Mod2 = 1\]
+    
+    Also: 
+    \[\left(\left(1234 \cdot 333\right) + 41\left(76 + 5\right)\right)\Mod 2 = \left(0\cdot 1 + 1\left(0 + 1\right)\right) \Mod 2 = 1\]
+    
+    Let's say we now wonder if $2 + 2^{1000}$ is divisible by $3$: 
+    \begin{multiequality}
+    \left(2 + 2^{1000}\right) \Mod3 =\ & \left(2 \Mod 3 + \left(2 \Mod 3\right)^{1000}\right) \Mod 3  \\
+    =\ & \left(2 + \left(-1 \Mod 3\right)^{1000}\right) \Mod 3  \\
+    =\ & \left(2 + \left(-1\right)^{1000} \Mod 3\right) \Mod 3  \\
+    =\ & \left(2 + 1\right) \Mod 3  \\
+    =\ & 0 
+    \end{multiequality}
+
+    Thus, we can conclude that $2 + 2^{1000}$ is indeed divisible by 3.
+    
+    Using a similar trick, let's compute: 
+    \[\left(9^{1000} + 9^{10^{6}}\right) \Mod5 = \left(\left(-1\right)^{1000} + \left(-1\right)^{10^{6}}\right) \Mod5 = \left(1 + 1 \right) \Mod 5 = 2\]
+    
+    Thus, $9^{1000} + 9^{10^6}$ is not divisible by 5.
+}
+
+\parag{Even numbers}{
+    We know that: 
+    \[1234 = 1\cdot 10^{3} + 2\cdot 10^{2} + 3\cdot 10^1 + 4\]
+    
+    Thus, taking a mod 2: 
+    \begin{multiequality}
+    1234 \Mod 2 =\ & \left(1 \cdot \left(10 \Mod 2\right)^3 + 2 \left(10 \Mod 2\right)^2 + 3 \cdot \left(10 \Mod 2\right) + 4\right) \Mod 2  \\
+    =\ & \left(0 + 0 + 0 + 4\right) \Mod 2  \\
+    =\ & 0 
+    \end{multiequality}
+    
+    Thus, only the last number matters to say if a number is even in base 10.
+}
+
+\parag{Division by 9}{
+   We know that $\congruent{10}{1}{9}$, thus: 
+   \[\congruent{10^n}{1^n = 1}{9}\]
+   
+   This implies that:
+   \begin{multiequality}
+   1234 \Mod 9 =\ & \left(1 \cdot \left(10 \Mod 9\right)^3 + 2 \cdot \left(10 \Mod 9\right)^2 + 3 \cdot \left(10 \Mod 9\right)^1 + 4 \Mod9\right) \Mod 9  \\
+   =\ & \left(1 + 2 + 3 + 4\right) \Mod 9  \\
+   =\ & 10 \Mod 9  \\
+   =\ & 1 
+   \end{multiequality}
+   
+   In other words, to know if a number is divisible by 9, we can only add up the digits.
+}
+
+\parag{Back to Diffie-Hellman}{
+    For Diffie-Hellman, we needed to compute quickly big exponents modulo a given number. Let's see an example of how to do that more quickly.
+
+    To compute $28^{42} \Mod 67$, we can do it successively. Indeed: 
+    \[28^{42} \Mod 67 = \left(\cdots \left(\left(\left(\left(28^2 \Mod 67\right) \cdot 28\right) \Mod 67\right) \cdot 28\right) \Mod 67 \cdots \right)\Mod 67\]
+    
+    This is $\Theta\left(n\right)$, but there is even an algorithm named fast-exponentiation which reaches $\Theta\left(\log\left(n\right)\right)$.
+}
+
+
+
+
+\end{document}

@@ -1,0 +1,285 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-05 at 14:21:39.
+
+\usepackage{../../style}
+
+\title{AICC2}
+\author{Joachim Favre}
+\date{Jeudi 05 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{20}{2022-05-05}{Minimum distance}{
+\begin{itemize}[left=0pt]
+    \item Definition of minimum distance decoding.
+    \item Definition of the minimum distance of a code.
+    \item Proof of some theorems linking the maximum erasure and error weight so that that minimum distance decoding finds the good answer.
+    \item Proof of Singleton's Bound.
+    \item Example using the Mod 97--10 procedure.
+\end{itemize}
+
+}
+
+\parag{Definition: Minimum distance decoding}{
+    For any code $\mathcal{C}$ and for any channel yielding $y$, the Minimum Distance (MD)-Decoder outputs:
+    \[\hat{c} \in \arg \min_{x \in \mathcal{C}} d_H\left(y, x\right)\]
+
+    The arg maps back to the codeword. We are having a set since there might be multiple minimums.
+
+    In other words, the decoder makes a table, measuring the distance between what it gets and all the possible codewords. Then, it just picks the one with the smallest Hamming distance.
+
+    \subparag{Intuition}{
+        This decoder uses the intuition we had previously: it makes sense to map what we get to the closest codeword.
+    }
+}
+
+\parag{Example}{
+    Let's consider again our encoder doing repetition encoding $ab \mapsto aaabbb$ with $a, b \in \left\{0, 1\right\}$. If a MD-decoder receives $0??111$ which got out of an erasure channel, then it can draw:
+    \begin{center}
+    \begin{tabular}{c|c}
+        $x \in \mathcal{C}$ & $d\left(x, 0??111\right)$ \\
+        \hline
+        000000 & 5 \\
+        000111 & 2 \\
+        111000 & 6 \\
+        111111 & 3
+    \end{tabular}
+    \end{center}
+
+    Thus the decoder would translate $0??111 \mapsto 000111 \mapsto 01$.
+
+    Let's now consider a decoder getting 010111 after an error channel:
+    \begin{center}
+    \begin{tabular}{c|c}
+        $x \in \mathcal{C}$ & $d\left(x, 010111\right)$ \\
+        \hline
+        000000 & 4 \\
+        000111 & 1 \\
+        111000 & 5 \\
+        111111 & 2
+    \end{tabular}
+    \end{center}
+
+    Thus, the decoder would translate $010111 \mapsto 000111 \mapsto 01$.
+}
+
+
+\parag{Definition: Minimum distance of a code}{
+    Let's say we have a code $\mathcal{C}$. Then, the \important{minimum distance} of this code, is defined as:
+    \[d_{min}\left(\mathcal{C}\right) \over{=}{def} \min_{\substack{x, y \in \mathcal{C} \\ x \neq y}} d_H\left(x, y\right)\]
+
+    \subparag{Example}{
+        Let's consider the following code:
+        \[\mathcal{C} = \left\{000000, 000111, 111000, 1111111\right\}\]
+
+        Then, $d_{min}\left(\mathcal{C}\right) = 3$.
+    }
+}
+
+\parag{Example}{
+    Let's consider again the following code:
+    \begin{center}
+    \begin{tabular}{cccc}
+        000 & $\mapsto$ & $0000000 = c_1$ \\
+        001 & $\mapsto$ & $0011100 = c_2$ \\
+        010 & $\mapsto$ & $0111011 = c_3$ \\
+        011 & $\mapsto$ & $1110100 = c_4$ \\
+        100 & $\mapsto$ & $0100111 = c_5$ \\
+        101 & $\mapsto$ & $1101000 = c_6$ \\
+        110 & $\mapsto$ & $1001111 = c_7$ \\
+        111 & $\mapsto$ & $1010011 = c_8$ 
+    \end{tabular}
+    \end{center}
+
+    To compute its minimum distance, there is no other way (for now) than drawing a table, and computing all $64$ distances (36 if we remove symmetry and 28 if we remove the cases were $c_i = c_j$):
+
+    \begin{center}
+    \begin{tabular}{c|cccccccc}
+        & $c_1$ & $c_2$ & $c_3$ & $c_4$ & $c_5$ & $c_6$ & $c_7$ & $c_8$ \\
+        \hline
+            $c_1$ & 0 & 3 & 5 & 4 & 4 & 3 & 5 & 4 \\ 
+            $c_2$ &   & 0 & 4 & 3 & 5 & 4 & 4 & 5 \\ 
+            $c_3$ &   &   & 0 & 5 & 3 & 4 & 4 & 3 \\ 
+            $c_4$ &   &   &   & 0 & 4 & 3 & 5 & 4 \\ 
+            $c_5$ &   &   &   &   & 0 & 5 & 3 & 4 \\ 
+            $c_6$ &   &   &   &   &   & 0 & 4 & 5 \\ 
+            $c_7$ &   &   &   &   &   &   & 0 & 3 \\ 
+            $c_8$ &   &   &   &   &   &   &   & 0 \\ 
+    \end{tabular}
+    \end{center}
+
+    We thus get $d_{min}\left(\mathcal{C}\right) = 3$.
+}
+
+\parag{Theorem: Erasure channel}{
+    Let's consider an erasure channel.
+
+    If the erasure weight is such that $p < d_{min}\left(\mathcal{C}\right)$, then the MD-decoder is guaranteed to find the correct codeword.
+
+    \subparag{Proof}{
+        We know by hypothesis that $p < d_{min}\left(\mathcal{C}\right)$.
+
+        Let's suppose for contradiction that there are two codewords $c \neq \widetilde{c}$ such that they are both consistent with all non-erased symbols. This would mean that $c$ and $\widetilde{c}$ are equal in all non erasaed symbol, meaning:
+        \[d\left(c, \widetilde{c}\right) \leq p\]
+
+        But since $c \neq \widetilde{c}$, this is a contradiction to the property $d_{min}\left(\mathcal{C}\right) > p$.
+
+        \qed
+    }
+
+    \subparag{Examples}{
+        Let's consider the same code as in the last example. We know that $d_{min}\left(\mathcal{C}\right) = 3$.
+
+        If $y = ?01110?$, then we get $\hat{c} = 0011100$, which is the only possibility (as expected, since $p < d_{min}\left(\mathcal{C}\right)$).
+
+        If $y = 11???00$, then we get $\hat{c} \in \left\{1110100, 0100111\right\}$.
+
+        If $y = ???0011$, then we get $\hat{c} = 1010011$. We had luck, we found the correct codeword even though $p \geq d_{min}\left(\mathcal{C}\right)$.
+    }
+
+    \subparag{Remark}{
+        The greatest $p$, $p_{max}$, such that for any erasure weight $p \leq p_{max}$, we can be certain that the correct codeword can be found, is given by: 
+        \[p_{max} = d_{min} - 1\]
+    }
+    
+}
+
+\parag{Theorem: Error channel}{
+    Let's consider an error channel.
+
+    If the error weight is such that $p < \frac{d_{min}\left(\mathcal{C}\right)}{2}$, then the MD-decoder is guaranteed to find the correct codeword.
+
+    \subparag{Proof}{
+        By hypothesis, we know that the error weight is such that $p < \frac{d_{min}\left(\mathcal{C}\right)}{2}$. Let's say that the true codeword is $c$, the channel output is $y$, and $\hat{c}$ is the output of the MD-decoder.
+
+        Then, we know that $d\left(c, y\right) = p$. Also, we get that:
+        \[d\left(\hat{c}, y\right) \leq d\left(c, y\right) = p\]
+
+        Thus, using the triangle inequality:
+        \[d\left(c, \hat{c}\right) \leq \underbrace{d\left(c, y\right)}_{= p} + \underbrace{d\left(y, \hat{c}\right)}_{\leq p} \leq 2p \over{<}{hyp} 2\cdot \frac{d_{min}\left(\mathcal{C}\right)}{2} < d_{min}\left(\mathcal{C}\right)\]
+
+        And, the only possibility for $d\left(c, \hat{c}\right) < d_{min}\left(\mathcal{C}\right)$, is that $c = \hat{c}$, meaning that the MD-decoder gave the right result.
+    }
+
+    \subparag{Remark 1}{
+        The greatest $p$, $p_{max}$, such that for any error weight $p \leq p_{max}$, we can be certain that the correct codeword can be found, is given by: 
+        \[p_{max} = \left\lfloor \frac{d_{min} - 1}{2} \right\rfloor\]
+    }
+
+    \subparag{Remark 2}{
+        The greatest $p$, $p_{max}$, such that for any error weight $p \leq p_{max}$, we can be certain that an error \textit{can be deftected} is given by:
+        \[p_{max} = d_{min} - 1\]
+
+        Indeed, if $p \leq d_{min} - 1$, then we cannot mistake what we get with another codeword.
+    }
+    
+}
+
+\parag{Observation}{
+    We want $d_{min}\left(\mathcal{C}\right)$ to be large in a code, since, in both channel, the larger it is, the surer we are to get the good result. Then, we also want $n$ to be small, since it would mean less to transmit; and we want to have $\left|\mathcal{C}\right|$ to also be large. Those two last conditions are equivalent to wanting $R = \frac{k}{n}$ to be large.
+
+    We want both $d_{min}\left(\mathcal{C}\right)$ and $R$ to be large, but there is some tension between them: increasing them decreases the other. This leads us to the following bound.
+}
+
+\parag{Theorem: Singleton's bound}{
+    For any code $\mathcal{C}$, regardless of the alphabet $\mathcal{A}$, we have:
+    \[d_{min}\left(\mathcal{C}\right) \leq n -k + 1\]
+    where $n$ is the block length and $k = \log_{\left|\mathcal{A}\right|}\left(\left|\mathcal{C}\right|\right)$.
+
+    \subparag{Proof}{
+        We have $\left|\mathcal{A}\right|^k$. Let's say we have the following code (each column represents one of the digit of the code):
+        \begin{center}
+        \begin{tabular}{c|ccccccccc}
+            & 1 & 2 & 3 & $\cdots$ & $d_{min} -1$ & $d_{min}$ & $d_{min} + 1$ & $\cdots$ & $n$ \\
+            \hline
+            1 & 0 & 0 & 0 & $\cdots$ & 0 & 0 & 0 & $\cdots$ & 0 \\
+            2 & 0 & 1 & 0 & $\cdots$ & 1 & 1 & 0 & $\cdots$ & 1 \\
+            $\vdots$ \\
+            $n$ & 0 & 0 & 0 & $\cdots$ & 1 & 1 & 1 & $\cdots$ & 1
+        \end{tabular}
+        \end{center}
+
+        Now, let's erase the $d_{min} - 1$ first columns:
+        \begin{center}
+        \begin{tabular}{c|cccc}
+            & $d_{min}$ & $d_{min} + 1$ & $\cdots$ & $n$ \\
+            \hline
+            1 & 0 & 0 & $\cdots$ & 0 \\
+            2 & 1 & 0 & $\cdots$ & 1 \\
+            $\vdots$ \\
+            $n$ & 1 & 1 & $\cdots$ & 1
+        \end{tabular}
+        \end{center}
+
+        In this new table, there cannot be two rows that are equal since, then, $d_{min}$ could not be the one it is (since we erased $d_{min} - 1$ columns). However, since we only have $n - d_{min} + 1$ columns, we cannot make more that $\left|\mathcal{A}\right|^{n - d_{min} + 1}$ different rows. Since we have $\left|\mathcal{C}\right| = \left|\mathcal{A}\right|^k$ codewords, we get:
+        \[\left|\mathcal{A}\right|^k \leq \left|\mathcal{A}\right|^{n - d_{min} + 1} \iff k \leq n - d_{min} + 1 \iff d_{min} \leq n - k + 1\]
+
+        \qed
+    }
+
+}
+
+\parag{Definition: MDS code}{
+    A code $\mathcal{C}$ that attains Singleton's Bound with equality is called \important{Maximum Distance Separable (MDS) code}.
+}
+
+\parag{Example}{
+    Let's consider again the following code:
+    \begin{center}
+    \begin{tabular}{cccc}
+        000 & $\mapsto$ & $0000000 = c_1$ \\
+        001 & $\mapsto$ & $0011100 = c_2$ \\
+        010 & $\mapsto$ & $0111011 = c_3$ \\
+        011 & $\mapsto$ & $1110100 = c_4$ \\
+        100 & $\mapsto$ & $0100111 = c_5$ \\
+        101 & $\mapsto$ & $1101000 = c_6$ \\
+        110 & $\mapsto$ & $1001111 = c_7$ \\
+        111 & $\mapsto$ & $1010011 = c_8$ 
+    \end{tabular}
+    \end{center}
+
+    We know that $n = 7$, $k = 3$ and we have already computed $d_{min}\left(\mathcal{C}\right) = 3$. We observe that $n - k + 1 = 5 \neq 3$, meaning that it is not an MDS code.
+}
+
+\parag{Geometrical interpretation}{
+    We notice that we can interpret codes geometrically.
+
+    If $n = 2$ and $\mathcal{A} = \left\{0, 1\right\}$, then $\mathcal{A}^n = \mathcal{A}^2 = \left\{00, 01, 10, 11\right\}$. If our code is $\mathcal{C} =\left\{00, 11\right\}$, then we can draw the following diagram:
+    \svghere[0.25]{DiagramGeometricalInterpretationCode2D.svg}
+
+    We notice that the Hamming distance between two vertices, in the shortest number of edges we have to take to go from the first point to the second.
+
+    We can do a similar diagram if $n = 3$, if $\mathcal{C} = \left\{100\right\}, \left\{010\right\}, \left\{001\right\}$:
+    \svghere[0.25]{DiagramGeometricalInterpretationCode3D.svg}
+}
+
+\parag{Example: Procedure mod 97--10}{
+    We defined the procedure mod 97--10 as: 
+    \[u \mapsto v = \left(100u\right) + \left(98 - \left[100u\right]_{97}\right)\]
+
+    This is a code, just like what we have seen so far. Indeed, we have $k$ to be the number of digits of $u$, and: 
+    \[\mathcal{A} = \left\{0, 1, \ldots, 9\right\}, \mathspace n = k+2, \mathspace R = \frac{k}{n} = \frac{k}{k + 2}\]
+    
+    We proved that any codeword must satisfy $\left[v\right]_{97} = 1$, and we will now prove that any single error will be detected.
+
+    \subparag{Proof}{
+        Let's say that our channel maps: 
+        \[v \mapsto v' = v + a\cdot 10^\ell, \mathspace \text{ for some } \ell \in \mathbb{Z}, a \in \left\{-9, -8, \ldots, 9\right\}\]
+        
+        Our claim is that $\left[v'\right]_{97} = 1$ if and only if $a = 0$. We see that: 
+        \[\left[v'\right]_{97} = \left[v + a 10^\ell\right]_{97} = \left[\left[v\right]_{97} + \left[a 10^{\ell }\right]_{97}\right]_{97} = \left[1 + \left[a 10^\ell\right]_{97}\right]_{97}\]
+        
+        So, we must have $\left[a 10^\ell \right]_{97} = 0$, which is equivalent to $\left[a\right]_{97} = 0$ since $10^\ell$ and 97 are coprime and thus $10^\ell $ has an inverse mod 97. Also, this is equivalent to $a = 0$, since $a \in \left\{-9, -8, \ldots, 9\right\}$.
+
+        To sum up, we have indeed found that: 
+        \[\left[v'\right]_{97} = 1 \iff \left[a 10^\ell \right]_{97} = 0 \iff \left[a\right]_{97} = 0 \iff a = 0\]
+        
+        \qed
+    }
+    
+}
+
+
+\end{document}

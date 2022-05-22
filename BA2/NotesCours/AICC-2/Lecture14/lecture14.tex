@@ -1,0 +1,427 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-04-07 at 13:44:22.
+
+\usepackage{../../style}
+
+\title{AICC-2}
+\author{Joachim Favre}
+\date{Jeudi 07 avril 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2022-04-07}{Groups}{
+\begin{itemize}[left=0pt]
+    \item Explanation of Euclid's algorithm.
+    \item Proof of Bézout's identity.
+    \item Proof that $\left[a\right]_m$ has an inverse if and only if $a$ and $m$ are coprime.
+    \item Explanation of check digits, the procedure mod 97--10, and example of how IBANs are made.
+    \item Definition of commutative groups.
+    \item Definition of $\mathbb{Z}/m\mathbb{Z}^*$, and proof that it is a commutative group.
+    \item Definition of Euler's totient function, and proof of some of its properties.
+    \item Definition of the Cartesian product for groups.
+\end{itemize}
+}
+
+\parag{Lemma}{
+    The following identity holds: 
+    \[\gcd\left(a, b\right) = \gcd\left(a - kb, b\right)\]
+    
+    \subparag{Proof}{
+        Knowing that $d \divides a$ and $d \divides b$ is equivalent to saying that $d \divides a-kb$ and $d \divides b$.
+
+        Indeed, if $d$ divides $a$ and $b$, then it divides $b$ and $a - kb$. Also, if $d$ divides $b$ and $a - kb$, then it divides $a - kb + kb = a$. We can write those as fractions, it may help to visualise: 
+        \[\frac{a}{d} \in \mathbb{Z} \text{ and } \frac{b}{d} \in \mathbb{Z} \implies \frac{a - kb}{d} = \frac{a}{d} - k \frac{b}{d} \in \mathbb{Z}\] 
+        \[\frac{b}{d} \in \mathbb{Z} \text{ and } \frac{a - kb}{d} \in \mathbb{Z} \implies \frac{a}{d} = \frac{a - kb}{d} + k \frac{b}{d} \in \mathbb{Z}\] 
+        
+        Since the set of divisors of $a$ and $b$ is the same as the set of divisors of $b$ and $a - kb$, then clearly the greatest divisor is the same in both cases.
+
+        \qed
+    }
+}
+
+\parag{Euclid algorithm}{
+    We know we can write $a = bq + r$, where $0 \leq r < b$. Thus, from our lemma: 
+    \[\gcd\left(a, b\right) = \gcd\left(b, r\right) = \gcd\left(b, a \Mod b\right)\]
+    
+    We can continue that way recursively.
+
+    \subparag{Example}{
+        Let us compute the gcd between 122 and 22: 
+        \[\gcd\left(122, 22\right) = \gcd\left(22, 12\right) = \gcd\left(12, 10\right) = \gcd\left(10, 2\right) = \gcd\left(2, 0\right) = 2\]
+        
+        Since: 
+        \[122 = 22\cdot 5 + 12, \mathspace 22 = 12\cdot 1 + 10, \mathspace 12 = 10\cdot 1 + 2, \mathspace 10 = 2\cdot 5 + 0\]
+        
+    }
+}
+
+\parag{Theorem: Bézout's identity}{
+    Let $a$ and $b$ be integers, not both zero. 
+
+    Then, there exist integers $u$ and $v$ (possibly negative), such that: 
+    \[\gcd\left(a, b\right) = au + bv\]
+    
+    \subparag{Proof}{
+        We find the $u$ and the $v$ through an algorithm. 
+
+        We know that, since $a = bq + r$, then: 
+        \[\gcd\left(a, b\right) = \gcd\left(b, r\right)\]
+        
+        Let's suppose there exist numbers $\widetilde{u}$ and $\widetilde{v}$ such that: 
+        \[\gcd\left(b, r\right) = b \widetilde{u} + r\widetilde{v} = b\widetilde{u} + \left(a - bq\right)\widetilde{v} = a\widetilde{v} + b\left(\widetilde{u} - q\widetilde{v}\right) = au + bv\]
+        
+        Let us also see the following initial step: 
+        \[\gcd\left(a, 0\right) = a = 1\cdot a + 0\cdot 0 \implies u^* = 1, v^* = 0\]
+        
+        Note that, in the initial step, $v^*$ is not unique (but taking 0 is usually simpler).
+
+        This algorithm gives us a way to construct our $u$ and $v$, proving that they exist.
+
+        \qed
+    }
+
+    \subparag{Example}{
+        We can draw the following table:
+        \begin{center}
+        \begin{tabular}{|c||c|c|c|c|c|c|c}
+            \hline
+            $\gcd\left(a, b\right)$ & $a = bq + r$ & $q$ & $u = \widetilde{v}$ & $v = \widetilde{u} - q\widetilde{v}$ \\
+            \hhline{=#=|=|=|=|}
+            $\gcd\left(150, 33\right)$ & $33 \cdot 4 + 18$ & 4 & $2$ & $-1 -8 = -9$\\
+            \hline
+            $\gcd\left(33, 18\right)$ & $18\cdot 1 + 15$ & 1 & $-1$ & $1 - \left(-1\right)1 = 2$\\
+            \hline
+            $\gcd\left(18, 15\right)$ & $15\cdot 1 + 3$ & $1$ & $1$ & $0 - 1 = -1$\\
+            \hline
+            $\gcd\left(15, 3\right)$ & $3\cdot 5 + 0$ & 5 & 0 & 1 \\
+            \hline
+            $\gcd\left(3, 0\right) = 3$ & & & 1 & 0 \\
+            \hline
+        \end{tabular}
+        \end{center}
+
+        We complete the three first columns first, and then complete the last two columns by going from bottom to top. Note that a good idea is to verify that our current $u$ and $v$ are correct, in every row. For instance, for the third row from bottom:
+        \[3 = \gcd\left(18, 15\right) = 18\left(1\right) + 15\left(-1\right) = 3\]
+        which is correct.
+
+        In the end, we get that, indeed: 
+        \[2\cdot 150 - 9\cdot 33 = 3 = \gcd\left(150, 33\right)\]
+    }
+}
+
+\parag{Theorem}{
+    $\left[a\right]_m$ has a multiplicative inverse \textit{if and only if} $a$ and $m$ are coprime (meaning that $\gcd\left(a, m\right) = 1$).
+
+    \subparag{Remark}{
+        The proof $\impliedby$ is important since it gives us a procedure for finding an inverse.
+    }
+    
+
+    \subparag{Proof $\impliedby$}{
+        We suppose by hypothesis that $\gcd\left(a, m\right) = 1$.
+
+        By Bézout identity, we know $\exists u,v$ such that: 
+        \[1 = au + mv \implies \left[1\right]_m = \left[au\right]_m + \underbrace{\left[mv\right]_m}_{= 0} = \left[a\right]_m \left[u\right]_m\]
+        since $mv$ is a multiple of $m$.
+
+        We have found our inverse, $\left[u\right]_m$.
+    }
+
+    \subparag{Proof $\implies$}{
+        Let us suppose that $\left[a\right]_m$ has an inverse, $\left[u\right]_m$. Then, for some integer $v$ (the first part is true for any $v$, but then, after the implication, we only have one possible $v$): 
+        \[\left[au + mv\right]_m = \left[a\right]_m \left[u\right]_m \over{=}{hyp} \left[1\right]_m \implies au + mv = 1\]
+        
+        A number dividing both $a$ and $m$ definitely divides the left hand side, thus it needs to divide the right hand side. Since only $-1$ and $1$ divide the right hand side, this tells us that no number apart from those divide both $a$ and $b$, and thus: 
+        \[\gcd\left(a, m\right) = 1\]
+        
+        \qed
+    }
+
+    \subparag{Example}{
+        Let us draw the multiplication table for $\mathbb{Z} / 4 \mathbb{Z}$:
+        \begin{center}
+        \begin{tabular}{c|cccc}
+            $\cdot$ & 0 & 1 & 2 & 3 \\
+            \hline
+            0 & 0 & 0 & 0 & 0 \\
+            1 & 0 & 1 & 2 & 3 \\
+            2 & 0 & 2 & 0 & 2 \\
+            3 & 0 & 3 & 2 & 1
+        \end{tabular}
+        \end{center}
+
+        We see that our theorem is correct: the even rows (and columns) do not have a multiplicative inverse, whereas the odd ones do.
+    }
+}
+
+\parag{Corollary 1}{
+    $\gcd\left(a, m\right) = 1$ if and only if there exist integers $u$ and $v$ such that $1 = au + mv$.
+
+    \subparag{Proof $\implies$}{
+        We suppose that $\gcd\left(a, m\right) = 1$.
+
+        By Bézout's identity, we know that there exists integers $u$ and $v$ such that: 
+        \[1 = au + mv\]
+    }
+
+    \subparag{Proof $\impliedby$}{
+        We know by hypothesis that $1 = au + mv$, where $u$ and $v$ are integers.
+
+        Then, we can compute: 
+        \[\left[1\right]_m = \left[au + mv\right]_m = \left[a\right]_m \left[u\right]_m + \underbrace{\left[m\right]_m}_{= 0} \left[v\right]_m = \left[a\right]_m \left[u\right]_m\]
+        
+        Which shows that $\left[u\right]_m$ is the inverse of $\left[a\right]_m$. Thus, since $\left[a\right]_m$ has an inverse, we know that $a$ and $m$ are coprime, i.e: 
+        \[\gcd\left(a, m\right) = 1\]
+        
+        \qed
+    }
+}
+
+\parag{Corollary 2}{
+    If $p$ is a prime, all elements of $\mathbb{Z} / p\mathbb{Z}$, except for $\left[0\right]_p$, have a multiplicative inverse.
+
+    \subparag{Proof}{
+        We know that, for any $0 < a < p$, then $\gcd\left(a, p\right) = 1$, so we can apply the theorem we have just seen. If $a = 0$, then:
+        \[\gcd\left(a, p\right) = \gcd\left(0, p\right) = p \neq 1\]
+
+        \qed
+    }
+}
+
+\parag{Example: Check digits}{
+    Let's consider the number $0212351234$. We can compute its remainder $\Mod 97$, which gives us 95. Instead of publishing this number, we can publish the same number with the modulo appended at the end: 
+    \[021235123495\]
+    
+    Now, if we swapped two numbers, getting $0212{\color{red}53}123495$, we would know it is wrong since $0212531234 \Mod 97 = 63 \neq 95$. This algorithm allows us to know there is a problem.
+}
+
+\parag{Procedure mod 97--10}{
+    This algorithm is a variant of the previous one.
+
+    We start with a number $n$. We multiply our number by 100, getting $100n$, compute $r = 100n \Mod 98$, then add a check $c = 98 - r$ to our number multiplied by 100. In other words, we compute:
+    \[m = 100n + \left(98 - 100n \Mod 97\right)\]
+
+    Then, to check if our number was modified, we can verify that the result modulo 97 is 1. In other words, the test passes if:
+    \[\left[\text{number with check digits}\right]_{97} = \left[1\right]_{97}\]
+
+    \subparag{Proof: Test passes if no mistake}{
+        We want know to verify that the following is equal to 1: 
+        \begin{multiequality}
+        \left(100n + \left(98 - 100n \Mod 97\right)\right) \Mod 97 =\ & \left(100n + 98 - 100n\right) \Mod 97  \\
+        =\ & 98 \Mod 97  \\
+        =\ & 1 
+        \end{multiequality}
+        
+        We still need to prove that if we swap any two consecutive numbers, we will not get 1 at the end.
+    }
+
+    \subparag{Proof: Swapping numbers}{
+        Let's now suppose that we swap two consecutive digits in our number $n$, giving us $\widetilde{n}$. For example: 
+        \[n = 212ba1234 \implies \widetilde{n} = 212ab1234\]
+        
+        We want to express $\widetilde{n}$ as a function of $n$ ($k = 4$ in our example): 
+        \[\widetilde{n} = n - 10^k \left(a + 10b\right) + 10^k \left(b + 10a\right) = n + 10^k \left(9a - 9b\right)\]
+        
+        The test fails to detect only if $10^k \left(9a - 9b\right) \Mod 97 = 0$, meaning:
+        \[\left(\left[10\right]_{97}\right)^{k} \left[9\right]_{97} \left[a - b\right]_{97} = \left[0\right]_{97}\]
+        
+        However, since we know that all non-zero element of $\mathbb{Z} / 97 \mathbb{Z}$ has an inverse (since 97 is prime), our equation is equivalent to: 
+        \[\left[a - b\right]_{97} = \left[0\right]_{97}\]
+        
+        To conclude, the transposition is not detected if and only if $a = b$ (since $0 \leq a, b \leq 9$), which would mean that there is no transposition.
+
+        \qed
+    }
+    
+    \subparag{Remark}{
+        We know that $97$ is the largest prime under 100, this is why we picked it.      
+    }
+}
+
+\parag{IBAN}{
+    An IBAN is constructed the following way. The first 5 numbers represent the bank, the next 12 the account, the next 4 the country (we convert the two letters of the country, CH for Switzerland for instance, using $A \mapsto 10, \ldots, Z \mapsto 35$, leading to 1217 for CH), and then do a MOD97--10 procedure for the last two digits. We finally replace the four digits of the country by its letters, and reposition the two letters and the two digits of the MOD97--10 procedure to the front, leading to, for instance: 
+    \[\text{CH}{\color{red}54}\,00243\,0001\,2345\,6789\]
+
+    This means that, we can verify the user did not make a mistake writing his or her IBAN thanks to the MOD97--10 procedure. With our example, we can verify that: 
+    \[00243\,0001\,2345\,6789\,{\color{red}1217\,54} \Mod 97 = 1\]
+}
+
+\subsection{Commutative groups}
+\parag{Introduction}{
+    After $\mathbb{Z} / m\mathbb{Z}$, wee could go into two directions. Focus on finite groups, which have one operations, or focus on finite fields, which have two operations. 
+
+    We will begin with groups for now, and move onto fields later.
+}
+
+\parag{Definition: Commutative group}{
+    Let $G$ be a finite set, and $\star$ be an operation on pairs of elements of $G$, such that:
+    \begin{enumerate}
+        \item Closure: $\forall a, b \in G$, $a \star b \in G$
+        \item Associativity: $a \star \left(b \star c\right) = \left(a \star b\right) \star c$
+        \item Commutativity: $a\star b = b \star a$
+        \item Existence of identity: $\exists e \in G$ such that $e \star a = a\star e = a$
+        \item Existence of inverse: $\forall a \in G, \exists b \in G$ such that $a \star b = b\star a = e$
+    \end{enumerate}
+
+    Then, a \important{commutative group} (or Abelian group) is $\left(G, \star\right)$. Note that we can also define the concept of group, which does not have the commutativity property, but we are not interested in them in this course.
+
+    \subparag{Remark}{
+        We are generalising an idea, in order to be able to apply it to many stuff. If we can prove something is a group, then we will have a lot of properties for free.
+    }
+}
+
+\parag{Example}{
+    The following are groups: 
+    \[\left(\mathbb{R}, +\right), \mathspace \left(\mathbb{R} \setminus \left\{0\right\}, \cdot\right), \mathspace \left(\mathbb{C}, +\right), \mathspace \left(\mathbb{Z} / m\mathbb{Z}, +\right), \mathspace \left(\mathbb{Z} / p\mathbb{Z} \setminus \left\{\left[0\right]_p\right\}, \cdot\right)\]
+    where $p$ is a prime number.
+    
+    However, the following are not groups: 
+    \[\left(\mathbb{R}, \cdot\right), \mathspace \left(\mathbb{Z} / m\mathbb{Z}, \cdot\right), \mathspace \left(\mathbb{Z} / q \mathbb{Z} \setminus \left\{\left[0\right]_q\right\}, \cdot\right),\mathspace \left(\mathbb{N}, +\right), \mathspace \left(\mathbb{Z} \setminus \left\{0\right\}, \cdot\right)\]
+    where $q$ is not a prime number. For instance, $\left(\mathbb{R}, \cdot\right)$ is not a group since $0$ does not have an inverse.
+}
+
+\parag{Definition}{
+    We define $\mathbb{Z} / m\mathbb{Z}^*$ to be the set of elements of $\mathbb{Z} / m\mathbb{Z}$ that have a multiplicative inverse.
+
+    \subparag{Example}{
+        For instance: 
+        \[\mathbb{Z} / 4\mathbb{Z} = \left\{0, 1, 2, 3, 4\right\} \implies \mathbb{Z} / 4\mathbb{Z}^* = \left\{1, 3\right\}\]
+    }
+    
+}
+
+\parag{Theorem}{
+    For every integer $m > 1$, $\left(\mathbb{Z} / m\mathbb{Z}^*, \cdot\right)$ is a commutative group.
+
+    \subparag{Proof}{
+        It seems clear that all the axioms for the operator hold, except for closure which does not seem so clear from first sight. Let us prove that it holds.
+
+        Let $a, b \in \mathbb{Z} / m\mathbb{Z}^*$, meaning that they have a multiplicative inverse. Let us show that the multiplicative inverse of $\left[ab\right]_m$ is $\left(\left[b\right]_m\right)^{-1} \left(\left[a\right]_m\right)^{-1}$:
+        \begin{multiequality}
+        \left(\left[b\right]_m\right)^{-1} \left(\left[a\right]_m\right)^{-1} \left[ab\right]_m =\ & \left(\left[b\right]_m\right)^{-1} \underbrace{\left(\left[a\right]_m\right)^{-1} \left[a\right]_m}_{=1} \left[b\right]_m  \\
+        =\ & \left(\left[b\right]_m\right)^{-1} \left[b\right]_m  \\
+        =\ & 1 
+        \end{multiequality}
+        
+        Since $\left[ab\right]_m$ has a multiplicative inverse, we know $\left[ab\right]_m \in \mathbb{Z} / m\mathbb{Z}^*$.
+
+        \qed
+    }
+}
+
+\parag{Example}{
+    Let us draw the multiplication table of $\left(\mathbb{Z} / 5\mathbb{Z}^*, \cdot\right)$:
+    \begin{center}
+    \begin{tabular}{c|cccc}
+        $\cdot$ & 1 & 2 & 3 & 4 \\
+        \hline
+        1 & 1 & 2 & 3 & 4 \\
+        2 & 2 & 4 & 1 & 3 \\
+        3 & 3 & 1 & 4 & 2 \\
+        4 & 4 & 3 & 2 & 1 \\
+    \end{tabular}
+    \end{center}
+
+    We can realise that every number appears exactly once in every row and in every column.
+
+    We have seen that in $\mathbb{Z} / m\mathbb{Z}$, the map $x \mapsto ax$ is a bijection when $a^{-1}$ exists. Each row (and each column) of the above table is such a map, which explains our observation.
+}
+
+\parag{Number of elements}{
+    We wonder how many elements there are in $\mathbb{Z} / m\mathbb{Z}^*$. 
+
+    We have the following candidates: 
+    \[\mathbb{Z} / m\mathbb{Z} = \left\{0, 1, \ldots, m -1\right\}\]
+    
+    But then, $a$ is in $\mathbb{Z} / m\mathbb{Z}^*$ if and only if $\gcd\left(a, m\right) = 1$. This makes us come to our following definition.
+}
+
+\parag{Definition: Euler's totient function}{
+    We define \important{Euler's totient function}, $\phi\left(n\right)$, to be the number of $i \in\left\{1, 2, \ldots, n\right\}$ such that $i$ and $n$ are coprime (meaning $\gcd\left(i, n\right) = 1$).
+
+    \subparag{Remark}{
+        Note that, when we work modulo $n$: 
+        \[\left\{1, 2, \ldots, n\right\} = \left\{0, 1, \ldots, n-1\right\}\]
+
+        Thus, our function is exactly what we have seen in our last paragraph.
+    }
+
+    \subparag{Properties}{
+        As we have seen, $\phi\left(m\right)$ is the cardinality of $\mathbb{Z} / m\mathbb{Z}^*$. Also, we can see that, if $p$ is prime, then $\phi\left(p\right) = p-1$.
+    }
+}
+
+\parag{Examples}{
+    Let us compute the following values of Euler's totient function: 
+    \[\phi\left(1\right) = 1, \mathspace \phi\left(2\right) = 1, \mathspace \phi\left(3\right) = 2, \mathspace \phi\left(4\right) = 2, \mathspace \phi\left(5\right) = 4, \mathspace \phi\left(6\right) = 2\]
+    
+    Indeed, for example, for $n = 4$, we have $\mathbb{Z} / 4\mathbb{Z}^* = \left\{1, 3\right\}$.
+
+    We can observe that this is not a monotonic function.
+}
+
+\parag{Theorem}{
+    Let $p$ be a prime number, and $k \in \mathbb{Z}_+$. Then: 
+    \[\phi\left(p^k\right) = p^k - p^{k-1}\]
+    
+    \subparag{Proof}{
+        Our candidates are: 
+        \[\left\{1, 2, \ldots, p, p+1, \ldots, 2p, \ldots, 3p, \ldots, \underbrace{p^{k-1} p}_{= p^k}\right\}\]
+        
+        We have $p^k$ candidates. Also, we see that $p$, $2p$, and so on, are not comprime with $p^k$ (since they are multiples of $p$), and we have $p^{k-1}$ of them. All others are coprime with $p^k$, since $p$ is a prime. Thus, we have a total number of: 
+        \[p^k - p^{k-1}\]
+        
+        \qed
+    }
+}
+
+\parag{Theorem}{
+    Let $p$ and $q$ be two distinct primes. Then: 
+    \[\phi\left(pq\right) = \left(p-1\right)\left(q -1\right)\]
+    
+    \subparag{Proof}{
+        Let's say without loss of generality that $p < q$. Then, our candidates are: 
+        \[\left\{1, 2, 3, \ldots, p, \ldots, q, \ldots, 2p, \ldots, 2q, \ldots, pq\right\}\]
+        
+        We have $pq$ candidates, from which we need to remove our $q$ multiples of $p$ and our $p$ multiples of $q$. Moreover, we must be sure not to double-count $pq$, so we get: 
+        \[pq - q - p + 1 = \left(p-1\right)\left(q - 1\right)\]
+        
+        \qed
+    }
+}
+
+\parag{Definition: Regular Cartesian product}{
+    Let $\mathcal{A}_1$ and $\mathcal{A}_2$ be two sets. The \important{Cartesian product} $\mathcal{A}_1 \times \mathcal{A}_2$ is the set: 
+    \[\mathcal{A} = \mathcal{A}_1 \times \mathcal{A}_2 = \left\{\left(a_1, a_2\right) \text{ such that } a_1 \in \mathcal{A}_1, a_2 \in \mathcal{A}_2\right\}\]
+
+    \subparag{Example}{
+        For example:
+        \[\left\{0, 1\right\} \times \left\{0, 1, 2\right\} = \left\{\left(0, 0\right), \left(0, 1\right), \left(0, 2\right), \left(1, 0\right), \left(1, 1\right), \left(1, 2\right)\right\}\]
+    }
+}
+
+\parag{Definition: Cartesian product for groups}{
+    Similarly, the \important{Cartesian product of two groups}, shorten the \important{product group}, $\left(G, \star\right) = \left(G_1, \star_1\right)\times \left(G_2, \star_2\right)$ is the set $G_1 \times G_2$ endowed with the binary operation $\star$, defined by: 
+
+
+    \subparag{Example}{
+        For instance, let us draw the operation table for $\left(\mathbb{Z} / 2\mathbb{Z}, +\right) \times \left(\mathbb{Z} / 3\mathbb{Z}, \cdot\right)$, denoting $\left(a, b\right)= ab$:
+
+        \begin{center}
+        \begin{tabular}{c|cccccc}
+            $\star = \left(+, \cdot\right)$ & 00 & 01 & 02 & 10 & 11 & 12 \\
+            \hline
+            00 & 00 & 00 & 00 & 10 & 10 & 10 \\
+            01 & 00 & 01 & 02 & 10 & 11 & 12 \\
+            02 & 00 & 02 & 01 & 10 & 12 & 11 \\
+            10 & 10 & 10 & 10 & 00 & 00 & 00 \\
+            11 & 10 & 11 & 12 & 00 & 01 & 02 \\
+            12 & 10 & 12 & 11 & 00 & 02 & 01
+        \end{tabular}
+        \end{center}
+    }
+}
+
+\end{document}

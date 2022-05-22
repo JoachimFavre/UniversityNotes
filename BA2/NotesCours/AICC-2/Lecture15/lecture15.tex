@@ -1,0 +1,309 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-04-12 at 15:14:18.
+
+\usepackage{../../style}
+
+\title{AICC 2}
+\author{Joachim Favre}
+\date{Mardi 12 avril 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{15}{2022-04-12}{Isomorphisms and orders}{
+\begin{itemize}[left=0pt]
+    \item Definition of isomorphic groups.
+    \item Definition of the order of an element of a group.
+    \item Explanation of a theorem stating that two groups are isomorphic if and only if they have the same set of orders.
+\end{itemize}
+}
+
+\parag{Theorem}{
+    If $\left(G_1, \star_1\right)$ and $\left(G_2, \star_2\right)$ are commutative groups, then the product group $\left(G, \star\right) = \left(G_1, \star_1\right) \times \left(G_2, \star_2\right)$ is also a commutative group.
+}
+
+\parag{Example 1}{
+    Let us take the two following commutative groups:
+    \[\left(G_1, \star_1\right) = \left(\mathbb{Z} / 4\mathbb{Z}, +\right), \mathspace \left(G_2, \star_2\right) = \left(\mathbb{Z} / 3\mathbb{Z}^*, \cdot\right)\]
+
+    Now, let us take $\left(G, \star\right)$ as the product group. This yields that, for instance:
+    \[\left(3, 2\right) \star \left(1, 2\right) = \left(\left[3\right]_4 + \left[1\right]_4, \left[2\right]_3 \cdot \left[1\right]_3\right) = \left(0, 1\right)\]
+
+    To find the identity element, we can realise that the operations are completely separate, thus:
+    \[e = \left(e_1, e_2\right) = \left(0, 1\right)\]
+
+    Now, if we want to find the inverse of $\left(3, 2\right)$, we see that it is given by $\left(1, 2\right)$, since we have already computed that:
+    \[\left(3, 2\right) \star \left(1, 2\right) = \left(0, 1\right)\]
+
+    This makes sense since $1$ is the inverse of 3 in the first group, and 2 is the inverse of 2 in the second group.
+}
+
+\parag{Example 2}{
+    Let us consider the following:
+    \[\left(\mathbb{Z} / 2\mathbb{Z}, \cdot\right) \times \left(\mathbb{Z} / 3\mathbb{Z}, \cdot\right)\]
+
+    We see that it is not a product group, since we did not start with commutative groups. For instance, $\left(0, 0\right)$ does not have any inverse.
+
+    However, the following is a product group:
+    \[\left(\underbrace{\mathbb{Z} / 2\mathbb{Z}^*}_{= \left\{1\right\}}, \cdot\right) \times \left(\underbrace{\mathbb{Z} / 3\mathbb{Z}^*}_{= \left\{1, 2\right\}}, \cdot\right)\]
+}
+
+\parag{Example 3}{
+    Similarly, the following is not a group:
+    \[\left(\mathbb{Z} / m\mathbb{Z}, \cdot\right) \times \left(\mathbb{Z}/n\mathbb{Z}, \cdot\right)\]
+
+    We can see that, if keep only the elements $\left(x, y\right)$ that have an inverse, this yields a group, which is exactly:
+    \[\left(\mathbb{Z} / m\mathbb{Z}^*, \cdot\right) \times \left(\mathbb{Z}/ n\mathbb{Z}^*, \cdot\right)\]
+}
+
+\parag{Example: Isomorphism}{
+    Let us compare the two following groups:
+    \[\left(\mathbb{Z} / 2\mathbb{Z}, +\right), \mathspace \left(\mathbb{Z} / 4\mathbb{Z}^*, \cdot\right)\]
+
+    Let us draw the two operation tables:
+    \begin{center}
+    \begin{tabular}{c|cc}
+        + & 0 & 1 \\
+        \hline
+        0 & 0 & 1 \\
+        1 & 1 & 0
+    \end{tabular}
+    \hspace{1em}
+    \begin{tabular}{c|cc}
+        $\cdot$ & 1 & 3 \\
+        \hline
+        1 & 1 & 3 \\
+        3 & 3 & 1
+    \end{tabular}
+    \end{center}
+
+    We see that the two are almost the same groups. After taking the following mapping, the two groups are exactly the same:
+    \[\psi\left(0\right) = 1, \mathspace \psi\left(1\right) = 3\]
+
+    Abstractly, we can represent them as a group with $G = \left\{a, b\right\}$, and:
+    \begin{center}
+    \begin{tabular}{c|cc}
+        $\star$ & $a$ & $b$ \\
+        \hline
+        $a$ & $a$ & $b$ \\
+        $b$ & $b$ & $a$
+    \end{tabular}
+    \end{center}
+
+    The three groups are the same up to names.
+}
+
+\parag{Definition: Isomorphism}{
+    Two groups $\left(G, \star\right)$ and $\left(H, \otimes\right)$ are \important{isomorphic} if there exists a mapping $\psi: G \mapsto H$ such that:
+    \[\psi\left(a \star b\right) = \psi\left(a\right) \otimes \psi\left(b\right), \mathspace \forall a, b \in G\]
+}
+
+\parag{Properties}{
+    Let $\left(G, \star\right)$ and $\left(H, \otimes\right)$ be two groups, which are isomorphic. Then:
+    \begin{itemize}
+        \item If $\left(G, \star\right)$ is a commutative group, so is $\left(H, \otimes\right)$.
+        \item If $e$ is the identity element of $\left(G, \star\right)$, then $\psi\left(e\right)$ is the identity element of $\left(H, \otimes\right)$.
+        \item If $a$ and $b$ are inverse of each other in $\left(G, \star\right)$, then $\psi\left(a\right)$ and $\psi\left(b\right)$ are inverse of each other in $\left(H, \otimes\right)$.
+    \end{itemize}
+}
+
+\parag{Example 1}{
+    Let us take the two following operation tables:
+    \begin{center}
+    \begin{tabular}{c|cccc}
+        $+$ & 0 & 1 & 2 & 3 \\
+        \hline
+        $0$ & 0 & 1 & 2 & 3 \\
+        1 & 1 & 2 & 3 & 0 \\
+        2 & 2 & 3 & 0 & 1 \\
+        3 & 3 & 0 & 1 & 2
+    \end{tabular}
+    \hspace{1em}
+    \begin{tabular}{c|cccc}
+        $\cdot$ & 1 & 2 & 3 & 4 \\
+        \hline
+        $1$ & 1 & 2 & 3 & 4 \\
+        2 & 2 & 4 & 1 & 3 \\
+        3 & 3 & 1 & 4 & 2 \\
+        4 & 4 & 3 & 2 & 1
+    \end{tabular}
+    \end{center}
+
+    We wonder if they are isomorphic groups.
+
+    We see that the first one is $\left(\mathbb{Z}/4\mathbb{Z}, +\right)$ and the second one is $\left(\mathbb{Z} / 5\mathbb{Z}^*, \cdot\right)$, so they are groups. We then have to verify that they have the same number of elements, which is correct. Then, looking at identity elements, we know that, if $\psi$ exists, then:
+    \[\psi\left(0\right) = 1\]
+
+    For the rest of the values, we have to consider inverses. Doing so, we see that the inverse of 2 is 2 in the first group and the inverse of 4 is 4 in the second group, whereas the inverses of the other numbers are not themselves for the others. Thus:
+    \[\psi\left(2\right) = 4\]
+
+    To see the last two values, let us draw the second table as:
+    \begin{center}
+    \begin{tabular}{c|cccc}
+        $\cdot$ & 1 & 2 & 4 & 3 \\
+        \hline
+        1 & 1 & 2 & 4 & 3 \\
+        2 & 2 & 4 & 3 & 1 \\
+        4 & 4 & 3 & 1 & 2 \\
+        3 & 3 & 1 & 2 & 4 \\
+    \end{tabular}
+    \end{center}
+
+    Then, it becomes clear that:
+    \[\psi\left(1\right) = 2, \mathspace \psi\left(3\right) = 3\]
+
+    In fact, we could also have chosen the mapping the other way around, and the following would also have given us an isomorphism:
+    \[\psi\left(1\right) = 3, \mathspace \psi\left(3\right) = 2\]
+}
+
+\parag{Example 2}{
+    Let's consider the two following groups:
+    \[\left(\mathbb{Z} / 2\mathbb{Z}, +\right) \times \left(\mathbb{Z} / 2\mathbb{Z}, +\right), \mathspace \left(\mathbb{Z} / 3\mathbb{Z}, +\right)\]
+
+    We wonder if they are isomorphic. We can clearly see that the cardinality does not match, so no:
+    \[\left(\mathbb{Z}/2\mathbb{Z}\right) \times \left(\mathbb{Z} / 2\mathbb{Z}\right) = \left\{\left(0,0\right), \left(0, 1\right), \left(1, 0\right), \left(1, 1\right)\right\}\]
+    \[\mathbb{Z}/3\mathbb{Z} = \left\{0, 1, 2\right\}\]
+}
+
+\parag{Example 2}{
+    Let us consider the two following groups:
+    \[\left(\mathbb{Z} / 2\mathbb{Z}, +\right) \times \left(\mathbb{Z} / 2\mathbb{Z}, +\right), \mathspace \left(\mathbb{Z} / 4\mathbb{Z}, +\right)\]
+
+    We see that, in the first group, the identity element is $e = 00$. Then, we can see that, for any element in the first group:
+    \[x + x = 00 = e\]
+
+    Thus, any element of the first group is its own inverse. However, we can see that this is not the case for the second group (for instance $1 + 1 = 2 \neq 0$), so they are not isomorphisms.
+}
+
+\parag{Example 3}{
+    Let us consider the two following groups:
+    \[\left(\left]0, +\infty\right[, \cdot\right), \mathspace\left(\mathbb{R}, +\right)\]
+
+    We can see that they are isomorphisms, since, taking $\psi\left(x\right) = \log\left(x\right)$, we get:
+    \[\psi\left(xy\right) = \psi\left(x\right) + \psi\left(y\right)\]
+
+    \subparag{Remark}{
+        This is a nice example, but, in this course, we (usually) only consider finite groups. Many things of what we develop cannot be applied to groups with infinite cardinality.
+    }
+}
+
+\parag{Observation}{
+    Let us consider the powers of the elements of the group $\left(\mathbb{Z} / 7\mathbb{Z}^*, \cdot\right)$:
+    \begin{center}
+    \begin{tabular}{c|cccccccc}
+        \diagbox{$a$}{$k$} & 1 & 2 & 3 & 4 & 5 & 6 & 7 & $\cdots$ \\ 
+        \hline
+        1 & \textcolor{red}{1} & \textcolor{red}{1} & \textcolor{red}{1} & \textcolor{red}{1} & \textcolor{red}{1} & \textcolor{red}{1} & \textcolor{red}{1} & $\cdots$ \\
+        2 & 2 & 4 & \textcolor{red}{1} & 2 & 4 & \textcolor{red}{1} & 2 & $\cdots$ \\
+        3 & 3 & 2 & 6 & 4 & 5 & \textcolor{red}{1} & 3 & $\cdots$ \\
+        4 & 4 & 2 & \textcolor{red}{1} & 4 & 2 & \textcolor{red}{1} & 4 & $\cdots$ \\
+        5 & 5 & 4 & 6 & 2 & 3 & \textcolor{red}{1} & 5 & $\cdots$ \\
+        6 & 6 & \textcolor{red}{1} & 6 & \textcolor{red}{1} & 6 & \textcolor{red}{1} & 6 & $\cdots$
+    \end{tabular}
+    \end{center}
+    
+    We see that, by exponentiating, at some point, we always get 1. This yields repeating patterns of the same length, which always make the $a$ appear again.
+}
+
+\parag{Theorem}{
+    Let $\left(G, \star\right)$ be a finite commutative group with identity element $e$.
+
+    For every element $a \in G$, there exists an integer $k \geq 1$ such that:
+    \[\underbrace{a \star a \star \cdots \star a}_{\text{$k$ elements}} = e\]
+
+    \subparag{Proof}{
+        Let us write:
+        \[\underbrace{a \star a \star \cdots \star a}_{\text{$k$ elements}} = a^k\]
+
+        Now, we can consider the following list of elements (which we know belong to $G$ by closure):
+        \[a^0, a^1, a^2, a^3, a^4, a^5, a^6, \ldots\]
+
+        Since we have an infinite sequence and $G$ has a finite number of elements, we know by the pigeon-hole principle that there exist $i < j$ such that:
+        \[a^i = a^j \implies a^j = a^i \underbrace{\star a \star a \star \ldots \star a}_{\text{$j-i$ times}}\]
+
+        But, since they are equal, this necessarily means that:
+        \[\underbrace{a \star a \star \ldots \star a}_{\text{$\left(j-i\right)$ $a$'s}} = a^{j-i} = e\]
+
+        \qed
+    }
+}
+
+\parag{Definition: Order}{
+    Let $\left(G, \star\right)$ be a finite commutative group with identity element $e$, and let $a \in G$.
+
+    The smallest positive integer $k$ such that:
+    \[\underbrace{a \star a \star \cdots \star a}_{\text{$k$ elements}} = e\]
+    is called the \important{order} (or period) of $a$.
+
+    \subparag{Remark}{
+        We know this $k$ exists by our theorem above.
+    }
+}
+
+\parag{Example}{
+    Let us consider the following group:
+    \[\left(\mathbb{Z} / 12\mathbb{Z}, +\right)\]
+
+    We wonder what is the order of $a = 3$ in this group. Since the operation is addition, we have that:
+    \[a^k = a + a + \ldots + a\]
+
+    We see that:
+    \[3 + 3 + 3 + 3 = 12 = 0\]
+
+    We can convive ourselves that there are no $k$ such that $k < 4$ (by computing all of them and putting them in a table, for instance), thus, the order of $a = 3$ is $4$.
+
+    Similarly, for $a = 5$, the order is 12.
+}
+
+\parag{Definition: Set of orders}{
+    The set of order of each element of a group is called the \important{set of orders} of this group.
+}
+
+\parag{Example}{
+    Let's say we want to find the order of each element of the group $\left(\mathbb{Z} / 10\mathbb{Z}^*, \cdot\right)$. A good way is to draw a table:
+
+    \begin{center}
+    \begin{tabular}{cccc|c}
+        $x$ & $x^2$ & $x^3$ & $x^4$ & order \\
+        \hline
+        1 &    &    &    & 1 \\
+        3 & 9  & 7  & 1  & 4 \\
+        7 & 9  & 3  & 1  & 4 \\
+        9 & 1  &    &    & 2
+    \end{tabular}
+    \end{center}
+        
+    Thus, the \important{set of orders} of this group is: 
+    \[\left\{1, 2, 4, 4\right\}\]
+}
+
+
+\parag{Theorem}{
+    Two groups are isomorphic if and only if they must have the same set of orders.
+}
+
+\parag{Example 1}{
+    Let's consider again the two following groups:
+    \[\left(\mathbb{Z}/4\mathbb{Z}, +\right), \mathspace \left(\mathbb{Z} / 5\mathbb{Z}^*, \cdot\right)\]
+
+    The set of orders of the first one is: 
+    \[\left\{1, 4, 2, 4\right\}\]
+    
+    The set of orders of the second one is: 
+    \[\left\{1, 4, 4, 2\right\}\]
+
+    Thus, they are isomorphisms.
+}
+
+\parag{Example 2}{
+    Now, let's consider again the two following groups: 
+    \[\left(\mathbb{Z} / 2\mathbb{Z}^2, +\right), \mathspace \left(\mathbb{Z} / 10\mathbb{Z}^*, \cdot\right)\]
+    
+    The set of orders are, respectively: 
+    \[\left\{1, 2, 2, 2\right\}, \mathspace \left\{1, 4, 4, 2\right\}\]
+    
+    Thus, they are not isomorphisms.
+}
+
+\end{document}
