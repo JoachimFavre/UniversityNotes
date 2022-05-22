@@ -1,0 +1,255 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-04-27 at 10:01:16.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Mercredi 27 avril 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{18}{2022-04-27}{Vous savez toujours calculer des valeurs propres?}{
+\begin{itemize}[left=0pt]
+    \item Explication de la méthode de calcul des polynômes de Taylor par ceux en une dimension.
+    \item Définition d'un point stationnaire d'une fonction, et preuve que les extremums locaux d'une fonction dérivable en ce point sont des points stationnaires.
+    \item Définition d'un point critique d'une fonction, et preuve que les extremums locaux d'une fonction sont des points critiques.
+    \item Explication et justification de la condition suffisante pour un extremum local, passant par les valeurs propres de la matrice Hessienne.
+\end{itemize}
+}
+
+\parag{Exemple}{
+    Considérons la fonction $f: \mathbb{R}^2 \mapsto \mathbb{R}$ de classe $C^{\infty}$ suivante: 
+    \[f\left(x, y\right) = e^{-x + 2y^2 + 1}\]
+
+    Nous voulons trouver le polynôme de Taylor de $f$ d'ordre 2 autour de $\left(0, 1\right)$. Calculons nos dérivées: 
+    \[\frac{\partial f}{\partial x}\left(0, 1\right) = -e^{-x + 2y^2 + 1} \eval_{\left(0, 1\right)}^{} = -e^3\] 
+    \[\frac{\partial f}{\partial y}\left(0, 1\right) = 4ye^{-x + 2y^2 + 1}\eval_{\left(0, 1\right)}^{} = 4e^3\] 
+    \[\frac{\partial^{2} f}{\partial x^{2}}\left(0, 1\right) = e^{-x + 2xy^2 + 1} \eval_{\left(0, 1\right)}^{} = e^3\] 
+    \[\frac{\partial^{2} f}{\partial y^{2}} = 4e^{-x + 2y^2+ 1} + 4y \left(4y\right)e^{-x + 2y^2 + 1} \eval_{\left(0, 1\right)}^{} = 20e^3\] 
+    \[\frac{\partial^2 f\left(x, y\right)}{\partial x \partial y}\left(0, 1\right) = \frac{\partial^2 f}{\partial y \partial x}\left(0, 1\right) = -4ye^{-x + 2y^2 + 1}\eval_{\left(0, 1\right)}^{} = -4e^3\]
+    
+    Et ainsi, on obtient: 
+    \begin{multiequality}
+    P_{2,f,\left(0, 1\right)} =\ & e^3 + \left(-e^3\right)x + 4e^3 \left(y - 1\right) + \frac{1}{2}\left(e^3 x^2 + 2\left(-4e^3\right)x\left(y - 1\right) + 20e^3 \left(y - 1\right)^2\right) \\
+    =\ & e^{3} \left(1 - x + 4\left(y - 1\right) + \frac{1}{2}x^2 - 4x\left(y - 1\right) + 10\left(y - 1\right)^2\right) 
+    \end{multiequality}
+}
+
+\parag{Remarque}{
+    Il existe une autre méthode pour calculer les polynômes de Taylor, en utilisant les developments limités d'une seule variable.
+}
+
+\parag{Exemple}{
+    Reprenons l'exemple que nous venons de faire. Puisque nous faisons notre development limité autour de $\left(0, 1\right)$, nous avons que $x$ et $y-1$ sont petits. Ainsi, mettons-les en évidence: 
+    \begin{multiequality}
+    f\left(x, y\right) =\ & e^{-x + 2y^2 + 1} = e^{-x + 2\left(\left(y-1\right)+1\right)^2 + 1} \\
+    =\ & e^{-x + 2\left(y - 1\right)^2 + 4\left(y - 1\right) + 2 + 1} = e^3 e^{\overbrace{-x + 4\left(y-1\right) + 2\left(y - 1\right)^2}^{s}} 
+    \end{multiequality}
+     
+    Ainsi, puisque $s$ est petit, nous pouvons maintenant utiliser la développement limité d'ordre 2 de $e^s$ autour de $s = 0$, en ignorant les termes d'ordre plus grand ou égal à 3: 
+    \begin{multiequality}
+     P_{2,f,\left(0, 1\right)} =\ & e^3 \left(1 + s + \frac{1}{2}s^2\right) \\
+    =\ & e^3 \left[1 + \left(-x + 4\left(y - 1\right) + 2\left(y - 1\right)^2\right) + \frac{1}{2}\left(x^2 + 16\left(y - 1\right)^2 - 8x\left(y - 1\right)\right)\right] \\
+    =\ & e^3 \left(1 - x + 4\left(y - 1\right) + \frac{1}{2} x^2 + 10\left(y - 1\right)^2 - 4x\left(y - 1\right)\right) \\
+    \end{multiequality}
+    
+    Ce qui est exactement ce que nous avions obtenu.
+}
+
+\parag{Taylor en trois dimensions}{
+    Considérons maintenant le cas où $n = 3$. Ainsi, nous avons $f\left(x, y, z\right)$, une fonction de classe $C^3$, et nous voulons calculer son développement limité autour de $\left(a, b, c\right) \in E \subset \mathbb{R}^3$.
+
+    En utilisant la même méthode que dans le cours précédent, nous pouvons poser:
+    \[g\left(t\right) = \begin{pmatrix} a + t\left(x - a\right) \\ b + t\left(y - b\right) \\ c + t\left(z - c\right) \end{pmatrix} = \begin{pmatrix} g_1\left(t\right) \\ g_2\left(t\right) \\ g_3\left(t\right) \end{pmatrix}, \mathspace F'\left(t\right) = \frac{\partial f}{\partial x} \cdot \frac{\partial g_1}{\partial t} + \frac{\partial f}{\partial y} \cdot \frac{\partial g_2}{\partial t} + \frac{\partial f}{\partial z} \cdot \frac{\partial g_3}{\partial t}\]
+
+    Ainsi, nous avons: 
+    \[F'\left(0\right) = \frac{\partial f}{\partial x}\left(a, b, c\right)\left(x - a\right) + \frac{\partial f}{\partial y}\left(a, b, c\right)\left(y - b\right) + \frac{\partial f}{\partial z}\left(a, b, c\right)\left(z - c\right)\]
+    
+    La dérivée seconde est donnée par: 
+    \begin{multiequality}
+    F''\left(0\right) =\ & \frac{\partial^{2} f}{\partial x^{2}}\left(a, b, c\right)\left(x - a\right)^2 + \frac{\partial^{2} f}{\partial y^{2}}\left(a, b, c\right)\left(y - b\right)^2 + \frac{\partial^{2} f}{\partial z^{2}}\left(a, b, c\right)\left(z - c\right)^2  \\
+     & + 2 \frac{\partial^2 f}{\partial x \partial y}\left(x - a\right)\left(y - b\right) + 2 \frac{\partial^2 f}{\partial y \partial z}\left(y - b\right)\left(z - c\right) + 2 \frac{\partial^2 f}{\partial x \partial z}\left(x - a\right)\left(z - c\right) 
+    \end{multiequality}
+    
+    \subparag{Remarque personnelle}{
+        Je vois un pattern avec la formule trouvée dans le cours précédent. Ainsi, j'en sais rien si c'est vrai, mais je conjecture que nous avons, pour $n$ variables:
+        \[F^{\left(p\right)}\left(0\right) = \left(\left(x_1 - a_1\right)\frac{\partial}{\partial x_1} + \ldots + \left(x_n - a_n\right) \frac{\partial}{\partial x_n}\right)^p f\left(x_1, \ldots, x_n\right)\]
+    }
+    
+}
+
+\parag{Méthodes}{
+    Nous avons maintenant deux méthodes pour calculer une formule de Taylor:
+    \begin{enumerate}
+        \item Utiliser la formule de Taylor en plusieurs variables.
+        \item Utiliser les développements limités d'une seule variable.
+    \end{enumerate}
+}
+
+\parag{Exemple}{
+    Prenons la fonction suivante: 
+    \[f\left(x, y\right) = \frac{\sin\left(x + \frac{1}{y}\right)}{1 + x}\]
+
+    Nous voulons calculer sa formule de Taylor d'ordre 2.
+
+    \subparag{Méthode 1}{
+        Cette méthode est directe mais fastidieuse. Les dérivées deviennent vite très compliquées.
+    }
+
+    \subparag{Méthode 2}{
+        Cette méthode nécessite un traitement soigneux et une maitrise des développements limités.
+
+        Commençons pas tout réécrire en fonction de $\left(y - 1\right)$: 
+        \[\frac{1}{y} = \frac{1}{\left(y - 1\right) + 1} = 1 - \left(y - 1\right) + \left(y - 1\right)^2 - \ldots\]
+        
+        Nous pouvons aussi voir que: 
+        \[\frac{1}{1 + x} = 1 - x + x^2 + \ldots\]
+        
+        Regardons maintenant le sinus:
+        \begin{multiequality}
+         & \sin\left(x + 1 - \left(y - 1\right) + \left(y - 1\right)^2 - \ldots\right) \\
+         =\ & \sin\left(1 + \underbrace{x - \left(y - 1\right) + \left(y - 1\right)^2}_{\text{$s$ petit}} - \ldots\right) \\
+         =\ & \sin\left(1\right)\cos\left(s\right) + \cos\left(1\right)\sin\left(s\right) \\
+         =\ & \sin\left(1\right)\left(1 - \frac{s^2}{2} + \ldots\right) + \cos\left(1\right)\left(s - \ldots\right) 
+        \end{multiequality}
+
+        En multipliant tout ensemble, on obtient (désolé pour le changement de taille de police, c'est impossible de tout écrire sur une ligne comme ça aussi):
+        {\tiny\[\left(1 - x + x^2\right)\left[\sin\left(1\right)\left(1 - \frac{1}{2}\left(x - \left(y - 1\right) + \left(y - 1\right)^2\right)^2\right) + \cos\left(1\right)\left(x - \left(y - 1\right) + \left(y - 1\right)^2\right)\right]\]}
+
+        Ce qu'on peut simplifier, nous donnant $P_{2f\left(0, 1\right)}$:
+        \begin{multiequality}
+        & \sin\left(1\right)\left(1 - \frac{1}{2}x^2 - \frac{1}{2}\left(y - 1\right)^2 + x\left(y - 1\right) - x + x^2\right) \\
+        & + \cos\left(1\right)\left(x - \left(y - 1\right) + \left(y - 1\right)^2  -x^2 + x\left(y - 1\right)\right)  \\
+        =\ & \sin\left(1\right) + x\left(\cos\left(1\right) - \sin\left(1\right)\right) - \left(y - 1\right)\cos\left(1\right) + x^2 \left(\frac{1}{2} \sin\left(1\right) - \cos\left(1\right)\right)\\
+        &  + \left(y - 1\right)^2 \left(\cos\left(1\right) - \frac{1}{2}\sin\left(1\right)\right) + x\left(y - 1\right)\left(\sin\left(1\right) + \cos\left(1\right)\right)
+        \end{multiequality}
+    }
+}
+
+
+\subsection{Extrema d'une fonction de plusieurs variables}
+\parag{Définition: Point stationnaire}{
+    Soit $E \subset \mathbb{R}^n$ et $f : E \mapsto \mathbb{R}$.
+
+    $\bvec{a} \in E$ est un \important{point stationnaire} de $f$ si et seulement si: 
+    \[\nabla f\left(\bvec{a}\right) = \left(\frac{\partial f}{\partial x_1}\left(\bvec{a}\right), \ldots, \frac{\partial f}{\partial x_n}\left(\bvec{a}\right)\right) = \bvec{0}\]
+}
+
+\parag{Définition: Maximum local}{
+    $f: E \mapsto \mathbb{R}$ admet un \important{maximum local} au point $\bvec{a} \in E$ s'il existe $\delta > 0$ tel que $f\left(\bvec{x}\right) \leq f\left(\bvec{a}\right)$ pour tout $\bvec{x} \in E \cap B\left(\bvec{a}, \delta\right)$.
+}
+
+\parag{Définition: Minimum local}{
+    $f: E \mapsto \mathbb{R}$ admet un \important{minimum local} au point $\bvec{a} \in E$ s'il existe $\delta > 0$ tel que ${\color{red}f\left(\bvec{x}\right) \geq f\left(\bvec{a}\right)}$ pour tout $\bvec{x} \in E \cap B\left(\bvec{a}, \delta\right)$.
+}
+
+\parag{Exemple 1}{
+    Prenons la fonction $f\left(x, y\right) = x^2 + y^2$. Nous pouvons voir que $\left(0, 0\right)$ est un point stationnaire: 
+    \[\nabla f\left(x, y\right) = \left(2x, 2y\right) \eval_{\left(0, 0\right)}^{} = \bvec{0}\]
+    
+    Or, nous pouvons voir que c'est un minimum local sur le graphique:
+    \imagehere[0.5]{exemplePointstationnaireMinLocal1.png}
+}
+
+\parag{Exemple 2}{
+    Prenons la fonction $f\left(x, y\right) = x^2$. Nous pouvons voir que $\left(0, b\right)$ est un point stationnaire $\forall b \in \mathbb{R}$: 
+    \[\nabla f\left(x, y\right) = \left(2x, 0\right)\eval_{\left(0, b\right)}^{} = \bvec{0}\]
+    
+    De manière similaire, nous pouvons aussi voir qu'ils représentent des minimum locaux sur le graphique:
+    \imagehere[0.5]{exemplePointstationnaireMinLocal2.png}
+}
+
+\parag{Proposition: Condition nécessaire pour un extremum local}{
+    Soit $E \subset \mathbb{R}^n$ et $f: E \mapsto \mathbb{R}$ une fonction admettant un extremum local au point $\bvec{a} \in E$ et telle que $\frac{\partial f}{\partial x_i}\left(\bvec{a}\right)$ existent $\forall i = 1, \ldots, n$. 
+
+    Alors, $\bvec{a}$ est un point stationnaire de $f$, i.e. $\nabla f\left(\bvec{a}\right) = \bvec{0}$.
+
+    \subparag{Preuve}{
+        Soit la fonction suivante:
+        \[g_i\left(x\right) = f\left(a_1, \ldots, a_{i-1}, x, a_{i+1}, \ldots, a_n\right)\]
+
+        Nous savons que $\nabla f\left(\bvec{a}\right)$ existe implique que $g_i\left(x\right)$ est dérivable en $a_i = x$. De plus, nous savons qu'elle admet un extremum local en ce point puisque $f$ en a un à ce point (si $g$ n'avais pas d'extremum local, alors clairement $f$ n'en n'aurait pas non plus). Or, par le cours d'Analyse 1, cela implique que:
+        \[g'_i\left(a_i\right) = 0 = \frac{\partial f}{\partial x_i}\left(\bvec{a}\right) = 0\]
+
+        Nous pouvons faire ce même argument pour chaque $i = 1, \ldots, n$, ainsi on obtient bien que $\nabla f\left(\bvec{a}\right) = \bvec{0}$.
+
+        \qed
+    }
+
+    \subparag{Remarque 1}{
+        Cette proposition est parallèle à celui qu'on a vu en Analyse 1: si une fonction d'une variable est dérivable à un point et elle admet un extremum local en ce point, alors sa dérivée est nulle.
+    }
+
+    \subparag{Remarque 2}{
+        La réciproque est fausse. Si le gradient est nul en un point, alors cela nous donne par forcément un extremum local. Nous pouvons prendre un contre-exemple parallèle à celui typique en Analyse 1: 
+        \[f\left(x, y\right) = x^3\]
+
+        Il y aura un autre contre-exemple dans l'exemple suivant.
+    }
+
+    \subparag{Remarque 3}{
+        Même si $f\left(\bvec{x}\right)$ admet un minimum local le long de toute droite passant par $\bvec{a}$, cela n'implique pas que $f\left(\bvec{x}\right)$ admet un minimum local en $\bvec{a}$. Nous avons un résultat similaire pour les maximum locaux.
+    }
+}
+
+\parag{Exemple}{
+    Prenons $f\left(x, y\right) = x^2 - y^2$. Ainsi, nous avons: 
+    \[\nabla f\left(0, 0\right) = \left(2x, -2y\right)\eval_{\left(0,0\right)}^{} = \bvec{0}\]
+
+    Ainsi, $\bvec{0}$ est un point stationnaire, mais comme on peut le voir sur le graphique suivant, ce n'est pas un extremum:
+    \imagehere[0.5]{exemplePointStationairePasMinLocal.png}
+}
+
+\parag{Définition: Point critique}{
+    $\bvec{a} \in E$ est un \important{point critique} de $f: E \mapsto \mathbb{R}$ si $\bvec{a}$ est un point stationnaire, ou si au moins une des dérivées partielles de $f$ n'existe pas en $\bvec{x} = \bvec{a}$.
+
+    \subparag{Remarque}{
+        En utilisant notre théorème, nous avons la proposition suivante:
+
+        Si $\bvec{a}$ est un point d'extremum local, alors $\bvec{a}$ est un point critique.
+    }
+}
+
+\parag{Théorème: Condition suffisante pour un extremum local}{
+    Soit $f: E \mapsto \mathbb{R}$ une fonction de classe $C^2$ sur $E$, et soit $\bvec{a} \in E$ un point stationnaire ($\nabla f\left(\bvec{a}\right) = \bvec{0}$).
+
+    Si toutes les valeurs propres de la matrice Hessienne de $f$ en $\bvec{a}$ sont strictement positives, alors $f$ possède un minimum local en $\bvec{a}$.
+
+    Si toutes les valeurs propres de la matrice Hessienne de $f$ en $\bvec{a}$ sont strictement négatives, alors $f$ possède un maximum local en $\bvec{a}$.
+
+    S'il y a au moins une valeur propre strictement négative et au moins une strictement positive, alors $\bvec{a}$ n'est pas un point d'extremum local. 
+
+    \subparag{Justification}{
+        Nous n'allons pas démontrer ce théorème, mais justifions le de manière à comprendre ce qui se passe derrière.
+
+        La matrice Hessienne est symétrique par le théorème de Schwarz, puisque $f \in C^2\left(E\right)$: 
+        \[\Hess_f\left(\bvec{a}\right) = \left(\Hess_f\left(\bvec{a}\right)\right)^T\]
+        
+        Par le théorème spectral d'Algèbre Linéaire, nous savons donc que $\Hess_f\left(\bvec{a}\right)$ a toutes ses valeurs propres réelles, et qu'elle est diagonalisable à l'aide d'une matrice orthogonale $O$: 
+        \[\Hess_f\left(\bvec{a}\right) = ODO^T\]
+        où: 
+        \[D = \begin{pmatrix} \lambda_1 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & \lambda_n \end{pmatrix}, \mathspace O^{-1} = O^T\]
+        
+        Ainsi, il existe un changement de variable linéaire orthogonal $\left(x_1, \ldots, x_n\right) \mapsto \left(y_1, \ldots, y_n\right)$ tel que la matrice Hessienne devient diagonale, avec $\lambda_1, \ldots, \lambda_n \in\mathbb{R}$ étant ses valeurs propres: 
+        \[D = \Hess_{f\left(y_1, \ldots, y_n\right)}\left(\bvec{a}\right)\]
+        
+        Alors si nous supposons que $f$ est de classe $C^3$, nous pouvons écrire par la formule de Taylor: 
+        \begin{multiequality}
+        f\left(\bvec{y}\right) - f\left(\bvec{a}\right) \approx\ & \frac{1}{2} \left(\lambda_1 \left(y_1 - a_1\right)^2 + \ldots + \lambda_n \left(y_n - a_n\right)^2\right) \\
+        & + \epsilon\left(\left\|\bvec{y}- \bvec{a}\right\|^2\right) 
+        \end{multiequality}
+
+        De là, nous pouvoir que, clairement, si $\lambda_1 > 0, \ldots, \lambda_n > 0$, alors $f\left(\bvec{y}\right) - f\left(\bvec{a}\right) \geq 0$ pour tout $\bvec{y}$ dans un voisinage de $\bvec{a}$, et donc $\bvec{a}$ est un point de minimum local. 
+
+        De manière similaire, si $\lambda_1 < 0, \ldots, \lambda_n < 0$, alors $f\left(\bvec{y}\right) - f\left(\bvec{a}\right) \leq 0$ et donc $\bvec{a}$ est un point de maximum local.
+
+        Finalement, nous voyons que s'il existe $i, j$ tels que $\lambda_i > 0$ et $\lambda_j < 0$, alors $\bvec{a}$ n'est pas un point d'extremum local (nous pouvons trouver une inégalité dans chaque direction en mettant toutes les composantes à 0 sauf la $i$-ème ou la $j$-ème).
+    }
+}
+
+
+
+\end{document}

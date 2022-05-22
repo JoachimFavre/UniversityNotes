@@ -1,0 +1,269 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-04-25 at 10:46:46.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Lundi 25 avril 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{17}{2022-04-25}{Méthode de physicien}{
+\begin{itemize}[left=0pt]
+    \item Définition du Laplacien.
+    \item Preuve de la proposition permettant de calculer un Laplacien d'une fonction donnée en coordonnées polaires.
+    \item Définition des fonctions harmoniques.
+    \item Définition de la formule de Taylor pour les fonctions de $n$ variables.
+\end{itemize}
+}
+
+\subsection{Application du gradient et du Laplacien en coordonnées polaires}
+\parag{Définition: Laplacien}{
+    Soit $E \subset \mathbb{R}^n$ un ensemble, et soit $f : E \mapsto \mathbb{R}$ de classe $C^2$ sur $E$.
+
+    La fonction $\Delta f : E \mapsto \mathbb{R}$ suivante est le \important{Laplacien} de $f$: 
+    \[\Delta f\left(x_1, \ldots, x_n\right) = \frac{\partial^{2} f}{\partial x_1^{2}} + \ldots + \frac{\partial^{2} f}{\partial x_n^{2}}\]
+    
+    \subparag{Remarque personnelle}{
+        Définissons la Nabla de la manière suivante: 
+        \[\nabla = \left(\frac{\partial}{\partial x_1}, \ldots, \frac{\partial}{\partial x_n}\right)\]
+
+        Notez que c'est un vecteur d'opérateurs, le Nabla ne contient pas des valeurs ou des fonctions, mais l'opérateur dérivée. Cela peut être défini formellement, mais nous allons l'utiliser comme des physiciens.
+
+        Premièrement, remarquons que notre gradient est toujours cohérent avec cette notation: 
+        \[\nabla f = \left(\frac{\partial f}{\partial x_1}, \ldots, \frac{\partial f}{\partial x_n}\right)\]
+        
+        Cette définition est très pratique, notamment pour définir la divergence et le rotationel, très pratiques en physique ($\rot f = \nabla \times f$, $\Div f = \nabla \dotprod f$).
+
+        Maintenant, pour le Laplacien, on voit que: 
+        \[\Delta f = \nabla^2 f\]
+        où un vecteur au carré est défini par: 
+        \[\bvec{a}^2 = \bvec{a} \dotprod \bvec{a} = \left\|\bvec{a}\right\|^2\]
+
+        Nous pouvons donc définir: 
+        \[\Delta = \nabla^2\]
+    }
+}
+
+\parag{Exemple}{
+    Soit la fonction $f: \mathbb{R}^2 \mapsto\mathbb{R}$ suivante: 
+    \[f\left(x, y\right) = xy + 3x^3\]
+
+    Cette fonction est de classe $C^{\infty}$ sur $\mathbb{R}$, ainsi: 
+    \[\Delta f\left(x, y\right) = \frac{\partial^{2} f}{\partial x^{2}} + \frac{\partial^{2} f}{\partial y^{2}} = 18x + 0 = 18x\]
+}
+
+\parag{Proposition}{
+    Soit $f : \mathbb{R}^2 \mapsto\mathbb{R}$ une fonction de classe $C^2$, et soit $\widetilde{f} = f \circ g\left(r, \phi\right)$, où $g$ est la fonction changement de variable vers les coordonnées polaires. Alors: 
+    \[\nabla f\left(x, y\right) = \left(\cos\left(\phi\right) \frac{\partial \widetilde{f}}{\partial r} - \frac{1}{r} \sin\left(\phi\right) \frac{\partial \widetilde{f}}{\partial \phi}, \sin\left(\phi\right) \frac{\partial \widetilde{f}}{\partial r} + \frac{1}{r} \cos\left(\phi\right) \frac{\partial \widetilde{f}}{\partial \phi}\right)\]
+
+    \[\Delta f\left(x, y\right) = \frac{\partial^{2} \widetilde{f}}{\partial r^{2}} + \frac{1}{r^2} \frac{\partial^{2} \widetilde{f}}{\partial \phi^{2}} + \frac{1}{r} \frac{\partial f}{\partial r}\]
+
+    \subparag{Preuve}{
+        Nous savons que $\widetilde{f}\left(r, \phi\right) = f\circ g\left(r, \phi\right)$, où: 
+        \begin{multiequation}
+        & g\left(r, \phi\right) = \begin{pmatrix} r \cos\left(\phi\right) \\ r \sin\left(\phi\right) \end{pmatrix} = \begin{pmatrix} x \\ y \end{pmatrix} \\
+        \implies & J_g\left(r, \phi\right) = \begin{pmatrix} \cos\left(\phi\right) & -r \sin\left(\phi\right) \\ \sin\left(\phi\right) & r\cos\left(\phi\right) \end{pmatrix} 
+        \end{multiequation}
+        
+        De plus: 
+        \begin{multiequality}
+        J_{\widetilde{f}\left(r, \phi\right)} =\ & J_{f\circ g}\left(r, \phi\right) = \left(\frac{\partial \widetilde{f}}{\partial r}, \frac{\partial \widetilde{f}}{\partial \phi}\right) = J_f\left(g\left(r, \phi\right)\right) J_g\left(r, \phi\right)  \\
+        =\ & J_f\left(x, y\right) J_g\left(r, \phi\right) = \underbrace{\left(\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}\right)}_{\nabla f\left(x, y\right)}J_g\left(r, \phi\right) 
+        \end{multiequality}
+        
+        Ceci est une équation matricielle, qu'on peut résoudre en utilisant la formule pour l'inverse des matrices $2\times 2$: 
+        \begin{multiequality}
+        \nabla f\left(x, y\right) =\ & \left(\frac{\partial f}{\partial x}, \frac{\partial f}{\partial y}\right) \\
+        =\ & \left(\frac{\partial \widetilde{f}}{\partial r}, \frac{\partial \widetilde{f}}{\partial \phi}\right) \left(J_g \left(r, \phi\right)\right)^{-1}  \\
+        =\ & \left(\frac{\partial \widetilde{f}}{\partial r}, \frac{\partial \widetilde{f}}{\partial \phi}\right) \frac{1}{r} \begin{pmatrix} r\cos\left(\phi\right) & r\sin\left(\phi\right) \\ -\sin\left(\phi\right) & \cos\left(\phi\right) \end{pmatrix} \\
+        =\ & \left(\cos\left(\phi\right) \frac{\partial \widetilde{f}}{\partial r} - \frac{1}{r} \sin\left(\phi\right) \frac{\partial \widetilde{f}}{\partial \phi}, \sin\left(\phi\right) \frac{\partial \widetilde{f}}{\partial r} + \frac{1}{r} \cos\left(\phi\right) \frac{\partial \widetilde{f}}{\partial \phi}\right)
+        \end{multiequality}
+        
+        Pour calculer $\frac{\partial^2 f}{\partial x^2}$, nous pouvons utiliser la méthode que nous venons de calculer: 
+        \begin{multiequality}
+        \frac{\partial^2 f}{\partial x^2} =\ & \cos\left(\phi\right) \frac{\partial}{\partial r}\left(\frac{\partial f}{\partial x} \text{ en coordonnées polaires}\right) \\
+        & -\frac{1}{r}\sin\left(\phi\right) \frac{\partial}{\partial \phi}\left(\frac{\partial f}{\partial x} \text{ en coordonnées polaires}\right) 
+        \end{multiequality}
+
+        Nous ferons ces calculs dans la série 9.
+
+        \qed
+    }
+
+    \subparag{Remarque personnelle}{
+        J'espère que les dérivées selon des fonctions vous ont manquées, parce qu'on y retourne! \smiley
+
+        Je trouve personnellement que c'est plus intuitif, mais il est naturellement complètement possible que vous préfériez la méthode présentée pendant le cours.
+
+        Commençons par définir que: 
+        \[x\left(r, \phi\right) = r\cos\left(\phi\right), \mathspace y\left(r, \phi\right) = r\sin\left(\phi\right)\] 
+        \[r\left(x, y\right) = \sqrt{x^2 + y^2}, \mathspace \phi\left(x, y\right) = \arctan\left(\frac{y}{x}\right)\]
+        
+        Notez que $\phi\left(x, y\right)$ devrait avoir une définition par partie plus générale pour être vraie pour tout $x, y$, mais prenons $x, y > 0$. Le raisonnement est le même si nous voulons prendre $\mathbb{R}^2$ comme domaine (tout ce qu'il faut retenir pour utiliser cette méthode en examen c'est que les dérivées de $\text{atan2}\left(y, x\right)$ sont égales à celles de $\arctan\left(\frac{y}{x}\right)$), mais nous pouvons aussi le faire à l'aide de la méthode de calcul de dérivée de l'inverse d'une fonction vue plus tôt dans ce cours. 
+
+        Ainsi, si nous avons une fonction qui nous est donnée sous sa forme polaire, nous pouvons écrire: 
+        \[f\left(r, \phi\right) = f\left(\sqrt{x^2 + y^2}, \arctan\left(\frac{y}{x}\right)\right)\]
+        
+        Dérivons notre fonction par la formule vue plus tôt dans une de mes remarques: 
+        \begin{multiequality}
+        \frac{\partial f\left(r, \phi\right)}{\partial x} =\ & \frac{\partial f\left(r, \phi\right)}{\partial r} \cdot \frac{\partial r\left(x, y\right)}{\partial x} + \frac{\partial f\left(r, \phi\right)}{\partial \phi} \cdot \frac{\partial \phi\left(x, y\right)}{\partial x}  \\
+        =\ & \frac{\partial f}{\partial r} \frac{2x}{2\sqrt{x^2 + y^2}} + \frac{\partial f}{\partial \phi} \frac{1}{1 + \left(\frac{y^2}{x^2}\right)} \left(-\frac{y}{x^2}\right) \\
+        \end{multiequality}
+        
+        Et nous pouvons maintenant repasser en variables polaires, en prenant la définition de $x\left(r, \phi\right)$ et $y\left(r, \phi\right)$: 
+        \begin{multiequality}
+        \frac{\partial f\left(r, \phi\right)}{\partial x} =\ & \frac{\partial f}{\partial r} \frac{r\cos\left(\phi\right)}{r} + \frac{\partial f}{\partial \phi} \frac{-r\sin\left(\phi\right)}{r^2} \\
+        =\ & \frac{\partial f}{\partial r} \cos\left(\phi\right) - \frac{\partial f}{\partial \phi} \frac{\sin\left(\phi\right)}{r}
+        \end{multiequality}
+        
+        Ce qui est exactement ce qui est exactement le résultat attendu. Il est naturellement possible de faire exactement le même raisonnement pour la dérivée partielle selon $y$ et pour les dérivées secondes.
+    }
+    
+}
+
+\parag{Exemple}{
+    Soit la fonction de classe infinie sur $\mathbb{R}^2 \setminus \left(0, 0\right)$ suivante: 
+    \[f\left(x, y\right) = \frac{y}{x^2 + y^2}\]
+    
+    Ce n'est pas très agréable de calculer les dérivées de cette fonction dans cette forme, ainsi passons là en coordonnées polaires: 
+    \[\widetilde{f}\left(r, \phi\right) = \frac{r\sin\left(\phi\right)}{r^2} = \frac{\sin\left(\phi\right)}{r}\]
+
+    Par notre proposition, nous obtenons: 
+    \[\Delta f = \frac{\partial^2 \widetilde{f}}{\partial r^2} + \frac{1}{r^2} \frac{\partial^2 \widetilde{f}}{\partial \phi^2} + \frac{1}{r} \frac{\partial \widetilde{f}}{\partial r} = \frac{2 \sin\left(\phi\right)}{r^3} + \frac{1}{r^2} \frac{- \sin\left(\phi\right)}{r} + \frac{1}{r} \left(-\frac{\sin\left(\phi\right)}{r^2}\right) = 0\]
+}
+
+\parag{Définition: Fonctions harmoniques}{
+    Une fonction telle que $\Delta f = 0$ sur $E \subset \mathbb{R}^2$ s'appelle \important{harmonique}.
+}
+
+\parag{Proposition}{
+    Une fonction harmonique sur un domaine compact atteint son minimum et son maximum sur la frontière du domaine.
+
+    \subparag{Preuve}{
+        Nous acceptons cette proposition sans preuve. Cependant, nous pouvons faire une justification rapide.
+
+        Nous pouvons remarquer que le Laplacien est la trace (la somme des éléments diagonaux) de la matrice Hessienne. Or, un théorème d'Algèbre Linéaire nous dit que la trace d'une matrice est égale à la somme de ses valeurs propres, et nous verrons plus tard que les valeurs propres de la matrice Hessienne définissent l'existence ou non du maximum et du minimum.
+    }
+    
+    \subparag{Remarque}{
+        Ceci implique qu'une fonction harmonique sur un domaine compact est telle que, pour n'importe quel sous-ensemble compact, elle atteint son minimum et son maximum sur la frontière.
+    }
+}
+
+\parag{Exemple 1}{
+    Soit la fonction $f: \mathbb{R}^2 \mapsto \mathbb{R}$ définie par: 
+    \[f\left(x, y\right) = x^2 - y^2\]
+    
+    Alors, nous avons: 
+    \[\Delta f\left(x, y\right) = 2 - 2 = 0, \mathspace \forall \left(x, y\right) \in \mathbb{R}^2\]
+
+    Ainsi, cette fonction est harmonique.
+
+    \imagehere[0.5]{exempleFonctionHarmonique.png}
+}
+
+\parag{Exemple 2}{
+    Soit la fonction $g: \mathbb{R}^2 \mapsto \mathbb{R}$ définie par: 
+    \[g\left(x, y\right) = x^2 + y^2\]
+    
+    Alors: 
+    \[\Delta g\left(x, y\right) = 2 + 2 = 4 \neq 0, \mathspace \forall \left(x, y\right) \in \mathbb{R}^2\]
+    
+    Ainsi, elle n'est pas harmonique.
+
+    \imagehere[0.5]{exempleFonctionNonHarmonique.png}
+}
+
+\subsection{Formule de Taylor}
+\parag{Théorème}{
+    Soit $E \subset \mathbb{R}^n$, et soit $f : E \mapsto \mathbb{R}$ une fonction de classe $C^{p+1}$ au voisinage de $\bvec{a} \in E$. 
+
+    Alors, il existe $\delta > 0$ tel que, pour tout $\bvec{x} \in B\left(\bvec{a}, \delta\right) \cap E$, il existe $0 < \theta < 1$ tel que: 
+    \[f\left(\bvec{x}\right) = F\left(0\right) + F'\left(0\right) + \ldots + \frac{1}{p!} F^{\left(p\right)}\left(0\right) + \frac{1}{\left(p+1\right)!}F^{\left(p+1\right)}\left(\theta\right)\]
+    où $F: I \mapsto \mathbb{R}$, avec $I \subset \left[0, 1\right]$, est définie par $F\left(t\right) = f\left(\bvec{a} + t\left(\bvec{x} - \bvec{a}\right)\right)$.
+
+    \subparag{Preuve}{
+        Nous remarquons que $f\left(\bvec{x}\right) = F\left(1\right)$ et $f\left(\bvec{a}\right) = F\left(0\right)$. Ainsi, $F\left(t\right)$ est de classe $C^{p+1}$ sur $I$. 
+
+        Dans le cours d'Analyse 1, nous avions vu la formule de Taylor pour les fonctions d'une seule variable, ce que nous pouvons appliquer sur $F\left(t\right)$: 
+        \[F\left(t\right) = F\left(0\right) + F'\left(0\right)t + \ldots + \frac{1}{p!} F^{\left(p\right)}\left(0\right)t^p + \frac{1}{\left(p+1\right)!} F^{\left(p+1\right)}\left(\theta\right)t^{p+1}\]
+        où $\theta$ est entre $0$ et $t$.
+
+        Or, nous voulons $F\left(1\right)$, donc: 
+        \[f\left(\bvec{x}\right) = F\left(1\right) = F\left(0\right) + F'\left(0\right) + \ldots + \frac{1}{p!}F^{\left(p\right)}\left(0\right) + \frac{1}{\left(p+1\right)!}F^{\left(p+1\right)}\left(\theta\right)\]
+        où $\theta$ est entre $0$ et $1$.
+
+        \qed
+    }
+    
+    \subparag{Remarque}{
+        Nous voyons que: 
+        \[F'\left(0\right) = \lim_{t \to 0} \frac{f\left(\bvec{a} + t\left(\bvec{x} - \bvec{a}\right)\right) - f\left(\bvec{a}\right)}{t} = Df\left(\bvec{a}, \bvec{x} - \bvec{a}\right)\]
+        
+    }
+    
+    \subparag{Terminologie}{
+        Ce théorème nous dit que nous pouvons écrire:
+        \[f\left(\bvec{x}\right) = F\left(0\right) + F'\left(0\right) + \ldots + \frac{1}{p!} F^{\left(p\right)}\left(0\right) + \text{ le reste}\]
+
+        Nous l'appelons le \important{polynôme de Taylor} de $f$ d'ordre $p$ au point $\bvec{a}$.
+    }
+}
+
+\parag{Cas où $n = 2$}{
+    Soit $\bvec{a} = \left(a, b\right), \bvec{x} = \left(x, y\right)$ et $f\left(x, y\right): E \mapsto \mathbb{R}$ une fonction de classe $C^{p+1}$ où $p \geq 2$. Nous cherchons le polynôme de Taylor d'ordre $p$ autour de $\bvec{a}$.
+
+    Pour commencer, nous prenons: 
+    \[F\left(t\right) = f\left(a + t\left(x - a\right),  b + t\left(y - b\right)\right)\]
+
+    Pour trouver $F'\left(t\right)$ en termes de $f$, nous pouvons remarquer que nous avons $F\left(t\right) = f \circ g\left(t\right)$, où: 
+    \[g\left(t\right) = \left(a + t\left(x - a\right), b + t\left(y - b\right)\right)\]
+    
+    Ainsi, par le théorème de la composée des matrices Jacobiennes: 
+    \[F'\left(t\right) = J_f\left(t\right) = J_f\left(g\left(t\right)\right) \cdot J_g\left(t\right) = \begin{pmatrix} \frac{\partial f}{\partial x} & \frac{\partial f}{\partial y} \end{pmatrix} \begin{pmatrix} \frac{\partial g_1}{\partial t} \\ \frac{\partial g_2}{\partial t} \end{pmatrix} = \frac{\partial f\left(g\left(t\right)\right)}{\partial x}\left(x - a\right) + \frac{\partial f\left(g\left(t\right)\right)}{\partial y}\left(y - b\right)\]
+    
+    Et ainsi: 
+    \[F'\left(0\right) = \frac{\partial f\left(a, b\right)}{\partial x}\left(x - a\right) + \frac{\partial f\left(a, b\right)}{\partial y}\left(y - b\right)\]
+    
+    Nous voulons maintenant calculer $F''\left(0\right)$. Nous venons de trouver que:
+    \[F'\left(t\right) = \frac{\partial f}{\partial x} \frac{\partial g_1}{\partial t} + \frac{\partial f}{\partial y} \frac{\partial g_2}{\partial t} \]
+    
+    Calculons la dérivée du premier terme:
+    \[\frac{\partial }{\partial t}\left(\frac{\partial f}{\partial x} \cdot \frac{\partial g_1}{\partial t}\right) = \frac{\partial }{\partial t} \left(\frac{\partial f}{\partial x}\right) \frac{\partial g_1}{\partial t} + \frac{\partial f}{\partial x} \underbrace{\left(\frac{\partial^2 g_1}{\partial t_1^2}\right)}_{= 0} = \left(\frac{\partial^{2} f}{\partial x^{2}} \frac{\partial g_1}{\partial t} + \frac{\partial^2 f}{\partial y \partial x} \frac{\partial g_2}{\partial t}\right) \frac{\partial g_1}{\partial t}\]
+
+    La dérivée du deuxième terme d'une manière similaire: 
+    \[\frac{\partial}{\partial t} \left(\frac{\partial f}{\partial y} \frac{\partial g_2}{\partial t}\right) = \frac{\partial^2 f}{\partial y \partial x} \left(\frac{\partial g_1}{\partial t}\right) \left(\frac{\partial g_2}{\partial t}\right) + \frac{\partial^2 f}{\partial y^2} \left(\frac{\partial g_2}{\partial t}\right)^2\]
+    
+    Nous pouvons mettre nos résultats ensembles pour obtenir que, avec le théorème de Schwartz (puisque notre fonction est de classe $C^p$ où $p \geq 3$):
+    \[F''\left(t\right) = \frac{\partial f}{\partial x^2}\left(x - a\right)^2 + 2 \frac{\partial^2 f}{\partial x \partial y}\left(x - a\right)\left(y - b\right) + \frac{\partial^2 f}{\partial y^2}\left(y - b\right)^2\]
+    
+    Et ainsi: 
+    \[F''\left(0\right) = \frac{\partial^2 f}{\partial x^2}\left(x - a\right)^2 + 2 \frac{\partial^2 f}{\partial x \partial y}\left(x - a\right)\left(y - b\right) + \frac{\partial^2 f}{\partial y^2}\left(y - b\right)^2\]
+    
+    D'une façon similaire, on obtient: 
+    \[F^{\left(3\right)} = \frac{\partial^3 f}{\partial x^3}\left(x - a\right)^3 + 3 \frac{\partial^3 f}{\partial x^2 \partial y}\left(x - a\right)^2 \left(y - b\right) + 3 \frac{\partial^3 f}{\partial x \partial y^2}\left(x - a\right)\left(y - b\right)^2 + \frac{\partial^3 f}{\partial y^3}\left(y - b\right)^3\]
+
+    Nous reconnaissons les coefficients binomiaux $C_p^k = \frac{p!}{k! \left(p - k\right)!}$, et nous pouvons démontrer par récurrence que: 
+    \[F^{\left(p\right)}\left(0\right) = \sum_{k=0}^{p} \frac{\partial^p f}{\partial x^k \partial y^{p - k}} C_p^k \left(x - a\right)^{k} \left(y - b\right)^{p - k}\]
+    
+    Souvent, on utilise l'approximation de Taylor d'ordre 2, donnée par: 
+    \begin{multiequality}
+    f\left(x, y\right) =\ & f\left(a, b\right) + \frac{\partial f}{\partial x}\left(a, b\right)\left(x - a\right) + \frac{\partial f}{\partial y}\left(a, b\right)\left(y - b\right)  \\
+     & + \frac{1}{2}\left(\frac{\partial^2 f}{\partial x^2}\left(a, b\right)\left(x - a\right)^2 + 2 \frac{\partial^2 f}{\partial x \partial y}\left(a, b\right)\left(x - a\right)\left(y- b\right) + \frac{\partial^2 f}{\partial y^2}\left(a, b\right)\left(y - b\right)^2\right) \\
+     & + \epsilon\left(\left\|\left(x, y\right) - \left(a, b\right)\right\|^2\right) 
+    \end{multiequality}
+    où les deux premières lignes sont $P_{2,f,\left(a, b\right)}$, le polynôme de Taylor de $f$ d'ordre 2 autour de $\left(a, b\right)$, et la troisième ligne est le reste.
+    
+    \subparag{Remarque personnelle}{
+        En manipulant les opérateurs comme de physiciens, il est tentant d'écrire: 
+        \[F^{\left(p\right)}\left(0\right) = \left(\left(x - a\right)\frac{\partial}{\partial x} + \left(y - b\right) \frac{\partial}{\partial y}\right)^p f\]
+    }
+}
+
+
+
+\end{document}

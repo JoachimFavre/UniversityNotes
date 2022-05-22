@@ -1,0 +1,213 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-28 at 23:52:33.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Mercredi 30 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2022-03-30}{Gros théorème très très utile}{
+\begin{itemize}[left=0pt]
+    \item Démonstration du théorème qui fait le lien entre les dérivées partielles, le gradient, les dérivées directionnelles et la différentielle d'une fonction.
+    \item Démonstration que le gradient est toujours orthogonal à une courbe de niveau d'une fonction.
+    \item Dérivation de la formule pour trouver le plan orthogonal au graphique d'une fonction.
+\end{itemize}
+}
+
+\parag{Remarque}{
+    Soit $L : \mathbb{R}^n \mapsto \mathbb{R}$ une transformation linéaire, et $\left\{\bvec{e_i}\right\}_{i=1}^n$ la base canonique de $\mathbb{R}^n$. Posons aussi: 
+    \[\bvec{\ell} = \left(L\left(\bvec{e_1}\right), \ldots, L\left(\bvec{e_n}\right)\right)\]
+    
+    Alors, nous avons: 
+    \[L\left(\bvec{v}\right) = L\left(v_1 \bvec{e_1} + \ldots + v_n \bvec{e_n}\right) \over{=}{linéaire}  v_1 L\left(\bvec{e_1}\right) + \ldots + v_n L\left(\bvec{e_n}\right)\]
+
+    Ce qui est égal à: 
+    \[L\left(\bvec{v}\right) = \left<\bvec{v}, \left(L\left(\bvec{e_1}\right), \ldots, L\left(\bvec{e_n}\right)\right)\right> = \left<\bvec{v}, \bvec{\ell}\right>\]
+    
+    Ainsi, si nous connaissons les valeurs de notre transformation linéaire évaluée aux différents vecteurs de la base canonique, alors nous pouvons trouver la formule générale de celle-ci. Ce résultat va être important dans la preuve du théorème qui suit.
+}
+
+\parag{Théorème 1 sur la dérivabilité}{
+    Soit $f: E \mapsto \mathbb{R}$, où $E \subset \mathbb{R}^n$, une fonction dérivable en $\bvec{a} \in E$ et de différentielle $L_{\bvec{a}} : \mathbb{R}^n \mapsto \mathbb{R}$. Alors:
+    \begin{enumerate}
+        \item $f$ est continue en $\bvec{a} \in E$.
+        \item Pour tout $\bvec{v} \in \mathbb{R}^n$, où $\bvec{v} \neq \bvec{0}$, la dérivée directionnelle $Df\left(\bvec{a}, \bvec{v}\right)$ existe et: 
+            \[Df\left(\bvec{a}, \bvec{v}\right)= L_{\bvec{a}}\left(\bvec{v}\right)\]
+        \item Toutes les dérivées partielles de $f$ en $\bvec{a}$ existent, et: 
+        \[\frac{\partial f}{\partial x_{k}}\left(\bvec{a}\right) = L_{\bvec{a}}\left(\bvec{e_k}\right)\]
+        où $\bvec{e_k}$ est le $k$-ème vecteur de la base canonique.
+    
+        Le gradient de $f$ existe en $\bvec{a}$ et: 
+        \[\nabla f\left(\bvec{a}\right) = \left(L_{\bvec{a}}\left(\bvec{e_1}\right), \ldots, L_{\bvec{a}}\left(\bvec{e_n}\right)\right)\]
+        
+        \item Pour tout $\bvec{v} \in \mathbb{R}^n$, où $\bvec{v} \neq \bvec{0}$, alors: 
+        \[L_{\bvec{a}}\left(\bvec{v}\right) = Df\left(\bvec{a}, \bvec{v}\right) = \left<\nabla f\left(\bvec{a}\right), \bvec{v}\right>\]
+        \item Pour tout $\bvec{v} \in \mathbb{R}^n$ tel que $\left\|\bvec{v}\right\| = 1$, nous avons: 
+            \[Df\left(\bvec{a}, \bvec{v}\right) \leq \left\|\nabla f\left(\bvec{a}\right)\right\|\]
+        
+            De plus: 
+            \[Df\left(\bvec{a}, \frac{\nabla f\left(\bvec{a}\right)}{\left\|\nabla f\left(\bvec{a}\right)\right\|}\right) = \left\|\nabla f\left(\bvec{a}\right)\right\|\]
+            
+            En d'autres mots, le gradient donne la direction et la valeur de la plus grande pente de $f$ en $\bvec{a}$ (si $\nabla f\left(\bvec{a}\right) \neq \bvec{0}$, sinon la fonction est simplement plate à cet endroit, comme nous le verrons plus tard).
+    \end{enumerate}
+    
+    \subparag{Preuve du point 1}{
+        Puisque $f$ est dérivable en $\bvec{a}$, nous avons que: 
+        \[f\left(\bvec{x}\right) = f\left(\bvec{a}\right) + L_{\bvec{a}}\left(\bvec{x} - \bvec{a}\right) + r\left(\bvec{x}\right), \mathspace \lim_{\bvec{x} \to \bvec{a}} \frac{r\left(\bvec{x}\right)}{\left\|\bvec{x} - \bvec{a}\right\|} = 0\]
+        
+        Puisque nous voulons montrer que notre fonction est continue, calculons la limite suivante: 
+        \[\lim_{x \to \bvec{a}} f\left(\bvec{x}\right) = \lim_{\bvec{x} \to \bvec{a}} \left(f\left(\bvec{a}\right) + \underbrace{L_{\bvec{a}}\left(\bvec{x} - \bvec{a}\right)}_{\to 0} + \underbrace{r\left(\bvec{x}\right)}_{\to 0}\right) = f\left(\bvec{a}\right)\]
+        
+        En effet, nous savons que $L_{\bvec{a}} \bvec{x}$ est continue, puisque les polynômes sont continus.
+
+        Nous avons donc démontré que $f$ est continue en $\bvec{x} = \bvec{a}$.
+    }
+
+    \subparag{Preuve du point 2}{
+        Soit $\bvec{v} \in \mathbb{R}^n$, où $\bvec{v} \neq \bvec{0}$. Soit aussi $g\left(t\right) = f\left(\bvec{a} + t \bvec{v}\right)$, définie sur $g : D \mapsto \mathbb{R}$, où $D \subset \mathbb{R}$. Alors, nous savons que, si la dérivée existe: 
+        \[D f\left(\bvec{a}, \bvec{v}\right) = g'\left(t\right) \eval_{t = 0}^{}\]
+        
+        Nous voulons donc uniquement montrer que cette dérivée existe: 
+        \[D f\left(\bvec{a}, \bvec{v}\right) = \lim_{t \to 0} \frac{g\left(t\right) - g\left(0\right)}{t} = \lim_{t \to 0} \frac{f\left(\bvec{a} + t \bvec{v}\right) - f\left(\bvec{a}\right)}{t}\]
+        
+        Or, nous savons que notre fonction est dérivable en $\bvec{a}$, donc: 
+        \begin{multiequation}
+        & f\left(\bvec{x}\right) = f\left(\bvec{a}\right) + L_{\bvec{a}}\left(\bvec{x} - \bvec{a}\right) + r\left(\bvec{x}\right)  \\
+            \implies & f\left(\bvec{a} + t \bvec{v}\right) = f\left(\bvec{a}\right) + L_{\bvec{a}} \left(t \bvec{v}\right) + r\left(\bvec{a} + t \bvec{v}\right)
+        \end{multiequation}
+        
+        Ainsi, en prenant $\bvec{x}\left(t\right) = \bvec{a} + t \bvec{v}$, qui est tel que $\bvec{x} \to \bvec{a}$ quand $t \to 0$, nous obtenons que notre limite est égale à:
+        \begin{multiequality}
+        D f\left(\bvec{a}, \bvec{v}\right) =\ & \lim_{t \to 0} \frac{f\left(\bvec{a}\right) + L_{\bvec{a}}\left(t \bvec{v}\right) + r\left(\bvec{a} + t \bvec{v}\right) - f\left(\bvec{a}\right)}{t}  \\
+        =\ & \lim_{t \to 0} \frac{L_{\bvec{a}}\left(t \bvec{v}\right) + r\left(\bvec{a} + t \bvec{v}\right)}{t}  \\
+        =\ & \lim_{t \to 0} \left(\frac{t \cdot L_{\bvec{a}}\left(\bvec{v}\right)}{t} + \frac{r\left(\bvec{a} + t\bvec{v}\right)}{\left\|t \bvec{v}\right\|} \cdot \frac{\left\|t \bvec{v}\right\|}{t}\right)   \\
+        =\ &  \lim_{t \to 0} \left(L_{\bvec{a}} + \underbrace{\frac{r\left(\bvec{x}\left(t\right)\right)}{\left\|\bvec{x}\left(t\right) - \bvec{a}\right\|}}_{\to 0} \frac{\left|t\right| \left\|\bvec{v}\right\|}{t}\right) \\
+        =\ & L_{\bvec{a}}\left(\bvec{v}\right) 
+        \end{multiequality}
+    }
+
+    \subparag{Preuve du point 3}{
+        Nous savons déjà que: 
+        \[\frac{\partial f}{\partial x_k}\left(\bvec{a}\right) = D f\left(\bvec{a}, \bvec{e_k}\right)\]
+        
+        Ainsi, par le point 2: 
+        \[\frac{\partial f}{\partial x_k}\left(\bvec{a}\right) = D f\left(\bvec{a}, \bvec{e_k}\right) = L_{\bvec{a}}\left(\bvec{e_k}\right)\]
+
+        De plus, cela implique directement que le gradient de $f$ existe, et que: 
+        \[\nabla f\left(\bvec{a}\right) = \left(L_{\bvec{a}}\left(\bvec{e}_1\right), \ldots, L_{\bvec{a}}\left(\bvec{e}_n\right)\right)\]
+    }
+    
+    \subparag{Preuve du point 4}{
+        Par la remarque juste avant le théorème, nous savons que: 
+        \[L_{\bvec{a}}\left(\bvec{v}\right) = \left<\bvec{v}, \nabla f\left(\bvec{a}\right)\right>\]
+
+        En effet, par le point 3: 
+        \[\nabla f\left(\bvec{a}\right) = \left(L_{\bvec{a}}\left(\bvec{e_1}\right), \ldots, L_{\bvec{a}}\left(\bvec{e_n}\right)\right)\]
+        
+        Ceci nous donne donc que: 
+        \[D f\left(\bvec{a}, \bvec{v}\right) = L_{\bvec{a}}\left(\bvec{v}\right) = \left<\bvec{v}, \nabla f\left(\bvec{a}\right)\right>\]
+    }
+    
+    \subparag{Preuve du point 5}{
+        Soit $\left\|\bvec{v}\right\| = 1$, et supposons que $\nabla f\left(\bvec{a}\right) \neq 0$. Alors: 
+        \begin{multiequality}
+        D f\left(\bvec{a}, \bvec{v}\right) =\ & \left<\nabla f\left(\bvec{a}\right), \bvec{v}\right>  \\
+        =\ & \left\|\nabla f\left(\bvec{a}\right)\right\| \underbrace{\left\|\bvec{v}\right\|}_{= 1} \underbrace{\cos\left(\nabla f\left(\bvec{a}\right), \bvec{v}\right)}_{\leq 1}  \\
+        \leq\ & \left\|\nabla f\left(\bvec{a}\right)\right\| 
+        \end{multiequality}
+        
+        De plus, soit $\bvec{v} = \frac{\nabla f\left(\bvec{a}\right)}{\left\| f\left(\bvec{a}\right)\right\|}$. Alors: 
+        \[D f\left(\bvec{a}, \bvec{v}\right) = \left<\nabla f\left(\bvec{a}\right), \frac{\nabla f\left(\bvec{a}\right)}{\left\|\nabla f\left(\bvec{a}\right)\right\|}\right> = \frac{\left\|\nabla f\left(\bvec{a}\right)\right\|^2}{\left\|\nabla f\left(\bvec{a}\right)\right\|} = \left\|\nabla f\left(\bvec{a}\right)\right\|\]
+        
+        Ainsi, si $\nabla f\left(\bvec{a}\right) \neq \bvec{0}$, la valeur maximale de la dérivée directionnelle de $f$ en $\bvec{a}$ est dans la direction du gradient $\nabla f\left(\bvec{a}\right)$.
+
+        \qed
+    }
+}
+
+\parag{Exemple}{
+    Soit la fonction suivante: 
+    \[f\left(x, y\right) = x^2 + y^2\]
+
+    Nous allons montrer que cette fonction est dérivable sur $\mathbb{R}^2$. Commençons par calculer les dérivées partielles: 
+    \[\frac{\partial f}{\partial x} = 2x, \mathspace \frac{\partial f}{\partial y} = 2y\]
+    
+    Nous pouvons maintenant calculer le gradient: 
+    \[\nabla f = \left(2x, 2y\right), \mathspace \forall \left(x, y\right) \in\mathbb{R}^2\]
+    
+    Aussi, calculons la différentielle, avec $\bvec{v} = \left(v_1, v_2\right)$
+    \[L_{\left(x, y\right)}\left(\bvec{v}\right) = D f\left(\left(x, y\right), \bvec{v}\right) = \left<\nabla f\left(x, y\right), \bvec{v}\right> = 2xv_1 + 2xv_2\]
+
+    Prenons maintenant par exemple $\left(x, y\right) = \left(1, 1\right)$ et $\bvec{v} = \left(\frac{1}{2}, \frac{\sqrt{3}}{2}\right)$. On remarque que le gradient en ce point est donné par $\nabla f\left(1, 1\right) = \left(2, 2\right)$. Calculons la dérivée directionnelle dans la direction de $\bvec{v}$ et dans la direction du gradient: 
+    \[D f\left(\left(1, 1\right), \bvec{v}\right) = \left<\left(2, 2\right), \left(\frac{1}{2}, \frac{\sqrt{3}}{2}\right)\right> = 1 + \sqrt{3}\] 
+    \[D f\left(\left(1, 1\right), \frac{\nabla f}{\left\|\nabla f\right\|}\right) = \left<\left(2, 2\right), \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)\right> = \sqrt{2} + \sqrt{2} = 2\sqrt{2} = \left\|\nabla f\left(1, 1\right)\right\| > 1 + \sqrt{3}\]
+    
+    \subparag{Courbe de niveau}{
+        Considérons maintenant la courbe de niveau de notre fonction $f\left(x, y\right)$: 
+        \[\left\{\left(x, y\right) \in \mathbb{R}^2 \telque x^2 + y^2 = k\right\}\]
+        ce qui est un cercle de rayon $\sqrt{k}$ et centre $\left(0, 0\right)$.
+        
+        On remarque que $\nabla f\left(x, y\right) = \left(2x, 2y\right)$ est normal à la courbe de niveau.
+
+        \imagehere[0.7]{GradientTangentCourbeDeNiveau.png}
+        
+        On sait que $\nabla f\left(x, y\right) \neq 0$ dans notre cas, généralisons donc nos trouvailles. La courbe de niveau montre là où la valeur de la fonction ne change pas. Ainsi, la dérivée directionnelle dans la direction de notre courbe de niveau, $\bvec{v}$, doit être nulle. Or, on sait qu'elle se calcule par: 
+        \[D f\left(\left(x_0, y_0\right), \bvec{v}\right) = \left<\nabla f\left(x_0, y_0\right), \bvec{v}\right> = 0\]
+        
+        Et, puisque $\nabla f\left(x_0, y_0\right) \neq 0$ et $\bvec{v} \neq 0$, nécessairement ils doivent être orthogonaux.
+    }
+}
+
+\parag{Application: Plan tangent à une surface}{
+    Soit $f: E \mapsto \mathbb{R}$, où $E \subset \mathbb{R}^2$, une fonction dérivable sur $E$ (c'est-à-dire qu'elle est dérivable en tout point de $E$). Soit aussi $\bvec{a} = \left(x_0, y_0, f\left(x_0, y_0\right)\right) \in \mathbb{R}^3$ un point du graphique de $f$. On cherche une équation du plant tangent à $z = f\left(x, y\right)$ à ce point.
+
+    Soit $F\left(x, y, z\right) = z - f\left(x, y\right)$, qui est définie sur $D \mapsto \mathbb{R}$, où $D \subset \mathbb{R}^3$, et qui est dérivable puisque $f\left(x, y\right)$ est dérivable. Par définition de $F\left(x, y, z\right)$, nous avons paramétrisé la surface de notre graphique avec l'équation $F\left(x, y, z\right) = 0$ (puisqu'on sait que c'est équivalent à $z = f\left(x, y\right)$, qui est la définition de notre graphique).
+
+    Le gradient de $F$ est donné par:
+    \[\nabla F\left(x, y, z\right) = \left(- \frac{\partial f}{\partial x}\left(\bvec{a}\right), - \frac{\partial f}{\partial y}\left(\bvec{a}\right), 1\right) \neq \bvec{0}\]
+    
+    Par un argument similaire à ce que nous venons de trouver avec la courbe de niveau, nous savons que le gradient est orthogonal au plan tangent à la courbe. En effet, la courbe de niveau de $F$ telle que $F\left(x, y, z\right) = 0$ est exactement notre graphique. Ainsi, tout vecteur de notre plan $\bvec{v}$ est tel que:
+    \[\left<\nabla F\left(\bvec{a}\right), \bvec{v}\right> = 0\]
+   
+    Prenons $z_0 = f\left(x_0, y_0\right)$. Puisque nous savons que le point $\left(x_0, y_0, z_0\right)$ appartient au plan, nous savons que $\bvec{v}$, allant de $\left(x_0, y_0, z_0\right)$ à un vecteur quelconque, est de la forme $\left(x - x_0, y- y_0, z - z_0\right)$. Ainsi, cela nous donne:
+    \begin{multiequation}
+    & \left<\nabla F\left(\bvec{a}\right), \left(x - x_0, y - y_0, z - z_0\right)\right> = 0  \\
+    \iff & - \frac{\partial f}{\partial x}\left(\bvec{a}\right) \left(x - x_0\right) - \frac{\partial f}{\partial y}\left(\bvec{a}\right) \left(y-  y_0\right) + 1\left(z - f\left(x_0, y_0\right)\right) = 0 \\
+    \iff & z = f\left(x_0, y_0\right) + \left<\nabla f\left(x_0, y_0\right), \left(x - x_0, y - y_0\right)\right>
+    \end{multiequation}
+
+    Il faut connaitre ce résultat.
+
+    \subparag{Remarque}{
+        Nous pouvons comparer ce résultat avec la tangente à une fonction d'une seule variable en $a \in E$: 
+        \[T_a\left(x\right) = f\left(a\right) + f'\left(a\right)\left(x - a\right)\]
+    }
+    
+}
+ 
+\parag{Exemple}{
+    Prenons la fonction suivante:
+    \[f\left(x, y\right) = \sin\left(xy\right)\]
+
+    Nous verrons plus tard qu'elle est bien dérivable sur $\mathbb{R}^2$. Calculons son gradient: 
+    \[\nabla f\left(x, y\right) = \left(y \cos\left(xy\right), x \cos\left(xy\right)\right)\]
+    
+    Un vecteur normal au graphique de $z = \sin\left(xy\right)$ en $\left(x_0, y_0, \sin\left(x_0 y_0\right)\right)$ est: 
+    \[\left(y_0 \cos\left(x_0 y_0\right), x_0 \cos\left(x_0 y_0\right), - 1\right)\]
+    
+    Ainsi, cela nous donne que la plan tangent à la surface $z = \sin\left(x, y\right)$ en ce point est: 
+    \[z = \sin\left(x_0, y_0\right) + y_0 \cos\left(x_0 y_0\right)\left(x - x_0\right) + x_0 \cos\left(x_0 y_0\right)\left(y - y_0\right)\]
+
+    Nous aurions naturellement pu aller plus rapidement en prenant directement la formule: 
+    \[z = f\left(x_0, y_0\right) + \left<\nabla f\left(x_0, y_0\right), \left(x - x_0, y - y_0\right)\right>\]
+    
+    
+}
+
+
+\end{document}

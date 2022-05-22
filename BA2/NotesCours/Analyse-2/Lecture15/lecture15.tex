@@ -1,0 +1,241 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-04-11 at 10:16:28.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Lundi 11 avril 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{15}{2022-04-11}{Masterclass Jacob}{
+\begin{itemize}[left=0pt]
+    \item La référence du titre de ce cours est pas triviale, bien joué si vous l'avez (pour les autres, allez regarder la \textit{La Recette \#10} de Maskey).
+    \item Définition des fonctions à valeurs dans $\mathbb{R}^m$, et explication de pourquoi les concepts définis jusqu'à présent fonctionnent de la même manière pour ces fonctions.
+    \item Définition de la matrice Jacobienne, et du déterminant de Jacobi.
+    \item Explication du théorème permettant de trouver la matrice Jacobienne d'une fonction composée.
+\end{itemize}
+
+}
+\subsection{Fonctions à valeurs dans $\mathbb{R}^m$}
+
+\parag{Exemple}{
+    Soit $E \subset \mathbb{R}^n$ un ensemble ouvert, et soit $f: E \mapsto \mathbb{R}$ une fonction telle que le gradient $\nabla f\left(\bvec{x}\right)$ existe $\forall \bvec{x} \in E$.
+
+    Alors, $\left(\nabla f\right)^T: E \mapsto \mathbb{R}^n$ est une application à valeurs dans $\mathbb{R}^n$.
+
+    Par exemple, si on prend $f\left(x, y\right) = \sin\left(x, y\right)$, nous avons $f: \mathbb{R}^2 \mapsto \mathbb{R}$ de classe $C^{\infty}$ sur $\mathbb{R}^2$, et cela nous donne: 
+    \[\nabla f\left(x, y\right) = \left(\frac{\partial f}{\partial x}\left(x, y\right), \frac{\partial f}{\partial y}\left(x, y\right)\right) = \left(y \cos\left(xy\right), x\cos\left(xy\right)\right)\]
+    
+    Ceci est une matrice ligne, et nous voulons un vecteur colonne à la fin, c'est pourquoi nous devons le transposer. Nous pouvons dessiner notre champ de vecteurs:
+    \imagehere[0.5]{ChampVecteurGradient.png}
+}
+
+\parag{Introduction}{
+    Plus généralement, nous pouvons considérer les fonctions à valeurs dans $\mathbb{R}^m$, $\bvec{f} : E \mapsto \mathbb{R}^m$ où $E \subset \mathbb{R}^n$:
+    \[\bvec{f}\left(\bvec{x}\right) = \begin{pmatrix} f_1\left(\bvec{x}\right) \\ \vdots \\ f_m\left(\bvec{x}\right) \end{pmatrix} \in \mathbb{R}^m\]
+    
+    Chaque composante $f_i$ est une fonction réelle de $n$ variables réelles.
+}
+
+\parag{Définition: $k$-ème dérivée partielle}{
+    Soit $E \subset \mathbb{R}^n$.
+
+    La \important{$k$-ème dérivée partielle} de $\bvec{f}: E \mapsto \mathbb{R}^m$ en $\bvec{a} \in E$, est définie par: 
+    \[\frac{\partial \bvec{f}}{\partial x_k}\left(\bvec{a}\right) \over{=}{déf} \begin{pmatrix} \frac{\partial f_1}{\partial x_k}\left(\bvec{a}\right) \\ \vdots \\ \frac{\partial f_m}{\partial x_k}\left(\bvec{a}\right) \end{pmatrix}\]
+    si chacune des fonctions $f_1, \ldots, f_m$ admet la dérivée partielle $\frac{\partial}{\partial x_k}$ en $\bvec{a}$.
+}
+
+\parag{Définition: Dérivée directionnelle}{
+    Soit $E \subset \mathbb{R}^n$, et soit $\bvec{v} \in \mathbb{R}^n$ tel que $\bvec{v} \neq \bvec{0}$. 
+
+    La \important{dérivée directionnelle} de $\bvec{f}: E \mapsto \mathbb{R}^m$ suivant $\bvec{v}$ en $\bvec{a} \in E$, est: 
+    \[D \bvec{f}\left(\bvec{a}, \bvec{v}\right) \over{=}{déf} \begin{pmatrix} Df_1\left(\bvec{a}, \bvec{v}\right) \\ \vdots \\ Df_m\left(\bvec{a}, \bvec{v}\right) \end{pmatrix}\]
+    si $Df_i\left(\bvec{a}, \bvec{v}\right)$ existent pour tout $i = 1, \ldots, m$.
+}
+
+\parag{Définition: Limite}{
+    Soit $E \subset \mathbb{R}^{n}$. 
+
+    Une fonction $\bvec{f} : E \mapsto \mathbb{R}^m$ admet $\bvec{\ell} \in \mathbb{R}^m$ pour \important{limite} lorsque $\bvec{x}$ tend vers $\bvec{a}$ si $\forall \epsilon > 0$, $\exists \delta > 0$ tel que pour tout $\bvec{x} \in E$, on a: 
+    \[0 < \left\|\bvec{x} - \bvec{a}\right\| \leq \delta \implies \left\|f\left(\bvec{x}\right) - \bvec{\ell}\right\| \leq \epsilon\]
+    \subparag{Remarque}{
+        En particulier, nous avons: 
+        \[\lim_{\bvec{x} \to \bvec{a}} \bvec{f}\left(\bvec{x}\right) = \begin{pmatrix} \lim\limits_{\bvec{x} \to \bvec{a}} f_1\left(\bvec{x}\right) \\ \vdots \\ \lim\limits_{\bvec{x} \to \bvec{a}} f_m\left(\bvec{x}\right) \end{pmatrix} \]
+        
+        En effet, nous voulons que la valeur suivante soit arbitrairement petite:
+        \[\left\|\bvec{f}\left(\bvec{x}\right) - \bvec{\ell}\right\|^2 = \left(f_1\left(\bvec{x}\right) - \ell_1\right)^2 + \ldots + \left(f_m\left(\bvec{x}\right) - \ell_m\right)^2\]
+
+        Or, puisque c'est une somme de carré, rendre la norme arbitrairement petite est équivalent à rendre les composantes arbitrairement proche à $\ell_i$.
+
+        En d'autres mots, l'existence de cette limite est équivalente à l'existence de la limite de toutes les composantes.
+    }
+}
+
+\parag{Définition: Dérivabilité}{
+    Soit $E \subset \mathbb{R}^n$.
+
+    $\bvec{f}: E \mapsto \mathbb{R}^m$ est \important{dérivable} au point $\bvec{a} \in E$ s'il existe une transformation linéaire $\bvec{L}_{\bvec{a}}: \mathbb{R}^n \mapsto \mathbb{R}^m$ et une fonction $\bvec{r}: E \mapsto \mathbb{R}^m$ telles que: 
+    \[\bvec{f}\left(\bvec{x}\right) = \bvec{f}\left(\bvec{a}\right) + \bvec{L}_{\bvec{a}}\left(\bvec{x} - \bvec{a}\right) + \bvec{r}\left(\bvec{x}\right)\]
+
+    De plus, il faut aussi que: 
+    \[\lim_{\bvec{x} \to \bvec{a}} \frac{\bvec{r}\left(\bvec{x}\right)}{\left\|\bvec{x} - \bvec{a}\right\|} = 0\]
+    
+    Si $\bvec{f}$ est dérivable, alors $\bvec{L}_{\bvec{a}}: \mathbb{R}^n \mapsto \mathbb{R}^m$ est appelée la \important{différentielle} de $\bvec{f}$ en $\bvec{a}$.
+}
+
+\parag{Proposition: Dérivabilité pour chaque composante}{
+    Soit $E \subset \mathbb{R}^n$.
+
+    $\bvec{f} = \left(f_1, \ldots, f_m\right): E \mapsto \mathbb{R}^m$ est dérivable en $\bvec{a} \in E$ \textit{si et seulement si} chaque composante $f_i : E \mapsto \mathbb{R}$ est dérivable en $\bvec{a} \in E$ pour $i = 1, \ldots, m$. De plus, nous pouvons construire: 
+    \[\bvec{L}_{\bvec{a}}\left(\bvec{v}\right) = \begin{pmatrix} L_{1, \bvec{a}}\left(\bvec{v}\right) \\ \vdots \\ L_{m, \bvec{a}}\left(\bvec{v}\right) \end{pmatrix}, \mathspace \bvec{v} \in \mathbb{R}^n, \bvec{v} \neq \bvec{0}\]
+    où $L_{i, \bvec{a}}\left(\bvec{v}\right)$ est la différentielle de $f_i$ calculée en $\bvec{a}$ et appliquée en $\bvec{v}$. En d'autres mots: 
+    \[L_{i, \bvec{a}}\left(\bvec{v}\right) = D f_i\left(\bvec{a}, \bvec{v}\right) = \left<\nabla f_i\left(\bvec{a}\right), \bvec{v}\right>\]
+
+    \subparag{Preuve}{
+        La définition d'une fonction dérivable nous donne $m$ équations, une pour chaque composante. De plus, la contrainte avec la limite peut aussi être séparée en $m$ sous-contraintes, en utilisant notre remarque pour le calcul des limites.
+    }
+}
+
+\parag{Définition: Matrice Jacobienne}{
+    Soit $E \subset \mathbb{R}^n$. Si $\bvec{f}: E \mapsto \mathbb{R}^m$ possède toutes ses dérivées partielles en $\bvec{a}\in E$, alors sa \important{matrice Jacobienne} (matrice de Jacobi) est définie par:
+    \[J_{\bvec{f}}\left(\bvec{a}\right) \over{=}{déf} \begin{pmatrix} \dfrac{\partial f_1}{\partial x_1}\left(\bvec{a}\right) & \dfrac{\partial f_1}{\partial x_2}\left(\bvec{a}\right) & \cdots & \dfrac{\partial f_1}{\partial x_n}\left(\bvec{a}\right) \\ \dfrac{\partial f_2}{\partial x_1}\left(\bvec{a}\right) & \dfrac{\partial f_2}{\partial x_2}\left(\bvec{a}\right) & \cdots & \dfrac{\partial f_2}{\partial x_n}\left(\bvec{a}\right) \\ \vdots & \vdots & \ddots & \vdots \\ \dfrac{\partial f_m}{\partial x_1}\left(\bvec{a}\right) & \dfrac{\partial f_m}{\partial x_2}\left(\bvec{a}\right) & \cdots & \dfrac{\partial f_m}{\partial x_n}\left(\bvec{a}\right) \end{pmatrix} = \begin{pmatrix} \nabla f_1\left(\bvec{a}\right) \\ \nabla f_2\left(\bvec{a}\right) \\ \vdots \\ \nabla f_m\left(\bvec{a}\right) \end{pmatrix}\]
+
+    \subparag{Observations}{
+        Cette matrice n'est pas forcément carrée.
+
+        De plus, nous pouvons voir que chaque colonne de la matrice Jacobienne est la dérivée partielle $\frac{\partial \bvec{f}}{\partial x_i}\left(\bvec{a}\right)$. Aussi, chaque ligne est le gradient $\nabla f_i\left(\bvec{a}\right)$. La Professeure utilise cet argument pour justifier que le gradient devrait être une matrice ligne (mais selon moi cela devrait quand même être un vecteur colonne, car le Nabla doit être un vecteur colonne si nous voulons la mnémotechnie $\grad\left(\bvec{f}\right) = \nabla f$, $\Div\left(\bvec{f}\right) = \nabla \cdot \bvec{f}$ et $\rot\left(\bvec{f}\right) = \nabla \times \bvec{f}$).
+
+        Ainsi, nous avons que:
+        \begin{itemize}
+            \item Si $g : \mathbb{R}^n \mapsto \mathbb{R}$, alors $J_g\left(\bvec{x}\right) = \nabla g\left(\bvec{x}\right)$.
+            \item Si $g: \mathbb{R} \mapsto \mathbb{R}^n$, alors $J_{\bvec{g}}\left(x\right) = \frac{\partial \bvec{g}}{\partial x}$.
+            \item Si $g: \mathbb{R}\mapsto\mathbb{R}$, alors $J_g\left(x\right) = g'\left(x\right)$.
+        \end{itemize}
+    }
+    
+
+    \subparag{Remarque 1}{
+        Si $\bvec{f}$ est dérivable en $\bvec{a} \in E$, alors nous avons: 
+        \[J_{\bvec{f}}\left(\bvec{a}\right) = \begin{pmatrix} L_{1, \bvec{a}}\left(\bvec{e_1}\right) & \cdots & L_{1, \bvec{a}}\left(\bvec{e_n}\right) \\ \vdots & \ddots & \vdots \\ L_{m, \bvec{a}}\left(\bvec{e_1}\right)  & \cdots & L_{m, \bvec{a}}\left(\bvec{e_n}\right) \end{pmatrix} \]
+        
+        Ainsi, si $\bvec{f}$ est dérivable en $\bvec{a}$, la matrice nous donne la matrice de la différentielle de $\bvec{f}$.
+    }
+
+    \subparag{Remarque 2}{
+        Si $\bvec{f}$ est dérivable, alors:
+        \begin{multiequality}
+        D \bvec{f}\left(\bvec{a}, \bvec{v}\right) =\ & \begin{pmatrix} D f_1\left(\bvec{a}, \bvec{v}\right) \\ \vdots \\ D f_m\left(\bvec{a}, \bvec{v}\right) \end{pmatrix}  \\
+        =\ & \begin{pmatrix} \left<\nabla f_1\left(\bvec{a}\right), \bvec{v}\right> \\ \vdots \\ \left<\nabla f_m\left(\bvec{a}\right), \bvec{v}\right> \end{pmatrix}  \\
+        =\ & \underbrace{\begin{pmatrix}  & \nabla f_1\left(\bvec{a}\right) &  \\  & \vdots &  \\  & \nabla f_m\left(\bvec{a}\right) &  \end{pmatrix}}_{m \times n} \underbrace{\begin{pmatrix} v_1 \\ \vdots \\ v_n \end{pmatrix}}_{n \times 1}  \\
+        =\ & \left(J_{\bvec{f}}\left(\bvec{a}\right)\right)\cdot \bvec{v}
+        \end{multiequality}
+
+        Cela rejoint notre première remarque.
+    }
+}
+
+\parag{Définition: Jacobien}{
+    Soit $E \subset \mathbb{R}^n$. Si $\bvec{f}: E \mapsto \mathbb{R}^m$ possède toutes ses dérivées partielles en $\bvec{a}\in E$, et si $m = n$, alors on définit le \important{déterminant de Jacobi}, aussi appelé \important{le Jacobien}, de $\bvec{f}$ en $\bvec{a}$ comme: 
+    \[\left|J_{\bvec{f}}\left(\bvec{a}\right)\right| = \det\left(J_{\bvec{f}}\left(\bvec{a}\right)\right) \over{=}{déf} \det\begin{pmatrix} \dfrac{\partial f_1}{\partial x_1}\left(\bvec{a}\right) & \cdots & \dfrac{\partial f_1}{\partial x_n}\left(\bvec{a}\right) \\ \vdots & \ddots & \vdots \\ \dfrac{\partial f_m}{\partial x_1}\left(\bvec{a}\right) & \cdots & \dfrac{\partial f_m}{\partial x_n}\left(\bvec{a}\right) \end{pmatrix}\]
+}
+
+\parag{Exemple}{
+    Soient $\bvec{f}\left(x, y\right) = \sin\left(xy\right)$ et $\bvec{g} : \mathbb{R}^2 \mapsto \mathbb{R}^2$ définie par: 
+    \[\bvec{g}\left(x, y\right) = \left(\nabla f\left(x, y\right)\right)^T = \begin{pmatrix} y \cos\left(xy\right) \\ x\cos\left(xy\right) \end{pmatrix} \]
+
+    Calculons sa matrice Jacobienne:
+    \[J_{\bvec{g}}\left(x, y\right) = \begin{pmatrix} \frac{\partial g_1}{\partial x} & \frac{\partial g_1}{\partial y} \\ \frac{\partial g_2}{\partial x} & \frac{\partial g_2}{\partial y} \end{pmatrix} = \begin{pmatrix} -y^2 \sin\left(xy\right) & \cos\left(xy\right) - xy\sin\left(xy\right) \\ \cos\left(xy\right) - xy\sin\left(xy\right) & -x^2 \sin\left(xy\right) \end{pmatrix} \over{=}{obs} \begin{pmatrix} \frac{\partial^2 f}{\partial x^2} & \frac{\partial^{2} f}{\partial y \partial x} \\ \frac{\partial^2 f}{\partial x \partial y} & \frac{\partial^2 f}{\partial y^2} \end{pmatrix} \]
+    
+    On remarque que $J_{\bvec{g}}\left(x, y\right) = \Hess\left(f\right)\left(\bvec{x}\right)$. Calculons maintenant le Jacobien: 
+    \[\left|J_{\bvec{g}}\left(x, y\right)\right| = x^2 y^2 \sin^2\left(xy\right) - \left(\cos\left(xy\right) - xy\sin\left(xy\right)\right)^2 = -\cos^2\left(xy\right) + 2xy\cos\left(xy\right)\sin\left(xy\right)\]
+}
+ 
+\parag{Remarque}{
+    Soit $E \subset \mathbb{R}^n$.
+
+    D'après la définition, nous avons, pour toute fonction $f: E \mapsto \mathbb{R}$ (attention, $\mathbb{R}$ et non pas $\mathbb{R}^n$) de classe $C^2$ sur $E$: 
+    \[J_{\left(\nabla f\right)^T}\left(\bvec{x}\right) = \Hess\left(f\right)\left(\bvec{x}\right)\]
+}
+
+\subsection{Application des matrices Jacobiennes}
+\parag{Théorème}{
+    Soient $A, B$ deux ensembles tels que $A \subset \mathbb{R}^n$ et $\bvec{g}\left(A\right) \subset B \subset \mathbb{R}^p$. Soient $\bvec{g}: A \mapsto \mathbb{R}^p$ et $\bvec{f} : B \mapsto \mathbb{R}^q$. En d'autres mots, nous avons: 
+    \[\mathbb{R}^n \over{\mapsto}{$\bvec{g}$} \mathbb{R}^p \over{\mapsto}{$\bvec{f}$} \mathbb{R}^q\]
+    
+    Soient $\bvec{a} \in A$ et $\bvec{b} = \bvec{g}\left(\bvec{a}\right) \in B$. Supposons que $\bvec{g}$ est dérivable en $\bvec{a}$ avec la différentielle $L_{\bvec{g}, \bvec{a}}$ et $\bvec{f}$ est dérivable en $\bvec{b}$ avec la différentielle $L_{\bvec{f}, \bvec{b}}$.
+
+    \vspace{1em}
+
+    Alors $\bvec{f} \circ \bvec{g}$ est dérivable en $\bvec{a}$, et on a:
+    \begin{enumerate}
+        \item $\displaystyle \bvec{L}_{\bvec{f} \circ \bvec{g}, \bvec{a}} = \bvec{L}_{\bvec{f}, \bvec{b}} \circ \bvec{L}_{\bvec{g}, \bvec{a}}$
+        \item $\displaystyle J_{\bvec{f}\circ \bvec{g}}\left(\bvec{a}\right) = J_{\bvec{f}}\left(\bvec{g}\left(\bvec{a}\right)\right) \cdot J_{\bvec{g}}\left(\bvec{a}\right)$
+        \item Si $n = p = q$, alors $\displaystyle \left|J_{\bvec{f} \circ \bvec{g}}\left(\bvec{a}\right)\right| = \left|J_{\bvec{f}}\left(\bvec{g}\left(\bvec{a}\right)\right)\right|\cdot \left|J_{\bvec{g}}\left(\bvec{a}\right)\right|$
+    \end{enumerate}
+    
+    \subparag{Idée de la preuve}{
+        Nous savons que $\bvec{g}$ est dérivable en $\bvec{a}$, ainsi: 
+        \[\bvec{f}\left(\bvec{g}\left(\bvec{x}\right)\right) = \bvec{f}\left(\bvec{g}\left(\bvec{a}\right) + \bvec{L}_{\bvec{g}, \bvec{a}}\left(\bvec{x} - \bvec{a}\right) + \bvec{r}_{\bvec{g}}\left(\bvec{x}\right)\right)\]
+        
+        Maintenant, nous savons que $\bvec{f}$ est dérivable en $\bvec{g}\left(\bvec{a}\right)$, ainsi, c'est égal à:
+        \[\bvec{f}\left(\bvec{g}\left(\bvec{a}\right)\right) + \bvec{L}_{\bvec{f}, \bvec{b}} \left(\bvec{L}_{\bvec{g}, \bvec{a}}\left(\bvec{x} - \bvec{a}\right) + \bvec{r}_{\bvec{g}}\left(\bvec{x}\right)\right) + \bvec{r}_{\bvec{f}}\left(\bvec{g}\left(\bvec{x}\right)\right)\]
+
+        Ainsi, en utilisant la linéarité de $\bvec{L}_{\bvec{f}, \bvec{b}}$, on obtient que c'est égal à: 
+        \begin{multiequality}
+        &  \bvec{f}\left(\bvec{g}\left(\bvec{a}\right)\right) + \bvec{L}_{\bvec{f}, \bvec{b}}\left(\bvec{L}_{\bvec{g}, \bvec{a}}\left(\bvec{x} - \bvec{a}\right)\right)  \\
+        +\ & \bvec{L}_{\bvec{f}, \bvec{b}} \left(\bvec{r}_{\bvec{g}}\left(\bvec{x}\right)\right) + \bvec{r}_{\bvec{f}}\left(\bvec{g}\left(\bvec{x}\right)\right)
+        \end{multiequality}
+
+        Or, les deux termes de la deuxième ligne sont très petits lorsque $\bvec{x} \to \bvec{a}$, ainsi on obtient que $\bvec{f} \circ \bvec{g}$ est dérivable en $\bvec{a}$ avec la différentielle:
+        \[\bvec{L}_{\bvec{f} \circ \bvec{g}, \bvec{a}} = \bvec{L}_{\bvec{f}, \bvec{b}} \circ L_{\bvec{g}, \bvec{a}}\]
+    }
+}
+
+\parag{Exemple 1}{
+    Pour commencer, vérifions notre résultat en prenant $n = p = q = 1$. Ainsi, par exemple, soient: 
+    \[f: \mathbb{R} \mapsto \mathbb{R}, \mathspace f\left(y\right) = y^2\] 
+    \[g: \mathbb{R} \mapsto \mathbb{R}, \mathspace g\left(x\right) = \sin\left(x\right)\]
+
+    Nous pouvons maintenant calculer la composée: 
+    \[f \circ g\left(x\right) = f\left(g\left(x\right)\right) = f\left(\sin\left(x\right)\right) = \sin^2\left(x\right)\]
+    
+    Soit $a \in \mathbb{R}$ et $b = g\left(a\right) = \sin\left(a\right) \in \mathbb{R}$, alors nous pouvons calculer les matrices Jacobiennes, qui sont des matrices $1 \times 1$ et donc des scalaires:
+    \[J_{g}\left(a\right) = \left(\sin\left(x\right)\right)' \eval_{x=a}^{}= \cos\left(a\right)\]
+    \[J_{f}\left(b\right) = \left(y^2\right)' \eval_{y=b=\sin\left(a\right)}^{} = 2b = 2\sin\left(a\right)\]
+    
+    Notre théorème nous dit que:
+    \[J_{f\circ g}\left(a\right) = J_f\left(g\left(a\right)\right) \cdot J_g\left(a\right) = 2\sin\left(a\right) \cdot \cos\left(a\right)\]
+    
+    Nous pouvons vérifier ce résultat:
+    \[J_{f\circ g}\left(a\right) = \left(\sin^2\left(x\right)\right)' \eval_{x = a}^{}= 2\sin\left(a\right)\cos\left(a\right)\]
+    
+    Il est très intéressant de remarquer que nous avons retrouvé la formule de dérivée d'une fonction composée: 
+    \[\left(f\circ g\right)'\left(a\right) = f'\left(g\left(a\right)\right) g'\left(a\right)\]
+}
+
+\parag{Exemple 2}{
+    Prenons les fonctions suivantes: 
+    \[f: \mathbb{R} \mapsto \mathbb{R}, \mathspace f\left(z\right) = z^2\] 
+    \[g: \mathbb{R}^2 \mapsto \mathbb{R}, \mathspace g\left(x, y\right) = \sin\left(xy\right)\]
+    
+    Calculons nos matrices Jacobiennes:
+    \[J_g\left(x, y\right) = \nabla g\left(x, y\right) = \left(y \cos\left(xy\right), x\cos\left(xy\right)\right)\] 
+    \[J_f\left(z\right) = \left(z^2\right)' = 2z\implies J_f\left(g\left(x, y\right)\right) = 2z \eval_{z=\sin\left(xy\right)}^{} = 2\sin\left(xy\right)\] 
+    
+    Calculons déjà notre résultat, afin de savoir ce que nous devons obtenir: 
+    \begin{multiequation}
+    & f \circ g\left(x, y\right) = \sin^2\left(x, y\right)  \\
+    \implies & J_{f \circ g}\left(x, y\right) = \nabla \left(f \circ g\right)\left(x, y\right) = \left(2\sin\left(xy\right)\cos\left(xy\right)y, 2\sin\left(xy\right)\cos\left(xy\right)x\right)
+    \end{multiequation}
+    
+    Notre théorème nous dit que: 
+    \[J_{f}\left(\sin\left(x, y\right)\right) \cdot J_{g}\left(x, y\right) = 2\sin\left(xy\right)\left(y \cos\left(xy\right), x\cos\left(xy\right)\right)\]
+    
+    Ce qui est bien ce à quoi nous nous attendions.
+}
+
+\end{document}

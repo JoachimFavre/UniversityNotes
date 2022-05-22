@@ -1,0 +1,157 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-11 at 12:14:47.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Mercredi 11 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{21}{2022-05-11}{Lagrange à Laferme avec Lescochons}{
+    \begin{itemize}[left=0pt]
+        \item Démonstration du théorème de la méthode des multiplicateurs de Lagrange quand $n = 2$, et explication de sa généralisation.
+        \item Exemples de ce théorème.
+    \end{itemize}
+}
+
+\subsection{Extrema liés --- Méthode des multiplicateurs de Lagrange}
+
+\parag{Théorème: Condition nécessaire pour un extremum sous contrainte quand $n=2$}{
+    Soit l'ensemble $E \subset \mathbb{R}^2$ et soient les fonctions $f, g : E \mapsto \mathbb{R}$ de classe $C^1$. Supposons que $f\left(x, y\right)$ admette un extremum en $\left(a, b\right) \in E$ sous la contrainte $g\left(x, y\right) = 0$, et que $\nabla g\left(a, b\right) \neq \bvec{0}$.
+
+    Alors, il existe $\lambda \in \mathbb{R}$, appelé le \important{multiplicateur de Lagrange}, tel que: 
+    \[\nabla f\left(a, b\right) = \lambda \nabla g\left(a, b\right)\]
+    
+    \demonstrationaconnaitre
+
+    \subparag{Preuve}{
+        Nous savons que $\nabla g\left(a, b\right) \neq \bvec{0}$,  donc au moins l'une des dérivées partielles est non-nulle. Supposons que $\frac{\partial g}{\partial y}\left(a, b\right) \neq 0$ (le cas $\frac{\partial g}{\partial x}\left(a, b\right) \neq 0$ est similaire).
+
+        Nous avons $g\left(a, b\right) = 0$ puisque $\left(a, b\right)$ satisfait la contrainte $g\left(x, y\right) = 0$. Ainsi, par le TFI, il existe une fonction $y = h\left(x\right)$ de classe $C^1$ au voisinage de $x = a$ telle que: 
+        \[h'\left(x\right) = - \frac{\frac{\partial g}{\partial x}\left(x, h\left(x\right)\right)}{\frac{\partial g}{\partial y}\left(x, h\left(x\right)\right)}, \mathspace \text{avec } g\left(x, h\left(x\right)\right) = 0\]
+        
+        Aussi, pour $\left(x, y\right)$ satisfaisant notre contrainte $g\left(x, y\right) = 0$, nous pouvons remplacer $y = h\left(x\right)$ dans l'expression $f\left(x, y\right)$ pour obtenir une fonction d'une seule variable: 
+        \[f\left(x, y\right) \over{=}{si $g(x, y) = 0$}  f\left(x, h\left(x\right)\right)\]
+        
+        Nous savons que les extrema de cette fonction, respectent:
+        \[f'\left(x, h\left(x\right)\right) = \frac{\partial f}{\partial x}\left(x, h\left(x\right)\right) + \frac{\partial f}{\partial y}\left(x, h\left(x\right)\right)h'\left(x\right) = 0\]
+        
+        Par hypothèse, $\left(a, b\right)$ est un point d'extremum, et il respecte la contrainte $g\left(a, b\right) = 0$, donc les hypothèses de l'équation que nous venons d'obtenir sont bien respectées, ce qui nous permet de trouver que:
+        \[\frac{\partial f}{\partial x}\left(a, b\right) = -\frac{\partial f}{\partial y}\left(a, b\right) h'\left(a\right)\]
+
+        Pour résumer, nous avons trouvé jusque là que:
+        \[\frac{\partial f}{\partial x}\left(a, b\right) = -\frac{\partial f}{\partial y}\left(a, b\right) h'\left(a\right), \mathspace h'\left(a\right) \over{=}{TFI} -\frac{\frac{\partial g}{\partial x}\left(a, b\right)}{\frac{\partial g}{\partial y}\left(a, b\right)}\]
+        
+        Ceci implique que:
+        \[\underbrace{\frac{\partial f}{\partial x}\left(a, b\right)}_{v_1} = \underbrace{\frac{\partial f}{\partial y}\left(a, b\right)}_{v_2} \frac{\overbrace{\frac{\partial g}{\partial x}\left(a, b\right)}^{u_1}}{\underbrace{\frac{\partial g}{\partial y}\left(a, b\right)}_{u_2 \neq0}}\]
+        
+        Séparons notre preuve en différents cas. Si $u_1 = 0$, alors $v_1 = 0$ et donc $\nabla f\left(a, b\right) = \left(0, v_2\right)$ et $\nabla g\left(a, b\right) = \left(0, u_2\right)$. Ceci implique bien qu'il existe un $\lambda \in \mathbb{R}$ tel que $v_2 = \lambda \underbrace{u_2}_{\neq 0}$ et donc: 
+        \[\nabla f\left(a, b\right) = \lambda \nabla g\left(a, b\right)\]
+        
+        Sinon (si $u_1 \neq 0$), alors, en définissant $\frac{v_1}{u_1} = \frac{v_2}{u_2} := \lambda \in \mathbb{R}$, nous trouvons:
+        \[\left(v_1, v_2\right) = \lambda\left(u_1, u_2\right) \iff \nabla f\left(a, b\right) = \lambda \nabla g\left(a, b\right)\]
+         
+        \qed
+    }
+
+    \subparag{Intuition de la preuve}{
+        Nous trouvons $f\left(x, y\right)$ sous la forme d'une fonction d'une seule variable et la dérivons, puis nous utilisons le théorème des fonctions implicites, ce qui nous permet de trouver un lien entre les dérivées de $f$ et celles de $g$.
+    }
+
+    \subparag{Remarque}{
+        Géométriquement, $g\left(x, y\right) = 0$ est une courbe de niveau. Or, on sait que $\nabla g\left(x, y\right)$ est toujours orthogonal à cette courbe. Maintenant, si $\left(a, b\right)$ est une extremum local de $f\left(x, y\right)$ sur cette courbe, cela implique que, pour un $\bvec{v}$ tangent à la courbe, $D_{\bvec{v}}f\left(a, b\right) = \left<\nabla f\left(a, b\right), \bvec{v}\right> = 0$ puisque c'est un extremum (ce point est visible sur l'image ci-dessous).
+
+        Ainsi, ceci nous avons plusieurs possibilités. Soit $\nabla f\left(a, b\right) = 0$, auquel cas nous pouvons prendre $\lambda = 0$, et l'extremum est un extremum local de la fonction, même sans contrainte. Sinon, $\nabla f\left(a, b\right)$ est orthogonal à la courbe, et donc il est parallèle au gradient de $g$, nous disant $\nabla f\left(a, b\right) = \lambda \nabla g\left(a, b\right)$ où $\lambda \neq 0$.
+    }
+
+    \subparag{Note personnelle: Exemple}{
+        Regardons par exemple la fonction $f\left(x, y\right) = x$ avec la contrainte $g\left(x, y\right) = x^2 + y^2 - 4 = 0$. La courbe sous contrainte est présentée en violet, et il est clair que, aux extrema, $\nabla g$ (les vecteurs en noirs) est colinéaire à $\nabla f$ (le vecteur en bleu):
+        \imagehere{MethodeDeLagrangeExemplePerso.png}
+    }
+    
+}
+
+\parag{Théorème: Condition nécessaire pour un extremum sous contrainte}{
+    Soit $E \subset \mathbb{R}^n$ et soient $f, g_1, \ldots, g_m E \mapsto \mathbb{R}$ des fonctions de classe $C^1$, où $m \leq n-1$. Soit $\bvec{a} \in E$ un extremum de $f\left(\bvec{x}\right)$ sous les contraintes $g_1\left(\bvec{x}\right) = \ldots = g_m\left(\bvec{x}\right) = 0$.
+
+    Supposons que les vecteurs $\nabla g_1\left(\bvec{a}\right), \ldots, \nabla g_m\left(\bvec{a}\right)$ sont linéairement indépendants. Alors, il existe un vecteur $\bvec{\lambda} = \left(\lambda_1, \ldots, \lambda_m\right) \in \mathbb{R}^m$ tel que: 
+    \[\nabla f\left(\bvec{a}\right) = \sum_{k=1}^{m} \lambda_k \nabla g_k\left(\bvec{a}\right) = \lambda_1 \nabla g_1\left(\bvec{a}\right) + \ldots + \lambda_m \nabla g_m\left(\bvec{a}\right)\]
+    
+    En particulier, si on cherche un extremum de $f\left(\bvec{x}\right)$ sous une seule contrainte $g\left(\bvec{x}\right) = 0$, on obtient les équations:
+    \[\begin{systemofequations} \nabla f\left(\bvec{x}\right) = \lambda \nabla g\left(\bvec{x}\right) \\ g\left(\bvec{x}\right) = 0 \end{systemofequations} \mathspace \text{si } \nabla g\left(\bvec{x}\right) \neq 0\]
+}
+
+\parag{Exemple 1}{
+    Nous voulons trouver toutes les extrema de la fonction $f\left(x, y, z\right) = x - 2y + 2z$ sous la contrainte $g\left(x, y, z\right) = x^2 + y^2 + z^2 - 9 = 0$.
+
+    Commençons par remarquer que pour $\left(x, y, z\right)$ sur notre sphère de rayon 3: 
+    \[\nabla g\left(x, y, z\right) = \left(2x, 2y, 2z\right) \neq \left(0, 0, 0\right)\]
+    puisque $\left(x, y, z\right) = \left(0, 0, 0\right)$ n'appartient à pas la sphère de rayon 3.
+    
+    Par le théorème des multiplicateurs de Lagrange, si un point $\left(x, y, z\right)$ appartenant à la sphère est un point d'extremum de $f\left(x, y, z\right)$, alors il existe $\lambda \in \mathbb{R}$ tel que:
+    \[\begin{systemofequations} \nabla f\left(x, y, z\right) = \lambda \nabla g\left(x, y, z\right) \\ x^2 + y^2 + z^2 = 9\end{systemofequations} \iff \begin{systemofequations} \left(1, -2, 2\right) = \lambda\left(2x, 2y, 2z\right) \\ x^2 + y^2 + z^2 = 9 \end{systemofequations}\]
+
+    Clairement, $\lambda \neq 0$, donc nous pouvons diviser la première équation par $\lambda$: 
+    \[\begin{systemofequations} x = \frac{1}{2\lambda}, \\ y = -\frac{1}{\lambda} \\ z = \frac{1}{\lambda} \end{systemofequations} \implies \begin{systemofequations} x = \frac{1}{2} z \\ y = -z \end{systemofequations}\]
+    
+    En mettant ceci dans notre contrainte, on obtient: 
+    \[9 = x^2 + y^2 + z^2 = \frac{1}{4} z^2 + z^2 + z^2 = \frac{9}{4}z^2 \implies z^2 = 4 \implies z = \pm 2\]
+    
+    Ainsi, si $z = 2$, on obtient $x = 1$, $y = -2$ et donc on a le point $\left(1, -2, 2\right)$. Si $z = -2$, on obtient le point $\left(-1, 2, -2\right)$. Nous pouvons maintenant regarder leur image par $f$: 
+    \[f\left(1, -2, 2\right) = 1 + 4 + 4 = 9, \mathspace f\left(-1, 2, -2\right) = -1 - 4- 9 = -9\]
+    
+    Nous devons encore vérifier que ce sont bien des extrema. Cependant, puisque la sphère est un compact et $f$ est continue, nous savons que $f$ atteint son minimum et son maximum. On sait aussi qu'elle est de classe $C^1$, donc les points critiques sont les point stationnaires. Donc, parmi les points stationnaires il existe forcément les points de minimum et de maximum sous la contrainte. Mais, nous n'avons trouvé que deux points, nous savons donc que ce sont notre minimum et maximum.
+}
+
+\parag{Exemple 2}{
+    Nous voulons trouver les extrema de la fonction $f\left(x, y, z\right) = xyz$ sous les contraintes: 
+    \[g_1\left(x, y, z\right) = x + y + z - 5 = 0, \mathspace g_2\left(x, y, z\right) = xy + yz + xz - 8 = 0\]
+
+    Commençons par vérifier que les gradients de $g_1$ et $g_2$ sont linéairement indépendants: 
+    \[\nabla g_1\left(x, y, z\right) = \left(1, 1, 1\right), \mathspace \nabla g_2 \left(x, y, z\right) = \left(y + z, x + z, x + y\right)\]
+
+    Pour savoir s'ils sont linéairement indépendants, nous posons: 
+    \[\nabla g_2\left(x, y, z\right) = k \nabla g_1\left(x, y, z\right) \implies \left(y + z = x + z, x + y\right) = \left(k, k, k\right) \implies x = y = z\]
+    
+    Cependant, nous pouvons voir que $x = y = z$ ne marche pas avec nos contraintes:
+    \[\begin{systemofequations} g_1\left(x, x, x\right) = 3x - 5 = 0 \implies x = \frac{5}{3}\\g_2\left(x, x, x\right) = 3x^2 - 8 = 0 \end{systemofequations}\]
+    mais $3\left(\frac{5}{3}\right)^2 = \frac{25}{3} \neq 8$.
+
+    Nous en déduisons que le théorème des multiplicateurs de Lagrange s'applique, et on obtient les équations: 
+    \[\begin{systemofequations} \nabla f\left(x, y, z\right) = \left(yz, xz, xy\right) = \lambda_1\overbrace{\left(1, 1, 1\right)}^{\nabla g_1} + \lambda_2\overbrace{\left(y + z, x + z, x + y\right)}^{\nabla g_2} \\ g_1\left(x, y, z\right) = x + y + z - 5 = 0 \\ g_2 \left(x, y, z\right) = xy + yz + xz -8 = 0\end{systemofequations}\]
+
+    Ceci nous donne le système de 5 équations à 5 inconnues suivant:
+    \[\begin{systemofequations} yz = \lambda_1 + \lambda_2\left(y + z\right) \\ xz = \lambda_1 + \lambda_2\left(x + z\right) \\ xy = \lambda_1 + \lambda_2\left(x + y\right) \\ x + y + z = 5 \\ xy + yz + xz = 8 \end{systemofequations}\]
+
+    On voit que la quatrième équation nous donne $x + y = 5 - z$. Ainsi, en additionnant les deux premières équations: 
+    \[z\left(x + y\right) = 2\lambda_1 + \lambda_2\left(x + y + 2z\right) \implies z\left(5 - z\right) = 2\lambda_1 + \lambda_2\left(5 + z\right)\]
+    
+    Nous pouvons utiliser la même idée en additionnant la deuxième et la troisième équation, et en additionnant la première et la troisième équation. Ceci nous donne le système: 
+    \[\begin{systemofequations} z\left(5 - z\right) = 2\lambda_1 + \lambda_2\left(5 + z\right) \\ x\left(5 - x\right) = 2\lambda_1 + \lambda_2\left(5 + x\right) \\ y\left(5 - y\right) = 2\lambda_1 + \lambda_2\left(5 + y\right) \end{systemofequations} \implies \begin{systemofequations} z^2 + \left(\lambda_2 - 5\right)z + 5\lambda_2 + 2\lambda_1 = 0 \\ x^2 + \left(\lambda_2 - 5\right)x + 5\lambda_2 + 2\lambda_1 = 0 \\ y^2 + \left(\lambda_2 - 5\right)y + 5\lambda_2 + 2\lambda_1 = 0\end{systemofequations}\]
+    
+    Nous savons qu'une équation quadratique a au plus deux solutions différentes. Nous savons déjà que $x = y = z$ n'est pas possible, donc la seule possibilité qui nous arrangerait (qui dirait que des solutions existe) serait qu'une variable est différente des deux autres. Prenons par exemple $x = y \neq z$. Alors, les équations 4 et 5 de notre premier système nous donnent:
+    \[\begin{systemofequations} 2x + z = 5 \\ x^2 + 2xz = 8 \end{systemofequations} \implies \begin{systemofequations} z = 5 - 2x \\ x^2 + 2x\left(5 - 2x\right) - 8 = 0 \implies -3x^2 + 10x - 8 = 0 \end{systemofequations}\]
+
+    Nous pouvons donc résoudre: 
+    \[x = \frac{10 \pm \sqrt{100 - 96}}{6} = \frac{10 \pm 2}{6} \implies x_1 = 2, x_2 = \frac{4}{3} \implies z_1 = 1, z_2 = \frac{7}{3}\]
+
+    Ceci nous donne 6 points candidats pour un extremum de $f$ sous les contraintes (en considérant aussi $x = z \neq y$ et $y = z \neq x$): 
+    \[\left\{\left(2, 2, 1\right), \left(1, 2, 2\right), \left(2, 1, 2\right), \left(\frac{4}{3}, \frac{4}{3}, \frac{7}{3}\right), \left(\frac{7}{3}, \frac{4}{3}, \frac{4}{3}\right), \left(\frac{4}{3}, \frac{7}{3}, \frac{4}{3}\right)\right\}\]
+    
+    Calculons les valeurs de nos fonctions: 
+    \[f\left(2, 2, 1\right) = f\left(1, 2, 2\right) = f\left(2, 1, 2\right) = xyz \eval_{\left(2, 2, 1\right)}^{} = 4\]
+    \[f\left(\frac{4}{3}, \frac{4}{3}, \frac{7}{3}\right) = f\left(\frac{4}{3}, \frac{7}{3}, \frac{4}{3}\right) = f\left(\frac{7}{3}, \frac{4}{3}, \frac{4}{3}\right) = \frac{112}{27} = 4 + \frac{4}{27}\]
+
+    Par un argument similaire à l'exemple précédent, si nous arrivons à démontrer que les contraintes définissent un compact dans $\mathbb{R}^3$, nous pourrons en déduire que les premiers points nous donnent un minimum de $f$ sous les contraintes, et les deuxième nous donnent un maximum de $f$ sous les contraintes. En effet, nous savons déjà que $f$ est continue, ainsi, si les contraintes définissent un compact, cela implique que $f$ atteint son minimum et son maximum, qui sont à des points stationnaires puisqu'elle est de classe $C^1$, qui sont donnés par le théorème des multiplicateurs de Lagrange.
+
+    Démontrons donc que les contraintes forment un compact. Il est possible de trouver à partir des contraintes que: 
+    \[\frac{1}{2}\left(x + y\right)^2 + \underbrace{\frac{1}{2}\left(x - 5\right)^2}_{\leq 17} + \underbrace{\frac{1}{2}\left(y - 5\right)^2}_{\leq 17} = 17\]
+    
+    Ceci nous dit donc que $x$ et $y$ sont bornées. De plus, puisque $z = 5 - x- y$, cette variable est aussi bornée. Ceci nous permet en effet de conclure que notre ensemble est en effet compact.
+}
+
+\end{document}

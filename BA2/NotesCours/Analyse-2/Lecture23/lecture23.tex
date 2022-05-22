@@ -1,0 +1,220 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-19 at 11:10:14.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Mercredi 18 mai}
+
+\begin{document}
+\maketitle
+
+\lecture{23}{2022-05-18}{Fubini on steroids}{
+\begin{itemize}[left=0pt]
+    \item Définition de l'intégrale d'une fonction sur un ensemble qui n'est pas un pavé fermé.
+    \item Explication du théorème de Fubini pour les domaines à frontière régulière de type 1 et 2.
+    \item Explication de la méthode pour calculer l'intégrale de fonctions sur des domaines à frontières régulières qui ne sont ni de type 1 ni de type 2.
+\end{itemize}
+
+}
+
+\parag{Exemple}{
+    Nous voulons calculer le volume du sous-ensemble de $\mathbb{R}^3$ défini par: 
+    \[\left\{\left(x, y, z\right) \in \mathbb{R}^3 : 0 \leq x \leq 4, 0 \leq y \leq 3, 0 \leq z \leq \left(1 + 3x + x\sin\left(xy\right)\right)\right\}\]
+
+    Nous remarquons que $f\left(x, y\right) = 1 + 3x + x\sin\left(xy\right)$ est continue, et que $f\left(x\right) > 0$ sur cet intervalle. Ainsi, nous pouvons utiliser le théorème de Fubini sur le pavé fermé $P = \left[0, 4\right] \times \left[0, 3\right]$. Pour commencer, utilisons la linéarité et l'additivité de l'intégrale:
+    \[V = \iint_{P} \left(1 + 3x + x\sin\left(xy\right)\right)dxdy = \iint_{P} 1dxdy + 3\iint_{P} xdxdy + \iint_{P} x\sin\left(xy\right) dx dy\]
+    
+    La première intégrale est le volume du pavé fermé, qui est $\left(4 - 0\right)\left(3 - 0\right) = 12$. Regardons maintenant la deuxième intégrale. Nous pouvons choisir l'ordre des variables, et il est souvent mieux d'utiliser la variable ``qui participe le moins'', donc commençons par $y$: 
+    \[3 \iint_{P} xdxdy = 3 \int_{0}^{4} \left(\int_{0}^{3} xdy\right)dx = 3 \int_{0}^{4} xy \eval_{y=0}^{y=3} dx = 3 \int_{0}^{4} 3xdx = \frac{9}{2}x^2 \eval_{0}^{4} = 72\]
+    
+    Pour l'exemple, calculons cette même intégrale en intégrant d'abord par $x$: 
+    \[3 \iint_P xdxdy = \int_{0}^{3} \left(\int_{0}^{4} 3x dx\right)dy = \int_{0}^{3} \left(\frac{3}{2} x^2 \eval_{x=0}^{x=4}\right)dy = \int_{0}^{3} 24dy = 24y \eval_{0}^{3} = 72\]
+    comme attendu.
+    
+    Calculons maintenant notre troisième intégrale, en commençant par intégrer par $y$ puisqu'elle est plus simple:
+    \[\iint_{P} x \sin\left(xy\right)dxdy = \int_{0}^{4} \left(\int_{0}^{3} x\sin\left(xy\right)dy\right)dx\]
+
+    Prenons maintenant le changement de variable $u\left(y\right) = xy$, ce qui nous donne:
+    \[\int_{0}^{4} \left(\int_{0}^{3} \sin\left(u\right)du\right)dx = \int_{0}^{4} -\cos\left(xy\right) \eval_{0}^{3} dx = \int_{0}^{4} \left(-\cos\left(3x\right) + 1\right)dx\]
+
+    Nous trouvons donc finalement qu'elle notre troisième intégrale est égale à:
+    \[x - \frac{1}{3}\sin\left(3x\right) \eval_{0}^{4} = 4 - \frac{1}{3} \sin\left(12\right)\]
+    
+    Considérons encore cette troisième intégrale, mais en prenant un autre ordre d'intégration: 
+    \[\iint_P x\sin\left(xy\right)dxdy = \int_{0}^{3} \left(\int_{0}^{4} x\sin\left(xy\right)dx\right)dy\]
+
+    Calculons l'intégrale intérieure:
+    \[\int_{0}^{4} x\sin\left(xy\right)dx = - \frac{x}{y} \cos\left(xy\right) \eval_{0}^{4} + \frac{1}{y} \int_{0}^{4} \cos\left(xy\right)dx = -\frac{x}{y} \cos\left(xy\right) \eval_{x=0}^{x=4} + \frac{1}{y} \frac{\sin\left(xy\right)}{y} \eval_{x=0}^{x=4}\]
+
+    Ce qui est égal à:
+    \[- \frac{4}{y}\cos\left(4y\right)+ \frac{1}{y^2}\sin\left(4y\right)\]
+
+    Nous voulons intégrer ce résultat entre 0 et 3, donc regardons sa limite: 
+    \begin{multiequality}
+    \lim_{y \to 0} \frac{\sin\left(4y\right) - 4y\cos\left(4y\right)}{y^2} =\ & \lim_{y \to 0} \frac{4y - \frac{\left(4y\right)^3}{6} + \ldots - 4y\left(1 - \frac{1}{2}\left(4y\right)^2 + \ldots\right)}{y^2} \\
+    =\ & \lim_{y \to 0} \frac{-\frac{\left(4y\right)^3}{6} + 32y^3}{y^2} \\
+    =\ & 0 
+    \end{multiequality}
+    
+    Calculons finalement notre intégrale extérieure (qui, malheureusement, ne peut pas être séparée en deux intégrales, puisque celles-ci ne s'expriment pas en fonctions élémentaires): 
+    \begin{multiequality}
+       & \int_{0}^{3} \left(-\frac{4}{y}\cos\left(4y\right) + \frac{1}{y^2} \sin\left(4y\right)\right)dy  \\
+    =\ & \int_{0}^{3} \frac{\sin\left(4y\right) - 4y\cos\left(xy\right)}{y^2}dy \\
+    =\ & \int_{0}^{3} \left(4y \cos\left(4y\right) - \sin\left(4y\right)\right) d\left(\frac{1}{y}\right) \\
+    =\ & -\frac{\sin\left(4y\right)}{y} + 4\cos\left(4y\right) \eval_{0}^{3} - \int_{0}^{3} \frac{4\cos\left(4y\right) - 16y\sin\left(4y\right) - 4\cos\left(4y\right)}{y}dy \\
+    =\ & -\frac{\sin\left(12\right)}{3} + 4\cos\left(12\right) + \underbrace{\lim_{y \to 0} \frac{\sin\left(4y\right)}{y}}_{= 4} - 4 + \int_{0}^{3} 16\sin\left(4y\right)dy \\
+    =\ & -\frac{\sin\left(12\right)}{3} + 4\cos\left(12\right) - 4\cos\left(4y\right)\eval_{0}^{3} \\
+    =\ & -\frac{1}{3}\sin\left(12\right) + 4\cos\left(12\right) - 4\cos\left(12\right) + 4 \\
+    =\ & 4- \frac{1}{3}\sin\left(12\right) 
+    \end{multiequality}
+    comme attendu. Cependant, clairement, le choix prudent de l'ordre d'intégration est important, car nous sommes allé beaucoup plus rapidement en intégrant par $y$ d'abord.
+
+    Nous trouvons donc finalement que notre volume est donné par: 
+    \[V = 12 + 72  + 4 - \frac{1}{3} \sin\left(12\right) = 88 - \frac{1}{3} \sin\left(12\right)\]
+}
+
+\subsection{Intégrales sur un ensemble borné}
+\parag{Définition: Fonction intégrable sur un ensemble borné quelconque}{
+    Soit $E \subset \mathbb{R}^n$ un ensemble borné. Clairement, puisqu'il est borné, il existe un pavé fermé tel que $E \subset P \subset\mathbb{R}^n$. Soit aussi $f :E \mapsto \mathbb{R}$ une fonction bornée sur $E$.
+
+    Posons maintenant la fonction suivante: 
+    \begin{functionbypart}{\hat{f}\left(\bvec{x}\right)}
+        f\left(\bvec{x}\right), \mathspace \text{si } \bvec{x} \in E \\
+        0, \mathspace \text{si } \bvec{x} \in P \setminus E
+    \end{functionbypart}
+
+    La fonction $f$ est \important{intégrable} sur $E$, si $\hat{f}$ est intégrable sur $P$. Dans ce cas, on pose: 
+    \[\int_{E} f\left(\bvec{x}\right) d \bvec{x} \over{=}{déf} \int_P \hat{f}\left(\bvec{x}\right)d \bvec{x}\]
+    
+    \subparag{Remarque}{
+        La définition ne dépend pas du choix du pavé fermé autour de notre sous-ensemble $E$.
+    }
+}
+
+\parag{Définition: Frontière régulière}{
+    Une frontière est dite régulière (de mesure nulle) si, pour tout $\epsilon > 0$, il existe un ensemble de pavé fermés $\left\{q_1, q_2, \ldots\right\}$ tels que: 
+    \[\sum_{i \in I}^{} \left|q_i\right| < \epsilon \mathspace \text{et} \mathspace \partial E \subset \bigcup_{i \in I} q_i\]
+    
+    \subparag{Intuition}{
+        En gros, cela veut dire que la frontière n'a pas d'aire. 
+
+        Voici un exemple d'une frontière qui n'est pas régulière:
+        \imagehere[0.7]{EnsemblePasMesureNulle.png}
+
+        De manière similaire, la courbe d'Osgood n'est pas régulière (je vous laisser aller jeter un \oe{il} sur Wikipédia, \textit{Osgood Curve} en anglais).
+    } 
+}
+
+\parag{Théorème}{
+    Si $f : E \mapsto \mathbb{R}$ est bornée sur $E$, continue sur l'intérieur $\mathring{E}$, et la frontière $\partial E$ est assez régulière, alors $f\left(\bvec{x}\right)$ est intégrable sur $E$.
+}
+
+\parag{Théorème de Fubini pour les domaines à frontière régulière}{
+    \begin{enumerate}[left=0pt]
+        \item Soient:
+            \begin{itemize}
+                \item $\left[a, b\right] \subset \mathbb{R}$ un intervalle, où $a < b$.
+                \item $\phi_1, \phi_2 : \left[a, b\right]\mapsto \mathbb{R}$ deux fonctions continues telles que $\phi_1\left(x\right) < \phi_2\left(x\right)$ pour tout $x \in \left]a, b\right[ $.
+                \item $D = \left\{\left(x, y\right) \in \mathbb{R}^2 : a < x < b, \phi_1\left(x\right) < y < \phi_2\left(x\right)\right\}$ (appelé le domaine à frontière régulière de type 1).
+            \end{itemize}
+            
+            Alors, pour tout fonction continue $f: \bar{D} \mapsto \mathbb{R}$, nous avons: 
+            \[\iint_D f\left(x, y\right) dx dy = \int_{a}^{b} \left(\int_{\phi_1\left(x\right)}^{\phi_2\left(x\right)} f\left(x, y\right)dy\right)dx\]
+
+            Le choix du sens des variables d'intégration \textit{ne peut pas} se faire arbitrairement.
+        \item Soient:
+            \begin{itemize}
+                \item $\left[c, d\right] \subset \mathbb{R}$ un intervalle, où $c < d$.
+                \item $\psi_1, \psi_2 : \left[c, d\right] \mapsto \mathbb{R}$ deux fonctions continues telles que $\psi_1\left(y\right) < \psi_2\left(y\right)$ pour tout $y \in \left]c, d\right[ $.
+                \item $D = \left\{\left(x, y\right) \in \mathbb{R}^2 : c < y < d, \psi_1\left(y\right) < x < \psi_2\left(y\right)\right\}$ (appelé le domaine à frontière régulière de type 2).
+            \end{itemize}
+            
+            Alors, pour toute fonction continue $f: \bar{D} \mapsto \mathbb{R}$, nous avons: 
+            \[\iint_D f\left(x, y\right)dxdy = \int_{c}^{d} \left(\int_{\psi_1\left(y\right)}^{\psi_2\left(y\right)} f\left(x, y\right)dx\right)dy\]
+            Le choix du sens des variables d'intégration \textit{ne peut pas} se faire arbitrairement.
+    \end{enumerate}
+
+    \subparag{Exemple}{
+        Voici un exemple de type 1 (à gauche) et un exemple de type 2 (à droite):
+        \imagehere{FubiniType1Type2.png}
+    }
+}
+
+\parag{Exemple}{
+    Soit la fonction $f\left(x, y\right) = x^2 y$ et le domaine suivant: 
+    \[D = \left\{\left(x, y\right) \in \mathbb{R}^2 : 0 < x < 1, 0 < y < 1 - x\right\}\]
+    
+    Ceci nous donne le graphe suivant:
+    \imagehere[0.3]{FubiniExemple1.png}
+
+    Nous pouvons l'interpréter comme un domaine de type 1, donc le théorème de Fubini nous dit que: 
+    \[\iint_D f\left(x,y\right)dxdy = \int_{0}^{1} \left(\int_{0}^{1 - x}  x^2 y dy\right)dy = \int_{0}^{1} \frac{1}{2}x^2 \left(1 - x^2\right)dx\]
+
+    Ce qui est égal à: 
+    \[\frac{1}{2} \int_{0}^{1} \left(x^2 - 2x^3 + x^4\right)dx = \frac{1}{6} x^3 - \frac{1}{4}x^4 + \frac{1}{10}x^5 \eval_{0}^{1} = \frac{1}{6}- \frac{1}{4} + \frac{1}{10} = \frac{10 - 15 + 6}{60} = \frac{1}{60}\]
+    
+    
+    Cependant, nous pouvons aussi réécrire notre domaine de manière à ce qu'il soit de type 2: 
+    \[D = \left\{\left(x, y\right) \in \mathbb{R}^2 : 0 < y < 1, 0 < x < 1 - y\right\}\]
+    
+    Ainsi, le théorème de Fubini nous dit que: 
+    \[\iint_D f\left(x, y\right)dxdy = \int_{0}^{1} \left(\int_{0}^{1 -y} x^2 y dx\right)dy = \int_{0}^{1} \frac{1}{3}\left(1-y\right)^3 ydy\]
+    
+    Ce qui est égal à:
+    \[\frac{1}{3} \int_{0}^{1} \left(y - 3y^2 + 3y^3 - y^4\right)dy = \frac{1}{6}y^2 - \frac{1}{3}y^3 + \frac{1}{4}y^4 - \frac{1}{15}y^5 \eval_{0}^{1} = \frac{10 - 20 + 15 - 4}{60} = \frac{1}{60}\]
+    comme attendu.
+
+    Parfois, il est donc possible de changer notre domaine d'un type à l'autre, mais le choix est souvent forcé.
+}
+
+\parag{Remarque}{
+    Regardons le domaine $D$ suivant, qui n'est malheureusement ni de type 1 ni de type 2:
+    \imagehere[0.6]{FubiniAucunType.png}
+
+    Nous pouvons le séparer en trois sous-ensembles de type 1:
+    \imagehere[0.6]{FubiniAucunTypeSepareTroisType1.png}
+
+    De manière générale, il est possible de diviser le domaine en réunion de domaines de type 1 ou 2, et nous pouvons ensuite utiliser l'additivité de l'intégrale. Ici, nous aurions, pour une fonction $f: \bar{D} \mapsto\mathbb{R}$ continue: 
+    \begin{multiequality} 
+     & \iint_D f\left(x, y\right)dxdy \\
+    =\ & \iint_{D_1} f\left(x,y\right)dxdy + \iint_{D_2} f\left(x, y\right)dxdy + \iint_{D_3} f\left(x,y\right)dxdy \\
+    =\ & \int_{x_1}^{x_2} \left(\int_{\phi_3\left(x\right)}^{\phi_1\left(x\right)} f\left(x,y\right)dy\right)dx + \int_{x_2}^{x_3} \left(\int_{\phi_3\left(x\right)}^{\phi_2\left(x\right)} f\left(x,y\right)dy\right)dx + \int_{x_3}^{x_4} \left(\int_{\phi_4\left(x\right)}^{\phi_2\left(x\right)} f\left(x,y\right)dy\right)dx 
+    \end{multiequality}
+
+    Il peut arriver qu'il y ait certains sous-ensembles qui soient de type 1, et certains de type 2.
+}
+
+\parag{Exemple}{
+    Nous voulons calculer du domaine entre $y = x^2$ et $y = x+2$, quand $-1 \leq x \leq 2$. Il est souvent une bonne idée de se faire un dessin pour comprendre ce qu'on nous demande:
+    \imagehere[0.5]{FubiniExemple2Type1.png}
+
+    Il est plus simple de considérer ce domaine comme un ensemble de type 1: 
+    \[D = \left\{\left(x,y\right) \in \mathbb{R}^2 : -1 \leq x \leq 2, x^2 \leq y \leq x + 2\right\}\]
+    
+    Nous cherchons l'aire, donc: 
+    \[\iint_D 1 dxdy = \int_{-1}^{2} \left(\int_{x^2}^{x+2} dy\right) = \int_{-1}^{2} \left(x + 2 -x^2\right)dx = \frac{1}{2}x^2 + 2x - \frac{1}{3}x^3 \eval_{-1}^{2}\]
+
+    Ce qui est égal à: 
+    \[2 + 4 - \frac{8}{3} -\frac{1}{2} + 2 - \frac{1}{3} = 8 - 3 - \frac{1}{2} = \frac{9}{2}\]
+    
+    
+    Cependant, nous aurions aussi pu considérer notre domaine comme une réunion de deux domaines de type 2:
+    \[D = \left\{\left(x, y\right) \in \mathbb{R}^2 : 0 \leq y \leq 1, -\sqrt{y} \leq x \leq \sqrt{y}\right\} \cup \left\{\left(x, y\right) \in \mathbb{R}^2 : 1 \leq y \leq 4, y - 2 \leq x \leq \sqrt{y}\right\}\]
+    \imagehere[0.5]{FubiniExemple2Type2.png}
+
+    Nous avons alors: 
+    \begin{multiequality}
+    \iint_D 1dxdy =\ & \iint_{D_1} 1dxdy + \iint_{D_2} 1 dxdy \\
+    =\ & \int_{0}^{1} \left(\int_{-\sqrt{y}}^{\sqrt{y}} 1dx\right)dy + \int_{1}^{4} \left(\int_{y - 2}^{\sqrt{y}} 1dx\right)dy \\
+    =\ & \int_{0}^{1} 2\sqrt{y}dy + \int_{1}^{4} \left(\sqrt{y} - y + 2\right)dy \\
+    =\ & 2 \cdot \frac{2}{3} y^{\frac{3}{2}} \eval_{0}^{1} + \frac{2}{3} y^{\frac{3}{2}} - \frac{1}{2} y^2 + 2y \eval_{1}^{4} \\
+    =\ & \frac{4}{3} + \frac{16}{3} - 8 + 8 - \frac{2}{3} + \frac{1}{2} \\
+    =\ & \frac{9}{2} 
+    \end{multiequality}
+}
+
+
+\end{document}

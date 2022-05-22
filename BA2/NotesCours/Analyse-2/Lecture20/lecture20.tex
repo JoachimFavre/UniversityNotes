@@ -1,0 +1,239 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-05 at 10:33:54.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Jeudi 05 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{20}{2022-05-05}{Fonctions implicites}{
+\begin{itemize}[left=0pt]
+    \item Définition de la notion de surface de niveau.
+    \item Explication et démonstration du théorème des fonctions implicites.
+    \item Application de ce théorème pour le calcul de l'hyperplan tangent.
+\end{itemize}
+
+}
+
+\parag{Définition: Surface de niveau}{
+    Une \important{surface de niveau} d'une fonction $F\left(x, y, z\right)$ est la surface définie par l'équation $F\left(x, y, z\right) = C \in \mathbb{R}$. $C$ s'appelle le \important{niveau}.
+
+    De manière similaire, une \textcolor{red}{ligne} de niveau d'une fonction ${\color{red}F\left(x, y\right)}$ est la \textcolor{red}{ligne} définie par l'équation ${\color{red}F\left(x, y\right)} = C \in \mathbb{R}$. $C$ s'appelle le niveau.
+
+    \subparag{Exemple}{
+        Par exemple, sur une carte géographique, il y a les courbes d'altitudes, qui sont les ensembles de points situés à la même altitude.
+
+        \imagehere[0.7]{carteCourbeDeNiveau.png}
+    }
+}
+
+\parag{Exemple 3}{
+    Prenons $F\left(x, y\right) = 1 - y e^x + xe^y = 0$. Nous nous demandons si nous pouvons prendre $y = f\left(x\right)$ autour d'un point donné. Nous ne pouvons pas résoudre cette équation d'une manière explicite, mais la fonction est bien définie autour de tout point donné.
+
+    Nous pouvons considérer $F\left(x, y\right)$ comme une fonction de deux variables de classe $C^{\infty}\left(\mathbb{R}^2\right)$ qui défini une surface $z = F\left(x, y\right)$. Nous considérons l'intersection de cette surface avec le plan $z = 0$. La courbe obtenue s'appelle la \important{ligne de niveau} de $F\left(x, y\right)$ à $z = 0$.
+
+    Prenons par exemple le point $\left(0, 1\right)$, qui est bien tel que $F\left(0, 1\right) = 0$. Nous cherchons donc $y = f\left(x\right)$ telle que $F\left(x, f\left(x\right)\right) = 0$ pour tout $x$ proche de 0. Ainsi, supposant que $y = f\left(x\right)$ existe, nous pouvons trouver sa dérivée:
+    \begin{multiequation}
+    & F\left(x, f\left(x\right)\right) = 0 \\
+    \implies & F'\left(x, f\left(x\right)\right) = 0  \\
+    \implies & \frac{\partial f}{\partial x}\left(x, f\left(x\right)\right) + \frac{\partial F}{\partial y}\left(x, f\left(x\right)\right) f'\left(x\right) = 0 \\
+    \implies & f'\left(x\right) = -\frac{\frac{\partial F}{\partial x}\left(x, f\left(x\right)\right)}{\frac{\partial F}{\partial y}\left(x, f\left(x\right)\right)} = -\frac{y e^x + e^y}{-e^x + xe^y}
+    \end{multiequation}
+    
+    Si nous regardons en $\left(0, 1\right)$:
+    \[f'\left(0\right) = \frac{-y e^x + e^y}{-e^x + xe^y} \eval_{\left(0, 1\right)}^{} = -\frac{-1 + e}{-1} = -1 + e\]
+    qui est la pente de la tangente à $y = f\left(x\right)$ au point $\left(0, 1\right)$.
+    
+    \imagehere[0.5]{ExempleFonctionImpliciteTangente.png}
+}
+
+
+\parag{Théorème des fonctions implicites (TFI)}{
+    Soit $n \geq 2$ et $E \subset \mathbb{R}^n$. Soit aussi $F: E \mapsto \mathbb{R}$ une fonction de classe $C^1$ au voisinage de $\bvec{a} = \left(a_1, \ldots, a_n\right) \in E$ telle que:
+    \begin{enumerate}
+        \item $F\left(\bvec{a}\right) = 0$
+        \item $\frac{\partial F}{\partial x_n}\left(\bvec{a}\right)\neq 0$
+    \end{enumerate}
+
+    Alors, il existe un voisinage $B\left(\bcheck{a}, \delta\right)$ de $\bcheck{a} = \left(a_1, \ldots, a_{n-1}\right) \in \mathbb{R}^{n-1}$ (remarquez que $\bcheck{a}$ a $n-1$ composante et non pas $n$) et une fonction $f: B\left(\bcheck{a}, \delta\right) \mapsto\mathbb{R}$ telle que:
+    \begin{enumerate}
+        \item $a_n = f\left(a_1, \ldots, a_{n-1}\right)$
+        \item $F\left(x_1, \ldots, x_{n-1}, f\left(x_1, \ldots, x_{n-1}\right)\right) = 0, \mathspace \forall \left(x_1, \ldots, x_{n-1}\right) \in B\left(\bcheck{a}, \delta\right)$
+        \item $f$ est de classe $C^1$ dans un voisinage de $\bcheck{a}$, et on a:
+            \[\frac{\partial f}{\partial x_p}\left(x_1, \ldots, x_{n-1}\right) = - \frac{\frac{\partial F}{\partial x_p}\left(x_1, \ldots, x_{n-1}, f\left(x_1, \ldots, x_{n-1}\right)\right)}{\frac{\partial F}{\partial x_n}\left(x_1, \ldots, x_{n-1}, f\left(x_1, \ldots, x_{n-1}\right)\right)}, \mathspace\forall p = 1, \ldots, n-1\]
+
+    \end{enumerate}
+
+    \subparag{Intuition}{
+        Puisque la fonction est de classe $C^1$, elle se comporte comme une droite dans un voisinage de chaque point. Il est facile de voir pourquoi $\frac{\partial F}{\partial x_n}\left(\bvec{a}\right)$ doit être non-nulle en considérant le cas de $n = 2$. Si $\frac{\partial F}{\partial y} = 0$, alors la droite est verticale, ce qui est un problème.
+
+        De plus, nous pouvons remarquer que si nous voulions que la fonction $f$ n'existe pas, c'est qu'il faudrait un point où elle devrait prendre deux valeurs différentes. Pour arriver à cela, sa dérivée doit clairement passer de positive à négative ou inversement, ce qui est impossible par le TVI puisqu'elle est non-nulle et continue partout.
+
+    }
+}
+
+\parag{Cas $n = 2$}{
+    Considérons le cas où $n = 2$. Reformulons notre théorème.
+
+    Soit $E \subset \mathbb{R}^2$, et soit $F\left(x, y\right) : E \mapsto \mathbb{R}$ une fonction de classe $C^1$ telle que $F\left(a, b\right) = 0$ et $\frac{\partial F}{\partial y}\left(a, b\right) \neq 0$.
+
+    Alors, l'équation $F\left(x, y\right) = 0$ définit localement autour de $\left(a, b\right)$ une fonction $y = f\left(x\right)$ telle que $f\left(a\right) = b$, $F\left(x, f\left(x\right)\right) = 0$ pour tout $x$ dans un voisinage de $x = a$, et:
+    \[f'\left(x\right) = - \frac{\frac{\partial F}{\partial x}\left(x, f\left(x\right)\right)}{\frac{\partial F}{\partial y}\left(x, f\left(x\right)\right)}\]
+
+    Nous pouvons donc calculer $f'\left(a\right)$ sans savoir la formule pour $f\left(x\right)$.
+
+    Nous pouvons faire le schéma suivant, où la fonction est bien définie dans les voisinages rouges, mais pas dans les voisinages verts (puisqu'elle ne respecte pas les hypothèses de notre théorème):
+    \imagehere[0.7]{FonctionImpliciteCas2.png}
+}
+
+
+\parag{Exemple}{
+    Reprenons l'exemple du cercle, $F\left(x, y\right) = x^2 + y^2 - 1$. Nous avons:
+    \[\frac{\partial F}{\partial y} = 2y \neq 0 \iff y \neq 0\]
+
+    Ainsi, prenons $y > 0$, ce qui implique que $F\left(x, y\right) = 0 \iff y = \sqrt{1 - x^2}$. Calculons sa dérivée directement:
+    \[f\left(x\right) = \sqrt{1 - x^2} \implies f'\left(x\right) = \frac{-2x}{2\sqrt{1 - x^2}} = -\frac{x}{\sqrt{1 - x^2}}\]
+
+    Cependant, nous pouvons aussi utiliser notre théorème. En effet, par le TFI, il existe $y = f\left(x\right)$ où:
+    \[f'\left(x\right) = \frac{\frac{\partial F}{\partial x}\left(x, f\left(x\right)\right)}{\frac{\partial F}{\partial y}\left(x, f\left(x\right)\right)} = -\frac{2x}{2y} \eval_{y = \sqrt{1 - x^2}}^{} = -\frac{x}{\sqrt{1 - x^2}}\]
+    comme attendu.
+}
+
+\parag{Cas $n = 3$}{
+    Considérons le cas $n = 3$, reformulons notre théorème.
+
+    Soit $E \subset \mathbb{R}^3$ et $F\left(x, y, z\right) : E \mapsto \mathbb{R}$ de classe $C^1$ telle que $F\left(a, b, c\right) = 0$ et $\frac{\partial F}{\partial z}\left(a, b, c\right) \neq 0$.
+
+    Alors, il existe localement une fonction $z = f\left(x, y\right)$ telle que $f\left(a, b\right) = c$, $F\left(x, y, f\left(x, y\right)\right) = 0$ pour tout couple $\left(x, y\right)$ dans un voisinage de $\left(a, b\right)$ et:
+    \[\frac{\partial f}{\partial x}\left(x, y\right) = -\frac{\frac{\partial F}{\partial x}\left(x, y, f\left(x, y\right)\right)}{\frac{\partial F}{\partial z}\left(x, y, f\left(x, y\right)\right)}\]
+    \[\frac{\partial f}{\partial y}\left(x, y\right) = -\frac{\frac{\partial F}{\partial y}\left(x, y, f\left(x, y\right)\right)}{\frac{\partial F}{\partial z}\left(x, y, f\left(x, y\right)\right)}\]
+}
+
+\parag{Exemple}{
+    Soit la fonction suivante:
+    \[F\left(x, y, z\right) = x\cos\left(y\right) + y\cos\left(z\right) + z\cos\left(x\right) - 1\]
+
+    Pour commencer, on remarque que $F\left(0, 0, 1\right) = 0$:
+    \[F\left(0, 0, 1\right) = 0 + 0 + 1 \cos\left(0\right) - 1 = 0\]
+
+    Nous voulons maintenant savoir si $F\left(x, y, z\right) = 0$ définit autour de $\left(0, 0, 1\right)$ une fonction $z = f\left(x, y\right)$ telle que $F\left(x, y, f\left(x, y\right)\right) = 0$, et, si oui, quelles sont ses dérivées partielles.
+
+    On remarque que:
+    \[\frac{\partial F}{\partial z}\left(0, 0, 1\right) = -y \sin\left(z\right) + \cos\left(x\right) \eval_{\left(0, 0, 1\right)}^{} = \cos\left(0\right) = 1 \neq 0\]
+
+    Ainsi, par le TFI, la fonction $z = f\left(x, y\right)$ est bien définie au voisinage de $\left(0, 0\right)$ et est de classe $C^1$. Calculons les dérivées partielles de $\left(x, y\right)$ au point $\left(0, 0\right)$:
+    \[\frac{\partial f}{\partial x}\left(0, 0\right) = - \frac{\frac{\partial F}{\partial x}\left(x, y, f\left(x, y\right)\right)}{\frac{\partial F}{\partial z}\left(x, y, f\left(x, y\right)\right)} = \frac{\cos\left(y\right) - z\sin\left(x\right)}{-y\sin\left(z\right) + \cos\left(x\right)}\eval_{\left(0, 0, 1\right)}^{} = -\frac{1}{1} = -1\]
+        \[\frac{\partial f}{\partial y}\left(0, 0\right) = - \frac{\frac{\partial F}{\partial y}\left(x, y, f\left(x, y\right)\right)}{\frac{\partial F}{\partial z}\left(x, y, f\left(x, y\right)\right)} = \frac{-x \sin\left(y\right) + \cos\left(z\right)}{-y\sin\left(z\right) + \cos\left(x\right)}\eval_{\left(0, 0, 1\right)}^{} = -\frac{\cos\left(1\right)}{1} = -\cos\left(1\right)\]
+
+    Ceci nous donne donc le gradient de $f$ en $\left(0, 0\right)$:
+    \[\nabla f\left(0, 0\right)= \left(\frac{\partial f}{\partial x}\left(0, 0\right), \frac{\partial f}{\partial y}\left(0, 0\right)\right) = \left(-1, -\cos\left(1\right)\right)\]
+
+    Ceci nous permet de calculer l'équation du plan tangent:
+    \[z = f\left(a, b\right) + \left<\nabla f\left(a, b\right), \left(x-a, y- b\right)\right>\]
+
+    \imagehere{FonctionImpliciteCas3.png}
+}
+
+\parag{Application: Équation de l'hyperplan tangent}{
+    Reconstruisons la formule pour trouver un hyperplan tangent. 
+
+    Soit $F\left(x_1, \ldots, x_n\right)$ une fonction de classe $C^1$ sur $E \subset \mathbb{R}^n$ telle qu'il existe un $i$, où $1 \leq i \leq n$, tel que, pour un $\bvec{a} \in E$, nous avons $F\left(\bvec{a}\right) = 0$ et:
+    \[\frac{\partial F}{\partial x_i}\left(\bvec{a}\right) \neq 0\]
+
+    Par le TFI, nous savons que l'équation $F\left(x_1, \ldots, x_n\right) = 0$ définit une hypersurface $x_i = f\left(a_1, \ldots, a_{i-1}, a_{i+1}, \ldots, a_n\right)$ ($f$ ne contient pas $a_i$ dans son paramètre) qui est de classe $C^1$.
+
+    Or, nous savons que $\exists i$ pour lequel $\frac{\partial F}{\partial x_i}\left(\bvec{a}\right) \neq 0$, est équivalent à $\nabla F\left(\bvec{a}\right) \neq 0$. Ceci implique que $DF\left(\bvec{a}, \bvec{v}\right) = \left<\nabla F\left(\bvec{a}\right), \bvec{v}\right> = 0$ si et seulement si $\bvec{v}$ est tangent à l'hypersurface de niveau. En d'autres mots, pour tout vecteur $\bvec{v}$ dans l'hyperplan tangent à $F\left(\bvec{x}\right) = 0$ au point $\bvec{x} = \bvec{a}$, nous devons avoir:
+    \[DF\left(\bvec{a}, \bvec{v}\right) = \left<\underbrace{\nabla F\left(\bvec{a}\right)}_{\neq \bvec{0}}, \underbrace{\bvec{v}}_{\bvec{x} - \bvec{a}}\right> = 0 \]
+
+    L'équation de l'hyperplan tangent à $F\left(\bvec{x}\right) = 0$ au point $\bvec{a}$ tel que $F\left(\bvec{a}\right) = 0$ est donc:
+    \[\left<\nabla F\left(\bvec{a}\right), \bvec{x} - \bvec{a}\right> = 0\]
+
+    \subparag{Observation}{
+        Nous pouvons voir que, parfois, nous avons besoin d'utiliser différentes variables pour représenter le plan tangent d'une fonction à chacun de ses points. Par exemple, pour une sphère, à chaque pôle il y a une variable que nous ne pouvons pas utiliser (puisque sa dérivée est nulle). Ainsi, nous ne pouvons pas écrire le plan tangent à chaque point d'une sphère sous la forme $z = h\left(x, y\right)$.
+    }
+    
+
+    \subparag{Remarque}{
+        Notez qu'un hyperplan est l'équivalent d'un plan en dimension $n$. Par exemple, en dimension 2 c'est une droite, en dimension 3 c'est un plan, etc.
+    }
+}
+
+\parag{Exemple 1}{
+    Nous avions trouvé que pour $F\left(x, y, z\right) = x\cos\left(y\right) + y\cos\left(z\right) + z\cos\left(x\right) - 1$, nous avons:
+    \[\nabla F\left(0, 0, 1\right) = \left(1, \cos\left(1\right), 1\right) \neq \bvec{0}\]
+
+    Ainsi, le plan tangent nous est donné par:
+    \[\left<\left(1, \cos\left(1\right), 1\right), \left(x - 0, y - 0,  z- 1\right)\right> = 0 \implies x + y \cos\left(1\right) + z - 1 = 0 \implies z = 1 - x - y\cos\left(1\right)\]
+
+    Il est possible de vérifier que nous pouvons obtenir la même équation en prenant $z = f\left(0, 0\right) + \left<\nabla f\left(0, 0\right), \left(x - 0, y - 0\right)\right>$.
+}
+
+\parag{Exemple 2}{
+    Considérons l'équation d'une sphère de rayon 1, donc $F\left(x, y, z\right) = x^2 + y^2 + z^2 - 1 = 0$. Nous cherchons une équation du plant tangent en $\left(a, b, c\right) \in \mathbb{R}^3$ tels que $a^2 + b^2 + c^2 - 1 = 0$.
+
+    Premièrement, remarquons que: 
+    \[\nabla F\left(a, b, c\right) = \left(2x, 2y, 2z\right) \eval_{\left(a, b, c\right)}^{} = \left(2a, 2b, 2c\right) \neq \bvec{0}\]
+    puisque $a = b = c = 0$ n'appartient pas à la sphère.
+    
+    L'équation du plan tangent au point $\left(a, b, c\right)$ est donc donné par:
+    \begin{multiequation}
+    & \left<\left(2a, 2b, 2c\right), \left(x-a, y-b, z-c\right)\right> = 0 \\
+    \iff & 2a\left(x-a\right) + 2b\left(y-b\right) + 2c\left(z-c\right) = 0 \\
+        \iff & ax + by + cz - \underbrace{\left(a^2 + b^2 + c^2\right)}_{= 1} = 0 \\
+        \iff & ax + by + cz = 1
+    \end{multiequation}
+}
+
+\parag{Exemple 3}{
+    Considérons l'équation suivante:
+    \[F\left(x, y\right) = x^{\frac{2}{3}} + y^{\frac{2}{3}} - 4 = 0\]
+
+    Nous voulons trouver l'équation de la ligne tangente au point $\left(a, b\right) = \left(2^{\frac{3}{2}}, 2^{\frac{3}{2}}\right)$. Commençons par vérifier qu'il appartient bien à la courbe:
+    \[\left(2^{\frac{3}{3}}\right)^{\frac{2}{3}} + \left(2^{\frac{3}{2}}\right)^{\frac{2}{3}} = 2 + 2 = 4 \implies F\left(a, b\right) = 0\]
+
+    Calculons maintenant le gradient à ce point:
+    \[\nabla F\left(a, b\right) = \left(\frac{2}{3} x^{-\frac{1}{3}}, \frac{2}{3} y^{-\frac{1}{3}}\right) \eval_{\left(2^{\frac{3}{2}}, 2^{\frac{3}{2}}\right)}^{} = \left(\frac{2}{3} \left(2^{\frac{3}{2}}\right)^{-\frac{1}{3}}, \frac{2}{3}\left(2^{\frac{3}{2}}\right)^{-\frac{1}{3}}\right) = \left(\frac{\sqrt{2}}{3}, \frac{\sqrt{2}}{3}\right) \neq \bvec{0}\]
+
+    Nous pouvons donc appliquer notre formule, pour trouver que l'équation de la tangente est:
+    \begin{multiequation}
+    & \left<\nabla F\left(a, b\right), \left(x - a, y - b\right)\right> = 0 \\
+    \implies & \left<\left(\frac{\sqrt{2}}{3}, \frac{\sqrt{2}}{3}\right), \left(x - 2^{\frac{3}{2}}, y - 2^{\frac{3}{2}}\right)\right> = \frac{\sqrt{2}}{3}\left(x - 2^{\frac{3}{2}}\right) + \frac{\sqrt{2}}{3}\left(y - 2^{\frac{3}{2}}\right) = 0 \\
+    \implies & x + y = 2 \cdot 2^{\frac{3}{2}} = 2^{\frac{5}{2}} \\
+    \implies & y = 2^{\frac{5}{2}} - x = \sqrt{32} - x 
+    \end{multiequation}
+
+    \imagehere{AstroideDroiteTangente.png}
+
+    Notez que l'équation $x^{\frac{2}{3}} + y^{\frac{2}{3}} = 8^{\frac{2}{3}}$, celle qui est dessinée ci-dessus, donne une figure appelée un astroïde.
+}
+
+\parag{Remarque}{
+    Considérons le cas $n = 3$, et faisons le lien avec l'équation du plan tangent au graphique de $z = f\left(x, y\right)$.
+
+    Si $F\left(x, y, z\right) = z - f\left(x, y\right)$, où $f$ est une fonction de classe $C^1$, alors nous avons $\frac{\partial f}{\partial z} = 1$, et donc $\nabla F\left(x, y, z\right) \neq 0$ pour tout $\left(x, y, z\right)$ où $z = f\left(x, y\right)$ est bien définie.
+
+    Ainsi, si $c = f\left(a, b\right)$, c'est à dire si $a, b, c$ appartient à la surface de niveau $F\left(x, y, z\right) = 0$, on trouve par le TFI que l'équation du plan tangent au point $\left(a, b, c\right)$ est:
+    \begin{multiequation}
+    & \left<\nabla F\left(a, b, c\right), \left(x - a, y - b, z- c\right)\right> = 0 \\
+    \iff & \underbrace{\frac{\partial F}{\partial x}\left(a, b, c\right)}_{-\frac{\partial f}{\partial x}\left(a, b\right)}\left(x - a\right) + \underbrace{\frac{\partial F}{\partial y}}_{- \frac{\partial f}{\partial y}\left(a, b\right)}\left(a, b, c\right) + \underbrace{\frac{\partial F}{\partial z}}_{1}\left(a, b, c\right)\left(z - \underbrace{c}_{f\left(a, b\right)}\right) = 0
+    \end{multiequation}
+    
+    Nous retrouvons donc l'équation:
+    \begin{multiequation}
+    & -\frac{\partial f}{\partial x}\left(a, b\right)\left(x - a\right) - \frac{\partial f}{\partial y}\left(a, b\right)\left(y - b\right) + \left(z - f\left(a, b\right)\right) = 0  \\
+    \iff & z = f\left(a, b\right) + \left<\nabla f\left(a, b\right), \left(x - a, y- b\right)\right> 
+    \end{multiequation}
+}
+
+\parag{Examen}{
+    Notez qu'à l'examen qu'il y a toujours une question sur les plans tangents, ou sur le calcul d'une dérivée d'une fonction dont on n'a pas la forme explicite.
+}
+
+
+
+\end{document}
