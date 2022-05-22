@@ -9,10 +9,12 @@ import os
 import re
 import fitz  # pip install PyMuPDF
 
-COURSE = "AlgebreLinaire"
+COMPILED_DIR = "_CompiledNotes"
+# COURSE = "Analyse-2"
+COURSE = "AICC-2"
 PDF = ".pdf"
 
-LECTURE_PATH = r"{}\Lecture{}\lecture{}.tex"
+LECTURE_PATH = r"{}\Lecture{:02d}\lecture{}.tex"
 LECTURE_TOC_REGEX = r"(?:Lecture|Cours) (\d+) .* \d{4}\D*(\d+)\n"
 
 BEGIN_EXTRACTION = ["Liste des cours", "List of lectures"]
@@ -29,7 +31,7 @@ def uin(text):
 def extract_lectures_begin_page(course):
     began_extraction = False
     result = []
-    with fitz.open(course + PDF) as pdf_file:
+    with fitz.open(COMPILED_DIR + "/" + course + PDF) as pdf_file:
         for page in pdf_file:
             content = page.get_text()
 
@@ -50,7 +52,7 @@ def extract_lectures_begin_page(course):
                     lecture_number = int(lecture[0])
                     lecture_page = int(lecture[1])
                     if lecture_number != last_lecture + 1:
-                        print("Missing lecture " + last_lecture + 1)
+                        print("Missing lecture " + str(last_lecture + 1))
                         return None
                     last_lecture = lecture_number
                     result.append(lecture_page)
