@@ -1,0 +1,86 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-05 at 16:28:04.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Jeudi 05 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{18}{2022-05-05}{Numbers and generics}{
+\begin{itemize}[left=0pt]
+    \item Explanation of how to use numbers and operators.
+    \item Explanation of how to use generics.
+\end{itemize}
+
+}
+
+\parag{Numbers}{
+    Numbers often need to be used in hardware description, so some VHDL libraries where made binary and two's complement for us. To use it, we need to call \texttt{USE ieee.numeric\_std.all;} before the entity. This defines two types: \texttt{unsigned(<n\_bits - 1> DOWNTO 0)} (set of $n$ bits with binary interpretation) and \texttt{signed(<n\_bits - 1> DOWNTO 0)} (set of $n$ bits with a two's complement interpretation).
+
+    To convert our sets of bits between regular integers, signed interpretation, unsigned interpretation and logic vectors, we can do type casting:
+    \imagehere{NumbersConversionDiagram.png}
+
+    For instance, if we want a set of 9 bits to represent 356 with binary interpretation, we can do \texttt{to\_unsigned(356, 9);}.
+}
+
+\parag{Operators}{
+    There are some operations that are predefined for numbers. 
+
+    We can add and substract numbers (using \texttt{+} or \texttt{-}, leading to a number represented by the same number of bits) or we can compare a number with another (using \texttt{>}, \texttt{>=}, \texttt{<} or \texttt{<=}). For instance, we could have:
+    \begin{center}
+        \texttt{res <= current WHEN a + previous <= to\_unsigned(11, 9) ELSE '0';}
+    \end{center}
+    
+    Note that there also are some other operations which we should not use. For instance, for multiplications and divisions, some synthesizers do not know which hardware to generate. Similarly, logic and arithmetics shifts, and rotates must not be used since their implementations may result in unexpected behaviour (we need to use manual concatenation instead).
+}
+
+\begin{filecontents*}[overwrite]{GenericSyntax.code}
+ENTITY <name> IS
+    GENERIC(<list>);
+    PORT(<list>);
+END <name>;
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{GenericCounterEntity.code}
+ENTITY GenericCounter IS
+    GENERIC(MaxState : INTEGER;
+            NrOfBits : INTEGER;
+            ResetState : INTEGER;
+            OutState : INTEGER);
+    PORT(clock, reset, e : IN std_logic;
+         X : OUT std_logic);
+END GenericCounter
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{GenericInstantiation.code}
+Example : GenericCounter
+    GENERIC MAP(MaxState => 432,
+                NrOfBits => 9,
+                ResetState => 356,
+                OutState => 10 )
+    PORT MAP ( ... );
+\end{filecontents*}
+
+
+\parag{Generics}{
+    We can map ports when instantiating a component, but it could be nice to also map constants. 
+
+    To do that, we can insert a generic block in the entity definition:
+    \importcode{GenericSyntax.code}{VHDL}
+    
+    For instance:
+    \importcode{GenericCounterEntity.code}{VHDL}
+    
+    Then, we can instantiate this:
+    \importcode{GenericInstantiation.code}{VHDL}
+    
+    Note that there is no semicolon after the final bracket of the \texttt{GENERIC MAP} part.
+}
+
+
+\end{document}

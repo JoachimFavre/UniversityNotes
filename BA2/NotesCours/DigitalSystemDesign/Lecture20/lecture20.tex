@@ -1,0 +1,87 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-12 at 14:14:44.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Jeudi 12 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{20}{2022-05-12}{CPU}{
+\begin{itemize}[left=0pt]
+    \item Explanation how the RISC-architecture for a CPU works.
+\end{itemize}
+}
+
+\section{CPU (Not at the exam)}
+
+\begin{filecontents*}[overwrite]{assemblyExample.code}
+00000000 <main>:
+     0:    18 80 40 00    l.movhi r4,0x4000
+     4:    18 c0 00 01    l.movhi r6,0x1
+     8:    a8 84 34 00    l.ori r4,r4,0x3400
+     c:    a8 c6 86 a0    l.ori r6,r6,0x86a0
+    10:    8c a4 00 00    l.lbz r5,0x0(r4)
+    14:    ac a5 00 40    l.xori r5,r5,0x40
+    18:    a8 66 00 00    l.ori r3,r6,0x0
+    1c:    d8 04 28 00    l.sb 0x0(r4),r5
+    20:    15 00 00 00    l.nop 0x0
+    24:    9c 63 ff ff    l.addi r3,r3,0xffffffff
+    28:    bc 23 00 00    l.sfnei r3,0x0
+    2c:    13 ff ff fd    l.bf 20 <__bss_start+0xffffdfe4>
+    30:    15 00 00 00    l.nop 0x0
+    34:    03 ff ff f7    l.j 10 <__bss_start+0xffffdfd4>
+    38:    15 00 00 00    l.nop 0x0
+\end{filecontents*}
+
+\parag{Assembly}{
+    When we compile a C program, it generates machine language. For instance, for an OpenRisc CPU, it could give:
+    \importcode{assemblyExample.code}{}
+
+    The number on the left represents the memory address: each instruction is in a sequential memory location. For an instruction we need 4 bytes (since this CPU is 32 bits), thus each number increases by 4. Each 32-bit number in the second column represents an instruction. The third part is human-readable assembly code (this is the same, but expressed for humans). In the assembly code, the r1 to r6 are the registers, which are basically D-flipflop. Those are our variables. Naturally, the only thing the CPU understands is the hexadecimal part.
+}
+
+\parag{Executable}{
+    When the code is compiled, it is stored in an .elf or .exe file. The first part is an header, then the instruction in hexadecimal, some read-only data (all constants), and finally the read/write data (instructions or arrays we want to create in the RAM at the launch of the program). This gives the following diagram:
+    \imagehere[0.4]{ExeStructure.png}
+}
+
+\parag{RISC-architecture}{
+    The RISC-architecture is the easiest architecture of CPU. Its registers are D-flipflop.
+
+    The first thing, only done once when starting the program, the executable is put to memory.
+
+    Then, there is a Fetch block, which contains a program counter, and fetches the right instruction one after the other. After that, we need to decode this instruction: do we have to load something from memory, do we have to add, and so on. This is just a multiplexer. We often need two inputs (for multiplications, bitwise xor, and so on), so it may also select a register from which we need to get the value. This then goes to the execute stage, where the instruction is executed. After that, it goes to memory, since there may need more memory action for some commands. Finally, the result is written back to the register. Then, we begin again, fetching the next instruction.
+
+    We can sum it up as:
+    \imagehere{RISCArchitectureExampleDiagram.png}
+
+    This is not that complex, but there is a lot of combinational logic. This is just a big finite state machine, and the program determines which transitions we are going to take.
+}
+
+\parag{Add flipflops}{
+    This is very slow, because of all this combinational logic. We wanted to make them faster (going from Mhz to Ghz), thus we cut the critical path time by adding some flipflops. There is an initial delay before it starts executing, but there is still one instruction at each clock cycle.
+    \imagehere{CpuAddedFlipFlops.png}
+
+    This may cause a data-coherency problem. Indeed, the data may not be yet written (may still be in the memory state, or just have arrived in the write back state) when the execute will get the data from the memory. This problem of data-dependency can be solved by adding a data forwarding unit, that forwards it to the execute stage (and is nothing else than a multiplexer). For instance:
+    \imagehere{CpuDataForwardingUnit.png}
+
+    Now, we want to turn the lamp on. To do this, we have to load the value from the external lamp. The problem is that we ave both the fetch and the memory who want to use the system bus at the same time. However, we do not have a parallel bus, so we cannot do that. Since the memory does not have the lamp value yet, and it really needs it to continue, it will stall the CPU (tell everyone to stop) and ask for the value, read it, and then let the CPU continue. This is called a stall. This happens a lot when the memory is slower than the CPU.
+    \imagehere{CPUStall.png}
+
+    Then, we may want to have a loop. The thing is, when the execute block sees the looping instruction, we have to invalid instructions in the decode and the fetch blocks. Thus, we invalidate those instructions, by flushing the pipeline:
+    \imagehere{CpuFlush.png}
+
+    All branchings leads to flushing, meaning that they take multiple cycles. We can also do some things, such as branching detection units, and so on, but most processors do not have it.
+}
+
+\parag{Execution}{
+    Note that there is a full execution example on the slides, if it interests you. I don't think it is important to put it here since all the important concepts are already presented.
+}
+
+
+\end{document}

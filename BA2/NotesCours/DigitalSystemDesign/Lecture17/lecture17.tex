@@ -1,0 +1,172 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-02 at 13:15:23.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Lundi 02 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{17}{2022-05-02}{Port mapping and types}{
+\begin{itemize}[left=0pt]
+    \item Explanation of port mapping.
+    \item Explanation on how to use types.
+    \item Example of a serial adder.
+\end{itemize}
+}
+
+
+\begin{filecontents*}[overwrite]{ArchitectureComponent.code}
+COMPONENT <component_name> IS
+    PORTS(
+        <port_list>
+    );
+END COMPONENT;
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{ArchitectureComponentPortMap.code}
+<name> : <component_name>
+PORT MAP(
+    <component_port_1> => <signal_1>,
+    <component_port_2> => <signal_2>,
+    ...,
+    <component_port_n> => <signal_n>
+);
+\end{filecontents*}
+
+\parag{Port mapping}{
+    To use a previously defined component, we need to tell that we are going to use it in the declaration section of the architecture (by copy-pasting the component's entity section): 
+    \importcode{ArchitectureComponent.code}{VHDL}
+
+    Then, in the architecture, we do a port map, using the \texttt{=>} symbol, telling which input/output of the blackbox gets connected to which signal. Also, note that we use comas in the \texttt{PORT MAP}, just like when we call a function in a regular programming language.
+    \importcode{ArchitectureComponentPortMap.code}{VHDL}
+}
+
+\parag{Type}{
+    We can define types in VHDL in the declaration section of an architecture. This is some kind of enumeration in C. This follows the following syntax: 
+    \begin{center}
+        \texttt{TYPE <type\_name> IS (<name\_1>, ..., <name\_n>);}
+    \end{center}
+
+    Note that names need to be unique, as usual. Thus, we have to be careful not to have \texttt{reset} as an input and \texttt{reset} in our type.
+}
+
+\begin{filecontents*}[overwrite]{FullAdder.code}
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+
+ENTITY FullAdder IS
+    PORT(
+        A, B, Cin : IN std_logic;
+        Sum, Cout: OUT std_logic
+    );
+END FullAdder;
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{SerialAdd.code}
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+    PORTS (
+        A, B, start, clock : IN std_logic;
+        Sums, Overflow : OUT std_logic
+    );
+ENTITY SerialAdd IS
+END SerialAdd;
+
+ARCHITECTURE datapath OF SerialAdd IS
+    COMPONENT FullAdder IS
+        PORTS (
+            A, B, Cin : IN std_logic;
+            Sum, Cout : OUT std_logic;
+        );
+    END COMPONENT;
+
+    SIGNAL s_Cin, s_Cout, s_Cout_del : std_logic;
+BEGIN
+    s_Cin <= s_Cout_del AND NOT (start);
+    
+    dff : PROCESS(clock) IS
+    BEGIN
+        IF(falling_edge(clock)) THEN
+            s_Cout_del <= s_Cout;
+        END IF;
+    END PROCESS;  -- is already reset by the start signal
+
+    add : FullAdder
+    PORT MAP (
+        A => A,
+        B => B,
+        Cin => s_Cin,
+        Sum => Sums,
+        Cout => s_Cout
+    );
+END datapath;
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{controlmachine.code}
+ARCHITECTURE UseType OF ControlMachine IS
+    TYPE StateType IS (IDLE, BIT0, BIT1, BIT2, BIT3);
+    SIGNAL s_cur_state, s_next_state : StateType;
+BEGIN
+    overflow <= '1' WHEN s_cure_state = BIT3 ELSE '0';
+    valid <= '1' WHEN s_cur_state = BIT0
+                      OR s_cur_state = BIT1
+                      OR s_cur_state = BIT2
+                      OR s_cur_state = BIT3
+                 ELSE '0';
+    dff : PROCESS(clock)
+    BEGIN
+        IF (rising_edge(clock)) THEN
+            IF(reset = '1') THEN s_cur_state <= IDLE
+                            ELSE s_cur_state <= s_next_state;
+            END IF;
+        END IF;
+    END PROCESS dff;
+
+    transition : PROCESS(start, s_cur_state) IS
+    BEGIN
+        CASE(s_cur_state) IS
+            WHEN IDLE => IF(start = '1') THEN s_next_state
+                             s_next_state <= BIT0;
+                         ELSE
+                             s_next_state <= IDLE;
+                         END IF;
+            WHEN BIT0 => s_next_state <= BIT1;
+            WHEN BIT1 => s_next_state <= BIT2;
+            WHEN BIT2 => s_next_state <= BIT3;
+            WHEN OTHERS => s_next_state <= IDLE;
+        END CASE;
+    END PROCESS transition;
+END UseType;
+\end{filecontents*}
+
+
+\parag{Example}{
+    Let's say we want to make a 4-bit serial adder. The idea is that we want to add up numbers, where we have one bit of each number at a time (LSB first, MSB last):
+    \imagehere{SerialAdderDiagram.png}
+
+    Let's first say we have the following full adder:
+    \importcode{FullAdder.code}{VHDL}
+
+    We note that, looking at the timing diagram, the bits arrive at the rising edges of the clock. Also, when the LSB arrives, we want \texttt{CIn} to be 0, but then for the others, we want to be the carry out of the last bit (we need a memory action, thus we will need a flip-flop). This means that we can draw the following circuit and timing diagram:
+    \imagehere{SerialAdderExtendedDiagram.png}
+
+    Which implies the following code:
+    \importcode{SerialAdd.code}{VHDL}
+    
+    Now, we want to make the sequence. This leads to the following timing diagram: 
+    \imagehere{SerialAdderSequence.png}
+
+    Note that, this time, everything is happening on the positive edge of the clock.
+
+    \importcode{controlmachine.code}{VHDL}
+}
+
+
+
+
+\end{document}

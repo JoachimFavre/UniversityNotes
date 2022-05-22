@@ -1,0 +1,75 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-28 at 13:15:52.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Lundi 28 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2022-03-28}{Old programming logic}{
+\begin{itemize}[left=0pt]
+    \item Explanation of different circuits that allowed for programming logic: PAL, GAL, PLD and CPLD.
+\end{itemize}
+}
+
+\section{Programmable logic}
+\parag{Introduction}{
+    Today, all digital circuits circuits are realised as ASIC (Application Specific Integrated Circuit), which contains billions of transistors in less than a squared millimiter. However, it is very expensive since the design process takes more than a year, and there is an initial cost ranging from $100\,000$ USD to $5\,000\,000$ USD. In other words, it is only interesting for high-volume market. Thus, this is one of the reasons why programmable logic devices (which are also ASIC) were introduced.
+}
+
+\parag{PAL}{
+    The first of the family of programmable logic devices was introduced in 1978. The company MMI (nowadays AMD) introduced the PAL (programmable Array Logic). The basic concept of a PAL is based on the canonical form in which a logic function can be written. Indeed, any logic function can be written as a sum of products. When we want to translate such a function, we always have the same architecture. A final OR, which is connected to an array of ANDs, which are connected to the inputs:
+    \imagehere[0.5]{PALCanonicalForm.png}
+
+    The only thing that changes in this architecture is the wiring. Thus, in the PAL, every and is connected to all inputs and their negation, using antifuses. We can then blow out the fuses we do not want (since they are antifuses, when it is exploded, it always makes current).
+    \imagehere[0.5]{PALMacroCell.png}
+
+    The circuit realised on this picture is called a macro-cell. A PAL contains multiple of them. 
+
+    For example, a macro-cell representing $Q = ABC + \bar{A}BC + A \bar{B} \bar{C}$ would look like:
+    \imagehere{PALMacroCellRealisationExample.png}
+
+    We must be sure that the AND we do not use always give 0.
+
+    This PAL was very successful since it allowed for any logic function to be realised, the input-to-ouput delay is fixed (namely $t_{not} + t_{and} + t_{or}$), it was really low power, and when programmed the program stays even when the power is switched off (we call this property non-volatile). However, it had a big draw-back: it can only be programmed once. This is called OTP (One Time Programmable), and it is a problem since we cannot make a modification, and if we make a mistake we must throw it out.
+}
+
+\parag{GAL}{
+    In 1985, Lattice semiconductors introduced the GAL (Generic Array Logic). Lattice had the great idea to replace the antifuses by E$^2$-switches (Electrical Erasable-switches). They are realised by floating-gate-transistors, which are still the basis of nowadays used FLASH devices (such as the SSDs). They can even be reprogrammed while they are running (this is called ICP, In Circuit Programming), which made possible to reprogram a system on distance (using modems).
+
+    The architecture is the same as the PAL, but the antifuses are replaced by floating-gate-transistors.
+
+    However, the E$^2$-switch technology has some restrictions. First, it can only be reprogrammed about $10\,000$ times (this is why we must do some backups often, by the way!) and the programming stays for about 20 years.
+
+}
+
+\parag{PLD}{
+    There also was another problem with PAL and GAL systems: only combinatorial functions can be realised. This led to a second generation of GAL that incorporeted in each macro-cell a D-flipflop, named the PLD (Programmable Logic Device).
+    \imagehere{GLDMacroCell.png}
+}
+
+\parag{CPLD}{
+    As complexity of digital system increased, and technology shrank smaller, a new area of PLDs emerged: the CPLD (Complex Programmable Logic Device). The \textit{complex} is not related to the programming, but to the size of the device. It can be seen as tens to hundreds of GALs in one package.
+
+    The CPLD uses the same macro-cell, but connect them internally by a routing array. This rounting array consists of a matrix of connections. On the following diagram, the horizontal lines are the ouputs of the macro cells, and the vertical lines provide the inputs to the macro-cells. Then, we can add a E$^2$-switch on each crossing point.
+    \imagehere[0.7]{CPLDRoutingArrayDiagram.png}
+
+    To connect the CPLD to the outside, it introduced a programmable connection, which is called IOB (Input Output Block). If the tristate enable (a switch that can be activated or deactivated through current) is deactivated, then we can use an external connection as an input. However, if we program badly our circuit, there can be a bidirectional input (an inputs comes from the D-flipflop and from the external connection), which is very dangerous since it makes the temperature rise.
+    \imagehere{CPLDExternalConnection.png}
+
+    We no longer find PALs and PLDs on the market nowadays, but we still find CPLD. For example, Intel's EPM7032 CPLD:
+    \imagehere{IntelEPM7032CPLD.png}
+
+    We notice that the more maro-cells we add, the biggest routing arrays we need, in a not scalable way. This led to the FPGA.
+}
+
+
+
+
+
+\end{document}

@@ -1,0 +1,144 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-09 at 13:26:06.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Lundi 09 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{19}{2022-05-09}{Testbenching}{
+\begin{itemize}[left=0pt]
+    \item Explanation on how to use testbenching, which is non-synthesisable.
+    \item Explanation on how to use the \texttt{assert} clause.
+\end{itemize}
+}
+
+\subsection{Testbenching}
+\parag{Introduction}{
+    We may want the computer to automatically check our code, instead of us needing to look at the waves and making thousands of mistakes. This leads to testbenching. This is what is used for automatically grading the TPs.
+
+    Note that this is not synthesisable. 
+
+    \subparag{Remark}{
+        Note that everything is this subsection will not be at the final exam. However, this is very useful, so we should still be able to use it for next year.
+    }
+}
+
+\parag{Testbench}{
+    The idea is to have a circuit which checks our circuit. 
+
+    Its \texttt{ENTITY} contains no external connection (thus no \texttt{PORT} declaration, since it is not mandatory), and the \texttt{ARCHITECURE} has the design to be tested as \texttt{COMPONENT}, a list with signals that are to be connected to the input(s) and the outputs of the DUT (Device Under Test), the instantiation of the DUT, the stimuli generator (gives the different testing vectors, written as an explicit process) and the output checker (as implicit or explicit process). 
+
+    This makes the following harnas, which is non-synthesizable:
+    \imagehere{WorkbenchNonSynthesisableHarnas.png}
+}
+
+\parag{Stimuli generator}{
+    There are two ways of testing. One way is exhaustive testing: we check all possibilities. Another way is typical and corner case testing: we only take a subset of all the different possibilities. This leads to some danger, since we are not 100\% sure that everything is correct. 
+    
+    To generate the cases for typical and corner case testing, we can take some random entries out of the truth table (this is easy, but error prone). Another way, named the golden reference method, is to have a functional model (named the ``golden reference'', and generated in python for instance) that generates the cases. A third way is to use a software that generates set of cases from a functional description.
+
+    Each of these cases forms one test vector, which consists of the input values and the expected output values. Using those methods, we generate a sequence of test vectors.
+
+    Now, we can put a vector in our DUT, wait a bit (we do not want the checker to see hazards), and look at the reaction of our DUT.
+}
+
+\begin{filecontents*}[overwrite]{testbenching.code}
+ARCHITECTURE vector OF testbench IS
+    COMPONENT testobject IS
+    PORT ( A, B, C : IN std_logic:
+           X, Y : OUT std_logic);
+    END COMPONENT;
+
+    SIGNAL s_A, s_B, s_C : std_logic;
+    SIGNAL s_X, s_Y, s_X_exp, s_Y_exp : std_logic;
+
+    BEGIN
+        DUT : testobject
+        PORT MAP(A => s_A,
+                 B => s_B,
+                 C => s_C,
+                 X => s_X,
+                 Y => s_Y);
+
+        sim : PROCESS
+        BEGIN
+            s_A <= '0';
+            s_B <= '1';
+            s_C <= '1';
+            s_X_exp <= '1';
+            s_Y_exp <= '0';
+            WAIT for 1 ns;
+            s_A <= '1';
+            s_B <= '0';
+            s_C <= '1';
+            s_X_exp <= '0';
+            s_Y_exp <= '1';
+            WAIT;  -- stops the simulation
+         END PROCESS;
+END vector;
+
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{bettertestbench.code}
+sim : PROCESS
+    PROCEDURE check (  -- non synthesisable
+        CONSTANT i1 : std_logic;
+        CONSTANT i2 : std_logic;
+        CONSTANT i3 : std_logic;
+        CONSTANT i4 : std_logic;
+        CONSTANT i5 : std_logic
+    ) IS
+    BEGIN
+        s_A <= i1;
+        s_B <= i2;
+        s_C <= i3;
+        s_X_exp <= i4;
+        s_Y_exp <= i5;
+
+        WAIT for 1 ns;
+
+        ASSERT s_X = s_X_exp  -- non synthesisable
+        REPORT "Error in X"
+        SEVERITY error;
+
+        ASSERT s_Y = s_Y_exp
+        REPORT "Error in Y"
+        SEVERITY error;
+    END PROCEDURE check;
+
+    BEGIN
+        check('0', '1', '1', '1', '0');
+        check('1', '0', '1', '0', '1');
+        WAIT;
+    END PROCESS;
+\end{filecontents*}
+
+\parag{Example}{
+    We can make the testbench, for instance (note that a process without sensitivity list is executed only once, at the start of the simulation):
+    \importcode{testbenching.code}{vhdl}
+    
+    Doing this is a lot of things to write, so we would like to make it nicer and remove repeting code.
+}
+
+\parag{Output reaction checker}{
+    We now want to compare the value automatically. To do this, we can at the same time improve our stimuli generator (note that the \texttt{ASSERT} and the \texttt{PROCEDURE} clauses are non-synthesisable):
+    \importcode{bettertestbench.code}{vhdl}
+    
+}
+
+\parag{Assert clause}{
+    The assert clause works as:
+    \begin{center}
+        \texttt{ASSERT <condition> REPORT <message> SEVERITY <level>;}
+    \end{center}
+    
+    If the condition is true, then the assert does nothing, if it is false then it will print the message (which needs to be written in between quotation marks) and do something depending on the severity level.  For the serverities \texttt{note}, \texttt{warning} and \texttt{error}, the message is printed differently and the simulation continues, but for the \texttt{failure} it is printed the same way as an \texttt{error} and the simulator stops.
+}
+
+\end{document}

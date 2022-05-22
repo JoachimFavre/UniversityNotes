@@ -1,0 +1,118 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-04-11 at 13:16:14.
+
+\usepackage{../../style}
+
+\title{DSD}
+\author{Joachim Favre}
+\date{Lundi 11 avril 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2022-04-11}{Let's do some boilerplate code}{
+\begin{itemize}[left=0pt]
+    \item Introduction and short history of VHDL.
+    \item Explanation of the blackbox view (entity) in VHDL.
+\end{itemize}
+
+}
+
+\section{VHDL}
+\subsection{Introduction and implicit processes}
+
+\parag{Introduction}{
+    Currently, designing a digital system is very complicated. Drawing circuits works well, but it is complicated. This is what people did until 1985, but then, for more complex designs, we needed to invent something else.
+
+    We can do an analogy with software development. Developing in assembly is very complicated, but then we developed higher-level languages such as C++ and Java. A compiler turns those languages into assembly.
+
+    For hardware development, we want a higher descriptive language, which gets turned into Gate level by a synthesizer. The two most populace Hardware Description Languages (HDLs) are VHDL and Verilog. The first one is used in Europe, the second one in the rest of the world.
+
+    \subparag{Terminology}{
+        Note that we do not ``program'' in HDL, we describe hardware.
+    }
+}
+
+\parag{VHDL}{
+    In this course, we will focus on the hardware description language VHDL (Very high-speed integrated circuits Hardware Description Language).
+
+    This is a formal language for specifying digital systems, equally good at structural and behavioural level. This is used for system description, simulation, conceptual modelling and documentation. Its main characteristics are that it is hierarchical (we can split a problem in sub problems), it has event-driven simulation, it is modular, extensible, and a universal language strongly typed and is derived from Ada.
+}
+
+\parag{History}{
+    In 1983, the project began. It was financed by the U.S. Departement of Defense, and it was developed by companies such as Texas Instruments and IBM.
+
+    It was impossible to make a circuit without making a mistake, and it cotted a lot. Thus, the basic idea of VHDL was to simulate a circuit, and verify that is will work.
+
+    In 1985, version 7.2 was released to the public domain. In 1987, there was the release of a public language, VHDL87. It is still sometimes used. Later, in 1993, there was the version VHDL93, which had many significant improvements. This version is still the most used version, due to EDA tools (such as the P\&R software Quartus). The newer versions are not yet supported by all tools, so we will not see them.
+
+    USA uses Verilog, because US companies did not want to use anything that was financed by US defense. However, Europe wanted to use things that are standardised and, until two years ago, Verilog was not standardised whereas VHDL was.
+}
+
+\parag{Usage}{
+    VHDL is a very rich language and provides syntactical elements for discribing synthesizeable digital systems, functional description of complex components (processors, and so on), description of libraries of elementary gates with internal delays rise and fall times (edges which are not instantaneous), and so on.
+
+    Many of those features were invented for system simulation, but we will only use the description of synthesizable zero-delay digital systems.
+}
+
+\parag{Syntactical rule}{
+    VHDL is a case-insentive langue. Also, it has free formatting (we can indent the code how we want). Each command sequence is terminated by a semicolon. We can make a line comment using a double dash: \texttt{-{}-}.
+}
+
+\parag{Conventions}{
+    We can either write all the keywords in capital, and write the variable names in lower case, or reverse. We can use the convention we want, but the Professor recommends us to use the first one
+}
+
+\parag{Elements}{
+    VHDL consists of two main items: entity and architecture. The first one is the \important{black-box} view of the digital circuit. This describes the blackbox we had in Logisim:
+    \imagehere[0.5]{VHDLBlackBoxView.png}
+}
+
+\begin{filecontents*}[overwrite]{VHDLBlackBox.code}
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;  -- we use VHDL93
+
+ENTITY t_ff IS
+    PORT (
+        Toggle : IN std_logic;
+        Reset  : IN std_logic;
+        Clock  : IN std_logic;
+        Q      : OUT std_logic
+    );
+END t_ff;
+\end{filecontents*}
+
+
+\parag{Black box view}{
+    Each VHDL description contains the view of the circuit as black-box. This is indicated by the keyword \texttt{ENTITY}. Each entity has some syntactical elements, namely a library definition. We need to specify those two lines in every entities, even if they are describe in the same document. Then, there is the name (\texttt{t\_ff} here), which can only contains letters, digits, underscores, but cannot end with an underscore and cannot contains multiple times. Finally, there are some possible ports.
+
+    \importcode{VHDLBlackBox.code}{VHDL}
+    
+    A port has the structure \texttt{<port\_name>, <port\_name>, ... : <port\_type> <signal type>;}. We can define multiple port names on the same line if they have the same port type and signal type. There are three valid port types: \texttt{IN}, \texttt{OUT} and \texttt{INOUT}. We will probably not see the third one, and we must not use it. Finally, we specify the signal type (which will be described right after). The order of the ports does not matter, but note that the last line in the port section is not terminated by a semicolon. 
+
+    VHDL knows many types, such as Real, Integer, Time, and so on. The thing is, in a hardware defining language, these types have no real meaning in synthesizable digital systems. The only quantities we can use are a single bit, represented by \texttt{std\_logic}, or a set of $n$ bits, represented by the type \texttt{std\_logic\_vector(<n-1> DOWNTO 0)}. The \texttt{DOWNTO} allows us to have the good order: MSB on the left hand side, and LSB on the right hand side. As in Logisim, those quantities do not contain any interpretation. Any bit (from  \texttt{std\_logic} or \texttt{std\_logic\_vector}) can hold 9 values: '0' (logic 0), '1' (logic 1), 'U' (undefined state, for example a D-flipflop at the start of the simulation), 'X' (unknown, often cause by a short circuit), '-' (don't care, used for testing), 'Z' (high impedance, it is the output of a tri-state buffer), 'L' (weak 0), 'H' (weak 1), 'W' (weak unknown). Note that we will not see the four last states. Of course, in real life, there are only the two first states; but here they are useful for testing.
+}
+
+\begin{filecontents*}[overwrite]{exampleVHDL.code}
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+
+ENTITY moore IS
+    PORT (
+        my_inputs  : IN std_logic_vector(4 DOWNTO 0);
+        clock, reset : IN std_logic;
+        my_outputs : OUT std_logic_vector(1 DOWNTO 0)
+    );
+END moore;
+\end{filecontents*}
+
+\parag{Example}{
+    For instance, let us make the entity for the following circuit, where $k = 5$, $n = 7$ and $m = 2$:
+    \imagehere{VHDLBlackBoxViewCircuitExample.png}
+
+    \importcode{exampleVHDL.code}{VHDL}
+}
+
+
+\end{document}
