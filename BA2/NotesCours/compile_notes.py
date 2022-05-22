@@ -35,14 +35,14 @@ PRINTED_VERSION = False
 CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
-# COURSES_NAME = ["AICC-2", "Analyse-2", "Analyse-2-MethodesDeDemonstration", "DigitalSystemDesign"]
-COURSES_NAME = ["AICC-2"]
+COURSES_NAME = ["AICC-2", "Analyse-2", "Analyse-2-MethodesDeDemonstration", "DigitalSystemDesign"]
+# COURSES_NAME = ["AICC-2"]
 # COURSES_NAME = ["Analyse-2"]
 # COURSES_NAME = ["Analyse-2-MethodesDeDemonstration"]
 # COURSES_NAME = ["DigitalSystemDesign"]
 
 COPY_EXTENSIONS = ["tex", "pdf", "png", "jpg", "jpeg", 'code', 'svg']
-# FOREWORD_NAME = {'fr': 'foreword_fr.txt', 'en': 'foreword_en.txt'}
+FOREWORD_NAME = {'fr': 'foreword_fr.txt', 'en': 'foreword_en.txt'}
 FRONTMATTER_NAME = "frontmatter.tex"
 
 
@@ -405,14 +405,14 @@ def create_main_tex(tmp_dir, tex_files, config, summaries):
     page_style_no_title = ("\\fancyhf{}\n"
                            + "\\fancyfoot[LE,RO]{\\thepage}\n")
 
-    # if config["english"]:
-    #     foreword_key = 'en'
-    # else:
-    #     foreword_key = 'fr'
+    if config["english"]:
+        foreword_key = 'en'
+    else:
+        foreword_key = 'fr'
 
-    # with open(FOREWORD_NAME[foreword_key], encoding='utf8') as foreword_file:
-    #     foreword = foreword_file.read()
-    foreword = ""
+    with open(FOREWORD_NAME[foreword_key], encoding='utf8') as foreword_file:
+        foreword = foreword_file.read()
+    # foreword = ""
 
     main_tex_content = ("\\documentclass[a4paper]{book}\n"
                         + "\n"
