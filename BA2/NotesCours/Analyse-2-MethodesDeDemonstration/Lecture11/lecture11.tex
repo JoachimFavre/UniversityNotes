@@ -1,0 +1,118 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-03-28 at 10:22:21.
+
+\usepackage{../../style}
+
+\title{Méthodes de démonstration}
+\author{Joachim Favre}
+\date{Lundi 28 mars 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2022-03-28}{Récurrence}{
+\begin{itemize}[left=0pt]
+    \item Explication de la méthode de démonstration dite par récurrence.
+    \item Explication de la méthode de démonstration dite par récurrence généralisée.
+\end{itemize}
+
+}
+
+\parag{Méthode 7: Récurrence}{
+    Soit $P\left(n\right)$ une proposition qui dépend de $n \in \mathbb{N}$, où $n \geq n_0$. Supposons que:
+    \begin{enumerate}
+        \item $P\left(n_0\right)$ est vraie.
+        \item $P\left(n\right)$ implique que $P\left(n+1\right)$ pour tous $n \geq n_0$ naturels.
+    \end{enumerate}
+    
+    Alors $P\left(n\right)$ est vraie pour tous $n \geq n_0$.
+
+    \subparag{Remarque}{
+        Cette méthode de démonstration découle directement de l'axiome suivant (le principe fondamental de la récurrence):
+    
+        Soit $S \subset \mathbb{N}$. Si ce sous-ensemble est tel que $0 \in \mathbb{N}$ et pour tout $n \in S$ on a $\left(n + 1\right) \in S$, alors, $S = \mathbb{N}$.
+    }
+}
+
+\parag{Exemple}{
+    L'inégalité suivante tient pour tout $n \geq 1$ naturels: 
+    \[1 + \frac{1}{2^2} + \ldots + \frac{1}{n^2} \leq 2 - \frac{1}{n}\]
+    
+    \subparag{Preuve}{
+        Puisque nous voulons montrer ceci pour tout $n$, alors c'est intéressant de le faire par récurrence.
+
+        À l'examen, il est important de dire quelle est la proposition que nous essayons de démontrer, ainsi, nous voulons montrer $P\left(n\right)$, où:
+        \[P\left(n\right): 1 + \frac{1}{2^2} + \ldots + \frac{1}{n^2} \leq 2 - \frac{1}{n}\]
+        
+        \begin{enumerate}[left=0pt]
+            \item Commençons par l'initialisation. $P\left(1\right)$ est bien vraie car:
+            \[1 \leq 2 - \frac{1}{1} = 1\]
+        \item Faisons maintenant l'hérédité. Nous supposons que $P\left(n\right)$ est vraie (hypothèse de récurrence, HR), et nous voulons en déduire $P\left(n+1\right)$. Commençons par le côté gauche de $P\left(n+1\right)$: 
+            \begin{multiequality}
+                1 + \frac{1}{2^2} + \ldots + \frac{1}{n^2} + \frac{1}{\left(n + 1\right)^2} \over{\leq}{HR}\ & 2 - \frac{1}{n} + \frac{1}{\left(n+1\right)^2} \\
+                =\ & 2 - \frac{n^2 + n + 1}{n\left(n + 1\right)^2}  \\
+                =\ & 2 - \frac{n\left(n+1\right)}{n\left(n+1\right)^2} - \underbrace{\frac{1}{n\left(n+1\right)^2}}_{> 0}  \\
+                \leq\ & 2 - \frac{1}{n + 1} 
+            \end{multiequality}
+            
+            Nous avons donc aussi montré $P\left(n+1\right)$.
+        \item Pour finir, il ne faut pas oublier la conclusion, qui est aussi importante. Puisque $P\left(1\right)$ est vraie et $P\left(n\right) \implies P\left(n+1\right)$, nous avons montré que $P\left(n\right)$ est vraie pour tout $n \geq 1$, où $n \in \mathbb{N}$.
+
+            \qed
+        \end{enumerate}
+    }
+}
+
+\parag{Récurrence généralisée}{
+    Soit $P\left(n\right)$ une proposition qui dépend de $n \in \mathbb{N}$, où $n \geq n_0$. Supposons qu'il existe un $k \in \mathbb{N}$ tel que:
+    \begin{enumerate}
+        \item $P\left(n_0\right), \ldots, P\left(n_0 + k\right)$ sont vraies.
+        \item $\left\{P\left(n\right), \ldots, P\left(n + k\right)\right\}$ impliquent $P\left(n + k + 1\right)$ pour tout $n \geq n_0$.
+    \end{enumerate}
+    
+    Alors, $P\left(n\right)$ est vraie pour tout $n \geq n_0$, où $n \in \mathbb{N}$.
+}
+
+\parag{Définition: Suite de Fibonacci}{
+    La suite de Fibonacci $\left(f_n\right)$ est définie telle que: 
+    \[f_1 = 1, \mathspace f_2 = 1, \mathspace f_{n+2  = f_n + f_{n+1}}\]
+    
+    Les premiers termes de cette suite sont: 
+    \[1, \mathspace 1, \mathspace 2, \mathspace 3, \mathspace 5, \mathspace 8, \mathspace 13, \mathspace 21, \mathspace \ldots\]
+}
+
+\parag{Exemple}{
+    Pour tout $n \geq 3$, nous avons: 
+    \[3f_n = f_{n+2} + f_{n-2}\]
+    
+    \subparag{Preuve}{
+        Notre proposition $P\left(n\right)$ est définie comme: 
+        \[P\left(n\right) : 3f_n = f_{n+2} + f_{n-2}, \mathspace \forall n \geq 3\]
+        
+        \begin{enumerate}[left=0pt]
+            \item Faisons la base. $P\left(3\right)$ fonctionne car: 
+            \[3\cdot 2 = 5 + 1\]
+
+            De plus, $P\left(4\right)$ tient aussi: 
+            \[3\cdot 3 = 8+1\]
+            
+        \item Passons maintenant à l'hérédité. Puisque nous utilisions le principe de la récurrence généralisée, nous supposons que $P\left(n\right)$ et $P\left(n + 1\right)$ sont vraies (HR), pour un $n \geq 3$. Nous voulons démontrer que $P\left(n+2\right)$ est vraie: 
+            \begin{multiequality}
+            3f_{n+2} \over{=}{déf}\ & 3f_n + 3f_{n+1} \\
+            \over{=}{HR}\ & \left(f_{n + 2} + f_{n-2}\right) + \left(f_{n + 3} + f_{n-1}\right) \\
+            =\ & \underbrace{f_{n+2} + f_{n+3}}_{= n} + \underbrace{f_{n-2} + f_{n-1}}_{= f_n} \\
+            =\ & f_{n+4} + f_n 
+            \end{multiequality}
+         
+            Ce qui montre bien que $P\left(n+2\right)$ est vraie.
+        \item Pour conclure, nous avons montrer que $P\left(3\right)$ et $P\left(4\right)$ sont vraies, puis que $P\left(n\right) \land P\left(n + 1\right) \implies P\left(n+2\right)$. Ainsi, par récurrence généralisée, nous avons montré que $P\left(n\right)$ est vraie pour tout $n \geq 3$, où $n \in \mathbb{N}$.
+        \end{enumerate}
+
+        \qed
+    }
+}
+
+
+
+\end{document}

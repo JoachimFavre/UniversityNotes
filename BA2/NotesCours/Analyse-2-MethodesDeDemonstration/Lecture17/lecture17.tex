@@ -1,0 +1,92 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-04-25 at 10:16:38.
+
+\usepackage{../../style}
+
+\title{Méthodes de démonstration}
+\author{Joachim Favre}
+\date{Lundi 25 avril 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{17}{2022-04-25}{Récurrence sur deux variables}{
+\begin{itemize}[left=0pt]
+    \item Explication de la méthode de récurrence sur deux variable dite du carré.
+    \item Explication de la méthode de récurrence sur deux variable dite de la diagonale.
+\end{itemize}
+
+}
+
+\parag{Récurrence sur deux variables}{
+    Soit $P\left(n, m\right)$ une proposition, où $n, m \geq 0$.
+
+    Nous pouvons utiliser différentes méthodes pour la démontrer par récurrence sur deux variables.
+
+    \subparag{Méthode du carré}{
+        \begin{enumerate}[left=0pt]
+            \item $P\left(0, 0\right)$ est vraie.
+            \item $\forall n \geq 0, \ P\left(n, 0\right) \implies P\left(n + 1, 0\right)$
+            \item $\forall m, n, \ P\left(n, m\right) \implies P\left(n, m+1\right)$
+        \end{enumerate}
+
+        Notez que, à la place du deuxième point, il est parfois plus simple de démontrer que, pour tout $m, n \geq 0$, $P\left(n, m\right) \implies P\left(n+1, m\right)$.
+
+        \imagehere[0.5]{RecurrenceMethodeDuCarre.png}
+    }
+    
+    \subparag{Méthode de la diagonale}{
+        \begin{enumerate}[left=0pt]
+            \item $P\left(0, 0\right)$ est vraie
+            \item $\forall n \geq 0, \ P\left(n, 0\right) \implies P\left(n+1, 0\right)$
+            \item $\forall m, n,\ P\left(n+1, m\right) \implies P\left(n, m+1\right)$
+        \end{enumerate}
+
+        \imagehere[0.5]{RecurrenceMethodeDeLaDiagonale.png}
+    }
+
+    Les deux méthode nous permettent de conclure que $P\left(n, m\right)$ est vraie $\forall n, m \in \mathbb{N}$.
+}
+
+\parag{Exemple: Nombres de Fibonacci}{
+    Soit la proposition $P\left(n, m\right)$ suivante:
+    \[f_n f_{m+1} - f_m f_{n + 1} = \left(-1\right)^m f_{n - m}, \mathspace \]
+    
+    Nous allons montrer $P\left(n, m\right)$ pour touts $n, m$ où $0 \leq m \leq n$.
+
+    \subparag{Preuve}{
+        Nous allons suivre le schéma suivant, avec la base en verte, et l'hérédité en rouge et en bleue:
+        \imagehere[0.5]{RecurrenceDeuxVariablesExemple.png}
+
+        \begin{enumerate}[left=0pt]
+            \item Base: 
+                \[P\left(0, 0\right): \mathspace f_0 f_1 - f_0 f_1 = 0 = \left(-1\right)^0 f_0\] 
+                \[P\left(1, 0\right): \mathspace f_1 f_1 - f_0 f_{2} = 1 - 0 = 1 = \left(-1\right)^0 f_1\]
+                
+                Puisque $n \geq m$, $P\left(0, 1\right)$ n'existe pas. Cependant, nous aurons aussi besoin de montrer $P\left(1, 1\right)$: 
+                \[P\left(1, 1\right): \mathspace f_1 f_2 - f_1 f_2 = 0 = \left(-1\right)^1 f_0\]
+            \item Hérédité: Nous remarquons que $P\left(n, 0\right)$ est vraie pour tout $n \geq 0$ (sans récurrence); 
+            \[f_n f_1 - f_0 f_{n+1} = f_n - 0 = f_n = \left(-1\right)^0 f_n\]
+            
+            Nous pouvons aussi  démontrer que $P\left(n, 1\right)$ est vraie pour tout $n \geq 1$ (sans récurrence)
+            \[f_n f_2 - f_1 f_{n+1} = f_n - f_{n+1} = f_n - \left(f_n + f_{n-1}\right) = \left(-1\right)^1 f_{n-1}\]
+            
+            Maintenant, nous supposons que $P\left(n, m\right)$ et $P\left(n, m+1\right)$ sont vraies, et nous voulons démontrer que cela implique que $P\left(n, m+2\right)$ est aussi vraie $\forall n \geq m + 2$: 
+            \begin{multiequality}
+            & f_{n} f_{m+3} - f_{m+2} f_{n+1}  \\
+            =\ & f_{n} \left(f_{m+1} + f_{m + 2}\right) - \left(f_m + f_{m+1}\right)f_{n+1} \\
+            =\ & \underbrace{\left(f_n f_{m+1} - f_m f_{n+1}\right)}_{\left(-1\right)^m f_{n-m}} + \underbrace{\left(f_n f_{m+2} - f_{m+1} f_{n+1}\right)}_{\left(-1\right)^{m+1}f_{n-m-1}} \\
+            =\ & \left(-1\right)^m \left(f_{n-m} - f_{n - m -1}\right) \\
+            =\ & \left(-1\right)^m f_{n-m-2} \\
+            =\ & \left(-1\right)^{m+2} f_{n-m-2} 
+            \end{multiequality}
+             comme attendu.
+         \item Nous avons démontré que $P\left(n, 0\right)\ \forall n \geq 0$, $P\left(n, 1\right)\ \forall n \geq 1$, et $\left\{P\left(n, m\right), P\left(n, m+1\right)\right\} \implies P\left(n, m+ 2\right)$.
+
+             Ainsi, nous avons démontré par récurrence sur deux variables que la proposition $P\left(n, m\right)$ est vraie pour tout $n, m$ tels que $0 \leq m \leq n$.
+        \end{enumerate}
+    }
+}
+
+\end{document}

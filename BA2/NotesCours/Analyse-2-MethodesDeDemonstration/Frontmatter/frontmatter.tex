@@ -121,13 +121,13 @@
         \[\det\begin{pmatrix} v_1\left(x_0\right) & v_2\left(x_0\right) \\ v_1'\left(x_0\right) & v_2'\left(x_0\right) \end{pmatrix} = 0\]
 
         Ainsi, le kernel de cette matrice est est non-trivial (il n'est pas de dimension 0), donc il existe un vecteur non nul $\binom{a}{b} \in \mathbb{R}^2$ tel que:
-        \[\begin{bmatrix} v_1\left(x_0\right) & v_2\left(x_0\right) \\ v_1'\left(x_0\right) & v_2'\left(x_0\right) \end{bmatrix} \begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} 0 \\ 0 \end{pmatrix} \]
+        \[\begin{pmatrix} v_1\left(x_0\right) & v_2\left(x_0\right) \\ v_1'\left(x_0\right) & v_2'\left(x_0\right) \end{pmatrix} \begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} 0 \\ 0 \end{pmatrix} \]
 
         Ainsi:
-        \begin{systemofequations}{}
+        \[\begin{systemofequations}
         &\ a v_1\left(x_0\right) + b v_2\left(x_0\right) = 0 \\
         &\ a v_1'\left(x_0\right) + b v_2'\left(x_0\right) = 0
-        \end{systemofequations}
+        \end{systemofequations}\]
 
     Soit $v\left(x\right) = av_1\left(x\right) + bv_2\left(x\right)$. Alors, $v\left(x\right)$ est une solution de l'équation donnée par la superposition des solutions. De plus, par le système d'équations que nous venons de trouver, nous avons $v\left(x_0\right) = 0$ et $v'\left(x_0\right) = 0$. Par le théorème de l'existence et unicité d'une solution de l'équation $y''\left(x\right) + p\left(x\right)y'\left(x\right) + q\left(x\right)y\left(x\right) = 0$, cette équation admet une seule solution satisfaisant $y\left(x_0\right) = 0$ et $y'\left(x_0\right) = 0$. Puisque la solution triviale $y\left(x\right) = 0 \ \forall x \in I$ satisfait l'équation et les conditions initiale, alors nécessairement:
     \[v\left(x\right) = av_1\left(x\right) + bv_2\left(x\right) = 0, \mathspace \forall x \in I\]
@@ -156,10 +156,10 @@
         Nous avons deux solutions linéairement indépendantes $v_1, v_2 : I \mapsto \mathbb{R}$. Ainsi, par la caractérisation, nous savons que $W\left[v_1, v_2\right]\left(x\right) \neq 0$ pour tout $x \in I$, ce qui implique que $W\left[v_1, v_2\right]\left(x_0\right) \neq 0$.
 
         Or, quand le déterminant d'une matrice est non-nul (la matrice est dite \textit{dégénérée}), nous savons qu'une équation l'utilisant a une solution unique. Ainsi, nous savons qu'il existe d'uniques constantes $C_1, C_2 \in \mathbb{R}$ telles que:
-        \begin{systemofequations}{}
+        \[\begin{systemofequations}
         &\ C_1 v_1\left(x_0\right) + C_2 v_2\left(x_0\right) = a_0 \\
         &\ C_1 v_1'\left(x_0\right) + C_2 v_2'\left(x_0\right) = b_0
-        \end{systemofequations}
+        \end{systemofequations}\]
 
         Considérons la fonction $v\left(x\right) = C_1 v_1\left(x\right) + C_2 v_2\left(x\right)$. Nous pouvons en déduire deux informations. La première est que $v\left(x\right)$ est une solution de l'équation (puisque $v_1\left(x\right)$ et $v_2\left(x\right)$ sont des solutions). La deuxième est que $v\left(x_0\right) = a_0$ et $v'\left(x_0\right) = b_0$.
 
@@ -244,43 +244,167 @@
 }
 
 \parag{Théorème du min et du max sur un compact}{
-    Une fonction continue sur un sous-ensemble compact $E \subset \mathbb{R}^2$ atteint son maximum et son minimum, i.e.: 
+    Une fonction continue sur un sous-ensemble compact $E \subset \mathbb{R}^2$ atteint son maximum et son minimum, i.e.:
     \[\exists \max_{\bvec{x} \in E} f\left(\bvec{x}\right), \mathspace \exists \min_{\bvec{x} \in E} f\left(\bvec{x}\right)\]
 
     \subparag{Preuve $f\left(E\right)$ est borné}{
-        Nous voulons commencer par montrer que $\left\{f\left(\bvec{x}\right)\right\}_{\bvec{x} \in E}$ est borné. 
+        Nous voulons commencer par montrer que $\left\{f\left(\bvec{x}\right)\right\}_{\bvec{x} \in E}$ est borné.
 
-        Supposons par l'absurde que $f\left(E\right)$ n'est pas borné, c'est à dire que pour tout $k \geq 0$, il existe un $\bvec{x_k} \in E$ tel que $\left|f\left(\bvec{x_k}\right)\right| \geq k$. Ceci nous donne une suite $\left\{\bvec{x_k}\right\} \in E$. 
+        Supposons par l'absurde que $f\left(E\right)$ n'est pas borné, c'est à dire que pour tout $k \geq 0$, il existe un $\bvec{x_k} \in E$ tel que $\left|f\left(\bvec{x_k}\right)\right| \geq k$. Ceci nous donne une suite $\left\{\bvec{x_k}\right\} \in E$.
 
         Puisque $E$ est un ensemble compact, nous savons qu'il est borné, et donc $\left\{\bvec{x_k}\right\}$ est bornée. Ainsi, par le théorème de Bolzano-Weierstrass, nous pouvons trouver une sous suite convergente $\left\{\bvec{x_{k_{p}}}\right\}$, qui a pour limite un vecteur $\bvec{x_0} \in \mathbb{R}^n$. Puisque $E$ est compact (et donc fermé), nous savons que $\bvec{x_0} \in E$.
 
-        Puisque $f$ est continue, nous savons que: 
+        Puisque $f$ est continue, nous savons que:
         \[\lim_{p \to \infty} f\left(\bvec{x_{k_{p}}}\right) = f\left(\bvec{x_0}\right) \in\mathbb{R}\]
-        
+
         Mais, par construction, $\left|f\left(\bvec{x_k}\right)\right| \geq k$ pour tout $k \in \mathbb{N}$, ce qui est notre contradiction. Nous en concluons que $f$ est bornée.
     }
 
     \subparag{Preuve $f$ atteint ses extremum}{
-        Nous voulons montrer que $f$ atteint son minimum et son maximum sur $E$. 
+        Nous voulons montrer que $f$ atteint son minimum et son maximum sur $E$.
 
-        Par ce que nous venons de démontrer, nous savons que $f\left(E\right)$ est un sous-ensemble borné. Ainsi: 
+        Par ce que nous venons de démontrer, nous savons que $f\left(E\right)$ est un sous-ensemble borné. Ainsi:
         \[\exists M = \sup\left\{f\left(\bvec{x}\right), \bvec{x} \in E\right\}, \mathspace \exists m = \inf\left\{f\left(\bvec{x}\right), \bvec{x} \in E\right\}\]
-        
-        Par la définition du supremum et de l'infimum, nous pouvons nous en rapprocher arbitrairement, donc cela implique qu'il existe deux suites $\left\{\bvec{a_k}\right\}, \left\{\bvec{b_k}\right\} \in E$ telles que: 
+
+        Par la définition du supremum et de l'infimum, nous pouvons nous en rapprocher arbitrairement, donc cela implique qu'il existe deux suites $\left\{\bvec{a_k}\right\}, \left\{\bvec{b_k}\right\} \in E$ telles que:
         \[\lim_{k \to \infty} f\left(\bvec{a_k}\right) = m, \mathspace \lim_{k \to \infty} f\left(\bvec{b_k}\right) = M\]
 
-        Or, puisque $\left\{\bvec{a_k}\right\}, \left\{\bvec{b_k}\right\} \in E$ (qui est borné), ce sont des suites bornées, et donc il existe des sous-suites convergentes. En d'autres mots: 
+        Or, puisque $\left\{\bvec{a_k}\right\}, \left\{\bvec{b_k}\right\} \in E$ (qui est borné), ce sont des suites bornées, et donc il existe des sous-suites convergentes. En d'autres mots:
         \[\bvec{a_{k_p}} \to \bvec{a} \in \mathbb{R}^n, \mathspace \bvec{b_{k_p}} \to \bvec{b} \in \mathbb{R}^n\]
-        
-        De plus, puisque $E$ est compact (et donc fermé), nous savons que $\bvec{a} \in E$ et $\bvec{b} \in E$. Ainsi, par la continuité de $f$: 
+
+        De plus, puisque $E$ est compact (et donc fermé), nous savons que $\bvec{a} \in E$ et $\bvec{b} \in E$. Ainsi, par la continuité de $f$:
         \[m = \lim_{k \to \infty} f\left(\bvec{a_k}\right) = \lim_{p \to \infty} f\left(\bvec{a_{k_p}}\right) = f\left(\bvec{a}\right)\]
         \[M = \lim_{k \to \infty} f\left(\bvec{b_k}\right) = \lim_{p \to \infty} f\left(\bvec{b_{k_p}}\right) = f\left(\bvec{b}\right)\]
 
-        Ainsi, nous savons qu'il existe $\bvec{a}, \bvec{b} \in E$ tels que: 
+        Ainsi, nous savons qu'il existe $\bvec{a}, \bvec{b} \in E$ tels que:
         \[f\left(\bvec{a}\right) = m = \min_{\bvec{x} \in E} f\left(\bvec{x}\right)\]
         \[f\left(\bvec{b}\right) = M = \max_{\bvec{x} \in E} f\left(\bvec{x}\right)\]
 
         \qed
+    }
+}
+
+\parag{Proposition: Hypothèses équivalentes pour le théorème de la condition suffisante pour un extremum local quand $n = 2$}{
+    Dans le cas où $n = 2$, nous pouvons réécrire les conditions de notre théorème.
+
+    Notre matrice Hessienne est donnée par:
+    \[\Hess_f\left(\bvec{a}\right) = \begin{pmatrix} \frac{\partial^{2} f}{\partial x^{2}} & \frac{\partial^2 f}{\partial y \partial x} \\ \frac{\partial^2 f}{\partial x \partial y} & \frac{\partial^{2} f}{\partial y^{2}}  \end{pmatrix} = \begin{pmatrix} r & s \\ s & t \end{pmatrix} \]
+
+    Nous avons les équivalences suivantes:
+    \begin{enumerate}
+        \item $\lambda_1 > 0, \lambda_2 > 0 \iff \det \Hess_f\left(\bvec{a}\right) > 0 \text{ et } r > 0$
+        \item $\lambda_1 < 0, \lambda_2 < 0 \iff \det \Hess_f\left(\bvec{a}\right) > 0 \text{ et } r < 0$
+        \item $\lambda_1 > 0, \lambda_2 < 0 \text{ ou } \lambda_1 < 0, \lambda_2 > 0 \iff \det \Hess_f\left(\bvec{a}\right) < 0$
+    \end{enumerate}
+
+    \subparag{Preuve}{
+        Pour commencer, nous savons que le déterminant et la trace d'une matrice sont des invariants de conjugaisons. Ainsi, si on a:
+        \[O \begin{pmatrix} r & s \\ s & t \end{pmatrix} O^{-1} = \begin{pmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{pmatrix} \iff \begin{pmatrix} r & s \\ s & t \end{pmatrix} = O^{-1} \begin{pmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{pmatrix} O\]
+
+        Alors, on obtient:
+        \[rt - s^2 = \det\Hess_f\left(\bvec{a}\right) = \det\left(O\right)\lambda_1 \lambda_2 \det\left(O^{-1}\right) = \lambda_1 \lambda_2\]
+        \[r + t = \Tr\Hess_f\left(\bvec{a}\right) = \Tr\left(O D O^{-1}\right) = \Tr\left(O^{-1} O D\right) = \Tr\left(D\right) = \lambda_1 + \lambda_2\]
+    }
+
+    \subparag{Preuve point 1 $\implies$}{
+         Commençons par montrer la direction $\implies$. Ainsi, nous supposons que $\lambda_1 > 0, \lambda_2 > 0$.
+
+         Alors, clairement, $\det\Hess_f\left(\bvec{a}\right) = \lambda_1 \lambda_2 > 0$. Aussi, nous voyons que:
+         \[\lambda_1 \lambda_2 = rt - s^2 > 0 \implies rt > s^2 \geq 0 \implies rt > 0\]
+         donc $r$ et $t$ sont de même signe.
+
+         Nous pouvons aussi voir que:
+         \[\Tr\Hess_f\left(\bvec{a}\right) = \underbrace{\lambda_1}_{> 0} + \underbrace{\lambda_2}_{> 0} = r + t > 0\]
+         donc $r$ et $t$ doivent être les deux strictement positifs, puisqu'ils ont le même signe.
+
+         Nous en déduisons bien que $\det\Hess_f\left(\bvec{a}\right) > 0$ et $r > 0$.
+    }
+
+    \subparag{Preuve point 1 $\impliedby$}{
+        Supposons que $\det\Hess_f\left(\bvec{a}\right) > 0$ et $r > 0$.
+
+        Alors, puisque $\det\Hess_f\left(\bvec{a}\right) = \lambda_1 \lambda_2 > 0$, nous en déduisons que $\lambda_1$ et $\lambda_2$ sont de même signe. De plus, nous voyons aussi que $rt > s^2 \geq 0 \implies rt > 0$.
+
+        Ainsi, puisque $rt > 0$ et $r > 0$, nous obtenons que $t > 0$. De plus, cela implique que:
+        \[\Tr\Hess_f\left(\bvec{a}\right) = \lambda_1 + \lambda_2 = \underbrace{r}_{> 0} + \underbrace{t}_{> 0} > 0\]
+
+        Puisque $\lambda_1$ et $\lambda_2$ sont de mêmes signes, et $\lambda_1 + \lambda_2 > 0$, nous en déduisons bien que $\lambda_1 > 0$ et $\lambda_2 > 0$.
+    }
+
+    \subparag{Preuve point 2 $\implies$}{
+         Commençons par montrer la direction $\implies$. Ainsi, nous supposons que $\lambda_1 < 0, \lambda_2 < 0$.
+
+         Alors, clairement, $\det\Hess_f\left(\bvec{a}\right) = \lambda_1 \lambda_2 > 0$. Aussi, nous voyons que:
+         \[\lambda_1 \lambda_2 = rt - s^2 > 0 \implies rt > s^2 \geq 0 \implies rt > 0\]
+         donc $r$ et $t$ sont de même signe.
+
+         Nous pouvons aussi voir que:
+         \[\Tr\Hess_f\left(\bvec{a}\right) = \underbrace{\lambda_1}_{< 0} + \underbrace{\lambda_2}_{< 0} = r + t < 0\]
+         donc $r$ et $t$ doivent être les deux strictement négatifs, puisqu'ils ont le même signe.
+
+         Nous en déduisons bien que $\det\Hess_f\left(\bvec{a}\right) > 0$ et $r < 0$.
+    }
+
+    \subparag{Preuve point 2 $\impliedby$}{
+        Supposons que $\det\Hess_f\left(\bvec{a}\right) > 0$ et $r < 0$.
+
+        Alors, puisque $\det\Hess_f\left(\bvec{a}\right) = \lambda_1 \lambda_2 > 0$, nous en déduisons que $\lambda_1$ et $\lambda_2$ sont de même signe. De plus, nous voyons aussi que $rt > s^2 \geq 0 \implies rt > 0$.
+
+        Ainsi, puisque $rt > 0$ et $r < 0$, nous obtenons que $t < 0$. De plus, cela implique que:
+        \[\Tr\Hess_f\left(\bvec{a}\right) = \lambda_1 + \lambda_2 = \underbrace{r}_{< 0} + \underbrace{t}_{< 0} < 0\]
+
+        Puisque $\lambda_1$ et $\lambda_2$ sont de mêmes signes, et $\lambda_1 + \lambda_2 < 0$, nous en déduisons bien que $\lambda_1 < 0$ et $\lambda_2 < 0$.
+    }
+
+    \subparag{Preuve point 3}{
+        Nous voyons que:
+        \[\det\Hess_f\left(\bvec{a}\right) < 0 \iff \lambda_1 \lambda_2 < 0 \iff \lambda_1 \text{ et } \lambda_2 \text{ sont de signes opposés}\]
+
+    }
+
+    \subparag{Note personnelle}{
+        La démonstration de ce théorème peut sembler très longue et compliquée, mais elle ne l'est pas! À partir du moment où on sait que le déterminant est donné par $ad - bc$ et que la trace est donnée par la somme des éléments diagonaux, il suffit de poser nos hypothèses et de simplement voir ce que nous pouvons en déduire, en gardant en tête où nous voulons aller.
+    }
+}
+
+\parag{Théorème: Condition nécessaire pour un extremum sous contrainte quand $n=2$}{
+    Soit l'ensemble $E \subset \mathbb{R}^2$ et soient les fonctions $f, g : E \mapsto \mathbb{R}$ de classe $C^1$. Supposons que $f\left(x, y\right)$ admette un extremum en $\left(a, b\right) \in E$ sous la contrainte $g\left(x, y\right) = 0$, et que $\nabla g\left(a, b\right) \neq \bvec{0}$.
+
+    Alors, il existe $\lambda \in \mathbb{R}$, appelé le \important{multiplicateur de Lagrange}, tel que:
+    \[\nabla f\left(a, b\right) = \lambda \nabla g\left(a, b\right)\]
+
+    \subparag{Preuve}{
+        Nous savons que $\nabla g\left(a, b\right) \neq \bvec{0}$,  donc au moins l'une des dérivées partielles est non-nulle. Supposons que $\frac{\partial g}{\partial y}\left(a, b\right) \neq 0$ (le cas $\frac{\partial g}{\partial x}\left(a, b\right) \neq 0$ est similaire).
+
+        Nous avons $g\left(a, b\right) = 0$ puisque $\left(a, b\right)$ satisfait la contrainte $g\left(x, y\right) = 0$. Ainsi, par le TFI, il existe une fonction $y = h\left(x\right)$ de classe $C^1$ au voisinage de $x = a$ telle que:
+        \[h'\left(x\right) = - \frac{\frac{\partial g}{\partial x}\left(x, h\left(x\right)\right)}{\frac{\partial g}{\partial y}\left(x, h\left(x\right)\right)}, \mathspace \text{avec } g\left(x, h\left(x\right)\right) = 0\]
+
+        Aussi, pour $\left(x, y\right)$ satisfaisant notre contrainte $g\left(x, y\right) = 0$, nous pouvons remplacer $y = h\left(x\right)$ dans l'expression $f\left(x, y\right)$ pour obtenir une fonction d'une seule variable:
+        \[f\left(x, y\right) \over{=}{si $g(x, y) = 0$}  f\left(x, h\left(x\right)\right)\]
+
+        Nous savons que les extrema de cette fonction, respectent:
+        \[f'\left(x, h\left(x\right)\right) = \frac{\partial f}{\partial x}\left(x, h\left(x\right)\right) + \frac{\partial f}{\partial y}\left(x, h\left(x\right)\right)h'\left(x\right) = 0\]
+
+        Par hypothèse, $\left(a, b\right)$ est un point d'extremum, et il respecte la contrainte $g\left(a, b\right) = 0$, donc les hypothèses de l'équation que nous venons d'obtenir sont bien respectées, ce qui nous permet de trouver que:
+        \[\frac{\partial f}{\partial x}\left(a, b\right) = -\frac{\partial f}{\partial y}\left(a, b\right) h'\left(a\right)\]
+
+        Pour résumer, nous avons trouvé jusque là que:
+        \[\frac{\partial f}{\partial x}\left(a, b\right) = -\frac{\partial f}{\partial y}\left(a, b\right) h'\left(a\right), \mathspace h'\left(a\right) \over{=}{TFI} -\frac{\frac{\partial g}{\partial x}\left(a, b\right)}{\frac{\partial g}{\partial y}\left(a, b\right)}\]
+
+        Ceci implique que:
+        \[\underbrace{\frac{\partial f}{\partial x}\left(a, b\right)}_{v_1} = \underbrace{\frac{\partial f}{\partial y}\left(a, b\right)}_{v_2} \frac{\overbrace{\frac{\partial g}{\partial x}\left(a, b\right)}^{u_1}}{\underbrace{\frac{\partial g}{\partial y}\left(a, b\right)}_{u_2 \neq0}}\]
+
+        Séparons notre preuve en différents cas. Si $u_1 = 0$, alors $v_1 = 0$ et donc $\nabla f\left(a, b\right) = \left(0, v_2\right)$ et $\nabla g\left(a, b\right) = \left(0, u_2\right)$. Ceci implique bien qu'il existe un $\lambda \in \mathbb{R}$ tel que $v_2 = \lambda \underbrace{u_2}_{\neq 0}$ et donc:
+        \[\nabla f\left(a, b\right) = \lambda \nabla g\left(a, b\right)\]
+
+        Sinon (si $u_1 \neq 0$), alors, en définissant $\frac{v_1}{u_1} = \frac{v_2}{u_2} := \lambda \in \mathbb{R}$, nous trouvons:
+        \[\left(v_1, v_2\right) = \lambda\left(u_1, u_2\right) \iff \nabla f\left(a, b\right) = \lambda \nabla g\left(a, b\right)\]
+
+        \qed
+    }
+
+    \subparag{Intuition de la preuve}{
+        Nous trouvons $f\left(x, y\right)$ sous la forme d'une fonction d'une seule variable et la dérivons, puis nous utilisons le théorème des fonctions implicites, ce qui nous permet de trouver un lien entre les dérivées de $f$ et celles de $g$.
     }
 }
 

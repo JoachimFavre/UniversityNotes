@@ -1,0 +1,83 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-04-04 at 19:21:21.
+
+\usepackage{../../style}
+
+\title{Analyse 2 --- Méthode de démonstration}
+\author{Joachim Favre}
+\date{Mercredi 06 avril 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2022-04-06}{Récurrence forte}{
+\begin{itemize}[left=0pt]
+    \item Explication de la méthode dite de récurrence forte.
+    \item Résumé des trois méthodes de récurrence que nous avons vues.
+\end{itemize}
+}
+
+\parag{Récurrence forte}{
+    Soit $n_0 \in \mathbb{N}$ et $P\left(n\right)$ une proposition qui dépend de $n \in \mathbb{N}$, où $n \geq n_0$.
+
+    Supposons que:
+    \begin{enumerate}
+        \item $P\left(n_0\right)$ est vraie.
+        \item $\left\{P\left(n_0\right), P\left(n_0 + 1\right), \ldots, P\left(n\right)\right\}$ impliquent $P\left(n+1\right)$, pour tout $n \geq n_0$, $n \in \mathbb{N}$.
+    \end{enumerate}
+    
+    Alors, $P\left(n\right)$ est vraie pour tout $n \geq n_0$, où $n \in \mathbb{N}$.
+}
+
+\parag{Exemple}{
+    Pour tout $n \geq 2$, où $n \in \mathbb{N}$, $n$ est un produit de facteurs premiers.
+
+    \subparag{Preuve}{
+        Nous faisons notre démonstration par récurrence forte. 
+        \begin{enumerate}[left=0pt]
+            \item Nous voulons montrer $P\left(2\right)$. Nous savons que $2$ est premier, donc nous pouvons écrire: 
+            \[2 = 2\]
+            
+            Ce qui montre qu'elle est vraie.
+        \item Nous considérons que $\left\{P\left(2\right), \ldots, P\left(n\right)\right\}$ sont vraies, et nous voulons montrer que $P\left(n+1\right)$ est vraie. 
+
+            Considérons $\left(n + 1\right) \in \mathbb{N}$. S'il est premier, alors, par le même argument que pour la base, $P\left(n+1\right)$ est vraie.
+
+            Sinon, nous savons que $\left(n + 1\right) = m\cdot k$ où $m, k \in \mathbb{N}$ sont tels que $2 \leq m, k < n + 1$. Par notre hypothèse de récurrence, nous savons que $P\left(m\right)$ et $P\left(k\right)$ sont vraies, donc $m$ et $k$ sont des produits de facteurs premiers. Ceci implique que $\left(n + 1\right) = m\cdot k$ est aussi un produit de facteurs premiers. Ainsi, $P\left(n+1\right)$ est vraie.
+        \item Puisque la base et l'hérédité tiennent, nous avons démontré par récurrence forte $P\left(n\right)$ pour tout $n \geq 2$, où $n \in \mathbb{N}$.
+        \end{enumerate}
+        
+        \qed
+    }
+}
+
+\parag{Résumé: Récurrence}{
+    Nos trois méthodes nous permettent de démontrer que $P\left(n\right)$ est vraie pour tout $n \geq n_0$.
+
+    \subparag{Récurrence simple}{
+        \begin{enumerate}[left=0pt]
+            \item $P\left(n_0\right)$ est vraie.
+            \item $P\left(n\right) \implies P\left(n+1\right)$ pour tout $n \geq n_0$.
+        \end{enumerate}
+    }
+
+    \subparag{Récurrence généralisée}{
+        Soit $k \geq 1$.
+        \begin{enumerate}[left=0pt]
+            \item $P\left(n_0\right), \ldots, P\left(n_0 + k\right)$ sont vraies.
+            \item $\left\{P\left(n\right), \ldots, P\left(n+k\right)\right\} \implies P\left(n+k+1\right)$ pour tout $n \geq n_0$.
+        \end{enumerate}
+    }
+
+    \subparag{Récurrence forte}{
+        \begin{enumerate}[left=0pt]
+            \item $P\left(n_0\right)$ est vraie.
+            \item $\left\{P\left(n_0\right), \ldots, P\left(n\right)\right\} \implies P\left(n+1\right)$ pour tout $n \geq n_0$.
+        \end{enumerate}
+    }
+}
+
+
+
+\end{document}
