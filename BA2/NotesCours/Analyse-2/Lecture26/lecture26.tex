@@ -1,0 +1,263 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-24 at 14:18:22.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Lundi 30  mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{26}{2022-05-30}{Toutes les bonnes choses ont une fin}{
+\begin{itemize}[left=0pt]
+    \item Définition du changement de variable cylindrique.
+    \item Beaucoup d'exemples.
+\end{itemize}
+
+}
+
+\parag{Exemple}{
+    Nous voulons calculer le volume d'une ellisoïde, c'est à dire: 
+    \[D = \left\{\left(x, y, z\right) \in \mathbb{R}^3, \frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} \leq 1\right\}, \mathspace a, b, c > 0\]
+
+    Commençons par faire le changement de variable suivant, nous permettant d'obtenir une sphère: 
+    \[\left(x, y, z\right) = H\left(u, v, w\right) = \left(au, bv, cw\right) \implies E = \left\{\left(u, v, w\right) \in\mathbb{R}^3 : u^2 + v^2 + w^2 \leq 1\right\}\]
+
+    Notre Jacobien est donc: 
+    \[J_{H}\left(u, v, w\right) = \begin{pmatrix} a & 0 & 0 \\ 0 & b & 0 \\ 0 & 0 & c \end{pmatrix} \implies \left|\det J_{H}\left(u, v, w\right)\right| = abc > 0\]
+    
+    Nous pouvons ensuite faire un changement de coordonnées sphériques, nous donnant: 
+    \[P = \left\{\left(r, \theta, \phi\right) \in \mathbb{R}^3 : 0 \leq r \leq 1, 0 \leq \theta \leq \pi, 0 \leq \phi < 2\pi\right\}\]
+    
+    Pour résumer, nous avons:
+    \imagehere{ChangementDeVariableEllipsoide.png}
+    
+    Calculons maintenant notre volume: 
+    \begin{multiequality}
+    V =\ & \iiint_D 1dxdydz = \iiint_E abc du dv dw = abc \iiint_P r^2 \sin\left(\theta\right) dr d\phi d \theta \\
+    =\ & \int_{0}^{2\pi} d\phi \int_{0}^{\pi} \sin\left(\theta\right) d \theta \int_{0}^{1} r^2 dr = abc 2\pi \left(-\cos\left(\phi\right)\right)\eval_{0}^{\pi} \cdot \frac{1}{3} r^3 \eval_{0}^{1} = \frac{4}{3} \pi abc 
+    \end{multiequality}
+}
+
+\parag{Coordonnées cylindriques}{
+    Nous définissons le changement de variables en coordonnées cylindriques par: 
+    \begin{functionbypart}{G\left(r, \phi, z\right)}
+        x = r\cos\left(\phi\right) \\
+        y = r\sin\left(\phi\right) \\
+        z = z
+    \end{functionbypart}
+    où $G : \left[0, +\infty\right[ \times \left[0, 2\pi\right[ \times \mathbb{R} \mapsto \mathbb{R}^3$.
+
+    Nous pouvons faire le schéma suivant:
+    \imagehere[0.4]{ChangementDeVariableCylindrique.png}
+
+    Calculons maintenant la matrice Jacobienne:
+    \begin{multiequation}
+    & J_{G}\left(r, \phi, z\right) = \begin{pmatrix} \cos\left(\phi\right) & -r\sin\left(\phi\right) & 0 \\ \sin\left(\phi\right) & r\cos\left(\phi\right) & 0 \\ 0 & 0 & 1 \end{pmatrix}  \\
+    \implies & \det J_{G}\left(r, \phi, z\right) = 1 \begin{vmatrix} \cos\left(\phi\right) & -r\sin\left(\phi\right) \\ \sin\left(\phi\right) & r\cos\left(\phi\right) \end{vmatrix} = r\left(\cos^2\left(\phi\right) + \sin^2\left(\phi\right)\right) = r
+    \end{multiequation}
+}
+
+\parag{Exemple}{
+    Soit $a > 0$. Nous voulons trouver le volume du domaine ayant les frontières suivantes et qui contient $\left(0, 0, a\right)$: 
+    \[\begin{systemofequations} x^2 + y^2 + z^2 = 2za \\x^2 + y^2 = z^2\end{systemofequations}\]
+
+    On voit que $z$ est un peu spécial par rapport à $x$ et $y$ (qui elles cependant jouent un rôle symétrique), mais nous voyons tout de même qu'il semble y avoir un lien avec un cercle. Essayons de réorganiser nos équations:
+    \[\begin{systemofequations} x^2 + y^2 + z^2 - 2za + a^2 = a^2 \\x^2 + y^2 = z^2\end{systemofequations} \implies \begin{systemofequations} x^2 + y^2 + \left(z - a\right)^2 = a^2 \\x^2 + y^2 = z^2\end{systemofequations}\]
+
+    Faisons maintenant un changement de variables vers les coordonnées cylindriques: 
+    \[\begin{systemofequations} r^2 + \left(z - a\right)^2 = a^2 \\ r = z, z \geq 0 \text{ ou } r = -z, z < 0 \end{systemofequations}\]
+
+    Cependant, le volume dont nous voulons calculer le volume contient $\left(0, 0, a\right)$ où $a > 0$, donc seul le cône $r = z > 0$ est valide, l'autre cône définit un autre volume.
+
+    Nous obtenons que notre domaine est borné par la sphère de rayon $a$ et de centre $\left(0, 0, a\right)$ et par le cône $r = z$ (où $z > 0$). Calculons l'intersection entre ces deux surfaces (donc nous prenons $r = z$): 
+    \[r^2 + \left(r - a\right)^2 = a^2 \implies 2r^2 = 2ra \implies r = a = z \text{ ou } r = 0 = z\]
+    
+    Le point $r = 0 = z$ est une solution triviale, donnée par le bas du cône. Cependant, le deuxième résultat $r = a = z$ est beaucoup plus intéressant. C'est un un cercle de rayon $a$ et de centre $\left(0, 0, a\right)$, ce qui est le cercle équatorial de notre sphère. Nous pouvons le voir sur l'image ci-dessous:
+    \imagehere[0.6]{IntersectionConeSphere.png}
+
+    Nous pouvons maintenant séparer notre volume en deux calculs: la demi-sphère du haut et le cône du bas. Le volume de la première est donné par $\frac{1}{2} \frac{4}{3} \pi a^3 = \frac{2}{3} \pi a^3$, auquel nous devons calculer le volume de notre cône: 
+    \[V_{cone} = \int_{0}^{2\pi} d\phi \int_{0}^{a} dz \int_{0}^{z} \underbrace{r}_{\left|\det\left(J_G\right)\right|} dr = 2\pi \int_{0}^{a} dz\cdot \frac{1}{2} r^2 \eval_{0}^{z} = \pi \int_{0}^{a} z^2 dz = \frac{1}{3} \pi z^3 \eval_{0}^{a} = \frac{1}{3} \pi a^3\]
+    
+    En additionnant nos deux volumes, nous obtenons que le volume total est donné par: 
+    \[V = \frac{2}{3}\pi a^3 + \frac{1}{3} \pi a^3 = \pi a^3\]
+}
+
+\parag{Remarque}{
+    Dans les changements de variables sphériques et cylindriques, la coordonnée $z$ joue un rôle spéciale (son expression est plus simple que les deux autres). Cependant, selon la géométrie du domaine et selon la fonction donnée, nous pouvons choisir une autre coordonnée cartésienne pour avoir cette forme spéciale. Par exemple, pour un changement de variable sphérique avec $y$ ayant la forme spéciale, nous aurions: 
+    \begin{functionbypart}{G_{sph}}
+        x = r\sin\left(\theta\right) \cos\left(\phi\right) \\
+        z = r\sin\left(\theta\right) \sin\left(\phi\right) \\
+        y = r \cos\left(\theta\right)
+    \end{functionbypart}
+
+    où $G_{sph} : \left[0, +\infty\right[ \times \left[0, \pi\right] \times \left[0, 2\pi\right]  \mapsto \mathbb{R}^3$ comme d'habitude, et: 
+        \[\left|J_{G_{sph}}\right| = \left|- J_{\widetilde{G}}\right| = r^2 \sin\left(\theta\right)\]
+    puisqu'échanger deux lignes d'une matrice correspond à multiplier son déterminant par $-1$, mais nous ne considérons que la valeur absolue de notre déterminant.
+
+    Nous pouvons bien sûr faire la même chose avec un changement de variable cylindrique. Par exemple: 
+    \begin{functionbypart}{G_{cyl}}
+        x = r\cos\left(\phi\right) \\
+        z = r \sin\left(\phi\right) \\
+        y = y
+    \end{functionbypart}
+    où $G_{cyl} = \left[0, +\infty\right[ \times \left[0, 2\pi\right[ \times \mathbb{R} \mapsto\mathbb{R}^3$, et: 
+    \[\left|J_{G_{cyl}}\right| = \left|-r\right| = r\]
+    pour la même raison.
+    
+    \imagehere[0.8]{ChangementDeVariableSpheriqueCylindriqueRotation.png}
+
+    \subparag{Observation}{
+        Une autre manière de voir ceci, est que nous pouvons faire un changement de variable afin de réordrer nos variables: 
+        \begin{functionbypart}{G\left(\widetilde{x}, \widetilde{y}, \widetilde{z}\right)}
+            x = \widetilde{x}  \\
+            y = \widetilde{z}  \\
+            z = \widetilde{y}
+        \end{functionbypart}
+        
+        Clairement, $\det J_G = -1$, donc nous avons bien $\left|\det J_G\right| = 1$, ce qui nous permet en effet de réordrer nos variables sans conséquence (sans avoir à multiplier par quoi que ce soit).
+    }
+}
+
+\parag{Exemple}{
+    Soit $a > 0$. Nous voulons trouver le volume du domaine ayant les frontières suivantes et qui contient $\left(0, a, 0\right)$: 
+    \[\begin{systemofequations} x^2 + z^2 + y^2 = 2ya \\ x^2 + z^2 = y^2\end{systemofequations}\]
+
+    C'est exactement les mêmes frontières que dans notre exemple ci-dessus, en prenant $\left(x, y, z\right) \mapsto \left(\widetilde{x}, \widetilde{z}, \widetilde{y}\right)$. Ainsi, nous trouvons de la même manière que: 
+    \[V_D = \pi a^3\]
+    
+}
+
+\parag{Résumé des changements de variables}{
+    Nous avons vu les changements de variables remarquables suivants:
+    \[G_{polaire}\left(r, \phi\right) = \begin{systemofequations} x = r\cos\left(\phi\right) \\ y = r\sin\left(\phi\right) \end{systemofequations} \implies \left|\det\left(J_{G}\right)\right| = r\]
+    \[G_{spherique}\left(r, \theta, \phi\right) = \begin{systemofequations} x = r\sin\left(\theta\right)\cos\left(\phi\right) \\ y = r\sin\left(\theta\right) \sin\left(\phi\right) \\ z = r\cos\left(\theta\right) \end{systemofequations} \implies \left|\det\left(J_{G}\right)\right| = r^2 \sin\left(\theta\right)\]
+    \[G_{cylindrique}\left(r, \phi, z\right) = \begin{systemofequations} x = r\cos\left(\phi\right) \\y = r\sin\left(\phi\right) \\ z = z \end{systemofequations} \implies \left|\det\left(J_{G}\right)\right| = r\]
+    
+    Avec: 
+    \[r > 0, \mathspace 0 \leq \theta \leq \pi, \mathspace 0 \leq \phi < 2\pi\]
+}
+
+
+
+\subsection{Exemples d'examen pour terminer}
+\parag{Exemple 1}{
+    Nous voulons calculer l'intégrale suivante: 
+    \[I = \iiint_{D} \frac{1}{\left(1 + x + y + z\right)^3}dxdydz, \mathspace \text{où } D = \left\{x \geq 0, y \geq 0, z \geq 0, x + y + z \leq1\right\}\]
+
+    Le domaine $D$ est un tétraèdre:
+    \imagehere[0.5]{DomaineTetraedre.png}
+    
+    Il n'y a pas vraiment de ressemblance avec un cercle ou une sphère (il n'y a pas vraiment de carré), donc nous ne pouvons pas vraiment prendre de changement de variable sphérique ou cylindrique. 
+
+    Coupons le volume sur le plan $xy$: 
+    \imagehere[0.35]{DomaineTetraedreProjection2D.png}
+
+    Nous pouvons ainsi voir que: 
+    \[D = \left\{\left(x, y, z\right) \in \mathbb{R}^3 : 0 \leq x \leq 1, 0 \leq y \leq 1 - x, 0 \leq z \leq 1 - x - y\right\}\]
+   
+    Ainsi, calculons notre intégrale: 
+    \begin{multiequality}
+    I =\ & \int_{0}^{1} dx \int_{0}^{1-x} dy \int_{0}^{1 - x -y } \frac{1}{\left(1 + x + y + z\right)^3} dz \\
+    =\ & \int_{0}^{1} dx \int_{0}^{1-x} dy \left(\frac{-1}{2}\right) \frac{1}{\left(1 + x + y + z\right)^2} \eval_{z=0}^{z=1-x-y} \\
+    =\ & \int_{0}^{1} dx \int_{0}^{1-x} \left(\frac{-1}{8} + \frac{1}{2} \cdot \frac{1}{\left(1 + x + y\right)^2}\right) dy \\
+    =\ & \int_{0}^{1} dx \left(-\frac{1}{8} y - \frac{1}{2} \cdot \frac{1}{\left(1 + x + y\right)}\right)\eval_{y=0}^{y=1-x} \\
+    =\ & \int_{0}^{1} \left(\frac{-1}{8}\left(1 - x\right) - \frac{1}{4} + \frac{1}{2}\cdot \frac{1}{1 + x}\right)dx \\
+    =\ & \int_{0}^{1} \left(\frac{1}{8}\left(x - 1\right) - \frac{1}{4} + \frac{1}{2} \cdot \frac{1}{1+x}\right)dx \\
+    =\ & \frac{1}{16}\left(x - 1\right)^2 - \frac{1}{4}x + \frac{1}{2} \log\left|x + 1 \right| \eval_{x=0}^{x=1} \\
+    =\ & -\frac{1}{4} + \frac{1}{2} \log\left(2\right) - \frac{1}{16} \\
+    =\ & \frac{1}{2} \log\left(2\right) - \frac{5}{16} 
+    \end{multiequality}
+    
+    Nous pouvons vérifier que, comme ce à quoi nous pouvions nous attendre en regardant l'image ci-dessus, notre résultat est bien positif.
+}
+
+\parag{Exemple 2}{
+    Il arrive que nous pouvons calculer certaines intégrales multiples sans calcul (y compris à l'examen!), voici un exemple. Considérons l'intégrale suivante: 
+    \[I = \int_{-1}^{1} dy \int_{y^2}^{1} \sin\left(y\right) \cos\left(x\right)dx\]
+    
+    Comme souvent, il est une bonne idée de dessiner notre domaine: 
+    \imagehere[0.5]{ExempleIntegraleSansCalcul.png}
+    
+    Essayons de calculer notre intégrale: 
+    \[\int_{-1}^{1} \int_{y^2}^{1} \sin\left(y\right)\cos\left(x\right) dx = \int_{-1}^{1} \sin\left(y\right)\left(\sin\left(1\right) - \sin\left(y^2\right)\right)dy = \int_{-1}^{1} f\left(y\right)dy\]
+    
+    L'intégrale de $\sin\left(y^2\right)$ ne s'exprime pas avec des fonctions élémentaires, donc nous avons un problème. Cependant, nous pouvons voir que: 
+    \[f\left(-y\right) = \sin\left(-y\right) \cdot \left(\sin\left(1\right) - \sin\left(\left(-y\right)^2\right)\right) = - \sin\left(y\right) \left(\sin\left(1\right) - \sin\left(y^2\right)\right) = -f\left(y\right)\]
+
+    Donc $f\left(y\right)$ est impaire. Or nous savons que, pour $g\left(x\right)$ une fonction impaire, $\int_{-a}^{a} g\left(x\right)dx = 0$. Ainsi, nous avons trouvé que: 
+    \[I = 0\]
+    
+    Une autre manière pour arriver à ce résultat est de changer l'ordre d'intégration: 
+    \begin{multiequality}
+    I =\ & \int_{0}^{1} dx \int_{-\sqrt{x}}^{\sqrt{x}} \sin\left(y\right)\cos\left(x\right)dy = \int_{0}^{1} dx \left(\cos\left(x\right) \underbrace{\left(-\cos\left(\sqrt{x}\right) + \cos\left(-\sqrt{x}\right)\right)}_{= 0}\right) \\
+    =\ & \int_{0}^{1} 0dx = 0 
+    \end{multiequality}
+}
+
+\parag{Exemple 3}{
+    Nous allons voir un autre exemple d'intégrale qui pourrait apparaitre en vrai-faux (intégrales qui demandent généralement peu de calculs, mais plutôt une bonne compréhension du domaine). Nous nous demandons si l'intégrale suivante est positive:
+    \[I = \int_{0}^{\frac{\pi}{3}} \left(\int_{0}^{1} \frac{\sin\left(r^2\right)}{1 + e^3} r\right)\]
+
+    Nous remarquons que le $r$ vient d'un changement de variable polaire, ainsi nous pouvons écrire: 
+    \[f\left(r, \phi\right) = \frac{\sin\left(r^2\right)}{1 + e^r}\]
+    
+    Clairement $f\left(r, \phi\right) > 0$. Ainsi, nous intégrons une fonction positive, ce qui veut bien dire que l'intégrale est positive.
+}
+
+\parag{Exemple 4}{
+    Nous voulons écrire l'intégrale suivante en coordonnées polaires: 
+    \[\iint_D \left(x^2 + y^2\right)dx dy, \mathspace \text{où } D = \left\{\left(x, y\right) \in \mathbb{R}^2 : \left(x + 1\right)^2 + y^2 \leq 1, y \leq 0\right\}\]
+    
+    La première inégalité nous donnée: 
+    \begin{multiequation}
+    & \left(x+1\right)^2 + y^2 \leq 1 \implies \left(r\cos\left(\phi\right) + 1\right)^2 + r^2 \sin^2\left(\phi\right) \leq 1  \\
+    \implies & r^2 \cos^2\left(\phi\right) + 2r\cos\left(\phi\right) + 1 + r^2 \sin^2\left(\phi\right) \leq 1 \implies r^2 \leq -2r\cos\left(\phi\right) \\
+    \over{\implies}{$r > 0$}  & r \leq -2\cos\left(\phi\right)
+    \end{multiequation}
+    
+    Puisque nous voulons $r > 0$, cela nous donne $\frac{\pi}{2} < \phi < \frac{3\pi}{2}$. De plus, nous voulons aussi $y \leq 0$, ce qui force $\pi \leq \phi \leq 2\pi$. En mettant ces deux conditions en commun, nous trouvons: 
+    \[\pi \leq \phi < \frac{3\pi}{2}\]
+
+    Ainsi, nous avons: 
+    \[\iint_D r^2 dxdy = \iint_E r^2 \cdot r dr d\phi = \int_{\pi}^{\frac{3\pi}{2}} d\phi \int_{0}^{-2\cos\left(\phi\right)} r^3 dr\]
+    
+}
+
+\parag{Exemple 5}{
+    Nous voulons dessiner le domaine suivant:
+    \[D = \left\{\left(x, y\right) \in \mathbb{R}^2 : x\geq -1, \left|y\right| \leq 1 - x\right\}\]
+    
+    Séparons notre dessin en deux cas: 
+    \[y \geq 0 \implies y \leq 1 - x\] 
+    \[y < 0 \implies -y \leq 1 - x \implies y \geq x - 1\]
+    
+    Ceci nous permet de dessiner:
+    \imagehere[0.35]{ExempleDessinDomaine.png}
+}
+
+\parag{Exemple 6}{
+    Nous nous demandons l'aire de quoi exprime l'intégrale suivante: 
+    \[I = \int_{\frac{\pi}{4}}^{\frac{\pi}{2}} d\phi \int_{0}^{\frac{1}{\sin\left(\phi\right)}} rdr\]
+    
+    Clairement, $r$ vient d'un changement de variable depuis les coordonnées cartésiennes, ainsi essayons de trouver les inégalités sur $x$ et $y$. Pour commencer, nous voyons que: 
+    \[\frac{\pi}{4} < \phi < \frac{\pi}{2} \implies \sin\left(\phi\right) > 0\]
+
+    Ceci nous permet de voir que: 
+    \[0 < r < \frac{1}{\sin\left(\phi\right)} \iff \underbrace{0 < r \sin\left(\phi\right)}_{= y} < 1 \iff 0 < y < 1\]
+    
+    Ainsi, nous pouvons faire notre dessin:
+    \imagehere[0.5]{TriangleCoordonneesPolaires.png}
+
+    Nous trouvons donc que notre intégrale calcule l'aire d'un triangle.
+}
+
+\parag{Remarque}{
+    Pour conclure, il faut toujours dessiner le domaine quand on fait une intégration de plusieurs variables (sur deux variables, mais aussi sur trois variables).
+}
+
+
+\end{document}

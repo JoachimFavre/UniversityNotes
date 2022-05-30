@@ -1,0 +1,201 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-23 at 10:23:49.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Lundi 23 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{24}{2022-05-23}{Changements de variables}{
+\begin{itemize}[left=0pt]
+    \item Explication du théorème de Fubini pour les intégrales triples.
+    \item Explication du théorème disant comment faire un changement de variable pour une intégrale multiple.
+    \item Application du changement de variable pour les coordonnées polaires.
+\end{itemize}
+}
+
+\parag{Exemple 2}{
+    Nous voulons calculer l'intégrale de $f\left(x, y\right) = \frac{x^2}{y^2}$ sur le domaine suivant: 
+    \[D = \left\{\left(x, y\right) \in \mathbb{R}^2 : 1 < x < 2, \frac{1}{x} < y < x\right\}\]
+    
+    Nous pouvons voir notre ensemble comme un domaine régulier de type 1:
+    \imagehere[0.4]{ExempleIntegraleXsdSurYsdType1.png}
+
+    Clairement, puisque $\left(x, 0\right) \not\in D$, notre fonction est continue et donc nous pouvons appliquer notre théorème: 
+    \[\iint_D \frac{x^2}{y^2} dxdy = \int_{1}^{2} \left(\int_{\frac{1}{x}}^{x}  \frac{x^2}{y^2} dy\right)dx = \int_{1}^{2} \left(\frac{-x^2}{y} \eval_{y=\frac{1}{x}}^{y =x}\right)dx = \int_{1}^{2} \left(-x + x^3\right)dx \]
+
+    Ce qui est égal à: 
+    \[-\frac{1}{2} x^2 - \frac{1}{4} x^4 \eval_{1}^{2} = -2 + \frac{1}{2} + 4 - \frac{1}{4} = \frac{9}{4}\]
+     
+    Nous pouvons maintenant aussi considérer notre ensemble comme deux domaines réguliers de type 2:
+    \imagehere[0.4]{ExempleIntegraleXsdSurYsdType2.png}
+
+    Appliquons notre théorème sur cette autre vision du même ensemble: 
+    \[\iint_D \frac{x^2}{y^2} dxdy = \int_{\frac{1}{2}}^{1} \left(\int_{\frac{1}{y}}^{2} \frac{x^2}{y^2}dx\right)dy + \int_{1}^{2} \left(\int_{y}^{2} \frac{x^2}{y^2}dx\right)dy = \ldots = \frac{9}{4}\]
+    
+    Ici, cela ne change pas grand chose de savoir interpréter notre domaine de deux manières différentes, mais, même si ce n'est pas toujours possible, cela permet parfois de grandement simplifier notre intégrale
+}
+
+\parag{Théorème de Fubini pour les intégrales triples}{
+    Soient:
+    \begin{itemize}
+        \item Un intervalle $\left[a, b\right]$, où $a < b$.
+        \item Deux fonctions $\phi_1, \phi_2 \left[a, b\right] \mapsto \mathbb{R}$ continues telles que $\phi_1\left(x\right) < \phi_2\left(x\right)$ pour tout $x \in \left]a, b\right[ $
+        \item L'ensemble défini par:
+        \[D = \left\{\left(x, y\right) \in \mathbb{R}^2 : a < x < b, \phi_1\left(x\right) < y < \phi_2\left(x\right)\right\}\]
+        
+        \item Deux fonctions $G, H : \bar{D} \mapsto \mathbb{R}$ continues telles que $G\left(x, y\right) < H\left(x, y\right)$ pour tout $\left(x, y\right) \in D$.
+        \item L'ensemble défini par:
+        \[E = \left\{\left(x, y, z\right) \in \mathbb{R}^3 : \left(x, y\right) \in D : G\left(x, y\right) < z < H\left(x, y\right)\right\}\]
+        \item Une fonction $f: \bar{E} \mapsto \mathbb{R}$.
+    \end{itemize}
+
+    Alors, $f$ est intégrable sur $E$, et on a: 
+    \[\int_{E} f\left(x, y, z\right)dxdydz = \int_{a}^{b} \left(\int_{\phi_1\left(x\right)}^{\phi_2\left(x\right)} \left(\int_{G\left(x, y\right)}^{H\left(x, y\right)} f\left(x, y, z\right)dz\right)dy\right)dx\]
+    
+    Nous ne pouvons pas choisir l'ordre d'intégration.
+    
+    \subparag{Notation}{
+        Pour simplifier la notation d'intégrales multiples, nous pouvons écrire:
+        \begin{multiequality}
+         & \int_{a}^{b} \left(\int_{\phi_1\left(x\right)}^{\phi_2\left(x\right)} \left(\int_{G\left(x, y\right)}^{H\left(x, y\right)} f\left(x, y, z\right)dz\right)dy\right)dx  \\
+        \over{=}{not.}\ & \int_{a}^{b} dx \int_{\phi_1\left(x\right)}^{\phi_2\left(x\right)} dy \int_{G\left(x, y\right)}^{H\left(x, y\right)} f\left(x, y, z\right)dz
+        \end{multiequality}
+    }
+    
+
+    \subparag{Remarque}{
+        Si nous voulions formuler ce théorème de la même manière que pour le théorème pour les intégrales de deux variables, nous aurions besoin de définir 6 types différents de domaines. En d'autres mots, le nom des variables dans le théorème n'est pas important (il serait donc valide pour un $D = \left\{\left(z, x\right) \in \mathbb{R}^2 : a < z < b, \phi_1\left(z\right) < x < \phi_2\left(z\right)\right\}$ si tout le reste est cohérent avec).
+    }
+}
+
+\parag{Exemple}{
+    Nous voulons intégrer $f\left(x, y,  z\right) = e^{x^3}$ sur le domaine suivant: 
+    \[E = \left\{\left(x, y, z\right) \in \mathbb{R}^3 : 0 < z < y < x < 1\right\}\]
+    
+    Nous remarquons que $f\left(x, y, z\right)$ n'a pas directement de primitive selon $x$, donc nous voudrons intégrer selon cette variable en dernier. Nous faisons ensuite un choix arbitraire pour l'ordre en $y$ et $z$, afin de réécrire notre domaine comme: 
+    \[E = \left\{\left(x, y, z\right) \in \mathbb{R}^3 : 0 < x < 1, 0 < y < x, 0 < z < y\right\}\]
+    
+    Calculons maintenant notre intégrale: 
+    \begin{multiequality}
+    \int_{E} e^{x^3}dxdydz =\ & \int_{0}^{1} dx \int_{0}^{x} dy \int_{0}^{y} e^{x^3} dz = \int_{0}^{1} dx \int_{0}^{x} dy \left(z e^{x^3}\right)\eval_{z=0}^{z=y}  \\
+    =\ & \int_{0}^{1} dx \int_{0}^{x} dy \left(y e^{x^3}\right) = \int_{0}^{1} dx \frac{1}{2}y^2 e^{x^3} \eval_{y=0}^{y=x} \\
+    =\ & \frac{1}{2} \int_{0}^{1} x^2 e^{x^3}dx = \frac{1}{6} \int_{0}^{1} e^{x^3} d\left(x^3\right) \\
+    =\ & \frac{1}{6}e^{x^3} \eval_{0}^{1} = \frac{e - 1}{6}
+    \end{multiequality}
+    
+    Notez qu'il est absolument nécessaire d'intégrer selon $x$ en premier (comme mentionné ci-dessus, $e^{x^3}$ n'a pas de primitive exprimée en fonctions élémentaires). Cependant, nous pouvons échanger l'ordre d'intégration entre $y$ et $z$: 
+    \[E = \left\{\left(x, y, z\right) \in \mathbb{R}^3 : 0 < x < 1, 0 < z < x, z < y < x\right\}\]
+
+    Ceci nous donne ainsi que: 
+    \begin{multiequality}
+    \int_{E} e^{x^3} dxdydz =\ & \int_{0}^{1} dx \int_{0}^{x} dz \int_{z}^{x} e^{x^3} dy = \int_{0}^{1} dx \int_{0}^{x} dz ye^{x^3} \eval_{y=z}^{y=x}  \\
+    =\ & \int_{0}^{1} dx \int_{0}^{x} dz \left(x - z\right)e^{x^3} = \int_{0}^{1} dx \left(xz - \frac{1}{2} z^2\right)\eval_{z=0}^{z=x} \\
+    =\ & \int_{0}^{1} dx \left(x^2 - \frac{1}{2}x^2\right)e^{x^3} = \frac{1}{2} \int_{0}^{1} x^2 e^{x^3}dx \\
+    =\ & \frac{1}{6} \int_{0}^{1} e^{x^3} d\left(x^3\right) \frac{1}{6} e^{x^3} \eval_{0}^{1} = \frac{e - 1}{6} 
+    \end{multiequality}
+    comme attendu.
+}
+
+\subsection[Changement de variables]{Changement de variables dans une intégrale multiple}
+\parag{Théorème}{
+    Soit $E \subset \mathbb{R}^n$ un sous-ensemble tel que $\bar{E}$ est compact. Soit aussi $\psi : E \mapsto \mathbb{R}^n$ telle que $\psi \in C^1\left(E\right)$ et $\psi: E \mapsto \psi\left(E\right)$ est bijective (ce qui est équivalent à $J_{\psi}\left(\bvec{u}\right)$ est inversible pour tout $\bvec{u} \in E$, comme vu précédemment). Soit finalement $f: \bar{D} \mapsto \bar{\psi\left(E\right)} \mapsto \mathbb{R}$ une fonction continue.
+
+    Alors: 
+    \[\int_{D} f\left(\bvec{x}\right)d \bvec{x} = \int_{E} f\left(\psi\left(\bvec{u}\right)\right) \left|\det\left(J_{\psi}\left(\bvec{u}\right)\right)\right|d \bvec{u}\]
+
+    \imagehere[0.5]{TheoremeChangementDeVariablesIntegralesMultiples.png}
+}
+
+\parag{Exemple 1}{
+    Nous voulons intégrer $f\left(x, y\right) = 1 = f\left(u, v\right)$ en utilisant un changement de variable (clairement non nécessaire, mais c'est pour l'exemple). Soient les deux sous-ensembles suivants: 
+    \[E = \left[0, 1\right]^2, \mathspace D = \psi\left(E\right) = \left[0, 2\right]^2\]
+    
+    Ainsi, nous trouvons que notre fonction de changement de variable est donné par: 
+    \[\psi\left(u, v\right) = \begin{pmatrix} 2u \\ 2v \end{pmatrix} = \begin{pmatrix} x \\ y \end{pmatrix}, \mathspace J_{\psi} = \begin{pmatrix} 2 & 0 \\ 0 & 2 \end{pmatrix} \implies \left|\det\left(J_{\psi}\right)\right| = 4, \ \forall \left(u, v\right) \in E \]
+
+    Calculons finalement notre intégrale: 
+    \[\int_{D} f\left(x, y\right)dxdy = \int_{E} 1 \left|\det J_{\psi}\right|du dv = \int_{0}^{1} du \int_{0}^{1} dv 1 \cdot 4 = 4\left(1 - 0\right)\left(1 - 0\right) = 4\]
+    
+    Ce qui est cohérent avec le résultat que nous aurions obtenu sans changement de variable: 
+    \[\int_D f\left(x, y\right)dxdy = \int_{0}^{2} dx \int_{0}^{2} 1dy = 1\left(2 - 0\right)\left(2 - 0\right) = 4\]
+}
+
+\parag{Exemple 2}{
+    Nous voulons intégrer la fonction $f\left(x, y\right) = x^2$ sur le domaine suivant: 
+    \[D = \left\{\left(x, y\right) \in \mathbb{R}^2 : 0 < x < 1, -x < y < x\right\} \cup \left\{\left(x, y\right) \in \mathbb{R}^2 : 1 < x < 2,  x - 2 < y < 2 - x\right\}\]
+    
+    Nous pouvons dessiner notre domaine $D = D_1 \cup D_2$ de la manière suivante: 
+    \imagehere[0.5]{IntegraleChangementDeVariablesExample1.png}
+
+    Clairement, $D_1$ et $D_2$ sont des domaines réguliers de type 1. Ainsi, utilisons le théorème de Fubini: 
+    \begin{multiequality}
+    \iint_D f\left(x, y\right) dxdy =\ & \int_{0}^{1} dx \int_{-x}^{x} x^2 dy + \int_{1}^{2} dx \int_{x-2}^{2-x} x^2 dy  \\
+    =\ & \int_{0}^{1} dx \left(yx^2\right) \eval_{y=-x}^{y=x} + \int_{1}^{2} dx \left(yx^2\right) \eval_{y=x-2}^{y=2-x} \\
+    =\ & \int_{0}^{1} 2x^3 dx + \int_{1}^{2} \left(4 - 2x\right)x^2 dx \\
+    =\ & \frac{1}{2} x^4 \eval_{0}^{1} + \frac{4}{3} x^3 \eval_{1}^{2} - \frac{1}{2} x^4 \eval_{1}^{2} \\
+    =\ & \frac{7}{3}
+    \end{multiequality}
+    
+    Cependant, il est plus simple de voir notre ensemble comme un carré, que nous pouvons tourner. Ainsi, nous pouvons introduire les variables suivantes: 
+    \[\begin{systemofequations} u = x - y \\ v = x + y \end{systemofequations} \iff \begin{systemofequations} x = \frac{1}{2}\left(u + v\right) \\ y = \frac{1}{2}\left(v - u\right) \end{systemofequations} \implies 0 < u < 2, 0 < v < 2 \]
+    
+    En d'autres mots, nous avons trouvé: 
+    \[\psi\left(u, v\right) = \left(x, y\right) = \left(\frac{1}{2}\left(u + v\right), \frac{1}{2}\left(u - v\right)\right) \]
+    
+    Calculons le déterminant de son Jacobien: 
+    \[J_{\psi}\left(u, v\right) = \begin{pmatrix} \frac{1}{2} & \frac{1}{2} \\ -\frac{1}{2} & \frac{1}{2} \end{pmatrix} \implies\det\left(J_{\psi}\left(u, v\right)\right) = \frac{1}{4} + \frac{1}{4} = \frac{1}{2} \neq 0\]
+    donc $\psi: E \mapsto D$ est bien bijective. 
+
+    Nous pouvons maintenant calculer notre intégrale: 
+    \begin{multiequality}
+    \iint_D x^2 dxdy =\ & \iint_E \frac{1}{4}\left(u + v\right)^2 \left|\det\left(J_{\psi}\left(u, v\right)\right)\right|dudv = \int_{0}^{2} du \int_{0}^{2} dv \cdot\frac{1}{8} \left(u + v\right)^2 \\
+    =\ & \frac{1}{24}\int_{0}^{2} du \left(u + v\right)^3 \eval_{v=0}^{v=2} = \frac{1}{24} \int_{0}^{2} \left(\left(u + 2\right)^3 - u^3\right)du \\
+    =\ & \frac{1}{24} \cdot \frac{1}{4} \left(\left(u + 2\right)^4 - u^4\right) \eval_{0}^{2} = \frac{1}{6} \cdot \frac{1}{16}\left(4^4 - 2^4 - 2^4 + 0\right)  \\
+    =\ & \frac{1}{6}\cdot \frac{1}{16}\left(16\left(2^4 - 2\right)\right) = \frac{1}{6} \cdot 14 = \frac{7}{3} 
+    \end{multiequality}
+    comme attendu.
+}
+
+\parag{Application: Changement de variables polaire}{
+    Par définition, le changement de variable polaire nous donne: 
+    \[\psi : \mathbb{R}_+ \times \left[0, 2\pi\right[ \mapsto \mathbb{R}^2 \setminus \left\{0\right\}, \mathspace \psi\left(r, \phi\right) = \left(r\cos\left(\phi\right), r\sin\left(\phi\right)\right)\]
+    
+    Calculons son déterminant Jacobiens: 
+    \[J_{\psi}\left(r, \phi\right) = \begin{pmatrix} \cos\left(\phi\right) & -r\sin\left(\phi\right) \\ \sin\left(\phi\right) & r\cos\left(\phi\right) \end{pmatrix} \implies \det\left(J_{\psi}\left(r, \phi\right)\right) = r\left(\cos^2\left(\phi\right) + \sin^2\left(\phi\right)\right) = r\]
+    
+    Elle est donc bien bijective lorsque $r \neq 0$. 
+
+    Si nous avons un domaine circulaire dans $\mathbb{R}^2$, il est souvent une bonne idée de faire un changement de variable polaire.
+}
+
+\parag{Exemple 1}{
+    Nous voulons calculer l'aire du secteur circulaire $S_{\alpha, r}$ d'angle $\alpha$ et rayon $R$, où $0 < \alpha \leq 2\pi$ et $R > 0$:
+    \imagehere{IntegraleAireDisque.png}
+
+    Soit le domaine suivant: 
+    \[E_{\alpha, R} = \left\{\left(r, \phi\right) : 0 < r < R, 0 < \phi < \alpha\right\}\]
+    
+    Ainsi, l'aire est donnée par: 
+    \begin{multiequality}
+    A_{\alpha, R} =\ & \iint_{S_{\alpha, R}} dxdy = \iint_{E_{\alpha, r}} 1 \left|\det\left(J_{\psi}\right)\right| dr d\phi = \int_{0}^{\alpha} d\phi \int_{0}^{R} rdr \\
+    =\ & \int_{0}^{\alpha} d\phi \cdot \frac{1}{2} r^2 \eval_{0}^{R} = \frac{1}{2} R^2 \int_{0}^{\alpha} d\phi = \frac{1}{2} R^2 \alpha 
+    \end{multiequality}
+    
+    En particulier, si $\alpha = 2\pi$, l'aire du disque de rayon $R$ est donnée par: 
+    \[A_{2\pi, R} = \frac{1}{2} R^2 2\pi = \pi R^2\]
+    comme attendu.
+
+    \subparag{Remarque}{
+        Notez qu'il aurait été possible de calculer l'aire d'un cercle en coordonnée cartésienne, il est d'ailleurs un bon exercice de le faire pour un cercle de rayon 1, mais le changement de variable nous simplifie grandement la tâche.
+    }
+    
+}
+
+
+\end{document}

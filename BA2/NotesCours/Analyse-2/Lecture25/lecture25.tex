@@ -1,0 +1,197 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-23 at 12:59:59.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Mercredi 25 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{25}{2022-05-25}{$\pi$ apparaît de nulle part}{
+\begin{itemize}[left=0pt]
+    \item Explication du changement de variables en coordonnées sphériques.
+    \item Explication de la méthode pour calculer la masse d'un objet donc on connait la masse volumique en tout point.
+\end{itemize}
+
+}
+
+\parag{Exemple 2}{
+    Nous voulons calculer l'intégrale de $f\left(x, y\right) = \sqrt{4 - x^2 - y^2}$ sur le domaine suivant: 
+    \[D = \left\{\left(x, y\right) \in \mathbb{R}^2 : x > 0, y > 0, 1 < \sqrt{x^2 + y^2} < 2\right\}\]
+    
+    Clairement, il est plus simple d'exprimer notre domaine en coordonnées polaires: 
+    \[D = \left\{\left(r, \phi\right) \in \mathbb{R}^2, 0 < \phi < \frac{\pi}{2}, 1 < r < 2\right\}\]
+    
+    \imagehere[0.7]{ExempleChangementDeCoordonneesPolaires.png}
+
+    Calculons donc notre intégrale: 
+    \begin{multiequality}
+    \iint_D \sqrt{4 - x^2 - y^2} dxdy =\ & \iint_E \sqrt{4 - r^2} \cdot rdrd\phi = \int_{0}^{\frac{\pi}{2}} d\phi \int_{1}^{2} r\sqrt{4 - r^2}dr \\
+    =\ & \frac{\pi}{2} \cdot \frac{1}{2} \int_{1}^{2} \sqrt{4 - r^2}d\left(r^2\right) = \frac{\pi}{4}\left(-\int_{1}^{2} \left(4 - r^2\right)^{\frac{1}{2}} d\left(4 - r^2\right)\right) \\
+    =\ & \frac{\pi}{4} \left(\frac{-2}{3}\right)\left(4 - r^2\right)^{\frac{3}{2}} \eval_{r=1}^{r=2} = - \frac{\pi}{6} \left(-3^{\frac{3}{2}}\right) \\
+    =\ & \frac{\pi}{2}\sqrt{3} 
+    \end{multiequality}
+    
+    Le résultat de cette intégrale est positif, comme ce à quoi nous pourrions nous attendre. Il n'est jamais une mauvaise idée de vérifier le signe après avoir calculé une intégrale.
+}
+
+\parag{Exemple 3}{
+    Nous voulons calculer l'intégrale de $f\left(x, y\right) = \sqrt{a^2 - x^2 - y^2}$, où $a > 0$, sur le domaine $D$ (qui représente une boucle de Lemniscate de Bernoulli; une figure géométrique sur laquelle il a travaillé en 1694): 
+    \[D = \left\{\left(x, y\right) \in \mathbb{R}^2 : x > 0, \left(x^2 + y^2\right)^2 = a^2 \left(x^2 - y^2\right)\right\}\]
+    
+    Écrivons ce résultat en coordonnées polaires, car cela semble infiniment plus facile: 
+    \[r^4 = a^2 \left(r^2 \cos^{2}\left(\phi\right) - r^2 \sin^2\left(\phi\right)\right) \over{\implies}{$r \neq 0$} r^2 = a^2\left(\cos^2\left(\phi\right) - \sin^2\left(\phi\right)\right) = a^2 \cos\left(2\phi\right)\]
+    
+    Ainsi, nous avons deux conditions sur $\phi$: 
+    \[\begin{systemofequations} a^2 \cos\left(2\phi\right) = r^2 > 0 \\ x > 0 \end{systemofequations} \implies \begin{systemofequations} - \frac{\pi}{4} < \phi < \frac{\pi}{4} \text{ ou } \frac{3\pi}{4} < \phi < \frac{5\pi}{4} \\ -\frac{\pi}{2} < \phi < \frac{\pi}{2} \end{systemofequations} \implies -\frac{\pi}{4} < \phi < \frac{\pi}{4}\]
+    
+    Ceci nous donne ainsi: 
+    \[E = \left\{-\frac{\pi}{4} < \phi < \frac{\pi}{4}, r < a\sqrt{\cos\left(2\phi\right)}\right\}\]
+    
+    Nous pouvons dessiner la lemniscate (nous ne travaillons que sur la boucle de droite): 
+    \imagehere{ChangementsDeVariablesLemniscate.png}
+    
+    Nous avons un domaine régulier de type 2, donc nous pouvons calculer notre intégrale: 
+    \[I = \iint_D \sqrt{a^2 - x^2 - y^2}dxdy = \iint_E \sqrt{a^2 - r^2} rdr d\phi = \int_{-\frac{\pi}{4}}^{\frac{\pi}{4}} d\phi \int_{0}^{a\sqrt{\cos\left(2\phi\right)}} \sqrt{a^2 - r^2} rdr\]
+
+    Commençons par calculer l'intégrale interne. Pour y arriver, nous devons remarquer que:
+    \[\left(1 - \cos\left(2\phi\right)\right)^{\frac{3}{2}} = \left(1 - \cos^2\left(\phi\right) + \sin^2\left(\phi\right)\right)^{\frac{3}{2}} = 2^{\frac{3}{2}} \left(\sin^2\left(\phi\right)\right)^{\frac{3}{2}} = 2^{\frac{3}{2}} \left|\sin\left(\phi\right)\right|^3\]
+
+    Ainsi, calculons notre intégrale interne:
+    \begin{multiequality}
+    \int_{0}^{a\sqrt{\cos\left(2\phi\right)}} \sqrt{a^2 - r^2} rdr =\ & -\frac{1}{2} \int_{0}^{a\sqrt{\cos\left(2\phi\right)}} \sqrt{a^2 - r^2} d\left(a^2 - r^2\right) \\
+    =\ & -\frac{1}{2}\left(\frac{2}{3}\right)\left(a^2 - r^2\right)^{\frac{3}{2}} \eval_{0}^{a\sqrt{\cos\left(2\phi\right)}} \\
+    =\ & -\frac{1}{3} \left(a^2 - a^2 \cos\left(2\phi\right)\right)^{\frac{3}{2}} + \frac{1}{3} a^2 \\
+    =\ & -\frac{1}{3} a^3 2^{\frac{3}{2}} \left|\sin\left(\phi\right)\right|^3 + \frac{1}{3} a^3 
+    \end{multiequality}
+
+    Calculons maintenant l'intégrale extérieure: 
+    \[I = \int_{-\frac{\pi}{4}}^{\frac{\pi}{4}} \left(-\frac{1}{3} a^3 2^{\frac{3}{2}} \left|\sin\left(\phi\right)\right|^3 + \frac{1}{3} a^3\right)d\phi = \frac{1}{3} a^3 \left(\frac{\pi}{4} + \frac{\pi}{4}\right) -\frac{1}{3} a^3 2^{\frac{3}{2}} \int_{-\frac{\pi}{4}}^{\frac{\pi}{4}} \left|\sin\left(\phi\right)\right|^3 d\phi\]
+    
+    Cependant, la fonction que nous voulons intégrer est paire, et nous savons que pour $f\left(x\right)$ paire, $\int_{-a}^{a} f\left(x\right)dx = 2 \int_{0}^{a} f\left(x\right)dx$:
+    \[I = \frac{\pi a^3}{6} - \frac{1}{3} a^3 2^{\frac{3}{2}} \cdot 2 \int_{0}^{\frac{\pi}{4}} \sin^3 \left(\phi\right)d\phi\]
+
+    Calculons cette dernière intégrale. Puisque nous avons la puissance d'un sinus ou un cosinus impaire, nous devons changer vers l'autre fonction: 
+    \begin{multiequality}
+    \int_{0}^{\frac{\pi}{4}} \sin^3 \left(\phi\right) d\phi =\ & \int_{0}^{\frac{\pi}{4}} \left(1 - \cos^2\left(\phi\right)\right) d\left(-\cos\left(\phi\right)\right) = \int_{0}^{\frac{\pi}{4}} \left(\cos^2 \left(\phi\right) - 1\right)d\left(\cos\left(\phi\right)\right) \\
+    =\ & \frac{1}{3} \cos^3 \left(\phi\right) - \cos\left(\phi\right) \eval_{0}^{\frac{\pi}{4}} = \frac{1}{3} \left(\frac{1}{\sqrt{2}}\right)^3 - \frac{1}{\sqrt{2}} - \frac{1}{3} + 1 \\
+    =\ & \frac{2}{3} + \frac{1}{\sqrt{2}} \left(\frac{1}{6} - 1\right) = \frac{2}{3} - \frac{5}{6\sqrt{2}} 
+    \end{multiequality}
+    
+    Ainsi, nous trouvons finalement que: 
+    \[I = \frac{\pi a^3}{6} - \frac{a^3 2^{\frac{3}{2}} 2}{3} \left(\frac{2}{3} - \frac{5}{6\sqrt{2}}\right) = \frac{a^3}{3} \left(\frac{\pi}{2} - \frac{8\sqrt{2} - 10}{3}\right) > 0\]
+    
+    Notre fonction $f\left(x, y\right)$ est toujours positive, donc notre résultat est cohérent.
+}
+
+\parag{Remarque personnelle}{ 
+    J'ai un exemple que je trouve personnellement incroyable donc, vu que nous ne l'avons pas vu en classe, je vais le mettre là. Nous voulons calculer l'intégrale suivante: 
+    \[I = \int_{-\infty}^{\infty} e^{-x^2} dx\]
+    
+    Cependant, nous savons que les primitives de la fonction $f\left(x\right) = e^{-x^2}$ ne peuvent pas s'exprimer avec des fonctions élémentaires. Ainsi, nous allons devoir utiliser un trick de \textit{5head}. Commençons par remarquer que, dans notre intégrale, $x$ est juste une variable fictive, ainsi nous pouvons écrire: 
+    \[I = \int_{-\infty}^{\infty} e^{-x^2} dx = \int_{-\infty}^{\infty} e^{-y^2} dy\]
+    
+    Maintenant vient le coup de génie, auquel vous n'avez probablement pas pensé (et c'est bien normal, c'est non-trivial). Calculons le carré de notre intégrale: 
+    \begin{multiequality}
+    I^2 =\ & \int_{-\infty}^{\infty} e^{-x^2} dx \int_{-\infty}^{\infty} e^{-y^2}dy \\
+    =\ & \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} e^{-x^2} \cdot e^{-y^2} dx dy  \\
+    =\ & \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} e^{-\left(x^2 + y^2\right)} dxdy 
+    \end{multiequality}
+    
+    Faisons maintenant un changement de variable polaire; le $r$ qui apparaît nous aide infiniment: 
+    \[I^2 = \int_{0}^{2\pi} \int_{0}^{\infty} r e^{-r^2} dr d\phi = \int_{0}^{2\pi} -\frac{1}{2} \cdot e^{-r^2} \eval_{r=0}^{r \to \infty}  d\phi = \int_{0}^{2\pi} \frac{1}{2} d\phi = \pi\]
+    
+    Ceci nous permet finalement de trouver que: 
+    \[I = \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}\]
+
+    Le fait que $\pi$ apparaisse dans cette intégrale est tout simplement magnifique.
+
+    \subparag{Remarque}{
+        Cette intégrale peut sembler anodine, mais être capable de la calculer de manière formelle comme cela est notamment très important en statistique. Nous voulons que l'intégrale en $-\infty$ et $+\infty$ de la Gaussienne nous donne 1, donc vous savez pourquoi on divise par $\sqrt{\pi}$ dans la formule.
+    }
+    
+}
+
+\parag{Application: Changement de variables en coordonnées sphériques}{
+    Le changement de variable vers les coordonnées sphériques est défini par: 
+    \begin{functionbypart}{G\left(r, \theta, \phi\right)}
+        x = r\sin\left(\theta\right)\cos\left(\phi\right) \\
+        y = r\sin\left(\theta\right)\sin\left(\phi\right) \\
+        z = r\cos\left(\theta\right)
+    \end{functionbypart}
+    où $G : \left]0, +\infty\right[ \times \left[0, \pi\right] \times \left[0, 2\pi\right[  \mapsto \mathbb{R}^3 \setminus \left\{0\right\}$.
+
+    Nous pouvons illustrer ceci de la manière suivante:
+    \imagehere[0.4]{ChangementDeVariablesCoordonneesSpheriques.png}
+
+    Si $r > 0$, nous avons: 
+    \[r = \sqrt{x^2 + y^2 + z^2}, \mathspace \theta = \arccos\left(\frac{z}{r}\right)\]
+    
+    De plus, si $\sin\left(\theta\right) \neq 0$, nous pouvons trouver $\phi$ en voyant que: 
+    \[\cos\left(\phi\right) = \frac{x}{r \sin\left(\theta\right)}, \mathspace \sin\left(\phi\right) = \frac{y}{r\sin\left(\theta\right)}\]
+
+    Calculons la matrice Jacobienne de notre fonction $G$: 
+    \[J_{G}\left(r, \theta, \phi\right) = \begin{pmatrix} \sin\left(\theta\right)\cos\left(\phi\right) & r\cos\left(\theta\right)\cos\left(\phi\right) & -r\sin\left(\theta\right)\sin\left(\phi\right) \\ \sin\left(\theta\right)\sin\left(\phi\right) & r\cos\left(\theta\right)\sin\left(\phi\right) & r\sin\left(\theta\right)\cos\left(\phi\right) \\ \cos\left(\theta\right) & -r\sin\left(\theta\right) & 0 \end{pmatrix} \]
+    
+    Nous pouvons maintenant calculer la valeur absolue de son déterminant: 
+    \begin{multiequality}
+    & \left|\det J_{G}\left(r, \theta, \phi\right)\right| \\
+    =\ & \left|r^2 \cos^2\left(\theta\right) \sin\left(\theta\right)\cos^2\left(\phi\right) + r^2 \sin^3\left(\theta\right)\sin^2\left(\phi\right) + r^2 \cos^2\left(\theta\right) \sin\left(\theta\right)\sin^2\left(\phi\right) + r^2 \sin^3\left(\theta\right) \cos^2\left(\phi\right)\right| \\
+    =\ & \left|r^2 \cos^2\left(\theta\right)\sin\left(\theta\right) + r^2 \sin^3\left(\theta\right)\right| \\
+    =\ & \left|r^2 \sin\left(\theta\right)\right| 
+    \end{multiequality}
+    
+    Puisque $0 \leq\theta \leq\pi$, nous savons que $\sin\left(\theta\right) > 0$, ainsi: 
+    \[\left|\det J_{G}\left(r, \theta, \phi\right)\right| = r^2 \sin\left(\theta\right)\]
+    
+    Nous en déduisons que quand $r > 0$ et $\sin\left(\theta\right) > 0$ (c'est-à-dire $\theta \neq 0$ et $\theta \neq \pi$), alors $G$ est bijective.
+
+    \subparag{Remarque}{
+        Il est important de se souvenir de ce résultat.
+    }
+}
+
+\parag{Exemple}{
+    Calculons le volume d'une boule de rayon $a > 0$. Pour commencer, regardons notre domaine: 
+    \[E = \left\{0 < r < a, 0 < \theta < \pi, 0 < \phi < 2\pi\right\} = B\left(\bvec{0}, a\right)\]
+
+    Nous trouvons donc: 
+    \begin{multiequality}
+    V =\ & \iiint_{B\left(\bvec{0}, a\right)} 1 dxdydz = \iiint_E \left|\det J_G\left(r, \theta, \phi\right)\right| d\phi d\theta dr \\
+    =\ & \int_{0}^{2\pi} d\phi \int_{0}^{\pi} d \theta \int_{0}^{a} \sin\left(\theta\right) r^2 dr = \int_{0}^{2\pi} d\phi \cdot \int_{0}^{\pi} \sin\left(\theta\right) d \theta \cdot \int_{0}^{a} r^2 dr \\
+    =\ & 2\pi\left(-\cos\left(\theta\right)\right) \eval_{0}^{\pi} \cdot \frac{1}{3} r^3 \eval_{0}^{a} = 2\pi\left(1 + 1\right) \frac{1}{3} a^3 \\
+    =\ & \frac{4}{3} \pi a^3 
+    \end{multiequality}
+    comme attendu.
+}
+
+\parag{Application: Masse totale d'un objet solide de densité donnée}{
+    Pour calculer la masse totale $M$ d'un objet solide de volume $V$ et de densité $\rho\left(x, y, z\right)$, nous pouvons calculer: 
+    \[M = \iiint_V \rho\left(x, y, z\right) dxdydz\]
+    
+    \subparag{Note personnelle: Intuition}{
+        Nous prenons une grande somme des morceaux de masses infinitésimaux $dm = \rho dV$ sur les petits morceaux de volumes $dV = dxdydz$.
+    }
+}
+
+\parag{Exemple}{
+    Nous voulons trouver la masse totale d'un secteur sphérique, où: 
+    \[S = \left\{x, y, z > 0, x^2 + y^2 + z^2 < a^2\right\}, \mathspace \rho\left(x, y, z\right) = x^2 + y^2\]
+    
+    Nous pouvons tout écrire avec des coordonnées sphériques: 
+    \[E = \left\{0 < r < a, 0 < \theta < \frac{\pi}{2}, 0 < \phi < \frac{\pi}{2}\right\}, \mathspace \rho\left(r, \theta, \phi\right) = r^2 \sin^2\left(\theta\right)\]
+    
+    Ainsi, nous pouvons calculer notre masse: 
+    \begin{multiequality}
+    M =\ & \iiint_S \left(x^2 + y^2\right)dxdydz = \int_{0}^{\frac{\pi}{2}} \int_{0}^{\frac{\pi}{2}} d \theta \int_{0}^{a} \underbrace{r^2 \sin^2 \left(\theta\right)}_{\rho\left(r, \theta, \phi\right)} \underbrace{r^2 \sin\left(\theta\right)}_{\left|J_G\right|} dr  \\
+    =\ & \frac{\pi}{2} \int_{0}^{\frac{\pi}{2}} \sin^3 \left(\theta\right) d \theta \cdot \int_{0}^{a} r^4 dr = \frac{\pi}{2} \int_{0}^{\frac{\pi}{2}} \left(\cos^2\left(\theta\right) - 1\right) d\left(\cos \theta\right) \cdot \frac{1}{5} a^5 \\
+    =\ & \frac{\pi a^5}{10} \left(\frac{1}{3} \cos^3\left(\theta\right) - \cos\left(\theta\right)\right) \eval_{0}^{\frac{\pi}{2}} = \frac{\pi a^5}{10} \left(-\frac{1}{3} + 1\right) \\
+    =\ & \frac{\pi a^5}{15} 
+    \end{multiequality}
+}
+
+\end{document}
