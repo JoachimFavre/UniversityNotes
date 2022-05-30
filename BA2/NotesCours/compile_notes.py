@@ -466,7 +466,7 @@ def create_main_tex(tmp_dir, tex_files, config, summaries):
                         + "\\chapter{" + summary_lectures + "}\n")
 
     for lecture_no, summary, date, title in summaries:
-        if lecture_no != "0":
+        if lecture_no != 0:
             main_tex_content += ("\\lecturetitlesummary{" + str(lecture_no)
                                  + "}{" + date + "}{" + title + "}\n")
             main_tex_content += "\\vspace{0.5em\n}"

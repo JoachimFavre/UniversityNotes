@@ -143,7 +143,7 @@ def modify_lectures(course, lectures, to_replace, to_replace_with):
 def open_lecture(course, lecture):
     print("Opening lecture " + str(lecture) + "...")
     path = get_lecture_path(course, lecture)
-    os.startfile(path)
+    os.system("gvim + \"" + path + "\"")
 
 
 print("Extracting lecture pages from table of contents...")
