@@ -1,0 +1,293 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-06-02 at 11:40:42.
+
+\usepackage{../../style}
+
+\title{AICC 2}
+\author{Joachim Favre}
+\date{Jeudi 02 juin 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{27}{2022-06-02}{Summary}{
+\begin{itemize}[left=0pt]
+    \item Explanation on how to find a Generator matrix for Reed-Solomon codes.
+    \item Summary of everything we did in this course.
+\end{itemize}
+
+}
+
+\parag{Example}{
+    Let us pick $\mathbb{F}_7$, $n = 4$ and $k = 3$. Also, we choose: 
+    \[a_1 = 1, \mathspace a_2 = 3, \mathspace a_3 = 4, \mathspace a_4 = 6\]
+    
+
+    To construct the code, it is interesting to make a table:
+    \begin{center}
+    \begin{tabular}{c|c|c}
+        $\bvec{u}$ & $p_{\bvec{u}}\left(x\right)$ & $\bvec{c}$ \\
+        \hline
+        $000$ & $0$ & $0000$ \\
+        $001$ & $x^2$ & $1221$ \\
+        $002$ & $2x^2$ & $2442$\\
+        $003$ & $3x^2$ & 3663\\
+        $\vdots$ & $\vdots$ & $\vdots$\\
+        $006$ & $6x^2$ & 6556\\
+        $010$ & $x$ & 1346\\
+        $011$ & $x + x^2$ & 2560\\
+        $\vdots$ & $\vdots$ & $\vdots$
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Decoding}{
+    Let's assume that we receive $\bvec{y}$, which was not modified by the channel, and we want to decode it. We can use a Lagrange interpolation to find $\bvec{u}$ back.
+
+    Note that if the channel made a modification of $\bvec{y}$, it is harder to decode it, but we have nice algorithms to do so (which will not be presented here).
+}
+
+
+\parag{Generator matrix for RS codes}{
+    If we have a list of all the elements, we can make a generator matrix by picking $k$ codewords, preferably such that it gives us a systematic generator matrix (if the code is systematic). Then, we can find the parity-check matrix easily if we found our systematic form. However, we would like to find a better way to make a generator matrix.
+
+    When we proved that Reed-Solomon Codes are linear, we proved that the mapping $\bvec{u} \mapsto \bvec{c_n}$ is linear: 
+    \[\left(\alpha \bvec{u} + \bvec{v}\right) \mapsto \left(\alpha \bvec{c_u} + \bvec{c_v}\right)\]
+    
+    This means that if we have a basis for the vectors $\bvec{u}$, we can use it to find a basis for the vectors $\bvec{c}$. We can just use the canonical basis:
+    \begin{center}
+    \begin{tabular}{c|c|c}
+        $\bvec{u}$ & $p_{\bvec{u}}\left(x\right)$ & $\bvec{c}$ \\
+        \hline
+        $\bvec{e}_{k} = \left(1, 0, \ldots, 0\right)$ & $x^{k-1}$ & $\left(a_1^{k-1}, \ldots, a_n^{k-1}\right)$  \\
+        $\bvec{e}_{k-1} = \left(0, 1, \ldots, 0\right)$ & $x^{k-1}$ & $\left(a_1^{k-2}, \ldots, a_{n}^{k-2}\right)$  \\
+        $\vdots$ & $\vdots$ & $\vdots$ \\
+        $\bvec{e}_1 = \left(0, 0, \ldots, 1\right)$ & 1 & $\left(1, \ldots, 1\right)$
+    \end{tabular}
+    \end{center}
+    
+    But since the mapping is linear, this is also a basis for $\mathcal{C}$, giving us the following generator matrix (which is sadly not necessarily systematic):  
+    \[G = \begin{pmatrix} 1 & 1 & \cdots & 1 \\ a_1 & a_2 & \cdots & a_n \\ \vdots & \vdots & \ddots & \vdots \\ a_{1}^{k-1} & a_2^{k-2} & \cdots & a_n^{k-1} \end{pmatrix} \]
+    
+    This is sometimes the definition of the Reed-Solomon codes.
+
+    \subparag{Remark}{
+        Note that the matrix we got is named the Vandermonde matrix, and it shows up in many contexts.
+    }
+}
+
+\parag{Example}{
+    Let us pick $\mathbb{F}_5$, $n = 4$, $k = 3$ and: 
+    \[a_1 = 1, a_2 = 4, a_3 = 0, a_4 = 3\]
+    
+    We can draw a table, as usual:
+    \begin{center}
+    \begin{tabular}{c|c|c}
+        $\bvec{u}$ & $p_{\bvec{u}}\left(x\right)$ & $\bvec{c}$ \\
+        \hline
+        $\bvec{u}_{001} = 001$ & $x^2$ & $1104$ \\
+        $\bvec{u}_{010} = 010$ & $x$ & $1403$ \\
+        $\bvec{u}_{100} = 100$ & 1 & $1111$
+    \end{tabular}
+    \end{center}
+    
+    Thus, now, if we want to compute the codeword of $\bvec{u}_{131} = \left(1, 3, 1\right) = \bvec{u}_{001} + 3 \bvec{u}_{010} + \bvec{u}_{100}$, we can just look at the corresponding codewords of those vectors: 
+    \[\bvec{c}_{131} = \bvec{c}_{001} + 3 \bvec{c}_{010} + \bvec{c}_{100} = \left(1, 1, 0, 4\right) + 3\left(1, 4, 0, 3\right) + \left(1, 1, 1, 1\right) = \left(0, 4, 1, 4\right)\]
+    
+}
+
+\parag{Remark}{
+    Nowadays, Reed-Solomon codes are much less used since we no longer spend that much efforts on having a good $d_{min}$. Indeed, if the channel has a low probability to push our codeword onto another (close) codeword, but all other codewords are very far away, then this may be very efficient despite a low $d_{min}$. Thus, We are now more interested on some kind of average distance.
+}
+
+
+
+\parag{Small excursion: Storage on optical disks}{
+    We have a problem when storing data on optical disks: disks get scratched and thus we have many errors in a row, they are not uniform. This is called a burst error.
+
+    \subparag{Example}{
+        Let us use Reed-Solomon codes with $\mathbb{F}_{2^8}$ with $n = 28$ and $k = 24$, meaning $d_{min} = 5$.
+
+        If we use what we did until now, we split the data into block of 24 bits, and expand them into blocks of 28 bits through coding. Let's now make a scratch on our disk. A $\SI{2.5}{\milli\metre }$ scratch erases about 4000 bits, meaning $\frac{4000}{8}$ symbols, and thus $\frac{500}{28} = 17.85$ codewords are erased. 
+    }
+    
+
+    \subparag{One solution}{
+        A solution is using cross interleaving. When writing the symbols, we write them in a big table as the rows, and instead of reading the table row by row, we read it column by column. This leads the bits of a codeword to be very wide apart, and thus survive error burst.
+
+        For instance, if we want to write four times the codeword $\bvec{c} = 11001$ on our disk, we would do as follows:
+        \svghere{Interleaving.svg}
+
+        Leading to ${\color{red}1111}{\color{green}1111}{\color{blue}0000}{\color{fullpurple}0000}{\color{yellow}1111}$ being written on the disk. Looking at the picture, note how the first bit of the first codeword (the first bit of the red area) is far from the second bit of the first codeword (the first bit of the green area).
+    }
+}
+
+\section{Summary}
+\parag{Introduction}{
+    In AICC 1 we saw computations, algorithms and discrete structures. But, to have interesting computations we need data, and AICC-2 is about sending such data. 
+
+    We saw the following three main topics: source coding (compressing information), cryptography (protecting information, and proving message integrity and confidentiality), and channel coding (protecting the information from natural damages). Such topics are important since they are building blocks of communication systems, have interesting maths behind, and all have the notion of entropy as a common root (even though we did not see it in channel coding).
+
+    The big picture of point-to-point communication system is:
+    \svgherenolatex[0.7]{PointToPointCommunication.svg}
+}
+
+\subsection{Source Coding}
+\parag{Definition: Entropy}{
+    Entropy is defined as: 
+    \[H_D\left(s\right) = -\sum_{s}^{} p\left(s\right) \log_D\left(p\left(s\right)\right)\]
+    
+    This is a fundamental definition in science. In this course, we usually pick $D = 2$.
+}
+
+\parag{Theorem: Entropy bounds}{
+    Entropy has the following bound: 
+    \[0 \leq H_D\left(\mathcal{S}\right) \leq \log_D \left|\mathcal{S}\right|\]
+
+    In other words, it is bounded by the degenerate probability distribution (one event has probability 1, and all others have probability 0), and by the uniform distribution (every event has the same probability to show up).
+}
+
+\parag{Entropy conditioned by event}{
+    We saw that, when conditioning over an event, entropy works the same way: 
+    \[H\left(S | Y = y\right) = -\sum_{s}^{} p\left(s|Y=y\right) \log\left(p\left(s | Y = y\right)\right)\]
+}
+
+\parag{Definition: Conditional entropy}{
+    Conditional entropy is defined to be: 
+    \[H\left(S|Y\right) = \sum_{y}^{} p\left(y\right) H\left(S | Y=y\right) = -\sum_{s}^{} \sum_{y}^{} p\left(s, y\right) \log\left(p\left(s|y\right)\right)\]
+}
+
+\parag{Theorem: Conditioning reduces entropy}{
+    If someone tells us something more, then it reduces the entropy: 
+    \[H\left(S | Y\right) \leq H\left(S\right)\]
+    
+    Note that this is not true for entropy conditioned by an event, under certain conditions we can have $H\left(S | Y=y\right) > H\left(s\right)$. Indeed, under some $y$, $S$ may be way more random. However, its average has to be less random (thus $H\left(S |Y\right) \leq H\left(S\right)$).
+}
+
+\parag{Theorem: Chain rule for entropy}{
+    Conditional entropy follows the following equality: 
+    \[H\left(S_1, S_2\right) = H\left(S_1\right) + H\left(S_2 | S_1\right)\]
+}
+
+\parag{Source coding}{
+    Let us consider a source alphabet $\mathcal{A}$, and a mapping $\Gamma\left(s\right)$. This mapping is our code. The length $\ell\left(s\right)$ gives us the length of the codeword $\Gamma\left(s\right)$.
+    
+    We say that a code is uniquely decodable if, when receiving all codewords concatenated, we can decode what was the original content. 
+
+    A code is prefix-free if no codeword is the prefix of another, meaning that we can write the code as a tree, where codewords are at leafs.
+}
+
+\parag{Theorem}{
+    There exists a uniquely decodable code with lengths $\left\{\ell_1, \ell_2, \ldots\right\}$ if and only if there exists a prefix-free code with the same lengths.
+}
+
+\parag{Theorem: Kraft inequality}{
+    For any $D$-ary uniquely decodable code, the following inequality holds: 
+    \[\sum_{s \in \mathcal{A}}^{} D^{-\ell\left(s\right)} \leq 1\]
+}
+
+\parag{Source model: IID source}{
+    We worked over IID sources, meaning that data comes from a fixed distribution, in an independent way (the $n$\Th character does not depend on the characters that came before).
+
+}
+
+\parag{Shannon-Fano code}{
+    Over an IID source, we can create a Shannon-Fano code by picking the lengths to be:
+    \[\ell \left(s\right) = \left\lceil -\log\left(p\left(s\right)\right) \right\rceil \]
+    
+    Note that Shanno-Fano codes are not optimal, but Huffman codes are.
+}
+
+
+\parag{Theorem}{
+    For a Shannon-Fano code or a Huffman code, we have: 
+    \[H_D\left(\mathcal{S}\right) \leq L\left(S, \Gamma\right) \leq H_D\left(\mathcal{S}\right) + 1\]
+    where $L\left(S, \Gamma\right)$ is the average codeword length.
+}
+
+\parag{Fundamental theorem of source coding}{
+    Now, we make Shannon-Fano codes or Huffman code on blocks of length $n$. This gives us: 
+    \[H^*\left(S\right) = \lim_{n \to \infty} \frac{H\left(S_1, \ldots, S_n\right)}{n}\]
+    where $H^*\left(S\right)$ is the entropy rate of the source. This is to what the codeword length $\frac{L\left(S, \Gamma\right)}{n}$ tends towards for Shanno-Fano and Huffman codes when we increase the block size $n$ to infinity.
+}
+
+\subsection{Cryptography}
+\parag{One-time pad}{
+    We have a plaintext $t \in \left\{0, 1\right\}^n$ and a key $k \in \left\{0, 1\right\}^n$ which bits are picked independently and uniformly. Then, we pick the cyphertext to be $c = t \oplus k$.
+
+    This is perfectly secret. In other words, the ciphertext holds no information over the text, we absolutely need to know the key. The thing is, it is very expensive, and only used in very rare scenarios.
+}
+
+\parag{Diffie-Hellman}{
+    Alice and Bob agree on a $p$ and a $g$ publicly. Then, Alice generates a $a$ she keeps secret and publishes $A = g^a$. Similarly, Bob generates a $b$ he keeps secret, and publishes $B = g^b$. Then, both of them can compute the same common key by doing $K = B^a = A^b = g^{ab}$. Nobody else can get this key, since discrete logs are very hard to do.
+
+    \svghere{DiffieHellmanSystem.svg}
+
+    Then, we can use El Gamal cryptosystem to send a text using this key.
+}
+
+\parag{RSA}{
+    Bob generates two prime numbers $p$ and $q$, $m = pq$, an encoding exponent $e$, and a decoding exponent $d$. He then publishes $\left(m, e\right)$, which Alice can use to send $c = \left[t^e\right]_m$. Then, Bob can decipher this by doing $t = \left[c^d\right]_m$.
+
+    Nobody else than Bob can compute $t$ since discrete logs and prime factorisations are very hard to do.
+
+    \svghere{RSACryptosystem.svg}
+
+    We needed to do a lot of work to show that there always exist a $d$ such that, for any $t$, we can get back $t$. Also, we needed $m = pq$ to be a product of primes in order to hide the size of the group, which is $\phi\left(m\right) = \left(p-1\right)\left(q-1\right)$ and can only be computed by knowing the prime factorisation of $m$.
+}
+
+\subsection{Channel coding}
+\parag{Models}{
+    We made two models. The first one is the error channel, which flips some bits randomly and uniformly in the message. The second one is the erasure channel, which replaces some symbol by a new symbol ``?''.
+}
+
+\parag{Channel coding}{
+    The idea is, instead of sending any $\bvec{x} \in \mathbb{F}^n$, we restrict to a subset $\mathcal{C} = \left\{\bvec{c_1}, \ldots, \bvec{c_M}\right\} \subseteq \mathbb{F}^n$.
+}
+
+\parag{Channel decoding}{
+    To decode, we use the minimum distance decoding. In other words, we pick the codeword that minimises the Hamming distance with what we received.
+
+    Hence, we were interested in $d_{min}\left(\mathcal{C}\right)$.
+}
+
+\parag{Remark}{
+    In fact, when doing channel coding, we do not want to make a code that has a $k$ as big as the amount of data we want to send. Thus, we split our data in blocks of $k$ bits, and encode every block. When decoding, we split the data we receive into blocks of $n$ bits and decode them one by one.
+}
+
+\parag{Theorem: Singleton bound}{
+    Any code follow the following inequality: 
+    \[d_{min}\left(\mathcal{C}\right) \leq n - k + 1\]
+
+    A code for which there is an equality is named a Maximum Distance Separable (MDS) code.
+}
+
+\parag{Linear codes}{
+    We restricted ourselves to linear codes, since it allows us to find properties more easily. To describe a linear code, we can use a generator matrix $G \in \mathbb{F}^{k \times n}$: 
+    \[\mathcal{C} = \left\{\bvec{c} \in \mathbb{F}^n : \bvec{c} = \bvec{u} G, \text{ for a } \bvec{u} \in \mathbb{F}^k\right\}\]
+    
+    We can also express our code by having a parity-check matrix $H \in \mathbb{F}^{\left(n-k\right) \times n}$: 
+    \[\mathcal{C} = \left\{\bvec{c} \in \mathbb{F}^n : \bvec{c} H^T = \bvec{0}\right\}\]
+
+    Note that $H$ is a parity matrix for $G$ if and only if $H$ is full rank (meaning $\rank\left(H\right) = n -k$) and $H$ satisfies $GH^T = 0$.
+}
+
+\parag{Theorem}{
+    For a linear code, we have that: 
+    \[d_{min}\left(\mathcal{C}\right) = \min_{\bvec{c} \neq \bvec{0}} w\left(\bvec{c}\right)\]
+    where $w\left(\bvec{x}\right) = d\left(\bvec{x}, \bvec{0}\right)$ is the Hamming weight.
+}
+
+\parag{Syndrome}{
+    For a linear code, we can decode a received $\bvec{y}$ using its syndrome. We compute its syndrome $\bvec{s} = \bvec{y} H^T$, look at a table in which we stored all cosets leader and their syndrome, fetch the coset leader $\bvec{t}$ having the same syndrome as $\bvec{y}$, and finally decode by doing:
+    \[\bvec{x} = \bvec{y} - \bvec{c}\]
+}
+
+\parag{Reed-Solomon codes}{
+    We construct a Reed-Solomon by taking all polynomials $p_{\bvec{u}}\left(x\right)$ with degree $\deg\left(p_{\bvec{u}}\left(x\right)\right) \leq k-1$ and by computing: 
+    \[\bvec{c} = \left(p_{\bvec{u}}\left(a_1\right), \ldots, p_{\bvec{u}}\left(a_n\right)\right)\]
+    for fixed $a_1, \ldots, a_n$.
+}
+
+\end{document}

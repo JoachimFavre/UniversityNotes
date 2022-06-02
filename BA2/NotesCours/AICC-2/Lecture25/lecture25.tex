@@ -1,0 +1,328 @@
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-05-24 at 15:18:36.
+
+\usepackage{../../style}
+
+\title{AICC 2}
+\author{Joachim Favre}
+\date{Mardi 24 mai 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{25}{2022-05-24}{Back to probabilities}{
+\begin{itemize}[left=0pt]
+    \item Definition of coset and coset leader.
+    \item Explanation of the coset decoder, and proof that it behaves like a minimum-distance decode when the coset leader are the ones with the lowest weight.
+    \item Explanation of the syndrome decoder.
+    \item Introduction of probabilities in error channels.
+\end{itemize}
+
+}
+
+\parag{Example}{
+    Let's compute again the minimum distance of any Hamming code. We notice that three exists three columns that are linearly dependant (the three firsts) but there is no 2 columns that are linearly dependent. Thus, the minimal weight is 3.
+}
+
+\parag{Implication}{
+    Let's say we have a column of 0 in our parity-check matrix. We can say it is the $i$\Th column. Then, the vector $\bvec{e_i}$ (which has a one in the $i$\Th position and 0s everywhere else) is such that $\bvec{e_i} H^T = \bvec{0}$. Thus, $\bvec{e_i} \in \mathcal{C}$ and, since $w\left(\bvec{e_i}\right) = 1$, we get $d_{min}\left(\mathcal{C}\right) = 1$.
+}
+
+\subsection{Decoding based on cosests and syndromes}
+\parag{Decoding}{
+    A way to understand decoding is to make a big lists of possible $\bvec{y}$ that the channel can output, and say to what it will be decoded to. In other words, we want to partition our space $\mathbb{F}_q^n$ into different codewords:
+    \imagehere[0.7]{DecodingSchema.png}
+
+    Our goal is to develop such theory by using the linear property of our codes.
+}
+
+\parag{Recall: Equivalence relation}{
+    Let $\left(G, \star\right)$ be a group and $\left(H, \star\right)$ be a subgroup. 
+
+    We define $a \sim b$, for $a, b \in G$, if $b = a \star h$ for some $h \in H$. The equivalence class of $a \in G$ is: 
+    \[\left[a\right] = \left\{b : a \sim b\right\} = \left\{a \star h, h \in H\right\} = a + H\]
+    
+    We call this the \important{coset} of $H$ with respect to $a$.
+
+    \subparag{Example}{
+        Let $\left(G, \star\right) = \left(\mathbb{Z}/10\mathbb{Z}, +\right)$, and $H = \left\{0, 5\right\}$. Then: 
+        \[\left[0\right] = \left\{0, 5\right\} = \left[5\right]\] 
+        \[\left[1\right] = \left\{1, 6\right\} = \left[6\right]\]
+        \[\left[2\right] = \left\{2, 7\right\} = \left[7\right]\] 
+        \[\left[3\right] = \left\{3, 8\right\} = \left[8\right]\]
+        \[\left[4\right] = \left\{4, 9\right\} = \left[9\right]\]
+    }
+
+    \subparag{Properties}{
+        \begin{enumerate}[left=0pt]
+            \item Every $b \in G$ is in exactly one coset.
+        
+        Indeed, if $b = a_1 \star h_1 = a_2 \star h_2$, then we get that: 
+        \[a_1 = a_2 \star h_2 \star h_1^{-1} \implies a_1 \sim a_2\]
+        since $h_1, h_2 \in H \implies h_2 \star h_1^{-1} \in H$.
+        \item All cosets have the same cardinality.
+        \item Cosets are either equal or fully distinct. 
+        \item The union of all cosets is exactly $G$.
+        \end{enumerate}
+
+        In other words, cosets partition the set $G$ in equal shares.
+    }
+}
+
+\parag{Application}{
+    Let's apply cosets to linear codes.
+
+    Let $G = \left(\mathbb{F}_q^n, +\right)$ and $H = \mathcal{C}$, where $\mathcal{C}$ is a $\left(n, k\right)$ linear block code over $\mathbb{F}_q$. We know that: 
+    \[\left|\mathcal{C}\right| = q^k = M\]
+    
+    The coset of any $\bvec{x} \in \mathcal{C}$ is: 
+    \[\left[\bvec{x}\right] = \left\{\bvec{y} : \bvec{y}= \bvec{x} + \bvec{c}\right\} = \bvec{x} + \mathcal{C}\]
+    
+    We can notice that all our codewords belong to the coset $\left[\bvec{0}\right] = \mathcal{C}$.
+}
+
+\parag{Example}{
+    Let's consider the file $\mathbb{F}_2$, and the code: 
+    \[\mathcal{C} = \left\{000, 111\right\}\]
+    
+    Then our generator and parity-check matrices are: 
+    \[G = \begin{pmatrix} 1 & 1 & 1 \end{pmatrix}, \mathspace H = \begin{pmatrix} 1 & 1 & 0 \\ 1 & 0 & 1 \end{pmatrix} \]
+
+    Then, we can compute the cosets of $\mathcal{C}$ with respect to different $\bvec{x}$:
+    \begin{center}
+    \begin{tabular}{c|c}
+        $\bvec{x}$ & Coset \\
+        \hline
+        000 & $\left\{000, 111\right\}$ \\
+        001 & $\left\{001, 110\right\}$ \\
+        010 & $\left\{010, 101\right\}$  \\
+        100 & $\left\{100, 011\right\}$
+    \end{tabular}
+    \hspace{1em}
+    \begin{tabular}{c|c}
+        $\bvec{x}$ & Coset \\
+        \hline
+        000 & $\left\{000, 111\right\}$  \\
+        110 & $\left\{110, 001\right\}$ \\
+        101 & $\left\{101, 010\right\}$  \\
+        011 & $\left\{011, 100\right\}$
+    \end{tabular}
+    \end{center}
+
+    The two tables were split such that every line appears exactly once. We notice that we have computed all the possible cosets (except for 111, we will see why later, but it's just that we prefer the 000). We can observe that, between the two tables, the cosets are the same (no number is paired up with a different number), only the order of its elements change. In fact, the order could be chosen as we want according.
+}
+
+\parag{Generalisation}{
+    Let's draw the following table, where each $\bvec{t_i}$ is chosen such that no two lines are the same:
+    \begin{center}
+    \begin{tabular}{c|c|ccc}
+        $\bvec{x}$ & Coset of $\mathcal{C}$ with respect to $\bvec{x}$ & $D_0$ & $\cdots$ & $D_{M-1}$\\
+        \hline
+        $\bvec{0}$ & $\mathcal{C}$ & $\bvec{c_0}$ & $\cdots$ & $\bvec{c_{M-1}}$ \\
+        $\vdots$ & $\vdots$ & $\vdots$ & & $\vdots$ \\
+        $\bvec{t_{L-1}}$ & $\bvec{t_{L-1}} + \mathcal{C}$ & $\bvec{t_{L-1}} + \bvec{c_0}$ & $\cdots$ & $\bvec{t_{L-1}} + \bvec{c_{M-1}}$
+    \end{tabular}
+    \end{center}
+
+    We know $M = q^k$, since it is the size of our code. Also, since this table has every sequence exactly once and since $\mathbb{F}^n$ has $q^n$ elements, we want $ML = \left|\mathbb{F}^n\right| = q^n$, and thus $L = q^{n-k}$.
+
+    Let's now define the set of elements in the $i$\Th column to be $D_i$, and call the $\bvec{t_i}$ the coset leaders. Such leaders are naturally not unique (as we have seen in the last example). In fact, we can pick any element of the line as its leader (a leader always belongs to its line since $\bvec{t_i} + \bvec{c_0} = \bvec{t_i}$).
+}
+
+\parag{Coset decoder}{
+    Looking at our table from the last paragraph, if $\bvec{y} \in D_j$, then we output $\bvec{c_j}$. In other words, we return the first element of the column where $\bvec{y}$ lives.
+
+    \subparag{More formal}{
+        We receive $\bvec{y} \in \mathbb{F}_q^n$. We first identify the coset of $\bvec{y}$. This has a leader, let's call it $\bvec{t_i}$. Then, we output $\bvec{y} - \bvec{t_i}$.
+    }
+}
+
+\parag{Example}{
+    Let's pick again the code $\mathcal{C} = \left\{000, 111\right\}$, and pick the following table:
+    \begin{center}
+    \begin{tabular}{c|c}
+        $\bvec{x}$ & Coset \\
+        \hline
+        000 & $\left\{000, 111\right\}$ \\
+        001 & $\left\{001, 110\right\}$ \\
+        010 & $\left\{010, 101\right\}$  \\
+        100 & $\left\{100, 011\right\}$
+    \end{tabular}
+    \end{center}
+
+    Let's say we receive $\bvec{y} = 101$. We notice that it lives in the second column, thus we return 111.
+
+    Let us pick the other table:
+    \begin{center}
+    \begin{tabular}{c|c}
+        $\bvec{x}$ & Coset \\
+        \hline
+        000 & $\left\{000, 111\right\}$  \\
+        110 & $\left\{110, 001\right\}$ \\
+        101 & $\left\{101, 010\right\}$  \\
+        011 & $\left\{011, 100\right\}$
+    \end{tabular}
+    \end{center}
+
+    Then, receiving $\bvec{y} = 101$, we would return 000. Thus, the result depends on the coset leaders. We need to find a way to choose such leaders.
+}
+
+\parag{Theorem}{
+    Choosing the leader of each coset to be one of the ones with the smallest Hamming weight, leads the coset decoder to be a minimum distance decoder. 
+
+    \subparag{Proof}{
+        Let's suppose we receive $\bvec{y} \in D_j$, which is in row $i$. This implies that $\bvec{y} = \bvec{c_j} + \bvec{t_i}$, meaning that:
+        \[d\left(\bvec{y}, \bvec{c_j}\right) = d\left(\bvec{c_j} + \bvec{t_i}, \bvec{c_j}\right) = w\left(\bvec{t_i}\right)\]
+
+        Also, let us see the distance with another codeword, $\bvec{c_k}$ where $k \neq j$: 
+        \[d\left(\bvec{y}, \bvec{c_k}\right) = d\left(\bvec{c_j} + \bvec{t_i}, \bvec{c_k}\right) = w\left(\bvec{c_j} - \bvec{c_k} + \bvec{t_i}\right) = w\left(\bvec{c_m} + \bvec{t_i}\right)\]
+        
+        However, $\bvec{c_m} + \bvec{t_i}$ is in the same row. Since we picked the leader to be the one with the smallest Hamming weight, we know that: 
+        \[w\left(\bvec{c_m} + \bvec{t_i}\right) \geq w\left(\bvec{t_i}\right) \iff d\left(\bvec{y}, \bvec{c_j}\right) \geq d\left(\bvec{y}, \bvec{c_k}\right)\]
+
+        \qed
+    }
+}
+
+\parag{Theorem}{
+    Two $\bvec{y} \in \mathbb{F}^n$ have the same syndrome if and only if they are in the same coset.
+
+    \subparag{Proof}{
+        Let's suppose that $\bvec{y_a}$ and $\bvec{y_b}$ have the same syndrome, meaning that: 
+        \[\bvec{y_a} H^T = \bvec{y_b} H^T \implies\left(\bvec{y_a} - \bvec{y_b}\right) H^T = 0\]
+        
+        This implies that $\left(\bvec{y_a} - \bvec{y_b}\right) \in \mathcal{C}$ by definition of the parity-check matrix. However, this yields that $\bvec{y_a}$ and $\bvec{y_b}$ are in the same coset.
+
+        The reciprocal is left as an exercise to the reader.
+
+        \qed
+    }
+}
+
+\parag{Syndrome decoder}{
+    We can sum up the syndrome decoder as the following algorithm.
+
+    \begin{enumerate}
+        \item Pre-compute and store the syndrome of each coset leader.
+        \item Receive $\bvec{y} \in \mathbb{F}_q^n$, and compute its syndrome $\bvec{s} = \bvec{y} H^T$.
+        \item Find $\bvec{t}$ by looking at the lookup table, knowing that its syndrome is also $\bvec{s}$.
+        \item Output $\bvec{y} - \bvec{t}$.
+    \end{enumerate}
+}
+
+\parag{Example 1}{
+    Let's consider again the code $\mathcal{C} = \left\{000, 111\right\}$, with parity check matrix given by: 
+    \[H = \begin{pmatrix} 1 & 1 & 0 \\ 1 & 0 & 1 \end{pmatrix} \]
+    
+    Let's compute the syndromes of the coset leaders (they are easy to choose since we can take all of the weight-0 and weight-1 codewords):
+    \begin{center}
+    \begin{tabular}{c|c}
+        Coset leader & Syndrome  \\
+        \hline
+        000 & 00 \\
+        001 & 01 \\
+        010 & 10 \\
+        100 & 11
+    \end{tabular}
+    \end{center}
+
+    Now, let's say we received $\bvec{y} = 101$. Let's compute its syndrome: 
+    \[\bvec{s} = \bvec{y} H^T = \left(1, 0, 1\right) \begin{pmatrix} 1 & 1 \\ 1 & 0 \\ 0 & 1 \end{pmatrix} = \left(1, 0\right)\]
+    
+    By looking at the lookup-table, we get that the coset leader is $\bvec{t} = 010$. Substracting it from $\bvec{y}$, we get: 
+    \[\bvec{x} = \bvec{y} - \bvec{t} = 101 - 010 = 111\]
+    
+    This is indeed exactly what the minimum-distance decoder would have output.
+}
+
+\parag{Example 2}{
+    Let's consider the code defined by the following generator and parity-check matrices: 
+    \[G = \begin{pmatrix} 1 & 0 & 0 & 0 & 1 & 1 \\ 0 & 1 & 0 & 1 & 0 & 1 \\ 0 & 0 & 1 & 1 & 1 & 0 \end{pmatrix}, \mathspace H = \begin{pmatrix} 0 & 1 & 1 & 1 & 0 & 0 \\ 1 & 0 & 1 & 0 & 1 & 0 \\ 1 & 1 & 0 & 0 & 0 & 1 \end{pmatrix} \]
+    
+    We can make the following table. The first 6 leaders are easy since we can pick all the weight 1 sequence. However, for the last one, we need to think more. We have no more weight 1 sequence, thus we can look at all weight 2 sequences which are not already in the first 6 rows, and make the \nth{7} row.
+    \begin{center}
+    \begin{tabular}{c|cccccccc}
+        & 000000 & 001110 & 010101 & 011011 & 100011 & 101101 & 110110 & 111000 \\
+        \hline
+        000000 & 000000 & 001110 & 010101 & 011011 & 100011 & 101101 & 110110 & 111000 \\ 
+        000001 & 000001 & 001111 & 010100 & 011010 & 100010 & 101100 & 110111 & 111001 \\
+        000010 & 000010 & 001100 & 010111 & 011001 & 100001 & 101111 & 110100 & 111010 \\
+        000100 & 000100 & 001010 & 010001 & 011111 & 100111 & 101001 & 110010 & 111100 \\
+        001000 & 001000 & 000110 & 011101 & 010011 & 101011 & 100101 & 111110 & 110000 \\
+        010000 & 010000 & 011110 & 000101 & 001011 & 110011 & 111101 & 100110 & 101000 \\
+        100000 & 100000 & 101110 & 110101 & 111011 & 000011 & 001101 & 010110 & 011000 \\
+        100100 & 100100 & 101010 & 110001 & 111111 & 000111 & 001001 & 010010 & 011100 \\
+    \end{tabular}
+    \end{center}
+
+    We can observe that any weight-1 error sequence will be decoded correctly. However, there is also one weight-2 error sequence that will be decoded correctly (the last one). Any other error pattern will lead to a decoding error.
+
+    We can then draw the following table:
+    \begin{center}
+    \begin{tabular}{c|c}
+        $\bvec{t_i}$ & $\bvec{s_i}$ \\
+        \hline
+        000000 & 000 \\
+        000001 & 001 \\
+        000010 & 010 \\
+        000100 & 100 \\
+        001000 & 110 \\
+        010000 & 101 \\
+        100000 & 011 \\
+        100100 & 111
+    \end{tabular}
+    \end{center}
+    
+    Let's say we want to decode $\bvec{y} = 011000$. First, we compute its syndrome: 
+    \[\bvec{s} = \bvec{y} H^T = 011\]
+
+    The corresponding leader is $\bvec{t} = 1000000$. Thus, we get that the decoded word is: 
+    \[\bvec{x} = \bvec{y} - \bvec{t} = 111000\]
+}
+
+\parag{Remark}{
+    The syndrome decoding is conceptually important. However, piratically (this was supposed to be ``pratically'', but my auto-correcter made that and I find it very funny), it is still too expensive because of the lookup table.
+
+    For instance, on a CR-rom, we have $\left|\mathbb{F}\right| = 2^8$, with $n = 32$ and $k = 28$. This means that we have $4.29 \cdot 10^9$ coset leaders, and thus $10^{12}$ bits (100 Gigabytes) to store.
+}
+
+\subsection{Error probability}
+
+\parag{Binary symmetric channel}{
+    Let's now add probabilities to our error channel. To do so, we will work over the field $\mathbb{F}_2$, and say that every bit has a flip probability $\epsilon$ (supposedly small). This is called the binary symmetric channel (BSC). 
+
+    In other words, we have a bit-flipper channel, where each bit has a probability $\epsilon$ to be switched, and a probability $\left(1 - \epsilon\right)$ not to be changed. Note that the flips are independent.
+
+    \imagehere[0.7]{BinarySymmetricChannel.png}
+}
+
+
+\parag{Example}{
+    Let $\bvec{x} = \bvec{0} \in\mathbb{F}_2^{10}$. Let's compute the probability that the output value is $\bvec{y} = 0110100000$: 
+    \[P\left(\bvec{y} = 0110100000\right) = \epsilon^3 \left(1 - \epsilon\right)^7\]
+    since bit flipping is independent, and we have 3 bits that were flipped and 7 bits that weren't.
+}
+
+\parag{Linear codes}{
+    Now, let us use a linear code $\mathcal{C}$. Let's define $P_C\left(i\right)$ to be the probability that the Minimum-Distance decoder decodes correctly if the transmitted codeword is $\bvec{c_i}$.
+
+    We see that: 
+    \[P_C\left(0\right) = P\left(\bvec{y} \in D_0 | \bvec{x} = \bvec{c_0}\right) = \sum_{\bvec{y} \in D_0}^{} P\left(\bvec{y} | \bvec{x} = \bvec{0}\right)= \sum_{\bvec{y} \in D_0}^{} \epsilon^{w\left(\bvec{y}\right)} \left(1- \epsilon\right)^{n - w\left(\bvec{y}\right)}\]
+
+    Now, let's compute it for a general $j$: 
+    \[P_C\left(j\right) = P\left(\bvec{y} \in D_j | \bvec{x} = \bvec{c_j}\right) = P\left(\bvec{c_j} + \bvec{e} \in D_j | \bvec{x} = \bvec{c_j}\right)\]
+
+    However, we know $D_j = D_0 + \bvec{c_j}$, so: 
+    \[\bvec{c}_j + \bvec{e} \in D_i \iff \bvec{e} \in D_0\]
+    
+    This implies that that: 
+    \[P_C\left(j\right) = P\left(\bvec{e} \in D_0 | \bvec{c_j}\right) = P\left(\bvec{e} \in D_0\right) = \sum_{\bvec{e} \in D_0}^{} \epsilon^{w\left(e\right)} \left(1 - \epsilon\right)^{n - w\left(\bvec{e}\right)}\]
+    
+    However, this is exactly the sum we computed before, yielding: 
+    \[P_C\left(j\right) = P_C\left(0\right) = \sum_{\bvec{y} \in D_0}^{} \left(\frac{\epsilon}{1 - \epsilon}\right)^{w\left(\bvec{y}\right)} \left(1 - \epsilon\right)^n, \mathspace \forall j\]
+}
+
+
+
+\end{document}
