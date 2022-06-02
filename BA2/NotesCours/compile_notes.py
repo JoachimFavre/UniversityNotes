@@ -11,6 +11,12 @@ the .pdf is required.)
 Do not name any file "[CourseName].pdf" or "[CourseName]_questions.txt" in the
 result directory, or else it may get deleted or replaced.
 
+Things to verify before printing a document:
+    - Titles in headers must not overlap
+    - Summaries are done using itemize with left=0pt
+    - Verify lessons dates day
+    - The Frontmatter was written
+
 Created on Sun Sep 26 13:43:40 2021
 @author: Joachim Favre
 """
@@ -36,7 +42,6 @@ CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
 COURSES_NAME = ["AICC-2", "Analyse-2", "Analyse-2-MethodesDeDemonstration", "DigitalSystemDesign"]
-# COURSES_NAME = ["AICC-2"]
 # COURSES_NAME = ["Analyse-2"]
 # COURSES_NAME = ["Analyse-2-MethodesDeDemonstration"]
 # COURSES_NAME = ["DigitalSystemDesign"]
@@ -297,10 +302,10 @@ def verify_content(content, file_name):
     if n_opening_parenthesis != n_closing_parenthesis:
         print("\tThe number of opening parenthesis is not the same one "
               "as the number of closing parenthesis in {}.".format(file_name))
-        
+
     if content.count("\\later") > 0:
         print("\tA note for later was left in {}.".format(file_name))
-        
+
     if content.count("bmatrix") > 0:
         print("\tA bmatrix was left in {}.".format(file_name))
 
@@ -308,7 +313,7 @@ def verify_content(content, file_name):
 def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
     frontmatter_summary = None
     frontmatter_tex_file = None
-    
+
     informations = []
     for relation_index, tex_file in tex_files:
         file_path = tmp_dir + "/" + tex_file
