@@ -20,7 +20,7 @@
 
 \parag{Decoding exponent}{
     We can note that such $d$ are not unique. Let's say we found $ed = k \ell + 1$. Let's add $ek \alpha$ (where $\alpha$ is an arbitrary number) on both sides, yielding:  
-    \[ed + ek \alpha = k \ell + 1 + ek \alpha = e\left(d + k \alpha\right) = k\left(\ell + e \alpha\right) + 1\]
+    \[ed + ek \alpha = k \ell + 1 + ek \alpha \iff e\left(d + k \alpha\right) = k\left(\ell + e \alpha\right) + 1\]
     
     Thus, picking $\widetilde{d} = d + k\alpha$ and $\widetilde{\ell} = \ell + e\alpha$, we get: 
     \[e\widetilde{d} = k\widetilde{\ell} + 1\]
@@ -38,7 +38,7 @@
     $e$ is usually chosen to be equal to $e = 65537 = 2^{16} + 1$. This is very nice, since it allows us to compute $t^e$ by doing:
     \[t^e = t^{2^{16}} \cdot t = \left(\left(\left(t\right)^2\right)^2 \ldots \right)^2 \cdot t\]
 
-    This is like doing the fast-exponentiation algorithm, but also do not need (slightly) less multiplications afterhand.
+    This is like doing the fast-exponentiation algorithm, but needs (slightly) less multiplications afterhand.
 }
 
 \parag{Fast exponentiation}{
@@ -77,9 +77,9 @@
     }
 
     \subparag{Without mistake}{
-        we want to do something smarter: we want that if we give $m$, then the other is not able to find $\phi\left(m\right)$. We know that Euler's totient function is very ``random'', meaning that we really have to know the prime factorisation of $m$ to compute $\phi\left(m\right)$. This implies that we can pick $m = pq$ where $p$ and $q$ are two primes, which means that $\phi\left(m\right) = \left(p-1\right)\left(q-1\right)$. This is very hard to find unless we know $p$ and $q$, and prime factorisation is really hard.
+        We want to do something smarter: we want that if we give $m$, then the other is not able to find $\phi\left(m\right)$. We know that Euler's totient function is very ``random'', meaning that we really have to know the prime factorisation of $m$ to compute $\phi\left(m\right)$. This implies that we can pick $m = pq$ where $p$ and $q$ are two primes, which means that $\phi\left(m\right) = \left(p-1\right)\left(q-1\right)$. This is very hard to find unless we know $p$ and $q$, and prime factorisation is really hard.
 
-        We would already be done for $\left(\mathbb{Z} / m\mathbb{Z}^*\right)$, but we would prefer RSA to work for all elements $a \in \mathbb{Z} / pq\mathbb{Z}^*$. We will block the user from taking $t = 0$ since it implies $c = 0$, but we would prefer to let him or her pick $t = p$ for instance.
+        We would already be done for $\left(\mathbb{Z} / m\mathbb{Z}^*\right)$, but we would prefer RSA to work for all elements $a \in \mathbb{Z} / pq\mathbb{Z}$. We will block the user from taking $t = 0$ since it implies $c = 0$, but we would prefer to let him or her pick $t = p$ for instance.
 
         Thus, we need to understand $\left(\mathbb{Z} / m\mathbb{Z}, \cdot\right)$ when $m = pq$. We notice that there is a very good way to see $\Mod pq$ through the Chinese remainder theorem. Indeed, this theorem tells us that we have the bijective mapping $\left[a\right]_{pq} \leftrightarrow \left(\left[a\right]_p, \left[a\right]_q\right)$ which allows us to multiply numbers as: 
         \[\left[ab\right]_{pq} \leftrightarrow \left(\left[ab\right]_p, \left[ab\right]_q\right) = \left(\left[a\right]_p, \left[b\right]_p\right) \cdot \left(\left[a\right]_q, \left[b\right]_q\right)\]
@@ -99,7 +99,7 @@
 \parag{Weaknesses}{
     Let's say we want to decrypt $c$ without knowing $d$. We can use one of the following ways:
     \begin{itemize}
-        \item Factor $m$ to find $p$ and $q$, which is very hard when $m$ is larger.
+        \item Factor $m$ to find $p$ and $q$, which is very hard when $m$ is large.
         \item In $\mathbb{Z} / m\mathbb{Z}$, solve $c = x^e$ for $x$. This is very hard to do if $m$ is large, since it requires using discrete logs.
         \item Guess $k, t$ or $d$, which is very hard unless there is some human mistake behind.
     \end{itemize}

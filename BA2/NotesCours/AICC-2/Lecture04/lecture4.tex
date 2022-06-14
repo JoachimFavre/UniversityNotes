@@ -21,7 +21,7 @@
 }
 
 \parag{Advantage of prefix free code}{
-    We will focus on prefix free codes because there is no loss of optimality. Indeed, codewords can be as short as for any uniquely decodable code, and a prefix-free codeword is recognised as son as its last digit is seen.
+    We will focus on prefix free codes because there is no loss of optimality. Indeed, codewords can be as short as for any uniquely decodable code, and a prefix-free codeword is recognised as soon as its last digit is seen.
 }
 
 \parag{Definition: Average Codeword Length}{
@@ -80,7 +80,7 @@
         \end{multiequality}
         
 
-        We sum over $l_i$ and $p_i$ instead of $l\left(s\right)$ and $p\left(s\right)$ to have a lighter notation.
+        We sum over $\ell_i$ and $p_i$ instead of $\ell\left(s\right)$ and $p\left(s\right)$ to have a lighter notation.
 
         We can also look at the two conditions for equality, and it ends our proof.
 
@@ -139,7 +139,7 @@
     \end{tabular}
     \end{center}
     
-    We can construct a tree to make our code. On the left, we have this code, on the right we have the same code, from which we removed useless branches:
+    We can construct a tree to make our code. On the left, we have the Shannon-Fano code, on the right we have the same code, from which we removed useless branches:
     \imagehere[0.7]{ShanonFanoCodeExampleTree.png}
 
     We observe that Shannon-Fano code are not too bad, but they are not optimal. Also, they are definitely not unique either.
@@ -153,13 +153,17 @@
         We have already seen the left side of the equation, so let us prove the right hand side: 
         \begin{multiequality}
             L\left(S, \Gamma_{SF}\right) =\ & \sum_{i}^{} p_i \left\lceil -\log_D \left(p_i\right) \right\rceil < \sum_{i}^{} p_i \left(-\log_D \left(p_i\right) + 1\right)  \\
-        =\ & -\sum_{i}^{} p_i \log_D\left(p_i\right) + \sum_{i}^{} p_i = -\sum_{i}^{} p_i\left(\log_D\left(p_i\right)\right) + 1 
+        =\ & -\sum_{i}^{} p_i \log_D\left(p_i\right) + \sum_{i}^{} p_i = -\sum_{i}^{} p_i\left(\log_D\left(p_i\right)\right) + 1  \\
+        =\ & H_D\left(S\right) + 1 
         \end{multiequality}
+        as required.
+
+        \qed
     }
 }
 
 \parag{Optimal Code: Huffman Code}{
-    We want to construct an optimal code. An idea would be to put the highest probability at the highest position on the tree, and the continue with less and less probability. However, this is not optimal.
+    We want to construct an optimal code. An idea would be to put the highest probability at the highest position on the tree, and then continue with less and less probability. However, this is not optimal.
 
     Let's instead start from the leaf. We merge the two least likely, compute the sum of the probability, and treat this as a new symbol. Then, we can begin again recursively:
     \imagehere{HuffmanCodeTreeExample.png}
@@ -227,7 +231,7 @@
     \[L\left(S, \Gamma_H\right) \leq L\left(S, \Gamma\right)\]
 
     \subparag{Proof}{
-        For simplicity, we will consider only binary codes. Let $L = \max_i l_i$. We can see the following three facts.
+        For simplicity, we will consider only binary codes. Let $L = \max_i \ell_i$. We can see the following three facts.
 
         \begin{enumerate}[left=0pt]
         \item First, in the decoding tree of an optimal binary code, each intermediate node has exactly two offsprings. Indeed, else we could decrease the least distance. In particular, it means that any leaf at depth $L$ has a sibling. We can take the following example, where the two first trees are optimal, but not the third one:
@@ -239,9 +243,9 @@
         
         Let's now use those facts, we seek an optimal (minimum average-length) code for the given probabilities. Let's say that they are in increasing order: $p_M \leq \ldots \leq p_1$. We can merge the two least probability leafs, and take $q_1 = p_M + p_{M-1}$. Now, we want to construct a code $\widetilde{\Gamma}$ for $q_1, p_{M-2}, \ldots, p_1$. Note that, in $\widetilde{\Gamma}$, $q_1$ is a leaf node. We notice that, a code for $\Gamma$ directly results from a code for $\widetilde{\Gamma}$. The third fact hereinabove guarantees us the existence of a code $\widetilde{\Gamma}$ such that $\Gamma$ is optimal.
 
-        By the path-length lemma, we know $L = \widetilde{L} + q_1$. Since $q_1$ is fixed (it is not up for optimisation, as we have seen with our facts), we want to minimise $\widetilde{L}$. We are done if find an optimal code $\widetilde{\Gamma}$ for $q_1, p_{M-2}, \ldots, p_1$. We have reduced the size of the alphabet by 1, so we can use recursion. For the initial case, when only two elements are left, there are no other way than linking them two.
+        By the path-length lemma, we know $L = \widetilde{L} + q_1$. Since $q_1$ is fixed (it is not up for optimisation, as we have seen with our facts), we want to minimise $\widetilde{L}$. We are done if we find an optimal code $\widetilde{\Gamma}$ for $q_1, p_{M-2}, \ldots, p_1$. We have reduced the size of the alphabet by 1, so we can use recursion. For the initial case, when only two elements are left, there are no other way than linking them two.
 
-        Thus, this Huffman codes are optimal.
+        Thus, this means Huffman codes are optimal.
 
         \qed
     }
