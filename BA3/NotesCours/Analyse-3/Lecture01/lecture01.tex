@@ -1,0 +1,333 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-09-26 at 08:21:12.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Lundi 26 septembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2022-09-26}{Un vecteur d'opérateurs}{
+\begin{itemize}[left=0pt]
+    \item Rappel des ensembles de nombres, des espaces euclidiens, du produit scalaire et de son application pour calculer une norme et une distance, des ensembles ouverts, fermés et bornés, des fonctions et champs vectoriels, des graphiques de fonctions et de la continuité.
+    \item Définition du gradient, du Laplacien, de la divergence et du rotationnel.
+    \item Explication et preuve d'un théorème reliant ces notions.
+\end{itemize}
+
+}
+
+\section{Rappels}
+\parag{Nombres}{
+    Nous considérons les 5 ensembles de nombres suivants: 
+    \[\mathbb{N}, \mathbb{Z}, \mathbb{Q}, \mathbb{R}, \mathbb{C}\]
+    nommé les nombres naturels, nombres entiers relatifs, les nombres rationnels, les nombres réels et les nombres complexes, respectivement.
+
+    Notez que, dans ce cours $0 \in \mathbb{N}$.
+}
+
+\parag{Espace Euclidien}{
+    Nous allons principalement considérer l'espace Euclidien suivant: 
+    \[\mathbb{R}^n = \underbrace{\mathbb{R} \times \ldots \times \mathbb{R}}_{n} = \left\{\left(x_1, \ldots, x_n\right) | x_i \in \mathbb{R}\right\}\]
+
+    En particulier, nous avons: 
+    \[\mathbb{R}^2 = \left\{\left(x, y\right) | x \in \mathbb{R}, y \in \mathbb{R}\right\}, \mathspace \mathbb{R}^3 = \left\{\left(x, y, z\right) | x, y, z \in \mathbb{R}\right\}\]
+
+    \subparag{Remarque personnel}{
+        Dans ce cours, le Professeur n'écrit pas les vecteurs de manière différente sur le tableau et dans les séries d'exercices (en les soulignant, en mettant une flèche dessus ou avec du gras), je ne vais donc pas le faire non plus. 
+
+        Notez que c'est relativement cohérent puisque nous notons par exemple les matrices et les ensembles sans aucune notation spéciale, cela paraît presque un peu incohérent de garder une notation différente pour les vecteurs.
+    }
+}
+
+\parag{Produit scalaire}{
+    Soient $x = \left(x_1, \ldots, x_n\right)\in \mathbb{R}^n$ et $y = \left(y_1, \ldots, y_n\right) \in \mathbb{R}^n$, alors nous définissons leur \important{produit scalaire} comme: 
+    \[x \dotprod y = \left<x, y\right> = x_1 y_1 + \ldots + x_n y_n = \sum_{i=1}^{n} x_i y_i\]
+    
+    Cela nous permet aussi de définir une \important{norme}:
+    \[\left\|x\right\| = \sqrt{\left<x, x\right>} = \sqrt{x \dotprod x} = \sqrt{x_1^2 + \ldots + x_n^2}\]
+
+    Ce qui nous aide à définir une \important{distance}: 
+    \[d\left(x, y\right) = \left\|x - y\right\|\]
+}
+
+\parag{Ensemble ouvert}{
+    $\Omega \in \mathbb{R}^n$ est un \important{ensemble ouvert} si $\forall x \in \Omega$, $\exists r > 0$ tel que: 
+    \[B_{r}\left(x\right) = \left\{y \in \mathbb{R}^n | d\left(y, y\right) < r\right\} \subseteq \Omega\]
+
+    Ceci nous permet de définir les \important{ensembles fermés}: un ensemble est fermé s'il est le complémentaire d'un ouvert (le complémentaire de $E \subset \mathbb{R}^n$ est donné par $\mathbb{R}^n \setminus E$).
+
+    \subparag{Intuition}{
+        En d'autres mots, un ensemble est ouvert si on peut mettre une boule ouverte autour de n'importe quel point. En particulier, un ensemble ouvert n'a pas de bord.
+    }
+
+    \subparag{Notation}{
+        Dans ce cours, nous noterons toujours les ensembles ouverts par $\Omega$.
+    }
+}
+
+\parag{Ensemble borné}{
+    Un ensemble $F$ est borné s'il existe un $R > 0$ tel que: 
+    \[F \subset B_R\left(0\right)\]
+    
+    En d'autres mots, notre ensemble est inclus dans une boule avec un rayon suffisamment grand.
+}
+
+\parag{Fonctions et champs vectoriels}{
+    Soit $\Omega \subset \mathbb{R}^n$, alors la fonction suivante est un champ scalaire (elle prend un vecteur et donne un scalaire): 
+    \[\begin{split}
+    f: \Omega &\longmapsto \mathbb{R} \\
+    x &\longmapsto f\left(x\right)
+    \end{split}\]
+    
+    La fonction suivante est un champ vectoriel: 
+    \[\begin{split}
+    F: \Omega &\longmapsto \mathbb{R}^n \\
+    x &\longmapsto F\left(x\right) = \left(F_1\left(x\right), \ldots, F_n\left(x\right)\right)
+    \end{split}\]
+}
+
+\parag{Graphique d'une fonction}{
+    \subparag{Champ scalaire}{
+        Soient $\Omega \subset \mathbb{R}^n$ et $f: \Omega  \mapsto \mathbb{R}$ une fonction. Alors son graphique est donné par: 
+        \[\left\{\left(x_1, \ldots, x_n, x_{n+1}\right) \in \mathbb{R}^{n+1} | x_{n+1} = f\left(x_1, \ldots, x_n\right)\right\}\]
+        
+        Nous remarquons qu'il faut une dimension de plus pour dessiner le graphique d'une fonction. 
+    }
+    
+    \subparag{Champ vectoriel}{
+        Considérons maintenant $\Omega \subset \mathbb{R}^n$ et $f: \Omega \mapsto \mathbb{R}^n$. Le problème est que c'est un objet à $2n \geq 4$ dimension, il n'est donc pas facile de le représenter en moins de 3 dimensions.
+
+        Cependant, nous pouvons dessiner notre champ vectoriel en dessinant des vecteurs à un certain nombre de points du plans (pas tous puisque ce ne serait pas lisible).
+    }
+}
+
+\parag{Continuité et différentiabilité}{
+    Soit $\Omega \subset \mathbb{R}^n$ un ensemble ouvert. Nous définissons les \important{classes}: 
+    \[C^0 \left(\Omega\right) = \left\{f: \Omega \mapsto \mathbb{R} | f \text{ est continue}\right\}\]
+    \[C^k\left(\Omega\right) = \left\{f: \Omega \mapsto \mathbb{R} | \text{toutes les dérivées partielles d'ordre $\leq k$ existent et sont continues}\right\}\]
+
+    Nous pouvons généraliser ces idées à des champs vectoriels, pour tout $k \geq 0$: 
+    \[C^k\left(\Omega; \mathbb{R}^n\right) = \left\{F = \left(F_1, \ldots, F_n\right) : \Omega \mapsto \mathbb{R}^n | F_i \in C^k\left(\Omega\right)\right\}\]
+
+    On peut remarquer que: 
+    \[C^k\left(\Omega; \mathbb{R}\right) = C^k\left(\Omega\right)\]
+}
+
+
+\section{Opérateurs différentiels}
+\subsection{Définitions principales}
+
+\parag{Notation}{
+    Dans ce chapitre, $\Omega \subset \mathbb{R}^n$ est toujours un ensemble ouvert.
+}
+
+\parag{Définition: Gradient}{
+    Soit $f: \Omega \mapsto \mathbb{R}$ une fonction. Le \important{gradient} de $f$ est: 
+    \[\nabla f\left(x\right) = \left(\frac{\partial f}{\partial x_1} \left(x\right), \ldots, \frac{\partial f}{\partial x_n} \left(x\right)\right) \in \mathbb{R}^n\]
+
+    Nous voyons que cela nous donne une nouvelle fonction $\nabla f : \Omega \mapsto \mathbb{R}^n$.
+
+    \subparag{Remarque}{
+        Dans la littérature, il existe aussi les notations suivantes: 
+        \[\nabla f = \grad f\] 
+        \[\frac{\partial f}{\partial x_1} = \partial_1 f = D_{x_1} f = \partial_{x_1} f = \ldots\]
+    }
+
+    \subparag{Classes}{
+        Nous pouvons remarquer que si $f \in C^1\left(\Omega\right)$, alors $\nabla f \in C^0\left(\Omega; \mathbb{R}^n\right)$.
+    }
+
+    \subparag{Exemple}{
+        Soit la fonction suivante: 
+        \[\begin{split}
+        f: \mathbb{R}^2 &\longmapsto \mathbb{R} \\
+        \left(x, y\right) &\longmapsto x^2 + y^2
+        \end{split}\]
+        
+        Alors nous avons $\nabla f\left(x, y\right) = \left(2x, 2y\right)$.
+    }
+
+    \subparag{Interprétation}{
+        Le gradient pointe dans la direction où la fonction croit le plus. 
+
+        Aussi, en physique, le gradient d'une énergie potentielle est une force: 
+        \[\nabla E_{pot, G} = \nabla \frac{G m M}{\left\|\left(x, y, z\right)\right\|} = \frac{G M m}{\left\|\left(x, y, z\right)\right\|^2} \frac{-\left(x, y, z\right)}{\left\|\left(x, y, z\right)\right\|} = F_G\]
+    }
+    
+}
+
+\parag{Définition: Laplacien}{
+    Soit $f: \Omega \mapsto \mathbb{R}$ une fonction. Le \important{Laplacien} de $f$ est: 
+    \[\Delta f\left(x\right) = \frac{\partial^{2} f}{\partial x_1^{2}}\left(x\right) + \ldots + \frac{\partial^{2} f}{\partial x_n^{2}}\left(x\right) = \sum_{i=1}^{n} \frac{\partial^{2} f}{\partial x_i^{2}}\left(x\right) \in \mathbb{R}\]
+
+    Nous voyons que cela nous donne une nouvelle fonction $\Delta f : \Omega \mapsto \mathbb{R}$.
+
+    \subparag{Classes}{
+        Nous pouvons voir que, si $f \in C^2\left(\Omega\right)$, alors $\Delta f \in C^0\left(\Omega\right)$.
+    }
+
+    \subparag{Exemple}{
+        Soit la fonction $f\left(x, y\right) = x^2 + y^2$. Nous avons alors: 
+        \[\Delta f\left(x, y\right) = 2 + 2 = 4\]
+    }
+    
+}
+
+\parag{Définition: Divergence}{
+    Soient $\Omega \subset \mathbb{R}^n$ et $F = \left(F_1, \ldots, F_n\right): \Omega \mapsto \mathbb{R}^n$, alors la \important{divergence} de $F$ est définie par:
+    \[\Div F\left(x\right) = \frac{\partial F_1}{\partial x_1} \left(x\right) + \ldots + \frac{\partial F_n}{\partial x_n} \left(x\right) \in \mathbb{R}\]
+
+    Nous voyons que cela nous une nouvelle fonction $\Div F \in C^0\left(\Omega\right)$.
+
+    \subparag{Notation}{
+        Nous pouvons définir le \important{nabla} de la manière suivante, ce qui reste cohérent avec la définition du gradient: 
+        \[\nabla = \left(\frac{\partial}{\partial x_1}, \ldots, \frac{\partial }{\partial x_n} \right)\]
+        ce qui est un  vecteur d'opérateurs.
+
+        Alors, nous pouvons définir notre divergence comme: 
+        \[\Div F\left(x\right) = \nabla \dotprod F = \left(\frac{\partial }{\partial x_1} , \ldots, \frac{\partial }{\partial x_n} \right) \dotprod \left(F_1, \ldots, F_n\right)\]
+    }
+
+    \subparag{Classes}{
+        Nous pouvons voir que, si $F \in C^1\left(\Omega; \mathbb{R}^n\right)$, alors $\Div F \in C^0\left(\Omega\right)$.
+    }
+    
+    \subparag{Exemple}{
+        Prenons la fonction suivante: 
+        \[\begin{split}
+        F: \mathbb{R}^3 &\longmapsto \mathbb{R}^3 \\
+        \left(x, y, z\right) &\longmapsto \left(x + y + z, x^2 + y^2 + z^2, x^3 + y^3 + z^3\right)
+        \end{split}\]
+        
+        Alors, nous avons: 
+        \[\Div F = 1 + 2y + 3z^2\]
+    }
+
+    \subparag{Note personnelle: Interprétation}{
+        Considérons un champ vectoriel représentant la vitesse de particules d'un fluide. Si nous considérons une boule de rayon infinitésimal dans l'espace avec ce fluide, la divergence à un point représente la quantité de fluide qui rentre moins celle qui sort de cette sphère. Ainsi, par exemple, si nous avons un liquide incompressible, alors la divergence est nulle partout. Si nous avons une source à un endroit, alors la divergence est positive, si nous avons un puits, alors elle est négative.
+
+        Je vous recommande vivement cette vidéo de 3Blue1Brown afin de mieux comprendre cette notion:
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=rB83DpBJQsE}
+        \end{center}
+    }
+}
+
+\parag{Définition: Rotationel}{
+    Soient $\Omega \in \mathbb{R}^n$ et $F = \left(F_1, \ldots, F_n\right) : \Omega \mapsto \mathbb{R}^n$.
+
+    Si $n = 2$, alors le \important{rotationnel} de $F$ est donné par: 
+    \[\rot F = \frac{\partial F_2}{\partial x_1} \left(x\right) - \frac{\partial F_1}{\partial x_2} \left(x\right) \in \mathbb{R}\]
+    
+    Si $n = 3$, alors il est donné par: 
+    \autoeq{\unexpanded{\rot F\left(x\right) = ``\left(\rot F_{23}, \rot F_{31}, \rot F_{12}\right)'' = \left(\frac{\partial F_3}{\partial x_2} \left(x\right) - \frac{\partial F_2}{\partial x_3} \left(x\right), \frac{\partial F_1}{\partial x_3} \left(x\right) - \frac{\partial F_3}{\partial x_1} \left(x\right), \frac{\partial F_2}{\partial x_1} \left(x\right) - \frac{\partial F_1}{\partial x_2} \left(x\right)\right)}}
+    
+    Si $n \geq 4$, on ne l'utilise pas dans ce cours (même s'il existe une définition).
+
+    On remarque qu'en deux dimensions c'est un scalaire mais en trois c'est un vecteur.
+
+    \subparag{Notation}{
+        Pour $n = 3$, nous pouvons noter: 
+        \[\rot F = \nabla \times F = \nabla \wedge F = \left(\frac{\partial }{\partial x}, \frac{\partial }{\partial y} , \frac{\partial }{\partial z} \right)\times \left(F_1, F_2, F_3\right)\]
+        
+        Afin de mémoriser le cas de $n = 2$, nous pouvons remarquer que c'est simplement la troisième composant du cas $n = 3$.
+    }
+    
+    \subparag{Exemple}{
+        Prenons la fonction suivante: 
+        \[\begin{split}
+        F: \mathbb{R}^2 \setminus \left\{\left(0, 0\right)\right\} &\longmapsto \mathbb{R}^2 \\
+        \left(x, y\right) &\longmapsto \left(-\frac{y}{\sqrt{x^2 + y^2}}, \frac{x}{\sqrt{x^2 + y^2}}\right)
+        \end{split}\]
+        
+        Nous obtenons ainsi que: 
+        \[\rot F\left(x, y\right) = \frac{\partial }{\partial x} \left(\frac{x}{\sqrt{x^2 + y^2}}\right) - \frac{\partial }{\partial y} \left(\frac{y}{\sqrt{x^2 + y^2}}\right)\]
+        
+        En continuant de travailler, nous pouvons obtenir: 
+        \[\rot F\left(x, y\right) = \frac{1}{\sqrt{x^2 + y^2}}\]
+    }
+
+    \subparag{Note personnelle: Interprétation}{
+        Considérons à nouveau un champ vectoriel représentant les vitesses de particules de fluide dans un espace. Si nous considérons une sphère de rayon infinitésimal à un point, et que nous considérons des frottement entre le fluide et la sphère, alors celle-ci va commencer à tourner et le rotationnel est son vecteur vitesse angulaire. 
+
+        À nouveau, je vous recommande vivement cette vidéo de 3Blue1Brown afin de mieux comprendre cette notion:
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=rB83DpBJQsE}
+        \end{center}
+    }
+    
+}
+
+\parag{Remarque}{
+    Le plus grand intérêt de ces notions est les lois de Maxwell, que nous verront en électromagnétisme:
+    \[\nabla \dotprod E = \frac{\rho}{\epsilon_0}, \mathspace \nabla\dotprod B = 0, \mathspace \nabla \times E = - \frac{\partial B}{\partial t} , \mathspace \nabla \times B = \mu_0 J + \mu_0 \epsilon_0 \frac{\partial E}{\partial t} \]
+    où $B$ est un champ magnétique et $E$ un champ électrique.
+}
+
+
+\parag{Théorème}{
+    Soient $\Omega \in \mathbb{R}^n$ un ensemble ouvert, $f \in C^2\left(\mathbb{R}\right)$ un champ scalaire, et $F \in C^2\left(\Omega, \mathbb{R}^n\right)$ un champ vectoriel, alors: 
+    \begin{enumerate}
+        \item $\displaystyle \Div\left(\nabla f\right) = \Delta f$
+        \item $\displaystyle \rot\left(\nabla f\right) = 0, \mathspace \text{si } n = 2, 3$
+        \item $\displaystyle \Div\left(\rot F\right) = 0, \mathspace \text{si } n = 3$
+        \item $\displaystyle \Div\left(f\cdot F\right) = f\cdot \Div F + F \cdot \nabla f$
+    \end{enumerate}
+
+    Remarquez que la troisième équation ne ferait même pas de sens pour $n= 2$, puisque la divergence prend un champ vectoriel en entrée.
+
+    \subparag{Note personnelle: Intuition}{
+        L'intuition pour les points 2 et 3 n'est pas facile. Pour bien les comprendre, nous avons besoin du théorème du gradient et du rotationnel. Nous les verrons probablement plus tard \later{vérifier}, mais laissez-moi déjà les formuler rapidement.
+
+        Le théorème de la divergence dit que l'intégrale de la divergence d'un champ vectoriel sur un volume fermé borné, est égale au flux de ce champ sur la surface de ce volume:
+        \[\iiint_{V} \left(\nabla \dotprod F\right) dV = \iint_{\partial V} F \dotprod dS\]
+        où $dS$ est un vecteur orthogonal à la surface infinitésimale et dont la norme est l'aire de cette surface.
+        
+        Ce théorème est une formalisation de l'intuition que j'ai essayé de donner sur le gradient, il permet de faire fonctionner l'analogie avec une sphère de rayon infinitésimal.
+
+        Le théorème du rotationnel est très similaire: il dit que le flux du rotationnel à travers une surface fermée est égale à la circulation du champ sur la frontière de cette surface:
+        \[\iint_S \left(\nabla \times F\right) \dotprod dS = \oint_{\partial S} F \dotprod d \ell \]
+
+        Ce théorème permet aussi de justifier l'intuition que j'ai donnée sur le rotationnel. Notez que ces deux théorèmes peuvent être compliqué à comprendre du premier coup, mais en prenant le temps vous devriez y arriver (ils sont aussi très pratiques pour bien comprendre la divergence et le rotationnel).
+        
+        Commençons par regarder le point 2 de notre théorème. Le gradient montre toujours la direction où le champ augmente le plus rapidement. Ainsi, la circulation du gradient sur n'importe quelle boucle fermée donne 0 (physiquement parlant, par exemple, l'intégrale du travail de la force gravitationnelle (donnée par la divergence du champ scalaire énergie potentielle) sur un chemin faisant une boucle fermée donne 0; on n'a pas gagné ou perdu d'énergie). Cela nous montre donc bien que le rotationnel du gradient doit être nul.
+
+        Regardons maintenant le point 3 de notre théorème. Considérons un cube dans l'espace (il faudrait théoriquement considérer un volume quelconque, mais un cube permet de faire une grosse simplification). Le théorème de la divergence dit que nous essayons de calculer le flux du rotationnel sur chaque face. Or, celui-ci est donné par la circulation du champ autour de chaque face (ce que nous pouvons séparer pour chaque arrête autour de la surface), par le théorème du rotationnel. Cependant, chaque arrête est adjacente à exactement deux faces, et quand nous calculons la somme des circulations de chaque face, nous avons chaque arrête additionnée une fois dans un sens positif et une fois dans un sens négatif (voir l'image ci-dessous), ce qui les fera toujours se simplifier et donc donner 0.
+
+        \svghere[0.5]{IntuitionDivRot.svg}
+
+        Si pour le troisième point vous préférez considérer un volume fermé quelconque, on peut voir qu'il n'existe pas de ligne fermant la surface de frontière de ce volume, et une intégrale sur un ensemble vide donne 0.
+
+        J'avais développé ces intuitions en lisant le thread suivant sur MathStackExchange, si vous avez du mal à comprendre mon explication peut-être que celle données dedans vous satisferont mieux (les explications seront similaires, mais avec des mots différents): 
+        \begin{center}
+            \url{https://math.stackexchange.com/questions/26854}
+        \end{center}
+        
+        Ce ne sont vraiment pas des notions faciles à comprendre, c'est normal de galérer dessus.
+    }
+    
+
+    \subparag{Preuve 1}{
+        Nous avons:
+        \autoeq{\unexpanded{\Div\left(\nabla f\right) = \Div\left(\partial_{x_1} f, \ldots, \partial_{x_n} f \right) = \partial_{x_1} \partial_{x_1} f + \ldots + \partial_{x_n} \partial_{x_n} f = \Delta f}}
+    }
+
+    \subparag{Preuve 2}{
+        Posons $n = 2$. Nous trouvons que:
+        \autoeq{\unexpanded{\rot\left(\nabla f\right) = \rot\left(\partial_x f, \partial_y f\right) = \partial_x \partial_y f - \partial-y \partial_x f = \partial_x \partial_y f - \partial_x \partial_y f = 0}}
+        
+        Le cas $n = 3$, et la preuve pour les troisièmes et quatrièmes points seront faites dans la deuxième série.
+
+        \qed
+    }
+}
+
+
+\end{document}
