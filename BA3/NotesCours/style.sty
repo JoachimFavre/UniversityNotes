@@ -21,7 +21,7 @@
 \usepackage{tabularx}
 
 \usepackage[nointegrals]{wasysym}
-\usepackage{siunitx}
+\usepackage[binary-units]{siunitx}
 \sisetup{parse-numbers = false}
 \sisetup{per-mode = symbol}
 \usepackage{xcolor}
@@ -594,20 +594,18 @@
     \settowidth{\eqwidth}{$\displaystyle #2$}
 
     \luaexec{
-    IMPOSSIBLE_STRING = "\#\#\#\#\#"  % constant used later
-    %
     % ------------------------------------------------------- Functions -------------------------------------------------------
     function replaceSymbols(txt, symbols, before, after)
         for i, symbol in pairs(symbols) do
             % Case we have \over{symbol}{...}. Note that because of internal mechanisms, \over{...}{...} is turned to \over {...}{...} before receiving it
-            void, currentIndex = text:find("\\over {" .. symbol .. [[}{]])       --[[} (we need to close the bracket for LaTeX)]]
+            void, currentIndex = txt:find("\\over {" .. symbol .. [[}{]])       --[[} (we need to close the bracket for LaTeX)]]
             while currentIndex ~= nil do
                 % We first look for the content between the brackets by matching those brackts
                 insideText = ""
                 bracketLevel = 1
                 while bracketLevel > 0 do
                     currentIndex = currentIndex + 1
-                    currentChar = text:sub(currentIndex, currentIndex)
+                    currentChar = txt:sub(currentIndex, currentIndex)
                     if currentChar == "{" then bracketLevel = bracketLevel + 1
                     elseif currentChar == "}" then bracketLevel = bracketLevel - 1
                     end
@@ -618,13 +616,25 @@
                 end
                 % We found the content. Now we replace it, using a placeholder for latter replacement. It would have been nice to use regex, but it is a pain to mach brackets using regular expressions.
                 toReplace = "\\over {" .. symbol .. "}{" .. insideText .. "}"
-                txt = txt:gsub(literalise(toReplace), before .. "\\over {" .. IMPOSSIBLE_STRING .. "}{" .. insideText .. "}" .. after)
+                txt = txt:gsub(literalise(toReplace), before .. "\\over {" .. symbol .. "}{" .. insideText .. "}" .. after)
                 % Consider next \over{symbol}{...}
-                void, currentIndex = text:find("\\over {" .. symbol .. [[}{]], currentIndex)       --[[} (we need to close the bracket for LaTeX)]]
+                void, currentIndex = txt:find("\\over {" .. symbol .. [[}{]], currentIndex)       --[[} (we need to close the bracket for LaTeX)]]
             end
-            % After having considered all \over{symbol}{...}, we replace the others
-            txt = txt:gsub(literalise(symbol), before .. symbol .. after)
-            txt = txt:gsub(IMPOSSIBLE_STRING, symbol)  % Could be probably more efficicent, but I don't really care as long as it solves the problem in a sufficiently small time
+            % After having considered all \over{symbol}{...}, we replace all symbols which are not in brackets. This is important, because we don't want to replace the = in "\sum_{i=1}^{n}", nore the ones that were already replaced in the "\over{symbol}"
+            bracketLevel = 0
+            i = 1
+            while i <= \#txt do
+                currentChar = txt:sub(i,i)
+                if currentChar == "{" then bracketLevel = bracketLevel + 1
+                elseif currentChar == "}" then bracketLevel = bracketLevel - 1
+                end
+                startSymb, endSymb = txt:find(symbol, i)
+                if bracketLevel == 0 and startSymb == i then
+                    txt = txt:sub(1, startSymb-1) .. before .. symbol .. after .. txt:sub(endSymb+1, \#txt)
+                    i = endSymb + \#before + \#after
+                end
+                i = i + 1
+            end
         end
         return txt
     end
