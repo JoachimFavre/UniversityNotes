@@ -1,0 +1,68 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-09-22 at 08:19:36.
+
+\usepackage{../../style}
+
+\title{Électronique 1}
+\author{Joachim Favre}
+\date{Jeudi 22 septembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2022-09-22}{Introduction}{
+\begin{itemize}[left=0pt]
+    \item Explication de différents exemples.
+    \item Explication de la différence entre analogique et numérique.
+\end{itemize}
+
+}
+
+\section{Introduction}
+\parag{Électronique}{
+    L'électronique combine trois domaines: l'observation de l'électricité dans la nature, l'apprentissage de la maitrise et reproduction des phénomènes physiques, puis du traitement (analogique ou numérique) permettant à des applications.
+}
+
+\parag{Capteur et actuateur}{
+    Un capteur transforme une mesure en une autre grandeur que l'on sait traiter, comme la tension ou le courant par exemple. Un actuateur est un composant inverse.
+}
+
+\parag{Conversion}{
+    Quand on reçoit le signal d'un capteur et avant de transmettre un signal à un actuateur, on a besoin de la conditionner afin d'enlever le bruit, transformer la tension en courant, etc. 
+
+    Ensuite, nous pouvons traiter notre signal. Si nous faisons un traitement analogique, nous n'avons pas de conversion à faire, mais si on préfère utiliser un traitement numérique à la place, alors il faut convertir notre signal analogique en signal numérique avant le calcul (avec un convertisseur analogique-numérique, CAN) et inversement après (CNA).
+}
+
+\parag{Exemple}{
+    Un système pourrait par exemple ressembler à:
+    \imagehere[0.8]{ExempleSysteme.png}
+}
+
+\parag{Étude de cas}{
+    Disons que nous voulons calculer la moyenne d'une tension. Nous pouvons faire un calcul numérique (où nous ferons une somme sur un nombre fini d'échantillons, divisé par le nombre d'échantillons) ou un calcul analogique (où nous ferons une intégrale entre $0$ et $T$, divisée par $T$).
+
+    Faire un traitement numérique est simple, le code est trivial et laissé en exercice au lecteur.
+
+    Le faire en analogique est plus compliqué. En électronique on ne manipule que trois grandeur: la tension, le courant et la charge; le temps n'en fait pas partie. Pour obtenir le temps, on prend un intégrateur qui calcule continuellement l'intégrale d'une constante. De cette manière, on obtient une tension en sortie de cet intégrateur qui est proportionnelle au temps écoulé. Ainsi, nous pouvons savoir quand arrêter notre analyse, et nous pouvons multiplier notre intégrale par l'inverse du temps. Cela nous donne le schéma suivant:
+    \imagehere[0.8]{ExempleMoyenneTension.png}
+}
+
+\parag{Analogique vs numérique}{
+    Le numérique a le grands avantage d'avoir une immunité au bruit (un peu de bruit sur le 0 fera que ça rester à 0) et de pouvoir faire une modification facilement. Cependant, ses inconvénient sont d'avoir des fréquences finies ce qui peut nous forcer à devoir déformer le phénomène (transformer un problème continu en discret) et il est impossible d'amplifier le signal (ce qui empêche d'envoyer des ``pêches'' (c'est une citation) à distance).
+
+    L'analogique est opposé sur ces points: il n'y a aucune immunité au bruit, et il est très difficile de faire une modification (s'il y a une erreur sur notre chip, il faut la jeter et en refaire une). Cependant, l'analogique a l'avantage d'aller à une grande vitesse ce qui permet notamment de ne pas déformer un phénomène et de l'étudier parfaitement (si on ignore le bruit; nous pouvons par exemple, faire une intégrale exactement, sans avoir à échantillonner) et finalement nous pouvons amplifier le signal.
+
+    Les deux peuvent être mélangés.
+}
+
+\parag{Linéarisation}{
+    Il n'existe rien de linéaire en électronique (même le $U = RI$ des resistor n'est pas vrai, puisque la résistance dépend de la température), donc nous allons considérer comme linéaire des fonctions qui ne le sont pas.
+}
+
+
+
+\end{document}

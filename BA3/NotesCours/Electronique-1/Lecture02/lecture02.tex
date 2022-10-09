@@ -1,0 +1,135 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-09-29 at 08:17:42.
+
+\usepackage{../../style}
+
+\title{Électronique}
+\author{Joachim Favre}
+\date{Jeudi 29 septembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2022-09-29}{On se met des baffes}{
+\begin{itemize}[left=0pt]
+    \item Explication du vocabulaire liés au sinusoïdes.
+    \item Définition des sources (indépendantes) de courant et des sources de tensions, et explication de la différence entre les sources idéales et réelles.
+    \item Explication des conventions utilisées pour ce cours.
+    \item Explication de la loi des transistors. 
+    \item Explication de comment calculer la puissance d'un circuit.
+    \item Calcul de la tension efficace.
+\end{itemize}
+
+}
+
+\section{Signaux}
+\parag{Signal}{
+    Un signal est un phénomène créé par une variation d'énergie. Nous étudierons des signaux électriques, donc paramétrés par une tension $U$ (la différence de potentiel énergétique; en quelques sortes la répartition énergétique) et un courant $I$ (les charges en déplacement, $\frac{dQ}{dt} $). Nous pouvons ensuite utiliser de tels signaux pour transmettre de l'énergie.
+
+    Il existe des signaux continus, c'est-à-dire constants, et des signaux variables, c'est-à-dire qu'ils varient avec le temps. Par exemple, un capteur produit un signal variable.
+
+    Les signaux variables que nous allons étudier sont des signaux alternatifs (des signaux périodiques). Par exemple, la sinusoïde, ou:
+    \imagehere{ExempleSignaux.png}
+
+    Les signaux triangulaires sont intéressants car avoir une tension progressant linéairement avec le temps nous permet d'avoir une notion du temps qui évolue. Les signaux carrés sont intéressants car cela donne une horloge, ce qui est très pratique pour faire des machines à états finis en électronique numérique.
+}
+
+\parag{Sinusoïde}{
+    Les signaux sinusoïdaux ont un vocabulaire un peu spécial.
+
+    La \important{valeur crête} (\textit{peak value} en anglais) est l'amplitude ($V_p$ peut vouloir dire tension peek). La \important{valeur crête-crête} (ou valeur crête-à-creux ou \textit{peak-to-peak value}; $V_{pp}$ peut vouloir dire tension peak-to-peak), ce qui est typiquement deux fois l'amplitude pour des signaux sinusoïdaux.
+
+    La valeur moyenne est toujours 0 pour une sinusoïdale, donc elle ne représente pas bien la puissance qu'on se prend si on met les doigts dans la prise. Nous allons plutôt utiliser la \important{valeur efficace}, que nous allons voir comment calculer plus tard. 
+}
+
+\parag{Source}{
+    Il y a deux types de sources indépendantes (qui peuvent dépendre intérieurement du circuit, mais qui donnent l'illusion de ne pas dépendre pas du circuit (cela deviendra plus clair dans la phrase qui suit)): les sources de courant et les sources de tension. Les premières assurent avoir toujours la même fonction courant peu importe le circuit qui est connecté; les deuxièmes assurent avoir toujours la même fonction tension peu importe le circuit qui est connecté. Nous avons l'habitude de travailler avec les deuxième dans notre vie, mais les premières existent aussi et sont par exemple nécessaire dans un ordinateur. 
+
+    Nous avons les symboles suivants (par convention, les sources indépendantes sont représentées par des ronds):
+    \imagehere[0.5]{SourcesIndependentes.png}
+
+    Ces symboles sont très récents, car la communauté scientifique essaye de converger vers de symboles les plus universels possibles (qu'ils soient partout les mêmes). 
+}
+
+\parag{Conventions}{
+    Par convention, les signaux continus sont représentés par des majuscules ($U = V$ et $I$) et les signaux variables sont représentés par des majuscules ($u\left(t\right) = v\left(t\right)$, $i\left(t\right)$; et plus tard $\underline{u} = \underline{v}$ et $\underline{i}$ quand nous utiliserons des nombres complexes). 
+
+    De manière générale, en électronique, $U$ (la tension, une différence de potentiel) et $V$ (le potentiel, représente aussi une différence de potentiel) représentent exactement la même chose.
+
+    Historiquement, le sens du courant électronique est opposé au sens de déplacement de l'électron (puisque les électrons sont chargés négativement, et que nous avions supposés qu'ils étaient chargés positivement). Nous avons gardé cette convention.
+
+    Dans un circuit, nous utilisons deux références: la Terre et la masse. La Terre est neutre, ainsi nous considérons qu'elle est toujours à $\SI{0}{\volt}$. Dans l'espace, on n'a pas la possibilité d'avoir le même référentiel, donc nous posons le $\SI{0}{\volt}$ à un endroit, comme le chassis de notre fusée. Par mesure de sécurité, le chassis de n'importe quel objet puissant (comme une machine à laver) doit être au $\SI{0}{\volt}$ de la Terre (relié profondément dans les canalisations). En d'autres mots, la Terre c'est le $\SI{0}{\volt}$ absolu, la masse c'est le $\SI{0}{\volt}$ relatif. 
+
+    Par simplicité, nous considérons que les fils n'ont pas de résistance, et donc qu'ils ont un potentiel constant (c'est une équipotentiel). Cependant, entre des fils différents, il peut y avoir des différences de potentiels, appelée tension.
+
+    Deux accidents peuvent arriver en électronique, souvent dus à la température. Si un fil casse mais ne touche rien en tombant, alors cela fait un circuit ouvert. Si un fil casse mais tombe sur un autre fil, alors nous avons un court-circuit.
+}
+
+\parag{Résistor}{
+    Nous utilisons des conducteurs pour transporter des circuits. Cependant, nous ne pouvons par relier une borne d'une source à son autre borne, puisque cela crée un court-circuit, il y a une très petite résistance sur le circuit, ce qui donne un courant énorme (puisque $I = \frac{U}{R}$, comme nous allons le voir).
+
+    Il nous faut donc rajouter d'autres composantes. Les premières qu'on va considérer sont les résistor. Ils sont caractérisés par une résistance $R$, et ils suivent la loi:
+    \[U_R = RI_R\]
+    où $U_R$ est la différence de potentiel entre les deux bornes et $I_R$ est le courant passant à travers le résistor.
+}
+
+\parag{Puissance}{
+    Nous pouvons calculer la tension prise par un composant à l'aide de la tension à ses bornes et du courant le traversant:
+    \[P = UI\]
+    
+    Considérons les signes. Nous voulons que si $P < 0$, alors le circuit nous coûte de l'énergie; et si $P > 0$, alors il produit de l'énergie sous forme de chaleur. De plus, par convention physique, la tension va dans la direction du $+$ vers le $-$ (elle est orientée du potentiel le plus haut à celui le plus bas). Aussi par convention, le courant suit le sens inverse des électrons. Ainsi, pour que tout fonctionne, cela nous donne que si courant et tension sont de même sens, alors ils sont de mêmes signes. En d'autres mots, si la tension et le courant vont dans le même sens, alors cela produit de l'énergie, sinon cela en consomme.
+
+    Notez que les français font l'inverse. Cependant, les suisses et les anglo-saxons utilisent la convention énoncée ci-dessus, et donc c'est celle que nous utiliserons dans ce cours.
+
+    \subparag{Remarque}{
+        Par exemple, dans le circuit suivant, une source ne perd pas toujours de l'énergie:
+        \imagehere[0.7]{SourceProduitEnergie.png}
+    }
+}
+
+
+\parag{Source idéale et réelle}{
+    \subparag{Source de tension}{
+        Une source de tension réelle (modélisée) est composée d'une source de tension idéale mise en série avec une résistance (plus cette dernière est petite, meilleure est la source de tension):
+        \imagehere{SourceTensionReelle.png}
+
+        Par exemple, cela donnerait les graphiques suivants:
+        \imagehere{GraphiquesSourceTensionReelle.png}
+    }
+
+    \subparag{Source de courant}{
+        Une source de courant réelle (modélisée) est composée d'une source de courant idéale mise en parallèle avec une résistance (plus cette dernière est grande, meilleure est la source de tension):
+        \imagehere{SourceCourantReelle.png}
+
+        Par exemple, cela donnerait les graphiques suivants:
+        \imagehere{GraphiquesSourceCourantReelle.png}
+    }
+}
+
+\parag{Superposition de signaux}{
+    Il nous arrive vouloir de superposer des sources. Cependant, cela nous arrive aussi d'avoir une source de bruit qui vient se superposer sur notre signal, ce qui est gênant.
+}
+
+\parag{Tension efficace}{
+    Si on met une baffe dans un sens, puis dans l'autre sens, la tête de l'autre personne sera revenue dans sa position initiale; cependant la personne a mal. Donc, La moyenne n'est pas ce que nous voulons calculer, nous voulons plutôt considérer la puissance.
+
+    Commençons par considérer le signal en valeur absolue, appelé le signal redressé: 
+    \[V_{moy} = \frac{2}{T} \int_{0}^{\frac{T}{2}} V\left(t\right)dt = \frac{2}{T} \int_{0}^{\frac{T}{2}} A \sin\left(2 \pi f t\right) = -\frac{AT}{2\pi}\left[\cos\left(\pi\right) - \cos\left(0\right)\right] = \frac{AT}{\pi}\]
+
+    Cependant, comme mentionné plus tôt, il est plus intéressant de regarder la puissance moyenne: 
+    \[P_{EFF} = \frac{P_{TOT}}{T} = \frac{1}{T}\int_{0}^{T} U\left(t\right) I\left(t\right) dt = \frac{1}{T}\int_{0}^{T} R I^2\left(t\right) dt = \frac{1}{T}\int_{0}^{T} \frac{A^2 \sin^2\left(2 \pi f t\right)}{R} dt = \frac{A^2}{2R}\]
+    
+    Considérons que cette puissance est générée par une tension continue plutôt. La tension constante qui créerait cette puissance, que nous appelons la tension efficace, est donnée par:
+    \[P_{EFF} = \frac{U_{EFF}^2}{R} \iff \frac{A^2}{2R} = \frac{U_{EFF}^2}{R} \iff U_{EFF} = \frac{A}{\sqrt{2}}\]
+
+    Pour conclure, la valeur moyenne de la tension ne sert à rien, mais la valeur moyenne de la puissance est importante.
+}
+
+
+
+
+\end{document}
