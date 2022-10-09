@@ -1,0 +1,210 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-04 at 08:16:57.
+
+\usepackage{../../style}
+
+\title{Machine Learning}
+\author{Joachim Favre}
+\date{Mardi 04 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2022-10-04}{Gradient descent}{
+\begin{itemize}[left=0pt]
+    \item Derivation of the closed form for the linear regression model.
+    \item Definition of loss function and empirical risk.
+    \item Explanation of the gradient descent algorithm.
+    \item Explanation of the linear classifier, and explanation why it does not work.
+    \item Introduction to the ``logistic regression'' classifier model. 
+\end{itemize}
+
+}
+
+\parag{Minimisation}{
+    We want to minimise our loss function, thus we compute its gradient (it is not really important how, but we basically use the fact that $\nabla_{\bvec{a}} \left\|\bvec{a}\right\|^2 = \nabla_{\bvec{a}} \bvec{a}^T \bvec{a} = 2 \bvec{a}$, and $\nabla_{B} \bvec{a}^T B = \bvec{a}$) and get:
+    \[\nabla_{W} R = 2 \sum_{i=1}^{N} \bvec{x_i} \left(\bvec{x_i}^T W - \bvec{y_i}^T\right)\]
+
+    This form is very similar to the one we got for the one-dimensional output. When setting it to zero, we get: 
+    \[\underbrace{\left(\sum_{i=1}^{N} \bvec{x_i} \bvec{x_i}^T \right)}_{\in \mathbb{R}^{\left(D+1\right)\times\left(D+1\right)}} \underbrace{W^*}_{\in \mathbb{R}^{\left(D+1\right)\times C}} = \underbrace{\sum_{i=1}^{N} \bvec{x_i} \bvec{y_i}^T}_{\left(D+1\right)\times C}\]
+    
+    We can again group the inputs in a matrix $X$, and do exactly the same thing for $Y$: 
+    \[Y = \begin{pmatrix} \bvec{y_1}^T \\ \vdots \\ \bvec{y_N}^T \end{pmatrix} = \begin{pmatrix} y_1^{\left(1\right)} & \cdots & y_1^{\left(C\right)} \\ \vdots & \ddots & \vdots \\ y_N^{\left(1\right)} & \cdots & y_n^{\left(C\right)} \end{pmatrix} \in \mathbb{R}^{N \times C} \]
+    
+    Then, following the same strategy as before, we have: 
+    \[W^* = \left(X^T X\right)^{-1} X^T Y = X^{\dagger} Y\]
+    
+    Again, there are ways to compute efficiently $\left(X^T X\right)^{-1} X^T$, the Moore-Penrose pseudo-inverse of $X$, so we just call this $X^{\dagger}$.
+}
+
+\parag{Summary}{
+    The professor does not require us to know all the computations for this exam, but more this last formula, how $X$ and $Y$ are constructed, and what $W^*$ means. Let us thus do a small summary.
+
+    We define the following matrices: 
+    \[X = \begin{pmatrix} \bvec{x_1}^T \\ \vdots \\ \bvec{x_N}^T \end{pmatrix} = \begin{pmatrix} 1 & \cdots & x_1^{\left(D\right)} \\ \vdots & \ddots & \vdots \\ 1 & \cdots & x_N^{\left(D\right)} \end{pmatrix} \in \mathbb{R}^{N \times \left(D+1\right)}\]
+    \[Y = \begin{pmatrix} \bvec{y_1}^T \\ \vdots \\ \bvec{y_N}^T \end{pmatrix} = \begin{pmatrix} y_1^{\left(1\right)} & \cdots & y_1^{\left(C\right)} \\ \vdots & \ddots & \vdots \\ y_N^{\left(1\right)} & \cdots & y_n^{\left(C\right)} \end{pmatrix} \in \mathbb{R}^{N \times C}\]
+    \[W = \begin{pmatrix} \bvec{w_{\left(1\right)}}^{T} \\ \vdots \\ \bvec{w_{\left(C\right)}}^{T} \end{pmatrix} \in \mathbb{R}^{\left(D+1\right)\times C}\]
+    where each $\bvec{w}_{\left(j\right)}$ is a $\left(D+1\right)$-dimensional vector, used to predict the $j$\Th output dimension.
+    
+    The best weights are given by:
+    \[W^* = \left(X^T X\right)^{-1} X^T Y = X^{\dagger} Y\]
+    
+    And we can then use them to predict $\bvec{y_t}$, given a new $\bvec{x_t}$: 
+    \[\bvec{y_t} = \left(W^*\right)^T \bvec{x_t}\]
+}
+
+
+\subsection{Loss function and empirical risk}
+\parag{Loss function}{
+    The \important{loss function} $\ell\left(\hat{y_i}, y_i\right)$ computes an error value between the prediction and the true value. We will see different loss functions throughout the semester.
+
+    \subparag{Examples}{
+        So far, we have seen the two following: 
+        \[\ell \left(\hat{y_i}, y_i\right) = \left(\hat{y_i} - y_i\right)^2\]
+        \[\ell \left(\bvec{\hat{y_i}}, \bvec{y_i}\right) = \left\|\bvec{\hat{y_i}} - \bvec{y_i}\right\|^2\]
+    }
+}
+
+\parag{Empirical risk}{
+    Given $N$ training samples $\left\{\left(\bvec{x_i}, y_i\right)\right\}$ the \important{empirical risk} is defined as:
+    \[R\left(\left\{\bvec{x_i}\right\}, \left\{y_i\right\}, \bvec{w}\right) = \frac{1}{N} \sum_{i = 1}^{N} \ell \left(\hat{y_i}, y_i\right)\]
+    where $\left\{\bvec{x_i}\right\}$ and $\left\{y_i\right\}$ are the sets of training inputs and labels, respectively.
+    
+    During training, our goal is to find the $\bvec{w}$ which minimised the empirical risk:
+    \[\min_{\bvec{w}} \sum_{i=1}^{N} \ell \left(\hat{y_i}, y_i\right)\]
+    \[\bvec{w}^* = \argmin_{\bvec{w}} \frac{1}{N} \sum_{i=1}^{N} \ell \left(\hat{y_i}, y_i\right)\]
+
+    Note that the first expression outputs the minimum error, thus we cannot equal it to $\bvec{w}^*$, whereas argmin outputs the $\bvec{w}$ which minimises the function.
+}
+
+\subsection{Gradient descent}
+\parag{Remark}{
+    So far, we have always been able to find a closed form for the minimum of our functions. However, this is not always possible, so we must find a way to approximate the minimum. \important{Gradient descent} is one.
+}
+
+\parag{One dimension}{
+    Let's first consider a one-dimensional function. We can always move to the direction opposite to the direction of the derivative. We basically iteratively compute $w_k = w_{k-1} - \eta \frac{dR\left(w_{k-1}\right)}{dw}$, where $w_0$ can be initialised randomly. $\eta$ defines the step of each iteration, and it is often referred as the \important{learning rate} in machine learning. We will consider it constant in this course, but there are better solutions. 
+
+    When reaching the minimum, the derivative tends to zero, and thus the algorithm converges to this point. To know if we have converged, we can define some constant $\delta_R$: 
+    \[\left|R\left(w_{k-1}\right) - R\left(w_k\right)\right| < \delta_R\]
+    
+    Or $\delta_W$ such that: 
+    \[\left|w_{k-1} - w_{k}\right| < \delta_W\]
+
+    We could also take a maximum number of iterations, but then we have no guarantee that we reached the minimum.
+
+    Note that if we take $\eta$ too small, then the algorithm will take a lot of time to converge, and if we take $\eta$ to be too large, then there can be some numeric problems. For instance, on the following pictures, in the second case, the steps are too large and the algorithm starts jumping between two points:
+    \imagehere[0.8]{GradientDescentInfluenceLearningRate.png}
+}
+
+\parag{Non-convex function}{
+    We can use the same algorithm for non-convex functions. The problem, is that we have multiple points where the gradient is 0. Thus, the initialisation is really important. On the following pictures, in the first case, we get a local (non-global) minimum, and in the second case we get a saddle point:
+    \imagehere[0.8]{GradientDescentNonConvex.png}
+}
+
+\parag{Multi-dimensional}{
+    We can use the same algorithm for multi-variable functions, by following the negative direction of the gradient. We basically iteratively compute $\bvec{w_k} = \bvec{w_{k-1}} - \eta \nabla_{\bvec{w}} R\left(\bvec{w_{k-1}}\right)$, where $\bvec{w_0}$ can be initialised randomly. 
+
+    The learning rate $\eta$ has the same effect as in the 1D case. We use the same one for all dimensions, but this can be improved in more complex techniques.
+
+    Convergence can again be measured, this time by computing the norm: 
+    \[\left\|\bvec{w_{k-1}} - \bvec{w_k}\right\| < \delta_{\bvec{w}}\]
+
+    \subparag{Remark}{
+        This algorithm works since the gradient points towards the distance of greatest increase, and it magnitude shows how fast it increases. Thus, always going proportionally to its magnitude in the direction opposite to which it points, it theoretically makes us go to a minimum (we can of course still have the same problems as with a one-dimensional function, getting stuck in a saddle point, a maximum or cycle between some points).
+    }
+    
+}
+
+
+\subsection{Linear classification}
+\parag{Goal}{
+    Now, we want to predict one discrete label for a given sample. 
+
+    \subparag{Example}{
+        Given an input sentence, we may want to predict if the person liked the movie or not. Similarly, given pictures, we may want to predict what animal is on it.
+    }
+}
+
+\parag{Two classes}{
+    For now, let's limit ourselves to two classes. In the following example we have two categories, one red and one blue: 
+    \imagehere[0.5]{LinearClassificationColourExample2D.png}
+
+    We can label $y \in \left\{-1, 1\right\}$ or $y \in\left\{0, 1\right\}$. The samples with label 1 are called \important{positive samples}, and the ones with -1 (or 0) are called \important{negative samples}.
+
+    We can also see our data in 3D:
+    \imagehere[0.5]{LinearClassificationColourExample3D.png}
+}
+
+\parag{Regression}{
+    We can tackle classification as a regression problem. For instance:
+    \imagehere[0.5]{LinearClassificationTumorExample.png}
+
+    We can use exactly the same strategy as in linear regression: 
+    \[\bvec{w}^* = \argmin_{\bvec{w}} \sum_{i=1}^{N} \left(\bvec{x_i}^T \bvec{w} - y_i\right)^2 = \left(X^T X\right)^{-1} X^T \bvec{y}\]
+    
+    However, we are outputing a continuous $y$ when we would prefer to have a discrete label. Thus, we need to discretise. For instance: 
+    \begin{functionbypart}{\text{label}}
+        1, \mathspace \text{if } \hat{y_t} \geq 0.5 \\
+        0, \mathspace \text{otherwise}
+    \end{functionbypart}
+
+    The point where we change from 0 to 1 is named the \important{decision boundary}. In one dimension it is a point, in two dimensions it is a line, and so on. In the following pictures, the green line is the decision boundary, the orange plane is the result from the linear regression, and the cyan plane represents our step function. Note that the decision boundary is the intersection of those two planes.
+    \imagehere{LinearClassificationColourExampleDecisionBoundary.png}
+
+
+    \subparag{Problem}{
+        We can see that, on the pictures above, our classifier works perfectly. However, if we add some new samples, then it starts working less well:
+        \imagehere[0.9]{LinearClassificationTumorExampleNotWorking.png}
+
+        This is a problem of the least-square classifier: finding the hyperplane which best fits the data points does not really work; so we will try to use another classifier. Basically, when using a least-square loss, we are not encoding a classification problem.
+    }
+}
+
+\subsection{Non-linear classification}
+\parag{Sigmoid}{
+    We would like to make a model which will output a discrete value. To do so, we could take our linear model through a step function:
+    \begin{functionbypart}{\text{label}}
+        1, \mathspace \text{if } \bvec{w}^T \bvec{x} \geq 0.5 \\
+        0, \mathspace \text{otherwise}
+    \end{functionbypart}
+
+    The problem is that this is not continuous, meaning that we cannot compute the gradient. Instead, we can use an approximation of the step function, such as the logistic sigmoid function: 
+    \[f\left(a\right) = \frac{1}{1 + \exp\left(-a\right)}\]
+
+    In our case, $a = \bvec{w}^T \bvec{x}$, so we have: 
+    \[\hat{y} = f\left(\bvec{w}^T \bvec{x}\right) = \frac{1}{1 + \exp\left(-\bvec{w}^T \bvec{x}\right)} = \frac{1}{1 + \exp\left(-w^{\left(0\right)} - w^{\left(1\right)}x\right)}\]
+    
+    Modifying $w^{\left(0\right)}$ has the effect to shift the function, and increasing $w^{\left(1\right)}$ has the effect of increasing the slope (and making it negative flips the function).
+    \imagehere{SigmoidExample.png}
+
+    We can note that it fixes our problem, we can add points without having the model work less well:
+    \imagehere[0.7]{LinearClassificationTumorExampleSigmoid.png}
+    
+    The prediction made by our model can be interpreted as the probability that $\bvec{x}$ belongs to the positive class (or a score for the positive classe).
+
+    This model is named \important{logistic regression}. This is a slightly misleading name since we are doing a classification model.
+}
+
+\parag{Cross-entropy}{
+    Given $N$ training samples, we want to find the best parameters $\bvec{w}$. To do so, we need to define a loss function. Instead of using the squared loss, we will instead make use of the probabilistic interpretation: 
+    \[p\left(\bvec{y} | \bvec{w}\right) = \prod_{i=1}^{N} \hat{y_i}^{y_i} \cdot  \left(1 - \hat{y_i}\right)^{1 - y_i}\]
+    
+    The true $y_i$ (by opposition to the approximated $\hat{y_i}$ given by our model) is either $1$ or $0$. In the first case, we only care about the first factor (meaning that we only care about the probability for the positive class), and in the second case we only care about the second factor.
+
+    This loss function is problematic with small values, so instead we take a logarithm. Also, since we prefer finding minimums, we take a negative value: 
+    \[R\left(\bvec{w}\right) = - \sum_{i=1}^{N} \left(y_i \ln\left(\hat{y_i}\right) + \left(1 - y_i\right)\ln\left(1 - \hat{y_i}\right)\right)\]
+    
+    This loss function is known as the \important{cross-entropy}. We can rewrite it as: 
+    \[R\left(\bvec{w}\right) = - \sum_{i \in \text{positive}}^{} \ln\left(\hat{y_i}\right) - \sum_{i \in \text{negative}}^{} \ln\left(1 - \hat{y_i}\right) \]
+    
+    \subparag{Good news, bad news}{
+        This is again a convex function, so it has a unique minimum. The bad news is it has no closed form. Such functions is the reason why we need gradient descent.
+    }
+}
+
+\end{document}

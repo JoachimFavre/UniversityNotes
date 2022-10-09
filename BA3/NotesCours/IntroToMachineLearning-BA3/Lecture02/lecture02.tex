@@ -1,0 +1,149 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-09-27 at 08:18:16.
+
+\usepackage{../../style}
+
+\title{Intro to ML}
+\author{Joachim Favre}
+\date{Mardi 27 septembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2022-09-27}{Finding a closed form for linear regressions}{
+\begin{itemize}[left=0pt]
+    \item Application of linear regressions to more input dimensions.
+    \item Computation of the closed form for the linear regression model.
+    \item Explanation of the different error measurements.
+    \item Introduction to linear regressions with more output dimensions.
+\end{itemize}
+
+}
+
+\parag{Linear regression}{
+    Our goal is to minimise the average error, and thus the following function: 
+    \[R\left(w^{\left(0\right)}, w^{\left(1\right)}\right) = \frac{1}{N} \sum_{i=1}^{N} d^2\left(\hat{y_i}, y_i\right) = \frac{1}{N} \sum_{i=1}^{N} \left(w^{\left(0\right)} + w^{\left(1\right)}x_i - y_i\right)^2\]
+    
+    We can write it equivalently as: 
+    \[R\left(\bvec{w}\right) = \frac{1}{N} \sum_{i=1}^{N} \left(\bvec{w}^T \bvec{x_i} - y_i\right)^2\]
+    where $\bvec{x_i}^T \bvec{w} = \bvec{w} \bvec{x_i}^T = \bvec{w} \dotprod \bvec{x_i}$ and : 
+    \[\bvec{x_i} = \begin{pmatrix} 1 \\ x_i \end{pmatrix}, \mathspace \bvec{w} = \begin{pmatrix} w^{\left(0\right)} \\ w^{\left(1\right)} \end{pmatrix} \]
+    
+    However, typically, $\bvec{x_i}$ is not represented by a single value: we have many inputs. This leads to more dimensions.
+}
+
+\parag{More dimensions}{
+    In two dimensions (having inputs $x^{\left(1\right)}, x^{\left(2\right)}$), we want a plane instead of line. Then, we can write: 
+    \[y = w^{\left(0\right)} + w^{\left(1\right)}x^{\left(1\right)} + w^{\left(2\right)}x^{\left(2\right)} = \bvec{w}^T \begin{pmatrix} 1 \\ x^{\left(1\right)} \\ x^{\left(2\right)} \end{pmatrix}\]
+    
+    We would then want to find the best plane that fits our inputs.
+
+    We can generalise this mathematical form, leading to: 
+    \[y = w^{\left(0\right)} + \ldots + w^{\left(D\right)} x^{\left(D\right)} = \bvec{w}^T \begin{pmatrix} 1 \\ x^{\left(1\right)} \\ \vdots \\ x^{\left(D\right)} \end{pmatrix} = \bvec{w}^T \bvec{x}\]
+    where $\bvec{x}, \bvec{w} \in \mathbb{R}^{D+1}$.
+}
+
+\parag{Training}{
+    For any number of dimensions, we want to minimise: 
+    \[\min_{\bvec{w}} \frac{1}{N} \sum_{i=1}^{N} d ^2 \left(\hat{y_i}, y_i\right) \iff \min_{\bvec{w}} \frac{1}{N} \sum_{i=1}^{N} \left(\bvec{x_i}^T \bvec{w} - y_i\right)^2\]
+    just as in one dimension.
+
+    The goal is thus now a minimisation problem.
+}
+
+\parag{Recall: Derivative}{
+    The derivative of a function $R\left(w\right)$ of a single variable $w$ is the rate at which $R$ changes as $w$ changes. This is measured for an infinitesimal change in $w$: 
+    \[R'\left(\bar{w}\right) = \frac{dR}{dw} = \lim_{\Delta w \to 0} \frac{R\left(\bar{w} + \Delta w\right) - R\left(\bar{w}\right)}{\Delta w}\]
+
+    This represents the slope of the tangent line to the function at the point $\bar{w}$. This is great because it works for any function.
+
+    \subparag{Property}{
+        At minima and maxima (and saddle points), the derivative is zero. This is important for our problem.
+    }
+}
+
+\parag{Recall: Gradient}{
+    The gradient is a multi-viariable generalisation of the derivative. Given a function $R\left(\bvec{w}\right)$ where $\bvec{w} \in\mathbb{R}^D$: 
+    \[\nabla_{\bvec{w}} R\left(\bvec{w}\right) = \begin{pmatrix} \frac{\partial R}{\partial w^{\left(1\right)}}  \\ \vdots \\ \frac{\partial R}{\partial w^{\left(D\right)}} \end{pmatrix} \]
+    
+    \subparag{Property}{
+        The gradient at a point $\bvec{w}$ has the direction of greatest increase of the function at $\bvec{w}$. Also, its magnitude is the rate of increase in that direction.
+
+        It also becomes a zero vector at minima, maxima and saddle points.
+    }
+}
+
+\parag{Minimisation}{
+    As mentioned above, we seek to minimise: 
+    \[R\left(\bvec{w}\right) = \frac{1}{N} \sum_{i=1}^{N} \left(\bvec{x_i}^T \bvec{w} - y_i\right)^2\]
+    
+    Analysing this function, we could see that it is convex (meaning it has one minimum and no extremum).
+
+    Let's compute the gradient. We know that the gradient of a sum is the sum of the gradients, and the following properties: 
+    \[\nabla_{\bvec{w}} f\left(g\left(\bvec{w}\right)\right) = \frac{df\left(g\right)}{ddg} \nabla_{\bvec{w}} g\left(\bvec{w}\right), \mathspace \nabla_{\bvec{b}} \bvec{a}^T \bvec{b} = \bvec{a}\]
+    
+    We can use them: 
+    \autoeq{\unexpanded{\nabla_{\bvec{w}} R = \frac{1}{N} \sum_{i=1}^{N} \nabla_{\bvec{w}} \left(\bvec{x_i}^T \bvec{w} - y_i\right)^2 = \frac{2}{N} \sum_{i=1}^{N}\left(\bvec{x_i}^T \bvec{w} - y_i\right) \cdot  \nabla_{\bvec{w}} \left(\bvec{x_i}^T \bvec{w} - y_i\right) =  \frac{2}{N} \sum_{i=1}^{N} \left(\bvec{x_i}^T \bvec{w} - y_i\right) \left(\bvec{x_i} + \bvec{0}\right) = \frac{2}{N} \sum_{i=1}^{N} \left(\bvec{x_i} \bvec{x_i}^T \bvec{w} - y_i\right)}}
+
+    We want it to be 0, so we can let: 
+    \autoeq{\unexpanded{\underbrace{\left(\sum_{i=1}^{N} \bvec{x_i} \bvec{x_i}^T\right)}_{\in \mathbb{R}^{\left(D+1\right)\times\left(D+1\right)}} \bvec{w}^* = \sum_{i=1}^{N} \bvec{x_i} y_i}}
+    
+    Let's write this in a matrix form. We can write: 
+    \[X = \begin{pmatrix} \bvec{x_1}^T \\ \vdots \\ \bvec{x_N}^T \end{pmatrix} = \begin{pmatrix} 1 & \cdots & x_1^{\left(D\right)} \\ \vdots & \ddots & \vdots \\ 1 & \cdots & x_N^{\left(D\right)} \end{pmatrix} \in \mathbb{R}^{N \times \left(D+1\right)}, \mathspace \bvec{y} = \begin{pmatrix} y_1 \\ \vdots \\ y_n \end{pmatrix} \in \mathbb{R}^N\]
+    \[\]
+
+    Using such notations, we can rewrite our previous equation as: 
+    \[X^T X \bvec{w}^* = X^T \bvec{y} \implies \bvec{w}^* = \left(X^T X\right)^{-1} X^T \bvec{y} = X^{\dagger} \bvec{y}\]
+    Where $X^{\dagger}$ is the Moore-Penrose pseudo-inverse of $X$ (which can be easily computed in python).
+}
+
+\parag{Prediction}{
+    As for the 1D case, when we have found our optimal parameters $\bvec{w}^*$, we can predict $\hat{y_t}$ for any new $\bvec{x_t}$: 
+    \[y_t = \left(\bvec{w}^*\right)^T \bvec{x_t}\]
+}
+
+\parag{Model evaluation}{
+    Once a Machine Learning model is trained, we would typically want to understand how well it performs on unseen test data. To do so, we present it new data (which it hasn't seen during the training), and we compare the prediction of the model with the true annotations of this data.
+
+    To measure distance, we can use different metrics. We can use the one we used when training the function, the Mean Squared Error (MSE): 
+    \[\text{MSE} = \frac{1}{N_t} \sum_{i=1}^{N_t} \left(\hat{y_i} - y_i\right)^2\]
+    
+    We can consider a distance which fixes the unit, the Root Mean Squared Error (RMSE):
+    \[\text{RMSE} = \sqrt{\text{MSE} }= \sqrt{\frac{1}{N_t} \sum_{i=1}^{N_t} \left(\hat{y_i} - y_i\right)^2}\]
+
+    Another error measure we can use is the Mean Absolute Error (MAE): 
+    \[\text{MAE} = \frac{1}{N_t} \sum_{i=1}^{N_t} \left|\hat{y_i} - y_i\right|\]
+
+    We can also use the Mean Absolute Percentage Error (MAPE): 
+    \[\text{MAPE} = \frac{1}{N_t} \sum_{i=1}^{N_t} \left|\frac{\hat{y_i} - y_i}{y_i}\right|\]
+}
+
+\parag{Interpreting a linear model}{
+    Looking at our optimal parameters $\bvec{w}^*$, we can analyse the results. 
+
+    For instance, let's say we try to predict wine quality with some parameters. If a coefficient $w^{\left(i\right)}$ is very small in absolute value, then this parameter is not important for the model. If it is large in absolute value, it has a high impact; if the value is positive, the impact is positive, if it is negative, the impact is negative.
+
+    Still, we have to be careful when looking at the magnitude of the numbers. If a feature ranges from 0.1 to 0.2 with weight 10 and another feature ranges from 100 to 200 with weight 1, the second parameter would still be much more important than the first one (even if $10 > 1$). We can address this issue by normalising the data.
+}
+
+\subsection{Multiple output dimensions}
+\parag{Goal}{
+    Until now, we have assume that the output was a single value $y_i \in \mathbb{R}$. In practice, however, one may want to output multiple values for a given input, i.e. $\bvec{y_i} \in \mathbb{R}^C$ with $C > 1$.
+
+    We realise that $\bvec{w}^T \bvec{x_i}$ yields a single value, so we need a matrix of weights $W \in \mathbb{R}^{\left(D + 1\right) \times C}$, such that: 
+    \[\bvec{\hat{y_i}} = W^T \bvec{x_i} = \begin{pmatrix} \bvec{w_{\left(1\right)}}^{T} \\ \vdots \\ \bvec{w_{\left(C\right)}}^{T} \end{pmatrix} \bvec{x_i}\]
+    where each $\bvec{w}_{\left(j\right)}$ is a $\left(D+1\right)$-dimensional vector, used to predict the $j$\Th output dimension.
+    
+    Since the outputs are multi-dimensional, we need to modify the loss function. We can use the squared Euclidean distance, seeking to minimise:
+    \[\min_{\bvec{w}} \sum_{i=1}^{N} \left\|W^T \bvec{x_i} - \bvec{y_i}\right\|^2\] 
+    
+}
+
+
+
+
+\end{document}
