@@ -1,0 +1,231 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-09-30 at 15:35:22.
+
+\usepackage{../../style}
+
+\title{Computer networks}
+\author{Joachim Favre}
+\date{Vendredi 30 septembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2022-09-30}{Malicious names}{
+\begin{itemize}[left=0pt]
+    \item Definition of packet loss, packet delay, average throughput, transmission delay and propagation delay, and application of those ideas to multiple scenarios.
+    \item Definition and study of queuing delay.
+    \item Definition and study of bottleneck links.
+    \item Explanation of two ressource management: packet switching and connection switching.
+    \item Explanation of the idea of statistical multiplexing.
+    \item Explanation of the different security vulnerabilities the internet has.
+\end{itemize}
+
+}
+
+\subsection{Evaluate internet connection}
+\parag{Remark}{
+    This subject is one of the most complicated subject but most important subject we will see in the course.
+}
+
+\subsubsection{Direct link}
+\parag{Simplification}{
+    For now, we only consider two points: a destination and a source.
+
+    \imagehere[0.6]{DirectLink.png}
+}
+
+
+\parag{Definition: Packet loss}{
+    \important{Packet loss} is defined to be the fraction (in percentage) of packets from the source to the destination that are lost on the way.
+}
+
+\parag{Definition: Packet delay}{
+    \important{Packet delay} is the time it takes for a packet to get from the source to the destination.
+}
+
+\parag{Definition: Average throughput}{
+    The \important{average throughput} is the average rate at which the destination receives data.
+
+    \subparag{Example}{
+        If the destination receives $\SI{1}{\giga\byte }$ of data in $\SI{1}{\minute }$. Then, the average throughput is $\SI{133.34}{\mega\byte \per  \second }$.
+    }
+}
+
+\parag{Difference between delay and throughput}{
+    By sending multiple packets in parallel, on multiple links, it does not change the delay, but it might change the throughput. Indeed, the time for the packets to travel is the same, but we are able to send more data at the same time, and thus have a better througput.
+
+    Basically, packet delay matters for small messages (when playing video games, we want the game server to receive the information we clicked on the mouse the fastest possible), and average throughput matters for bulk transfers (we don't care if we have some delay when downloading a video game).
+
+    Both are related to each other, but not in an obvious way: improving one does not necessarily improve the other.
+}
+
+\parag{Definition: Transmission and propagation delay}{
+    The \important{transmission delay} is the time we take to push all the bits of our packet onto the link. Thus this is computed as:
+    \[\text{transmission delay} = \frac{\text{packet size}}{\text{link transmission rate}}\]
+
+    The \important{propagation delay} is the time it takes for the packet to reach the other end of the link. Thus, it is computed as:
+    \[\text{propagation delay} = \frac{\text{link length}}{\text{link propagation speed}}\]
+
+    We can notice that the propagation delay does not depend on the size of the packet, only how fast bits travel.
+
+    \subparag{Examples}{
+        Let's say we want to send a 3-byte package over link with transmission rate of $\SI{1}{\giga\byte \per \second }$. Then, the transmission delay is:
+        \[\text{transmission delay} = \frac{\SI{3}{\byte }}{\SI{1}{\giga\byte \per \second }} = \SI{3}{\nano\second }\]
+
+        Let's also say that our link has a length of $\SI{1}{\metre }$, and that its propagation speed (how fast bits travel over this link) is the speed of light. Then, the propagation delay is:
+        \[\text{propagation delay} = \frac{\SI{1}{\metre }}{\SI{3\cdot 10^{8}}{\metre \per \second }} = \SI{3.34}{\nano\second }\]
+    }
+
+    \subparag{Remark}{
+        We can make a link with packet delay:
+        \[\text{packet delay} = \text{transmission delay} + \text{propagation delay}\]
+
+        Indeed, the total time to send the packet can be split in two parts: the time we have to wait before pushing the last bit onto the link, and the time for this last bit to travel over the link.
+    }
+}
+
+\subsubsection{Switch}
+\parag{Circuit switch}{
+    We add a circuit switch between our source and our destination:
+    \imagehere[0.6]{LinkWithCircuitSwitch.png}
+
+    A circuit switch is a device used in traditional telephone networks (and not really used anymore today). Before two sources start exchanging data, the switch establishes a physical circuit between them. This means that we get:
+    \begin{multiequality}
+        \text{packet delay} =\ & \text{transmission delay over \nth{1} link} \\
+        & + \text{propagation delay of \nth{1} link} \\
+        & + \text{propagation delay of \nth{2} link}
+    \end{multiequality}
+
+    Indeed, this is almost exactly the same situation as what we had before, but with a link split in two; when the circuit is established, it's like if the packet switch is not there at all. We could also consider the delay it takes to establish the circuit, but this is amortised over multiple packets.
+}
+
+\parag{Store and forward switch}{
+    Let's now instead consider the switches which really compose the internet: store and forward switches. When a packets arrives, the switch stores it in a queue, and sends the most packets out of this queue. Note that, to do so, the switch waits for the last bit of the packet before retransmitting it.
+
+    This gives us the following equation:
+    \begin{multiequality}
+        \text{packet delay} =\ & \text{transmission delay over \nth{1} link} \\
+        & + \text{propagation delay of \nth{1} link} \\
+        & + {\color{red}\text{queueing delay}}  \\
+        & + {\color{red}\text{processing delay}}  \\
+        & + {\color{red}\text{transmission delay over \nth{2} link}}  \\
+        & + \text{propagation delay of \nth{2} link}  \\
+    \end{multiequality}
+    where the queuing delay is the time taken by the switch to get rid of the packets which were in the queue when the new packet arrived (this depends on the congestion of the network; we will study this value right after) and processing delay is the delay the switch takes to process where to send the packet. Note that we have again to add the transmission delay over the second link since, as mentioned above, this switch waits for all bits to come before sending them out.
+}
+
+\parag{Queuing delay}{
+    The queueing delay depends on the number of packets stored in the queue, and thus on the traffic pattern: the arrival rate of the queue, and the nature of arriving traffic (whether it is a constant stream, or if there are huge burst of data followed by calm periods). We cannot really make a deterministic equation for it, but we can analyse it through statistics.
+
+    Let's say a switch has an average bit arrival rate of $A$, and bit departure rate (transmission rate of the departure link) of $R$ (both in bits per second). Let's also say that the switch has an infinite buffer. Clearly, if $A > R$, then the queuing delay will grow to infinity quickly. However, when $A \leq R$, the question is more complicated: it depends on the burstiness of the arrivals. If there is a lot of packets which arrive at the switch at the same time, but then nothing for some hours, then, momentarily, there would be a tremendous increase in the queuing delay (even though, in the end, every packet will have been sent, since $A \leq R$).
+
+    We can draw the following graph:
+    \imagehere[0.5]{AverageQueuingDelay.png}
+
+    When below 1, we are fine (as long as the packets are spaced enough). However, we still try to operate a lot below 1, because when we are too close to this value, things get very unstable: a little $dx$ on this graph may lead to a big $dy$. This is why we work with overcapacity: we never want to work at the exact capacity of our material and be too close to this 1.
+
+    \subparag{Upper bound}{
+        Real-life switches have a limited queue size, let's say $N$. Supposing there is 0 processing delay and that all packets are $L$ bits, we know that, in the worst case, there are already $\left(N-1\right)$ packets when our packet arrive. This means that we have the following upper bound:
+        \[\text{queuing delay upper bound} = \left(N - 1\right) \frac{L}{R}\]
+    }
+}
+
+\parag{Summary}{
+    To summarise, the packet delay between two end-systems depends on many things, such as the network topology, link properties, switch operations, queue capacity, the rest of the traffic, and so on.
+}
+
+\subsubsection{Throughput}
+\parag{Throughput}{
+    Let's say we have a link connecting directly two end-systems, with transmission rate $R$. We want to transmit a file of size $F$ as $n$ packets of size $L$. The transfer time can be computed as:
+    \[\text{transfer time} = \underbrace{\frac{L}{R} + \ldots + \frac{L}{R}}_{n \text{ times}} + \text{propagation delay} = \frac{F}{R} + \text{propagation delay}\]
+    where $\frac{L}{R}$ is the transmission delay of a package over the link. We can notice that it does not depend on the size nor the number of the packets we make.
+
+    We can notice that if $F$ is big, then the propagation delay can be ignored (thus this delay is definitely not important when downloading a movie). Considering this value to be negligible, we get that the average throughput can be computed as:
+    \[\text{average throughput} = \frac{\text{data}}{\text{time}} = \frac{F}{F / R} = R\]
+    where we measure time between when we send the first bit and when the destination receives the last bit.
+}
+
+\parag{Switch}{
+    Let's now say we have two different links, one with transmission rate $R$ and a second one with transmission rate $R' > R$. The transfer time is given by:
+    \[\text{transfer time} = \frac{F}{R} + \text{propagation delay \nth{1} link} + \frac{L}{R'} + \text{propagation delay \nth{2} link}\]
+    Indeed, the source furst pushes all the $F$ bits of all the packets onto the \nth{1} link. Second, we have to wait for the last bit of the last packet to go to the switch. By the time the last bit of the last packet gets to the switch, all the other packets have already left the switch, because the second link has a higher transmission rate than the first link; thus we only need to wait for the switch to push $L$ more bits on the second link. Finally, we wait for the last bit of the last packet to get to the destination.
+
+    Thus, we computing the transfer time, the propagation delay is the sum of the one of every link; but the propagation rate is more complicated. We can consider everything negligible everything except for the first term, since $F$ is significantly bigger than the rest. This leads to:
+    \[\text{average throughput} = R = \min\left\{R, R'\right\}\]
+
+    We can convince ourselves that the formula is indeed the minimum of the transmission rate of the two links, by considering the case where $R' < R$. In fact, if we have 100 links between the source and the destination, the average throughput will be approximately equal to the transmission rate of the slowest link. This slowest link is the bottleneck link.
+}
+
+\parag{Bottleneck link}{
+    The \important{bottleneck link} in an end-to-end communication is the link of the route where traffic flows at the slowest rate. It can be caused by the link's transmission rate, or because of queuing delay. Increasing the speed of every link except for the bottle-neck one does not change anything.
+
+    Very often the bottlenecks are often at the end, since this is usually where there are the slowest link. However, this is not always the case; it is not even the case that the bottleneck is the one with the smallest transmission rate. Indeed, if a link is used by many communication pairs, it may become the bottleneck.
+    \imagehere[0.6]{BottleNeckLinkCenter.png}
+}
+
+\subsection{Sharing the infrastructure}
+\parag{Packet switch}{
+    In practice, a packet switch is connected to many links. When receiving a packet, it has to read the information written on the header of the packet, and decide where to transfer it.
+    \imagehere[0.5]{PacketSwitch.png}
+
+    A switch needs to have a queue (to store packets) and a forwarding table (which stores meta-data and indicates where to send each packets).
+}
+
+\parag{Ressource management}{
+     A packet switch can have too many packets in their queue, leading to queuing delay and even packet loss. When it has to decide which requests to satisfy and which to turn down, the switch needs to do ressource management.
+
+    \subparag{Packet switching}{
+        The first way is to treat packets on demand: treat them as they come and that's all. If a packet comes but the switch decides that it does not have the resources to manage this packet (because there are already too many packets waiting), it will just drop it.
+    }
+
+    \subparag{''Connection switching''}{
+        The second way, ``connection switching'' (a term from the Professor), is to set up a connection from a source first, reserving resources. The switch can decide whether it has the necessary resources to store and process all the packets that will belong to this connection and, if it does, it will reserve this space for it.
+
+       In other words, resources are reserved in advance.
+    }
+
+    To say which one is better, we have to define how much we care about efficiency and predictability of performance. The first method is very efficient but its performances are non-predictable, whereas the second one is very inefficient (we might deny service even if we have resources to handle it, but we reserved these resources for another link) but its performances are very predictable. Also, the first one is simpler to implement, but requires congestion control (in order to prevent source sending too many packets from taking over the switch and not letting anyone else communicate).
+
+    Over the internet, today, most packet switches do packet switching.
+}
+
+\parag{Example}{
+    Let's say that we have a video server connected to users through the following architecture:
+    \imagehere[0.6]{VideoServer.png}
+
+    We try to find the best number of users we should connect this switch to. Doing connection switching, clearly, we should have exactly 10 users. Doing packet switch, we can start thinking about probabilities. Let's say that each user has a probability of $0.1$ to be active at any given time. Then, we can compute that, with 35 users and assuming that they watch movies independently, there is probability $0.9996$ that 10 or fewer users are active. We can consider that this probability is big enough, or we could increase or decrease the number of users.
+}
+
+\parag{Statistical multiplexing}{
+    The idea is that we have many users share the same resources, but not all of them can share it at the same time. However, we bet that they will not be all active at the same time. This is doing \important{statistical multiplexing}.
+
+    \subparag{Example}{
+        This is the idea of banks. They bet on the fact that not everybody will come take their money at the same time, since it would make them collapse.
+
+        The computation we made in the last example assume independence of probabilities, and this is sometimes true, but it sometimes they are no longer independent. For instance, for banks, the probability for people coming taking their money is no longer independent during a crisis. Similarly, for our last example, when there is a new episode for Game Of Thrones, then everyone will want to see it at the same time.
+    }
+}
+
+\subsection{Security}
+\parag{Introduction}{
+    When many people share a common system, there are security vulnerabilities that can come up.
+
+    Internet was made by the US army during the Cold War, to have a communication system which could resist a nuclear explosion at some place. This makes the internet really resilient to removing nodes, but many other vulnerabilities did not have to be considered. In a military system, they did not really have to consider that there could be a user doing eavesdropping (the protection could be elsewhere).
+}
+
+\parag{Vulnerabilities}{
+    We can consider the following security vulnerabilities.
+
+    \begin{itemize}
+        \item Eve can do \important{eavesdropping} by trying to listen in on the communication, obtaining copies of the data for instance.
+        \item Persa can do \important{impersonating}, by pretending to be someone else in order to extract information.
+        \item Denis can do \important{a denial-of-service attack}, by disrupting a communication (sending a lot of junk traffic to consume all the resources; doing so alone, or by using bots).
+        \item Malik can send a \important{malware}, infecting people with malicious software.
+    \end{itemize}
+}
+
+\end{document}
