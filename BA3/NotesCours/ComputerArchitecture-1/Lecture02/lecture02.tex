@@ -1,0 +1,156 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-09-27 at 17:14:25.
+
+\usepackage{../../style}
+
+\title{Computer architecture}
+\author{Joachim Favre}
+\date{Mardi 27 septembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2022-09-27}{Random memory which is not random}{
+\begin{itemize}[left=0pt]
+    \item Explanation of ISA, and classifications (such as RISC and CISC).
+    \item Explanation of the instructions and instruction cycle.
+    \item Explanation on how memories work, and of the difference between DRAM and SRAM.
+\end{itemize}
+
+}
+
+\subsection{Instruction Set Architecture}
+\parag{ISA}{
+    \important{Instruction Set Architecture} (ISA) is all that one needs to know to program a processor. Thus, this is an interface between hardware and software, some kind of agreement between hardware and software. This is an abstract model of the CPU, so that programmer can use the CPU without needing to understand exactly how it works.
+
+    This is basically just a document which gives the documentation for the hardware.
+}
+
+\parag{Details}{
+    An ISA has to cover the following details:
+    \begin{enumerate}
+        \item Instruction classes (what the processor can directly execute; such as addition, load, jump, \ldots).
+        \item Registers (what type, how many there are, \ldots)
+        \item Memory organisation and access.
+        \item Instruction encoding (how the instructions are encoded in binary).
+        \item Addressing modes (does the CPU access data instantly, \ldots)
+    \end{enumerate}
+}
+
+\parag{Classification}{
+    \subparag{CISC vs RISC}{
+        We can classify the ISA in two ways: Complex Instruction-Set Computer (CISC) and Reduced Instruction-Set Computer (RISC).
+
+        In a CISC processor, there are relatively few registers, instructions encoding is complex, instructions have a variable size, there are many sorts and rather complex addressing modes and the execution pattern is very variable (some instructions take very few cycles while some take tens of cycles).
+
+        In a RISC processor, there are many registers, instruction encoding is very regular, they are all load/store architecture (the ALU only receives data from the register file) and most instructions take the same number of cycles.
+
+        We will implement a RISC architecture in the labs because it is simpler, for instance because it is easier for reading instructions. In a CISC processor, we have to know where the current instruction ends in order to read it in itGeneralProcessors entirety and not mix it with the next instruction (since instructions are not all of the same size).
+    }
+    
+    \subparag{Load/store architecture}{
+        Load/store architecture only access memory with load and store instructions; arithmetic and logic instructions operate exclusively on registers. In other words, if we want to computer $y = x + 1$, we first have to store 1 in a register, and then compute the addition.
+
+        As mentioned hereinabove, RISC processors are load/store.
+    }
+
+    \subparag{Number of bits}{
+        We can have 8-bit, 16-bit, 32-bit, 64-bit, \ldots architectures. This represents approximately the size of the data-path width, the integers size, and so on.
+
+        This increases with time and technology improvements.
+    }
+
+    \subparag{Harvard vs Von Neumann}{
+        In Harvard architecture, the instruction memory and the data memory are splitted. In Von Neumann architecture, both are merged into a single unified memory.
+
+        Today, most of architectures are some kind of Von Neumann architectures.
+    }
+}
+
+\parag{MIPS}{
+    Microprocessor without Interlocked Pipeline Stages (MIPS) is the ISA of the first commercial RISC. It was introduced in the early 1980s. We will use MIPS for most examples because its ISA is easy to understand, it has fixed instruction width, and there are many free simulators existing.
+
+    NIOS II is very similar to MIPS, and we will implement a simplified version of NIOS II in the labs.
+}
+
+\subsection{Instructions}
+\parag{Instructions}{
+    Usually, when writing high-level code, it is compiled into assembly, which then goes through an assembler and is translated into binary.
+
+    Assembly language is a programming language consisting of instructions that are mnemonic (easier) codes for corresponding machine-language instructions. For instance \texttt{add a, b, c} is an easier form than binary, but it translates one-to-one with binary.
+
+    Machine instructions are very regular and primitive. In other words, they have a fixed number of operands (usually one or two). Thus, if we want to add five numbers, we need to do 4 consecutive additions.
+}
+
+\parag{Instruction cycle}{
+    The instruction cycle works the following way:
+    \begin{enumerate}
+        \item We \textit{fetch} the instruction pointed by the program counter.
+        \item We \textit{decode} the instruction.
+        \item We \textit{get the operands} from the register file.
+        \item We \textit{execute} the instruction, letting the ALU to do the computation.
+        \item We \textit{save} the result into the register file
+        \item We finally \textit{prepare} for the next cycle, by updating the program counter (increase it by 1, or go elsewhere if there is a jump).
+    \end{enumerate}
+    
+    Obviously, this is related to ISA. Specifications matter for one or multiple state of the cycle above.
+}
+
+\subsection{Memory}
+\parag{Types}{
+    There are different type of memories: SRAM, DRAM, EPROM, FLSH, and so on. Today we mainly use SRAM (when closer to CPU because it is faster) and DRAM (this is slower but it stores more). Note that we have to do a tradeoff for memory: if we put a lot of memory inside the CPU, it will be very expensive. Thus, we put some fast memory with small capacity next to the CPU, and a lot of slower memory further away.
+
+    Memories differ in their capacity (how many bits), their density (how many bits per unit of area), their speed (how fast we read and write), whether it is writable (not read-only), permanent (does not lose state after power down; also named volatile), programmable read only (can only change the contents once after manufacture).
+
+    \subparag{Remark}{
+        Note that, today, for non-volatile storage, we usually use hard drives or SSD for computers and SD-card for phones.
+    }
+
+    \subparag{Tree}{
+        This is not very important, but we can draw the following tree for the types of memories:
+        \imagehere[0.7]{TreeMemories.png}
+    }
+    
+}
+
+\parag{Abstract view}{
+    A memory is a two-dimensional array of stored bits Each row of bits is identified by an address, and bits identified by the same address form a word (can be 32 bits for instance). For instance:
+    \imagehere[0.4]{AbstractViewMemory.png}
+
+    We need to convert $N$ bits to a $2^N$ bits represented as one-hot encoding, in order to tell the memory in which we want to write or read. We can do this by using a row decoder. For a memory having $N_{addr}$ adresses containing each words of $N_{data}$ bits, we could make the following diagram:
+    \imagehere[0.7]{AbstractViewMemory2.png}
+
+    Note that, in fact, we prefer making a better height/width ratio, since improves the performance, because it shortens the path for electrons. This can be done by adding a column selector. For instance, we could have:
+    \imagehere[0.7]{ColumnSelector.png}
+
+    For instance, if we have addresses that are 12-bit wide (meaning that we have $2^{12}$ words), each which can contain words of 16 bits, then we want to store a total of $2^12 \cdot 16 = 2^16$ bits. This means that, to make it square, we can take a square with side of $2^8$:
+    \imagehere[0.7]{MemorySquareExample.png}
+}
+
+\parag{Random access memory}{
+    Random access memory (RAM) is memory such that you can get access to any address with the same latency. Stated differently, if you take a random address, then you can access it with the same latency as any other.
+    
+    There exist many type of RAM, and here is a tree showing some of them (again, it is not very important, but it can be interesting):
+    \imagehere[0.7]{RAMTree.png}
+}
+
+
+\parag{SRAM and DRAM}{
+    Static RAM (SRAM) is memory where the content will stay forever as long as the power is on (the term static comes from here). This is low density, high power and expensive, but this is fast. 
+
+    Dynamic RAM (DRAM) is memory which needs to be refreshed regularly (the term dynamic comes from here). This is high density, low power and cheap, but this is slow.
+
+    \subparag{Remark}{
+        Note that those memories are much more complicated than basic flipflops. 
+    }
+}
+
+
+
+
+
+\end{document}
