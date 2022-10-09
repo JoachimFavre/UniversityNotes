@@ -1,0 +1,225 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-09-23 at 13:11:53.
+
+\usepackage{../../style}
+
+\title{Algorithms}
+\author{Joachim Favre}
+\date{Vendredi 23 septembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2022-09-23}{I'm rambling a bit}{
+\begin{itemize}[left=0pt]
+    \item Definition of algorithm and instance.
+    \item Recall on asymptotics (I ramble a bit on this subject, but I find it very interesting).
+    \item Definition of the sorting problem, and of loop invariants.
+    \item Explanation of the insertion sort algorithm.
+\end{itemize}
+
+}
+
+\section{Introduction}
+\subsection{Definitions and example}
+\parag{Definition: Algorithm}{
+    An \important{algorithm} is any well-defined computational procedure that takes some value, or set of values as input and produces some value, or set of values, as output. An algorithm is thus a sequence of computational steps that transform the input into the output.
+}
+
+\parag{Definition: Instance}{
+    Given a problem, an \important{instance} is a set of precise inputs. 
+    
+    \subparag{Remark}{
+        Note that for a problem that waits a number $n$ as an input, ``a positive integer'' is not an instance, whereas 232 would be one.
+    }
+    
+}
+
+
+\begin{filecontents*}[overwrite]{NaiveArithmetic.code}
+ans = 0
+for i = 1, 2, ..., n
+    ans = ans + i
+return ans
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{CleverArithmetic.code}
+return n*(n + 1)/2
+\end{filecontents*}
+
+
+\parag{Example: Arithmetic series}{
+    Let's say that, given $n$, we want to compute $\sum_{i=1}^{n} i$. There are multiples way to do so.
+
+    \subparag{Naive algorithm}{
+        The first algorithm that could come to mind is to compute the sum:
+        \importcode{NaiveArithmetic.code}{pseudo}
+        
+        This algorithm is very space efficient, since it only stores 2 numbers. However, it has a time-complexity of $\Theta\left(n\right)$ elementary operations, which is not very great.
+    }
+
+    \subparag{Clever algorithm}{
+        A much better way is to simply use the arithmetic partial series formula, yielding: 
+        \importcode{CleverArithmetic.code}{pseudo}
+        
+        This algorithm is both very efficient in space and in time. This shows that the first algorithm we think of is not necessarily the best, and that sometimes we can really improve it.
+    }
+}
+
+\subsection{Recall: Asymptotics}
+\parag{Complexity analysis}{
+    We want to analyse algorithm complexities and, to do so, we need a model. We will consider that any primitive operations (basically any line in pseudocode) consists of a constant amount of time. Different lines may take a different time, but they do not depend on the sizes of the input. 
+
+    When we only have primitive operations, we basically only need to compute the number of times each line is executed, and then look how it behaves asymptotically. 
+
+    We will mainly consider worst-case behaviour since it gives a guaranteed upper bound and, for some algorithms, the worst case occurs often. Also, the average case is often as bad as the worst-case.
+
+    \subparag{Remark}{
+        When comparing asymptotic behaviour, we have to be careful about the fact that this is asymptotical. In other words, some algorithms which behave less well when $n$ is very large might be better when $n$ is very small.
+
+        As a personal remark, it makes me think about galactic algorithms. There are some algorithms which could be better for very large numbers for some tasks, but those numbers should be so large that it will never be used in practice (for instance, having more bits than the number of atoms in the universe). My favourite example is an algorithm which does a 1729-dimensional Fourrier transform to multiply two numbers.
+    }
+    
+}
+
+\parag{Personal note: Definitions}{
+    We say that $f\left(x\right) \in O\left(g\left(x\right)\right)$, or more informally $f\left(x\right) = O\left(g\left(x\right)\right)$, read ``$f$ is big-O of $g$'', if there exists a $M \in \mathbb{R}_+$ and a $x_0 \in \mathbb{R}$ such that: \[\left|f\left(x\right)\right| \leq M \left|g\left(x\right)\right|, \mathspace \forall x \geq x_0\]
+
+    This leads to many other definitions:
+    \begin{itemize}
+        \item We say that $f\left(x\right) \in \Omega\left(g\left(x\right)\right)$ when $g\left(x\right) \in O\left(f\left(x\right)\right)$. 
+        \item We say that $f\left(x\right) \in \Theta\left(g\left(x\right)\right)$ when $f\left(x\right) \in O\left(g\left(x\right)\right)$ and $f\left(x\right) \in \Omega\left(g\left(x\right)\right)$. Functions belonging to $\Theta\left(g\left(x\right)\right)$ represent an equivalence class.
+        \item We say that $f\left(x\right) \in o\left(g\left(x\right)\right)$ when $f\left(x\right) \in O\left(g\left(x\right)\right)$ but $f\left(x\right) \not\in \Theta\left(g\left(x\right)\right)$.
+        \item We say that $f\left(x\right) \in \omega\left(g\left(x\right)\right)$ when $f\left(x\right) \in \Omega\left(g\left(x\right)\right)$ but $f\left(x\right) \not\in \Theta\left(g\left(x\right)\right)$.
+    \end{itemize}
+
+}
+
+\parag{Personal note: Intuition}{
+    We can have the following intuition:
+    \begin{itemize}
+        \item $f\left(x\right) \in O\left(g\left(x\right)\right)$ means that $f$ grows slower than (or as fast as) $g$ when $x \to \infty$.
+        \item $f\left(x\right) \in \Omega\left(g\left(x\right)\right)$ means that $f$ grows faster than (or as fast as) $g$ when $x \to \infty$.
+        \item $f\left(x\right) \in \Theta\left(g\left(x\right)\right)$ means that $f$ grows exactly as fast as $g$ when $x \to \infty$.
+        \item $f\left(x\right) \in o\left(g\left(x\right)\right)$ means that $f$ grows strictly slower than $g$ when $x \to \infty$.
+        \item $f\left(x\right) \in \omega\left(g\left(x\right)\right)$ means that $f$ grows strictly faster than $g$ when $x \to \infty$.
+    \end{itemize}
+
+    The following theorem can also help the intuition.
+}
+
+\parag{Personal note: Theorem}{
+    Let $f$ and $g$ be two functions, such that the following limit exists or diverges:
+    \[\lim_{x \to \infty} \frac{\left|f\left(x\right)\right|}{\left|g\left(x\right)\right|} = \ell \in \mathbb{R} \cup \left\{\infty\right\}\]
+    
+    We can draw the following conclusions, depending on the value of $\ell $:
+    \begin{itemize}
+        \item If $\ell = 0$, then $f\left(x\right) \in o\left(g\left(x\right)\right)$.
+        \item If $\ell = \infty$, then $f\left(x\right) \in \omega\left(g\left(x\right)\right)$.
+        \item If $\ell \in \mathbb{R}^*$, then $f\left(x\right) \in \Theta\left(g\left(x\right)\right)$.
+    \end{itemize}
+    
+    \subparag{Proof}{
+        We will only prove the third point, the other two are left as exercises to the reader.
+
+        First, we can see that $\ell > 0$, since $\ell \neq 0$ by hypothesis and since $\frac{\left|f\left(x\right)\right|}{\left|g\left(x\right)\right|} > 0$ for all $x$.
+
+
+        We can apply the definition of the limit. Since it is valid for all $\epsilon > 0$, we know that, in particular, it is true for $\epsilon = \frac{\ell }{2} > 0$. Thus, by definition of the limit, we know that for $\epsilon = \frac{\ell }{2} > 0$, there exists a $x_0 \in \mathbb{R}$, such that for all $x \geq x_0$, we have:
+        \autoeq{\unexpanded{\left|\frac{\left|f\left(x\right)\right|}{\left|g\left(x\right)\right|} - \ell \right| \leq \epsilon = \frac{\ell }{2} \iff -\frac{\ell }{2} \leq \frac{\left|f\left(x\right)\right|}{\left|g\left(x\right)\right|} - \ell \leq \frac{\ell }{2} \iff \frac{\ell }{2} \left|g\left(x\right)\right| \leq \left|f\left(x\right)\right| \leq \frac{3 \ell }{2} \left|g\left(x\right)\right|}}
+        since $\left|g\left(x\right)\right| > 0$.
+
+        Since $\frac{\ell }{2} \left|g\left(x\right)\right| \leq \left|f\left(x\right)\right|$ for $x \geq x_0$, we get that $f \in \Omega\left(g\left(x\right)\right)$. Also, since $\left|f\left(x\right)\right| \leq \frac{3 \ell }{2} \left|g\left(x\right)\right|$ for $x \geq x_0$, we get that $f \in O\left(g\left(x\right)\right)$. 
+
+        We can indeed conclude that $f \in \Theta\left(g\left(x\right)\right)$.
+
+        \qed
+    }
+    
+    \subparag{Example}{
+        Let $a \in \mathbb{R}$ and $b \in \mathbb{R}_+$. Let us compute the following ratio:
+        \[\lim_{n \to \infty} \frac{\left|\left(n + a\right)^b\right|}{\left|n^b\right|} = \lim_{n \to \infty} \left|\left(1 + \frac{a}{n}\right)^{b}\right| = 1\]
+        which allows us to conclude that $\left(n + a\right)^b \in \Theta\left(n^b\right)$.
+    }
+    
+
+    \subparag{Side note: Link with series}{
+        You can go read my Analyse 1 notes on my GitHub (in French) if you want more information, but there is an interesting link with series we can do here.
+
+        You can convince yourself that if $a_n \in \Theta\left(b_n\right)$, then $\sum_{n = 1}^{\infty} \left|a_n\right|$ and $\sum_{n = 1}^{\infty} \left|b_n\right|$ have the same nature. Indeed, this hypothesis yields that $\exists C_1, C_2 \in \mathbb{R}_+$ and a $n_0 \in \mathbb{N}$ such that, for all $n \geq n_0$:
+        \[0 \leq C_1 \left|b_n\right| \leq \left|a_n\right| \leq C_2 \left|b_n\right| \implies C_1 \sum_{n = 1}^{\infty} \left|b_n\right| \leq \sum_{n = 1}^{\infty}  \left|a_n\right| \leq C_2 \sum_{n = 1}^{\infty}  \left|b_n\right|\]
+        by the comparison criteria. 
+
+        Also, we know very well the convergence of the series $\sum_{n = 1}^{\infty} \left|\frac{1}{n^p}\right|$ (which converges for all $p > 1$, and diverges otherwise). Using Taylor series, this allows us to know very easily the convergence of a series.
+
+        For instance, let us consider $\sum_{n = 1}^{\infty} \left(\cos\left(\frac{1}{n}\right) - 1\right)$. We can compute the following limit:
+        \autoeq{\unexpanded{\lim_{n \to \infty} \frac{\left|\cos\left(\frac{1}{n}\right) - 1\right|}{\frac{1}{n^p}} = \lim_{n \to \infty} \left|n^p \left(1 - \frac{\left(\frac{1}{n}\right)^2}{2} + \epsilon\left(\frac{1}{n^4}\right) - 1\right)\right| = \lim_{n \to \infty} \left|-\frac{n^p}{2n^2} + n^p \epsilon\left(\frac{1}{n^4}\right)\right|= \frac{1}{2}}}
+        for $p = 2$. In other words, our series has the same nature as $\sum_{n=1}^{\infty} \left|\frac{1}{n^2}\right|$, which converges. This allows us to conclude that $\sum_{n = 1}^{\infty} \left(\cos\left(\frac{1}{n}\right) - 1\right)$ converges absolutely. 
+
+        You can see how powerful those tools are.
+    }
+    
+}
+
+
+\section{Sorting algorithms}
+\parag{Definition: The sorting problem}{
+    For the \important{sorting problem}, we take a sequence of $n$ numbers $\left(a_1, \ldots, a_n\right)$ as input, and we want to output a reordering of those numbers $\left(a_1', \ldots, a_n'\right)$ such that $a_1' \leq \ldots \leq a_n'$.
+
+    \subparag{Example}{
+        Given the input $\left(5, 2, 4, 6, 1, 3\right)$, a correct output is $\left(1, 2, 3, 4, 5, 6\right)$.
+    }
+    
+
+    \subparag{Personal note: Remark}{
+        It is important to have the same numbers at the start and the end. Else, it allows to have algorithms such as the Stalin sort (remove all elements which are not in order, leading to a complexity of $\Theta\left(n\right)$), or the Nagasaki sort (clearing the list, leading to a complexity of $\Theta\left(1\right)$).
+
+        They are more jokes than real algorithms, here is where I found the Nagasaki sort:
+        \begin{center}
+            \small \url{https://www.reddit.com/r/ProgrammerHumor/comments/o5w3eo}
+        \end{center}
+        
+    }
+}
+
+\parag{Definition: In place algorithm}{
+    An algorithm solving the sorting problem is said to be \important{in place} when the numbers are rearranged within the array (with at most a constant number of variables oustside the array at any time).
+}
+
+
+\parag{Loop invariant}{
+    We will see algorithms, which we will need to prove are correct. To do so, one of the methods is to use a loop invariant. This is something that stays true at any iteration of a loop. The idea is very similar to induction.
+
+    To use a loop invariant, we need to do three steps. In the \important{initialization}, we show that the invariant is true prior to the first iteration of the loop. In the \important{maintenance}, we show that, if the invariant is true before an iteration, then it remains true before the next iteration. Finally, in the \important{termination}, we use the invariant when the loop terminates to show that our algorithm works.
+}
+
+\subsection{Insertion sort}
+
+
+\begin{filecontents*}[overwrite]{InsertionSort.code}
+for j = 2 to n:
+    key = a[j]
+    // Insert a[j] into the sorted sequence.
+    i = j - 1
+    while i > 0 and a[i] > key
+        a[i + 1] = a[i]
+        i = i - 1
+    a[i+1] = key
+\end{filecontents*}
+
+\parag{Insertion sort}{
+    They idea of \important{insertion sort} is to iteratively sort the sequence. We iteratively insert elements at the right place.
+
+    This algorithm can be formulated as:
+    \importcode{InsertionSort.code}{pseudo}
+
+    We can see that this algorithm is in place.
+}
+
+
+
+\end{document}

@@ -1,0 +1,117 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-09-26 at 20:49:59.
+
+\usepackage{../../style}
+
+\title{Algorithms}
+\author{Joachim Favre}
+\date{Lundi 26 septembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2022-09-26}{Teile und herrsche}{
+\begin{itemize}[left=0pt]
+    \item Proof that insertion sort works, and analysis of its complexity.
+    \item Definition of divide-and-conquer algorithms.
+    \item Explanation of merge sort, and analysis of its complexity.
+\end{itemize}
+
+}
+
+\parag{Proof}{
+    Let us prove that insertion sort works by using a loop invariant.
+
+    We take as an invariant that at the start of each iteration of the outer for loop, the subarray \texttt{a[1\ldots (j-1)]} consists of the elements originally in \texttt{a[1\ldots (j-1)]} but in sorted order.
+    \begin{enumerate}
+        \item Before the first iteration of the loop, we have $j = 2$. Thus, the subarray consist only of \texttt{a[1]}, which is trivially sorted.
+        \item We assume the invariants holds at the beginning of an iteration $j = k$. The body of our inner while loop works by moving the elements \texttt{a[k-1]}, \texttt{a[k-2]}, and so on one step to the right, until it finds the proper position for \texttt{a[k]}, at which point it inserts the value of \texttt{a[k]}. Thus, at the end of the loop, the subarray \texttt{a[1\ldots k]} consists of the elements originally in \texttt{a[1\ldots k]} in a sorted order.
+        \item The loop terminated when $j = n + 1$. Thus, the loop invariant implies that \texttt{a[1\ldots n]} contains the original elements in sorted order.
+    \end{enumerate}
+}
+
+\parag{Complexity analysis}{
+    We can see that the first line is executed $n$ times, and the lines which do not belong to the inner loop are executed $n-1$ times (the first line of a loop is executed one time more than its body, since we need to do a last comparison before knowing we can exit the loop). We only need to compute how many times the inner loop is executed every iteration.
+
+    In the best case, the loop is already sorted, meaning that the inner loop is never entered. This leads to $T\left(n\right) = \Theta\left(n\right)$ complexity, where $T\left(n\right)$ is the number of operations required by the algorithm.
+
+    In the worst case, the loop is sorted in reverse order, meaning that the first line of the inner loop is executed $j$ times. Thus, our complexity is given by:
+    \[T\left(n\right) = \Theta\left(\sum_{j=2}^{n} j\right) = \Theta\left(\frac{n\left(n+1\right) - 1}{2}\right) = \Theta\left(n^2\right)\]
+    As mentioned in the previous course, we mainly have to keep in mind the worst case scenario.
+}
+
+\subsection{Merge sort}
+\parag{Divide-and-conquer}{
+    We will use a powerful algorithmic approach: recursively divide the problem into smaller subproblems.
+
+    We first \important{divide} the problem into $a$ subproblems of size $\frac{n}{b}$ that are smaller instances of the same problem. We then \important{conquer} the subproblems by solving them recursively (and if the subproblems are small enough, let's say of size less than $c$ for some constant $c$, we can just solve them by brute force). Finally, we \important{combine} the subproblem solutions to give a solution to the original
+problem
+
+    This gives us the following cost function:
+    \begin{functionbypart}{T\left(n\right)}
+        \Theta\left(1\right), \mathspace \text{if } n \leq c \\
+        a T\left(\frac{n}{b}\right) + D\left(n\right) + C\left(n\right), \mathspace \text{otherwise}
+    \end{functionbypart}
+    where $D\left(n\right)$ is the time to divide and $C\left(n\right)$ the time to combine solutions.
+}
+
+\begin{filecontents*}[overwrite]{MergeSort.code}
+MergeSort(A, p, r):
+    // p is the beginning index and r is the end index; they represent the section of the array we try to sort.
+    if p < r:  // base case
+        q = floor((p + r)/2)  // divide
+        MergeSort(A, p, q)  // conquer
+        MergeSort(A, q+1, r)  // conquer
+        Merge(A, p, q, r)  // combine
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{MergeMergeSort.code}
+Merge(A, p, q, r):
+    // p is the beginning index of the first subarray, q is the beginning index of the second subarray and r is the end of the second subarray
+    n1 = q - p + 1 // number of elements in first subarray
+    n2 = r - q  // number of elements in second subarray
+    let L[1...(n1+1)] and R[1...(n2+1)] be new arrays
+    for i = 1 to n1:
+        L[i] = A[p + i - 1]
+    for j = 1 to n2:
+        R[j] = A[q + j]
+    L[n1 + 1] = infinity
+    L[n2 + 1] = infinity
+    // Merge the two created subarrays.
+    i = 1
+    j = 1
+    for k = p to r:
+        // Since both subarrays are sorted, the next element is one of L[i] or R[j]
+        if L[i] <= R[j]:
+            A[k] = L[i]
+            i = i + 1
+        else:
+            A[k] = R[j]
+            j = j + 1
+\end{filecontents*}
+
+
+\parag{Merge sort}{
+    Merge sort is a divide and conquer algorithm:
+    \importcode{MergeSort.code}{pseudo}
+
+    For it to be efficient, we need to have an efficient merge procedure. Note that merging two sorted subarrays is rather easy: if we have two sorted piles of cards and we want to merge them, we only have to iterately take the smallest card between the two piles, there cannot be any smaller card that would come later, since the piles are sorted. This gives us the following algorithm:
+    \importcode{MergeMergeSort.code}{pseudo}
+
+    We can see that this algorithm is not in place, making it require more memory than insertion sort.
+
+    \subparag{Rermark}{
+        The Professor put the following video on the slides, and I like it very much, so here it is (reading the comments, dancers say ``teile une herrsche'', which means ``divide and conquer''):
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=dENca26N6V4}
+        \end{center}
+        
+    }
+    
+}
+
+\end{document}

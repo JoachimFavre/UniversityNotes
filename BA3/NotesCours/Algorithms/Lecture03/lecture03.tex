@@ -1,0 +1,126 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-09-30 at 13:17:58.
+
+\usepackage{../../style}
+
+\title{Algorithms}
+\author{Joachim Favre}
+\date{Vendredi 30 septembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2022-09-30}{Trees which grow in the wrong direction}{
+\begin{itemize}[left=0pt]
+    \item Proof of correctness of Merge-Sort.
+    \item Analysis of the complexity of merge-sort, through the substitution method and through trees.
+\end{itemize}
+
+}
+
+\parag{Theorem: Correctness of Merge-Sort}{
+    Assuming that the implementation of the \texttt{merge} procedure is correct, \texttt{mergeSort(A, p, r)} correctly sorts the numbers in $A\left[p\ldots r\right]$.
+
+    \subparag{Proof}{
+        Let's do a proof by induction on $n = r -p$.
+
+        \begin{itemize}[left=0pt]
+            \item When $n = 0$, we have $r = p$, and thus $A\left[p \ldots r\right]$ is trivially sorted.
+            \item We suppose our statement is true for all $n \in \left\{0, \ldots, k-1\right\}$ for some $k$, and we want to prove it for $n = k$.
+
+            By the inductive hypothesis, both \texttt{mergeSort(A, p, q)} and \texttt{mergeSort(A, q+1, r)} successfully sort the two subarrays. Therefore, a correct merge procedure will successfully sort $A\left[p\ldots q\right]$ as required.
+        \end{itemize}
+    }
+}
+
+\parag{Complexity analysis}{
+    Let's analyse the complexity for merge sort. 
+
+    Modifying the complexity for divide and conquer, we get:
+    \begin{functionbypart}{T\left(n\right)}
+        \Theta\left(1\right), \mathspace \text{if } n = 1\\
+        2T\left(\frac{n}{2}\right) + \Theta\left(n\right), \mathspace \text{otherwise}
+    \end{functionbypart}
+
+    Let's first try to guess the guess the solution of this recurrence. We can set $\Theta\left(n\right) = c\cdot n$ for some $c$, leading to:
+    \autoeq{\unexpanded{T\left(n\right) = 2T\left(\frac{n}{2}\right) + c\cdot n = 2\left(2T\left(\frac{n}{4}\right) + c \frac{n}{2}\right) + c n = 4T\left(\frac{n}{4}\right) + 2cn = 4\left(2T\left(\frac{n}{8}\right) + c \frac{n}{4}\right) = 8T\left(\frac{n}{8}\right) + 3cn}}
+
+    Thus, this seems that, continuing this enough times, we get:
+    \[T\left(n\right) = n T\left(1\right) + \log_2\left(n\right) c n \implies T\left(n\right) = \Theta\left(n \log\left(n\right)\right)\]
+
+    We still need to prove that this is true. We can do this by induction, and this is then named the substitution method.
+
+    \subparag{Proof: Upper bound}{
+        We want to show that there exists a constant $a > 0$ such that $T\left(n\right) \leq an\log\left(n\right)$ for all $n \geq 2$ (meaning that $T\left(n\right) = O\left(n \log\left(n\right)\right)$), by induction on $n$.
+
+        \begin{itemize}[left=0pt]
+            \item For any constant $n \in \left\{2, 3, 4\right\}$, $T\left(n\right)$ has a constant value; selecting $a$ larger than this value will satisfy the base cases when $n \in \left\{2, 3, 4\right\}$.
+            \item We assume that our statement is true for all $n \in \left\{2, 3, \ldots, k-1\right\}$ and we want to prove it for $n = k$: 
+            
+            \autoeq{\unexpanded{T\left(n\right) = 2T\left(\frac{n}{2}\right) + cn \over{\leq}{IH}  2 \frac{an}{2} \log\left(\frac{n}{2}\right) + cn = an \log\left(\frac{n}{2}\right) + cn = an\log\left(n\right) - an + cn \leq an\log\left(n\right)}}
+            if we select $a \geq c$.
+        \end{itemize}
+
+        We can thus select $a$ to be a positive constant so that both the base case and the inductive step hold.
+        
+    }
+
+    \subparag{Proof: Lower bound}{
+        We want to show that there exists a constant $b > 0$ such that $T\left(n\right) \geq bn\log\left(n\right)$ for all $n \geq 0$ (meaning that $T\left(n\right) = \Omega\left(n \log\left(n\right)\right)$), by induction on $n$.
+ 
+        \begin{itemize}[left=0pt]
+            \item For $n = 1$, $T\left(n\right) = c$ and $b n \log\left(n\right) = 0$, so the base case is satisfied for any $b$.
+            \item We assume that our statement is true for all $k \in \left\{0, \ldots, k-1\right\}$ we want to prove it for $n = k$:
+                \autoeq{\unexpanded{T\left(n\right) = 2T\left(\frac{n}{2}\right) + cn \over{\geq}{IH} 2 \frac{bn}{2} \log\left(\frac{n}{2}\right) + cn = bn \log\left(\frac{n}{2}\right) + cn = bn\log\left(n\right) - bn + cn \geq bn\log\left(n\right)}}
+            selecting $b \leq c$.
+
+            We can thus select $b$ to be a positive constant so that both the base case and the inductive step hold.
+        \end{itemize}
+    }
+    
+    \subparag{Proof: Conclusion}{
+        Since $T\left(n\right) = O\left(n \log\left(n\right)\right)$ and $T\left(n\right) = \Omega\left(n \log\left(n\right)\right)$, we have proven that $T\left(n\right) = \Theta\left(n\log\left(n\right)\right)$.
+    }
+
+    \subparag{Remark}{
+        The real recurrence relation for merge-sort is:
+        \begin{functionbypart}{T\left(n\right)}
+        c, \mathspace \text{if } n = 1 \\
+        T\left(\left\lfloor \frac{n}{2} \right\rfloor \right) + T\left(\left\lceil \frac{n}{2} \right\rceil \right) + c \cdot n.
+        \end{functionbypart}
+
+        Note that we are allowed take the same $c$ everywhere since we are considering the worst-case, and thus we can take the maximum of the two constants supposed to be there, and call it $c$.
+
+        Anyhow, in our proof, we did not consider floor and ceiling functions. Indeed, they make calculations really messy but don't change the final asymptotic result. Thus, when analysing recurrences, we simply assume for simplicity that all divisions evaluate to an integer.
+    }
+    
+}
+
+\parag{Remark}{
+    We have to be careful when using asymptotic notations with induction. For instance, if we know that $T\left(n\right) = 4T\left(\frac{n}{4}\right) + n$, and we want to prove that $T\left(n\right) = O\left(n\right)$, then we cannot just do: 
+    \[T\left(n\right) \over{\leq}{IH} 4c \frac{n}{4} + n = cn + n = n\left(c+1\right) = O\left(n\right)\]
+    
+    Indeed, we have to clearly state that we want to prove that $T\left(n\right) \leq nc$, and then prove it for the exact constant $c$ during the inductive step. The proof above is wrong and, in fact, $T\left(n\right) \neq O\left(n\right)$.
+}
+
+\parag{Other proof: Tree}{
+    Another way of guessing the complexity of merge sort, which works for many recurrences, is thinking of the entire recurrence tree. A recurrence tree is a tree (really?) where each node corresponds to the cost of a subproblem. We can thus sum the costs within each level of the tree to obtain a set of per-level costs, and then sum all the per-level costs to determine the total cost of all levels of recursion.  
+
+    For merge sort, we can draw the following tree:
+    \imagehere[0.8]{MergeSortComplexityTree.png}
+
+    We can observe than on any level, the amount of work sums up to $cn$. Since there are $\log_2\left(n\right)$ levels, we can guess that $T\left(n\right) = cn \log_2\left(n\right) = \Theta\left(n \log\left(n\right)\right)$. To prove it formally, we would again need to use recurrence.
+}
+
+\parag{Tree: Other example}{
+    Let's do another example for a tree, but for which the substitution method does not work: we take $T\left(n\right) = T\left(\frac{n}{3}\right) + T\left(\frac{2n}{3}\right) + cn$. The tree looks like:
+    \imagehere[0.7]{TreeOtherExample.png}
+
+    Again, we notice that every level contributes to around $cn$, and we have at least $\log_3\left(n\right)$ full levels. Therefore, it seems reasonable to say that $an\log_3\left(n\right) \leq T\left(n\right) \leq bn\log_{\frac{3}{2}}\left(n\right)$ and thus $T\left(n\right) = \Theta\left(n\log\left(n\right)\right)$.
+}
+
+\end{document}
