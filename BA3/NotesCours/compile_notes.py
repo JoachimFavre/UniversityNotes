@@ -33,7 +33,7 @@ import datetime
 DATE = {"french": r"Bachelor d'informatique --- Semestre 3 \\ Automne 2022",
         "english": r"Computer science bachelor --- Semester 3 \\ Autumn 2022"}
 
-# uses the "temp" folder in this diriectory if true, else uses a temporary
+# uses the "zzz_temp" folder in this diriectory if true, else uses a temporary
 # directory that gets destroyed after having finished
 USE_TEMP_FOLDER = False
 PRINTED_VERSION = False
@@ -42,6 +42,12 @@ CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
 COURSES_NAME = ["Analyse-3"]
+# COURSES_NAME = ["Algorithms"]
+# COURSES_NAME = ["NumericalMethods"]
+# COURSES_NAME = ["ComputerNetworks"]
+# COURSES_NAME = ["ComputerArchitecture-1"]
+# COURSES_NAME = ["Electronique-1"]
+# COURSES_NAME = ["IntroToMachineLearning-BA3"]
 
 COPY_EXTENSIONS = ["tex", "pdf", "png", "jpg", "jpeg", 'code', 'svg']
 FOREWORD_NAME = {'fr': 'foreword_fr.txt', 'en': 'foreword_en.txt'}
@@ -557,7 +563,7 @@ def _compile_course(course_name, tmp_dir):
 
 def compile_course(course_name, use_temp_folder):
     if use_temp_folder:
-        tmp_dir = r"temp"
+        tmp_dir = r"zzz_temp"
         _compile_course(course_name, tmp_dir)
     else:
         with tempfile.TemporaryDirectory() as tmp_dir:

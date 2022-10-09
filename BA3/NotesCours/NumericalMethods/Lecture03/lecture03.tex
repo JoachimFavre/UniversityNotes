@@ -1,0 +1,197 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-04 at 13:12:49.
+
+\usepackage{../../style}
+
+\title{NumMet}
+\author{Joachim Favre}
+\date{Mardi 04 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2022-10-04}{Yikes}{
+\begin{itemize}[left=0pt]
+    \item Definition of vector and matrix norms.
+    \item Definition of the conditioning number of a matrix, and explanation of the inequality linking this number to the error we can get solving a system made from this matrix.
+    \item Proof of the formula of solving polynomial regression, through normal equations (which can be generalised to any matrix).
+\end{itemize}
+
+}
+
+\subsection{Conditioning of linear systems}
+ \parag{Vector norm}{
+     To measure conditioning of linear systems, e need a way of comparing the sizes of error: \important{a norm}. A norm must respect some axioms (always positive, null only for the zero-vector, $\left\|\alpha \bvec{x}\right\| = \left|\alpha\right| \left\|\bvec{x}\right\|$ and the triangle inequality). We can define the $L_p$ norm to be: 
+    \[\left\|\bvec{x}\right\|_p = \left(\sum_{i=1}^{n} \left|\bvec{x_i}\right|^p\right)^{\frac{1}{p}}\]
+
+    Thus, we have: 
+    \[\left\|\bvec{x}\right\|_1 = \sum_{i=1}^{n} \left|x_i\right|, \mathspace \left\|\bvec{x}\right\| = \sqrt{\sum_{i=1}^{n} x_i^2}, \mathspace \left\|\bvec{x}\right\|_{\infty} = \max_{i=1}^n \left|x_i\right|\]
+    
+    We can draw unit circles for those different norms:
+    \imagehere{CirclesPVectorNorms.png}
+
+    In this course, we will pretty much always use a 2-norm.
+}
+
+\parag{Induced matrix norm}{
+    Every (vector) norm induces a \important{matrix norm}: 
+    \[\left\|A\right\| = \max\left\{\left\|A \bvec{x}\right\|, \text{where } \left\|\bvec{x}\right\| = 1\right\}\]
+    
+    This has some properties: 
+    \begin{enumerate}
+        \item $\left\|AB\right\| \leq \left\|A\right\|\left\|B\right\|$
+        \item $\left\|A \bvec{x}\right\| \leq \left\|A\right\| \left\|\bvec{x}\right\|$
+    \end{enumerate}
+
+    \subparag{Geometric interpretation}{
+        Geometrically, the norm of a matrix is the maximum warping ratio due to this matrix. This can be represented thanks to an ellipse:
+        \imagehere[0.7]{NormMatrixEllipse.png}
+    }
+    
+}
+
+
+\begin{filecontents*}[overwrite]{conditioningPython.code}
+A = np.array(...)
+cond = np.linalg.cond(A, p=2)
+\end{filecontents*}
+
+\parag{Conditioning}{
+    When solving linear systems, there can be rounding errors, cancellation, badly conditioned problems, or maybe even the problem itself can be inaccurate. 
+
+    For instance, if we consider a picture as a vector, then we can blur it through a matrix (which will add up some pixels around each pixel, with some weight). Thus, getting a blurred picture, if we know the matrix $A$ which blurred it, then we can get it's un-blured version (since we are very good at solving linear systems). This process is named deconvolution. In fact, in reality, it does not work as expected, because of the errors mentioned above.
+    \imagehere[0.6]{Deconvolution.png} 
+
+    We know $A \bvec{\hat{x}} \approx \bvec{b}$. Thus, we can define the \important{residual}: 
+    \[\bvec{r}\left(\bvec{\hat{x}}\right) = \underbrace{A \bvec{\hat{x}}}_{\bvec{\hat{b}}} - \bvec{b} = \bvec{\hat{b}} - \bvec{b}\]
+    
+    This is the backward error, and we can compute the forward error too:
+    \[\bvec{\hat{x}} - \bvec{x} = A^{-1}\left(\bvec{\hat{b}} - \bvec{b}\right) A^{-1} \bvec{r}\left(\bvec{\hat{x}}\right)\]
+
+    This gives us the following picture:
+    \imagehere[0.5]{BackwarForwardErrorLinearSystem.png}
+}
+
+\parag{Conditioning number}{
+    To sum up, we currently have a perturbed system $A\left(\bvec{x} + \Delta \bvec{x}\right) = \bvec{b} + \Delta \bvec{b}$, and we want to measure its error $\frac{\left\|\Delta \bvec{x}\right\|}{\left\|\bvec{x}\right\|}$. To do so, we can see that: 
+    \[\left\|\bvec{b}\right\| = \left\|A \bvec{x}\right\| \leq \left\|A\right\| \left\|\bvec{x}\right\| \iff \left\|\bvec{x}\right\| \geq \frac{\left\|\bvec{b}\right\|}{\left\|A\right\|}\]
+    
+    Also, since $A \Delta \bvec{x} = \Delta \bvec{b}$, we get: 
+    \[\left\|\Delta \bvec{x}\right\| = \left\|A ^{-1} \Delta \bvec{b}\right\| \leq \left\|A^{-1}\right\| \left\|\bvec{b}\right\|\]
+    
+    Putting everything together, we get: 
+    \[\frac{\left\|\Delta \bvec{x}\right\|}{\left\|\bvec{x}\right\|} \leq \left\|A^{-1}\right\|\left\|\Delta \bvec{b}\right\| \frac{\left\|A\right\|}{\left\|\bvec{b}\right\|} = \underbrace{\left\|A^{-1}\right\| \left\|A\right\|}_{= \cond\left(A\right)} \frac{\left\|\Delta \bvec{b}\right\|}{\left\|\bvec{b}\right\|}\]
+    where $\cond\left(A\right)$ is defined to be the \important{conditioning number} of a matrix. Basically, the condition number is the product of the maximum um warping ratio due to $A$ and the maximum warping ratio due to $A^{-1}$.
+        
+    Finally, we can get the following inequality: 
+    \[\frac{\left\|\Delta\bvec{x}\right\|}{\left\| \bvec{x}\right\|} \lesssim \cond\left(A\right) \ulp\left(1\right)\]
+    where $\ulp\left(1\right) \approx 2^{-23}$ for single precision and $\ulp\left(1\right) \approx 2^{-53}$ for double precision.
+
+    \subparag{Geometric interpretation}{
+        We can internet geometrically the conditioning number:
+        \imagehere{ConditioningNumberMatrix.png}
+    }
+
+    \subparag{Properties}{
+         The condition number has the following properties:
+        \begin{enumerate}
+            \item $\cond\left(A\right) = \infty$ if and only if $A$ is singular.
+            \item $\cond\left(A\right) \geq 1$ for any matrix $A$. This lower bound is reached for any non-zero multiple of the identity matrix.
+            \item $\cond\left(\gamma A\right) = \cond\left(A\right)$ for all $\gamma \in \mathbb{R}$.
+            \item $\cond\left(QA\right) = \cond\left(A\right)$ for all rotation matrix $Q$.
+        \end{enumerate}
+    }
+    
+   \subparag{Problem}{
+        To compute the conditioning number of a matrix, we need to invert it, and thus solve a linear system. And then, we need to compute a matrix norm, which we don't know yet how to do. Thus, this may seem like a big problem.
+
+        However, there exists efficient estimation algorithms. For instance, in python:
+        \importcode{conditioningPython.code}{python}
+    }
+    
+}
+
+\parag{Remark: Determinant}{
+    Note that the determinant is not a good way of determining if a linear system is solvable: this is absolutely not aware of numerical instabilities.
+
+    For instance, letting $A = \frac{1}{10} I \in \mathbb{R}^{1000 \times 1000}$. Its determinant is $\det\left(A\right) = 10^{-1000}$, which cannot be stored in a double-precision floating point number. However, it is trivial to solve. On the other hand, $\cond\left(A\right) = 1$.
+}
+
+\subsection{Polynomial regression}
+\parag{Finding a parabola}{
+    Let's say have some points at which a thrown ball was, and we want to find the parabola $y = a + bx + c x^2$ through which it went. To do so, we can do a quadratic regression to find the best $a, b, c$.
+
+    We need (at least) three observations. Then, we can set the following linear system (in $a, b, c$):
+    \[\begin{systemofequations} y_1 = a + bx_1 + cx_1^2 \\ y_2 = a + bx_2 + cx_2^2 \\ y_3 = a + bx_3 + cx_3^2 \end{systemofequations} \iff \begin{pmatrix} y_1 \\ y_2 \\ y_3 \end{pmatrix} = \begin{pmatrix} 1 & x_1 & x_1^2 \\ 1 & x_2 & x_2^2 \\ 1 & x_3 & x_3^2 \end{pmatrix} \begin{pmatrix} a \\ b \\ c \end{pmatrix} \]
+
+    Note that this matrix is named a Vandermonde matrix. We can solve this system using a LU factorisation for instance. 
+
+    However, we realise there are multiple problems. If the data is too closely spaced, then we may be extrapolating for too long. Also, we don't really know what to do if we have more than 3 observations, which ones we should use. Finally, there might be noise on our observations, and thus having more that 3 observations would lead to a system with no solution.
+
+    \subparag{Conditioning of the Vandermonde matrix}{
+        Note that for $n = 100$, and using uniformly spaced positions on $\left[0, 1\right]$ we get that the Vandermonde matrix $V$ has a conditioning number of: 
+        \[\cond\left(A\right) = 7.31 \cdot 10^{19}\]
+        which is huge.
+
+        We will treat this problem later in the course.
+    }
+}
+
+\parag{Regression}{
+    The problem currently is that we have many data points, leading to a lot of information, and it is impossible to exactly reach all of those points with our polynomial (because the points suffered some noise for instance). Thus, we want: 
+    \[\left\|\bvec{r}\left(\bvec{x}\right)\right\| = \left\|A \bvec{x} - \bvec{b}\right\| \approx 0\]
+    
+    In other words, we want $\left\|\bvec{r}\left(\bvec{x}\right)\right\|$ as small as possible. In this case, we use a 2-norm since it makes everything simpler. We note that minimising $\bvec{r}\left(\bvec{x}\right)$ is equivalent to minimising its square, thus: 
+    \autoeq{\unexpanded{\left\|A \bvec{x} - \bvec{b}\right\|^2 = \left\langle A \bvec{x} - \bvec{b}, A \bvec{x} - \bvec{b}\right\rangle = \left\langle A \bvec{x}, A \bvec{x}\right\rangle - 2\left\langle A \bvec{x}, \bvec{b}\right\rangle + \left\langle\bvec{b}, \bvec{b}\right\rangle = \bvec{x}^T A^T A \bvec{x} - 2 \bvec{b}^T A \bvec{x} + \left\|\bvec{b}\right\|^2}}
+
+
+    Now, we can compute the derivative (formally, it is a gradient) of this expression: 
+    \[\frac{\partial }{\partial \bvec{x}} \left[\bvec{x}^T A^T A \bvec{x} - 2 \bvec{b}^T A \bvec{x} + \underbrace{\left\|\bvec{b}\right\|^2}_{\text{constant}}\right] = 2 A^T A \bvec{x} - 2 A^T \bvec{b}\]
+    
+    Note that the rules used for differentiation do not need to be known. Now, we can set this derivative equal to zero, to find: 
+    \[A^T A \bvec{x} = A^T \bvec{b}\]
+
+    Those are named \important{normal equations}. Also, $A^T A$ is a symmetric matrix, meaning that we can make optimisations for the solver. We can see dimensions visually:
+    \imagehere[0.5]{DimensionsNormalEquation.png}
+
+    As a fun fact, it is interesting to know that normal equations have been very useful a lot of times (and for many matrices): Gauss used it for astronomy.
+
+    \subparag{Why normal}{
+        We can see that: 
+        \[A^T A \bvec{x} = A^T \bvec{b} \iff A^T\left(A \bvec{x} - \bvec{b}\right) = \bvec{0} \iff A^T \bvec{r}\left(\bvec{x}\right) = \bvec{0}\]
+
+        This means that $\bvec{r}\left(\bvec{x}\right) \in \ker\left(A^T\right) = \im\left(A^T\right)^\perp$, and thus that $\bvec{r}$ is orthogonal to the image of $A$. In other words, we have done an orthogonal projection of $\bvec{b}$ over the image of $A$.
+
+        \imagehere[0.5]{NormalEquationsOrthogonalImageA.png}
+    }
+
+    \subparag{Personal remark}{
+        Note that if we were looking for an orthogonal projection at first, we could have come to the solution more easily. Here is the way we used in my Linear Algebra class, which, in my opinion, helps to grasp the intuition:
+        \begin{multiequation}
+        & \bvec{\hat{b}} = \proj_{\im A}\left(\bvec{b}\right) = A \bvec{x}  \\
+        \implies & \bvec{\hat{b}} - \bvec{b} \text{ is orthogonal to } \im A  \\
+        \implies & \bvec{\hat{b}} - \bvec{b} \in \left(\im A\right)^\perp = \ker\left(A^T\right)  \\
+        \implies & A^T \left(\bvec{\hat{b}} - \bvec{b}\right) = \bvec{0} \\
+        \implies & A^T \left(A \bvec{\hat{x}} - \bvec{b}\right) = \bvec{0}  \\
+        \implies & A^T A \bvec{\hat{x}} - A^T \bvec{b} = \bvec{0}  \\
+        \implies & A^T A \bvec{\hat{x}} = A^T \bvec{b}
+        \end{multiequation}
+
+        Thus, when solving a system, if we want to find the ``best solution'' (in terms of the 2-norm), then we basically only need to multiply both sides on the left by $A^T$. This naturally works for any matrix.
+    }
+
+    \subparag{Problem}{
+        There is a problem with normal equations (especially if we recall the conditioning number of the Vandermonde matrix): 
+        \[\cond\left(A^T A\right) = \cond\left(A\right)^2\]
+        
+        ``Yikes.'' (Prof. Jakob)
+
+        In fact, the QR decomposition allows us to solve this problem.
+    }
+}
+
+\end{document}

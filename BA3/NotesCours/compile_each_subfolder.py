@@ -9,7 +9,7 @@ import time
 import os
 import subprocess
 
-COURSES_NAME = ["AICC-2", "Analyse-2", "Analyse-2-MethodesDeDemonstration", "DigitalSystemDesign"]
+COURSES_NAME = ["Analyse-3", "Algorithms", "NumericalMethods", "ComputerNetworks", "ComputerArchitecture-1", "Electronique-1", "IntroToMachineLearning-BA3"]
 
 
 def compile_tex(dir_path, file_path):

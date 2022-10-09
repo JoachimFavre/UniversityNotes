@@ -1,0 +1,94 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-09-20 at 13:12:26.
+
+\usepackage{../../style}
+
+\title{Numerical methods for Visual Computing and Machine Learning}
+\author{Joachim Favre}
+\date{Mardi 20 septembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2022-09-20}{Carnival}{
+\begin{itemize}[left=0pt]
+    \item You know, because at the carnival there are floats.
+    \item Explanation of floating point arithmetic.
+    \item Definition of the ULP and the denormalised numbers.
+\end{itemize}
+
+}
+
+\section{Floating point arithmetic}
+\parag{Introduction}{
+    The goal is to connect to real world, which is continuous. Thus, we will need to introduce approximation by making sure everything does not fall apart.
+
+    We have to approximate many numbers from mathematics, since we can only work with finite values (we cannot have an infinite number of digits after the coma).
+}
+
+\parag{Approach 1: Fixed point arithmetic}{
+    We can use a representation similar to integers, but setting a point at a very specific place. For instance: 
+    \[11000101 \leftrightarrow 1100.0101 = 2^3 + 2^2 + 2^{-2} + 2^{-4} = 12.3125\]
+    
+    The big problem with this approach is that we need a trade-off between the minimum and maximum numbers, and the precision we can have. However, many programs may require to work together with very small (in absolute value) and very big numbers. For instance, Google Earth needs to be both really precise when close to the Earth and use bigger value when we are far away. Also, in science, we have constants which range between really small and really big values.
+}
+
+\parag{Approach 2: Rational numbers}{
+    Let us build our numbers as a tuple of two integers: $\left(a, b\right)$ to represent $\frac{a}{b}$. We can use the fact that 
+    \[\frac{a}{b} + \frac{c}{d} = \frac{ad + cb}{bd} \implies \left(a, b\right) + \left(c, d\right) = \left(a d + c d, b d\right)\]
+    
+    There is a problem is when we have irrational numbers (such as $\pi$ or values in computer graphics) where this representation becomes very hard to store. However, it can sometimes be used, in banks for instance.
+}
+
+\parag{Approach 3: Floating point}{
+    This approach is to use the scientific notation: 
+    \[\underbrace{\pm}_{\text{sign}} \underbrace{2^E}_{\text{exponent}} \underbrace{\sum_{i=0}^{n} 2^{-i} A_i}_{\text{mantissa}}\]
+    
+    For instance: 
+    \[\pi = +2^{1} \cdot  1.1001001000\ldots_2\]
+    
+    However, the number 1 before the coma in the decimal number is redondant, so we omit it in the mantissa. This is makes us win 1 bit, but 0 is thus non-representible.
+
+    A 8-bit floating point spacing could look like the following discretisation of the number line:
+    \imagehere{FloatDiscretisedNumberLine.png}
+}
+
+\parag{IEEE754}{
+    In the common standard, IEE754, arithmetics operations are done as if there is an infinite precision, and then they are converted to representable numbers.
+
+    We also use two special exponents: all 0s and all 1s. They are used to encode zero, denormalised numbers, positive and negative infinity, and NaN.
+
+    \subparag{Types}{
+        Half-precision float is 16 bit, float is 32 bit and double-precision float is 64 bit.
+    }
+
+    \subparag{Remark}{
+        Note that in the IEEE754 floating point specification, two contiguous floating point numbers are also contiguous when considering the bits as an unsigned integer.
+    }
+}
+
+\parag{Denormalised numbers}{
+    Because we are omitting the 1 of the mantissa, there is a gap between the smallest positive number and the biggest negative numbers:
+    \imagehere[0.5]{DenormalisedNumbers.png}
+
+    Those numbers are named \important{denormalised numbers}. As mentioned above, they are represented using special exponents. They are very useful for some algorithms, but they are also hated by many people since they are more costly. When a CPU needs to compute using denormals, they stop using hardware and instead use software simulation, which slows down the program a lot.
+}
+
+\parag{Operations}{
+    Note that zero is signed, thus $\left(-0\right)\cdot \left(-0\right) = +0$. NaN is ``infectious'', meaning that anything multiplied by a NaN gives a NaN. Also, $0\cdot \infty$ gives a NaN.
+
+    Furthermore, any comparison using a NaN will give false. This can make some weird things if we are not careful enough.
+}
+
+\parag{Adding numbers}{
+    To add two numbers, we shift them so that they have the same exponent, and then add the mantissa. However, part of the numbers can be lost because of the shift. The \important{unit in the last place} (ULP) is the last number represented.
+}
+
+
+
+
+\end{document}
