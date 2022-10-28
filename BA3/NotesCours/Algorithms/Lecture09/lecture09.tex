@@ -1,0 +1,174 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-21 at 13:26:33.
+
+\usepackage{../../style}
+
+\title{Algo}
+\author{Joachim Favre}
+\date{Vendredi 21 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2022-10-21}{Dynamic cannot be a pejorative word}{
+\begin{itemize}[left=0pt]
+    \item Explanation on how to delete a node from a binary search tree.
+    \item Explanation of top-down with memoisation and bottom-up algorithms in Dynamic Programming, through the example of the Fibonacci numbers.
+\end{itemize}
+
+}
+
+\begin{filecontents*}[overwrite]{TransplantBST.code}
+procedure Transplant(T, u, v):
+    // u is root
+    if u.p == Nil:  
+        T.root = v
+    // u is the left child of its parent
+    else if u == u.p.left:  
+        u.p.left = v
+    // u is the right child of its parent
+    else:
+        u.p.right = v
+    
+    if v != Nil:
+        v.p = u.p
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{DeleteBST.code}
+procedure TreeDelete(T, z):
+    // z has no left child
+    if z.left == Nil:
+        Transplant(T, z, z.right)
+    // z has just a left child
+    else if z.right == Nil:
+        Transplant(T, z, z.left)
+    // z has two children
+    else:
+        y = TreeMinimum(z.right) // z's successor
+        if y.p != z:
+            // y is in z's subtree but is not its root
+            Transplant(T, y, y.right)
+            y.right = z.right
+            y.right.p = y
+        // Replace z by y
+        Transplant(T, z, y)
+        y.left = z.left
+        y.left.p = y
+\end{filecontents*}
+
+
+
+\parag{Deletion}{
+    When deleting a node $z$, we can consider three cases. If $z$ has no child, then we can just remove it. If it has exactly one child, then we can make that child take $z$'s position in the tree. If it has two children, then we can find its successor $y$ (which is at the leftmost of its right subtree, since this tree is not empty by hypothesis) and replace $z$ by $y$. Note that deleting the node $y$ to move it at the place of $z$ is not so hard since, by construction, $y$ has 0 or 1 child. Also, note that we could use the predecessor instead of the successor.
+
+    To implement our algorithm, it is easier to have a transplant procedure (to replace a subtree rooted at $u$ with the one rooted at $v$):
+    \importcode{TransplantBST.code}{pseudo}
+     
+    We can then write our deletion procedure:
+    \importcode{DeleteBST.code}{pseudo}
+    
+}
+
+\parag{Balancing}{
+    Note that neither our insertion nor our deletion procedures keep the height low. For instance, creating a binary search tree by inserting in order elements of a sorted list of $n$ elements makes a tree of height $n-1$.
+
+    There are balancing tricks when doing insertions and deletions, such as red-black trees or AVL trees, which allow to stay at $h = \Theta\left(\log\left(n\right)\right)$, but they will not be covered in this course. 
+
+    However, generally, making a tree from random order insertion is not so bad.
+}
+
+\parag{Summary}{
+    We have been able to make search, max, min, predecessor, successor, insertion and deletion in $O\left(h\right)$.
+}
+
+\section{Dynamic programming}
+\subsection{Introduction and Fibonacci}
+
+\parag{Introduction}{
+    Dynamic programming is a way to make algorithms and has little to do with programming. The idea is that we never compute twice the same thing, by remembering calculations already made.
+
+    This name was designed in the 50s, by a computer scientist who was trying to get money for his research, and he came up with this name, which he found that it cannot be negative.
+}
+
+\begin{filecontents*}[overwrite]{FibonacciRecurrence.code}
+procedure Fib(n):
+    if n == 0 or n == 1:
+        return 1
+    else
+        return Fib(n-1) + Fib(n-2)
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{FibonacciTopDownWithMemoization.code}
+procedure MemoisedFib(n):
+    // we store our answers in r
+    let r = [0...n] be a new array
+    for i = 0 to n
+        r[i] = -infinity
+    return MemoisedFibAux(n, r)
+
+procedure MemoisedFibAux(n, r):
+    if r[n] >= 0: return r[n]
+    if n == 0 or n == 1:
+        answer = 1
+    else:
+        answer = MemoisedFibAux(n-1, r) + MemoisedFibAux(n-2, r)
+    r[n] = answer
+    return r[n]
+\end{filecontents*}
+
+
+\begin{filecontents*}[overwrite]{BottomUpFibonacci.code}
+procedure BottomUpFibonacci(n):
+    let r = [0...n] be a new array
+    r[0] = 1
+    r[1] = 1
+    for i = 2 to n:
+        r[i] = r[i-1] + r[i-2]
+    return r[n]
+\end{filecontents*}
+
+
+
+\parag{Fibonacci numbers}{
+    Let's consider the Fibonacci numbers: 
+    \[F_0 = 1, \mathspace F_1 = 1, \mathspace F_n = F_{n-1} + F_{n-2}\]
+    
+    The first idea to compute this is through the given recurrence relation:
+    \importcode{FibonacciRecurrence.code}{pseudo}
+    
+    However, this is $\Theta\left(2^n\right)$. Indeed, when we reduce $n$ by 1, we double the number of computations we have to do. Another way to see this, is that we are never adding large numbers (more than 1), thus we have literally a complexity of $\Theta\left(F_n\right) = \Theta\left(\phi^n\right) = \Theta\left(2^n\right)$.
+    \imagehere[0.7]{NaiveFibonacciRecurrenceTree.png}
+
+    However, we can see that we are computing many things more than twice, meaning that we are wasting resources and that we can do better. An idea is to  remember what we have computed not to compute it again.
+
+    We have two solutions. The first method is \important{top-down with memoisation}: we solve recursively but store each result in a table. The second method is \important{bottom-up}: we sort the problems, and solve the smaller ones first; that way, when solving a subproblem, we have already solved the smaller subproblems we need.
+
+
+    \subparag{Top-down with memoisation}{
+        The code looks like:
+        \importcode{FibonacciTopDownWithMemoization.code}{pseudo}
+        
+        We can note that this has a much better runtime complexity than the naive one, since this is $\Theta\left(n\right)$. Also, for memory, we are taking about the same size since, for the naive algorithm, we had a stack depth of $O\left(n\right)$, which also needs to be saved.
+
+        \imagehere{TopDownFibonacciRecurrenceTree.png}
+    }
+
+    \subparag{Bottom-up}{
+        The code looks like:
+        \importcode{BottomUpFibonacci.code}{pseudo}
+        
+        Generally, the bottom-up version is slightly more optimised than top-down with memoisation.
+    }
+}
+
+\parag{Designing a dynamic programming algorithm}{
+    Dynamic programming is a good idea when our problem has an optimal substructure: the problem consists of making a choice, which leaves one or several subproblems to solve, where finding the optimal solution to all those subproblems allows us to get the optimal solution to our problem.
+}
+
+
+\end{document}
+

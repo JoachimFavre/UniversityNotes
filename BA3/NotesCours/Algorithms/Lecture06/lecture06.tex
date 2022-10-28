@@ -1,0 +1,193 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-10 at 14:19:02.
+
+\usepackage{../../style}
+
+\title{Algorithms}
+\author{Joachim Favre}
+\date{Lundi 10 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2022-10-10}{Heap sort}{
+\begin{enumerate}[left=0pt]
+    \item Definition of max-heap.
+    \item Explanation on how to store a heap.
+    \item Explanation of the \texttt{MaxHeapify} procedure.
+    \item Explanation on how to make a heap out of a random array.
+    \item Explanation on how to use heaps to make heapsort.
+\end{enumerate}
+}
+
+
+\section{Great data structures yield great algorithm}
+\subsection{Heap sort}
+\parag{Nearly-complete binary tree}{
+    A binary tree of depth $d$ is nearly complete if all $d-1$ levels are full, and, at level $d$, if a node is present, then all nodes to its left must also be present.
+
+    \subparag{Terminology}{
+        The size of a tree is its number of vertices. 
+    }
+
+    \subparag{Example}{
+        For instance, the three on the left is a nearly-complete binary tree of depth $3$, but not the one on the right:
+        \imagehere{NearlyCompleteBinaryTreeExample.png}
+
+        Both binary trees are of size 10.
+    }
+}
+
+
+\parag{Heap}{
+    A \important{heap} (or max-heap) is a nearly-complete binary tree such that, for every node $i$, the key (value stored at that node) of its children is less than or equal to its key.
+
+    \subparag{Examples}{
+        For instance, the nearly complete binary tree of depth 3 of the left is a max-heap, but not the one on the right:
+        \imagehere{MaxHeapExample.png}
+    }
+    
+
+    \subparag{Observations}{
+        We notice that the maximum number is necessarily at the root. Also, any path linking a leaf to the root is an increasing sequence.
+    }
+
+    \subparag{Remark 1}{
+        We can define the min-heap to be like the max-heap, but the property each node follows is that the key of its children is greater than or equal to its key.
+    }
+
+    \subparag{Remark 2}{
+        We must not confuse heaps and binary-search trees (which we will define later), which are very similar but have a more restrictive property. 
+    }
+}
+
+\parag{Height}{
+    The height of a node is defined to be the number of edges on a \textit{longest} simple path from the node \textit{down} to a leaf.
+
+    \subparag{Example}{
+        For instance, in the following picture, the node holding 10 has height 1, the node holding 14 has height 2, and the one holding a 2 has height 0.
+        \imagehere[0.7]{MaxHeapExample2.png}
+    }
+
+    \subparag{Remark}{
+        We note that, if we have $n$ nodes, we can bound the height $h$ of any node: 
+        \[h \leq \log_2\left(n\right)\]
+
+        Also, we notice that the height of the root is the largest height of a node from the tree. This is defined to be the \important{height of the heap}. We notice it is thus $\Theta\left(\log_2\left(n\right)\right)$.
+    }
+}
+
+\parag{Storing a heap}{
+    We will store a heap in an array, layer by layer. Thus, take the first layer and store it in the array. Then, we take the next layer, and store it after the first layer. We continue this way until the end.
+
+    Let's consider we store our numbers in a starting with index starting at 1. The children of a node $A\left[i\right]$ are stored in $A\left[2i\right]$ and $A\left[2i + 1\right]$. Also, if $i > 1$, the parent of the node $A\left[i\right]$ is $A\left[\left\lfloor \frac{i}{2} \right\rfloor \right]$.
+
+    Using this method, we realise that we do not need a pointer to the left and right elements for each node.
+
+    \subparag{Example}{
+        For instance, let's consider again the following tree, but considering the index of each node:
+        \imagehere[0.7]{MaxHeapExample2-Array.png}
+
+        This would be stored in memory as: 
+        \[A = \left[16, 14, 10, 8, 7, 9, 3, 2, 4, 1\right]\]
+        
+        Then, the left child of $i = 3$ is $\text{left}\left(i\right) = 2\cdot 3 = 6$, and its right child is $\text{right}\left(i\right) = 2\cdot 3 + 1 = 7$, as expected.
+    }
+}
+
+\begin{filecontents*}[overwrite]{maxHeapify.code}
+procedure maxHeapify(A, i, n):
+    l = left(i)  // 2i
+    r = right(i)  // 2i + 1
+    if l <= n and A[l] > A[i]  // don't want an overflow, so check l <= n
+        largest = l
+    else
+        largest = i
+    if r <= n and A[r] > A[largest]
+        largest = r
+
+    if largest != i
+        swap(A, i, largest)  // swap A[i] and A[largest]
+        maxHeapify(A, largest, n)
+\end{filecontents*}
+
+\parag{Max heapify}{
+    To manipulate a heap, we need to \important{max-heapify}. Given an $i$ such that the subtrees of $i$ are heaps (this condition is important), this algorithm ensures that the subtree rooted at $i$ is a heap (satisfying the heap property). The only violation we could have is the root of one of the subtrees being larger than the node $i$.
+
+    So, to fix our tree, we compare $A\left[i\right], A\left[\texttt{left}\left(i\right)\right]$ and $A\left[\texttt{right}\left(i\right)\right]$. If necessary, we swap $A\left[i\right]$ with the largest of the two children to get the heap property. This could break the previous sub-heap, so we need to continue this process, comparing and swapping down the heap, until the subtree rooted at $i$ is a max-heap. We could write this algorithm in pseudocode as:
+    \importcode{maxHeapify.code}{pseudo}
+
+    \subparag{Complexity}{
+        Asymptotically, we have done less computations than the height of our node $i$, yielding a complexity of $O\left(\text{height}\left(i\right)\right)$.
+
+        Also, we are working in place, thus we are taking a space of $\Theta\left(n\right)$.
+    }
+    
+    \subparag{Remark}{
+        This procedure is the main primitive we have to work with heaps, it is really important.
+    }
+}
+
+\begin{filecontents*}[overwrite]{buildMaxHeap.code}
+procedure buildMaxHeap(A, n)
+    for i = floor(n/2) downto 1
+        maxHeapify(A, i, n)
+\end{filecontents*}
+
+\parag{Building a heap}{
+    To make a heap from an unordered array $A$ of length $n$, we can use the following \texttt{buildMaxHeap} procedure:
+    \importcode{buildMaxHeap.code}{pseudo}
+    
+    The idea is that the nodes strictly larger than $\left\lfloor \frac{n}{2} \right\rfloor $ are leafs (no node after $\left\lfloor \frac{n}{2} \right\rfloor $ can have a left child since it would be at index $2i$ leading to an overflow, meaning that they are all all leaves), which are trivial subheaps. Then, we can merge increasingly higher heaps through the \texttt{maxHeapify} procedure. Note that we cannot loop in the other direction (from 1 to $\left\lfloor \frac{n}{2} \right\rfloor $), since maxHeapify does not create heap when our sub-trees are not heap. 
+
+    \subparag{Complexity}{
+        We can use the fact that \texttt{maxHeapify} is $O\left(\text{height}\left(i\right)\right)$ to compute the complexity of our new procedure. We can note that there are approximately $2^\ell $ nodes at the $\ell $\Th level (this is not really true for the last level, but it is not important) and since we have $\ell + h \approx \log_2\left(n\right)$ (the sum of the height and the level of a given note is approximately the height of our tree), we get that we have approximately $n\left(h\right) = 2^{\log_2\left(n\right) - h} = n2^{-h}$ nodes at height $h$. This yields:
+        \[T\left(n\right) = \sum_{h=0}^{\log_2\left(n\right)} n\left(h\right) O\left(h\right) = \sum_{h=0}^{\log_2\left(n\right)} \frac{n}{2^h} O\left(h\right) = O\left(n\sum_{h=0}^{\log_2\left(n\right)} \frac{h}{2^h}\right)\]
+
+        However, we notice that: 
+        \[\sum_{h=0}^{\infty} \frac{h}{2^h} = \frac{\frac{1}{2}}{\left(1 - \frac{1}{2}\right)^2} = 2\]
+        
+        Thus, we get that our function is bounded by $O\left(n\right)$.
+    }
+
+    \subparag{Correctness}{
+        To prove the correctness of this algorithm, we can use a loop invariant: at the start of every iteration of for loops, each node $i+1, \ldots, n$ is a root of a max-heap.
+
+        \begin{enumerate}[left=0pt]
+            \item At start, each node $\left\lfloor \frac{n}{2} \right\rfloor + 1, \ldots, n $ is a leaf, which is the root of a trivial max-heap. Since, at start, $i = \left\lfloor \frac{n}{2} \right\rfloor $, the initialisation of the loop invariant is true.
+            \item We notice that both children of the node $i$ are indexed higher than $i$ and thus, by the loop invariant, they are both roots of max-heaps. This means that the \texttt{maxHeapify} procedure makes node $i$ a max-heap root. This means that the invariant stays true after each iteration.
+            \item The loop terminates when $i = 0$. By our loop invariant, each node (notably node 1) is the root of a max-heap.
+        \end{enumerate}
+    }
+}
+
+\begin{filecontents*}[overwrite]{Heapsort.code}
+procedure heapsort(A, n)
+    buildMaxHeap(A, n)
+    for i = n downto 2
+        swap(A, 1, i)  // swap A[1] and A[i]
+        maxHeapify(A, 1, i-1)
+\end{filecontents*}
+
+\parag{Heapsort}{
+    Now that we built our heap, we can use it to sort our array:
+    \importcode{Heapsort.code}{pseudo}
+
+    A max-heap is only useful for one thing: get the maximum element. When we get it, we swap it to its right place. We can then max-heapify the new tree (without the element we put in the right place), and start again.
+
+    \subparag{Complexity}{
+        We run $O\left(n\right)$ times the heap repair (which runs in $O\left(\log\left(n\right)\right)$), thus we get that our algorithm has complexity $O\left(\log_2\left(n\right)\right)$.
+
+        It is interesting to see that, here, the good complexity comes from a really good data-structure. This is basically like selection sort (finding the biggest element and putting it at the end, it runs in $O\left(n^2\right)$) but finding the maximum in a constant time.
+    }
+
+    \subparag{Remark}{
+        We can note that, unlike Merge Sort, this sorting algorithm is in place.
+    }
+}
+
+\end{document}
