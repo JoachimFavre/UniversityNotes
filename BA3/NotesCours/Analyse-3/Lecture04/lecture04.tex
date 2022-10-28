@@ -1,0 +1,210 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-17 at 08:17:25.
+
+\usepackage{../../style}
+
+\title{Analyse}
+\author{Joachim Favre}
+\date{Lundi 17 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2022-10-17}{La gauche c'est positif}{
+\begin{itemize}[left=0pt]
+    \item Beaucoup d'exemples de champs qui dérivent et qui ne dérivent pas de potentiels.
+    \item Définition de bord, d'adhérence et de domaine régulier.
+    \item Explication et preuve du théorème de Green.
+\end{itemize}
+
+}
+
+\parag{Intuition}{
+    Si je fais un tour à vélo et que j'ai toujours le vent contraire, c'est que le vent ne dérivait pas d'un potentiel.
+
+    En effet, mathématiquement, le total du vent sur notre tour fermé à vélo $\Gamma$ donne: 
+    \[\int_{\Gamma} \text{vent}\left(\gamma\left(t\right)\right) \dotprod \gamma'\left(t\right) dt < 0 \mathspace \text{ puisque } \text{vent}\left(\gamma\left(t\right)\right) \dotprod \gamma'\left(t\right) dt < 0, \forall t\]
+}
+
+\parag{Exemple 1}{
+    Soit le champ suivant: 
+    \[F\left(x, y\right) = \left(-y, x\right) \in C^{\infty}\left(\mathbb{R}^2; \mathbb{R}^2\right)\]
+    
+    La première étape est de calculer le rotationnel: 
+    \[\rot F = \frac{\partial F_2}{\partial x} - \frac{\partial F_1}{\partial y} = 1 - \left(-1\right) = 2 \neq 0\]
+    
+    Donc, $F$ ne dérive pas d'un potentiel.
+}
+
+\parag{Exemple 2}{
+    Considérons le champ suivant: 
+    \[F\left(x, y\right) = \left(\frac{-y}{x^2 + y^2}, \frac{x}{x^2 + y^2}\right) \in C^1\left(\Omega; \mathbb{R}^2\right), \mathspace \text{où } \Omega = \mathbb{R}^2 \setminus \left\{\left(0, 0\right)\right\}\]
+
+    À nouveau, commençons par calculer le rotationnel: 
+    \autoeq{\unexpanded{\rot F = \frac{\partial }{\partial x} \left(\frac{x}{x^2 + y^2}\right) - \frac{\partial }{\partial y} \frac{-y}{x^2 + y^2} = \frac{x^2 + y^2 - 2x^2 + x^2 + y^2 - 2y^2}{\left(x^2 + y^2\right)^2} = 0}}
+    
+    Si $\Omega$ était étoilé (ou simplement connexe), nous pourrions directement conclure que $F$ dérive d'un potentiel. Cependant, en l'occurrence, il a un trou au milieu, ce qui fait qu'il n'est pas simplement connexe.
+    
+    La deuxième étape est de garder espoir et essayer d'utiliser la méthode de la variation de la constante pour trouver $f$ telle que $F = \nabla f$. Mais, malheureusement, la troisième étape est de remarquer que ça ne marche pas et de perdre espoir. Ceci nous amène à l'étape suivante.
+
+    La quatrième étape est de démontrer que notre champ ne dérive pas d'un potentiel en trouvant une courbe simple fermée $\Gamma$ telle que: 
+    \[\int_{\Gamma} F \dotprod d \ell \neq 0\]
+    
+    Pour se faire, on peut simplement prendre le cercle unité: 
+    \autoeq{\unexpanded{\int_{\Gamma} F \dotprod d \ell = \int_{0}^{2\pi} F\left(\cos\left(t\right), \sin\left(t\right)\right) \dotprod \left(-\sin\left(t\right), \cos\left(t\right)\right) dt = \int_{0}^{2\pi} \left(-\sin\left(t\right), \cos\left(t\right)\right) \dotprod \left(-\sin\left(t\right), \cos\left(t\right)\right)dt = \int_{0}^{2\pi} \left(\sin^2\left(t\right) + \cos^2\left(t\right)\right)dt = \int_{0}^{2\pi} dt = 2\pi}}
+    ce qui n'est pas nul.
+    
+    Ainsi, nous avons bien montré que $F$ ne dérive pas d'un potentiel.
+}
+
+\parag{Exemple 3}{
+    Considérons à nouveau le champ vectoriel suivant, mais sur un domaine différent:
+    \[F\left(x, y\right) = \left(\frac{-y}{x^2 + y^2}, \frac{x}{x^2 + y^2}\right) \in C^1\left(\Omega; \mathbb{R}^2\right), \mathspace \text{où } \Omega = \left\{\left(x, y\right) | y > 0\right\}\]
+
+    Nous n'avons pas changé notre champ, donc $\rot F = 0$. Cependant, maintenant, nous domaine est étoilé, ce qui nous permet de conclure par le théorème de la caractérisation par le rotationnel que $F$ dérive d'un potentiel.
+
+    \subparag{Remarque}{
+        Cet exemple nous montre que la géométrie du domaine est importante.
+    }
+}
+
+\parag{Exemple 4}{
+    Prenons le champ vectoriel suivant: 
+    \[F\left(x, y\right) = \left(\frac{x}{x^2 + y^2}, \frac{y}{x^2 + y^2} + 1\right)\]
+    avec $\Omega = \mathbb{R}^2 \setminus \left\{\left(0, 0\right)\right\}$.
+
+    Nous pouvons trouver que $\rot F = 0$, mais que $\Omega$ n'est pas simplement connexe. 
+
+    Passons maintenant à la deuxième étape:  Supposons que $F = \nabla f$. Alors, nous aurions: 
+    \autoeq{\unexpanded{\frac{\partial f}{\partial x} = \frac{x}{x^2 + y^2} \implies f\left(x, y\right) = \int\frac{x}{x^2 + y^2}dx + c\left(y\right) = \frac{1}{2} \log\left|x^2 + y^2\right| + c\left(y\right) = \frac{1}{2} \log\left(x^2 + y^2\right) + c\left(y\right)}}
+
+    Regardons maintenant la dérivée selon $y$: 
+    \[\frac{\partial f}{\partial y} = \frac{y}{x^2 + y^2} + c'\left(y\right) \over{=}{déf $f$}  \frac{y}{x^2 + y^2} + 1 \implies c'\left(y\right) = 1 \implies c\left(y\right) = y + c_2\]
+    
+    Nous avons ainsi trouvé que $F$ dérive de: 
+    \[f\left(x, y\right) = \frac{1}{2} \log\left(x^2 + y^2\right) + y + c_2\]
+}
+
+\parag{Exemple 5}{
+    Considérons le champ vectoriel suivant: 
+    \[F\left(x, y, z\right) = \left(\frac{x}{\left(x^2 + y^2\right)^2} + \frac{x}{\left(x^2 + z^2\right)^2}, \frac{y}{\left(x^2 + y^2\right)^2} + \frac{y}{\left(y^2 + z^2\right)^2}, \frac{z}{\left(x^2 + z^2\right)^2} + \frac{z}{\left(y^2 + z^2\right)^2}\right)\]
+    appartenant à $C^1\left(\Omega; \mathbb{R}^3\right)$, avec:
+    \[\Omega = \mathbb{R}^3 \setminus \left\{\left(x, y, z\right) | \left(x = 0 \text{ et } y = 0\right) \text{ ou } \left(x = 0 \text{ et } z = 0\right) \text{ ou } \left(y = 0 \text{ et } z = 0\right)\right\}\]
+
+    En d'autres mots, $\Omega$ est $\mathbb{R}^3$ sans les axes.
+
+    La première étape est de calculer le rotationnel, ce qui nous donne (nous pouvons accélérer ce calcul en se rendant compte de la symétrie entre chaque composante de $\rot F$): 
+    \[\rot F = 0\]
+    
+    Cependant, notre domaine n'est pas simplement connexe, donc nous passons à l'étape 2. Si $F = \nabla f$, alors nous avons: 
+    \[\frac{\partial f}{\partial x} = \frac{x}{\left(x^2 + y^2\right)^2} + \frac{x}{\left(x^2 + z^2\right)^2} \implies f\left(x, y, z\right) = -\frac{1}{2} \frac{1}{x^2 + y^2} - \frac{1}{2} \frac{1}{x^2 + z^2} + c\left(y, z\right)\]
+    
+    Considérons maintenant $y$: 
+    \autoeq{\unexpanded{\frac{\partial f}{\partial y} = \frac{y}{\left(x^2 + y^2\right)^2} + \frac{\partial c}{\partial y} \left(y, z\right) \over{=}{déf $f$} \frac{y}{\left(x^2 + y^2\right)^2} + \frac{y}{\left(y^2 + z^2\right)^2} \implies \frac{\partial c\left(y, z\right)}{\partial y} = \frac{y}{\left(y^2 + z^2\right)^2} \implies c\left(y, z\right) = \int \frac{y}{\left(y^2 + z^2\right)^2} dy + c_2\left(z\right) \implies f\left(x, y, z\right) = -\frac{1}{2} \frac{1}{x^2 + y^2} - \frac{1}{2} \frac{1}{x^2 + z^2} - \frac{1}{2} \frac{1}{y^2 + z^2} + c_2\left(z\right)}}
+    
+    Utilisons finalement $z$: 
+    \autoeq{\unexpanded{\frac{\partial f}{\partial z} = \frac{z}{\left(x^2 + z^2\right)^2} + \frac{z}{\left(y^2 + z^2\right)^2} + c_2'\left(z\right) \over{=}{déf $f$} \frac{z}{\left(x^2 + z^2\right)^2} + \frac{z}{\left(y^2+ z^2\right)^2} \implies c_2'\left(z\right) = 0 \implies c_2\left(z\right) = c_3}}
+    
+    Nous trouvons ainsi finalement que notre fonction $F$ dérive du potentiel suivant: 
+    \[f\left(x, y, z\right) = -\frac{1}{2}\left(\frac{1}{x^2 + y^2} + \frac{1}{x^2 + z^2} + \frac{1}{y^2 + z^2}\right) + c_3\]
+}
+
+\section{Théorème de Green}
+\parag{Définition: Bord}{
+    Soit $\Omega \in \mathbb{R}^n$ un ouvert. Alors, le \important{bord} de $\Omega$, noté $\partial \Omega$, est défini par: 
+    \[\partial \Omega = \left\{x \in \mathbb{R}^n | \forall r > 0, B_r\left(x\right) \cap \Omega \neq \o \text{ et } B_r\left(x\right) \cap \Omega^C \neq \o\right\}\]
+    où $B_r\left(x\right)$ est la boule ouverte de rayon $r$ centrée en $x$.
+    
+    \subparag{Exemple}{
+        Par exemple, sur l'image suivante, les points rouges ne font pas partie de $\partial \Omega$, mais le point vert oui:
+        \svghere[0.5]{BordDefinition.svg}
+    }
+}
+
+\parag{Définition: Adhérence}{
+    Soit $\Omega \in \mathbb{R}^n$ un ouvert. L'\important{adhérence} de $\Omega$, noté $\bar{\Omega}$, est donné par: 
+    \[\bar{\Omega} = \Omega \cup \partial \Omega\]
+}
+
+\parag{Exemple}{
+    Considérons par exemple le domaine ouvert suivant, celui d'un disque de rayon 1: 
+    \[\Omega = \left\{\left(x, y\right) \in \mathbb{R}^2 | x^2 + y^2 < 1\right\}\]
+    
+    Alors, nous avons: 
+    \[\partial \Omega = \left\{\left(x, y\right) |x^2 + y^2 = 1\right\}, \mathspace \bar{\Omega} = \left\{\left(x, y\right) | x^2 + y^2 \leq 1\right\}\]
+}
+
+\parag{Définition: Domaine régulier}{
+    $\Omega \in \mathbb{R}^2$ est un \important{domaine régulier} s'il existe des ouverts bornés $\Omega_0, \ldots, \Omega_k$ tels que:
+    \begin{itemize}
+        \item $\displaystyle\bar{\Omega_i} \subseteq \Omega_0$ pour tout $1 \leq i \leq k$.
+        \item $\displaystyle\bar{\Omega_i} \cap \bar{\Omega_j} = \o$ pour $1 \leq i < j \leq k$.
+        \item $\displaystyle\partial \Omega_i$ est une courbe régulière par morceau simple fermée pour tout $0 \leq i \leq k$.
+        \item $\displaystyle \Omega = \Omega_0 \setminus \bigcup_{i=1}^k \Omega_i$
+    \end{itemize}
+    
+    Le bord $\partial \Omega$ est orienté positivement si les paramétrisations choisies laissent le domaine $\Omega$ à gauche.
+
+    \subparag{Intuition}{
+        Notre domaine régulier $\Omega$ est défini par un ensemble $\Omega_0$ avec des ``trous'' $\Omega_1, \ldots, \Omega_k$.
+        \svghere[0.5]{DomaineRegulierExemple.svg}
+
+        Il est intéressant de remarquer que le bord ``des trous'' ne tournent pas dans le même sens que le bord de ``l'extérieur''.
+    }
+
+    \subparag{Remarque}{
+        Donner une orientation au bord $\partial \Omega$ permet d'enlever l'ambigüité qu'on avait sur le signes des intégrales: une intégrale ne dépend plus de la paramétrisation maintenant.
+    }
+}
+
+\parag{Théorème de Green}{
+    Soit $\Omega \subseteq \mathbb{R}^2$ un domaine régulier avec le bord $\partial \Omega$ orienté positivement. Soit aussi $F \in C^1\left(\Omega; \mathbb{R}^2\right)$.
+
+    Alors: 
+    \[\iint_{\Omega} \rot F\left(x, y\right) dxdy = \int_{\partial\Omega} F \dotprod d \ell \]
+    
+    Nous relions donc une intégrale multiple (de dimension 2) à une intégrale le long d'une courbe. 
+
+    \subparag{Remarque}{
+        Si $F$ dérive d'un potentiel, alors le théorème de Green se lit: 
+        \[0 = 0\]
+    }
+
+    \subparag{Preuve}{
+        Nous allons considérer trois cas.
+        \begin{enumerate}
+            \item Le cas d'un triangle. \later{fait la semaine prochaine}
+            \item Le cas des triangles généraux.
+            \item On considère un $\Omega$ général. Nous pouvons trianguler notre domaine, l'approximer avec des triangles infinitésimaux. L'intégrale sur la surface est à peu près égale à la somme des surfaces des triangles. Aussi, la somme des intégrales sur le bord donnent celle 
+        \end{enumerate}
+    }
+}
+
+\parag{Exemple}{
+    Soit le domaine suivant: 
+    \[\Omega = B_1\left(0\right) = \left\{\left(x, y\right) \in \mathbb{R}^2 | x^2 + y^2 < 1\right\}\]
+    
+    Nous prenons aussi le champ suivant: 
+    \[F\left(x, y\right) = \left(-y, x\right)\]
+    
+    Nous avions déjà calculé que $\rot F = 2$. Cela nous donne: 
+    \[\iint_{\Omega} \rot F \left(x,y\right) dxdy = \iint_{\Omega} 2dxdy = 2\iint_{\Omega}dxdy = 2 \text{Aire}\left(\Omega\right) = 2\pi\]
+    
+    De plus, on peut poser la paramétrisation de $\partial \Omega$ suivante:
+    \[\begin{split}
+    \gamma: \left[0, 2\pi\right] &\longmapsto \partial \Omega \\
+    t &\longmapsto \left(\cos\left(t\right), \sin\left(t\right)\right)
+    \end{split}\]
+    
+    Nous avons bien que $\partial \Omega$ est orienté positivement, ainsi: 
+    \[\int_{\partial \Omega} F \dotprod d \ell = \int_{0}^{2\pi} \left(-\sin\left(t\right), \cos\left(t\right)\right) \dotprod \left(-\sin\left(t\right), \cos\left(t\right)\right) = \int_{0}^{2\pi} 1dt = 2\pi\]
+    
+    Le théorème de Green est donc bien vérifié dans ce cas.
+}
+
+
+\end{document}
