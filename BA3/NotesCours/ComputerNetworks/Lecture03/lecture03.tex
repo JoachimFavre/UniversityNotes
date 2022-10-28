@@ -1,0 +1,184 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-07 at 15:17:39.
+
+\usepackage{../../style}
+
+\title{Compnet}
+\author{Joachim Favre}
+\date{Vendredi 07 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2022-10-07}{Speaking about all those cookies makes me hungry}{
+\begin{enumerate}[left=0pt]
+    \item Explanation of the three parts of the application layer we must keep in mind when designing an application: the architecture, the communication protocol, and the transport-layer technology.
+    \item Definition client-server and peer-to-peer architectures.
+    \item Definition of TCP and UDP technologies.
+    \item Explanation on how the web works, notably on the HTTP protocol cookies and the web caching.
+\end{enumerate}
+}
+
+\section{Application layer}
+\parag{Process}{
+    A \important{process} is a piece of code running on someone's computer.
+
+    In order to communicate, a process must know the process name of the other process. Such name could be, for instance, ``128.156.17.23, 80'', where the first part is the IP address and the second is the port number.
+}
+
+\parag{Designing an application}{
+    When designing an application, we need to design the architecture (which process does what), design the communication protocol (what sequences of messages can be exchanged) and choose the transport-layer technology.
+
+    \subparag{Remark}{
+        We will consider the first and third points hereinbelow, the second point will be explained through examples right after.
+    }
+    
+}
+
+\subsection{Architecture}
+\parag{Client-server architecture}{
+    In the \important{client-server architecture}, there is a client, which is a process that generates service requests, and a server, which is a process that is always running, reachable at a fixed and known process name, and which answers service requests. A server runs on a dedicated infrastructure. There is thus a clear separation of roles (a client that generates service requests and a server which answers or denies the requests).
+
+    In reality, nowadays we no longer only have one server, but we have a server farm. However, they all hide behind a single process name, so we will not treat this question in this course.
+}
+
+\parag{Peer-to-peer architecture}{
+    In the \important{peer-to-peer architecture}, a peer is a process that may both generate and answer requests. In other words, a peer may act both as a client and a server, generating service requests and answer (or deny) requests. A peer runs on personally owned end-system such as a laptop or a smartphone, there is no dedicated infrastructure.
+}
+
+\parag{Best architecture}{
+    There is not really any architecture which is best.
+
+    For instance, looking at security, in peer-to-peer there is no single point a hacker would need to enter, but we are sending data to many people and we are not sure that the data we receive is correct. Then, for performance, it also depends on the scenario.
+}
+
+\subsection{Choosing the transport-layer technology}
+\parag{Expectations}{
+    The choice of the transport-layer technology depends on the expectations the app has from it.
+
+    \subparag{Reliable data delivery}{
+        The application may expect reliable data delivery, meaning that that, if the message is not delivered to the destination process, we want to receive a signal failure (thus we need to detect and recover from packet loss).
+
+        This can be important for loss-sensitive applications, such as file transfer, emails, and so on.
+    }
+
+    \subparag{Guaranteed performance}{
+        Another expectation the application could have is some guaranteed performance, wanting a minimum througput or a maximum ent-to-end packet delay.
+    }
+
+    \subparag{Guaranteed security}{
+        The application could also want guaranteed security: confidentiality (meaning that its messages are only revealed to the destination), authenticity (making sure that the message comes from the claimed source), and data integrity (making sure that the message was not changed along the way).
+    }
+    
+}
+
+
+\parag{Internet transport-layer protocols}{
+    We have two internet transport-layer protocols.
+
+    The first one, \important{TCP} (Transmission Control Protocol) is reliable, delivers data in order, and provides flow and congestion control.
+
+    The second one, \important{UDP} (User Datagram Protocol) gives detection of packet corruption.
+
+    We can notice that no protocol offers guaranteed performance, nor security.
+
+    \subparag{Remark}{
+        The transport layer code only runs on our computer, not on the infrastructure between endsystems. Thus, if we want, we could write our own transport-layer protocol, we could. We would need to convince people we communicate to use it though.
+
+        For instance, Google can do that for people using Google Chrome connecting to Google services, since they wrote the code running the two.
+    }
+
+    \subparag{Note}{
+         Let's suppose a process sends a packet to another process. If the packet gets dropped along the way (for instance because some queue inside a packet switch is full), the protocol will know it (because it will not receive any acknowledgement of receipt) and thus send it again. This is why we say that TCP provides reliable data delivery.
+
+        Note that TCP does this without having the developer to think about it. This is the advantage of using pre-written protocols.
+    }
+}
+
+\parag{SSL}{
+    There is no official transport-layer technology that provides security grantees. However, because many applications do need that kind of service, they ended up implementing themselves. Because many applications used similar security-related functions, like encryption, a sub-layer (in the application layer) emerged, which is called \important{SSL} (Secure Sockets Layer). This is basically a software library containing many security-related functions.
+}
+
+\parag{Connection and memory}{
+    Processes being in a connection keep in memory what happened before. We say that they keep a state of the connection.
+
+    TCP is connection-oriented (or stateful), meaning that it maintains the sate on all the local/remote process pairs that use TCP.
+
+    UDP, however, is connection-less (or stateless), meaning that it does not maintain state on remote processes.
+
+    \subparag{Remark}{
+        Making a state takes a round trip time, thus if we only want to only send a small amount of data, then it may not be worth it to use TCP. 
+    }
+    
+}
+
+\subsection{Example: The web}
+\parag{Architecture}{
+    We want to make a process that generates a web requests, and a server, a process that is always running, reachable at a fixed known process name, and which answer web request. Thus, this is a client-server architecture.
+
+    \subparag{Remark}{
+        A web page is composed of a base file (html file for instance), and some referenced files (such as pictures, videos, scripts, and so on). Each file has its own URL, and this is how we address files.
+    }
+}
+
+\parag{Communication protocol}{
+    The two main HTTP request types are \texttt{GET} (the client requests to download a file) and \texttt{POST} (the client provides information). However, there can also be \texttt{HEAD} (the client requests file metadata), \texttt{PUT} (the client requests to upload a file), and so on.
+
+    The main HTTP response types are \texttt{OK}, \texttt{Not found}, \texttt{Moved permanently}, \texttt{Bad request}, and so on.
+
+    \subparag{Example}{
+        The most common exchange goes as follow. The web client requests the base file on a web page; the web server sends it; the web client reads it, identifies all the object that it needs, and it requests each of these objects one by one. This looks like:
+        \imagehere[0.75]{WebExchangeExampleNoCookies.png}
+    }
+
+    \subparag{Cookies}{
+        As presented here, the HTTP protocol is connection-less. The server does not need to remember what it sent to the web client in order to send it the new file. However, some web pages know who we are, saying ``Hello [name]'' on the top right for instance. To do so, knowing that we want to stay connection-less, we need to add a new concept: cookies. When we ask for a page, the webserver will give us the page with some cookies (in the application layer header of the packet). Then, our web client stores the cookies next to the url. During all our next communications, we will send back the cookies to the web server, and store the new cookies the server send us. 
+        \imagehere[0.75]{WebExchangeExampleCookies.png}
+
+        The web server does not keep any state, but it wrote all that it needs to remember in a cookie. This is not completely state-less, but the sate is not stored on the server (and this is great, because servers do not necessarily have the space to store everything, especially when the web was developed), but in a cookie stored in the web client. Thus we still call this a state-less protocol. Note that nothing prevents to implement state keeping on the server side.
+
+    }
+}
+
+\parag{Evolution of cookies}{
+    Previously, cookies could be modified on the web client, but now they tend to be encrypted (if those are cookies containing marketing data about us, they would not allow us to modify them).
+
+    This is not important for the exam, but there are two types of cookies: first-party cookies and third-party cookies. The latter is sent by a web page and will be used when accessing this webpage, whereas the former is sent by a web page and will be used when accessing another webpage. Note that we can deactivate all (or only third-party) cookies on a web client. It was imagined for very good reasons, but they started to be used for advertisements and tracking, so it explains why they are so badly seen nowadays.
+
+    Nowadays, web servers start doing cookie-less. This is done on the server-side and allows to keep tracking people without using cookie. Instead of using cookies, we store a user-id on a server. There even are cookie-less providers, which makes this tracking third party. Depending on how it is implemented, but they could even correlate the data they receive about the same person from different companies. This is very useful, for instance because to track users who clicked on the ``No Cookie'' button when accessing the web-page.
+}
+
+
+\parag{Transport-layer technology}{
+    The web always work on top of TCP. Note that the transport-layer is stateful (since we use TCP), but the application layer (HTTP) is not.
+
+    When we want to make our first request, our web client first requests the server to establish a connection. Then, we can make the \texttt{GET} request for the main page.
+
+    Let's compute the delay to receive the file. There is 1 RTT (round-trip time) given by the first packet asking to establish a connection, to which we add the delay for the request packet to go to the server, and the response packets to go the client. Note that, if the propagation delay is very big, this can add up to a lot. Thus, we use other methods to optimise this idea.
+
+    \subparag{Optimisations of TCP}{
+        \important{Persistent TCP connections} means that we use the same TCP connection for multiple HTTP requests and response. Thus, we only set up the connection once, which makes us gain some time. Note that, in general, when we see ``persistent'' in the exam, it means that we only need to add once the 1 RTT for establishing the connection. 
+
+        \important{Parallel TCP connections} means that we exchange multiple HTTP requests and response in parallel: we do not just wait for the acknowledgement of receipt of the last packet to send the next one. This is usually implemented by web servers, even though this method is not perfect.
+    }
+
+    \subparag{Web cache}{
+        Let's say many people make requests to a server which is far away. What we can do is adding a \important{proxy web server} (a \important{web cache}). Then, instead of asking the data to the server, we ask it to the proxy, which will ask it to the server, store it and send it back to us. This will take time the first time, but then when others people close will ask the proxy, it will be able to send the web page very fast.
+
+        There is a problem with this solution: we need to worry if the data is fresh, or if it is stale (meaning that the proxy needs to know if the data on the server was modified since the last time). To fix this problem, the proxy asks the web server if the data was modified by using a conditional \texttt{GET} request (asking to send the file if it was modified since a given data). We can note that it does not fix the problem of propagation delay, but saves the queuing and transmission delay for large files.
+
+        The proxy web server follows the HTTP protocol. Traditionally, it was ISP who offered proxy web servers (since it was a good thing for them if we did not have to always download from the outside using again their infrastructure); their proxy cache data from any sources.
+    }
+    
+}
+    
+\parag{Caching}{
+    Caching is a universal technique for improving performance, not only for the web, and it must definitely be kept in mind when designing an architecture. Its big challenge is stale data. The option we saw is dynamic check for staleness, but it may introduce significant delay. We will see another solution to stale data in the following example.
+}
+
+
+\end{document}

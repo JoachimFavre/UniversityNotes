@@ -1,0 +1,145 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-14 at 15:16:39.
+
+\usepackage{../../style}
+
+\title{Compnet}
+\author{Joachim Favre}
+\date{Vendredi 14 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2022-10-14}{A new foe has appeared: Trish}{
+\begin{enumerate}[left=0pt]
+    \item Explanation of the example of DNS: how and why it is used, how it was made scalable thanks to hierarchy, and the optimisations through caches. Also, explanation of the potential attacks that can be made on the DNS system.
+    \item Explanation of why people say peer-to-peer architectures scale better than client-server architecture.
+\end{enumerate}
+
+}
+
+\subsection{Example 2: DNS}
+\parag{DNS name}{
+    When we type a URL into our web client, such as \texttt{http://www.epfl.ch/index.html}, it extracts the DNS name (\texttt{www.epfl.ch}), converts it into an IP address (we will see how), forms the web-server process name (the port number is specified by the \texttt{http}, there is very specific port numbers for this protocol: 80 or 8080 for \texttt{http} and 443 or 8443 for \texttt{https}).
+
+    To translate the DNS name to an IP address, we use DNS (Domain Name System).
+
+    \subparag{Remark: Interface}{
+        An interface is a complicated notion since it appears in many forms, but it is basically a point where two systems (or subjects or organisations) meet and interact.
+
+        We have for instance seen the API (Application Programming Interface), which is an interface between an application and the Internet by giving a set of functions to communicate over the internet. There are also network interfaces: interface between an end-system and the network, a piece of hardware or software that sends and receives packets.
+
+        The DNS name identifies a network interface, meaning that it identifies an end-system (or host).
+    }
+}
+
+\parag{Architecture}{
+    Our web-client also runs a DNS client process, it can ask this process the IP address for a given DNS name. The DNS process (a process that generates DNS requests) then asks a DNS server (a process that answers DNS requests) for the IP address. Note that DNS resolution must be done before any web connection, giving some intuition on how important this is.
+
+
+    \subparag{Scalability}{
+        We notice that it is not possible to have a single DNS server in the entire Internet: this would be a single point of failure (if it crashes, nobody can access the web anymore), the propagation delay would be a problem for some people, it would be very costly to handle and to have it big enough, and so on. Using only one DNS server could not scale. This makes us introduce the concept of scalability.
+
+        \important{Scalability} is the ability of a system to grow, it is its ability to maintain its properties at a reasonable cost as it grows. 
+
+        For our DNS architecture, instead of having only one server, we have a hierarchy of DNS servers: at the top we have root servers, then TLD (top-level domain) servers (who are responsible for the top-level domain, the last component of a DNS names, such as \texttt{.com}, \texttt{.org}, \texttt{.ch}, and so on), and finally authoritative server (which are responsible for lower-level domain, meaning the last two components of a DNS name, such as \texttt{yahoo.com}, \texttt{epfl.ch}, and so on). 
+
+        Note that any root server know the address of a TLD server which knows the top-level, and every TLD server knows the IP address of an authoritative server which can handle the given DNS domain.
+
+        When our DNS client asks a DNS server, it asks a local DNS server (a server which knows a root server), which asks a root server, which asks a TLD server who knows the top level domain, which asks an authoritative server who knows the lower-level domain. This is known as a \important{recursive queries}.
+        \imagehere[0.75]{DNSRecursiveQueries.png}
+
+        Another alternative would be the local DNS server to ask the root for the IP address of the TLD server, then ask the TLD server the IP address for the authoritative server, and then finally ask the IP address corresponding to the DNS name. This is known as \important{iterative queries}.
+        \imagehere[0.75]{DNSIterativeQueries.png}
+
+        When asking a DNS server, we can add a flag to say if we want recursive or iterative queries, but it might reject our request. Our machine is configured to always access a given local DNS server. Then, this local DNS server knows at least one root server. Note that any DNS server is parametrised as a DNS server, so they all know at least one IP address.
+
+
+        To sum up, this is a hierarchy of three levels, where each node knows how to reach its children. This is definitely scalable, and there is no single point of failure or single institution which needs to manage for everything. For instance, EPFL has its own authoritative server.
+    }
+    
+    
+    \subparag{Caching}{
+        With all the queries, we need to optimise performance, which we can do through caching. When we have many users who want to access the same information, and that information takes time to get, then, as a very general paradigm, it makes sens to cache. By doing caching, any DNS server in the hierarchy (even the client) can make everything quicker. However, as usual with caching, we have the problem of stale data.
+
+        The solution against stale data for web pages is not really interesting here since IP addresses do not represent a lot of data. However, we notice that IP addresses do not change often. So, instead, when sending the IP address corresponding to a given DNS name, the DNS server adds a \important{TTL} (Time to Live; its length can vary a lot depending on the authoritative server), which the DNS server (or client) above also caches. The authoritative server assures that the IP address will not change during this period of time. Then, if the engineer wants to modify the IP address, he or she can allow the old IP address for the TTL of the most recent request.
+
+        We could also imagine another system, where, if data changes, then the DNS server notifies all servers who asked for this data. However, this is not a good idea since we are making a stateful architecture (it would need to know who asked). This would complicate the DNS protocol, and, very generally, we must think twice before turning a stateless architecture into a stateful one.
+    }
+    
+}
+
+\parag{Remark}{
+    We have seen two important concepts: hierarchy and caching.
+
+    To sum up, \important{hierarchy} is a universal technique for scaling large systems and \important{caching} is a universal technique for improving performance (where its main challenge is stale data, and to which we have seen two solutions).
+}
+
+
+\parag{Communication protocol}{
+    The communication protocol of DNS relies on \important{Resource Record} (RR). This a piece of information (such as a DNS to IP mapping). In this protocol, we then have queries (a request for an RR), answers (a response to a question) and messages (a set of queries and answers, plus some other elements). 
+
+    Any DNS client and server, or any two DNS servers, can exchange any sequence of message.
+}
+
+\parag{Transport layer technology}{
+    DNS's transport layer typically relies on UDP since we do not really need the confirmation that the message was received, it is not worth for the TCP connection setup time. 
+
+    Thus, typically, for short exchanges, we use UDP. However, when DNS servers begin to exchange a lot between them, then they can start using TCP. Note that, in an exam, without further information, we can suppose DNS works over UDP.
+}
+
+\parag{Attacks}{
+    Let's consider the possible attacks this system can undergo.
+
+    \subparag{Impersonating}{
+        A malicious entity, Persa, can impersonate a DNS server and, if she sends her IP address more quickly than the DNS server (she could do this by guessing: sending the IP address to many people), then our DNS client will just ignore the true answer. This means that we could connect to Persa's machine, thinking we are looking at our bank's website. If she makes a website that looks like our bank, then we could give her our username and password. 
+
+        This shows the power someone has by taking a DNS server.
+    }
+ 
+    \subparag{Denial of service}{
+        Another malicious entity, Denis, could make denial of service attack to Root and TLD DNS servers by spamming them of demands. Since there are relatively few root and TLD servers, this attack can really have a big impact over the web. This is a very common attack, and there are a lot of protections against it.
+    }
+    
+
+    \subparag{Trashing the cache}{
+        Another attack can be done by Trish, by asking to get the IP address of many random websites of which nobody cares. If the DNS server is not careful, its cache will be filled with trash. This attack is called \important{trashing the cache}, and it is a potential vulnerability to any architecture using caching.
+    }
+}
+
+\subsection{Example 3: BitTorrent}
+\parag{Scaling}{
+    We will only consider the architecture of BitTorrent. All architectures we have seen so far were client-servers, and this is the first peer-to-peer architecture. Let's see why people say that peer-to-peer architectures scale better than client-servers architecture.
+
+    We are doing this very approximately, considering many delays to be insignificant, because it depends on many things.
+
+    So, Alice has a file of size $F$ and wants to share it to $N$ of her friends. The transmission delay of cable going out of her home is $u_S$, and the one going out of her $i$\Th friend's home is $u_i$. 
+    \imagehere[0.5]{BitTorrentMathsSetup.png}
+
+    Let's consider client-server. The file distribution time depends on two things (in the big picture): Alice needs to send $N$ times its file, and each person must receive it. We thus get that the total distribution time is bounded below by: 
+    \[D_{CS} \geq \max\left\{\frac{N F}{u_s}, \frac{F}{u_i}\right\}\]
+
+    Let's now consider peer-to-peer. Alice splits her file in multiple parts, and then, iteratively, end-systems send parts they have to people who did not have it. The file distribution time is more complicated in this case. Approximately, Alice needs to send the whole file at least once, everyone needs to receive it, and we must consider the fact that we use everyone's link at the same time to send parts to others. This gives us: 
+    \[D_{P2P} \geq \max\left\{\frac{F}{u_s}, \frac{F}{u_i}, \frac{NF}{\sum_{i=1}^{N} u_i}\right\}\]
+    
+    If $N$ gets bigger and bigger, then the terms that dominate are:
+    \[D_{CS} \geq \frac{N F}{u_s}, \mathspace D_{P2P} \geq \frac{NF}{\sum_{i=1}^{N} u_i}\]
+
+    This allows us to draw the following graph:
+    \imagehere[0.5]{PeerToPeerVsClientServerFileDistributionTime.png}
+
+    Peer-to-peer has a sublinear behaviour, whereas client-server is linear. This is why we say peer-to-peer scales better than client-server.
+
+    \subparag{Remark}{
+        Naturally, we do not need to know those formulas by heart.
+    }
+}
+
+
+
+
+\end{document}
