@@ -174,14 +174,38 @@
         \[0 = 0\]
     }
 
-    \subparag{Preuve}{
-        Nous allons considérer trois cas.
-        \begin{enumerate}
-            \item Le cas d'un triangle. \later{fait la semaine prochaine}
-            \item Le cas des triangles généraux.
-            \item On considère un $\Omega$ général. Nous pouvons trianguler notre domaine, l'approximer avec des triangles infinitésimaux. L'intégrale sur la surface est à peu près égale à la somme des surfaces des triangles. Aussi, la somme des intégrales sur le bord donnent celle 
-        \end{enumerate}
+    \subparag{Preuve triangle isocèle rectangle}{
+        Nous considérons le cas d'un isocèle rectangle, dont les sommets sont en $\left(0, 0\right)$, $\left(0, 1\right)$ et en $\left(1, 0\right)$.
+        \svghere[0.6]{TriangleTheoremeGreen.svg}
+        Nous avons donc: 
+        \autoeq{\unexpanded{\Omega = \left\{\left(x, y\right) \in \mathbb{R}^2 | 0 < x < 1 \text{ et } 0 < y < 1 - x\right\} = \left\{\left(x, y\right)\in \mathbb{R}^2 | 0 < y < 1 \text{ et } 0 < x < 1 - x\right\}}}
+        
+        Ceci nous donne que: 
+        \autoeq{\unexpanded{\iint_{\Omega} \rot F dxdy = \iint_{\Omega} \partial_x F_2 dxdy - \iint_{\Omega} \partial_y F_1 dxdy = \int_{0}^{1} \int_{0}^{1-y} \partial_x F_2 dxdy - \int_{0}^{1} \int_{0}^{1-x} \partial_y F_1 dydx = \int_{0}^{1} \underbrace{F_2\left(1 - y, y\right)dy}_{t = y} - \int_{0}^{1} \underbrace{F_2\left(0, y\right)dy}_{t = 1 - y} \fakeequal - \int_{0}^{1} \underbrace{F_1\left(x, 1- x\right)dx}_{t = 1 - x} + \int_{0}^{1} \underbrace{F_1\left(x, 0\right)dx}_{t = x}}}
+
+
+        En faisant les changements de variables mentionnés sous chaque intégrale, nous obtenons que c'est égal à (en faisant attention aux bornes pour avoir les signes correctement):
+        \autoeq[s]{\unexpanded{\int_{0}^{1} F_1\left(t, 0\right)dt + \int_{0}^{1} \left[-F_1\left(1-t, t\right) + F_2\left(1 - t, t\right)\right]dt \fakeequal + \int_{0}^{1} F_2\left(0, 1-t\right)\left(-1\right)dt}}
+
+        Ce qui est exactement:
+        \[\int_{\Gamma_1} F \dotprod d \ell + \int_{\Gamma_2} F \dotprod d \ell + \int_{\Gamma_3} F \dotprod d \ell\]
+        comme attendu.
     }
+
+    \subparag{Preuve triangle quelconque}{
+        Le cas des triangles généraux sera fait dans la cinquième série d'exercices.
+    }
+    
+    \subparag{Preuve ouvert quelconque}{
+        On considère un $\Omega$ général. Dans l'idée, nous pouvons trianguler notre domaine, l'approximer avec des triangles de plus en plus fins.
+        \svghere[0.5]{TheoremGreenTriangulisation.svg}
+
+        On trouve ainsi, approximativement: 
+        \autoeq{\unexpanded{\iint_{\Omega} \rot F \approx \sum_{\text{triangles}}^{} \iint_{\text{triangle}} \rot F = \sum_{\text{triangles}}^{} \int_{\partial \text{triangle}} F \dotprod d \ell = \int_{\text{''extérieur''}} F \dotprod d \ell \approx \int_{\partial \Omega} F \dotprod d \ell}}
+        
+        En effet, chaque ligne à ``l'intérieur'' de notre triangulation est toujours au bord d'exactement deux triangles, et une fois de manière positive et une fois de manière négative. Ceci nous montre que la somme des intégrales sur les bords nous donne bien l'intégrale des bords de l'extérieur.
+    }
+    
 }
 
 \parag{Exemple}{

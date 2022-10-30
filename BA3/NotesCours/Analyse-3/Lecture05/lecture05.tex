@@ -1,0 +1,206 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-24 at 08:15:45.
+
+\usepackage{../../style}
+
+\title{Analyse}
+\author{Joachim Favre}
+\date{Lundi 24 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2022-10-24}{Théorème de la divergence en deux dimensions}{
+\begin{itemize}[left=0pt]
+    \item Preuve d'un corollaire du théorème de Green permettant de calculer l'aire d'un domaine.
+    \item Définition de la normale extérieure, et preuve d'une proposition permettant de la calculer.
+    \item Explication et preuve du théorème de la divergence dans $\mathbb{R}^2$.
+    \item Utilisation du théorème de la divergence dans $\mathbb{R}^2$ pour calculer une intégrale.
+\end{itemize}
+
+}
+
+\parag{Corolaire: Formule de l'Aire}{
+    Soit $\Omega$ un domaine régulier avec le bord $\partial \Omega$ orienté positivement. Nous avons alors:
+    \[\text{Aire}\left(\Omega\right) = \iint_{\Omega}1 dxdy = \int_{\partial \Omega} \left(0, x\right) \dotprod d \ell = \int_{\partial \Omega} \left(-y, 0\right) \dotprod d \ell \]
+    
+    \subparag{Preuve}{
+        Nous avons bien que: 
+        \[1 = \rot\left(0, x\right) = \rot\left(-y, 0\right)\]
+        
+        Puis, notre résultat découle directement par le théorème de Green.
+
+        \qed
+    }
+}
+
+\parag{Exemple}{
+    Nous voulons vérifier le théorème de Green pour le domaine suivant: 
+    \[\Omega = \left\{\left(x, y\right) \in \mathbb{R}^2 | x, y > 0 \text{ et } 4 < x^2 + y^2 < 9\right\}\]
+    
+    Et avec le champ vectoriel suivant: 
+    \[F\left(x, y\right) = \left(\frac{x}{x^2 + y^2}, \frac{1}{x^2 + y^2}\right)\]
+    
+    Nous remarquons que notre domaine a l'allure d'un cercle, ainsi utilisons des coordonnées polaires: 
+    \[\Omega = \left\{\left(r\cos\left(\theta\right), r\sin\left(\theta\right)\right) | \theta \in \left]0, \frac{\pi}{2}\right[ , r \in \left]2, 3\right[ \right\}\]
+
+    De plus, nous trouvons que le rotationnel de notre fonction est donné par: 
+    \[\rot F = \frac{-2x + 2xy}{\left(x^2 + y^2\right)^2}\]
+    
+    Calculons maintenant notre première intégrale:
+    \autoeq{\unexpanded{\iint_{\Omega} \rot F dx dy = \int_{2}^{3} \rot F \left(r \cos\left(\theta\right), r\sin\left(\theta\right)\right) d \theta dr = \int_{2}^{3} \int_{0}^{\frac{\pi}{2}} \frac{-2r \cos\left(\theta\right) + 2r^2 \cos\left(\theta\right)\sin\left(\theta\right)}{r^4} \underbrace{r}_{\text{Jacobien}} = \int_{2}^{3} \left(\frac{-2}{r^2} \left[\sin\left(\theta\right)\right]_{0}^{\frac{\pi}{2}} + \frac{2}{r} \left[\frac{\sin^2\left(\theta\right)}{2}\right]_{0}^{\frac{\pi}{2}}\right) dr = \int_{2}^{3} \left(\frac{-2}{r^2} + \frac{1}{r}\right) dr = \left[\frac{2}{r} + \log\left(r\right)\right]_2^3 = \frac{2}{3} + \log\left(3\right) - 1 - \log\left(2\right) = \frac{-1}{3} + \log\left(\frac{3}{2}\right)}}
+    
+    Nous pouvons ensuite calculer notre deuxième intégrale. Pour y arriver, nous devons définir une paramétrisation de $\partial \Omega$, de manière positive:
+    \begin{center}
+    \begin{minipage}{0.45\textwidth}
+    \[\begin{split}
+    \gamma_1: \left[0, \frac{\pi}{2}\right] &\longmapsto \Gamma_1 \\
+    t &\longmapsto \left(0, t\right)
+    \end{split}\]
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+    \[\begin{split}
+    \gamma_2: \left[2, 3\right] &\longmapsto -\Gamma_2 \\
+    t &\longmapsto \left(0, t\right)
+    \end{split}\]
+    \end{minipage}
+    \end{center}
+    
+    \begin{center}
+    \begin{minipage}{0.45\textwidth}
+    \[\begin{split}
+    \gamma_3: \left[0, \frac{\pi}{2}\right] &\longmapsto -\Gamma_3 \\
+    t &\longmapsto 2\left(\cos\left(t\right), \sin\left(t\right)\right)
+    \end{split}\]
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+    \[\begin{split}
+    \gamma_4: \left[2, 3\right] &\longmapsto \Gamma_4 \\
+    t &\longmapsto \left(t, 0\right)
+    \end{split}\]
+    \end{minipage}
+    \end{center}
+
+    \svghere[0.5]{TheoremGreenParametrisationExemple.svg}
+
+    Or, nous savons que: 
+    \[\partial \Omega = \Gamma_1 \cup \Gamma_2 \cup \Gamma_3 \cup \Gamma_4 = \Gamma_1 \cup -\left(-\Gamma_2\right) \cup -\left(-\Gamma_3\right) \cup \Gamma_4\]
+    
+    Et ainsi: 
+    \autoeq{\unexpanded{\int_{\partial \Omega} F \dotprod d \ell = \int_{\Gamma_1} F \dotprod d \ell - \int_{-\Gamma_2} F \dotprod d \ell - \int_{-\Gamma_3} F \dotprod d \ell + \int_{\Gamma_4} F \dotprod d \ell = \int_{0}^{\frac{\pi}{2}} \left(\frac{3\cos\left(t\right)}{9}, \frac{1}{9}\right)\dotprod 3\left(-\sin\left(t\right), \cos\left(t\right)\right)dt - \int_{2}^{3} \left(0, \frac{1}{t^2}\right) \dotprod \left(0, 1\right)dt \fakeequal - \int_{0}^{\frac{\pi}{2}} \left(\frac{2\cos\left(t\right)}{4}, \frac{1}{4}\right) \dotprod 2\left(-\sin\left(t\right), \cos\left(t\right)\right)dt + \int_{2}^{3} \left(\frac{t}{t^2}, \frac{1}{t^2}\right) \dotprod \left(1, 0\right)dt = \ldots = -\frac{1}{3} + \log\left(\frac{3}{2}\right)}}
+    comme attendu.
+}
+
+\parag{Définition: Normale extérieure}{
+    Soit $\Omega \subset \mathbb{R}^2$ un domaine régulier et $P \in \partial \Omega$ un point de la frontière de $\Omega$. Le vecteur $\nu_P \in \mathbb{R}^2$ est la \important{normal extérieure} à $\Omega$ en $P$ si:
+    \begin{enumerate}
+        \item $\left\|\nu_P\right\| = 1$
+        \item Si $\gamma: \left[a, b\right]\mapsto \partial \Omega$ est une paramétrisation telle que $\gamma\left(t_0\right)$ existe (où $t_0$ est tel que $\gamma\left(t_0\right) = P$), alors $\gamma'\left(t_0\right) \dotprod \nu_P = 0$.
+        \item Pour tout $\epsilon > 0$ suffisamment petit, alors $P + \epsilon \nu_P \not\in \Omega$
+    \end{enumerate}
+
+    \svghere[0.5]{NormeExterieure.svg}
+    
+    \subparag{Intuition}{
+        Le point 2 dit que notre vecteur est orthogonal au bord, et le point 3 nous donne la direction de ce vecteur (parmi les deux possibles).
+    }
+    
+    \subparag{Remarque}{
+        À un point où la dérivée n'existe pas (dans une courbe simple par morceaux), nous ne considérons pas le deuxième point, ce qui nous donne plein de vecteurs normaux extérieurs.
+    }
+    
+    
+}
+
+\parag{Proposition}{
+    Si $\Omega$ est un domaine régulier de bord régulier orienté positivement, et $\gamma: \left[a, b\right] \mapsto \partial \Omega$ est une paramétrisation régulière, alors pour tout $t \in\left[a, b\right]$, nous avons: 
+    \[\nu_{\gamma\left(t\right)} = \frac{\left(\gamma_2'\left(t\right), - \gamma_1'\left(t\right)\right)}{\left\|\gamma'\left(t\right)\right\|}\]
+        
+    \subparag{Preuve}{
+        Pour le point 1, nous avons bien: 
+        \[\left\|\nu_{\gamma\left(t\right)}\right\| = \frac{\left\|\left(\gamma_2', -\gamma_1'\right)\right\|}{\left\|\left(\gamma_1', \gamma_2'\right)\right\|} = 1\]
+
+        Pour le point 2, nous trouvons: 
+        \[\nu_{\gamma\left(t\right)} \dotprod \gamma'\left(t\right) = \frac{1}{\left\|\gamma'\right\|} \left(\gamma_2', -\gamma_1'\right) \dotprod \left(\gamma_1', \gamma_2'\right) = \frac{1}{\left\|\gamma'\right\|} \left(\gamma_2' \gamma_1' - \gamma_1' \gamma_2'\right) = 0\]
+
+        Pour le point 3, nous pouvons appliquer une translation et une rotation à notre domaine, afin d'avoir $\gamma'\left(t\right) = \left(0, y\right)$, où $y > 0$. Ainsi, cela nous donne le vecteur: 
+        \[\nu_{\gamma\left(t\right)} = \frac{\left(y, 0\right)}{y} = \left(1, 0\right)\]
+        qui pointe bien vers l'extérieur (comme on peut le voir sur l'image ci-dessous).
+
+        \svghere[0.65]{PreuvePropositionNormaleExterieure.svg}
+    }
+}
+
+\parag{Théorème de la divergence dans $\mathbb{R}^2$}{
+    Soit $\Omega \subset \mathbb{R}^2$ régulier, $F \in C^1\left(\Omega;\mathbb{R}^2\right)$ un champ vectoriel, et $\nu_P$ la normale extérieure à $\Omega$ en $P \in \partial \Omega$. Alors, nous avons: 
+    \[\iint_{\Omega} \Div F dxdy = \int_{\partial \Omega} \left(F \dotprod \nu\right) d \ell \]
+    
+    \subparag{Remarque 1}{
+        La quantité $\int_{\partial \Omega} F \dotprod \nu d \ell $ s'appelle le \important{flux} de $F$ à travers $\partial \Omega$.
+    }
+
+    \subparag{Remarque 2}{
+        Si $\gamma: \left[a, b\right] \mapsto \partial\Omega$ est une paramétrisation positive de $\partial\Omega$, alors: 
+
+        \autoeq{\unexpanded{\int_{\partial \Omega} F \dotprod \nu d \ell = \int_{a}^{b} F\left(\gamma\left(t\right)\right) \dotprod \nu_{\gamma\left(t\right)} \left\|\gamma'\left(t\right)\right\|dt = \int_{a}^{b} F\left(\gamma\left(t\right)\right) \dotprod \left(\gamma'_2\left(t\right), -\gamma_1'\left(t\right)\right) \frac{\left\|\gamma'\left(t\right)\right\|}{\left\|\gamma'\left(t\right)\right\|} dt}}
+        
+        Nous avons donc trouvé que: 
+        \[\int_{\partial \Omega} F \dotprod \nu d \ell = \int_{a}^{b} F\left(\gamma\left(t\right)\right) \dotprod \left(\gamma_2'\left(t\right), -\gamma_1'\left(t\right)\right)dt\]
+    }
+
+    \subparag{Intuition}{
+        Dans l'idée $\iint_{\Omega} \Div F dxdy$ est ``ce qui sort'' de $\Omega$, et $\int_{\partial\Omega} F \dotprod \nu d \ell $ est ``ce qui passe à travers'' $\partial \Omega$. Tout ce qui sort doit passer à travers la frontière, donc ces deux valeurs doivent être égales.
+    }
+    
+    \subparag{Preuve}{
+        Si $F = \left(F_1, F_2\right)$, alors:
+        \[\Div F = \rot\left(-F_2, F_1\right)\]
+
+        Nous obtenons ainsi, par le théorème de Green: 
+        \[\iint_{\Omega} \Div F dxdy = \iint_{\Omega} \rot\left(-F_2, F_1\right)dxdy = \int_{\partial \Omega} \left(-F_2, F_1\right) \dotprod d \ell \]
+        
+        Prenons maintenant une paramétrisation $\gamma: \left[a, b\right] \mapsto \partial \Omega$. Cela nous donne que notre intégrale est égale à: 
+        \autoeq[s]{\unexpanded{\int_{a}^{b} \left(-F_2\left(\gamma\left(t\right)\right), F_1\left(\gamma\left(t\right)\right)\right) \dotprod \left(\gamma_1'\left(t\right), \gamma_2'\left(t\right)\right)dt = \int_{a}^{b} \left(F_1, F_2\right) \dotprod \left(\gamma_2'\left(t\right), -\gamma_1'\left(t\right)\right) = \int_{\partial\Omega} \left(F \dotprod \nu\right)d \ell}}
+        par notre proposition ci-dessus.
+
+        \qed
+    }
+}
+
+\parag{Exemple 1}{
+    Nous voulons calculer $\int_{\Gamma} g\left(x, y\right) d \ell $ où $\Gamma$ est le cercle de rayon 3 centré en 0, et: 
+    \[g\left(x, y\right) = x\sin^4\left(y\right) + ye^{x^2 + 2x}\]
+
+    Avec la définition des intégrales curvilignes, ce calcul est compliqué. Cependant, nous pouvons plutôt faire les observations suivantes. Comme $\Gamma$ est le cercle de rayon 3 centre en 0, nous trouvons que $\Gamma = \partial\Omega$, où: 
+    \[\Omega = \left\{\left(x, y\right) \in \mathbb{R}^2 | x^2 + y^2 < 9\right\}\]
+    
+    \svghere[0.5]{Exemple1TheoremDivergence.svg}
+
+    Nous pouvons voir sur l'image ci-dessus que la normale extérieure au point $P\left(x, y\right) \in \partial \Omega$ est parallèle au vecteur allant de l'origine vers ce point. Ainsi: 
+    \[\nu_{\left(x, y\right)} = \frac{1}{\sqrt{x^2 + y^2}} \left(x, y\right) = \frac{1}{r} \left(x,y\right) = \frac{1}{3} \left(x, y\right)\]
+    
+    Ceci est extrêmement intéressant car nous pouvons écrire notre intégrale comme:
+    \[\int_{\Gamma} g d \ell = \int_{\partial\Omega} \underbrace{\left(\sin^4\left(y\right), e^{x^2+ 2x}\right)}_{F} \dotprod \frac{1}{3} \left(x, y\right) 3 d \ell = 3\int_{\partial \Omega} F \dotprod \nu d \ell \]
+     
+    Or, nous pouvons voir que: 
+    \[\Div F = \partial_x \left(\sin^4 \left(y\right)\right) + \partial_y\left(e^{x^2 + 2x}\right) = 0\]
+    
+    Ce qui nous permet de simplifier notre intégrale, par le théorème de la divergence: 
+    \[\int_{\Gamma} g d \ell = 3\int_{\partial \Omega}F \dotprod \nu d \ell = \iint_{\Omega} \Div F dxdy = 0\]
+
+    \subparag{Remarque}{
+        Cette méthode est à retenir pour le calcul d'intégrales.
+    }
+    
+}
+
+
+
+
+\end{document}
