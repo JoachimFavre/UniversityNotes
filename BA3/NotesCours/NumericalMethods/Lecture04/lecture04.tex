@@ -1,0 +1,238 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-11 at 13:13:52.
+
+\usepackage{../../style}
+
+\title{NumMet}
+\author{Joachim Favre}
+\date{Mardi 11 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2022-10-11}{QR factorisation}{
+\begin{itemize}[left=0pt]
+    \item Generalisation of linear regression to any linear combination of functions.
+    \item Explanation on how to compute Legendre polynomials, and of their interest for polynomial regressions.
+    \item Explanation of Tikhonov regularisation.
+    \item Explanation of the QR factorisation, and how to use it to compute least squares problems.
+\end{itemize}
+
+}
+
+\parag{Linear least squares}{
+    Our findings can be very easily generalised to any linear combination of basis functions. 
+    For instance, let us make a linear regression on the following model: 
+    \[y = c_0 + c_1 \sin\left(x\right) + c_2 \cos\left(x\right)\]
+    
+    So, if we have $4$ points, then we get: 
+    \[\begin{pmatrix} 1 & \sin\left(x_1\right) & \cos\left(x_1\right) \\ 1 & \sin\left(x_2\right) & \cos\left(x_2\right) \\ 1 & \sin\left(x_3\right) & \cos\left(x_3\right) \\ 1 & \sin\left(x_4\right) & \cos\left(x_4\right) \end{pmatrix} \begin{pmatrix} c_0 \\ c_1 \\ c_2 \end{pmatrix} = \begin{pmatrix} y_1 \\ y_2 \\ y_3 \\ y_4 \end{pmatrix} \]
+    
+    However, models such as $y = c_0 + \sin\left(c_1 x\right)+ \cos\left(c_2 x\right)$ or $y = \exp\left(cx\right)$ need to be studied with non-linear regression.
+
+    \subparag{Remark}{
+        Knowing if a function can be matched through linear regression is a typical exam question.
+    }
+}
+
+\parag{Problems}{
+    When working with linear regressions, we may have two very common problems.
+
+    The first one is overfitting (on the picture of the left) and the second one is using a wrong model (on the picture on the right):
+    \imagehere{OverfittingWrongModel.png}
+
+    In the second picture, fitting a polynomial to both sides would be much better. 
+}
+
+\parag{Generalisation: Weighted least squares}{
+    Currently, we treat every point as being equally important. However, sometimes, data is of better quality at some point. For instance, on the following picture, we may want to give more importance to the points on the left:
+    \imagehere[0.5]{WeightedLinearRegression.png}
+
+    We can however use weighted least squares by adding a weight per point, minimising the following function: 
+    \[\sum_{i=1}^{n} \left[w_i \left(\left(a x_i + b\right) - y_i\right)^2\right]\]
+    
+    This can be done easily by realising that we have new points $\hat{x_i} = \sqrt{w_i} x_i$ and $\hat{y_i} = \sqrt{w_i} y_i$. Thus, we can simply scales the row of $A$ and $\bvec{b}$ by the square roots of the corresponding weight.
+
+    \subparag{Standard deviation}{
+        If we know the standard deviation $\sigma_i$, then we typically take:
+        \[w_i = \frac{1}{\sigma_i}\]
+    }
+}
+
+\parag{Stone-Weierestrass theorem}{
+    Any continuous 1D functions defined on an interval can be approximated arbitrarily well (it can be \textit{uniformly approximated)} using polynomial functions.
+}
+
+\parag{Problem}{
+    The problem is that our functions become more and more alike:
+    \imagehere[0.5]{PolynomialAlmostLinearDependent.png}
+
+    Considering our functions as vectors, it is like having them more and more colinear. What we would do for vectors in this kind of scenario is to typically make an orthogonal basis. Thus, let us do the same for functions.
+}
+
+\parag{Function vector space}{
+    Considering functions to be vectors, if we want to orthogonalise them using the Gram-Schmidt orthonormalisation algorithm, we need to define an inner product. This can be: 
+    \[\left\langle f, g \right\rangle = \int_{a}^{b} f\left(x\right)g\left(x\right)dx\]
+    
+    \subparag{Remark}{
+        This is very similar to the inner product for vectors, using an integral instead of a sum:
+        \[\left\langle \bvec{x}, \bvec{y} \right\rangle = \sum_{i=1}^{n} x_i y_i\]
+    }
+
+    \subparag{Example}{
+        For simplicity, let us consider the domain $\left[-1, 1\right]$. Then: 
+        \[\left\langle 1, x \right\rangle = \int_{-1}^{1} 1\cdot x dx = \left[\frac{1}{2}x^2\right]_{-1}^1 = 0\]
+        
+        Thus, relatively to the inner product we chose, $f\left(x\right) = 1$ and $g\left(x\right) = x$ are orthogonal.
+    }
+}
+
+\parag{Legendre polynomials}{
+    We already know that $1$ and $x$ are orthogonal. However, we can realise that $x^2$ and $1$ are not orthogonal. Orthonormalising our new vectors, it gives us $x^2 - \frac{1}{3}$ as our third base.
+
+    Continuing this way, we get the Legendre polynomials, which span the same space as regular monomials, but are orthogonal:
+    \imagehere[0.5]{LegendrePolynomials.png}
+
+    Thus, instead of using monomials when trying to do polynomial regressions, using the Legendre polynomials is much better. There is then no more conditioning problem.
+}
+
+\subsection{Regularisation}
+\parag{Introduction}{
+    \important{Regularisation} is a name for any process designed to improve the condition number of a problem. However, in exchange for improved conditioning, a regularised solution will suffer from some balancing effect (such as decreased accuracy, a bias, and so on).
+}
+
+\parag{Tikhonov regularisation}{
+    Tikhonov regularisation is the most common regularisation method for linear systems, since it is very simple to implement.
+
+    The idea is that unstable solutions is often that $\bvec{x}$'s magnitude becomes too large. Thus, we will penalise $\bvec{x}$ with a too large $L_2$ norm: 
+    \[\bvec{x_{sol}} = \argmin \left[\left\|A \bvec{x} - \bvec{b}\right\|_2^2 + \lambda \left\|\bvec{x}\right\|_2^2\right]\]
+    where $\lambda$ is the parameter that controls the degree to which we prefer smaller solutions.
+
+    We can rewrite our equation as:
+    \autoeq{\unexpanded{\bvec{x_{sol}} = \argmin \left(\bvec{x}^T A^T A \bvec{x} - 2\bvec{b}^T A \bvec{x} + \left\|\bvec{b}\right\|_2^2 + \lambda \left\|\bvec{x}\right\|_2^2\right) = \argmin\left(\bvec{x}^T \left(A^T A + \lambda I \right) \bvec{x} - 2 \bvec{b}^T A \bvec{x} + \left\|\bvec{b}\right\|_2^2\right)}}
+
+    We can then solve this through the LU factorisation for instance, by adding $\lambda I$ to the normal equations $A^T A$. This can also be solved through the QR factorisation by constructing a new matrix $A$ and a new vector $\bvec{b}$.
+    
+    \subparag{Geometric interpretation}{
+        By adding a multiple of an identity matrix, it is like increasing the size of the eigenvalues, which are directly linked to the norm of the matrix. In other words, the bigger the $\lambda$, the more our matrix maps a circle to a circle:
+        \imagehere[0.75]{TikhonovRegularisationEllipses.png}
+
+    }
+
+    \subparag{Remark}{
+        Note that we can also use a $L_1$ norm, leading to the lasso optimisation.
+    }
+    
+}
+
+\subsection{QR factorisation}
+\parag{Introduction}{
+    There are many situations where the QR factorisation is the one to use, but many time the LU factorisation is better.
+
+    Those two factorisations are complementary. If we have a square system, then using the LU factorisation is still a great idea. However, as we will see, if our matrix has big conditioning number, then using the QR factorisation will help not to use the normal equations.
+}
+
+\parag{Angles}{
+    When working with least squares problem, we realise that distances and angle are really important. We must preserve distances and angles when transforming the matrices since, else, the answer will change. More than that, if we never modify distances and angles, then we will never amplify errors.
+
+    This leads us to the definition of isometries. An \important{isometry} is a transformation that preserves angles and distances. Rotation and mirroring are isometric transformation, but shearing (adding a dimension to another) is not.
+    \imagehere[0.75]{IsometriesExamples.png}
+
+    However, LU factorisation is based on adding a non-zero multiple row to another one (thus shearing).
+}
+
+\parag{Inner product}{
+    The \important{inner product}, or dot product, is defined as: 
+    \[\bvec{a} \dotprod \bvec{b} = \bvec{a}^T \bvec{b} = \left\|\bvec{a}\right\| \left\|\bvec{b}\right\| \cos\left(\theta\right)\]
+    where $\theta$ is the angle between the two vectors.
+
+    \subparag{Property}{
+        We notice that, if $\bvec{a}$ and $\bvec{b}$ are perpendicular, then $\bvec{a} \dotprod \bvec{b} = 0$. Also, if $\bvec{a}$ has unit length, then $\bvec{a} \dotprod \bvec{a} = 1$.
+    }
+}
+
+\parag{Orthogonal matrix}{
+    An \important{orthogonal matrix}, generally written $Q$, is a matrix where each of its columns are orthogonal to each other, and are of unit length.
+
+    \subparag{Property}{
+        We notice that, if $Q$ is an orthogonal matrix with columns $\bvec{Q_1}, \ldots, \bvec{Q_n}$, then: 
+        \[Q^T Q = \begin{pmatrix} \bvec{Q_1}^T \bvec{Q_1} & \cdots & \bvec{Q_1}^T \bvec{Q}_n \\ \cdots & \ddots & \cdots \\ \bvec{Q_n}^T \bvec{Q_1} & \cdots & \bvec{Q_n}^T \bvec{Q_n} \end{pmatrix} = \begin{pmatrix} 1 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & 1 \end{pmatrix} = I \]
+    }
+    
+    \subparag{Interest}{
+        As mentioned earlier, we notice that, since orthogonal transformations preserve distances and angles, they do not amplify error.
+    }
+}
+
+\parag{QR decomposition}{
+    There are three ways of computing a QR decomposition. The first way is using Gram-Shmidt algorithm, which is simple to implement but numerically unstable. The second way is the Householder transformation (we will focus on this one), which has excellent numerical properties but is hard to parallelise. The third way is through Givens rotations, which has excellent numerical properties, is parallelisable and is good for sparse problems.
+}
+
+\parag{Motivation}{
+    We notice that, when doing LU decomposition, we compute $U = E_n \cdots E_1 A$. However, the $E_i$ each amplify the errors (yeah it's the third time I wrote this same information, but it is important).
+
+    The idea of the Householder QR decomposition is to compute $R = Q_n \cdots Q_1 A$ (where $R$ is a right-triangular matrix, which is exactly the same thing as an upper-triangular matrix, but we call it $R$ and not $U$ for historical reasons), which does not amplify the error since we are using orthogonal matrices.
+}
+
+\parag{Householder QR decomposition}{
+    At each iteration, we want to remove all elements below the pivot using an orthogonal matrix: 
+    \[Q \bvec{x} = Q \begin{pmatrix} x_1 \\ x_2 \\ \cdots \\ x_n \end{pmatrix} = \begin{pmatrix} \widetilde{x_1} \\ 0 \\ \cdots \\ 0 \end{pmatrix} \]
+    
+    Let's first consider the case in 2 dimensions. Our goal is to project our vector onto the $\bvec{e_1}$ axis. The LU makes a basic projection, which does not preserves lengths:
+    \imagehere[0.5]{LUDecompositionProjection.png}
+
+    To preserve our length, we could do a rotation. However, this usually involves sines and cosines, which are not very efficient numerically. Instead, let us do a reflection (letting $\bvec{v}$ to be a vector orthogonal to the reflection axis):
+    \imagehere[0.5]{QRReeflectionAxis.png}
+
+    Assuming that $\left\|\bvec{v}\right\| = 1$, we get:
+    \[\widetilde{\bvec{x}} = \bvec{x} - 2\proj_{\bvec{v}}\left(\bvec{x}\right) = \bvec{x} - 2 \left(\bvec{v} \dotprod \bvec{x}\right)\bvec{v}\]
+
+    This works in any number of dimensions. We want a matrix, so we can translate it as: 
+    \[\widetilde{\bvec{x}} = Q \bvec{x}, \mathspace \text{where } Q = I - 2 \frac{\bvec{v} \bvec{v}^T}{\bvec{v} \dotprod \bvec{v}} = I - 2 \frac{\bvec{v} \bvec{v}^T}{\bvec{v}^T \bvec{v}}\]
+    
+    This is named the Houseolder reflection. We notice that there always are two possibilities for choosing the axis of reflection. Here is the second one for our example above:
+    \imagehere[0.5]{QRReflectionSecondAxis.png}
+
+    The difficulty comes from computing this $\bvec{v}$. This can be done by noting that we want $Q \bvec{v} = \bvec{e_1}$. However, the computations are non-trivial, and we don't really have to spend time developing the formula, only understand it (especially since those algorithms are implemented much better than what we could ever do in libraries).
+
+    \subparag{Remark}{
+        Our goal was to do this factorisation for tall matrices, so this looks like:
+        \imagehere[0.5]{QRFactorisationTallMatrices.png}
+
+        However, we can make an optimisation in practice, because of all the zeroes:
+        \imagehere[0.5]{QRFactorisationTallMatricesEconomy.png}
+
+        This second version is named the economy size.
+    }
+}
+
+\parag{Solving least squares problem with QR}{
+    When having found the economy-size of the QR factorisation, knowing that for any orthogonal matrix $Q^{-1} = Q^T$, then we can solve $A \bvec{x} = \bvec{b}$ by solving the following triangular system: 
+    \[R \bvec{x} = Q^T \bvec{b}\]
+    
+    \subparag{Geometric meaning}{
+        We rotate the space with the matrix $Q$ into a space where the least-square projection is trivial: we just have to remove some coordinates. However, since we chose the economy-size system, we are already ignoring some dimensions, and this is done automatically. To find back the right coordinates in our first axis system, we solve one linear system given by $R$.
+
+        \imagehere{QRLeastSquareGeometricMeaning.png}
+    }
+
+    \subparag{Remark}{
+        The QR factorisation is extremely well-behaved from a numerical perspective. It is even well-defined for singular matrices due to the reliance on isometries, which can't ``explode''.
+    }
+    
+}
+
+\parag{Interest}{
+    The QR factorisation is on average two times more expensive than the LU Factorisation. It is extremely well-behaved from a numerical point of view, and it can solve tall linear system, giving the least squares solutions, without having to use the normal equations.
+
+    Thus, if we have a square system, then it is better to use the LU factorisation, if we have a tall system it is better to use the QR factorisation.
+}
+
+
+
+
+\end{document}

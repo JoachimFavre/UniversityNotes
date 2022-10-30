@@ -41,13 +41,11 @@ PRINTED_VERSION = False
 CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
-COURSES_NAME = ["Analyse-3"]
+COURSES_NAME = ["Analyse-3", "Algorithms", ("NumericalMethods", [(5, 6)]), "ComputerNetworks"]
+# COURSES_NAME = ["Analyse-3"]
 # COURSES_NAME = ["Algorithms"]
-# COURSES_NAME = ["NumericalMethods"]
+# COURSES_NAME = [("NumericalMethods", [(5, 6)])]
 # COURSES_NAME = ["ComputerNetworks"]
-# COURSES_NAME = ["ComputerArchitecture-1"]
-# COURSES_NAME = ["Electronique-1"]
-# COURSES_NAME = ["IntroToMachineLearning-BA3"]
 
 COPY_EXTENSIONS = ["tex", "pdf", "png", "jpg", "jpeg", 'code', 'svg']
 FOREWORD_NAME = {'fr': 'foreword_fr.txt', 'en': 'foreword_en.txt'}
@@ -313,7 +311,8 @@ def verify_content(content, file_name):
         print("\tA bmatrix was left in {}.".format(file_name))
 
 
-def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
+def modify_tex_documents(tmp_dir, tex_files, relations, is_english,
+                         reorderings):
     frontmatter_summary = None
     frontmatter_tex_file = None
 
@@ -377,6 +376,11 @@ def modify_tex_documents(tmp_dir, tex_files, relations, is_english):
 
     # sorted by first element of summary: lecture number
     informations = sorted(informations)
+
+    # if need to reorder
+    for a, b in reorderings:
+        informations[a-1], informations[b-1] = informations[b-1], informations[a-1]
+
     sorted_tex_files = []
     sorted_summaries = []
     for summary, relation_index, tex_file in informations:
@@ -531,14 +535,24 @@ def move_questions_if_any(tmp_dir, course_name):
     return False
 
 
-def _compile_course(course_name, tmp_dir):
+def extract(course_name_and_reorderings):
+    if type(course_name_and_reorderings) is str:
+        return course_name_and_reorderings, []
+    else:
+        course_name, reorderings = course_name_and_reorderings
+        return course_name, reorderings
+
+
+def _compile_course(course_name_and_reorderings, tmp_dir):
+    course_name, reorderings = extract(course_name_and_reorderings)
+
     print("Copying the source code and the documents to the temporary "
           "directory.")
     tex_files, relations, config = copy_lectures(tmp_dir, course_name)
 
     print("Modifying the latex documents.")
     tex_files, summaries = modify_tex_documents(tmp_dir, tex_files, relations,
-                                                config["english"])
+                                                config["english"], reorderings)
 
     print("Copying the style to the temporary directroy.")
     copy_style(tmp_dir, config)
@@ -561,20 +575,21 @@ def _compile_course(course_name, tmp_dir):
         print("Done, the result is " + result_path + ".pdf.")
 
 
-def compile_course(course_name, use_temp_folder):
+def compile_course(course_name_and_reorderings, use_temp_folder):
     if use_temp_folder:
         tmp_dir = r"zzz_temp"
-        _compile_course(course_name, tmp_dir)
+        _compile_course(course_name_and_reorderings, tmp_dir)
     else:
         with tempfile.TemporaryDirectory() as tmp_dir:
-            _compile_course(course_name, tmp_dir)
+            _compile_course(course_name_and_reorderings, tmp_dir)
 
 
-def compile_multiple_courses(courses_name, use_temp_folder):
+def compile_multiple_courses(courses_name_and_reorderings, use_temp_folder):
     beginning_time = time.time()
-    for course_name in courses_name:
+    for current in courses_name_and_reorderings:
+        course_name, _ = extract(current)
         print("#"*10 + " Compiling notes from " + course_name + " " + "#"*10)
-        compile_course(course_name, use_temp_folder)
+        compile_course(current, use_temp_folder)
         print("\n")
     print("Done in {} seconds!\a".format(int(time.time() - beginning_time)))
 
