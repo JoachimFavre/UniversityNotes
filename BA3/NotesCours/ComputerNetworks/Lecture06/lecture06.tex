@@ -1,0 +1,182 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-28 at 15:13:09.
+
+\usepackage{../../style}
+
+\title{Compnet}
+\author{Joachim Favre}
+\date{Vendredi 28 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2022-10-28}{Now we have Jack \smiley}{
+\begin{itemize}[left=0pt]
+    \item Explanation of how TCP works with timeouts.
+    \item Explanation of how TCP sets the sender window in order to control flow and congestion.
+    \item Explanation of the protocol to set up and close a TCP connection.
+    \item Explanation of two vulnerabilities of the TCP protocol, and how to prevent them.
+\end{itemize}
+
+}
+
+\subsection{Real life}
+
+\later{n duplicate acks: fast retransmit + Reno}
+
+\parag{Reliability elements}{
+    In real life, UDP only provides checksum.
+
+    TCP provides checksums, \texttt{Ack}s, \texttt{Seq}s, time-outs and retransmissions.
+}
+
+\parag{\texttt{Ack}s and \texttt{Seq}s}{
+    In TCP, when the receiver does an \texttt{Ack}, he or she does not specify the number of the sequence number he received, but the next sequence he or she is expecting. We can notice that those are cumulative \texttt{Ack}s: if we ask for a given sequence, it means that we have already received everything before.
+
+    Each byte is implicitly numbered. Thus, when we are saying ``\texttt{Ack} $n$'', we are saying ``I want the bytes starting after the $n$\Th one''. As we will see later, the communication in fact does not begin with the sequence number 0, so we are, in fact, shifting everything by a constant.
+
+    Typically, both end-systems need to communicate data to each other (for instance, in the HTTP protocol, the web broswer makes \texttt{GET} requests and the web server gives data). Thus, TCP was designed with this idea in mind. This means that there is not ``a sender'' and ``a receiver'', and that, even if we are not communicating data, we must always give a \texttt{Seq} and an \texttt{Ack}.
+}
+
+\parag{Maximum segment size}{
+    TCP has a \important{maximum segment size} (MSS) which is typically 1500 bytes, but it may vary because of the network properties. This defines the maximum size our packet has, and thus how much data we can send at once.
+}
+
+\parag{Example}{
+    Let's say that a web client (Alice) is commutating with a web browser (Bob). The get request is 200 bytes, and the file is 3100 bytes (with maximum segment size being 1500 bytes).
+
+    Then, the communication goes as:
+    \imagehere[0.6]{ExampleTCPAck.png}
+
+    Indeed, the web server first sends sequence 10 (as mentioned earlier, we don't begin at 0 for a reason which will be explained later), then sequence $1500 + 10$ (since the first message was 1500 bytes), and finally the sequence $3010$.
+
+    We can note that when Alice acknowledges the received message, the sequence of the packet she is sending is always the same (as mentioned above, we need to have a sequence number even if we are not sending data). Indeed, as long as we are not sending data, it is like if we are sending messages of $0$ byte, and thus we are using the same sequence number.
+}
+
+\parag{Timeouts}{
+    When TCP times out, it sends again only one packet, the one with sequence number which was last acknowledged (and thus requested). 
+
+    To compute the time before timeout, it uses a formula. At any time, it as an estimation of the RTT, and it measures the time since the last computation. After any round trip, it updates the estimated RTT as:
+    \[\text{EstimatedRTT}_{n} = 0.875\cdot \text{EstimatedRTT}_{n-1} + 0.125\cdot \text{SampleRTT}\]
+
+    The timeout then also depends on a function of the RTT variance (intuitively, the more the RTT varies, the more we want to wait before timeouts): 
+    \[\text{DevRTT} = f\left(\text{RTT variance}\right)\]
+    
+    We finally let the timeout time to be: 
+    \[\text{Timeout} = \text{EstimatedRTT} + 4\text{DevRTT}\]
+    
+    \subparag{Catch phrase}{
+        We can sum up this formula as the following catch phrase: this is an empirical and conservative prediction of RTT. In other words, we use both experiment and data we previously had to compute the new RTT.
+    }
+
+    \subparag{Fast retransmission}{
+        TCP can guess that a segment was lost when there are three duplicated \texttt{Ack}s (so receiving 4 times the same acknowledgement in a row), which then allows the sender to do a fast retransmission.
+
+        We don't go below this value since, else, we could be considering that some packets were lost, whereas they were just reordered or duplicated by the network.
+
+        There are thus two way to trigger a retransmission (the one of the oldest unacknowledged segment): a timeout and 3 duplicates \texttt{Ack}.
+    }
+}
+
+\parag{Remark}{
+    TCP is a mix of Go-back-N and Selective Repeat: it uses cumulative \texttt{Ack}s like Go-back-N but retransmits 1 segment on timeout like Selective Repeat.
+}
+
+\parag{Flow control}{
+    The goal of flow control is to prevent the receiver from being overwhelmed by the sender. This is done by a \important{receiver window}---the spare room currently in receiver's receive buffer---which he or she communicates to the sender as a TCP header field.
+
+    If the receiver tells the sender that the window is empty, then the sender will periodically poke the receiver with empty messages (just the header), to know if there is space yet.
+
+    \imagehere[0.6]{TCPFlowControl.png}
+}
+
+\parag{Congestion control}{
+    The goal of congestion control is to prevent the network from being overwhelmed. 
+
+    The sender uses various techniques to estimate a \important{congestion window}: the number of unacknowledged bytes that the sender can transmit without creating congestion. The network layer could have this information but it cannot communicate it to the transport layer; thus the transport layer must estimate this on its own.
+
+    To do so, we consider the throughput $R$, and the RTT. We can then compute the \important{bandwith delay} by computing their product. This represents the amount of data we can send before receiving an acknowledgement. This thus some kind of upper bound but, in practice, we do not use so much space.
+
+
+    \subparag{General solution}{
+        There are multiple ways to solve this problem, but they all really on the same idea.
+
+        The sender to send data (this starts well) and, every time the receiver sends an \texttt{Ack}, the sender considers that there is no congestion and thus sends a lot more data at the same time. When there is a timeout, the sender considers that it means there was congestion, and diminishes the window. If we again reach a window of that size, we start being more cautious in our window size increase, increasing it more slowly.
+
+        This can typically be done by sending the MSS for the first segment, and then increasing by MSS for every \texttt{Ack} as long as there is no timeout. This means that we double the window size as long as there is no timeout. We always store the \texttt{ssthresh}, the last biggest window which worked without timeout. Then, the next time we go across this, we start being more cautious, increasing the window by 1 MSS every RTT (we expect $\frac{N}{\text{MSS}}$ \texttt{Ack}s per RTT, thus we increase every packet by $\frac{\text{MSS}\cdot \text{MSS}}{N}$ bytes).
+    }
+
+    \subparag{Tahoe}{
+        A basic algorithm named \important{Tahoe} is to first set the window to 1 MSS and increase exponentially. When we have a timeout, we reset the window to 1 MSS, and set \texttt{ssthresh} to half of the last window. When reaching \texttt{ssthresh}, we transition to linear increase.
+    }
+
+    \subparag{Reno}{
+        As mentioned earlier, TCP sometimes does fast retransmissions: we can guess that a packet was lost. In that kind of scenarios, we have not suffered massive packet drop, so it seems a bit agressive to start again from 0. This yields the following algorithm, named \important{Reno}.
+
+        This is exactly the same algorithm as Tahoe, except we add the following condition. When we receive 3 duplicate \texttt{Ack}s, we set \texttt{ssthreash} to half our current window, set the window to \texttt{ssthresh} and retransmit.
+
+        This is however a bit more complicated because of another thing. If we received 3 duplicate \texttt{Ack}s, then we can suspect that the three packets we sent after the one which was dropped were indeed received. This means that we want don't want to start considering those packets lost yet, so we inflate the window by 3 MSS. Then, we enter a fast recovery phase: every time we receive the same duplicate \texttt{Ack}, we increase the congestion window by 1 MSS. Finally, when we receive a new \texttt{Ack}, it means that the lost packet was received and thus we can exit fast recovery. When we do so, we set our window to the congestion threshold and thus start a linear increase.
+    }
+    
+    \subparag{Remark}{
+        Naturally, nothing prevents user from removing this guardrail by tweaking their computer. However, if everyone did that, the internet would work much less well.
+    }
+    
+    \subparag{Terminology}{
+        In TCP terminology, we call the exponential increase a \important{slow start} (slow since it starts from a small window), and the linear increase is named \important{congestion avoidance}.
+    }
+    
+}
+
+\parag{Remark}{
+    The sender window allows to fix both the flow and congestion control problems. We can let it to be the minimum between the receiver window and the congestion window.
+}
+
+\parag{Connection setup}{
+    Before making a connection, Alice must have a connection socket opened and Bob must have listening socket.
+
+    When Alice wants to make a connection, she sends a packet to Bob wearing a sequence number $x$, an acknowledgment (which has a value we don't care) and a 1-bit \texttt{Syn} flag. When Bob receives this connection setup request, his transport layer asks the application layer whether the connection should be accepted and, if it does, it creates a connection socket for communicating with Alice's process (as we saw in the last lesson). He then sends a packet back to Alice, wearing a sequence number $y$, an acknowledgement of $x+1$ (meaning that Bob says he indeed received the 1-bit data $x$, and asks for data starting at byte $x+1$), and the \texttt{Syn} flag. When Alice receives this packet, she allocates memory for a send and a receive buffer for this particular TCP connection. She then send another segment, which may carry data. When Bob receives Alice's second segment, he also allocates a send a receive buffer for this TCP connection.
+
+    At this point, when our two end-systems have allocated all the resources (like sockets and buffer) necessary for the communication, we say that Alice and Bob have established a TCP connection. We call this connection a \important{three way handshake}.
+
+    \imagehere[0.6]{TCPThreeWayHandshake.png}
+}
+
+\parag{Closing the connection}{
+    To close the connection, Alice sends a message with a \texttt{Fin} flag. When Bob receives this, he answers with two packets: an \texttt{Ack} and a message with the \texttt{Fin} flag. Alice will answer an \texttt{Ack} too. When one of the end-system receives a \texttt{Fin} flag, it deletes its receive and send buffers, and its connection socket.
+
+    \imagehere[0.6]{TCPTeardown.png}
+
+    This process is known as \important{teardown}.
+
+    \subparag{Remark}{
+        Note that the listening sokets are still here since they are not bound to a particular TCP: they will be still listening for new connection-setup request.
+    }
+}
+
+
+\parag{Connection Hijacking}{
+    If Jack sends a packet to Alice by making a header exactly the same as what Bob would do (which can be done if it is easy to predict), then he can send a file to Alice by making her think that it was what she was expecting from Bob.
+
+    The way to prevent this is to make headers unpredictable. Thus, when starting a connection, we pick random numbers at the start of the communication, which we send as sequence numbers at the beginning. Since those numbers are not predictable, Jack can no longer trivially know what header to make. 
+}
+
+\parag{Connection flooding}{
+    When receiving the first message of the three-way handshake, Bob saves it in its incomplete connections buffer. When receiving the third message, he then knows that the connection is established by looking at that buffer.
+
+    However, Denis can create many \texttt{Syn} segments (without ever completing any connection), flooding the buffer and preventing Bob to establish any new connection.
+
+    To solve this problem, we remove the connection buffer. However, Bob needs to make sure that Alice sent the first message before sending the third one. So, we use a cryptographic hash using a secret he only knows and the IP address of Alice. He uses this hash as the sequence number of his message in the three way handshake. Then, when receiving Alice's message, it will wear the acknowledgement of \texttt{Seq} + 1. He will thus be able to make sure that Alice indeed received this hash from him.
+
+    \subparag{Remark}{
+        Note that this does not prevent Denis from making a connection with Bob, but it prevents this specify type of attack (which would typically be very easy to do).
+    }
+}
+
+
+
+\end{document}
