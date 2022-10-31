@@ -1,0 +1,120 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-31 at 14:20:31.
+
+\usepackage{../../style}
+
+\title{Algorithms}
+\author{Joachim Favre}
+\date{Lundi 31 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2022-10-31}{More binary search trees}{
+\begin{itemize}[left=0pt]
+    \item Explanation on how to use dynamic programming in order to find the optimal binary search tree given a sorted sequence and a list of probabilities.
+\end{itemize}
+
+}
+
+\subsection{Optimal binary search tree}
+\parag{Optimal binary search trees}{
+    The goal is that, given a \textit{sorted} sequence $K = \left\langle k_1, \ldots, k_n\right\rangle$ of $n$ distinct key, we want to build a binary search tree. There is a slight twist: we know that the probability to search for $k_i$ is $p_i$ (for instance, on social media, people are much more likely to search for stars than for regular people). We thus want to build the binary search tree with minimum expected search cost.
+
+    The cost is the number of items examined. For a key $k_i$, the cost is given by $\text{depth}_T\left(k_i\right) + 1$, where the term $\text{depth}_T\left(k_i\right)$ tells us the depth of $k_i$ in the tree $T$. This gives us the following expected search cost: 
+    \autoeq{\unexpanded{\exval \left[\text{search cost in $T$}\right] = \sum_{i=1}^{n} \left(\text{depth}_T\left(k_i\right) + 1\right)p_i = \sum_{i=1}^{n} p_i + \sum_{i=1}^{n} \text{depth}_T\left(k_i\right) = 1 + \sum_{i=1}^{n} \text{depth}_T\left(k_i\right)p_i}}
+    
+    \subparag{Example}{
+        For instance, let us consider the following tree and probability table:
+        \imagehere[0.5]{BinarySearchTreeDPExample.png}
+
+        \begin{center}
+        \begin{tabular}{c|cccccc}
+            $i$ & 1 & 2 & 3 & 4 & 5 \\
+            \hline
+            $p_i$ & $0.25$ & 0.2 & 0.05 & 0.3 & 0.3
+        \end{tabular}
+        \end{center}
+
+        Then, we can compute the expected search cost to be: 
+        \[\exval \left[\text{search cost}\right] = 1 + \left(0.25\cdot 1 + 0\cdot 0.2 + 0.05\cdot 2 + 0.2\cdot 1 + 0.3\cdot 2\right)\]
+
+        Which is equal to:
+        \[\exval\left[\text{search cost}\right] = 1 + 1.15 = 2.15\]
+    }
+}
+
+\parag{Observation}{
+    We notice that the optimal binary search tree might not have the smallest height, and that it might not have the highest-probability key at the root too.
+}
+
+\parag{Brute force}{
+    Before doing anything too fancy, let us start by considering the brute force algorithm: we construct each $n$-node BST, then for each put in keys, and compute their expected search cost. We can finally pick the tree with the smallest expected search cost.
+
+    However, there are exponentially many trees, making our algorithm really bad.
+}
+
+\parag{Theorem: Optimal substructure}{
+    We know that:
+    \[\exval \left[\text{search cost}\right] = \sum_{i=1}^{n} \left(\text{depth}_T\left(k_i\right) + 1\right)p_i\]
+
+    Thus, if we increase the depth by one, we have: 
+    \[\exval \left[\text{search cost deeper}\right] = \sum_{i=1}^{n} \left(\text{depth}_T\left(k_i\right) + 2\right)p_i = \sum_{i=1}^{n} \left(\text{depth}_T\left(k_i\right) + 1\right)p_i + \sum_{i=1}^{n} p_i\]
+
+    This means that we, if we know two trees which we want to merge using a root, we can easily compute the expected search cost through a recursive function:
+    \autoeq{\unexpanded{\exval \left[\text{search cost}\right] = p_r + {\color{red!50!black}\left(\sum_{\ell=i}^{r-1}  p_\ell + \exval \left[\text{search cost in left subtree}\right]\right)} \fakeequal + {\color{green!50!black}\left(\sum_{\ell=r+1}^{j} p_\ell + \exval \left[\text{search cost in right subtree}\right]\right)} = \exval\left[\text{search cost left subtree}\right] + \exval\left[\text{search cost right subtree}\right] + \sum_{\ell=i}^{j} p_\ell}}
+
+    \imagehere[0.5]{BinarySearchTreeMergeDepth.png}
+
+    However, this means that, given the $i, j,$ and $r$, the optimality of our tree only depends on the optimality of the two subtrees (the formula above is minimal when the two expected values are minimal). We have thus proven the optimal substructure of our problem.
+
+    Let $e\left[i, j\right]$ be the expected search cost of an optimal binary search tree of key $k_i, \ldots, k_j$. This gives us the following recurrence relation:
+    \begin{functionbypart}{e\left[i, j\right]}
+    0, \mathspace \text{if } i = j + 1 \\
+    \min_{i \leq r \leq j} \left\{e\left[i, r-1\right] + e\left[r + 1, j\right] + \sum_{\ell = i}^{j} p_{\ell}\right\}, \mathspace \text{if } i \leq j
+    \end{functionbypart}
+}
+
+\begin{filecontents*}[overwrite]{OptimalBST.code}
+procedure OptimalBST(p, q, n):
+    // expected search cost of optimal BST in ki, ..., kj
+    let e[1...n+1, 0...n] be a new table
+    // root in optimal BST of ki, ..., kj
+    let root[1...n, 1...n] be a new table
+    // sum of pi + ... + pj (so that we don't have to recompute them every time)
+    let w[1...n+1, 0...n] be a new table
+
+    for i = 1 to n+1:
+        e[i, i-1] = 0
+        w[i, i-1] = 0
+
+    for l = 1 to n:
+        for i = 1 to n-l+1:
+            j = i + l - 1
+            e[i, j] = infinity
+            w[i, j] = w[i, j-1] + p[j]
+            for r = 1 to j:
+                t = e[i, r-1] + e[r+1, j] + w[i, j]
+                if t < e[i, j]:
+                    e[i, j] = t
+                    root[i ,j] = r
+    return e and root
+\end{filecontents*}
+
+
+\parag{Bottom-up algorithm}{
+    We can write our algorithm as:
+    \importcode{OptimalBST.code}{pseudo}
+
+    We needed to be careful not to compute the sums again and again.
+
+    We note that there are three nested loops, thus the total runtime is $\Theta\left(n^3\right)$. Another way to see this is that we have $\Theta\left(n^2\right)$ cells to fill in and that most cells take $\Theta\left(n\right)$ time to fill in.
+}
+
+
+\end{document}
+
