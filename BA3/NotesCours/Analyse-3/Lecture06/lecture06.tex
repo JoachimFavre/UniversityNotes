@@ -1,0 +1,239 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-10-31 at 08:14:36.
+
+\usepackage{../../style}
+
+\title{Analyse 3}
+\author{Joachim Favre}
+\date{Lundi 31 octobre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2022-10-31}{On passe aux surfaces}{
+\begin{itemize}[left=0pt]
+    \item Définition de la surface.
+    \item Explication des trois représentations des surfaces, et du passage de l'une à l'autre.
+    \item Définition de surface régulière et de surface régulière par morceaux.
+    \item Définition des intégrales de champ scalaires et de champs vectoriels sur des surfaces.
+\end{itemize}
+}
+
+\parag{Exemple 2}{
+    Nous voulons calculer $\int_{\Gamma}\left(F \dotprod \nu\right) d \ell $ où: 
+    \[F = \left(y\sin^2\left(y\right), xe^{x^2}\right), \mathspace \Gamma = \left\{\gamma\left(t\right) = \left(t^3, \sin\left(t\right)\right) | t \in \left[0, \pi\right]\right\}\]
+    
+    Une meilleure idée que de simplement appliquer la définition des intégrales de champ est de remarquer que notre courbe $\Gamma = -\Gamma_1$ peut être étendue avec une autre courbe $\Gamma_2$, afin d'obtenir un ensemble de frontière $\partial \Omega = \Gamma_1 \cup \Gamma_2 = -\Gamma \cup \Gamma_2$.
+    \svghere[0.5]{Exemple2TheoremDivergence.svg}
+
+    Or, puisque $\Div F = 0$, nous avons par le théorème de la divergence que: 
+    \[0 = \iint_{\Omega} \Div F dxdy = \int_{\partial \Omega} F \dotprod \nu d \ell = \int_{\Gamma_1} \left(F \dotprod \nu\right) d \ell + \int_{\Gamma_2} F \dotprod \nu d \ell \]
+    
+    Nous voulons calculer $\int_{\Gamma} \left(F\dotprod \nu\right) d \ell = \int_{\Gamma_1} \left(F \dotprod \nu\right) d \ell $ (l'intégrale ne dépend pas de l'orientation puisque nous calculons l'intégrale d'un champ scalaire). Ainsi, nous pouvons poser:
+    
+    \[\begin{split}
+    \gamma: \left[0, \pi\right] &\longmapsto \Gamma_2 \\
+    t &\longmapsto \left(t, 0\right)
+    \end{split}\]
+    
+    Ceci nous donne la normale $\nu_{\gamma}\left(t\right) = \left(0, -1\right)$. Nous pouvons donc finalement calculer notre résultat: 
+    \[\int_{\Gamma} F \dotprod \nu d \ell = 0 - \int_{\Gamma_2} F \dotprod \nu d \ell = -\int_{0}^{\pi^3} \left(0, te^{t^2}\right) \dotprod \left(0, -1\right) \left\|\left(1, 0\right)\right\| dt = \int_{0}^{\pi^3} te^{t^2} dt = \left[\frac{e^{t^2}}{2}\right]_{0}^{\pi^3}\]
+
+    Ce qui donne:
+    \[\frac{e^{\pi^6} - 1}{2}\]
+}
+
+\section{Surfaces et intégrales de surfaces}
+\subsection{Surfaces}
+
+\parag{Définition: Surface}{
+    Une \important{surface} est un objet à deux dimensions dans un espace à 3 dimensions. 
+
+    \subparag{Remarque}{
+        Afin de décrire une surface nous avons plusieurs possibilités.
+    }
+}
+
+\parag{Représentation cartésienne}{
+     Si nous avons $\Omega \subset \mathbb{R}^2$ et $f: \Omega \mapsto \mathbb{R}$, alors nous avons la surface suivante: 
+    \[\text{Graphe}\left(f\right) = \left\{\left(x, y, z\right) \in \mathbb{R}^3 | z = f\left(x, y\right)\right\}\]
+    
+    Cette représentation est appelée la \important{représentation cartésienne} de notre surface.
+   
+    \subparag{Exemple}{
+        Par exemple, si nous posons $f\left(x, y\right) = x^2 + y^2$ et $\Omega = B_1\left(0\right)$, alors cela nous donne un paraboloïde de révolution:
+        \svghere[0.6]{ParaboloideDeRevolution.svg}
+    }
+}
+
+\parag{Représentation implicite}{
+    Si nous avons $f: \mathbb{R}^3 \mapsto \mathbb{R}$, nous pouvons considérer ses zéros: 
+    \[S = \left\{\left(x, y, z\right) \in \mathbb{R}^3 | f\left(x, y, z\right) = 0\right\}\]
+    
+    Cet ensemble est aussi une surface. Cette représentation est appelée la \important{représentation implicite} de notre surface.
+
+    \subparag{Exemple}{
+        L'exemple le plus courant est celui de la sphère, avec $f\left(x, y, z\right) = x^2 + y^2 + z^2 - 4$.
+        \[S = \left\{\left(x, y, z\right) \in \mathbb{R}^3 | x^2 + y^2 + z^2 - 4 = 0\right\}\]
+    }
+}
+
+\parag{Représentation paramétrique}{
+    Si nous avons $\Omega \subset \mathbb{R}^2$ et $\sigma : \Omega \mapsto \mathbb{R}^3$, alors l'ensemble suivant est une surface: 
+    \[S = \im\left(\sigma\right) = \sigma\left(\Omega\right)\]
+    
+    Cette représentation est appelée la \important{représentation paramétrique} de notre surface.
+
+    \subparag{Exemple}{
+        Posons $\Omega = \left[0, 2\pi\right] \times \left[0, 3\right]$ et:
+        \[\begin{split}
+        \sigma: \Omega &\longmapsto \mathbb{R}^3 \\
+        \left(\theta, t\right) &\longmapsto \left(\cos\left(\theta\right), \sin\left(\theta\right), t\right)
+        \end{split}\]
+        
+        Nous remarquons alors que $\sigma\left(\Omega\right)$ est un cylindre de hauteur 3 et rayon 1.
+        \svghere[0.6]{Cylindre.svg}
+    }
+}
+
+\parag{Passage entre les représentations}{
+    Le passage entre nos 3 représentations n'est pas évident en général.
+
+    \subparag{Cartésienne vers paramétrique}{
+        Si nous connaissons: 
+        \[S = \text{Graphe}\left(f\right) = \left\{\left(x, y, z\right) | z = f\left(x, y\right)\right\}\]
+
+        Alors, nous pouvons poser $g\left(x, y, z\right) = f\left(x, y\right) - z$: 
+        \[S = \left\{\left(x, y, z\right) | f\left(x, y\right) - z = 0\right\}\]
+    }
+
+    \subparag{Paramétrique vers cartésien}{
+        Si nous avons: 
+        \[S = \left\{\left(x, y, z\right) | x^2 + y^2 + z^2 - 4 = 0\right\}\]
+        
+        Alors il n'est pas possible de faire un seul graphe, mais nous pouvons trouver que c'est égal à l'union de deux graphes en isolant $z$: 
+        \[S = \left\{\left(x, y, z\right) | z = \sqrt{4 - x^2 - y^2}\right\} \cup \left\{\left(x, y, z\right) | z = -\sqrt{4 - x^2- y^2}\right\}\]
+    }
+    
+    \subparag{Cartésien vers paramétrique}{
+        Si nous connaissons que: 
+        \[S = \text{Graphe}\left(f\right) = \left\{\left(x, y, z\right) | z = f\left(x, y\right)\right\}\]
+        où $f: \Omega \mapsto \mathbb{R}$.
+
+        Alors, nous avons $S = \sigma\left(\Omega\right)$, avec:
+        \[\begin{split}
+        \sigma: \Omega &\longmapsto \mathbb{R}^3 \\
+        \left(x, y\right) &\longmapsto \left(x, y, f\left(x, y\right)\right)
+        \end{split}\]
+    }
+}
+
+\parag{Description de la sphère}{
+    Comme nous l'avons vu jusque là, nous avons plusieurs manières de décrire une sphère.
+
+    La description cartésienne est:
+    \[S = \left\{\left(x, y, z\right) | z = \sqrt{r^2 - x^2 - y^2}\right\} \cup \left\{\left(x, y, z\right) | z = -\sqrt{r^2 - x^2- y^2}\right\}\]
+
+    La description paramétrique est:
+    \[S = \left\{\left(x, y, z\right) | x^2 + y^2 + z^2 - r^2 = 0\right\}\]
+
+    Et finalement, pour faire la description sphérique, nous avons $S = \sigma\left(\Omega\right)$, où $\Omega = \left[0, \pi\right]\times \left[0, 2\pi\right]$, et:
+    \[\begin{split}
+    \sigma: \Omega &\longmapsto S \\
+    \left(\theta, \phi\right) &\longmapsto \begin{pmatrix} R \sin\left(\theta\right) \cos\left(\phi\right) \\ R\sin\left(\theta\right) \sin\left(\phi\right) \\ R\cos\left(\theta\right) \end{pmatrix} 
+    \end{split}\]
+
+    \svghere[0.35]{Wikimedia-SphericalCoordinates.svg}
+}
+
+\parag{Définition: Surface régulière}{
+    $\Sigma \subset \mathbb{R}^3$ est une \important{surface régulière} si:
+    \begin{enumerate}
+        \item Il existe $\Omega \subset \mathbb{R}^2$, un ouvert borné, avec une frontière $\partial \Omega$ simple et régulière par morceaux (donc que $\Omega$ est un domaine ``sans trou'') et $\sigma: \bar{\Omega}\mapsto \mathbb{R}^3$ une fonction $C^1\left(\bar{\Omega};\mathbb{R}^3\right)$ injective sur $\Omega$ (mais pas nécessairement injective sur $\bar{\Omega}$) et telle que: 
+        \[\sigma\left(\bar{\Omega}\right) = \Sigma\]
+        
+        \item $\left\|\sigma_u \wedge \sigma_v\right\| \neq 0$ pour tout $\left(u, v\right) \in \Omega$ (où $\sigma_u = \frac{\partial \sigma}{\partial u} $ et $\sigma_v = \frac{\partial \sigma}{\partial v} $).
+    \end{enumerate}
+
+
+    \svghere[0.6]{DefinitionSurfaceReguliere.svg}
+
+    \subparag{Remarque 1}{
+        Ici, $\sigma_u \wedge \sigma_v$ est un produit vectoriel de $\sigma_u = \frac{\partial \sigma}{\partial u}$ et de $\sigma_v = \frac{\partial \sigma}{\partial v} $: 
+        \[\sigma_u \wedge \sigma_v = \begin{pmatrix} \sigma_{u, 2} \sigma_{v, 3} - \sigma_{u, 3} \sigma_{v, 2} \\ -\sigma_{u,  1} \sigma_{v,3} + \sigma_{u, 3} \sigma_{v, 1} \\ \sigma_{u, 1} \sigma_{v, 2} - \sigma_{u, 2} \sigma_{v, 1} \end{pmatrix} \]
+    }
+
+    \subparag{Remarque 2}{
+        Le terme $\left\|\sigma_u \wedge \sigma_v\right\| \neq 0$ pour les surfaces régulières joue le même rôle que le terme $\left\|\gamma'\left(t\right)\right\| \neq 0$ pour les courbes régulières.
+
+        De plus, nous avons besoin que ce soit non nul, car nous aurons besoin de vecteurs normaux à la surface, et les deux vecteurs normaux unitaires au point $P = \sigma\left(u, v\right)$ sont donnés par: 
+        \[\pm \frac{\sigma_u \wedge \sigma_v}{\left\|\sigma_u \wedge \sigma_v\right\|}\]
+
+    }
+}
+
+\parag{Définition: Surface régulière par morceaux}{
+    $\Sigma$ est \important{régulière par morceaux} si $\Sigma$ est connexe (en un seul morceau) et s'il existe des $\Sigma_1, \ldots, \Sigma_k$ régulières telles que $\Sigma = \Sigma_1 \cup \ldots \Sigma_k$ et où les $\Sigma_i$ ``ne se touchent qu'au bord'' (ne s'intersectent pas sauf aux bords).
+
+    \svghere[0.25]{SurfaceReguliereParMorceauxDefinition.svg}
+}
+
+\parag{Exemple}{
+    Nous voulons démontrer que la sphère de rayon $R$ centrée en $\left(0, 0, 0\right)$ est une surface régulière. 
+
+    Utilisons la description paramétrique:
+    \[\begin{split}
+    \sigma: \left[0, 2\pi\right]\times \left[0, \pi\right] &\longmapsto \mathbb{R}^3 \\
+    \left(\theta, \phi\right) &\longmapsto \begin{pmatrix} R\sin\left(\phi\right)\cos\left(\theta\right) \\ R\sin\left(\theta\right)\left(\phi\right) \\ R\cos\left(\phi\right) \end{pmatrix} 
+    \end{split}\]
+    
+    Cela nous donne que:
+    \[\sigma_{\theta} = \begin{pmatrix} -R\sin\left(\phi\right)\sin\left(\theta\right) \\ R\sin\left(\phi\right)\cos\left(\theta\right) \\ 0 \end{pmatrix}, \mathspace \sigma_{\phi} = \begin{pmatrix} R\cos\left(\phi\right)\cos\left(\theta\right) \\ R\cos\left(\phi\right)\sin\left(\theta\right) \\ -R\sin\left(\phi\right) \end{pmatrix} \]
+
+    Et ainsi: 
+    \[\sigma_{\theta} \wedge \sigma_{\phi} = \begin{pmatrix} -R^2 \sin^2\left(\phi\right) \cos\left(\theta\right) \\ -R^2\sin^2\left(\phi\right) \sin\left(\theta\right) \\ -R^2 \sin\left(\phi\right) \cos\left(\phi\right)\left(\sin^2\left(\theta\right) + \cos^2\theta\right) \end{pmatrix} = -R\sin\left(\phi\right) \sigma\left(\theta, \phi\right)\]
+    
+    Or, ceci n'est jamais 0 sur l'intérieur de notre surface, ce qui montre bien que $\left\|\sigma_{\theta} \wedge \sigma_{\phi}\right\| \neq 0$ pour tout $\left(\theta, \phi\right) \in \Omega = \left]0, 2\pi\right[ \times\left]0, \pi\right[$. Nous pouvons en déduire que $\sigma$ est une paramétrisation régulière, avec les normales: 
+    \[\pm \frac{\sigma_{\theta} \wedge \sigma_{\phi}}{\left\|\sigma_{\theta} \wedge \sigma_{\phi}\right\|} = \pm \frac{\sigma\left(\theta, \phi\right)}{R}\]
+    
+    \subparag{Observation}{
+        Nous avions trouvé que la normale extérieure d'un cercle avait une forme très similaire.
+    }
+    
+}
+
+\subsection{Intégrales de surface}
+\parag{Définition: Intégrale de surface}{
+    Soit $\Omega \in \mathbb{R}^3$ un ouvert, contenant $\Sigma$ une surface régulière. Soient aussi $f \in C^0\left(\Omega\right)$ un champ scalaire et $F \in C^{0}\left(\Omega; \mathbb{R}^3\right)$ un champ vectoriel. Soient finalement $A \subset \mathbb{R}^2$ un ouvert et $\sigma: \bar{A} \mapsto \Sigma$ une paramétrisation régulière.
+
+    Alors, nous définissons l'intégrale d'un champ scalaire par: 
+    \[\iint_{\Sigma} f ds = \iint_{A} f\left(\sigma\left(u, v\right)\right) \left\|\sigma_{u} \wedge \sigma_v\right\| dudv\]
+    
+    Et, nous définissions l'intégrale d'un champ vectoriel par: 
+    \[\iint_{\Sigma} F \dotprod ds = \iint_{A} F\left(\sigma\left(u, v\right)\right) \dotprod \left(\sigma_u \wedge \sigma_v\right) dudv\]
+    
+    \subparag{Remarque 1}{
+        Ces intégrales ressemblent beaucoup aux intégrales curvilignes:
+        \begin{center}
+        \begin{tabular}{rl}
+            Courbe $\Gamma$ & Surface $\Sigma$ \\
+            Paramétrisation $\gamma$ & Paramétrisation $\sigma$ \\
+            $\gamma'$ tangent à la courbe & $\sigma_u \wedge \sigma_v$ normal à la surface \\
+            $\left\|\gamma'\right\|dt$ & $\left\|\sigma_u \wedge \sigma_v\right\|dudv$  \\
+        \end{tabular}
+        \end{center}
+
+        Nous pouvons ainsi remarquer que les intégrales de champ scalaire sont très similaires ($\left\|\sigma_u \wedge \sigma_v\right\|$ et $\left\|\gamma'\right\|$ sont des facteurs correcteurs relatifs à la paramétrisation), alors que les intégrales de champ vectoriels sont assez différentes (dans un cas on donne de l'importance aux fonctions qui sont colinéaires à notre courbe, dans l'autre à celles qui sont orthogonales à notre surface).
+    }
+
+    \subparag{Remarque 2}{
+        L'intégrale d'un champ scalaire $\iint_{\Sigma} f ds$ est indépendante de $\sigma$. Aussi, l'intégrale de $\iint_{\Sigma} F \dotprod ds$ est indépendante de $\sigma$, au signe près (cela dépend de l'orientation de $\Sigma$, que nous définirons juste \later{?} après).
+    }
+}
+
+\end{document}
+
