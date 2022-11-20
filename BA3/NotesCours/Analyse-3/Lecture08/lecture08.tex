@@ -1,0 +1,255 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-11-14 at 08:19:24.
+
+\usepackage{../../style}
+
+\title{Analyse}
+\author{Joachim Favre}
+\date{Lundi 14 novembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2022-11-14}{J'aime bien cette date}{
+\begin{itemize}[left=0pt]
+    \item Définition du bord d'une surface.
+    \item Explication du théorème de Stokes, et d'un de ses corollaires.
+    \item Beaucoup d'exemples.
+\end{itemize}
+}
+
+\parag{Exemple 2}{
+    Nous voulons vérifier le théorème de la divergence pour: 
+    \[F\left(x, y, z\right) = \left(z, z, z\right), \mathspace \Omega = \left\{\left(x, y, z\right) \in \mathbb{R}^3 | \sqrt{x^2 + y^2} < z\left(2 - z\right)\right\}\]
+    
+    \subparag{Paramétrisation de l'intérieur}{
+        La première étape est comme d'habitude de faire une paramétrisation de l'intérieur de notre ensemble. 
+
+        Si $z$ est fixé, nous avons un cercle de rayon $z\left(2 - z\right)$, ce qui nous montre que nous devrions utiliser des coordonnées cylindriques. De plus, pour avoir $z\left(2 -z\right) > 0$, nous avons besoin de $z \in \left]0, 2\right[ $. Nous trouvons ainsi: 
+        \[\left(x, y, z\right) = \left(r\cos\left(\theta\right), r\sin\left(\theta\right), z\right)\]
+        
+        Cela nous donne donc finalement que:
+        \[\Omega = \left\{\left(r\cos\left(\theta\right), r\sin\left(\theta\right), z\right) | z \in \left[0, 2\right], \theta \in \left[0, 2\pi\right], r \in \left[0, 2\left(2 - z\right)\right]\right\}\]
+    }
+
+    \subparag{Divergence}{
+        La deuxième étape est, à nouveau, de calculer la divergence. Nous pouvons trouver que: 
+        \[\Div F = \ldots = 1\]
+    }
+    
+    \subparag{Intégrale en 3 dimensions}{
+        La troisième étape est ensuite de calculer l'intégrale de la divergence sur l'intérieur de notre ensemble: 
+        \[\iint_{\Omega} \Div F = \ldots = \frac{16}{15} \pi\]
+    }
+
+    \subparag{Paramétrisation de la frontière}{
+        La quatrième étape est maintenant de calculer une paramétrisation de la frontière. Nous remarquons qu'elle est atteinte quand $r = z\left(2-z\right)$, donc nous pouvons prendre la paramétrisation suivante:
+        \[\begin{split}
+        \sigma: \left[0, 2\pi\right] \times \left[0, 2\right] &\longmapsto \partial \Omega \\
+        \left(\theta,  z\right) &\longmapsto z\left(2-z\right)\cos\left(\theta\right), z\left(2-z\right)\sin\left(\theta\right), z
+        \end{split}\]
+    }
+    
+    \subparag{Normale}{
+        La cinquième étape est toujours de calculer la normale. Nous commençons ainsi par poser: 
+        \[\sigma_{\theta} \wedge \sigma_z = \left(z\left(2-z\right)\cos\left(\theta\right), z\left(2-z\right)\sin\left(\theta\right), -2z\left(1-z\right)\left(2-z\right)\right)\]
+
+        Nous devons maintenant vérifier qu'elle pointe bien toujours à l'extérieur. Pour y arriver, nous pouvons remarquer que ce champ vectoriel est continu (on ne s'intéresse pas à ce qui se passe en $r = 0$ et $z = 2$ puisque ce sont des bords ``pointus'' mais, comme pour les intégrales en une dimension, on oublie ce qui se passe au bout), et donc nous avons uniquement besoin de le vérifier en un seul point. Ainsi, si on regarde en $\left(\theta, z\right) = \left(0, 1\right)$: 
+        \[\sigma_{\theta} \wedge \sigma_{z} = \left(1, 0, 0\right)\]
+         
+        Elle pointe bien vers l'extérieure. Ceci nous donne alors que: 
+        \[\nu = \frac{\sigma_{\theta} \wedge \sigma_z}{\left\|\sigma_{\theta} \wedge \theta_z\right\|}\]
+    }
+    
+    \subparag{Intégrale en 2 dimensions}{
+        Nous pouvons finalement calculer notre intégrale: 
+        \autoeq{\unexpanded{\iint_{\partial \Omega} \left(F \dotprod \nu\right) dS = \int_{0}^{2} \int_{0}^{2\pi} \left(F\left(\sigma\left(\theta, z\right)\right) \dotprod \frac{\sigma_{\theta} \wedge \sigma_z}{\left\|\sigma_{\theta} \wedge \sigma_z\right\|}\right)\left\|\sigma_{\theta} \wedge \sigma_z\right\| d \theta dz = \int_{0}^{2} \int_{0}^{2\pi} F\left(\sigma\left(\theta, z\right)\right) \dotprod \left(\sigma_{\theta} \wedge \sigma_z\right) d \theta dz = \ldots = \frac{16\pi}{5}}}
+    }
+}
+
+\section{Théorème de Stokes}
+\parag{Définition: Bord d'une surface}{
+    Soit $\Sigma$ une surface régulière par morceaux et orientable. Nous supposons ainsi que $\Sigma = \Sigma_1 \cup \ldots \cup \Sigma_k$, où chaque $\Sigma_i$ est une surface régulière avec une paramétrisation $\sigma_i : \bar{A_i} \mapsto \Sigma_i$.
+
+    On fixe un champ de normales $\sigma: \Sigma \mapsto \mathbb{R}^3$ et on suppose qu'il est donné par: 
+    \[\frac{\sigma_{i, u}\wedge \sigma_{i, v}}{\left\|\sigma_{i, u} \wedge \sigma_{i, v}\right\|} = \nu_{\sigma\left(u, v\right)}, \mathspace \forall i, \forall \left(u, v\right) \in \bar{A_i}\]
+    
+    Finalement, nous supposons que, pour tout $i$, $\partial \bar{A_i}$ est une courbe simple fermée, régulière par morceaux et orientée positivement (de telle manière que $\bar{A_i}$ est toujours à gauche, puisque c'est positif la gauche (aucune influence politique intentionnelle)). 
+
+    Alors, nous définissions le \important{bord} de notre surface $\Sigma$ par: 
+    \[\partial \Sigma = \partial \Sigma_1 \cup \ldots \cup \partial \Sigma_k = \sigma_1\left(\partial \bar{A_1}\right) \cup \ldots \cup \sigma_k\left(\partial \bar{A_k}\right)\]
+    où l'on a enlevé les morceaux de courbes réduits à un point et les morceaux de courbe parcourus deux fois en sens inverse (une fois dans un sens et une fois dans l'autre).
+}
+ 
+
+\parag{Théorème de Stokes}{
+    Soit $\Sigma \subset \mathbb{R}^3$ une surface régulière par morceaux orientable et $F \in C^1\left(\Omega; \mathbb{R}^3\right)$, où $\Omega \subset \mathbb{R}^3$ est un ouvert contenant $\Sigma \cup \partial \Sigma$.
+
+    Alors: 
+    \[\iint_{\Sigma} \left(\rot F\right) \dotprod dS = \int_{\partial \Sigma} F \dotprod d \ell \]
+
+    \subparag{Remarque}{
+        Le signe de $\iint_{\Sigma} \rot F \dotprod dS$ dépend de l'orientation de $\Sigma$, et le signe de $\int_{\partial \Sigma} F \dotprod d \ell $ dépend du sens de parcours. Cependant, pour calculer la première intégrale, nous avons besoin d'une paramétrisation. Ceci nous donne une orientation pour chaque surface, et nous pouvons ainsi utiliser cette information pour trouver le sens de parcours de $\partial \Sigma$ correspondant.
+    }
+    
+    \subparag{Observation}{
+        C'est l'analogue du théorème de Green, mais pour les surfaces.
+    }
+}
+
+\parag{Corollaire}{
+    Si $\Sigma$ est une surface régulière par morceaux telle que $\partial \Sigma = \o$, alors: 
+    \[\iint_{\Sigma} \rot F \dotprod dS = 0, \mathspace \forall F\]
+    
+    \subparag{Exemple}{
+        Par exemple, si $\Sigma$ est une sphère et $F$ est n'importe quel champ fectoriel (faute non-intentionnelle, mais j'ai décidé de la garder quand même parce qu'elle me fait rigoler \smiley), alors: 
+        \[\iint_{\Sigma} \rot F \dotprod dS = 0\]
+    }
+}
+
+\parag{Exemple 1}{
+    Soit $F\left(x, y, z\right) = \left(z, x, y\right)$ et la surface suivante: 
+    \[\Sigma = \left\{\left(x, y, z\right) \in \mathbb{R}^3 | z^2 = x^2 + y^2 \text{ et } 0 \leq z \leq 1\right\}\]
+
+    Nous voulons vérifier le théorème de Stokes pour ce cas.
+    
+    \subparag{Paramétrisation de la surface}{
+        Nous remarquons que notre surface représente un cornet de glace. Puisque nous avons $z^2 = x^2 + y^2$, il semble judicieux d'utiliser des coordonnées cylindriques. La condition $z^2 = x^2 + y^2$ nous donne $z = r$ pour $0 \leq r \leq 1$. Nous avons ainsi la paramétrisation suivante:
+        \[\begin{split}
+        \sigma: \left[0, 1\right]\times \left[0, 2\pi\right] &\longmapsto \Sigma \\
+        \left(z, \theta\right) &\longmapsto \left(z\cos\left(\theta\right), z\sin\left(\theta\right), z\right)
+        \end{split}\]
+        
+        Nous pouvons voir que, ici: 
+        \[\bar{A} = \left[0, 1\right] \times \left[0, 2\pi\right] \subset \mathbb{R}^2\]
+    }
+
+    \subparag{Calcul du rotationnel}{
+        Calculons le rotationnel. Il faut faire attention au fait que, contrairement au cas en deux dimensions où c'est un scalaire, le rotationnel en trois dimensions est un vecteur: 
+        \[\rot F = \begin{pmatrix} \frac{\partial F_3}{\partial y} - \frac{\partial F_2}{\partial z}  \\ \frac{\partial F_1}{\partial z} - \frac{\partial F_3}{\partial x}  \\ \frac{\partial F_2}{\partial x} - \frac{\partial F_1}{\partial y}  \end{pmatrix} = \begin{pmatrix} 1-0 \\ 1-0 \\ 1-0 \end{pmatrix} = \begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix} \]
+    }
+    
+    \subparag{Intégrale en 3 dimensions}{
+        Nous voulons ensuite calculer $\iint_{\Sigma} \rot F dS$. Pour se faire, nous devons calculer la normale: 
+        \[\sigma_z = \begin{pmatrix} \cos\left(\theta\right) \\ \sin\left(\theta\right) \\ 1 \end{pmatrix}, \sigma_{\theta} = \begin{pmatrix} -z\sin\left(\theta\right) \\ z\cos\left(\theta\right) \\ 0 \end{pmatrix} \implies \sigma_z \wedge \sigma_{\theta} = \begin{pmatrix} -z\cos\left(\theta\right) \\ -z\sin\left(\theta\right) \\ z \end{pmatrix} \]
+
+        Nous n'avons pas besoin de regarder sa direction, tant que nous réutiliserons cette paramétrisation ensuite (et, de toute façon, il n'y a pas vraiment de direction meilleure qu'une autre). Nous pouvons donc calculer notre intégrale: 
+        \autoeq{\unexpanded{\iint_{\Sigma} \rot F dS = \int_{0}^{1} \int_{0}^{2\pi} \left(1, 1, 1\right) \dotprod \left(-2\cos\left(\theta\right), -2\sin\left(\theta\right), z\right) d \theta dz = \int_{0}^{1} \int_{0}^{2\pi} \left(-2\cos\left(\theta\right) - 2\sin\left(\theta\right) + z\right) d \theta dz = \int_{0}^{1} 2\pi z dz = 2\pi \frac{1}{2} = \pi}}
+    }
+
+    \subparag{Paramétrisation du bord}{
+        Nous avions pris: 
+        \[\bar{A} = \left[0, 1\right] \times \left[0, 2\pi\right]\]
+
+        Ainsi, en faisant attention que les orientations des courbes laissent $\bar{A}$ à gauche (pour avoir le même signe que ce que nous avions eu ci-dessus), nous pouvons faire le schéma suivant:
+        \svghere[0.7]{ConeDeGlace-ParametrisationRectangle.svg}
+
+        Nous trouvons ainsi $\partial \bar{A} = \Gamma_1 \cup \Gamma_2 \cup \Gamma_3 \cup \Gamma_4$, avec les paramétrisations suivantes:
+        \begin{center}
+        \begin{minipage}{0.45\textwidth}
+        \[\begin{split}
+        \gamma_1: \left[0, 1\right] &\longmapsto \Gamma_1 \\
+        t &\longmapsto \left(t, 0\right)
+        \end{split}\]
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.45\textwidth}
+        \[\begin{split}
+        \gamma_2: \left[0, 2\pi\right] &\longmapsto \Gamma_2 \\
+        t &\longmapsto \left(1, t\right)
+        \end{split}\]
+        \end{minipage}
+        \end{center}
+
+        \begin{center}
+        \begin{minipage}{0.45\textwidth}
+        \[\begin{split}
+        \gamma_3: \left[0, 1\right] &\longmapsto \Gamma_3 \\
+        t &\longmapsto \left(1 - t, 2\pi\right)
+        \end{split}\]
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.45\textwidth}
+        \[\begin{split}
+        \gamma_3: \left[0, 2\pi\right] &\longmapsto \Gamma_4 \\
+        t &\longmapsto \left(0, 2\pi - t\right)
+        \end{split}\]
+        \end{minipage}
+        \end{center}
+        
+        Nous savons maintenant que $\partial \Sigma = \sigma\left(\partial \bar{A}\right) = \sigma\left(\Gamma_1\right) \cup \sigma\left(\Gamma_2\right) \cup \sigma\left(\Gamma_3\right) \cup \sigma\left(\Gamma_4\right)$, où nous enlevons les points et les courbes parcourues deux fois dans deux sens différents.
+        \svghere[0.5]{CornetDeGlace-BordSurface.svg}
+
+        Nous trouvons ainsi: 
+        \[\sigma\left(\Gamma_1\right) = \left\{\sigma\left(\gamma\left(t\right)\right) | t \in \left[0, 1\right]\right\} = \left\{\left(t, 0, t\right) | t \in \left[0, 1\right]\right\}\] 
+        \[\sigma\left(\Gamma_2\right) = \left\{\sigma\left(\gamma_2\left(t\right)\right) | t \in \left[0, 2\pi\right]\right\} = \left\{\left(\cos\left(t\right), \sin\left(t\right), 1\right) | t \in \left[0, 2\pi\right]\right\}\]
+        \[\sigma\left(\Gamma_3\right) = \left\{\sigma\left(\gamma_3\left(t\right)\right) | t \in \left[0, 1\right]\right\} = \left\{\left(1 - t, 0, 1-t\right) | t \in \left[0, 1\right]\right\} = -\sigma\left(\Gamma_1\right)\]
+        \[\sigma\left(\Gamma_4\right) = \left\{\sigma\left(\gamma_2\left(t\right)\right) | t \in \left[0, 2\pi\right]\right\} = \left\{\left(0\cos\left(t\right), 0\sin\left(t\right), 0\right) | t \in \left[0, 2\pi\right]\right\} = \left\{0\right\}\]
+        
+        Or, puisque $\sigma\left(\Sigma_1\right) = -\sigma\left(\Gamma_3\right)$ et $\sigma\left(\Gamma_4\right)$ est un point, nous enlevons ces trois courbes. Cela nous donne ainsi:
+        \[\partial \Sigma = \sigma\left(\Gamma_2\right) = \left\{\left(\cos\left(t\right), \sin\left(t\right), 1\right) | t \in \left[0, 2\pi\right]\right\}\]
+        comme ce que nous aurions pu deviner intuitivement.
+    }
+
+    \subparag{Intégrale en une dimension}{
+        Nous pouvons maintenant calculer notre intégrale en une dimension: 
+        \autoeq{\unexpanded{\int_{\partial \Sigma} F \dotprod d \ell = \int_{0}^{2\pi} F\left(\cos\left(t\right), \sin\left(t\right), 1\right) \dotprod \gamma'\left(t\right)dt = \int_{0}^{2\pi} \left(1, \cos\left(t\right), \sin\left(t\right)\right) \dotprod \left(-\sin\left(t\right), \cos\left(t\right), 0\right) dt = \int_{0}^{2\pi} \left(-\sin\left(t\right) + \cos^2\left(t\right)\right) dt = \left[\frac{t}{2} + \frac{\sin\left(2t\right)}{4}\right]_0^{2\pi} = \pi}}
+    }
+} 
+
+\parag{Exemple 2}{
+    Nous voulons vérifier le théorème de Stokes pour $F\left(x, y, z\right) = \left(0, -z^2, 0\right)$, sur la surface $\Sigma$ suivante: 
+    \[\Sigma = \left\{x^2 + y^2 + z^2 = 4, z > 0\right\}\]
+    qui est la demi-sphère de rayon 2.
+    
+    \subparag{Paramétrisation de la surface}{
+        Nous pouvons utiliser des coordonnées sphériques, ce qui nous donne: 
+        \[\begin{split}
+        \sigma: \left[0, 2\pi\right] \times \left[0, \frac{\pi}{2}\right] &\longmapsto \Sigma \\
+        \left(\theta, \phi\right) &\longmapsto \left(2\cos\left(\theta\right)\sin\left(\phi\right), 2\sin\left(\theta\right)\sin\left(\phi\right), 2\cos\left(\phi\right)\right)
+        \end{split}\]
+    }
+    
+    \subparag{Rotationnel}{
+        Nous pouvons calculer notre rotationnel: 
+        \[\rot F = \left(2z, 0, 0\right)\]
+    }
+
+    \subparag{Intégrale en 2 dimensions}{
+        Pour calculer notre intégrale en deux dimensions, nous avons besoin de trouver la normale. Nous prendront un produit scalaire avec le rotationnel, dont les deuxièmes et troisièmes composantes sont nulles, donc nous n'avons pas besoin de les calculer: 
+        \[\sigma_{\theta} \wedge \sigma_{\phi} = \left(-4\cos\left(\theta\right)\sin^2\left(\phi\right), \ldots, \ldots\right)\]
+        
+        Nous trouvons maintenant que: 
+        \autoeq{\unexpanded{\iint_{\Sigma} \rot F dS = \int_{0}^{2\pi} \int_{0}^{\frac{\pi}{2}} 4\cos\left(\phi\right)\left(-4\cos\left(\theta\right)\sin^2\left(\phi\right)\right)d\phi d \theta = \int_{0}^{2\pi} \cos\left(\theta\right) d \theta \int_{0}^{\frac{\pi}{2}} d \phi = 0}}
+    }
+    
+    \subparag{Bord de la surface}{
+        Nous savons ensuite que le bord de la demi-sphère est simplement un cercle. Nous avons cependant simplement besoin de trouver son orientation.
+        \svghere[0.7]{DemiSphere-ParameterisationRectangle.svg}
+
+        En s'imaginant ce que représentent ces courbes sur la demi-sphère, nous voyons que les courbes $\sigma\left(\Gamma_2\right)$ et $\sigma\left(\Gamma_4\right)$ se simplifient, et que $\sigma\left(\Gamma_1\right)$ est un point. Ainsi, nous trouvons que $\partial \Sigma = \sigma\left(\Gamma_3\right)$, avec comme paramétrisation: 
+        \[\begin{split}
+        \gamma_3: \left[0, 2\pi\right] &\longmapsto \Gamma_3 \\
+        t &\longmapsto \left(2\pi - t, \frac{\pi}{2}\right)
+        \end{split}\]
+        
+        Et ceci implique que:
+        \[\begin{split}
+        \gamma: \left[0, 2\pi\right] &\longmapsto \sigma\left(\Gamma_3\right) \\
+        t &\longmapsto \left(2\cos\left(t\right), -2\sin\left(t\right), 0\right)
+        \end{split}\]
+        ce qui est le sens inverse du sens habituel (donc il faut vraiment faire attention au sens).
+    }
+
+    \subparag{Intégrale en une dimension}{
+        Nous pouvons finalement calculer notre intégrale: 
+        \[\int_{\partial \Sigma} F \dotprod d \ell = \int_{0}^{2\pi} F\left(2\cos\left(t\right), -2\sin\left(t\right), 0\right) \dotprod \ldots dt = \int_{0}^{2\pi} 0dt = 0\]
+        comme attendu.
+    }
+}
+
+\end{document}

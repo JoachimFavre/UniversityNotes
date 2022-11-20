@@ -1,0 +1,231 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-11-07 at 08:15:12.
+
+\usepackage{../../style}
+
+\title{Analyse}
+\author{Joachim Favre}
+\date{Lundi 07 novembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2022-11-07}{I'm in space}{
+\begin{itemize}[left=0pt]
+    \item Jouez à Portal (en anglais).
+    \item Définition de surface orientable, et explication d'un exemple.
+    \item Définition de domaine régulier et de champ de normales extérieures.
+    \item Explication du théorème de la divergence dans $\mathbb{R}^3$, et explication d'un exemple.
+\end{itemize}
+}
+
+
+\parag{Observation}{
+    Les deux uniques vecteurs normaux unitaire (de norme 1) au point $P = \sigma\left(u, v\right) \in \Sigma$ sont donnés par: 
+    \[\pm \frac{\sigma_u \wedge \sigma_v}{\left\|\sigma_u \wedge \sigma_v\right\|}\]
+}
+
+\parag{Définition: Surface orientale}{
+    Une surface régulière $\Sigma$ est \important{orientable} s'il existe une fonction continue $\nu : \Sigma \mapsto \mathbb{R}^3$ qui associe un point $P$ à $\nu_P$, de telle manière que $\nu_p$ est un des deux vecteurs normaux unitaires en $P$.
+
+    \subparag{Exemple: Sphère}{
+        Par exemple, pour la sphère, nous pouvons poser: 
+        \[\nu_P = \nu_{\sigma\left(\theta, \phi\right)} = \frac{\sigma\left(\theta, \phi\right)}{R}\]
+    }
+
+    \subparag{Exemple: Fonction implicite}{
+        On remarque même que n'importe quelle surface donnée par représentation implicite est orientable. En effet, si nous avons: 
+        \[S = \left\{\left(x, y, z\right) \in \mathbb{R}^3 | \Phi\left(x, y, z\right) = 0\right\}\]
+         
+        Alors nous pouvons par exemple prendre: 
+        \[\nu_{\left(x, y, z\right)} = \frac{\nabla\Phi}{\left\|\nabla\Phi\right\|}\]
+    }
+
+    \subparag{Exemple: Ruban de Möbius}{
+        Le ruban de Möbius n'est, par exemple, pas orientable: il est impossible de trouver une fonction $\nu$ \textit{continue}.
+
+    }
+
+    \subparag{Remarque}{
+        Nous ne considérerons que des surfaces orientables dans ce cours.
+    }
+}
+
+\parag{Définition: Flux}{
+    Si $\Sigma$ est orientable et $\nu : \Sigma \mapsto \mathbb{R}^3$ est un champ de normales unités, alors le \important{flux} de $F$ à travers $\Sigma$ est défini par: 
+    \[\iint_\Sigma \left(F \dotprod \nu\right) dS\]
+
+    \subparag{Remarque}{
+        Nous remarquons que, par définition des intégrales de surfaces:
+        \autoeq{\unexpanded{\iint_{\Sigma} \left(F \dotprod \nu\right)dS = \iint_A \left(F \dotprod\nu\right)  \left\|\sigma_u \wedge \sigma_v\right\| dudv = \pm \iint_A F \dotprod \frac{\left(\sigma_u \wedge \sigma_v\right)}{\left\|\sigma_u \wedge \sigma_v\right\|} \left\|\sigma_u \wedge \sigma_v\right\| dudv = \pm \iint_A F \dotprod \left(\sigma_u \wedge \sigma_v\right)dudv = \pm \iint_{\Sigma} F \dotprod dS}}
+
+        Et ainsi: 
+        \[\iint_{\Sigma} \left(F \dotprod \nu\right)dS = \pm \iint_\Sigma F \dotprod dS\]
+        
+    }
+}
+
+\parag{Exemple}{
+    Nous voulons calculer $\iint_{\Sigma} f dS$ où: 
+    \[f\left(x, y, z\right) = z, \mathspace \Sigma = \left\{\left(x, y, z\right) \in \mathbb{R}^3\ |\ 4\left(x^2 + y^2\right) = 4 + z^2 - 4z,\ 0 \leq z \leq 2,\ x \leq 0\right\}\]
+    
+
+    Comme quand nous travaillions dans $\mathbb{R}^2$, il faut commencer par dessiner et paramétriser $\Sigma$. Pour dessiner une surface, nous devons la comprendre. Or, nous pouvons voir que: 
+    \[4 + z^2 - 4z = \left(z - 2\right)^2\]
+
+    Cela nous donne ainsi: 
+    \[\Sigma = \left\{x^2 + y^2 = \frac{\left(z - 2\right)^2}{4}, 0 \leq z \leq 2, x \geq 0\right\}\]
+    
+    Nous remarquons donc que, sur les plan $O_{xy}$, nous avons des demi-cercles de rayon $\frac{\left|z - 2\right|}{2} = \frac{2 - z}{2}$. Cela nous donne ainsi que $\Sigma$ est un demi cône:
+    \svghere[0.2]{DemiCone.svg}
+
+    Nous devons maintenant paramétriser notre surface. Utilisons les coordonnées cylindriques: 
+    \[\left(x, y, z\right) = \left(r\cos\left(\theta\right), r\sin\left(\theta\right), z\right)\]
+    
+    En mettant ça dans notre première équation, nous obtenons: 
+    \[x^2 + y^2= \frac{\left(z-2\right)^2}{4} \iff r^2 = \frac{\left(z-2\right)^2}{4} \iff r = \frac{2 - z}{2} \iff z = 2 - 2r\]
+    
+    Nous pouvons ainsi éliminer une variable. Regardons maintenant les deux inégalités: 
+    \[0 \leq z \leq 2 \iff 0 \leq 2 - 2r \leq 2 \iff 0 \leq r \leq 1\]
+    \[x \geq 0 \iff \underbrace{r}_{\geq 0}\cos\left(\theta\right) \geq 0 \iff -\frac{\pi}{2} \leq \theta \leq \frac{\pi}{2}\]
+
+    Cela nous donne ainsi la paramétrisation suivante:
+    \[\begin{split}
+    \sigma: \left[0, 1\right] &\longmapsto \left[-\frac{\pi}{2}, \frac{\pi}{2}\right] \\
+    \left(r, \theta\right) &\longmapsto \left(r\cos\left(\theta\right), r\sin\left(\theta\right), 2 - 2r\right)
+    \end{split}\]
+    
+    La deuxième étape est maintenant de calculer $\sigma_r \wedge \sigma_{\theta}$: 
+    \[\sigma_r = \begin{pmatrix} \cos\left(\theta\right) \\ \sin\left(\theta\right)  \\ -2 \end{pmatrix}, \mathspace \sigma_{\theta} = \begin{pmatrix} -r\sin\left(\theta\right) \\ r\cos\left(\theta\right) \\ 0 \end{pmatrix}\]
+    \[\sigma_r \wedge \sigma_{\theta} = \begin{pmatrix} 2r\cos\left(\theta\right) \\ 2r\sin\left(\theta\right) \\ r \end{pmatrix} \implies \left\|\sigma_r \wedge \sigma_\theta\right\| = \sqrt{4r^2 + r^2} = \sqrt{5}r\]
+
+    Nous pouvons ensuite passer à la troisième étape, qui est de calculer notre intégrale: 
+    \autoeq{\unexpanded{\iint_{\Sigma} f dS = \iint_{\left[0, 1\right] \times \left[-\frac{\pi}{2}, \frac{\pi}{2}\right]} f\left(\sigma\left(r, \theta\right)\right) \left\|\sigma_r \wedge \sigma_{\theta}\right\|drd\theta = \int_{-\frac{\pi}{2}}^{\frac{\pi}{2}} \int_{0}^{1} \left(2 - 2r\right) \sqrt{5}r dr d \theta = \int_{-\frac{\pi}{2}}^{\frac{\pi}{2}} \left[\sqrt{5}r^2 - \frac{2}{3}\sqrt{5} r^3\right]_0^1 d\theta = \frac{\pi\sqrt{5}}{3}}}
+}
+
+\parag{Remarque}{
+    De manière générale, pour paramétriser une surface, il est souvent une bonne idée de prendre les coordonnées sphériques quand nous avons des $x^2 + y^2 + z^2$ et, sinon, de prendre les coordonnées cylindriques si nous avons $x^2 + y^2$, $x^2 + z^2$ ou $y^2 + z^2$.
+}
+
+\parag{Définition: Aire}{
+    L'aire d'une surface $\Sigma$ est définie par: 
+    \[\text{Aire}\left(\Sigma\right) = \iint_{\Sigma} 1 dS\]
+}
+
+\section{Théorème de la divergence dans l'espace (I'm in space)}
+\parag{Définition: Domaine régulier}{
+    $\Omega \in \mathbb{R}^3$ est un \important{domaine régulier} s'il existe des ouverts bornés $\Omega_0, \ldots, \Omega_k$ tels que:
+    \begin{enumerate}
+        \item $\bar{\Omega_i} \subseteq \Omega_0$ pour $1 \leq i \leq k$.
+        \item $\bar{\Omega_i} \cap \bar{\Omega_j} = \o$ pour $1 \leq i < j \leq k$
+        \item $\partial \Omega_i = \Sigma_i$ est une surface régulière par morceaux orientable
+        \item $\Omega = \Omega_0 \setminus \bigcup_{i=1}^k \bar{\Omega_i}$
+    \end{enumerate}
+
+    \subparag{Remarque}{
+        La définition est très similaire au cas en deux dimensions, mais nous demandons aussi que notre surface soit orientable.
+    }
+
+    \subparag{Observation}{
+        Le quatrième point nous donne que $\partial \Omega = \partial \Omega_0 \cup\ldots \partial \Omega_k$ est une union de surfaces régulières orientables. Ainsi, sur chaque morceau $\Sigma$ régulier de $\partial \Omega$, il existe un champ de normales $\nu: \Sigma \mapsto \mathbb{R}^3$. 
+    }
+}
+
+\parag{Définition: Champ de normales extérieures}{
+    Un \important{champ de normales extérieures} à un domaine régulier $\Omega$ est un champ $\nu: \partial \Omega \mapsto\mathbb{R}^3$ tel que, sur chaque $\Sigma$ réguliers, $\nu$ pointe vers l'extérieur de $\Omega$.
+    \svghere[0.5]{ChampNormalesExterieures.svg}
+}
+
+\parag{Théorème de la divergence dans $\mathbb{R}^3$}{
+    Soient $\Omega \subset \mathbb{R}^3$ régulier, $F \in C^1\left(\bar{\Omega}, \mathbb{R}^3\right)$ et $\nu$ un champ de normales extérieures à $\Omega$.
+
+    Alors, nous avons: 
+    \[\iiint_{\Omega} \Div\left(F\right) dxdydz = \iint_{\partial \Omega} \left(F \dotprod \nu\right)dS\]
+    
+    \subparag{Observation}{
+        Ce théorème est très similaire à celui dans $\mathbb{R}^2$.
+    }
+}
+
+\parag{Exemple 1}{
+    Nous voulons vérifier le théorème de la divergence pour: 
+    \[F\left(x, y, z\right) = \left(x^2, 0, 0\right), \mathspace \Omega = \left\{\left(x, y, z\right) \in \mathbb{R}^3 | x^2 + y^2 < 1, 0 < z < 1\right\}\]
+    
+    \subparag{Dessin et paramétrisation de $\Omega$}{
+        La première étape est, comme d'habitude de faire un dessin et une paramétrisation de $\Omega$. Clairement, $\Omega$ est un cylindre, et son schéma est plus bas dans ce document. Nous pouvons le paramétriser avec: 
+        \[\Omega = \left\{\left(r\cos\left(\theta\right), r\sin\left(\theta\right), z\right)\ |\  0 \leq r < 1, 0 \leq \theta\leq 2\pi, 0 < z < 1\right\}\]
+    }
+    
+    \subparag{Divergence}{
+        La deuxième étape est maintenant de calculer la divergence: 
+        \[\Div F = 2x\]
+    }
+    
+    \subparag{Intégrale triple}{
+        Nous pouvons ensuite passer à la troisième étape, le calcul de notre intégrale triple: 
+        \autoeq{\unexpanded{\iiint_{\Omega} \Div F dxdydz = \int_{0}^{1} \int_{0}^{2\pi} \int_{0}^{1} 2r\cos\left(\theta\right) \cdot  \underbrace{r}_{\text{Jacobien}} dz d \theta dr = \int_{0}^{1} dz \int_{0}^{1} r^3 dr \underbrace{\int_{0}^{2\pi} 2\sin\left(\theta\right) d \theta}_{= 0} = 0}}
+        
+        Il faut faire attention car, ici, nous avons fait un changement de variable: nous voulions calculer l'intégrale selon $dxdydz$, et nous devons donc multiplier par le Jacobien.
+    }
+
+    \subparag{Dessin et paramétrisation de $\Sigma$}{
+        Nous avons fait la moitié du théorème de la divergence, passons à l'autre moitié. La quatrième étape est, à nouveau, de faire un dessin et une paramétrisation:
+        \svghere[0.35]{CylindreSurfaces.svg}
+
+        Nous considérons le premier capuchon:
+        \[\Sigma_1 = \left\{\left(x, y, 1\right) | x^2 + y^2 \leq 1\right\}\]
+        \[\begin{split}
+        \sigma^1: \left[0, 1\right]\times \left[0, 2\pi\right] &\longmapsto \Sigma_{1} \\
+        \left(r, \theta\right) &\longmapsto \left(r \cos\left(\theta\right), r\sin\left(\theta\right), 1\right)
+        \end{split}\]
+
+        Puis le deuxième capuchon:
+        \[\Sigma_2 = \left\{\left(x, y, 0\right) | x^2 + y^2 \leq 1\right\}\]
+        \[\begin{split}
+        \sigma^2: \left[0, 1\right]\times \left[0, 2\pi\right] &\longmapsto \Sigma_{2} \\
+        \left(r, \theta\right) &\longmapsto \left(r \cos\left(\theta\right), r\sin\left(\theta\right), 0\right)
+        \end{split}\]
+
+        Et enfin la dernière surface:
+        \[\Sigma_3 = \left\{\left(x, y, z\right) | x^2 + y^2 \leq 1, 0 \leq z \leq 1\right\}\]
+        \[\begin{split}
+        \sigma^3: \left[0, 2\pi\right] \times \left[0, 1\right] &\longmapsto \Sigma_{3} \\
+        \left(\theta, z\right) &\longmapsto \left[\cos\left(\theta\right), \sin\left(\theta\right), z\right]
+        \end{split}\]
+    }
+
+    \subparag{Champ de normales}{
+        Passons maintenant à la cinquième étape qui est, à nouveau, de calculer le champ de normales. Il faut faire attention aux signes, ce qui nous donne, en regardant notre dessin:
+        \begin{functionbypart}{\nu_P}
+        \left(0, 0, 1\right), \mathspace \text{si } P \in \Sigma_1  \\
+        \left(0, 0, -1\right), \mathspace \text{si } P \in \Sigma_2  \\
+        \left(\cos\left(\theta\right), \sin\left(\theta\right), 0\right), \mathspace \text{si } P \in \Sigma_3
+        \end{functionbypart}
+        
+        Si nous avions un moins bon dessin, nous aurions bien sûr pu utiliser les paramétrisations pour calculer les normales: 
+        \[\sigma_r^1 = \begin{pmatrix} \cos\left(\theta\right) \\ \sin\left(\theta\right) \\ 0 \end{pmatrix}, \mathspace \sigma^1_{\theta} = \begin{pmatrix} -r\sin\left(\theta\right) \\ r\cos\left(\theta\right) \\ 0 \end{pmatrix}\]
+        \[\sigma_r^1 \wedge \sigma_{\theta}^1 = \begin{pmatrix} 0 \\ 0 \\ r \end{pmatrix} \implies \frac{\sigma_r^1 \wedge \sigma_{\theta}^1}{\left\|\sigma_r^1 \wedge \sigma_{\theta}^1\right\|} = \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix}\]
+        
+        Nous remarquons (en regardant le dessin) qu'elle pointe bien vers l'extérieur. En faisant exactement le même calcul, on trouve que $\frac{\sigma_r^2 \wedge \sigma_{\theta}^2}{\left\|\sigma_r^2 \wedge \sigma_{\theta}^2\right\|} = \left(0, 0, 1\right)$. Cependant, elle ne pointe cette fois pas dans la bonne direction, donc nous prenons plutôt la version allant de le sens opposé: $\nu = \left(0, 0, -1\right)$. Nous pouvons finalement faire exactement le même raisonnement pour la troisième paramétrisation.
+    }
+    
+    \subparag{Intégrale double}{
+        La sixième étape est finalement de calculer notre intégrale double: 
+        \autoeq{\unexpanded{\iint_{\partial \Omega} F \dotprod \nu dS = \iint_{\Sigma_1} \underbrace{F \dotprod \nu}_{=0} dS + \iint_{\Sigma_2} \underbrace{F \dotprod \nu}_{=0} dS + \iint_{\Sigma_3} F \dotprod \nu dS = \iint_{\Sigma_3} F \dotprod \nu dS = \int_{0}^{1} \int_{0}^{2\pi} \left(\cos^2\left(\theta\right), 0, 0\right) \dotprod\left(\cos\left(\theta\right), \sin\left(\theta\right), 0\right) \underbrace{\left\|\sigma_{\theta} \wedge \sigma_z\right\|}_{=1} d \theta dz = \int_{0}^{1} dz \int_{0}^{2\pi} \cos^3\left(\theta\right) d \theta = 0}}
+        puisque $\cos^3\left(\theta\right)$ est une fonction impaire. Le résultat était bien celui attendu.
+        
+        Cette fois, nous n'avons pas fait de changement de variable, nous avons fait une paramétrisation de notre surface. Il ne faut donc pas multiplier par le Jacobien.
+    }
+}
+
+\parag{Remarque}{
+    Si nous faisons une intégrale en $n$ dimensions, alors on ne met rien. Cependant, dès que nous faisons un changement de variable, il faut mettre un Jacobien.
+
+    Si nous faisons une intégrale sur une surface dans un espace tridimensionnel, ou une intégrale sur une courbe dans un espace bi- ou tridimensionnel, alors nous devons multiplier par notre paramétrisation. À nouveau, si nous avons besoin de faire un changement de variable, alors il faut multiplier par un Jacobien (même si on aurait simplement pu s'en tirer avec une meilleure paramétrisation dès le début).
+}
+
+\end{document}
