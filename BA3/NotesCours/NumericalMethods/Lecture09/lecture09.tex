@@ -1,0 +1,192 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-11-15 at 13:18:35.
+
+\usepackage{../../style}
+
+\title{NumMet}
+\author{Joachim Favre}
+\date{Mardi 15 novembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2022-11-15}{An AI which cannot learn a XOR}{
+\begin{itemize}[left=0pt]
+    \item Explanation of what is a neural network, with its neurons, layers and activation functions.
+    \item Definition of shallow and deep neural networks.
+    \item Explanation of the main idea behind how to train a neural network through stochastic gradient descent and back propagation.
+    \item Explanation of the big idea behind convolution neural networks, recurrent neural networks, and generative adversial networks.
+\end{itemize}
+
+}
+
+\section{Neural networks}
+\parag{Introduction}{
+    Neural networks are still relatively new. Even though people have been working on those things for many years, but now we finally have the data and hardware to run some.
+
+    \subparag{Remark}{
+        Deep down, we don't really understand how neural networks work. We have some intuition, but not the core.
+    }
+}
+
+\parag{Example: Natural processing}{
+    Neural networks allow to solve ``impossible problems'', such as natural language processing: translating a sentence from a language to another for instance. Languages are really too messy to allow this problem to be solved with other algorithms.
+}
+
+
+\parag{Example: Computer vision}{
+    Another example of application of neural networks is computer vision: say where are humans on a picture for instance. Humans could solve this problem, but it is really hard to say what equation they are solving.
+
+    This is typically what self-driving cars do.
+}
+
+\parag{Example: Visual computing}{
+    Neural networks are typically used for visual computing. Especially convolutional neural networks, which are very suited to extract semantic information from images.
+
+    For instance, we use them for object and person detection, 3D human pose estimation, animation (tell the character to go from a point A to a point B, and have it go there in a way that seems human, without having to animate everything) and deep learning supersampling (DLSS by NVIDIA; render less pixels but use a neural network to increase their number)
+}
+
+\parag{Biology}{
+    The main idea behind neural networks is biological: we have neurons which are connected one to another. Sometimes, neurons fires, and, when some of its ``input neurons'' fire, a neuron might fire or not.
+}
+
+\parag{History}{
+    The idea of neural networks is very old: McCuloch-Pitts model was made in 1943, and Rosenblatt's Perceptron in 1957.
+
+    Rosenblatt was very optimistic with his invention, but the big problem was that the Perceptron was only one level deep, meaning that all it did is a matrix multiplication. For instance, it was not able to run a basic XOR because it was not deep enough. This led to a big AI winter in the 1970s: it was hard to work on that subject since nobody wanted to give money for this research.
+
+    An important discovery was made in the 1970s: reverse-mode automatic differentiation. This is important to compute the derivative of something with many inputs efficiently. This was then applied to neural networks, leading to back propagation.
+
+    There were some nice neural networks (such as human-written digit recognition), but they had problems with larger neural networks, and with vanishing or exploding gradients (which we will see right after), which led to the second AI winter.
+
+    Now, looking back why it did not work in the 80s-90s, we can see the following reasons. First, they had datasets thousands of times too small. Second, their computer were millions of times to slow. Third, we need non-linear activation functions: the first activation functions were not chosen well, leading to a bad training. Finally, weights were not initialised in a good way. 
+}
+
+\parag{Creating a neural network}{
+    To make a neural networks, we first need to identify some inputs and some outputs (pixels for instance), which act as the first and the last layer. Each neuron is connected to neurons of the previous layer, use this data to produce a new value, and give it to the layer after.
+    \imagehere[0.3]{BasicStructureNN.png}
+
+    We add all the values of the neurons from the previous layer, weighting each with a given weight (which can be negative), to which we add a bias $b$. The value is then passed to an activation function. This leads to the following formula for a given neuron: 
+    \[h\left(\sum_{i} \bvec{w_i} \bvec{x_i} + b\right)\]
+
+    There are different types of activation functions. For instance, we can have the sigmoid ($\frac{1}{1 + \exp\left(-x\right)}$) or the ReLU ($\max\left\{0, x\right\}$):
+    \imagehere{ActivationFunctionsExample.png}
+
+    The non-linaerity of activation functions are really what makes everything work and allow not to be just a basic linear map. 
+
+    One neuron on its own is not very useful. However, as soon as we connect many layers, we get something very interesting. Layers in the middle are said to be ``hidden'', since we don't really matter when consider this as a black box.
+}
+
+\parag{Example}{
+    Let's consider the two following neural networks, with the given weights and using the ReLU activation function:
+    \imagehere[0.8]{NNStepBoxFunctions.png}
+
+    The first one encodes a step function, and the second one a box function. This is very interesting since it could allow us that we would approximate any function. Naturally, nobody does this in real life, but it allows to prove that this family of neural networks with non-linearity is more powerful.
+}
+
+\parag{Layered network}{
+    Instead of considering all neurons, we can instead consider layers. This allow to represent everything as vectors, and allow for a tremendous parallelisation:
+    \imagehere[0.3]{LayeredNetworks.png}
+
+    Then, this leads to the following formula: 
+    \[\bvec{a}^{\left(1\right)} = h\left(W^{\left(1\right)} \bvec{x} + \bvec{b}^{\left(1\right)}\right)\]
+
+    Also, we sometimes append the $\bvec{b}$ to the right of $W$ and a 1 to the bottom of $\bvec{x}$, which allows to do the addition with it:
+    \imagehere[0.15]{OptimisationMatrixVectorMultiplicationSum.png}
+    
+    This means that all layers Neural Networks is a chain of matrix multiplications and activation functions. The shape of $W$ and $\bvec{b}$ define the network structure, and their values define its behaviour.
+}
+
+\parag{Terminology}{
+    A network is said to be shallow if it has only one hidden layer. It is said to be deep if it has more hidden layers. 
+
+    Deep neural networks are really interesting since they allow to apply many times the activation function, and, again, it's their non-linearity which is really important.
+
+    When a neural network is really deep, then it needs to have a particular architecture (so that we know a bit more what it is doing; this is of course task-dependent), such as a stacked hourglass network:
+    \imagehere[0.7]{NNArchitectureStackedHourglass.png}
+}
+
+\parag{Training}{
+    There are so many weight and biases parameters that we cannot define them by hand. Thus, we have to give data to train our model, and make it ``learn'' the best parameters. This leads to a need of a huge amount of data, which created the science branch of big data. For instance, Image net contains 14 million image-class pairs.
+
+    To train a neural networks, we need the following steps. First, we need to define how we will have our inputs and our outputs (for instance, have a $28\times28$ pixels picture image as input and output a single label). Second, we need a dataset. Third, we need an objective (a loss function we want to minimise). Fourth, we need the architecture of the model. Finally, we can give all this to a solver.
+
+    Our loss function is written as $E\left(D, \theta\right)$, where $\theta$ is our parameters, and $D$ is the dataset (inputs and outputs). The goal is thus to find: 
+    \[\argmin_{\theta} E\left(D, \theta\right)\]
+
+    We only have one output $E\left(D, \theta\right)$, and many inputs. This shows the importance of automatic differentiation in reverse mode.
+
+    \subparag{Loss functions}{
+        We can have many loss functions, such as a quadratic loss, or an absolute loss: 
+        \[\ell_2\left(y, \ell \right) = \left(y - \ell \right)^2, \mathspace \ell _1\left(y, \ell \right) = \left|y - \ell \right|\]
+
+    }
+}
+
+\parag{Classification and regression}{
+    In machine learning, we can have two main goals: classification and regression.
+
+    In classification, we have a fixed number of possibilities and we want to give the category of our inputs. In regression, we want to output a continuous number.
+
+    For instance, predicting handwritten numbers is a classification problem. Indeed, outputting $8$ instead of $1$ is the exact same error as outputting $9$ instead of $1$, and it should not be considered differently (even though $1$ and $9$ are further apart). Thus, instead of outputting a single number, we usually output a 10-dimensional vector, where each component represents the probability that the picture represents the $i$\Th category.
+}
+
+\parag{Stochastic gradient descent}{
+    We notice that iteratively optimising over subsets (named ``minibatches'') of the dataset is efficient and works really well. The idea is that, at each iteration, a new subset is chosen as an approximation of the full objective. This allows to drastically decrease the computation time.
+
+    In fact, the noisiness of the subsets we choose allow to let gradient descent move out of local minima, giving better results.
+}
+
+\parag{Differentiation}{
+    With one hidden layer, we can write our neural network function as: 
+    \[E = \text{linear}\left(h\left(\text{linear}\left(\bvec{x}, W^{\left(1\right)}, \bvec{b}\right)\right)\right)\]
+    where $\text{linear}\left(A, \bvec{x}, \bvec{b}\right) = A \bvec{x} + \bvec{b}$. We can compute the Jacobian matrices with respect to any variable, typically by differentiating through reverse-mode automatic differentiation:
+    \imagehere[0.8]{BackPropagationJacobian.png}
+    where $J_{x}^f$ means the Jacobian of the function $f$ with respect of the parameter $x$.
+
+    Forward mode automatic differentiation basically computes the matrix product from left to right, whereas reverse mode computes it from right to left. We can observe that such Jacobian matrices are really sparse matrices, which are not efficient to represent through bi-dimensional arrays, so we use other ways:
+    \imagehere[0.8]{BackPropagationCompact.png}
+    where $*$ means an element-wise matrix product.
+
+    Note that this special case of automatic differentiation applied to neural networks is called backpropagation.
+}
+
+\parag{Convolution NNs}{
+    A convolution is a filter we apply with a matrix (called kernel). For instance, here is a picture and three different convolutions we did (with different kernels) in order to detect edges:
+    \imagehere[0.7]{ConvolutionDetectEdgesExample.png}
+
+    In a convolutional neural networks, we do multiple convultions in between multiple layers, and we also allow the neural network to also optimise those convolutions.
+}
+
+\parag{Recurrent neural networks}{
+    Another very interesting direction for neural networks is recurrent neural networks: we take some of the outputs and give them back as inputs. This is for instance great for language processing: we need to know what happened before.
+}
+
+\parag{GANs}{
+    In generative adversial networks (GANs), two neural networks play a game: there is a generator making fake images and a discriminator which go is to say if it is a real image or not. At first they are both really bad, but as its trains they both get really and really better.
+
+    \subparag{Usage}{
+        They can for instance be used to make fake human pictures, or turn a photo to a given painter's style.
+    }
+}
+
+\parag{Observation}{
+    To understand neural networks, we can try optimising a picture (instead of weights). This can give us an insight of the learnt patterns.
+    \imagehere[0.6]{NeuralNetworkOptimisePictureInstead.png}
+}
+
+\parag{Impacts}{
+    Neural networks have both a real social impact (they remove some jobs for instance), but they can also be really powerful. AI ethics is a really important field discussing those problems.
+}
+
+\parag{Suggestion}{
+    Prof Jakob suggests that it is important to become good in neural networks, but not to specialise in them. Indeed, very soon it will not be a specific task, but something everyone will be good in.
+}
+
+
+
+\end{document}
