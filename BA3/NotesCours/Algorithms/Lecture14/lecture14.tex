@@ -1,0 +1,335 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-11-07 at 14:20:16.
+
+\usepackage{../../style}
+
+\title{Algorithms}
+\author{Joachim Favre}
+\date{Lundi 07 novembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2022-11-07}{I love XKCD}{
+\begin{itemize}[left=0pt]
+    \item Definition of directed and undirected graphs, and explanation on how to store them in memory.
+    \item Explanation of BFS.
+    \item Explanation of DFS, and of the depth-first forest and edge classification it implies.
+    \item Explanation of the parenthesis theorem.
+    \item Explanation of the white-path theorem.
+    \item Definition of directed acyclic graphs.
+    \item Proof that a DAG is acyclic if and only if it does not have any back edge.
+    \item Definition of topological sort, and explanation of an algorithm to compute it.
+\end{itemize}
+
+}
+
+\section{Graphs}
+\subsection{Introduction}
+\parag{Introduction}{
+    Graphs are everywhere. For instance, in social media, when we have a bunch of entities and relationships between them, graphs are the way to go.
+}
+
+\parag{Definition: Graph}{
+    A \important{graph} $G = \left(V, E\right)$ consists of a vertex set $V$, and an edge set $E$ that contains pairs of vertices.
+
+    \subparag{Terminology}{
+        We can have a \important{directed graph}, where such pairs are ordered (if $\left(a, b\right) \in E$, then it is not necessarily the case that $\left(b, a\right) \in E$), or an \important{undirected graph} where such pairs are non-ordered (if $\left(a, b\right) \in E$, then $\left(b, a\right) \in E$).
+
+        \imagehere[0.6]{GraphsExample.png}
+    }
+
+    \subparag{Personal remark}{
+        It is funny that we are beginning graph theory right now because, very recently, XKCD published a comic about this subject:
+        \imagehere[0.6]{XKCD2694.png}
+
+        \begin{center}
+            \url{https://xkcd.com/2694/}
+        \end{center}
+    }
+}
+
+\parag{Definition: Degree}{
+    For a graph $G = \left(V, E\right)$, the \important{degree} of a vertex $u \in V$, denoted $\text{degree}\left(u\right)$, is its number of outgoing vertices.
+
+    \subparag{Remark}{
+        For an undirected graph, the degree of a vertex is its number of neighbours.
+    }
+}
+
+
+\parag{Storing a graph}{
+    We can store a graph in two ways: \important{adjacency lists} and \important{adjacency matrices}. Note that any of those two representations can be extended to include other attributes, such as edge weights.
+
+    \subparag{Adjacency lists}{
+        We use an array. Each index represents a vertex, where we store the pointer to the head of a list containing its neighbours. 
+
+        For an undirected graph, if $a$ is in the list of $b$, then $b$ is in the list of $a$.
+
+        For instance, for the undirected graph above, we could have the adjacency list:
+        \imagehere[0.4]{ExampleAdjacencyList.png}
+
+        Note that, in pseudo-code, we will denote this array at the attribute \texttt{Adj} of the graph \texttt{G}. In other words, to get the adjacent nodes of a vertex \texttt{u}, we will use \texttt{G.Adj[u]}.
+    }
+
+    \subparag{Adjacency matrix}{
+        We can also use a $\left|V\right| \times \left|V\right|$ matrix $A = \left(a_{ij}\right)$, where: 
+        \begin{functionbypart}{a_{ij}}
+        1, \mathspace \text{if } \left(i, j \right) \in E \\
+        0, \mathspace \text{otherwrise}
+        \end{functionbypart}
+
+        We can note that, for an undirected graph, the matrix is symmetric:
+        \imagehere[0.4]{ExampleAdjacencyMatrix.png}
+    }
+
+    \subparag{Complexities}{
+        Let us consider the different complexities of our two representations. The space complexity of adjacency lists is $\Theta\left(V + E\right)$ and the one of adjacency matrices is $\Theta\left(V^2\right)$. Then, the time to list all vertices adjacent to $u$ is $\Theta\left(\text{degree}\left(u\right)\right)$ for an adjacency list but $\Theta\left(V\right)$ for an adjacency matrix. Finally, the time to determine whether $\left(u, v\right) \in E$ is $O\left(\text{degree}\left(u\right)\right)$  for adjacency lists but only $\Theta\left(1\right)$ for adjacency matrices.
+        
+        We can thus note that adjacency matrix can be very interesting for edge queries (determining if an edge exits), but have an important cost to do so. Generally, adjacency matrices only become interesting when graphs are very dense.
+    }
+}
+
+\subsection{Primitives for traversing and searching a graph}
+\begin{filecontents*}[overwrite]{BreadthFirstSearch.code}
+procedure BFS(V, E, s):
+    for u in V without s:
+        u.d = infinity
+    s.d = 0
+    Q = empty queue
+    Enqueue(Q, s)
+    while !Q.isEmpty():
+        u = Dequeue(Q)
+        for v in G.adj[u]:
+            if v.d == infinity:
+                v.d = u.d + 1
+                Enqueue(Q, v)
+\end{filecontents*}
+
+\parag{Breadth-First Search}{
+    We have as input a graph $G = \left(V, E\right)$, which is either directed or undirected, and some source vertex $s \in V$. The goal is, for all $v \in V$, to output the distance from $s$ to $v$, named $v.d$.
+
+    \subparag{Algorithm}{
+        The idea is to send some kind of wave out form $s$. It will first hit all vertices which are 1 edge from $s$. From those points, we can again send some kind of waves, which will hit all vertices at a distance of two edges from $s$, and so on. In other words, beginning with the root, we look at the vertex closest to the current vertices, set all its neighbours distance to the distance of the current vertex plus 1, and store them in a queue to consider their neighbours later. 
+        \svghere{BFSWaves.svg}
+
+        This yields \important{Breadth-First Search} (BFS; named that way since it prioritises breadth over depth), which can be expressed as:
+        \importcode{BreadthFirstSearch.code}{pseudo}
+        
+        Note that cycles are never a problem, since we enqueue nodes only if it had not been visited before, and thus only once.
+    }
+
+    \subparag{Analysis}{
+        The informal proof of correctness is that we are always considering the nodes closest to the root, meaning that whenever we visit a node we could not have visited with a shorted distance. We will do a formal proof for the generalisation of this algorithm, Dijkstra's algorithm.
+
+        The runtime is $O\left(V + E\right)$. Indeed, it is $O\left(V\right)$ since each vertex are enqueued at most once (less if the graph is disconnected), and $O\left(E\right)$ $\left(u, v\right)$ is examined only when $u$ is dequeued, which happens at most once. In other words, every edge is examined at most once in a directed graph and at most twice if undirected.
+
+        We notice that we have to switch a bit our mind when we think about algorithm complexity for graphs: the input is non trivial. We know that the worst case is $E = O\left(V^2\right)$, but we may totally have $E = \Theta\left(V\right)$ for a given graph, meaning that our complexity needs to take both into account.
+    }
+
+    \subparag{Observation}{
+        We note that BFS may not reach all the vertices.
+    }
+
+    \subparag{Remark}{
+        We can save the shortest path tree by keeping track of the edge that discovered the vertex. Note that since each vertex (which is not the root and which distance is not infinite) have exactly one such vertex, and thus this is indeed a tree. Then, when given a vertex, we can find the shortest path by using those pointers in reverse orders, climbing the tree in the opposite direction.
+        \svghere[0.7]{BFSFindPathBack.svg}
+    }
+}
+
+\begin{filecontents*}[overwrite]{DepthFirstSearch.code}
+procedure DFS(G):
+    for u in G.v:
+        u.color = WHITE
+    time = 0
+    for u in G.v:
+        if u.color == WHITE:
+            DFSVisit(G, U)
+
+procedure DFSVisit(G, u):
+    time = time + 1
+    u.d = time
+    u.color = GREY
+    for v in G.Adj[u]:
+        if v.color == WHITE:
+            DFSVisit(v)
+    u.color = BLACK
+    time = time + 1
+    u.f = time
+\end{filecontents*}
+
+\parag{Depth-First Search}{
+    BFS goes through every vertex, but not necessarily every edge. We would now want to make an algorithm that goes through every edges. Note that this algorithm may seem very abstract and \textit{useless} for now but, as we will see right after, it gives us a very interesting insight about a graph.
+
+    The idea is, starting from a given point, we get going following a path until we get stuck, then backtrack, and get back going. Doing so, we want to output two timestamps on each vertex $v$: the discovery time $v.d$ (when we first start visiting a node) and the finishing time $v.f$ (when we finished visiting all neighbours of our node). This algorithm is named \important{Depth-First Search} (DFS).
+    
+    This is not really important where we start for now.
+
+    \subparag{Algorithm}{
+        Our algorithm can be stated the following way, where \texttt{WHITE} means not yet visited, \texttt{GREY} means currently visiting, and \texttt{BLACK} finished visiting:
+        \importcode{DepthFirstSearch.code}{pseudo}
+    }
+
+    \subparag{Example}{
+        For instance, running DFS on the following graph, where we have two DFS-visit (one on $b$ and one on $e$):
+        \imagehere[0.7]{DFSExample.png}
+    }
+
+    \subparag{Analysis}{
+
+        The runtime is $\Theta\left(V + E\right)$. Indeed, $\Theta\left(V\right)$ since every vertex is discovered once, and $\Theta\left(E\right)$ since each edge is examined once if it is a directed graph and twice if it is an undirected graph.
+    }
+
+    \subparag{XKCD}{
+        XKCD's viewpoint on the ways we have to traverse a graph:
+        \imagehere[0.6]{XKCD2407.png}
+        \begin{center}
+            \url{https://xkcd.com/2407/}
+        \end{center}
+
+        And there is also the following great XKCD on the slides:
+        \imagehere{XKCD761.png}
+        \begin{center}
+            \url{https://xkcd.com/761/}
+        \end{center}
+    }
+}
+
+\parag{Depth-First forest}{
+    Just as BFS leads to a tree, DFS leads to a forest (a set of trees). 
+
+    Indeed, we can again consider the edge that we used to discover a given vertex, to be an edge linking this vertex to its parent. Since trees might be disjoint but we are running DFS so that every edge is discovered, we may have multiple detached trees.
+
+    There will be examples hereinafter.
+
+    \subparag{Remark}{
+        Since we have trees, in particular, DFS leads a certain partial ordering of our nodes: a node can be descendent of another in a tree (or have no relation because they are not in the same tree).
+    }
+
+    \subparag{Formal definition}{
+        Very formally, each tree is made of edges $\left(u, v\right)$ such that $u$ (currently explored) is grey and $v$ is white (not yet explored) when $\left(u, v\right)$ is explored.
+    }
+}
+
+
+\parag{Parenthesis theorem}{
+    We can think of the discovery time as an opening parenthesis and the finishing time a closing parenthesis. Let us note $u$'s discovery and finishing time by brackets and $v$'s discovery and finishing times by braces. Then, to make a well-parenthesised formulation, we have only the following possibilities:
+    \begin{enumerate}
+        \item $\left(\right)\left\{\right\}$
+        \item $\left\{\right\}\left(\right)$
+        \item $\left(\left\{\right\}\right)$
+        \item $\left\{\left(\right)\right\}$
+    \end{enumerate}
+    
+    However, it is for instance impossible to have $\left(\left\{\right)\right\}$.
+
+    Very formally, this yields that, for any vertex $u, v$, we have exactly one of the following properties (where, in order, they exactly refer to each well-parenthesised brace-parenthesis expresesions above):
+    \begin{enumerate}
+        \item $u.d < u.f < v.d < v.f$ and neither of $u$ and $v$ are descendant of each other.
+        \item $v.d < v.f < u.d < u.f$ and neither of $u$ and $v$ are descendent of each other.
+        \item $u.d < v.d < v.f < u.f$ and $v$ is a descendant of $u$.
+        \item $v.d < u.d < u.f < v.f$ and $u$ is a descendant of $v$.
+    \end{enumerate}
+}
+
+\parag{White-path theorem}{
+    Vertex $v$ is a descendant of $u$ if and only if, at time $u.d$, there is a path from $u$ to $v$ consisting of only white vertices (except for $u$, which was just coloured grey).
+}
+
+\parag{Edge classification}{
+    A depth-first-search run gives us a classification of edges:
+    \begin{enumerate}
+        \item Tree edges are edges making our trees, the edges which we used to visit new nodes when running \texttt{DFSVisit}.
+        \item Back edges are edges $\left(u, v\right)$ where $u$ is a descendant (a child, grand-child, or any further, in the tree) of $v$. This is when $v.d < u.d < u.f < v.f$.
+        \item Forward edges are edges $\left(u, v\right)$ where $v$ is a descendant of $u$, bot not a tree edge. This is when $u.d < v.d < v.f < u.f$ (but, again $\left(u, v\right)$ is not a tree edge).
+        \item Cross edges are any other edge. This is when $v.d < v.f < u.d < u.f$.
+    \end{enumerate}
+
+    Note that having both $u.d < u.f < v.d < v.f$ and an edge $\left(u, v\right)$ is not possible since, then, because of our edge, we would have explored $v$ from $u$ and thus we would have had $v.d < u.f$. This explains why no edge is classified with the condition $u.d < u.f < v.d < v.f$.
+
+    \subparag{Example}{
+        For instance, in the following graph, tree edges are represented in orange, back edges in blue, forward edges in red and cross edges in green.
+        \imagehere[0.9]{EdgeClassificationExample.png}
+
+        Note that, in this DFS forest, we have two trees.
+    }
+    
+    \subparag{Remark}{
+        In the DFS of an undirected graph, it no longer makes sense to make the distinction between back and forward edges. We thus call both of them back edges.
+
+        Also, in an undirected graph, we cannot have any cross edge.
+    }
+
+    \subparag{Observation}{
+        A different starting point for DFS will lead to a different edge classification.
+    }
+}
+
+\subsection{Topological sort of graphs}
+\parag{Definition: Directed acyclic graph}{
+    A \important{directed acyclic graph} (DAG) is a directed graph $G$ such that there are no cycles (what a definition). In other words, for all $u, v \in E$ where $u \neq v$, if there exists a path from $u$ to $v$, then there exists no path from $v$ to $u$.
+} 
+
+\parag{Topological sort}{
+    We have as input a directed acyclic graph, and we want to output a linear ordering of vertices such that, if $\left(u, v\right) \in E$, then $u$ appears somewhere before $v$.
+
+    \subparag{Use}{
+        This can for instance really be useful for dependency resolution when compiling files: we need to know in what order we need to compiles files.
+    }
+    
+    \subparag{Example}{
+        For instance, let us say that, as good computer scientists, we made the following graph to remember which clothes we absolutely need to put before other clothes, in order to get dressed in the morning:
+        \imagehere[0.6]{GraphGettingDressedUpInTheMorning.png}
+
+        Then, we would want to output an order in which we could put those clothes: 
+        \imagehere{GraphGettingDressedUpInTheMorning-TopologicallySorted.png}
+    }
+}
+
+\parag{Theorem}{
+    A directed graph $G$ is acyclic if and only if a DFS of $G$ yields no back edges.
+
+    \subparag{Proof $\implies$}{
+        We want to show that a cycle implies a back-edge.
+
+        Let $v$ be the first vertex discovered in the cycle $C$, and let $\left(u, v\right)$ be its preceding edge in $C$ (meaning that $u$ is also in the cycle). At time $v.d$, vertices in $C$ form a white path $v$ to $u$, and hence $u$ is a descendant of $v$. This means that the edge $\left(u, v\right)$ is a back edge.
+    }
+
+    \subparag{Proof $\impliedby$}{
+        We want to show that a back-edge implies a cycle.
+
+        We suppose by hypothesis that there is a back edge $\left(u, v\right)$. Then, $v$ is the ancestor of $u$ in the depth-first forest. Therefore, there is a path from $v$ to $u$, and thus it creates a cycle.
+
+        \qed
+    }
+}
+
+\parag{Algorithm}{
+    The idea of topological sort is to call DFS on our graph (starting from any vertex), in order to compute finishing times $v.f$ for all $v \in V$. We can then output vertices in order of decreasing finishing time.
+
+    \subparag{Example}{
+        For instance, let's consider the graph above. Running DFS, we may get:
+        \imagehere[0.6]{GraphGettingDressedUpInTheMorning-DFSed.png}
+
+        Then, outputting the vertices by decreasing $v.f$, we get the exact topological order shown above. Note that it could have naturally outputted a different topological sort (if we had started our DFS at other points), since those are definitely not unique.
+    }
+
+    \subparag{Proof of correctness}{
+        We want to show that, if the graph is acyclic and $\left(u, v\right) \in E$, then $v.f < u.f$.
+
+        When we traverse the edge $\left(u, v\right)$, $u$ is grey (since we are currently considering it). We can then split our proof for the different colours $v$ can have:
+        \begin{enumerate}[left=0pt]
+            \item $v$ cannot be grey since, else, it would mean that we got to $v$ first, then got to $u$, and finally got back to $v$. In other words, we would have $v.d < u.d$ and thus $v.d < u.d < u.f < v.f$. This would imply $\left(u, v\right)$ would be a back edge, contradicting that our graph is acyclic. 
+            \item $v$ could be white, which would mean that that it is a descendant of $u$ and thus, by the parenthesis theorem, we would have $u.d < v.d < v.f < u.f$. 
+            \item $v$ could also be black, which would mean that $v$ is already finished and thus, definitely, $v.f < u.d$, implying that $v.f < u.f$.
+        \end{enumerate}
+        
+        \qed
+    }
+}
+
+\end{document}

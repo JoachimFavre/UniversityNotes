@@ -1,0 +1,138 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-11-14 at 14:18:20.
+
+\usepackage{../../style}
+
+\title{Algorithms}
+\author{Joachim Favre}
+\date{Lundi 14 novembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{15}{2022-11-14}{I definitely really like this date}{
+\begin{itemize}[left=0pt]
+    \item Definition of SCCs, and proof of their existence and unicity.
+    \item Definition of component graphs.
+    \item Explanation of Kosarju's algorithm for finding component graphs.
+\end{itemize}
+
+}
+
+\subsection{Strongly connected components}
+\parag{Definition: Connected vertex}{
+    Two vertices of an undirected graph are connected if there exists a path between those two vertices.
+
+    \subparag{Remark}{
+        To know if the two vertices are connected, we can run BFS on one of the vertex, and see if the other vertex has a finite distance. 
+    }
+
+    \subparag{Observation}{
+        For directed graph, this definition no longer really makes sense. Since we may want one similar, we will define strongly connected components right after.
+    }
+}
+
+\parag{Notation: Path}{
+    In a graph, if there is a path from $u$ to $v$, then we note $u \leadsto v$.
+}
+
+
+\parag{Definition: Strongly connected component}{
+    A \important{strongly connected component} (SCC) of a directed graph $G = \left(V, E\right)$ is a maximal set of vertices $C \subseteq V$ such that, for all $u, v \in C$ both $u \leadsto v$ and $v \leadsto u$. 
+
+    \subparag{Remark}{
+        To verify if we indeed have a SCC, we first verify that every vertex can reach every other vertex. We then also need to verify that it is maximal, which we can do by adding any element which has one connection to the potential SCC, and verifying that what it yields is not a SCC.
+    }
+
+    \subparag{Example}{
+        For instance, the first example is not a SCC since $c\not\leadsto b$, the second is not either since we could add $c$ and it is thus not maximal:
+        \imagehere[0.7]{WrongSCCExample.png}
+
+        However, here are all of the SCC of the graph:
+        \imagehere[0.7]{SCCExample.png}
+    }
+}
+
+\parag{Theorem: Existence and unicity of SCCs}{
+    Any vertex belongs to one and exactly one SCC.
+
+    \subparag{Proof}{
+        First, we notice that a vertex always belongs to at least one SCC since we can always make an SCC containing one element (and adding it enough elements so that to make it maximal). This shows the existence.
+
+        Second, let us suppose for contradiction that SCCs are not unique. Thus, for some graph, there exists a vertex $v$ such that $v \in C_1$ and $v \in C_2$, where $C_1$ and $C_2$ are two SCCs such that $C_1 \neq C_2$. By definition of SCCs, for all $u_1 \in C_1$, we have $u_1 \leadsto v$ and $v \leadsto u_1$, and similarly for all $u_2 \in C_2$. However, by transitivity, this also means that $u_1 \leadsto u_2$ and $u_2 \leadsto u_1$. This yields that we can create a new SCC $C_1 \cup C_2$, which contradicts the maximality of $C_1$ and $C_2$ and thus shows the unicity.
+
+        \qed
+    }
+}
+
+
+\parag{Definition:  Component graph}{
+    For a directed graph (digraph) $G = \left(V, E\right)$, its \important{component graph} $G^{SCC} = \left(V^{S C C}, E^{S C C}\right)$ is defined to be the graph where $V^{S C C}$ has a vertex for each SCC in $G$, and $E^{S C C}$ has an edge between the corresponding SCCs in G.
+
+    \subparag{Example}{
+        For instance, for the digraph hereinabove:
+        \imagehere[0.5]{ComponentGraphExample.png}
+    }
+}
+
+\parag{Theorem}{
+    For any digraph $G$, its component graph $G^{SCC}$ is a DAG (directed acyclic graph).
+
+    \subparag{Proof}{
+        Let's suppose for contradiction that $G^{S C C}$ has a cycle.  This means that we can access one SCC from $G$ from another SCC (or more); and thus any elements from the first SCC have a path to elements of the second SCC, and reciprocally. However, this means that we could the SCCs, contradicting their maximality.
+
+        \qed
+    }
+}
+
+\parag{Definition: Graph transpose}{
+    Let $G$ be a digraph (directed graph). 
+
+    The \important{transpose} of $G$, written $G^T$, is the graph where all the edges have their direction reversed:
+    \[G^T = \left(V, E^T\right), \mathspace \text{where } E^T = \left\{\left(u, v\right) : \left(v, u\right) \in E\right\}\]
+    \subparag{Remark}{
+        We call this a transpose since the transpose of $G$ is basically given by transposing its adjacency matrix.
+    }
+
+    \subparag{Observation}{
+        We can create $G^T$ in $\Theta\left(V + E\right)$ if we are using adjacency lists.
+    }
+}
+
+\parag{Theorem}{
+    A graph and its transpose have the same SCCs.
+}
+
+
+\parag{Kosarju's algorithm}{
+    The idea of Kosarju's algorithm to compute component graphs efficiently is:
+    \begin{enumerate}
+        \item Call \texttt{DFS($G$)} to compute the finishing times $u.f$ for all $u$.
+        \item Compute $G^T$.
+        \item Call \texttt{DFS($G^T$)} where the order of the main loop of this procedure goes in order of decreasing $u.f$ (as computed in the first DFS).
+        \item Output the vertices in each tree of the depth-first forest formed in second DFS, as a separate SCC. Cross-edges represent links in the component graph.
+    \end{enumerate}
+    
+    \subparag{Unicity}{
+        Since SCCs are unique, the result will always be the same, even though graphs can be traversed in very different ways with DFS.
+    }
+
+    \subparag{Analysis}{
+        Since every instruction is $\Theta\left(V + E\right)$, our algorithm runs in $\Theta\left(V + E\right)$.
+    }
+    
+    \subparag{Intuition}{
+        The main intuition for this algorithm is to realise that elements from SCCs can be accessed from one another when going forwards (in the regular graph) or backwards (in the transposed graph). Thus, we first compute some kind of ``topological sort'' (this is not a real one this we don't have a DAG), and use its reverse-order as starting points to go in the other direction. If two elements can be accessed in both directions, they will indeed be in the same tree at the end. If two elements have one direction where one cannot access the other, then the first DFS will order them so that we begin the second DFS by the one which cannot access the other.
+    }
+
+    \subparag{Personal remark}{
+        The Professor used the name ``magic algorithm'' since we do not prove this theorem and it seems very magical. I feel like it is better to give it its real name, but probably it is important to know its informal name for exams.
+    }
+    
+}
+
+\end{document}
