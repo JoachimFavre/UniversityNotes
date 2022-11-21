@@ -9,15 +9,16 @@ import time
 import os
 import subprocess
 
-COURSES_NAME = ["Analyse-3", "Algorithms", "NumericalMethods", "ComputerNetworks", "ComputerArchitecture-1", "Electronique-1", "IntroToMachineLearning-BA3"]
+COURSES_NAME = ["Analyse-3", "Algorithms", "NumericalMethods", "ComputerNetworks"]
 
 
-def compile_tex(dir_path, file_path):
+def compile_tex(dir_path, file_name):
+    beginning_dir = os.getcwd()
+    os.chdir(".\\" + dir_path)
     # latexmk compiles multiple times and all, so that's great
-    compile_cmd = ("latexmk \"" + file_path + "\" " +
-                   "-output-directory=\"" + dir_path
-                   + "\" -pdf -halt-on-error -shell-escape -lualatex")
+    compile_cmd = (f"latexmk {file_name} -shell-escape -pdf -halt-on-error -lualatex -f")
     completed_process = subprocess.run(compile_cmd)
+    os.chdir(beginning_dir)
     return completed_process.returncode
 
 
@@ -30,12 +31,13 @@ def compile_each(course_name):
                    + lecture)
         print(message.format("COMPILING"), end='')
 
+        succeeded = -1
         lecture_path = course_name + "\\" + lecture
         for file in os.listdir(lecture_path):
             file_path = lecture_path + "\\" + file
-            if not os.path.isfile(file_path) or file.split(".")[-1] != "tex":
+            if not os.path.isfile(file_path) or file.split(".")[-1] != "tex" or not file.split(".")[-2][-2:].isnumeric():  # check if formatted with two digits
                 continue
-            succeeded = compile_tex(lecture_path, file_path)
+            succeeded = compile_tex(lecture_path, file)
 
         if succeeded == 0:
             print("\r" + message.format("SUCCEEDED") + " "*10)
