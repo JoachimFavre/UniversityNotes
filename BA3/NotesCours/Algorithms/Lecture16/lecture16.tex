@@ -29,6 +29,8 @@
 
     \subparag{Applications}{
         This has many applications. For instance: evacuating people out of a building. If we have given exits and corridors size, we can then know how many people we could evacuate in a given time.
+
+        Another application is finding the best way to ship goods on roads, or disrupting it in another country.
     }
 }
 
@@ -115,7 +117,7 @@
 \parag{Definition: Augmenting path}{
    Given a flow network $G$ and flow $f$, an \important{augmenting path} is a simple path from $s$ to $t$ in the residual network $G_f$. 
 
-   \important{Augmenting the flow} $f$ by this path means applying the minimum capacity over the path: add it to edges which were here at the start, and remove it to edges we added after through the residual capacity.
+   \important{Augmenting the flow} $f$ by this path means applying the minimum capacity over the path: add it to edges which were here at the start, and remove it to edges we added after through the residual capacity. This can easily be seen by looking at the definition of residual capacity (if $\left(u, v\right) \in E$, then we use the opposite of the flow, if $\left(v, u\right) \in E$, then we use the positive version of the flow).
 }
 
 
@@ -163,7 +165,7 @@ procedure FordFulkersonMethod(G, s, t):
 
 \parag{Definition: Net flow across a cut}{
     The \important{net flow across a cut} $\left(S, T\right)$ is: 
-    \[f\left(S, T\right) = \sum_{u \in S, v \in T}^{} f\left(u, v\right) - \sum_{u \in S, v \in T}^{} f\left(v, u\right)\]
+    \[f\left(S, T\right) = \sum_{\substack{u \in S \\ v \in T}}^{} f\left(u, v\right) - \sum_{\substack{u \in S \\ v \in T}}^{} f\left(v, u\right)\]
     
     This is basically the flow leaving $S$ minus the flow entering $S$.
 
@@ -171,15 +173,31 @@ procedure FordFulkersonMethod(G, s, t):
         For instance, on the graph hereinabove, it is: 
         \[f\left(S, T\right) = 12 + 11 - 4 = 19\]
     }
+}
 
-    \subparag{Observation}{
-        We notice that this value is equal to the flow on the network $\left|f\right|$, by conservation of flow. This means that the net flow across a cut does not depend on the cut.
+\parag{Property}{
+    Let $f$ be a flow. For any cut $S, T$: 
+    \[\left|f\right| = f\left(S, T\right)\]
+    
+    \subparag{Proof}{
+        We make a proof by structural induction on $S$.
+
+        \begin{itemize}[left=0pt]
+            \item If $S = \left\{s\right\}$, then the net flow is the flow out from $s$ minus the flow into $s$, which is exactly equal to the value of the flow.
+            \item Let's say $S = S' \cup \left\{w\right\}$, supposing $\left|f\right| = f\left(S', T'\right)$. We know that, then, $T = T' \setminus \left\{w\right\}$.
+
+            By conservation of flow, we know that everything coming in this new node $w$ is also coming out. Thus, removing it from $T'$ and putting in $S'$ does not change anything: in any case, it does not add or remove any flow to a cut, it only relays it: 
+            \[f\left(S, T\right) = f\left(S', T'\right) \underbrace{- \sum_{v \in V}^{} f\left(v, w\right) + \sum_{v \in V}^{} f\left(w, v\right)}_{= 0} = f\left(S', T'\right)\]
+        \end{itemize}
+
+        \qed
     }
 }
 
+
 \parag{Definition: Capacity of a cut}{
     The \important{capacity of a cut} $S, T$ is defined as: 
-    \[c\left(S, T\right) = \sum_{u \in S, v \in T}^{} c\left(u, v\right)\]
+    \[c\left(S, T\right) = \sum_{\substack{u \in S \\ v \in T}}^{} c\left(u, v\right)\]
     
     \subparag{Example}{
         For instance, on the graph hereinabove, the capacity of the cut is: 
