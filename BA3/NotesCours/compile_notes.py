@@ -309,6 +309,9 @@ def verify_content(content, file_name):
 
     if content.count("bmatrix") > 0:
         print("\tA bmatrix was left in {}.".format(file_name))
+        
+    if content.count("Fourrier") > 0:
+        print("\t'Fourrier' instead of Fourier in {}.".format(file_name))
 
 
 def modify_tex_documents(tmp_dir, tex_files, relations, is_english,
