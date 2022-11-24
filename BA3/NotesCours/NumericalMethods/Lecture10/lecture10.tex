@@ -200,11 +200,11 @@
     We want to find uniform maximum error in ``problematic areas''. The idea is to find a new polynomial using equioscillation theorem:
     \imagehere[0.5]{RemezAlgorithm.png}
 
-    The idea of the algorithm is to first make an approximation (for instance using Chebyshev nodes). Then, we search for the zeroes of our function through bisection search, and use those information to make a golden bisection search to find the minimum and maximum of our approximation. After that, we make a new approximation by forcing those points to be at distance $E$ of our function real value. We don't know $E$, so we can put it as an unknown: 
+    The idea of the algorithm is to first make an approximation (for instance using Chebyshev nodes). Then, we search for the zeroes of our the relative error through bisection search, and use those information to make a golden bisection search to find the minimum and maximum of our the relative error of our approximation. After that, we make a new approximation by forcing those points to be at distance $E$ of our function real value. We don't know $E$, so we can put it as an unknown: 
     \[\begin{pmatrix} 1 & x_0 & \cdots & 1 \\ 1 & x_1 & \cdots & -1 \\ \vdots & \vdots & \ddots & \vdots \\ 1 & x_n & \cdots & \left(-1\right)^n \end{pmatrix} \begin{pmatrix} a_0 \\ \vdots \\ a_n \\ E \end{pmatrix} = \begin{pmatrix} f\left(x_0\right) \\ \vdots \\ f\left(x_n\right) \\ f\left(x_{n+1}\right) \end{pmatrix} \]
-    where $f$ is the function we want to approximate, $x_0, \ldots, x_n$ were the minimums and maximums of our approximation, and $a_0, \ldots, a_n$
+    where $f$ is the function we want to approximate, $x_0, \ldots, x_n$ were the minimum and maximum of our approximation, and $a_0, \ldots, a_n$
     
-    Now, the new approximation we get does not necessarily have its maximum and minimum at the same distance from the true function value. However, every iteration gets better. In other words, as we run this algorithm, we will converge to the following kind of result:
+    Now, the new approximation we get does not necessarily make a relative error such that its maximum and minimum are at the same distance from the true function value. However, every iteration gets better. In other words, as we run this algorithm, we will converge to the following kind of result:
     \imagehere[0.9]{RemezAlgorithmConverged.png}
 
     The axis are not shown here but polynomials of this form have a much smaller error (and this is has a huge impact for challenging functions).
