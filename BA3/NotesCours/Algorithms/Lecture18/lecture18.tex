@@ -1,0 +1,233 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-11-25 at 13:40:29.
+
+\usepackage{../../style}
+
+\title{Algorithms}
+\author{Joachim Favre}
+\date{Vendredi 25 novembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{18}{2022-11-25}{Either Levi or Mikasa made this function}{
+\begin{itemize}[left=0pt]
+    \item There exists no other Ackerman in the world, and when they wrote the term ``Inverse Ackermann function'', they definitely made a mistake while writing the word ``Ackerman''.
+    \item Definition of the disjoint-set data structures.
+    \item Explanation of how to implement a disjoint-set data structure though linked lists.
+    \item Explanation of how to implement a disjoint-set data structure though a forest of trees.
+    \item Definition of spanning trees.
+    \item Explanation of the minimum spanning tree problem.
+\end{itemize}
+
+}
+
+\subsection{Disjoint sets}
+\parag{Disjoint-set data structures}{
+    The idea of \important{disjoint-set data structures} is to maintain a collection $\mathcal{S} = \left\{S_1, \ldots, S_k\right\}$ of disjoint sets, which can change over time. Each set is identified by a representative, which is some member of the set. It does not matter which element is the representative as long as, asking for the representative twice without modifying the set, we get the same answer both times.
+
+    We want our data structure to have the following operations:
+    \begin{itemize}
+        \item \texttt{Make-Set(x)} makes a new set $S_i = \left\{x\right\}$, and add $S_i$ to our collection $\mathcal{S}$.
+        \item \texttt{Union(x, y)} modifies $\mathcal{S}$ such that, if $x \in S_x$ and $y \in S_y$, then:
+        \[\mathcal{S} = \mathcal{S} \setminus S_x \setminus S_y \cup \left\{S_x \cup S_y\right\}\]
+
+        In other words, we destroy $S_x$ and $S_y$, but create a new set $S_x \cup S_y$, which representative is any member of $S_x \cup S_y$.
+        
+        \item \texttt{Find(x)} returns the representative of the set containing $x$.
+    \end{itemize}
+
+    \subparag{Remark}{
+        This datastructure can also be named union find.
+    }
+}
+
+\parag{Linked list representation}{
+    A way to represent this data structure is through a linked list. To do so, each set is an object looking like a single linked list. Each set object is represented by a pointer to the head of the list (which we will take as the representative) and a pointer to the tail of the list. Also, each element in the list has a pointer to the set object and to the next element.
+
+    \imagehere{LinkedListRepresentation.png}
+
+    \subparag{Make-Set}{
+        For the procedure \texttt{Make-Set(x)}, we can just create a singleton list containing $x$. This is easily done in time $\Theta\left(1\right)$.
+    }
+
+    \subparag{Find}{
+        For the procedure \texttt{Find(x)}, we can follow the pointer back to the list object, and then follow the head pointer to the representative. This is also done in time $\Theta\left(1\right)$.
+    }
+    
+    \subparag{Union}{
+        For the procedure \texttt{Union(x, y)}, everything gets more complicated. We notice that we can append a list to the end of another list. However, we will need to update all the elements of the list we appended to point to the right set object, which will take a lot of time if its size is big. So, to do so, we can just append the smallest list to the largest one (if their size are equal, we can make an arbitrary choice). This method is named \important{weighted-union heuristic}.
+
+        We notice that, on a single operation, both ideas have exactly the same bound. So, to understand why this is better, let's consider the following theorem.
+    }
+}
+
+\parag{Theorem}{
+    Let us consider a linked-list implementation of a disjoint-set datastructure
+
+    With the weighted-union heuristic, a sequence of (any) $m$ operations takes $O\left(m + n\log\left(n\right)\right)$ time, where $n$ is the number of elements our structure ends with after those operations. Without this heuristic, this bound gets to $O\left(m + n^2\right)$.
+
+    \subparag{Proof with}{
+        The inefficiency comes from constantly rewiring our elements when running the \texttt{Union} procedure. Let us count how many times an element $i$ may get rewire if, amongst those $m$ operations, there are $n$ \texttt{Union} calls.
+
+        When we merge a set $A$ containing $i$ and another set $B$, if we have to update wiring of $i$, then it means that the size of the list $A$ was smaller than the one of $B$, and thus the size of the total list of $A \cup B$ is at least twice the size of the one of $A$. However, we can double the sizes of a list at most $\log\left(n\right)$ times, meaning that the element $i$ has been rewired at most $\log\left(n\right)$ times. Since we have $n$ elements for which we could have made the exact same analysis, we get a complexity of $O\left(n\log\left(n\right)\right)$ for this scenario.
+
+        Note that we also need to consider the case where there are many more \texttt{Make-Set} and \texttt{Find} calls than \texttt{Union} ones. This is pretty trivial since they are both $\Theta\left(1\right)$, and thus this case is $\Theta\left(m\right)$.
+
+        Putting everything together, we get a worst case complexity of $O\left(m + n\log\left(n\right)\right) = O\left(\max\left\{m, n\log\left(n\right)\right\}\right)$.
+    }
+    
+    \subparag{Proof without}{
+        Let's say that we have $n$ elements each in a singleton set and that our $m$ operations consist in always appending the list of the first set to the second one, through unions. This way, the first set will get a size constantly growing. Thus, we will have to rewire $1 + 2 + \ldots + n-1$ elements, leading to a worst case complexity of $O\left(n^2\right)$ for this scenario.
+
+        Again, considering the case where there are mostly \texttt{Make-Set} and \texttt{Find} call, it leads to a complexity of $\Theta\left(m\right)$. Putting everything together, we indeed get a worst case of $O\left(m + n^2\right)$.
+
+        \qed
+    }
+
+    \subparag{Remark}{
+        This kind of analysis is amortised complexity analysis: we don't make our analysis on a single operation, since we may have a really bad case happening. However, on average, it is fine.
+    }
+    
+}
+
+\begin{filecontents*}[overwrite]{DisjointSetForestMakeSet.code}
+procedure MakeSet(x):
+    x.p = x
+    x.rank = 0
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{DisjointSetForestFindSet.code}
+procedure FindSet(x):
+    if x != x.p:
+        x.p = FindSet(x.p)  // update parent
+    return x.p
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{DisjointSetForestUnion.code}
+procedure Union(x, y):
+    Link(FindSet(x), FindSet(y))
+
+procedure Link(x, y):
+    if x.rank > y.rank:
+        y.p = x
+    else:
+        x.p = y
+        if x.rank == y.rank:
+            y.rank = y.rank + 1
+\end{filecontents*}
+
+
+\parag{Forest of trees}{
+    Now, let's consider instead a much better idea. We make a forest of trees (which are \textit{not} binary), where each tree represents one set, and the root is the representative. Also, since we are working with trees, naturally each node only points to its parent.
+
+    \imagehere[0.4]{DisjointSetForrestTree.png}
+   
+    \subparag{Make-Set}{
+        \texttt{Make-Set(x)} can be done easily by making a single-node tree.  
+
+        \importcode{DisjointSetForestMakeSet.code}{pseudo}
+
+        The rank will be defined and used in the \texttt{Union} procedure.
+    }
+
+    \subparag{Find}{
+        For \texttt{Find(x)}, we can just follow pointers to the root.
+        
+        However, we can also use the following great heuristic: \important{path compression}. The \texttt{Find(x)} procedure follows a path to the origin. Thus, we can make all those elements' parent be the representative directly (in order to make the following calls quicker).
+
+        \importcode{DisjointSetForestFindSet.code}{pseudo}
+    }
+    
+    \subparag{Union}{
+        For \texttt{Union(x, y)}, we can make the root of one of the trees the child of another.
+
+        Again, we can optimise this procedure with another great heuristic: \important{union by rank}. For the \texttt{Find(x)} procedure to be efficient, we need to keep the height of our trees as small as possible. So, the idea is to append the tree with smallest height to the other. However, using heights is not really efficient (since they change often and are thus hard to keep track of), so we use ranks instead, which give the same kind of insights.
+
+        \importcode{DisjointSetForestUnion.code}{pseudo}
+    }
+    
+    \subparag{Complexity}{
+        Let's also consider applying $m$ operations to a datastructure with $n$ elements.
+
+        We can show that, using both union by rank and path compression, we have a complexity of $O\left(m \alpha\left(n\right)\right)$, where $\alpha\left(n\right)$ is the inverse Ackermann function. This function is growing really slow: we can consider $\alpha\left(n\right) \leq 5$ for any $n$ of size making sense when compared to the size of the universe. In other words, our complexity is \textit{approximately} $O\left(m\right)$.
+
+        Note that this complexity is tight, we don't like to just add some weird functions.
+    }
+}
+
+\begin{filecontents*}[overwrite]{ConnectedComponents.code}
+procedure ConnectedComponents(G):
+    for each vertex v in G.V:
+        MakeSet(v)
+    for each edge (u, v) in G.E:
+        if FindSet(u) != FindSet(v):
+            Union(u, v)
+\end{filecontents*}
+
+\parag{Application: Connected components}{
+    For instance, we can construct a disjoint-set data structure for all the connected components of an undirected graph. Using the fact that, in an undirected graph, two elements are connected if and only if there is a path between them:
+    \importcode{ConnectedComponents.code}{pseudo}
+
+    \subparag{Example}{
+        For instance, in the following graph, we have two connected components:
+        \imagehere[0.7]{ExampleConnectedComponents.png}
+
+        This means that our algorithm will give us two disjoint sets in the end.
+    }
+
+    \subparag{Analysis}{
+        We notice that we have $V$ elements, and we have at most $V + 3E$ union or find operations.
+
+        Thus, using the best implementation we saw for disjoint set data structures, we get a complexity of $O\left(\left(V + E\right) \alpha\left(V\right)\right) \approx O\left(V + E\right)$. For the other implementation we would get $O\left(V \log\left(V\right) + E\right)$.
+    }
+}
+
+\subsection{Minimum spanning tree}
+\parag{Definition: Spanning tree}{
+    A spanning tree of a graph $G$ is a set $T$ of edges that is acyclic and spanning (it connects all vertices).
+
+    \subparag{Example}{
+        For instance, the following is a spanning tree:
+        \imagehere[0.6]{ExampleSpanningTree.png}
+
+        However, the following is not a spanning tree since it has no cycle but is not spanning (the node $e$ is never reached):
+        \imagehere[0.6]{NotSpanningTreeExample1.png}
+
+        Similarly, the following is not a spanning tree since it is spanning but has a cycle:
+        \imagehere[0.6]{NotSpanningTreeExample2.png}
+    }
+    
+    \subparag{Remark}{
+        The number of edges of a spanning tree is $E_{span} = V - 1$.
+    }
+}
+
+\parag{Minimum spanning tree (MST)}{
+    The goal is now that, given an undirected graph $G = \left(V, E\right)$ and weights $w\left(u, v\right)$ for each edge $\left(u, v\right) \in E$, we want to output a spanning tree of minimum total weight (which sum of weights is the smallest).
+
+    \subparag{Application: Communication networks}{
+        This problem can have many applications. For instance, let's say we have some cities between which we can make communication lines at different costs. Finding how to connect all the cities at the smallest cost possible is exactly an application of this problem.
+    }
+
+    \subparag{Application: Clustering}{
+        Another application is clustering. Let's consider the following graph, where edge weights equal to the distance of nodes:
+        \imagehere[0.5]{MinimumSpanningTreesClustering.png}
+
+        Then, to find $n$ clusters, we can make the minimum spanning tree (which will want to use the small edges), and remove the $n-1$ fattest edges.
+    }
+}
+
+\parag{Definition: Cut}{
+    Let $G = \left(E, V\right)$ be a graph. A \important{cut} $\left(S, V \setminus S\right)$ is a partition of the vertices into two non-empty disjoint sets $S$ and $V \setminus S$.
+}
+
+\parag{Definition: Crossing edge}{
+    Let $G = \left(E, V\right)$ be a graph, and $\left(S, V \setminus S\right)$ be a cut. A \important{crossing edge} is an edge connecting a vertex from $S$ to a vertex from $V \setminus S$.
+}
+
+\end{document}
