@@ -1,0 +1,150 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-11-25 at 15:09:57.
+
+\usepackage{../../style}
+
+\title{CompNet}
+\author{Joachim Favre}
+\date{Vendredi 25 novembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2022-11-25}{Now we no longer care about layers}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the concepts of forwarding and routing in a router.
+    \item Explanation of virtual circuits networks.
+    \item Explanation of datagram networks through the IP protocol.
+    \item Explanation of the IP address format, and IP subnets.
+    \item Explanation of the concept NATs.
+\end{itemize}
+
+}
+
+
+\section{Network layer}
+\subsection{Network-layer functions}
+\parag{Forwarding}{
+    When Alice sends a packet to Bob, it will arrive to a router, at the crossroads of multiple links. This router will look at a particular network-layer value, and, according to this value, it will need to know on what link to send it.
+
+    To do so, each router has a forwarding table, mapping this header value to the link.
+
+    This process, called \important{forwarding}, is, in other words, a local process that takes place at a router and determines the output link for each packet.
+}
+
+\parag{Routing}{
+    To fill in a forwarding table, we cannot do this manually (it would not scale). Thus, we need to make a \important{routing} algorithm. 
+
+    There are two ways. Either all our routers are connected to a logically centralised device (named a network controller) which runs a centralised routing algorithm, or each router runs its own routing algorithm.
+
+    \subparag{Difference with forwarding}{
+        Note that whereas forwarding determines output link for each packet, routing populates forwarding tables. 
+
+        Also, note that, in the industry, one term is sometimes used for the other. The main thing to grasp is that populating forwarding tables and determining the output links are two very different tasks.
+    }
+}
+
+
+\subsection{Network-layer types}
+\parag{Virtual-circuits networks}{
+    We saw in previous courses that networks layers can't guarantee in-order delivery, maximum delay, minimum throughput and security. Let's see why, by taking the example of minimum throughput.
+
+    Let's say Alice wants to send data to Bob at least at $\SI{100}{\mega\bit \per \second }$. Thus, she would need to reserve this data by making a setup request along the way. When a router receives this request, it will need to keep a state, storing an input link, an output link and a number, named virtual-circuit. This means that, if it receives a message from this given input link with this given virtual-circuit, it will send it to this given output link. All the routers along the way will have to do the same. Then, Bob will send a response, and routers will append another virtual-circuit to their state (because they may receive messages from the two directions).
+
+    However, a router may observe tens of millions of traffic. Keeping all these states is really difficult. Also, we could very easily attack this system, since we could reserve a lot of resources without using them. To fix this problem, we would need some authentification system, which is really not doable at this scale.
+
+    \subparag{Remark}{
+        So far, we have seen two kinds of connections: transport-layer connections (such as TCP) and network-layer connections. The main difference between the two is that, at transport layer, state only needs to be kept at end-systems, whereas at network layer, state needs to be at all the routers. This explains why the first is scalable, whereas the second one is not.
+    }
+}
+
+\parag{Datagram networks}{
+    Instead of virtual-ciruit networks, the internet uses datagram networks, using the IP protocol. This protocol does best-effort delivery, meaning that there is no performance guarantee. 
+}
+
+\parag{IP forwarding}{
+    The idea is that any router from the internet must know what to do with any IP address.
+
+    Note that we do not need to store each destination address-output link tuple (this was exactly the problem before), we can work with ranges. For instance, if there are only 16 IP address in the world, then the table may look like:
+    \begin{center}
+    \begin{tabular}{|c|c|}
+        \hline
+        Destination address range & Output link \\
+        \hline
+        00** & 1 \\
+        0011 & 2 \\
+        01** & 3 \\
+        0101 & 2 \\
+        1*** & 4  \\
+        \hline
+    \end{tabular}
+    \end{center}
+
+    Then, if it receives an IP $1001_{2}$, then it can send it to the output link $4$. This is like if we worked with ranges: if we receive a packet going to the destination IP address between $1000$ and $1111$ (included), then we send it to the output link number 4. Now, if we have two matchs, we pick the one that has the fewest number of stars (meaning the longest prefix). For instance, let's say that we have a packet with destination address 0101. We have two matches---0101 and 01**---and we use the first one since it is more precise.
+
+    Thus, everything works with prefixes. We notice that the more ``exceptions'' (0111 and 0101 above), the more elements we need in the forwarding table. We can handle exceptions, but not too many (if we want our system to scale). Thus, we need to make sure addresses embed location information.
+
+    \subparag{Remark}{
+        This datagram approach is much better than the virtual circuits one, because it makes forwarding tables smaller (no need for per-connection state), and routers simpler (no need for connection setup and teardown).
+    }
+}
+
+\parag{IP address format}{
+    An IP address is a 32-bit number. We group the numbers in sets of eight bits, and each of the fours set into decimal form. For instance, $223.1.1.0$ actually represents: 
+    \[110111111\,00000001\,00000001\,00000000\]
+    
+    An IP prefix is a range of IP addreses. For instance $223.1.1.0/12$ (which equivalent to many things, such as $223.1.1.5/12$, but bits that are masked out are usually written by zeroes) represents:
+    \[110111111\,0000\text{****}\,\text{********}\,\text{********}\]
+    where 12 represented thee number of digits in the prefix. This represents the range of IP addresses going from $110111111\,00000000\,00000000\,00000000$ to $110111111\,00001111\,11111111\,11111111$.
+}
+
+\parag{IP subnet}{
+    As mentioned earlier, for our system to works, IP addresses need to have some kind of geographical grouping. Thus, the internet is organised in \important{IP subnets} (subnetworks). Each IP subnet is assigned a prefix, and every endsystem from those subnets has an IP from the range. Those subnets are of course linked by routers.
+
+    \imagehere[0.6]{IPSubnets.png}
+
+    In other words, informally, a subnet is a contiguous network are that does not contain any routers. All its end-systems and incident routers have IP addresses from the same IP prefix. Any organisation obtains IP prefixes from its ISP or from a regulatory body. Then, network operators assign IP addresses to router interfaces manually; and to end-systems also manually or through DHCP.
+
+    We notice that there exist some minimum-subnets linking those subnets (for instance, the one with prefix $223.1.9.0/24$ above).
+    
+    Also, routers need to have IP addresses (notably because they have general purpose processors, and can thus be considers as some kind of servers. In fact, for our IP subnet property to work, they have multiple ones: one for each subnet they connect to.
+
+    \subparag{Remark}{
+        This notion is really important in the conception of the internet.
+    }
+}
+
+\parag{IPv6}{
+    What we have explained so far is IPv4. The problem is that we don't have enough IP addresses (32 bits allows for 4 billion of different addresses, and this is definitely not enough for all devices connected to the internet). This is what led to the invention of the new version of IP, IPv6. 
+
+    However, the problem is that the transition to IPv6 is slow. 
+}
+
+
+\parag{NAT}{
+    The idea is, instead of using IPv6 to fix the available number of IPs, to use \important{NATs} (Network Address Translation). The idea is to connect multiple devices to the same IP. To do so, they all have a different IP inside the private network (which is not a problem, since nothing goes wrong if people in another have the same IP address because the network is private). Then, when we send a message to the router from inside this ``private IP address space'', it erases the IP address and replaces it by its own outside IP. When people will want to communicate with people inside the network, they will only need to give the IP address of the router.
+
+    The thing is, then, when it receives a packet, it needs to know to whom it must send it. To do so, the router will keep state on the private IP address, origin TCP port, replace this origin TCP port by a new value encoding the private IP address, and it will store this new TCP port too. The main idea behind this was to realise what information the router can remove, and replace it with embedded information. This is definitely a big hack: we have a lot of TCP ports but not enough IP addresses, so we also use the first to store the second.
+
+    If we have a server inside the private subnet, we can establish the state in the router manually: saying that if the router receives a packet with the router's IP address (since it is the only visible IP address outside) but port 80, then it must transfer it to this server. If we have multiple servers, everything gets more complicated. One of the solutions is to use an alternate port $8080$ for the other server. 
+
+    This also works with UDP (we just have to work with UDP sockets), but sometimes NATs block it (we can do whatever we want since it is local).
+
+    \subparag{Observation}{
+        Note that this solution is not easy to scale. However, since we are at the end of the network, we assume that we will have at most thousands of connections, which make it doable.
+    }
+
+    \subparag{Remark}{
+        NATs is a big hack, it transgresses the rule of the layers. This is at the network layer, but goes modify something in another layer. This is a \important{layering violation}.
+
+        This is a big problem since, because NATs are so prevalent on the internet, we can no longer change TCP and UDP. So, if we want to make a new transport layer (such as Google's QUIC), then we need to make it on top of one of those two.
+    }
+}
+
+
+
+\end{document}

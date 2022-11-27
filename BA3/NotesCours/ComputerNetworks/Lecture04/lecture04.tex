@@ -18,6 +18,7 @@
 \begin{enumerate}[left=0pt]
     \item Explanation of the example of DNS: how and why it is used, how it was made scalable thanks to hierarchy, and the optimisations through caches. Also, explanation of the potential attacks that can be made on the DNS system.
     \item Explanation of why people say peer-to-peer architectures scale better than client-server architecture.
+    \item Explanation on how to retrieve content in BitTorrent.
 \end{enumerate}
 
 }
@@ -113,7 +114,7 @@
 
 \subsection{Example 3: BitTorrent}
 \parag{Scaling}{
-    We will only consider the architecture of BitTorrent. All architectures we have seen so far were client-servers, and this is the first peer-to-peer architecture. Let's see why people say that peer-to-peer architectures scale better than client-servers architecture.
+    All architectures we have seen so far were client-servers, and BitTorrent's architecutre is the first peer-to-peer one. Let's see why people say that peer-to-peer architectures scale better than client-servers architecture.
 
     We are doing this very approximately, considering many delays to be insignificant, because it depends on many things.
 
@@ -139,6 +140,43 @@
     }
 }
 
+\parag{Content}{
+    Let's now see how we retrieve content with this system.
+
+    We have a set of files stored in different peers. Also, there are metadata files, storing information about the data files (the file identities and, optionally, location information). For instance, in BitTorrent, the metadata file is a \texttt{.torrent} file.
+
+    To retrieve content, we first need to learn metadata about the file ID. Second, we need to find metadata about the file location. Third, we need to get the metadata file (either from a web server or a peer), and read the data file IDs. Fourth, we need to find the data file locations. Finally, we get the data files from our peers.
+}
+
+\parag{File location}{
+    To find the file location, we can use one of two concepts: a tracker (which is centralised), xor a DHT (decentralised).
+}
+
+\parag{Metadata file}{
+    To get the metadata file, there are multiple ways.
+
+    The first way is to get it on a web server. To do so, we download it from the web server, and we don't need to learn any ID.
+
+    The second way is to get it from a peer: we learn its ID from a web server, and we learn its location from a tracker or DHT. In Bittorent, a metadata file ID is named a magnet link.
+
+    \subparag{Legality}{
+         Storing a magnet link on a server is legal, whereas storing metadata is not (for pirated files). The magnet link is not content, so it is legal to store it on a webserver. Also, then, since with magnet links nothing is centralised, it makes it much harder for authorities to shut it down.
+    }
+    
+    \subparag{Personal remark}{
+        I love how we speak about BitTorrent by only considering the case where we download pirated content. This is probably one of its light uses, but it is really funny to speak about that kind of stuff in class.
+    }
+}
+
+\parag{DHT}{
+    Now that we have a magnet link, we need to find the address of the files. Let's say we want to do it thanks to a \important{DHT} (Distributed Hash Table).
+
+    Let's suppose that we have 16 files, and 4 peers. We don't know who stores what since there is no centralised unit. So, when someone joins the network, he or she gets responsibility of some files, meaning that they get to know someone who has these files. Also, people know at least two of their neighbours. 
+
+    \imagehere[0.6]{DHT.png}
+
+    Thus, when someone gets a request for a file, they look if they are responsible for that ID, and, if not, transmit to their neighbour who has the range id which is closet to the range. Real networks implement optimisations, by knowing more people and doing a $\log\left(n\right)$-search.
+}
 
 
 
