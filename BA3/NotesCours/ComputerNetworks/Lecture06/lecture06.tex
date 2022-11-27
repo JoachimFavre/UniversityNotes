@@ -26,8 +26,6 @@
 
 \subsection{Real life}
 
-\later{n duplicate acks: fast retransmit + Reno}
-
 \parag{Reliability elements}{
     In real life, UDP only provides checksum.
 
@@ -74,7 +72,7 @@
     }
 
     \subparag{Fast retransmission}{
-        TCP can guess that a segment was lost when there are three duplicated \texttt{Ack}s (so receiving 4 times the same acknowledgement in a row), which then allows the sender to do a fast retransmission.
+        In some variations of TCP algorithms (such as Reno TCP), TCP can guess that a segment was lost when there are three duplicated \texttt{Ack}s (so receiving 4 times the same acknowledgement in a row), which then allows the sender to do a fast retransmission.
 
         We don't go below this value since, else, we could be considering that some packets were lost, whereas they were just reordered or duplicated by the network.
 
@@ -115,11 +113,11 @@
     }
 
     \subparag{Reno}{
-        As mentioned earlier, TCP sometimes does fast retransmissions: we can guess that a packet was lost. In that kind of scenarios, we have not suffered massive packet drop, so it seems a bit agressive to start again from 0. This yields the following algorithm, named \important{Reno}.
+        As mentioned earlier, Reno TCP sometimes does fast retransmissions: we can guess that a packet was lost. In that kind of scenarios, we have not suffered massive packet drop, so it seems a bit agressive to start again from 0. This yields the following algorithm, named \important{Reno}.
 
-        This is exactly the same algorithm as Tahoe, except we add the following condition. When we receive 3 duplicate \texttt{Ack}s, we set \texttt{ssthreash} to half our current window, set the window to \texttt{ssthresh} and retransmit.
+        This is exactly the same algorithm as Tahoe, except we add the following condition. When we receive 3 duplicate \texttt{Ack}s (meaning 4 times the same \texttt{Ack}), we set \texttt{ssthreash} to half our current window, set the window to \texttt{ssthresh} and retransmit.
 
-        This is however a bit more complicated because of another thing. If we received 3 duplicate \texttt{Ack}s, then we can suspect that the three packets we sent after the one which was dropped were indeed received. This means that we want don't want to start considering those packets lost yet, so we inflate the window by 3 MSS. Then, we enter a fast recovery phase: every time we receive the same duplicate \texttt{Ack}, we increase the congestion window by 1 MSS. Finally, when we receive a new \texttt{Ack}, it means that the lost packet was received and thus we can exit fast recovery. When we do so, we set our window to the congestion threshold and thus start a linear increase.
+        This is however a bit more complicated because of another thing. If we received 3 duplicate \texttt{Ack}s, then we can suspect that the three packets we sent after the one which was dropped were indeed received. This means that we want don't want to start considering those packets lost yet, so we inflate the window by 3 MSS. Then, we enter a fast recovery phase: every time we receive the same duplicate \texttt{Ack}, we increase the congestion window by 1 MSS (thus allowing to send exactly one packet, since the window cannot slide because of our missing packet). Finally, when we receive a new \texttt{Ack}, it means that the lost packet was received and thus we can exit fast recovery. When we do so, we set our window to the congestion threshold and thus start a linear increase.
     }
     
     \subparag{Remark}{
