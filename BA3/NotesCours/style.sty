@@ -679,12 +679,24 @@
             else
                 smallestIndex = \#text + 1
                 for i, symbol in pairs(equalitySymbols) do
-                    void, endIndex = text:find(symbol)
-                    if endIndex then
-                        if endIndex < smallestIndex then smallestIndex = endIndex end
+                    %
+                    j = 1
+                    repeat  % need to verify that the character we skip is not in between brackets
+                        void, endIndex = text:find(symbol, j)
+                        if endIndex then
+                            head = text:sub(1, endIndex)
+                            void, openCount = head:gsub("{", "") --[[ }{ close brackets for LaTeX]]
+                            void, closeCount = head:gsub("}", "")
+                        end
+                        j = j + 1
+                        texio.write(j)
+                    until(not endIndex or openCount == closeCount or j > \#text)
+                    %
+                    if endIndex and openCount == closeCount and endIndex < smallestIndex then
+                        smallestIndex = endIndex
                     end
                 end
-                head = text:sub(1, smallestIndex)
+                  head = text:sub(1, smallestIndex)
                 tail = text:sub(smallestIndex + 1, \#text)
             end
             %
@@ -698,6 +710,8 @@
         tex.print("\string\\begin{equation*}\string\\begin{split}")
         tex.print(text)
         tex.print("\string\\end{split}\string\\end{equation*}")
+        % and log it also
+        texio.write(text)
     else
         tex.print("\string\\[" .. text .. "\string\\]")
     end
