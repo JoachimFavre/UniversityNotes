@@ -1,0 +1,185 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-11-28 at 14:21:39.
+
+\usepackage{../../style}
+
+\title{Algorithms}
+\author{Joachim Favre}
+\date{Lundi 28 novembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{19}{2022-11-28}{Finding the optimal MST}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of Prim's algorithm for finding a MST.
+    \item Explanation and proof of Kruskal's algorithm for finding a MST.
+    \item Definition of the shortest path problem.
+\end{itemize}
+
+}
+
+\parag{Theorem: Cut property}{
+    Let $S, V \setminus S$ be a cut. Also, let $T$ be a tree on $S$ which is part of a MST, and let $e$ be a crossing edge of minimum weight.
+
+    Then, there is a MST of $G$ containing both $e$ and $T$.
+
+    \imagehere[0.5]{CutProperty.png}
+    
+    \subparag{Proof}{
+        Let us consider the MST $T$ is part of.
+
+        If $e$ is already in it, then we are done.
+
+        Since there must be a crossing edge (to span both $S$ and $V \setminus S$), if $e$ is not part of the MST, then another crossing edge $f$ is part of the MST. However, we can just replace $f$ by $e$: since $w\left(e\right) \leq w\left(f\right)$ by hypothesis, we get that the new spanning tree has a weight less than or equal to the MST we considered. But, since the latter was minimal, it means that our new tree is also minimal and that $w\left(f\right) = w\left(e\right)$. Note that the new tree is indeed spanning since, if we consider the original MST to which we add $e$, then it has a cycle going through $e$ (since adding an edge to a MST always leads to a cycle), and thus through $f$ too. We can then remove any of the edges in this cycle ($f$ in particular) and still have our spanning property.
+
+        In both cases, we have been able to create a MST containing both $T$ and $e$, finishing our proof.
+
+        \qed
+    }
+}
+
+\begin{filecontents*}[overwrite]{PrimsAlgorithm.code}
+procedure Prim(G, w, r):
+    let Q be an empty min-priority queue
+    for each u in G.V:
+        u.key = infinity
+        u.pred = Nil
+    decreaseKey(Q, r, 0)  // set r.key to 0
+    while !Q.isEmpty():
+        u = extractMin(Q)
+        for each v in G.Adj[u]:
+            if v in Q and w(u, v) < v.key:
+                v.pred = u
+                decreaseKey(Q, v, w(u, v))
+\end{filecontents*}
+
+\parag{Prim's algorithm}{
+    The idea of Prim's algorithm for finding MSTs is to greedily construct the tree by always picking the crossing edge with smallest weight.
+
+    \subparag{Proof}{
+        Let's do this proof by structural induction on the number of nodes in $T$.
+
+        Our base case is trivial: starting from any point, a single element is always a subtree of a MST. For the inductive step, we can just see that starting with a subtree of a MST and adding the crossing edge with smallest weight yields another subtree of a MST by the cut property.
+
+        \qed
+    }
+    
+    \subparag{Implementation}{
+        We need to keep track of all the crossing edges at every iteration, and to be able to efficiently find the minimum crossing edge at every iteration. 
+
+        Checking out all outgoing edges is not really good since it leads to $O\left(E\right)$ comparisons at every iteration and thus a total running time of $O\left(EV\right)$.
+
+        Let's consider a better solution. For every node $w$, we keep a value $\text{dist}\left(w\right)$ that measure the ``distance'' (the minimum sum of weights to reach it) of $w$ from the current tree. When a new node $u$ is added to the tree, we check whether neighbours of $u$ have their distance to the tree decreased and, if so, we decrease it. To extract the minimum efficiently, we use a min-priority queue for the nodes and their distances. In pseudocode, it looks like:
+        \importcode{PrimsAlgorithm.code}{pseudo}
+    }
+    
+    \subparag{Analysis}{
+        Initialising $Q$ and the first for loop take $O\left(V \log\left(V\right)\right)$ time. Then, decreasing the key of $r$ takes $O\left(\log\left(V\right)\right)$. Finally, in the while loop, we make $V$ \texttt{extractMin} calls---leading to $O\left(V \log\left(V\right)\right)$---and at most $E$ \texttt{decreaseKey} calls---leading to $O\left(E\log\left(V\right)\right)$.
+
+        In total, this sums up to $O\left(E \log\left(V\right)\right)$.
+    }
+}
+
+\begin{filecontents*}[overwrite]{KruskalsAlgorithm.code}
+procedure Kruskal(G, w):
+    let result be an empty set of edges
+    for each vertex v in G.V:
+        makeSet(v)
+    sort the edges of G.E into nondecreasing order by weight w
+    for each (u, v) from G.E:
+        if findSet(u) != findSet(v):
+            result = SetUnion(result, (u, v))
+    return result
+\end{filecontents*}
+
+\parag{Kruskal's algorithm}{
+    Let's consider another way to solve this problem. The idea of Kruskal's algorithm for finding MSTs is to start from a forest $T$ with all nodes being in singleton trees. Then, at each step, we greedily add the cheapest edge that does not create a cycle.
+
+    The forest will be have merged into a single tree at the end of the procedure.
+
+    \subparag{Proof}{
+        Let's do a proof by structural induction on the number of edges in $T$ to show that $T$ is always a sub-forest of a MST.
+
+        The base case is trivial since, at the beginning, $T$ is a union of singleton vertices and thus, definitely, it is the sub-forest of any tree on the graph (and of any MST, in particular). 
+
+        For the inductive step, by hypothesis, the current $T$ is a sub-tree of a MST. Let $e$ be an edge of minimum weight that does not create a cycle, and let's suppose for contradiction that it is not part of a MST. We notice that adding this edge to one of the MST will create a cycle, since adding an edge to a MST will always create a cycle. However, since there was no cycle when adding this edge to the forest, it means that there were some edges that were added later (meaning that they have greater weight) that compose this cycle. We can just remove one of those edges, getting a tree with weight smaller than the MST and also spanning, which is our contradiction.
+
+        \qed
+    }
+    
+    \subparag{Implementation}{
+        To implement this algorithm, we need to be able to efficiently check whether the cheapest edge creates a cycle. However, this is the same as checking whether its endpoint belong to the same component, meaning that we can use disjoint sets data structure. 
+
+        We can thus implement our algorithm by making each singleton a set, and then, when an edge $\left(u, v\right)$ is added to $T$, we take the union of the two connected components $u$ and $v$.
+        \importcode{KruskalsAlgorithm.code}{pseudo}
+    }
+
+    \subparag{Analysis}{
+        Initialising \texttt{result} is in $O\left(1\right)$, the first for loop represents $V$ \texttt{makeSet} calls, sorting $E$ takes $O\left(E \log\left(E\right)\right)$ and the second for loop is $O\left(E\right)$ \texttt{findSets} and \texttt{unions}. We thus get a complexity of: 
+        \[\underbrace{O\left(\left(V + E\right) \alpha\left(V\right)\right)}_{= O\left(E \alpha\left(V\right)\right)} + O\left(E \log\left(E\right)\right) = O\left(E \log\left(E\right)\right) = O\left(E \log\left(V\right)\right)\]
+        since $E = O\left(V^2\right)$ for any graph.
+
+        We can note that, if the edges are already sorted, then we get a complexity of $O\left(E \alpha\left(V\right)\right)$, which is almost linear.
+    }
+}
+
+\subsection{Shortest paths}
+\parag{Definition: Shortest path problem}{
+    Let $G = \left(V, E\right)$ be a directed graph with edge-weights $w\left(u, v\right)$ for all $\left(u, v\right) \in E$.
+
+    We want to find the path from $a \in V$ to $b \in V$, $\left(v_0, v_1, \ldots, v_k\right)$, such that its weight $\sum_{i=1}^{k} w\left(v_{i-1}, v_i\right)$ is minimum.
+    
+    \subparag{Variants}{
+        Note that there are many variants of this problem.
+
+        In \important{single-source}, we want to find the shortest path from a given source vertex to every other vertex of the graph. In \important{single-destination}, we want to find the shortest path from every vertex in the graph to a given destination vertex. In \important{single-pair}, we want to find the shortest path from $u$ to $v$. In \important{all-pairs}, we want to find the shortest path from $u$ to $v$ for all pairs $u, v$ of vertices.
+
+        We can observe that single-destination can be solved by solving single-source and by reversing edge directions. For single-pair, no algorithm better than the one for single-source is known for now. Finally, for all-pairs, it can be solved using single-source on every vertex, even though better algorithms are known.
+    }
+    
+}
+
+\begin{filecontents*}[overwrite]{BellmanFordRelax.code}
+procedure Relax(u, v, w):
+    if u.d + w(u, v) < v.d:
+        v.d = u.d + w(u, v)
+        v.pred = u
+\end{filecontents*}
+
+\begin{filecontents*}[overwrite]{BellmanFord.code}
+procedure initSingleSource(G, s):
+    for each v in G.V:
+        v.d = infinity
+        v.pred = Nil
+    s.d = 0
+
+procedure BellmanFord(G, w, s):
+    for i = 1 to len(G.V) - 1:
+        for each edge (u, v) in G.E:
+            relax(u, v, w)
+\end{filecontents*}
+
+
+\parag{Negative-weight edges}{
+    Note that we will try to allow negative weights, as long there is no negative-weight cycle (a cycle which sum is negative) reachable from the source (since then we could just keep going around in the cycle and all nodes would have distance $-\infty$). In fact, one of our algorithm will allow to detect such negative-weight cycles.
+
+    \subparag{Remark}{
+        Dijkstra's algorithm, which we will present in the following course, only works with positive weights.
+    }
+
+    \subparag{Application}{
+        This can for instance be really interesting for exchange rates. Let's say we have some exchange rate for some given currencies. We are wondering if we can make an infinite amount of money by trading money to a currency, and then to another, and so on until, when we come back to the first currency, we have made more money.
+
+        To compute this, we need to compute the product of our rates. Since we will want to apply minimum-path and we will compute their sum, we can take a logarithm on every exchange rate. That way, minimising this sum of logarithms is equivalent to minimising the logarithm of the product of currencies, and thus minimising the product of currencies. Moreover, we want to find the way to make the maximum amount of money, so we can just consider the opposite of all our logarithms. To sum up, we have $w\left(u, v\right) = -\log\left(r\left(u, v\right)\right)$.
+
+        Now, we only need to find negative cycles: they allow to make an infinite amount of money.
+    }
+}
+
+\end{document}
+
