@@ -1,0 +1,122 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-12-02 at 15:17:01.
+
+\usepackage{../../style}
+
+\title{Computer networks}
+\author{Joachim Favre}
+\date{Vendredi 02 décembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2022-12-02}{Lying and giving poison}{
+\begin{itemize}[left=0pt]
+    \item Explanation of link-state routing protocols through the example of Dijkstra's algorithm.
+    \item Explanation of distance-vector routing protocols through the example of Bellman-Ford's algorithm.
+    \item Explanation of poison reverse in order to fix count-to-infinity problems in Bellman-Ford's loops.
+    \item Explanation of autonomous systems and the problems they solve.
+\end{itemize}
+
+}
+
+\subsection{IP Routing}
+\parag{IP routing}{
+    Let's now consider how routers do to populate their forwarding table and know what to do with any destination IP address.
+
+    First, we can see that a router connecting a subnet to the outside (named a first-hop router) can easily know what to do with packages going to their subnet. But the rest is more complicated.
+
+    Routers need to learn the best way to reach other routers. To do so, we first assign link costs to each routers (which can be represented by propagation delay, usage fee for the ISP, performance of the end-routers, and so on). In exercises, such costs are usually the same for both directions, even though in real life it is not always the case. The best path for a router is the path with the smallest router. Then, the problem is an algorithmic one: find the minimum path in a weighted graph. This will give us tables for each routers, representing what is the next router to take for any given destination, which we can convert to forwarding tables.
+
+    \imagehere[0.6]{WeightedGraphIPRouting.png}
+
+    There have been designs where the link costs change dynamically with the real life traffic. However, most realistic network protocols do not implement that because it can be unstable.
+}
+
+\parag{Link-state routing}{
+    Let's consider a first class of algorithms, named \important{link-state routing algorithms}. The idea is that every router receives as input the network graph and link costs, and runs an algorithm to find the least-cost path to each destination router. 
+
+    We can for instance use \important{Dijkstra's algorithm}. This algorithm first considers all the edges going out of the source, setting the distance to all nodes it can reach, and putting all of their distance in a priority queue. Then, using this priority queue, it considers the node it can reach with smallest cost, knowing that it has found the quickest path to reach it (so it can mark it as visited), and continues from this node: it sees if it can reach new nodes or improve the path to any node. 
+
+    This works as long as all routers run the same algorithm with the same input.
+
+    \subparag{Centralisation}{
+        These kind of algorithms is sometimes called centralised, because it runs on a single entity.
+
+        Note that there are two types of centralised algorithms: in the first, each router runs the algorithm with the same input, and in the second a separate computer (a network controller) runs this algorithm for all routers and then send them the data.
+    }
+
+    \subparag{Remark}{
+        This class of algorithms require a big network flooding at the beginning, since routers need to exchange a lot of information in order to get a picture of the network and of the costs.
+    }
+    
+}
+
+\parag{Distance-vector routing}{
+    Let's now consider another class of algorithms protocol, named \important{distance-vector routing algorithms}. The idea is that routers iteratively exchange information with its neighbours and recomputes its paths based on what it gets.
+
+    We can for instance use \important{Bellman-Ford algorithm}. The idea is that each router stores a table: a column for every other router in the networks, and a line for each of its neighbours and itself. Each square of this table holds the distance from its neighbours or itself, to the other router of the network. At every iteration, routers receive the tables from their neighbours and see, from those informations and their neighbouring link cost, they can improve their own table.
+
+    For instance, let's say that the link between neighbouring routers $x$ and $y$ has a cost $3$ and $x$ only knows of a path from itself to $z$ with cost $100$. Now, at an iteration, router $x$ receives from $y$ that there is a quick path from $y$ to $z$ with cost $5$. However, since this is better than what $x$ had before, $x$ can instead consider the path to $z$ going through $y$: set $y$ as next hop for destination $z$, and set the path to cost $3 + 5 = 8$ (which is indeed smaller than 100, the weight of $x$'s previous path to $z$).
+
+    This algorithms ends when there is no more improvement possible. In fact, it needs to be run $n$ times, where $n$ is the diameter of the graph (the maximum number of edges between any two nodes).
+}
+
+\parag{Remark}{
+    In the end, our two approaches have the same output, they solve the same problem. However, in the first one, there is first a lot of information which needs to be transmitted, and then they all do the same computations. In the second one, this is more iterative, and they discuss between them.
+
+    The first method has the advantage of being faster. The second method has the advantages of keeping less state (each router does not have to store the whole graph, the table they store is smaller), and of consuming bandwidth (since there is no big exchange of data at the beginning).
+}
+
+
+\parag{Observation}{
+    Through both routing protocol (Dijkstra or Bellman-Ford), each router also learns the IP prefixes of every router. This means that they can populate their forwarding table by replacing the destination router by destination IP prefixes.
+}
+
+\parag{Loops}{
+    A big problem with distance-vector routing algorithms is that, since routers don't have the whole picture of the graph.
+
+    Let's say we have the following architecture:
+    \imagehere[0.4]{LoopIPRouting.png}
+
+    Now, let say that the link between $x$ and $y$ breaks. They both know it, but $z$ does not since it may be very far away. Since $y$ knows its link to $x$ no longer exists, if $y$ receives a packet it needs to send to $x$, it will send it to $z$. However, then, $z$ will send it back to $y$ because it still thinks the best path is on this path. This causes a \important{routing loop}. Note that this bug happened once in the first deployment of this protocol.
+
+    \subparag{Count-to-infinity}{
+        The first thing important to realise is that those loops are not infinite: if we don't look at those loops, they will be fixed by themselves. 
+
+        Indeed, let's continue considering the example above. When the link between $x$ and $y$ breaks, $y$ will see that $z$ can reach $x$ in distance 3 (without knowing that $z$'s path goes through $y$), and will thus set its own distance to $x$ to $4$. When $z$ sees that $y$ increased its distance by 1, it will also increase its own distance. This will continue until $y$ will consider that its distance to $x$ of $8$ and then, finally, $z$ will consider that the best next hop is $x$ with distance 7. 
+
+        This is named \important{count-to-infinity}, because routers start counting to big numbers (although those numbers are finite). This is not an infinite loop, but still it is a big problem if it happens, since it can take very long to resolve.
+    }
+    
+    \subparag{Poisoned reverse}{
+        Let's now see how to better solve loops than leaving them just be and getting solved on their own.
+
+        We first need to do some preparation. Let's say that, when running Bellman-Ford, a router $z$ decided to choose another router $y$ for its next hop for destination router $x$. Then, when $z$ sends its table to $y$, it lies claiming that its distance to $x$ is $\infty$. This is such that $y$ will never consider $z$ as a next hop for destination $x$ (which would create a loop). This infinity is named \important{poisoned reverse}.
+
+        Let's now consider again our example (the names right before were chosen to work with this example). When the link between $x$ and $y$ is destroyed, $y$ will consider its other possibilities for a path to $x$. Since it only has a link to $z$ but it thinks that $z$ has an infinite distance to $x$ (because of the poisoned reverse), it will set its distance to $x$ to infinity. Then, when $z$ will receive $y$'s table, it will consider that the shortest path to $x$ is to send packets directly onto the link with cost 7, and consider that the distance from $y$ to $x$ is infinity. After that, when $y$ receives $z$'s table, it sees that $z$ has a path to $x$ with cost $7$, setting its path to go through $z$ with cost $8$, but now lying when sending its table to $z$. The poisoned reverse moved from $y$ to $z$.
+
+        So, we can see that with the preparation we had, and with our poisoned reverse trick, loops also resolve by themselves but much quicker.
+    }
+}
+
+\parag{Autonomous systems}{
+    There are two main challenges left with internet routing: scales and administrative autonomy. Scale is a big problem since we have millions of routers and thus link-state would cause too much flooding and distance-vector would not converge. The administrative autonomy is also a problem, since each ISP might not want to use the same algorithm as everyone, or even reveal their link costs.
+
+    To solve those two challenges, we use \important{autonomous systems} (AS). Each runs its own routing algorithm (meaning Disjkstra or Bellman-Ford; but typically Dijsktra), which we refer to intra-AS routing algorithms.
+
+    \imagehere[0.6]{AutonomousSystems.png}
+
+    So, each router has one entry for each subnets inside the ASes, and one for every grouped subnets (using prefixes) contained in other ASes.
+
+    Every border router need to talk to each other, and thus they have to use the same protocol (meaning that they use two protocols: one for the outside, and one for the inside): \important{BGP} (Border Gateway Protocol), which is a variant of Bellman-Ford. This is the one and single inter-AS routing protocol (not to be mistaken with intra-AS routing protocols which can differ).
+
+    We notice that this hierarchy we introduced also allowed to solve the scaling problem. Each router needs forwarding entries per local IP subnet and foreign IP prefixes, meaning that much less state is store. 
+}
+
+
+\end{document}
