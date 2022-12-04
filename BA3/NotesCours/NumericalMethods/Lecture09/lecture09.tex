@@ -146,20 +146,20 @@
     \[E = \text{linear}\left(h\left(\text{linear}\left(\bvec{x}, W^{\left(1\right)}, \bvec{b}\right)\right)\right)\]
     where $\text{linear}\left(A, \bvec{x}, \bvec{b}\right) = A \bvec{x} + \bvec{b}$. We can compute the Jacobian matrices with respect to any variable, typically by differentiating through reverse-mode automatic differentiation:
     \imagehere[0.8]{BackPropagationJacobian.png}
-    where $J_{x}^f$ means the Jacobian of the function $f$ with respect of the parameter $x$.
+    where $J_{x}^f$ means the Jacobian of the function $f$ with respect of the parameter $x$. Note that to compute the Jacobian with respect of a matrix $J_W$, we first consider the elements of the matrix as a column vector.
 
     Forward mode automatic differentiation basically computes the matrix product from left to right, whereas reverse mode computes it from right to left. We can observe that such Jacobian matrices are really sparse matrices, which are not efficient to represent through bi-dimensional arrays, so we use other ways:
     \imagehere[0.8]{BackPropagationCompact.png}
     where $*$ means an element-wise matrix product.
 
-    Note that this special case of automatic differentiation applied to neural networks is called backpropagation.
+    Note that this special case of automatic differentiation applied to neural networks is called backpropagation. The idea is that we have big matrix product for the Jacobian matrices which we need to compute for the different weight matrices, so we iteratively compute it by beginning from the end and reuse everything we can reuse.
 }
 
 \parag{Convolution NNs}{
     A convolution is a filter we apply with a matrix (called kernel). For instance, here is a picture and three different convolutions we did (with different kernels) in order to detect edges:
     \imagehere[0.7]{ConvolutionDetectEdgesExample.png}
 
-    In a convolutional neural networks, we do multiple convultions in between multiple layers, and we also allow the neural network to also optimise those convolutions.
+    In a convolutional neural networks, we do multiple convultions in between multiple layers, and we allow the neural network to also optimise those convolutions.
 }
 
 \parag{Recurrent neural networks}{
