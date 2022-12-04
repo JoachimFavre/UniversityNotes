@@ -144,27 +144,6 @@ procedure Kruskal(G, w):
     
 }
 
-\begin{filecontents*}[overwrite]{BellmanFordRelax.code}
-procedure Relax(u, v, w):
-    if u.d + w(u, v) < v.d:
-        v.d = u.d + w(u, v)
-        v.pred = u
-\end{filecontents*}
-
-\begin{filecontents*}[overwrite]{BellmanFord.code}
-procedure initSingleSource(G, s):
-    for each v in G.V:
-        v.d = infinity
-        v.pred = Nil
-    s.d = 0
-
-procedure BellmanFord(G, w, s):
-    for i = 1 to len(G.V) - 1:
-        for each edge (u, v) in G.E:
-            relax(u, v, w)
-\end{filecontents*}
-
-
 \parag{Negative-weight edges}{
     Note that we will try to allow negative weights, as long there is no negative-weight cycle (a cycle which sum is negative) reachable from the source (since then we could just keep going around in the cycle and all nodes would have distance $-\infty$). In fact, one of our algorithm will allow to detect such negative-weight cycles.
 
