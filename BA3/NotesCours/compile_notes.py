@@ -295,6 +295,40 @@ def correct_spaces(content, is_english):
     return result
 
 
+def extract_all(content, command):
+    # command in the form \hat; will extract the content of all \hat{...}
+    result = []
+    for element in content.split(command)[1:]:
+        element = element.strip()
+        if element[0] != "{":
+            continue
+        
+        bracket_count = 1
+        current = ""
+        for char in element[1:]:
+            if char == "{":
+                bracket_count += 1
+            elif char == "}":
+                bracket_count -= 1
+                if bracket_count == 0:
+                    break
+            current += char
+        
+        if bracket_count != 0:
+            # Can happen with recursive stuf such as \hat{\hat{...}}, but
+            # who does that? O_o
+            print("\tProblem in extract_all function.")
+        
+        result.append(current)
+        
+    return result
+
+def one_contains(list_, element):
+    for node in list_:
+        if element in node:
+            return True
+    return False
+
 def verify_content(content, file_name):
     n_opening_parenthesis = (content.count("(") - content.count("\\left(")
                              - content.count("\\right("))
@@ -312,6 +346,18 @@ def verify_content(content, file_name):
         
     if content.count("Fourrier") > 0:
         print("\t'Fourrier' instead of Fourier in {}.".format(file_name))
+    
+    if one_contains(extract_all(content, r"\bvec"), "_"):
+        print(f"\tWrong style bvec in {file_name}")
+    
+    if one_contains(extract_all(content, r"\hat"), "_"):
+        print(f"\tWrong style hat in {file_name}")
+    
+    if one_contains(extract_all(content, r"\bhat"), "_"):
+        print(f"\tWrong style bhat in {file_name}")
+    
+    if one_contains(extract_all(content, r"\widetilde"), "_"):
+        print(f"\tWrong style widetilde in {file_name}")
 
 
 def modify_tex_documents(tmp_dir, tex_files, relations, is_english,
