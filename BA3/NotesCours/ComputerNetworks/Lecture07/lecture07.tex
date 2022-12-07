@@ -53,7 +53,12 @@
 \parag{Virtual-circuits networks}{
     We saw in previous courses that networks layers can't guarantee in-order delivery, maximum delay, minimum throughput and security. Let's see why, by taking the example of minimum throughput.
 
-    Let's say Alice wants to send data to Bob at least at $\SI{100}{\mega\bit \per \second }$. Thus, she would need to reserve this data by making a setup request along the way. When a router receives this request, it will need to keep a state, storing an input link, an output link and a number, named virtual-circuit. This means that, if it receives a message from this given input link with this given virtual-circuit, it will send it to this given output link. All the routers along the way will have to do the same. Then, Bob will send a response, and routers will append another virtual-circuit to their state (because they may receive messages from the two directions).
+    Let's say Alice wants to send data to Bob at least at $\SI{100}{\mega\bit \per \second }$. Thus, she would need to reserve this data by making a setup request along the way. When a router receives this request, it will need assign to it a value, named virtual circuit. They will thus need to keep a state, storing an input link, an output link and a number, named virtual-circuit. This means that, if it receives a message from this given input link with this given virtual-circuit, it will send it to this given output link. All the routers along the way will have to do the same.
+
+    Then, Bob will send a response, and, that way, routers will know the virtual-circuit of the router after them, and will append this to their state. This is important since, when a router receives a packet, it must modify the virtual-circuit to another value, depending on the router coming after it. Also, the sender must put the correct virtual-circuit when sending their packet.
+
+    For instance, on the following network, if Alice wants to send a packet to Bob, she will need to use the virtual-circuit (VC) 1. Then, the first router will receive this packet, modify its VC to 5 and send it on link 2. After that, the second router will receive this packet, modify its VC to 3, and send it on link 1. Bob will finally receive the packet, with VC 3.
+    \imagehere[0.5]{ExampleVirtualCircuit.png}
 
     However, a router may observe tens of millions of traffic. Keeping all these states is really difficult. Also, we could very easily attack this system, since we could reserve a lot of resources without using them. To fix this problem, we would need some authentification system, which is really not doable at this scale.
 
