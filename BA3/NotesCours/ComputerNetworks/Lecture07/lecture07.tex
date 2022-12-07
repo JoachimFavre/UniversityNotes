@@ -99,7 +99,7 @@
     
     An IP prefix is a range of IP addreses. For instance $223.1.1.0/12$ (which equivalent to many things, such as $223.1.1.5/12$, but bits that are masked out are usually written by zeroes) represents:
     \[110111111\,0000\text{****}\,\text{********}\,\text{********}\]
-    where 12 represented thee number of digits in the prefix. This represents the range of IP addresses going from $110111111\,00000000\,00000000\,00000000$ to $110111111\,00001111\,11111111\,11111111$.
+    where 12 represented the number of digits in the prefix. This represents the range of IP addresses going from $110111111\,00000000\,00000000\,00000000$ to $110111111\,00001111\,11111111\,11111111$.
 }
 
 \parag{IP subnet}{
@@ -107,7 +107,7 @@
 
     \imagehere[0.6]{IPSubnets.png}
 
-    In other words, informally, a subnet is a contiguous network are that does not contain any routers. All its end-systems and incident routers have IP addresses from the same IP prefix. Any organisation obtains IP prefixes from its ISP or from a regulatory body. Then, network operators assign IP addresses to router interfaces manually; and to end-systems also manually or through DHCP.
+    In other words, informally, a subnet is a contiguous network area that does not contain any routers. All its end-systems and incident routers have IP addresses from the same IP prefix. Any organisation obtains IP prefixes from its ISP or from a regulatory body. Then, network operators assign IP addresses to router interfaces manually; and to end-systems also manually or through DHCP.
 
     We notice that there exist some minimum-subnets linking those subnets (for instance, the one with prefix $223.1.9.0/24$ above).
     
@@ -128,7 +128,7 @@
 \parag{NAT}{
     The idea is, instead of using IPv6 to fix the available number of IPs, to use \important{NATs} (Network Address Translation). The idea is to connect multiple devices to the same IP. To do so, they all have a different IP inside the private network (which is not a problem, since nothing goes wrong if people in another have the same IP address because the network is private). Then, when we send a message to the router from inside this ``private IP address space'', it erases the IP address and replaces it by its own outside IP. When people will want to communicate with people inside the network, they will only need to give the IP address of the router.
 
-    The thing is, then, when it receives a packet, it needs to know to whom it must send it. To do so, the router will keep state on the private IP address, origin TCP port, replace this origin TCP port by a new value encoding the private IP address, and it will store this new TCP port too. The main idea behind this was to realise what information the router can remove, and replace it with embedded information. This is definitely a big hack: we have a lot of TCP ports but not enough IP addresses, so we also use the first to store the second.
+    The thing is, then, when it receives a packet, it needs to know to whom it must send it. To do so, the router will keep state of the private IP address and origin TCP port, replace this origin TCP port by a new value encoding the private IP address, and it will store this new TCP port too. The main idea behind this was to realise what information the router can remove, and replace it with embedded information. This is definitely a big hack: we have a lot of TCP ports but not enough IP addresses, so we also use the first to store the second.
 
     If we have a server inside the private subnet, we can establish the state in the router manually: saying that if the router receives a packet with the router's IP address (since it is the only visible IP address outside) but port 80, then it must transfer it to this server. If we have multiple servers, everything gets more complicated. One of the solutions is to use an alternate port $8080$ for the other server. 
 

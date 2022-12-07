@@ -30,7 +30,7 @@
 
     First, we can see that a router connecting a subnet to the outside (named a first-hop router) can easily know what to do with packages going to their subnet. But the rest is more complicated.
 
-    Routers need to learn the best way to reach other routers. To do so, we first assign link costs to each routers (which can be represented by propagation delay, usage fee for the ISP, performance of the end-routers, and so on). In exercises, such costs are usually the same for both directions, even though in real life it is not always the case. The best path for a router is the path with the smallest router. Then, the problem is an algorithmic one: find the minimum path in a weighted graph. This will give us tables for each routers, representing what is the next router to take for any given destination, which we can convert to forwarding tables.
+    Routers need to learn the best way to reach other routers. To do so, we first assign link costs to each routers (which can be represented by propagation delay, usage fee for the ISP, performance of the end-routers, and so on). In exercises, such costs are usually the same for both directions, even though in real life it is not always the case. The best path for a router is the path with the smallest cost. Then, the problem is an algorithmic one: find the minimum path in a weighted graph. This will give us tables for each routers, representing what is the next router to take for any given destination, which we can convert to forwarding tables.
 
     \imagehere[0.6]{WeightedGraphIPRouting.png}
 
@@ -57,9 +57,9 @@
 }
 
 \parag{Distance-vector routing}{
-    Let's now consider another class of algorithms protocol, named \important{distance-vector routing algorithms}. The idea is that routers iteratively exchange information with its neighbours and recomputes its paths based on what it gets.
+    Let's now consider another class of algorithms protocol, named \important{distance-vector routing algorithms}. The idea is that routers iteratively exchange information with their neighbours and recompute their paths based on what they get.
 
-    We can for instance use \important{Bellman-Ford algorithm}. The idea is that each router stores a table: a column for every other router in the networks, and a line for each of its neighbours and itself. Each square of this table holds the distance from its neighbours or itself, to the other router of the network. At every iteration, routers receive the tables from their neighbours and see, from those informations and their neighbouring link cost, they can improve their own table.
+    We can for instance use \important{Bellman-Ford algorithm}. The idea is that each router stores a table: a column for every other router in the networks, and a line for each of its neighbours and itself. Each square of this table holds the distance from its neighbours or itself, to the other router of the network. At every iteration, routers receive the tables from their neighbours and see, from those informations and their neighbouring link cost, if they can improve their own table.
 
     For instance, let's say that the link between neighbouring routers $x$ and $y$ has a cost $3$ and $x$ only knows of a path from itself to $z$ with cost $100$. Now, at an iteration, router $x$ receives from $y$ that there is a quick path from $y$ to $z$ with cost $5$. However, since this is better than what $x$ had before, $x$ can instead consider the path to $z$ going through $y$: set $y$ as next hop for destination $z$, and set the path to cost $3 + 5 = 8$ (which is indeed smaller than 100, the weight of $x$'s previous path to $z$).
 
@@ -69,7 +69,7 @@
 \parag{Remark}{
     In the end, our two approaches have the same output, they solve the same problem. However, in the first one, there is first a lot of information which needs to be transmitted, and then they all do the same computations. In the second one, this is more iterative, and they discuss between them.
 
-    The first method has the advantage of being faster. The second method has the advantages of keeping less state (each router does not have to store the whole graph, the table they store is smaller), and of consuming bandwidth (since there is no big exchange of data at the beginning).
+    The first method has the advantage of being faster. The second method has the advantages of keeping less state (each router does not have to store the whole graph, the table they store is smaller), and of consuming less bandwidth (since there is no big exchange of data at the beginning).
 }
 
 
@@ -78,7 +78,7 @@
 }
 
 \parag{Loops}{
-    A big problem with distance-vector routing algorithms is that, since routers don't have the whole picture of the graph.
+    A big problem with distance-vector routing algorithms is that, since routers don't have the whole picture of the graph, loops can happen.
 
     Let's say we have the following architecture:
     \imagehere[0.4]{LoopIPRouting.png}
@@ -115,8 +115,6 @@
 
     Every border router need to talk to each other, and thus they have to use the same protocol (meaning that they use two protocols: one for the outside, and one for the inside): \important{BGP} (Border Gateway Protocol), which is a variant of Bellman-Ford. This is the one and single inter-AS routing protocol (not to be mistaken with intra-AS routing protocols which can differ).
 
-    We notice that this hierarchy we introduced also allowed to solve the scaling problem. Each router needs forwarding entries per local IP subnet and foreign IP prefixes, meaning that much less state is store. 
+    We notice that this hierarchy we introduced also allowed to solve the scaling problem. Each router needs forwarding entries per local IP subnet and foreign IP prefixes, meaning that much less state is stored. 
 }
-
-
 \end{document}
