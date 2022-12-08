@@ -1,0 +1,139 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-12-06 at 13:36:20.
+
+\usepackage{../../style}
+
+\title{NumMet}
+\author{Joachim Favre}
+\date{Mardi 06 décembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2022-12-06}{Integrals}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the quadrature problem.
+    \item Explanation of the midpoint rule, the trapezoid rule, and Simpson's rule.
+    \item Explanation of adaptive quadrature.
+    \item Explanation of Newton-Cotes method.
+\end{itemize}
+
+}
+
+\section{Integration}
+\parag{Usefulness}{
+    Definite integrals are really important since they allow to compute areas and volume, but also because they allow to sum a lot of very small things.
+
+    For instance, they show up everywhere in physics when we want to use a local formula to get a result over a distance or a time.
+
+    Also, if we want to compute a realistic image, then we need to compute integrals. To compute light getting out of a dot, we need to sum all the light coming from the rest of the scene multiplied by a function saying what material is represented.
+
+    Finally, integrals are really useful in statistics.
+}
+
+\parag{Integration}{
+    It is always possible to compute a derivative analytically, but this is not the case for antiderivatives (which we need to compute definite integrals). There are really few rules, and they usually do not work for real life scenario.
+
+    We are thus forced to use numerical approaches.
+}
+
+\parag{Quadrature problem}{
+    Formally, we are given functions evaluations $f\left(x_1\right), \ldots, f\left(x_n\right)$ at nodes $x_1, \ldots, x_n \in \left[a, b\right]$, and we want to compute an approximation of: 
+    \[\int_{a}^{b} f\left(x\right)dx\]
+    
+    Just as for interpolation, the nodes may be arbitrary or fixed, and they may be regularly spaced or irregular.
+}
+
+\parag{Midpoint rule}{
+    We want to compute the area of a function over an interval. To do so, we can simply approximate it by a constant. Any interval can then later be split into subintervals, where we locally consider the function constant. We can choose the evaluations how we want, so let them be taken at the midpoint of our interval:
+    \[\int_{a}^{b} f\left(x\right)dx \approx \left(b-a\right)f\left(\frac{a+b}{2}\right)\]
+    
+    Now, we can make a composite quadrature, by splitting our interval into $n$ subintervals and applying our midpoint rule on every one of them, giving: 
+    \[\int_{a}^{b} f\left(x\right)dx \approx \sum_{i=1}^{k} f\left(\frac{x_i + x_{i+1}}{2}\right)\Delta x\]
+    
+    \imagehere[0.6]{MidpointRule.png}
+}
+
+\parag{Trapezoid rule}{
+    Instead of approximating our function by a constant, we can approximate it with linear functions (which draw trapezoids):
+    \[\int_{a}^{b} f\left(x\right)dx \approx \left(b-a\right)\frac{f\left(a\right)+ f\left(b\right)}{2}\]
+
+    Again, we can make a composite rule:
+    \autoeq{\unexpanded{\int_{a}^{b} f\left(x\right)dx \approx \sum_{i=1}^{k} \left(\frac{f\left(x_i\right) + f\left(x_{i+1}\right)}{2}\right) \Delta x = \Delta x \left(\frac{1}{2}f\left(a\right) + f\left(x_1\right) + \ldots + f\left(x_{k-1}\right) + \frac{1}{2} f\left(b\right)\right)}}
+
+    \imagehere[0.6]{TrapezoidRule.png}
+}
+
+\parag{Simpson's rule}{
+    Since we can make a linear fit, we can make a quadratic aproximation (leading to a method named Simpson's rule): 
+    \[\int_{a}^{b} f\left(x\right)dx \approx \frac{b-a}{6}\left(f\left(a\right) + 4f\left(\frac{a+b}{2}\right) + f\left(b\right)\right)\]
+    
+    And in composite form:
+    \autoeq{\unexpanded{\int_{a}^{b} f\left(x\right)dx \approx \frac{\Delta}{3} \left(f\left(a\right) + 2 \sum_{i=1}^{\frac{n}{2}-1} f\left(x_{2i}\right) + 4 \sum_{i=1}^{\frac{n}{2}} f\left(x_{2i - 1}\right) + f\left(b\right)\right) = \frac{\Delta}{3}\left(f\left(a\right) + 4 f\left(x_1\right) + 2f\left(x_2\right) + \ldots + 4f\left(x_{n-1}\right) + f\left(b\right)\right)}}
+    where $n$ needs to be odd.
+
+    \imagehere[0.6]{SimpsonRule.png}
+
+    \subparag{Remark}{
+        The idea is the same as splines: we approximate our function by a polynomial, and integrate it.
+    }
+    
+}
+
+\begin{filecontents*}[overwrite]{AdaptiveQuadrature.code}
+def integrate(f, a, b):
+    i_trap = trapezoid(f, a, b)
+    i_simp = simpson(f, a, b)
+    if abs(i_trap - i_simp) > epsilon*abs(i_trap):
+        mid = (a + b)/2
+        return integrate(f, a, mid) + integrate(f, mid, b)
+    else:
+        return i_simp
+\end{filecontents*}
+
+
+\parag{Adaptive quadrature}{
+    A good idea is to use two different quadrature rules (such as trapezoid and Simpson). If the two values are very different, then we split the interval in two halves and call the function recursively. If they are very close, we suppose that the value is correct and we return it. This allows to split more intervals where the function is badly behaved, and diminish the number of computations where it acts like a straight line.
+
+    \imagehere[0.6]{AdaptiveQuadrature.png}
+
+    \subparag{Implementation}{
+        This could for instance be implemented as:
+        \importcode{AdaptiveQuadrature.code}{python}
+    }
+    
+}
+
+\parag{Definition: Exact quadratures}{
+    We define a quadrature to be \important{exact} for polynomial of degree $n$ if the integration error of every degree-$n$ polynomial is zero and it is nonzero for some polynomials of degree $n+1$. 
+}
+
+
+\parag{Newton-Cotes}{
+    We saw that a quadrature is always written as: 
+    \[Q\left[f\right] = \sum_{i}^{} w_i f\left(x_i\right)\]
+    
+    So, any quadrature rule is only defined by weights $w_i$. To find good weights, we can just set up which polynomials we want to be correct, and solve a linear system: 
+    \[Q\left[1\right] = \int_{a}^{b} 1dx, \mathspace Q\left[x\right] = \int_{a}^{b} xdx, \mathspace Q\left[x^2\right] = \int_{a}^{b} x^2 dx, \mathspace \ldots\]
+
+    Given $n$ equally spaced points, we can find an exact quadrature for polynomials of degree $n$ using our linear system (we approximate our $n$ points by a polynomial and integrate). This gives us \important{Newton-Cotes} quadrature.
+}
+
+\parag{Gaussian quadrature}{
+    Note that there exists another technique named \important{Gaussian quadrature} which uses $n$ nonuniformly spaced points, and it is exact for polynomials of degree $2n - 1$.
+}
+
+
+\parag{Multidimensional integrals}{
+    To intergrate over a volume, Fubini's theorem say that we can do nested integrals: 
+    \[\int_{I_1 \times I_2 \times I_3} f\left(x, y, z\right)dxdydz = \int_{I_1} \left(\int_{I_2} \left(\int_{I_3} f\left(x, y, z\right) dx\right) dy\right) dz\]
+    
+    The thing is, if we want to use a quadrature rule with $4$ points and have $D$ dimensions, then we need $4^D$ points. This is named the curse of dimensionality: if we have 100 dimensions, then the problem is really intractable. Many integration problems do happen in so many dimensions, so we need to develop other ideas.
+}
+
+
+\end{document}
