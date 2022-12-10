@@ -1,0 +1,249 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-12-09 at 15:14:10.
+
+\usepackage{../../style}
+
+\title{CompNet}
+\author{Joachim Favre}
+\date{Vendredi 09 décembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2022-12-09}{Manuel-in-the-middle}{
+\begin{itemize}[left=0pt]
+    \item Explanation of how to make confidentiality, authenticity and integrity, using symmetric or asymmetric keys and hash functions.
+    \item Explanation of the man-in-the-middle attack, and how to prevent it using a CA.
+    \item Explanation of how to combine confidentiality with authenticity and data integrity.
+    \item Overview of SSL.
+    \item Overview of filtering tables.
+\end{itemize}
+
+}
+
+\section{Network security}
+\subsection{Building blocks}
+
+\parag{Goals}{
+    We have three security goal. 
+
+    \important{Confidentiality} requires that only the sender and the receiver understand the content of the message, \important{authenticity} gives a way to prove that the message comes from whom it claims to be, and \important{integrity} gives a way to prove that the message was not changed along the way.
+}
+
+\parag{Encryption and decryption}{
+    The sender can cypher their plaintext using \important{encryption}, and the receiver can decipher the ciphertext using \important{decryption}.
+
+    Ideally, the ciphertext should reveal no information about the plaintext.
+}
+
+\parag{Symmetric key}{
+    One approach to encryption and decryption is symmetric-key cryptography. Alice and Bob first need to agree on a key (on a way that nobody else can get this key), which they use for their encryption and decryption algorithms.
+
+    We note $\text{key}\left\{\text{ciphertext}\right\} = \text{plaintext}$. This method can be summarised as:
+    \[\text{key}\left\{\text{key}\left\{\text{plaintext}\right\}\right\} = \text{plaintext}\]
+
+    \subparag{Problem}{
+        The main challenge is to share a key. 
+    }
+}
+
+\parag{Asymmetric key}{
+    Another approach is to instead use two keys: a public key (denoted key+) and private key (denoted key-). The two are naturally linked, but we must not be able to guess the public key from the private key.
+
+    We have the two following properties: 
+    \[\text{key-}\left\{\text{key+}\left\{\text{plaintext}\right\}\right\} = \text{plaintext}\]
+    \[\text{key+}\left\{\text{key-}\left\{\text{plaintext}\right\}\right\} = \text{plaintext}\]
+    
+    This fixes the problem since we only need to share the public key (everyone can know it and use it to cipher messages), while keeping private the private key (only us will be able to decipher the message).
+
+    \subparag{Problem}{
+        The main problem with asymmetric cryptography is that it requires a lot more computations than symmetric cryptography.
+    }
+}
+
+\parag{Hash function}{
+    A hash function is a ``many-to-one'' function, compressing any input to a small output (named a \important{hash}).
+
+    The main goal is that it must reveal no information about the input, meaning that it is hard to find what input made this result, and it must be hard to identify two input that yield the same hash.
+
+    This is typically public what protocols use what hash functions.
+
+    \subparag{Bad hash function}{
+        For instance, a very bad hash function would map a text to the first $n$ letters of this text.
+    }
+
+    \subparag{Relation to encryption}{
+        Encryption and hashing have some things in common, but they are very different: we cannot decrypt the result of hashing.
+    }
+}
+
+\subsection{Providing security properties}
+\parag{Confidentiality}{
+    Let's say Eve is trying to read messages between Alice and Bob.
+
+    With symmetric keys, as long as she does not have this key, she cannot read the ciphered message.
+
+    With asymmetric keys, Alice can cipher her message using Bob's public key $\text{Bob-key+}\left\{\text{plaintext}\right\}$. Then, Eve cannot read this message if she does not have Bob's private key Bob-key-.
+}
+
+\parag{Authenticity}{
+    Let's say Persa is trying to impersonate Alice. If all Bob verifies is the IP address, she could for instance fake her IP address to be Alice's. If Persa is not between Alice and Bob but wants to fake being Alice while creating a TCP connection to Bob, it will be hard since the \texttt{SYN-ACK} will go to Alice. However, if she is on the communication path, then she can do whatever she wants.
+
+    \subparag{Symmetric}{
+        Let's instead consider a better way. Alice sends her plaintext (if she does not want confidentiality), and the ciphered version of this plaintext. Bob can then compute the ciphered version of the message, and verify that it is equal to the one Alice sent. This verifies that Alice once sent this message (even though Persa could send it multiple times after). Note that Alice needs to send both because, otherwise when Bob receives the ciphertext and deciphers it, he cannot know if this is a real message Alice wanted to send him. If he expects English but does not get a sentence, he will know there is a problem, but if he expects a number, then he cannot know if this is just a random number sent by Persa. 
+
+        Know, we realise that we need to send twice the size of the message to authenticate. This is very bad. So, instead of sending $\text{key}\left\{\text{plaintext}\right\}$, she can send a \important{MAC} (Message Authentication Code) $\text{hash}\left\{\text{key}, \text{plaintext}\right\}$. When Bob receives the plaintext, he can compute the MAC and compare it.
+
+        To sum up, Alice sends: 
+        \[\left(a, b\right) = \left(\text{plaintext}, \text{hash}\left\{\text{key}, \text{plaintext}\right\}\right)\]
+        
+        Then, Bob verifies that: 
+        \[\text{hash}\left\{\text{key}, a\right\} \over{=}{?}  b\]
+    }
+    
+
+    \subparag{Asymmetric}{
+        We can follow a similar idea with asymmetric keys.
+
+        When Alice sends plaintext to Bob, she can send it and a \important{digital signature} (the equivalent of a MAC for asymmetric cryptography) $\text{Alice-key-}\left\{\text{hash}\left\{\text{plaintext}\right\}\right\}$. This is the proof that the particular message was sent by an entity who knows the private key that matches the public key, key+.
+
+        To sum up, Alice sends: 
+        \[\left(a, b\right) = \left(\text{plaintext}, \text{Alice-key-}\left\{\text{hash}\left\{\text{plaintext}\right\}\right\}\right)\]
+        
+        Then, Bob verifies that:
+        \[\text{hash}\left\{a\right\} \over{=}{?}  \text{Alice-key+}\left\{b\right\}\]
+    }
+    
+    \subparag{Replay attack}{
+        Now, we want to prevent Persa from sending a message Alice sent to Bob again.
+
+        When Alice wants to send a message, she sends a message to Bob saying so, and Bob will send her back a \important{nonce}. This is a public information, which Alice will concatenate at the end of the message she uses in the next MAC: $\text{hash}\left\{\text{key, nonce, plaintext}\right\}$. After Bob verifies that this message was indeed sent by Alice using this nonce, Bob will then consider this nonce consumed.
+
+        If he receives again the same message later, he will see that this nonce was already used.
+    }
+}
+
+\parag{Data integrity}{
+    To provide data integrity, we do can do exactly the same thing as for authenticity. Note that the two are very close and almost always providing one provides the other.
+
+    \subparag{Difference}{
+        We could consider a very far-fetched scenario which provides authenticity but not data integrity. For instance, Alice can send her message and the key. Bob would then be able to know that Alice did indeed send this message, but not that it was not modified by Persa in between.
+
+        Of course, this scenario is not a real-world one since keys should not be shared that way.
+    }
+}
+
+\parag{Man-in-the-middle attacks}{
+    Let's say Alice wants to send a message to Bob, and Manuel is in the middle.
+
+    Alice needs to learn Bob's public key. However, Manuel can intercept Bob's key, keep it, and send his own public key to Alice. That way, when Alice sends a message, only Manuel will be able to decipher it. He could then encrypt it using Bob's public key and sending it to Bob. That way, Alice and Bob cannot know it, but someone can read their messages.
+
+    This breaks confidentiality, but let's see how we can also break authenticity. Manuel can convince Bob that his public key is Alice's. That way, when Manuel intercepts a message from Alice to Bob, he can remove Alice's signature and replace it by his own.
+
+    The root cause of those two problems is that, so far, we have no way to verify public keys.
+
+    \subparag{Solution}{
+        A way to solve this problem is to rely on trusted \important{certificate authority} (CA). Alice and Bob have pre-shared their key with it, and they already know its public key. That way, when Alice needs Bob's public key, she can ask it to the CA (or to Bob), and will receive a message a message saying ``Bob owns {Bob-key+}'' signed by this certificate authority.
+
+        Know, for this to work, Alice need to know the CA's true public key. This moves the failure point from needing to know everyone's public key to only the CA's. This CA's public key is typically stored in the browser.
+    }
+    
+    \subparag{Remark}{
+        Bootstrapping is unavoidable: we always need some form of shared state to begin with. Asymmetric crypto reduces bootstrapping information, since the public key does not have to be secret, but it also requires some (since we need to know the CA's public key).
+    }
+}
+
+\subsection{Securing internet protocols}
+\parag{Confidentiality}{
+    Let's say Alice and Bob want to send an email to Bob, while keeping the content confidential. They both know each other's public key. 
+
+    First, Alice wills end her message using a symmetric key (which Bob does not know), encrypt the symmetric key using Bob's public key, and send this tuple to Bob. That way, when Bob receives it, he can recover the symmetric key using his private key, and use this symmetric key to recover the message. They could use it for few sessions, but it depends on the protocol.
+
+    To sum this up, Alice sends: 
+    \[\left(a, b\right) = \left(\text{symm-key}\left\{\text{plaintext}\right\}, \text{Bob-key+}\left\{\text{symm-key}\right\}\right)\]
+
+    Then, Bob can compute: 
+    \[\text{symm-key} = \text{Bob-key-}\left\{b\right\}, \mathspace \text{plaintext} = \text{symm-key}\left\{a\right\}\]
+    
+    This is a very common trick: it allows to greatly decrease the computation time for ciphering the message since we cipher only a smaller thing using the asymmetric key. 
+}
+
+\parag{Authenticity and data integrity}{
+    Let's now instead consider that Alice and Bob do not care about confidentiality, but want authenticity and data integrity.
+
+    As seen before Alice sends her message and a digital signature: 
+    \[\left(a, b\right) = \left(\text{plaintext}, \text{Alice-key-}\left\{\text{hash}\left\{\text{plaintext}\right\}\right\}\right)\]
+    
+    Then, Bob verifies that:
+    \[\text{hash}\left\{a\right\} \over{=}{?}  \text{Alice-key+}\left\{b\right\}\]
+}
+
+\parag{Both}{
+    Now let's say they both want to have confidentiality and authenticity. 
+
+    To do so, Alice first does authenticity: she computes the digital signature of her message (using $\text{Alice-key-}\left\{\text{hash}\left\{\text{message}\right\}\right\}$) and puts it in a tuple with her message. She then ciphers this using a private key, and she puts it in a tuple with symmetric key ciphered by Bob's public key. Bob can then find back the symmetric key, use it to find the digital signature and the message, and verify that everything is correct.
+
+    In other words, Alice first computes: dm 
+    \[(a, b) = (\text{symm-key}\{\underbrace{(\text{plaintext}, \text{Alice-key-}\{\text{hash}\{\text{plaintext}\}\})}_{\text{authenticity}}\}, \text{Bob-key+}\{\text{symm-key}\})\]
+    
+    Then Bob can compute: 
+    \[\text{symm-key} = \text{Bob-key-}\left\{b\right\}, \mathspace \left(c, d\right) = \text{symm-key}\left\{a\right\}, \mathspace \text{plaintext} = c\]
+    
+    And finally Bob verifies that: 
+    \[\text{hash}\left\{c\right\} \over{=}{?} \text{Alice-key+}\left\{d\right\}\]
+
+    This is really just a mix of the two things we have seen so far: we first do authenticity and then confidentiality on top of it.
+}
+
+\parag{SSL}{
+    Let's say Alice wants to communicate with an online store, of which she does not already have the public key. Let's say they communicate using TCP.
+
+    As usual, they first do a three-way handshake, then Alice sends a ``Hello'' message, to which the server answers a public key and a certificate (made by a CA). Alice verifies the certificate. After that, Alice makes a ``masterkey'' ciphers it through the public key, and sends it to the server. Both endsystems will use it to generate 4 keys (1 for encryption and 1 for generating the MAC, for both the client and the server).
+
+    So, if Alice wants to send a message, she will send: 
+    \[\text{key2}\left\{\text{plaintext}, \text{hash}\left\{\text{key1}, \text{plaintext}\right\}\right\}\]
+
+    Note that if Persa comes in between, she can repeat and reorder application messages. To fix this problem, we can again use sequence numbers (just like nonce). Note that we need this even though TCP already provides \texttt{SEC} numbers, because we are working at the application layer, and TCP is not ciphered. In other words, Persa could receive the TCP packets, extract the messages Alice wants to send to the server, multiply them and reorder them, and then send it again through TCP. Now, if Alice wants to send a third message (assuming she sent two message before) she would instead send:
+    \[\text{key2}\left\{\text{plaintext}, \text{hash}\left\{\text{key1}, \#3, \text{plaintext}\right\}\right\}\]
+
+    This is the idea of \important{SSL} (Secure Sockets Layer), which is used to secure TCP applications.
+
+    \subparag{Remark}{
+        We can note that, during this process, the web server never authenticated us: it never made sure that Alice really was Alice.
+
+        In fact, this is not important as long as the server does not keep per-client state. However, as soon as it want to have some state, it needs to do this authentification on its own. To do so, we typically create accounts with passwords. Then, when we login, we get a cookie keeping us logged in.
+
+        In other words, Amazon does not really care who we are until we need to pay. At that point we need to log in. This happens separately to everything we have seen.
+    }
+}
+
+\subsection{Operational security}
+\parag{Filtering tables}{
+    Sometimes, network operator want to block some traffic from entering their network (in order to minimise risk). To do so, they use filtering tables (firewalls). 
+
+    For instance, we could have the following table:
+    \begin{center}
+    \begin{tabular}{|c|ccccc|}
+        \hline
+        \textbf{Action} & \textbf{Src. IP} & \textbf{Dst. IP} & \textbf{Protocol} & \textbf{Src. port} & \textbf{Dst. port} \\
+        \hline
+        Allow & 167.67/16 & Any & TCP & Any & 80 \\
+        Allow & Any & 167.67/16 & TCP & 80 & Any \\
+        Deny & Any & Any & Any & Any & Any  \\
+        \hline
+    \end{tabular}
+    \end{center}
+
+    This table only allow HTTP traffic from and to a specific IP prefix.
+
+    \subparag{Remark}{
+        It is a typical exam question to explain what a filtering table does.
+    }
+}
+
+
+\end{document}
