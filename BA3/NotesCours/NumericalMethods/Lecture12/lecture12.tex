@@ -1,0 +1,181 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-12-13 at 13:20:08.
+
+\usepackage{../../style}
+
+\title{NumMet}
+\author{Joachim Favre}
+\date{Mardi 13 décembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2022-12-13}{Pixar uses technology developed for A-bombs}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of naive Monte Carlo integration.
+    \item Explanation and proof of importance sampling.
+    \item Explanation and proof of the inversion method to transform a uniform distribution into a non-uniform one.
+\end{itemize}
+}
+
+\subsection{Monte Carlo}
+
+\parag{Introduction}{
+    Monte Carlo integration is an extremely general approach, which is very easy to implement. The thing is, it has a very slow convergence. However, our computers are so good now, that it is still fine.
+
+    If we have a small number of dimensions (typically 1 for instance), we should never use this method.
+
+    \subparag{Quote}{
+        \textit{``Monte Carlo is an extremely bad method. It should be used only when all alternative methods are worse.''} (Alan Sokal)
+    } 
+}
+
+\parag{History}{
+    During World War 2, the US tried (and succeeded) to create an atomic bomb. To do so, they needed to solve integrals, and they developed Monte Carlo method for this purpose. It was human computers who crunched those numbers.
+
+    It started with Ulam, a mathematician, who wanted to compute the probability to win at Solitaire. However, to do so, this is so complicated that we need to simulate all possible games. The thing is, there are many of them, so this is where Monte Carlo comes into place.
+
+    This algorithm is now still very used for atomic reactors or computer graphics.
+}
+
+\parag{Naive Monte Carlo Integration}{
+    We saw quadrature using Riemann Sum, leading to: 
+    \[\int_{\Omega} f\left(\bvec{x}\right) d \bvec{x} \approx \frac{1}{N} \sum_{i=1}^{N} f\left(\bvec{x}_i\right)\]
+    
+    The idea is instead to use a random variable $\bvec{X}_i$: 
+    \[\int_{\Omega} f\left(\bvec{x}\right) d \bvec{x} \approx \frac{1}{N} \sum_{i=1}^{N} f\left(\bvec{X}_i\right)\]
+    
+    This equality is difficult to show since we are using probabilities. To be able to be formal, we need to use expected values and their linearity: 
+    \[\exval\left(\frac{1}{N} \sum_{i=1}^{N} f\left(\bvec{X}_i\right)\right) = \frac{1}{N} \sum_{i=1}^{N} \int_{\Omega} \exval\left(f\left(\bvec{X}_i\right)\right) d \bvec{x} = \frac{1}{N} \sum_{i=1}^{N} \int_{\Omega} f\left(\bvec{x}\right)p_{\bvec{X}_i}\left(\bvec{x}\right) d \bvec{x}\]
+    by definition of the expected value of a continuous random variable.
+
+    Let's now consider a uniform distribution $p_{\bvec{X}_i}$, and a $\Omega$ such that its volume is 1. It yields: 
+    \[\exval\left(\frac{1}{N} \sum_{i=1}^{N} f\left(\bvec{X}_i\right)\right) = \int_{\Omega} f\left(\bvec{x}\right) d \bvec{x}\]
+    
+    So, it indeed works.
+
+    \subparag{Personal remark}{
+        The concept of continuous probabilities may seem abstract (especially with probability distribution and cumulative probability function coming after) since we have not yet had a course about them. If you want to have an overview and some intuition on what they mean, there is a 3Blue1Brown video on this subject:
+        \begin{center}
+            \url{https://youtu.be/ZA4JkHKZM50}
+        \end{center}
+    }
+}
+
+\parag{Convergence}{
+    We have proven that the approximation is centred on the correct value. Also, by the central limit theorem, we know that the result follows a normal distribution. We would want to know the error of our method, meaning its standard deviation. To do so, let's first compute the variance:
+    \[\Var\left(\frac{1}{N} \sum_{i=1}^{N} f\left(\bvec{X}_i\right) \right) = \frac{1}{N^2} N \Var\left(f\left(\bvec{X}_i\right)\right) = \frac{1}{N} \Var\left(f\left(\bvec{X}_i\right)\right)\]
+    where $\Var\left(f\left(\bvec{X}_i\right)\right)$ is constant.
+
+    However, we really care about the standard deviation, which is the square root of the variance. This means that our algorithm converges with speed $\frac{1}{\sqrt{N}}$. This may seem very bad (and it is), but we can see that it is not linked to the number of dimensions (and this is really good).
+}
+
+\parag{Importance sampling}{
+    We saw that the error follows $\sqrt{\frac{1}{N} \Var\left(f\left(\bvec{X}_i\right)\right)}$, so decreasing $\Var\left(f\left(\bvec{X}_i\right)\right)$ also allows to decrease the error. For now, there are some parts of the function can be very small, and giving the same importance to parts where the function is huge wastes some convergence speed. We would like instead to prioritise the important parts. To do so, we need to divide by the probability distribution of our random variable (it comes clear why in the proof):
+    \[\int_{\Omega} f\left(\bvec{x}\right) d \bvec{x} \approx \frac{1}{N} \sum_{i=1}^{N} \frac{f\left(\bvec{X}_i\right)}{p_{\bvec{X}}\left(\bvec{X}_i\right)}\]
+    
+    This method is named \important{importance sampling}. Note that it requires $p_{\bvec{X}}\left(\bvec{x}\right) > 0$ for all $\bvec{x}$ with $f\left(\bvec{x}\right) \neq 0$.
+
+    \subparag{Proof}{
+        Again, let's prove that it works:
+        \autoeq{\unexpanded{\exval\left(\frac{1}{N} \sum_{i=1}^{N} \frac{f\left(\bvec{X}_i\right)}{p_{\bvec{X}}\left(\bvec{X}_i\right)}\right) = \frac{1}{N} \sum_{i=1}^{N} \exval\left(\frac{f\left(\bvec{X}_i\right)}{p_{\bvec{X}}\left(\bvec{X}_i\right)}\right) = \frac{1}{N} \sum_{i=1}^{N} \int_{\Omega} \frac{f\left(\bvec{x}\right)}{p_{\bvec{X}}\left(\bvec{x}\right)} p_{\bvec{X}}\left(\bvec{x}\right) d \bvec{x}}}
+        
+        This indeed yields that: 
+        \[\exval\left(\frac{1}{N} \sum_{i=1}^{N} \frac{f\left(\bvec{X}_i\right)}{p_{\bvec{X}}\left(\bvec{X}_i\right)}\right) = \int_{\Omega} f\left(\bvec{x}\right) d \bvec{x}\]
+    }
+    
+
+    \subparag{Remark}{
+        We could want to set $p_{\bvec{X}}\left(\bvec{x}\right) = f\left(\bvec{x}\right)$ in order to get perfect sampling. The thing is, $p_{\bvec{X}}\left(\bvec{x}\right)$ needs to be a probability distribution, meaning that: 
+        \[\int_{\Omega} p_{\bvec{X}}\left(\bvec{x}\right) d \bvec{x} = 1 \implies p_{\bvec{X}}\left(\bvec{x}\right) = \frac{f\left(\bvec{x}\right)}{\int_{\Omega} f\left(\bvec{y}\right) d \bvec{y}}\]
+        
+        However, we would then need to compute the integral first, and the goal of our method is to compute this integral.
+    }
+}
+
+\parag{Pseudo-randomness}{
+    A computer is an incredibly deterministic machine, by construction. This means that it is very hard to generate something that seems indeterministic. John von Neumann said that \textit{''anyone who considers arithmetical methods of producing random digits is, of course, in a state of sin''}.
+
+    Thus, we need pseudo-random sequences: sequences that are not really random, but seem so. They should pass statistical tests of randomness, if the sequence repeats the period should be very long, it must be efficient to compute (Monte Carlo method consume a tremendous number of them), and it must be repeatable. This last point may seem weird, but when we want to debug: two runs of the same program should be the same, but within one run numbers should seem random.
+
+    \subparag{Bad sources}{
+        There are multiple sources of randomness.
+
+        We could use the digits of $\pi$ for instance (even though this is very expensive to compute and thus not very practical). Another not so practical source (which was used for a long time though) is books (and punch cards) that store million random digits which were generated using roulette wheels.
+    }
+    
+
+    \subparag{Good sources}{
+        A much better idea is using \important{linear congruential generator} (LCG). We just consider the sequence $\left(I_j\right)$ defined by:
+        \[I_{j+1} = \left(a I_j + c\right) \Mod m\]
+        where $a$, $c$ and $m$ are fixed.
+        
+        We can improve this by making methods such as PCG32.
+    }
+}
+
+\parag{Rejection sampling}{
+    Now that we have a way to get some kind of uniform distribution, let's consider how we can use them to generate random numbers following a probability distribution $p\left(\bvec{x}\right)$.
+
+    An idea is \important{rejection sampling}: we generate $N$ random points $\left(\bvec{x}, y\right)$, and see if they are below or over the curve of the probability distribution. In the first case we keep them, in the second one we reject them.
+    \imagehere[0.5]{RejectionSampling.png}
+    
+    This method works, but this is not great.
+
+    \subparag{Remark}{
+        This was for instance used a long time for computing the area of a circle and thus $\pi$: we consider a square of unit side and a circle inscribe in it, generate random numbers in the square and compute the ratio that land in the circle (which distance to the origin are less that $\frac{1}{2}$). This tends to the value of $\frac{\pi}{4}$.
+    }
+}
+
+\parag{Inversion method}{
+    Let's consider a much better method. First, we compute the CDF (cumulative distribution function) of our probability distribution: 
+    \[P_{X}\left(x\right) = \int_{-\infty}^{x} p_X\left(y\right) d y\]
+    
+    This function is monotonically increasing since $p_X\left(x\right) \geq 0$ for all $x$, and it thus as an inverse. We can compute uniform variates $\xi_i \in \left[0, 1\right]$ and evaluate $P_X^{-1}\left(\xi_i\right)$. The result will have the desired distribution.
+
+    \subparag{Proof}{
+        We want to show that if $\xi$ is a uniform random variable on $\left[0, 1\right]$, then the CDF of $P_X^{-1}\left(\xi\right)$ is $P_X\left(x\right)$. By definition of the CDF of $P_X^{-1}\left(\xi\right)$, it is given by:
+        \[\prob\left(P_{X}^{-1}\left(\xi\right) \leq x\right) = \prob\left(\xi \leq P_{X}\left(x\right)\right) = P_{X}\left(x\right)\]
+        This last equality holds since $\xi$ is uniformly distributed on $\left[0, 1\right]$.
+
+        \qed
+    }
+}
+
+\begin{filecontents*}[overwrite]{ImportanceSamplingExample.code}
+import numpy as np
+
+np.random.seed(1)  # make it repeatable
+n = 10000  # number of samples
+x = np.sqrt(np.random.rand(n))  # random variables
+y = f(x)/(2*x)  # result of individual sample
+result = y.mean()
+\end{filecontents*}
+
+\parag{Example}{
+    Let's consider the following function $f\left(x\right)$, which we want to integrate:
+    \imagehere[0.5]{MonteCarloExampleFunction.png}
+
+    We can approximate it with the probability distribution $p_X\left(x\right) = 2x$ (which is indeed a probability distribution since its integral on $\left[0, 1\right]$ is 1, and it is always positive).
+
+    Let's use the inversion method. We first compute the CDF:
+    \[P_X\left(x\right) = \int_{0}^{x} p_{X}\left(x'\right) d x' = \int_{0}^{x} 2x' dx' = x^2\]
+    
+    Then, we compute the inverse of this CDF: 
+    \[P^{-1}_{X}\left(y\right) = \sqrt{y}\]
+    
+    We can then generate uniform variables $\xi_i$ and evaluate $P_X^{-1}\left(\xi_i\right)$. This can be visualised as:
+    \imagehere[0.5]{InverseMethodExample.png}
+    
+    We indeed have more points landing on the right side than on the left side.
+
+    Then, we can use those random variables to compute the integral of our function $f\left(x\right)$ on $\left[0, 1\right]$ through Monte Carlo integration with importance sampling.
+    \importcode{ImportanceSamplingExample.code}{python}
+}
+
+
+\end{document}
