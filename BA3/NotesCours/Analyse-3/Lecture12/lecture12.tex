@@ -1,0 +1,222 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-12-12 at 08:25:40.
+
+\usepackage{../../style}
+
+\title{Analyse 2}
+\author{Joachim Favre}
+\date{Lundi 12 décembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2022-12-12}{On fait comme s'il n'y avait pas de problème}{
+\begin{itemize}[left=0pt]
+    \item Définition du produit de convolution.
+    \item Explication des propriétés du produit de convolution.
+    \item Preuve du lien entre produits de convolutions et produits avec les transformées de Fourier.
+    \item Application des transformées de Fourier à la résolution d'équations différentielles et fonctionnelles.
+\end{itemize}
+
+}
+
+\parag{Proposition: Parité des transformées}{
+    Soit $f: \mathbb{R} \mapsto \mathbb{R}$ une fonction intégrable en valeur absolue sur $\left]-\infty, \infty\right[ $.
+
+    \begin{enumerate}
+        \item Si $f$ est paire, alors: 
+        \[\hat{f}\left(\alpha\right) = \sqrt{\frac{2}{\pi}} \int_{0}^{\infty} f\left(x\right) \cos\left(\alpha x\right)dx\]
+
+        En particulier, $\hat{f}$ est paire.
+        \item Si $f$ est impaire, alors: 
+        \[\hat{f}\left(\alpha\right) = -i\sqrt{\frac{2}{\pi}} \int_{0}^{\infty} f\left(x\right)\sin\left(\alpha x\right)dx\]
+        
+        En particulier, $\hat{f}$ est impaire.
+    \end{enumerate}
+
+    \subparag{Preuve}{
+        La preuve est considérée triviale et laissée en exercice au lecteur.
+    }
+}
+
+\parag{Remarque}{
+    Comme pour les séries de Fourier, si $f: \left[0, \infty\right[  \mapsto \mathbb{R}$, on peut considérer la transformée de Fourier en sinus de $f$ en l'étendant sur $\mathbb{R}$ de manière à la rendre impaire.
+
+    De manière similaire, en étendant $f$ de manière la rendre paire, nous pouvons considérer la transformée de Fourier en cosinus de $f$.
+}
+
+\parag{Définition: Produit de convolution}{
+    Soient $f, g : \mathbb{R} \mapsto \mathbb{R}$ des fonctions intégrables en valeur absolue sur $\left]-\infty, \infty\right[ $. Alors, le \important{produit de convolution} de $f$ et $g$, noté $f * g$, est la fonction:
+    \[\begin{split}
+    f * g: \mathbb{R} &\longmapsto \mathbb{R} \\
+    x &\longmapsto \int_{-\infty}^{\infty} f\left(x - t\right)g\left(t\right)dt
+    \end{split}\]
+
+    L'idée est que nous gardons la fonction $g$ fixée, que nous retournons (prenons la symétrie de) la fonction $f$ et la déplaçons pour que sont centre soit en $x$, puis calculons l'intégrale de leur produit.
+
+    \subparag{Remarque personnelle}{
+        Il y a une vidéo de 3Blue1Brown sur ce sujet:
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=KuXjwB4LzSA}
+        \end{center}
+    }
+}
+
+\parag{Exemple 1}{
+    Considérons les fonctions suivantes:
+    \begin{functionbypart}{f\left(x\right) = g\left(x\right)}
+        1, & x \in \left[1, 1\right] \\
+        0, & \text{sinon}
+    \end{functionbypart}
+
+    Intuitivement, en regardant le dessin ci-dessous, nous pouvons voir que si $x > 2$, alors $f * g\left(x\right) = 0$, mais $f * g \left(\frac{3}{2}\right) = \frac{1}{2}$.
+    \svghere{ExempleProduitDeConvolution.svg}  
+
+    Calculons maintenant notre produit de convolution, en prenant le changement de variable $y = x-t$:
+    \[f * g \left(x\right) = \int_{-\infty}^{\infty} f\left(x - t\right)g\left(x\right) dx = \int_{-1}^{1} f\left(x - t\right)dt = -\int_{x+1}^{x-1} f\left(y\right)dy = \int_{x-1}^{x+1} f\left(y\right)dy\]
+    
+    Ainsi, nous obtenons que $f * g\left(x\right) = 0$ si $x \in \left[2, \infty\right[ $ ou $x \in \left]-\infty, -2\right] $. De plus, pour $x \in \left[0, 2\right[ $: 
+    \[f * g\left(x\right) = \int_{x-1}^{1} 1dx = 1 - x + 1 = 2 - x\]
+    
+    Et de manière similaire, si $x \in \left[-2, 0\right]$: 
+    \[f * g\left(x\right) = \int_{-1}^{x+ 1} 1dx = 2 + x\]
+    
+    Nous obtenons ainsi que:
+    \begin{functionbypart}{f * g\left(x\right)}
+        2 - \left|x\right|, & \text{si } x \in \left[-2, 2\right] \\
+        0, & \text{sinon}
+    \end{functionbypart}
+
+    \svghere[0.5]{ResultatExempleProduitDeConvolution.svg}
+}
+
+\parag{Exemple 2}{
+    Prenons $f\left(x\right) = g\left(x\right) = e^{-\left|x\right|}$. Alors, nous obtenons, si $x > 0$: 
+    \autoeq{\unexpanded{f * g\left(x\right) = \int_{-\infty}^{\infty} e^{-\left|x-t\right|} e^{-\left|t\right|} dt = \int_{-\infty}^{0} e^{-\left(x - t\right)} e^t dt + \int_{0}^{x} e^{-\left(x - t\right)} e^{-t} dt + \int_{x}^{\infty} e^{x-t} e^{-t} dt = \left[\frac{e^{2t - x}}{2}\right]_{-\infty}^{0} + xe^{-x} + \left[\frac{e^{x - 2t}}{-2}\right]_{x}^{\infty} = \frac{e^{-x}}{2} + xe^{-x} + \frac{e^{-x}}{2} = e^{-x}\left(1 + x\right)}}
+    
+    Similairement, si $x \leq 0$, on peut trouver que: 
+    \[f * g\left(x\right) = e^{x}\left( 1 - x\right)\]
+    
+    En mettant tout cela ensemble, nous obtenons que, pour tout $x \in \mathbb{R}$: 
+    \[f * g\left(x\right) = e^{-\left|x\right|}\left(1 + \left|x\right|\right)\]
+}
+
+\parag{Application physique}{
+    En physique, la loi de désintégration radioactive nous dit que la masse d'un produit radioactif au fil du temps est décrit par la loi suivante: 
+    \[M\left(t\right) = M_0 e^{-c t}\]
+    où $c > 0$ est une constante dépendante du matériau et $M_0 > 0$ la masse de départ.
+
+    Nous nous demandons maintenant quelle est la masse radioactive au temps $T$ si une centrale produit $m\left(t\right)$ déchets radioactifs par seconde pendant $\left[0, T\right]$ (qui se désintègrent naturellement en partie).
+
+    Commençons par discrétiser notre fonction. Nous pouvons approximer la masse produite entre $t_i$ et $t_{i+1} = t_i + \Delta t_i$ par $m\left(t_i\right) \Delta t$. Cette masse se désintègre entre $t_i$ et $T$, et donc elle contribue environ $m\left(t_i\right) \Delta t e^{-c \left(T - t_i\right)}$ à la radioactivité en $T$. La masse au temps $T$ est donc approximée par: 
+    \[M\left(t\right) \approx \sum_{i=0}^{n} m\left(t_i\right) \Delta t e^{-c \left(T - t_i\right)}\]
+    
+    Nous pouvons faire tendre $\Delta t$ vers 0 pour que ce ne soit plus une approximation, ce qui nous donne: 
+    \[M\left(t\right) = \int_{0}^{T} m\left(t\right)e^{-c\left(T - t\right)} dt = \left(m\left(t\right) * e^{-ct}\right)\left(T\right)\]
+    où $m\left(t\right)$ est prise telle que $m\left(t\right) = 0$ pour tout $x \in \mathbb{R} \setminus \left[0, T\right]$.
+}
+
+\parag{Propriétés}{
+    Soient $f, g, h : \mathbb{R} \mapsto \mathbb{R}$ des fonctions intégrables en valeur absolue sur $\left]-\infty, \infty\right[ $. Alors:
+    \begin{enumerate}
+        \item $\left(\alpha f + \beta g\right) * h = \alpha f * h + \beta g * h$
+        \item $f * g = g * f$
+        \item $\left(f * g\right) * h = f * \left(g * h\right)$
+    \end{enumerate}
+}
+
+\parag{Proposition: Convolutions et transformées}{
+    Soient $f, g: \mathbb{R} \mapsto \mathbb{R}$ des fonctions intégrables en valeur absolue sur $\left]-\infty, \infty\right[ $. Alors:
+    \begin{enumerate}
+        \item $\displaystyle \int_{-\infty}^{\infty} \left|f * g\left(x\right)\right|dx \in \mathbb{R}$ 
+        \item $\displaystyle \mathcal{F}\left(f * g\right) = \sqrt{2\pi} \mathcal{F}\left(f\right) \mathcal{F}\left(g\right)$
+    \end{enumerate}
+
+    \subparag{Preuve 1}{
+        Vérifions que notre intégrale est bien réelle (qu'elle n'est pas infinie): 
+       \autoeq{\unexpanded{\int_{-\infty}^{\infty} \left|f * g\left(x\right)\right|dx = \int_{-\infty}^{\infty} \left|\int_{-\infty}^{\infty} f\left(x - t\right) g\left(t\right) dt\right|dx \leq \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \left|f\left(x-t\right)\right|\left|g\left(t\right)\right|dt dx = \int_{-\infty}^{\infty} \left|g\left(t\right)\right| \int_{-\infty}^{\infty} \left|f\left(x-t\right)\right|dxdt =  \underbrace{\int_{-\infty}^{\infty} \left|g\left(t\right)\right|dt}_{\in \mathbb{R}} \cdot \underbrace{\int_{-\infty}^{\infty} \left|f\left(y\right)\right|dy}_{\in \mathbb{R}} \in \mathbb{R}}}
+       en prenant à nouveau le changement de variable $y = x - t$.
+    }
+
+    \subparag{Preuve 2}{
+        Considérons maintenant la transformée de Fourier de la convolution (en prenant encore le changement de variable $y = x - t$): 
+        \autoeq{\unexpanded{\mathcal{F}\left(f * g\right)\left(\alpha\right) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} f\left(x-t\right)g\left(t\right)dt e^{-i \alpha x} dx = \int_{-\infty}^{\infty} g\left(t\right) e^{-i\alpha t} \cdot \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} f\left(x-t\right) e^{-i \alpha\left(x - t\right)}dx dt = \int_{-\infty}^{\infty} g\left(t\right) e^{-i\alpha t} \cdot \underbrace{\frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} f\left(y\right) e^{-i \alpha\left(y\right)}dy}_{= \mathcal{F}\left(f\right)\left(\alpha\right)} dt = \mathcal{F}\left(f\right)\left(\alpha\right) \sqrt{2\pi} \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} g\left(t\right)e^{-i \alpha t} dt = \sqrt{2\pi} \mathcal{F}\left(f\right)\left(\alpha\right) \mathcal{F}\left(g\right)\left(\alpha\right)}}
+
+        \qed
+    }
+}
+
+\parag{Proposition: Convolution et transformées inverses}{
+    Soient $f, g: \mathbb{R} \mapsto \mathbb{R}$ des fonctions telles que $\hat{f} = \mathcal{F}\left(f\right)$ et $\hat{g} = \mathcal{F}\left(g\right)$ sont intégrables en valeur absolue sur $\left]-\infty, \infty\right[ $. Alors: 
+    \[\mathcal{F}^{-1}\left(\hat{f} * \hat{g}\right) = \sqrt{2\pi} \mathcal{F}^{-1}\left(\hat{f}\right) \mathcal{F}^{-1}\left(\hat{g}\right) = \sqrt{2\pi} fg\]
+
+    À partir de là, nous pouvons trouver que: 
+    \[\hat{f} * \hat{g} = \sqrt{2\pi} \mathcal{F} \left(fg\right) \implies \mathcal{F}\left(fg\right) = \frac{1}{\sqrt{2\pi}} \hat{f} * \hat{g} = \frac{1}{\sqrt{2\pi}} \mathcal{F}\left(f\right) * \mathcal{F}\left(g\right)\]
+
+    Ainsi, à un facteur de $\sqrt{2\pi}$ près, $\mathcal{F}$ transforme les convolutions en produits et inversement.
+}
+
+\parag{Application 1: Résolution d'EDO}{
+    Soit $f: \mathbb{R} \mapsto \mathbb{R}$ une fonction fixée. Nous cherchons une solution $u: \mathbb{R} \mapsto \mathbb{R}$ à l'équation: 
+    \[-u''\left(t\right) + u\left(t\right) = f\left(t\right)\]
+
+    Nous obtenons ce genre d'équation si nous avons un ressort dans le vide, sur lequel nous appliquons une force $f\left(t\right)$.
+
+    Appliquons la transformée de Fourier sur notre équation: 
+    \autoeq{\unexpanded{-\mathcal{F}\left(u''\right)\left(\alpha\right) + \mathcal{F}\left(u\right)\left(\alpha\right) = \mathcal{F}\left(f\right)\left(\alpha\right) \iff -\left(-\alpha ^2\right) \hat{u}\left(\alpha\right) + \hat{u}\left(\alpha\right) = \hat{f}\left(\alpha\right) \iff \hat{u}\left(\alpha\right) = \frac{1}{1 + \alpha ^2} \hat{f}\left(\alpha\right)}}
+    
+    Nous cherchons $u$, donc prenons la transformée de Fourier inverse: 
+    \[u\left(t\right) = \mathcal{F}^{-1} \left(\frac{1}{1 + \alpha ^2} \hat{f}\left(\alpha\right)\right) = \frac{1}{\sqrt{2\pi}} \mathcal{F}^{-1}\left(\frac{1}{1 + \alpha ^2}\right) * \mathcal{F}^{-1}\left(\hat{f}\right) = \frac{1}{\sqrt{2\pi}} \left(\sqrt{\frac{\pi}{2}} e^{-\left|t\right|} * f\right)\left(t\right)\]
+    puisque $\mathcal{F}\left(\frac{\sqrt{\pi}}{2} e^{-\left|t\right|}\right) = \frac{1}{1 + \alpha ^2}$.
+    
+    Nous obtenons ainsi finalement que: 
+    \[u\left(t\right) = \frac{1}{2} \int_{-\infty}^{\infty} e^{-\left|t-x\right|}f\left(x\right)dx\]
+    
+    Par exemple, pour $f\left(t\right) = e^{-\left|t\right|}$, nous pouvons trouver que: 
+    \[u\left(t\right) = \frac{1}{2} e^{-\left|t\right|} \left(1 + \left|t\right|\right)\]
+
+    Nous avions vu cette convolution plus tôt dans ce cours.
+}
+
+\parag{Application 2: Résolution d'EDO}{
+    Considérons l'équation d'Airy (qui a des applications en physique quantique et en optique): 
+    \[u''\left(x\right) - xu\left(x\right) = 0\]
+    
+    À nouveau, en appliquant la transformée de Fourier: 
+    \[\mathcal{F}\left(u''\right)\left(\alpha\right) - \mathcal{F}\left(x u\left(x\right)\right)\left(\alpha\right) = 0 \iff -\alpha ^2 \hat{u}\left(\alpha\right) - i \hat{u}'\left(\alpha\right) = 0 \iff \alpha ^2 \hat{u}\left(\alpha\right) = -i \hat{u}'\left(\alpha\right)\]
+    
+    C'est une EDL1 homogène, ce qui est facile à résoudre: 
+    \[\hat{u}\left(\alpha\right) = Ce^{i \frac{\alpha^3}{3}}\]
+    
+    Cette fonction n'est malheureusement pas intégrable en valeur absolue sur $\left]-\infty, \infty\right[ $, puisque $\int_{-\infty}^{\infty} \left|\hat{u}\left(\alpha\right)\right| d \alpha = +\infty$. Ainsi, $\mathcal{F}^{-1}$ n'est pas applicable. Mais, en l'appliquant quand même en faisant comme s'il n'y avait pas de problème, cela nous permet tout de même de deviner la solution: 
+    \[u\left(x\right) = \text{``}\mathcal{F}^{-1} \left(C e^{i \frac{\alpha^3}{3}}\right)\text{''} =  \text{``}\frac{C}{\sqrt{2\pi}} \int_{-\infty}^{\infty} e^{i \left(\frac{\alpha^3}{3} + \alpha x\right)} d\alpha \text{''} = \frac{2C}{\sqrt{2\pi}} \int_{0}^{\infty} \cos\left(\frac{\alpha^3}{3} + \alpha x\right)d \alpha\]
+
+    Cette fonction (à une constante multiplicative près) s'appelle la fonction d'Airy, et elle n'est exprimable à partir de fonctions élémentaires. On peut vérifier qu'elle est bien la solution à notre équation et que cette intégrale converge bien.
+
+    \subparag{Remarque}{
+        Comme mentionné précédemment, à l'aide de la théorie des distributions nous pouvons enlever la nécessité pour $\hat{f}$ d'être intégrable en valeur absolue sur $\left]-\infty, \infty\right[ $ afin de calculer sa transformée inverse. C'est la raison pour laquelle ça a quand même marché ici.
+    }
+}
+
+\parag{Application 3: Résolution d'équations fonctionnelles}{
+    Soit $f: \mathbb{R} \mapsto \mathbb{R}$ une fonction fixée. Nous cherchons une solution $u: \mathbb{R} \mapsto \mathbb{R}$ à l'équation fonctionnelle suivante: 
+    \[9 u\left(x\right) + 8\left(u* f\right)\left(x\right) = f\left(x\right)\]
+    
+    En prenant une transformée de Fourier, nous obtenons: 
+    \autoeq{\unexpanded{9 \hat{u}\left(\alpha\right) + 8\sqrt{2\pi} \hat{u}\left(\alpha\right) \hat{f}\left(\alpha\right) = \hat{f}\left(\alpha\right) \iff \hat{u}\left(\alpha\right) \left(9 + 8\sqrt{2\pi} \hat{f}\left(\alpha\right)\right) = \hat{f}\left(\alpha\right) \iff \hat{u}\left(\alpha\right) = \frac{\hat{f}\left(\alpha\right)}{9 + 8\sqrt{2\pi} \hat{f}\left(\alpha\right)}}}
+    
+    En posant par exemple $f\left(x\right) = e^{-\left|x\right|} \implies \hat{f}\left(\alpha\right) = \sqrt{\frac{2}{\pi}} \frac{1}{1 + \alpha ^2}$, on obtient: 
+    \[\hat{u}\left(\alpha\right) = \sqrt{\frac{2}{\pi}} \frac{1}{1 + \alpha ^2} \left(9 + 8\sqrt{2\pi} \sqrt{\frac{2}{\pi}} \frac{1}{1 + \alpha ^2}\right)^{-1} = \ldots = \sqrt{\frac{2}{\pi}} \frac{1}{25 + 9 \alpha ^2}\]
+    
+    Cela ressemble à $\frac{1}{1 + \alpha ^2}$, donc essayons de le faire ressortir: 
+    \[\hat{u}\left(\alpha\right) = \frac{1}{25} \sqrt{\frac{2}{\pi}} \frac{1}{1 + \left(\frac{3}{5} \alpha\right)^2} = \frac{1}{25} \hat{f}\left(\frac{3}{5}\alpha\right) = \frac{1}{25} \mathcal{F}\left(f\right)\left(\frac{3}{5} \alpha\right) = \frac{1}{25} \frac{5}{3} \mathcal{F}\left(f\left(\frac{5}{3}x\right)\right)\left(\alpha\right)\]
+
+    Ce qui nous donne finalement que: 
+    \[u\left(x\right) = \frac{1}{15} f\left(\frac{5}{3}x\right) = \frac{1}{15} e^{-\frac{5}{3}\left|x\right|}\]
+}
+
+\end{document}
