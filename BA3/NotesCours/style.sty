@@ -598,12 +598,12 @@
 \newcommand{\fakeequal}{}
 
 \newlength{\eqwidth}
-\newcommand{\autoeq}[2][]{
+\newcommand{\autoeq}[2][]{%
     % This command allows to automatically format equations and equalities, by splitting them when they are too long. Note that the result might be too long for the line too. You should then decrease the equation or font size.
     % This command needs to be used together with the \unexpanded command. For instance, we could write \autoeq{\unexpanded{1 + 1 = 2}}. There is also an optional parameter, when it is the character s, makes equality sloppy (you can try a very big equality with and without this optional parameter).
-    \settowidth{\eqwidth}{$\displaystyle #2$}
-
-    \luaexec{
+    \settowidth{\eqwidth}{$\displaystyle #2$}%
+    %
+    \luaexec{%
     % ------------------------------------------------------- Functions -------------------------------------------------------
     function replaceSymbols(txt, symbols, before, after)
         for i, symbol in pairs(symbols) do
@@ -691,7 +691,6 @@
                             void, closeCount = head:gsub("}", "")
                         end
                         j = j + 1
-                        texio.write(j)
                     until(not endIndex or openCount == closeCount or j > \#text)
                     %
                     if endIndex and openCount == closeCount and endIndex < smallestIndex then
@@ -709,13 +708,15 @@
         %
         end
         % Print everything
-        tex.print("\string\\begin{equation*}\string\\begin{split}")
+        tex.print("\string\\[\string\\begin{split}")
         tex.print(text)
-        tex.print("\string\\end{split}\string\\end{equation*}")
+        tex.print("\string\\end{split}\string\\]")
         % and log it also
+        texio.write("\string\\[\string\\begin{split}")
         texio.write(text)
+        texio.write("\string\\end{split}\string\\]")
     else
         tex.print("\string\\[" .. text .. "\string\\]")
     end
-    }
+    }%
 }
