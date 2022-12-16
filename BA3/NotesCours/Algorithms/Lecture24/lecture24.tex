@@ -1,0 +1,183 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-12-16 at 13:18:06.
+
+\usepackage{../../style}
+
+\title{Algorithms}
+\author{Joachim Favre}
+\date{Vendredi 16 décembre 2022}
+
+\begin{document}
+\maketitle
+
+\lecture{24}{2022-12-16}{Doing fun stuff with matrices (really)}{
+\begin{itemize}[left=0pt]
+    \item Applying dynamic programming to solve the all-pairs shortest paths problem.
+    \item Translating our dynamic algorithm to matrix usage, in order to use fast exponentiation.
+    \item Explanation of Floyd-Warshall's algorithm for solving the all-pairs shortest paths problem.
+    \item Explanation of Johnson's algorithm for solving the all-pairs shortest paths problem.
+\end{itemize}
+
+}
+
+\section{And now back to graphs\ldots}
+\subsection{All-pairs shortest paths}
+\parag{Goal}{
+    We want to find efficient ways to compute all-pairs shortest paths.
+
+    For now, we have seen algorithms allowing to compute the shortest path from a source to any point. Running these algorithms $\left|V\right|$ times allows to get all-pair shortest paths. Using BFS if the graph is unweighted, it is $VO\left(V + E\right) = O\left(EV\right)$; using Dijkstra if the graph has non-negative edge weights yields $VO\left(E + V\log\left(V\right)\right) = O\left(EV + V^2 \log\left(V\right)\right)$; and using Bellman-Ford, it gives $VO\left(VE\right) = O\left(V^2 E\right)$.
+
+    Since for any graph $E = O\left(V^2\right)$, we have an algorithm that works for any graph in $O\left(V^4\right)$. However, we would want to have a better algorithm for all-pair shortest path, one that has the same as for $\left|V\right|$ times Dijkstra: $O\left(EV + V^2 \log\left(V\right)\right) = O\left(V^3\right)$.
+}
+
+\parag{Dynamic programming}{
+    Our first guess is to use dynamic programming.
+
+    Let $d_m\left(u, v\right)$ be the weight of the shortest path from $u$ to $v$ that uses at most $m$ edges. For our recursive function, we guess that the last edge of our path is a given edge $\left(x, v\right) \in E$, giving us: 
+    \begin{functionbypart}{d_m\left(u, v\right)}
+    0, & \text{if } m = 0, u = v \\
+    \infty, & \text{if } m = 0, u \neq v \\
+    \min_{x \in V} \left\{d_{m-1}\left(u, x\right) + w\left(x, v\right)\right\}, & \text{otherwise}
+    \end{functionbypart}
+    where we consider $w\left(v, v\right) = 0$.
+    
+    When proving Bellman-Ford, we have proven that any path has at most $\left|V\right|-1$ edges. Thus, we only need to find $d_{\left|V\right|-1}\left(u, v\right)$ for all $\left(u, v\right) \in V \times V$. This means that we have $V^3$ subproblems, and we need $O\left(V\right)$ to compute the maximum amongst all those subproblems, leading to a complexity of $O\left(V^4\right)$. This is too much.
+}
+
+\parag{Matrix multiplication}{
+    Let's reinterpret our algorithm by doing a matrix multiplication. We know very efficient algorithm running in $O\left(2^{2.807}\right)$ (for Strassen's algorithm) or even $O\left(n^{2.376}\right)$ (For Coppersmith-Winograd algorithm) allowing to compute efficiently the following: 
+    \[c_{uv} = \sum_{k=1}^{n} a_{uk} b_{kv}\]
+    
+    We thus hope that we could use those algorithms to make sense of: 
+    \[c_{uv} = \min_{x \in V} \left\{d_{ux} + w_{xv}\right\}\]
+    
+    We can note that if we write interpret $a \oplus b = \min\left\{a, b\right\}$, and $a \odot b = a + b$, then we can rewrite the recursive definition of our dynamic problem as: 
+    \[c_{uv} = \left(a_{u1} \odot b_{1v}\right) \oplus \ldots \oplus \left(a_{un} \odot b_{nv}\right)\]
+
+    We can see that it has the form of a component of a matrix resulting a matrix multiplication. In other words, defining $D_m = \left(d_m\left(i, j\right)\right)$ and $W = \left(w\left(i, j\right)\right)$ and a matrix multiplication $A \odot B$ defined element wise by our reinterpretation above, then we could write: 
+    \[D_m = D_{m-1} \odot W\]
+
+    This might seem a bit abstract, but we are allowed to do so since $\left(\mathbb{R}, \text{min}, +\right)$ is a semiring (it is not important if we don't exactly understand this explanation; we only need to get the main idea).
+
+    In fact, since $D_m = D_{m-1} \odot W$, this means that $D_m = W^m$. If we just use the naive method to compute this product, it takes $\left|V\right|$ ``multiplications'' and thus we still have $\Theta\left(\left|V\right|^4\right)$ time. However, we can notice that we can use fast exponent---squaring repeatedly and multiplying the correct terms---giving $O\left(\left|V\right|^3 \log\left|V\right|\right)$. 
+
+    We may want to try doing more. We designed all this in the idea of using Strassen's algorithm, but sadly we cannot use it since the minimum operation does not have an inverse.
+
+
+    \subparag{Application}{
+        This idea of applying matrix multiplications with modified operations is a really nice one, which can be applied to many problems.
+
+        For instance, let's say we want to solve an easier version of our problem: transitive closure. We want to output an array $t\left[i, j\right]$ such that:
+        \begin{functionbypart}{t\left[i, j\right]}
+            1, & \text{if there is a path from $i$ to $j$} \\
+            0, & \text{otherwise}
+        \end{functionbypart}
+
+        Now, we can use $\lor$ (OR) and $\land$ (AND) operations: 
+        \[t\left[u, v\right] = \left(t\left[u, x_1\right] \land w\left[x_1, v\right]\right) \lor \ldots \lor \left(t\left[u, x_n\right] \land w\left[x_n, v\right]\right)\]
+        
+        $\left(\left\{0, 1\right\}, \lor, \land\right)$ is not a ring, but we can still use fast matrix multiplication in our case. This gives us a $O\left(V^{2.376} \log\left(V\right)\right)$ time (which is really good).
+    }
+}
+
+\parag{Floyd-Warshall algorithm}{
+    The idea of this algorithm is to make another dynamic program, but in a more clever way.
+
+    Let's consider a slightly different subproblem: let $c_k\left(u, v\right)$ be the weight of the shortest path from $u$ to $v$ with intermediate vertices in $\left\{1, 2, \ldots, k\right\}$. Our guess is that our shortest path uses vertex $k$ or not, leading to:
+    \begin{functionbypart}{c_k\left(u, v\right)}
+        w\left(u, v\right), & \text{if } k = 0  \\
+        \min\left(c_{k-1}\left(u, v\right), c_{k-1}\left(u, k\right) + c_{k-1}\left(k, v\right)\right), & \text{if } k \neq 0
+    \end{functionbypart}
+    
+    Again, we only need to consider up to $k = \left|V\right|$. This means that we have $O\left(V^3\right)$ subproblems, and only 2 choices, giving us a complexity of $O\left(V^3\right)$. This is already really good.
+
+    We'd not want to try even improve this result when the graph is sparse, meaning that $\left|E\right| \ll \left|V\right|^2$ (typically having $\left|E\right| = o\left(\left|V\right|^2\right)$).
+}
+
+\parag{Johnson's algorithm: Intuition}{
+    Our new idea takes is source on the hope to apply Dijkstra $\left|V\right|$ times. However, our graph may have negative edge weights, so we need to find a clever way to transform our graph in order to only have non-negative weights and keeping the propriety that the shortest path over those weights is the shortest path over the original weights.
+
+    To do so, we first need the following lemmas.
+}
+
+\parag{Theorem: Weight transformation}{
+    Let $h: V \mapsto \mathbb{R}$ be any function. Let's also suppose that for all $u, v \in V$ we have the following property:
+
+    \[w_h\left(u, v\right) = w\left(u, v\right) + h\left(u\right) - h\left(v\right)\]
+    where $w_h\left(u, v\right)$ are the edge weights of a modified version of our graph. Then, for any path $p$:
+    \[w\left(p\right) = w_h\left(p\right) - h\left(u\right) + h\left(v\right)\]
+    where $w_h\left(p\right)$ is the weight of our path $p$ on the modified version of our graph.
+
+    \subparag{Intuition}{
+        In other words, if we are able to construct a new graph with weights $w_h\left(u, v\right)$ which are all positive, then, computing a distance on this graph, we can easily transform it to a distance on the non-transformed graph.
+
+        In particular, if we find a path which has the shortest distance on the modified graph, then it will also be the path with shortest distance on our original graph.
+    }
+
+    \subparag{Proof}{
+        This is just a telescopic series. Supposing that we have any path $p = \left(x_0, x_1, \ldots, x_k\right)$ where $x_0 = u$ and $x_k = v$, it yields thatè:
+        \autoeq{\unexpanded{w_h\left(p\right) = \sum_{i=1}^{k} w_h\left(x_{i-1}, x_i\right) = \sum_{i=1}^{k} \left(w\left(x_{i-1}, x_i\right) + h\left(x_{i-1}\right) - h\left(x_i\right)\right) = \left(\sum_{i=1}^{k} w\left(x_{i-1}, x_i\right)\right) + h\left(x_0\right) - h\left(x_k\right) = w\left(p\right) + h\left(u\right) - h\left(v\right)}}
+
+        \qed
+    }
+}
+
+\parag{Definition: System of difference constraints}{
+    Our goal is to have a modified graph with positive edges. This means that, for all $u, v \in V$ we want: 
+    \[w_h\left(u,v\right) = w\left(u, v\right) + h\left(u\right) - h\left(v\right) \geq 0 \iff h\left(v\right) - h\left(u\right) \leq w\left(u, v\right)\]
+    
+    This last expression is what we are trying to solve, it is a \important{system of difference constraints}.
+}
+
+\parag{Theorem: Inexistence}{
+    If a weighted graph has a negative cycle, then there is no solution to the difference constraints for it.
+
+    \subparag{Proof}{
+        Let's suppose that we have a negative weight cycle $c = \left(v_0, v_1, \ldots, v_k\right)$ with $v_0 = v_k$. Supposing for contradiction that there exists a $h$ such that we have $h\left(v_i\right) - h\left(v_{i-1}\right) \leq w\left(v_{i-1}, v_{i}\right)$ for all $i$, we get: 
+        \[w\left(c\right) = \sum_{i=1}^{k} w\left(v_{i-1}, v_i\right) \geq \sum_{i=1}^{k} \left(h\left(v_i\right) - h\left(v_{i-1}\right)\right) = 0\]
+        since this is another telescopic series and since $v_0 = v_k$.
+
+        However, $w\left(c\right) \geq 0$ implies that $c$ was not a negative weight cycle, which is our contradiction.
+
+        \qed
+    } 
+}
+
+\parag{Theorem: Existence}{
+    If a weighted graph has no negative cycle, then we can solve the system of difference constraints.
+
+    \subparag{Proof}{
+        Let us first add a new vertex $s$ to our graph, which we link to every other vertex with an edge of weight 0: 
+        \[w\left(s, x\right) = 0, \mathspace \forall x \in V\]
+        
+        We let our function $h$ to be defined as:
+        \[h\left(v\right) = d\left(s, v\right)\]
+
+        We want to show that $h$ has the required property. Before doing so, we can notice that, by the triangle inequality, taking the shortest path from $s$ to $u$ and then from $u$ to $v$ cannot be a shorter path than directly taking the shortest path form $s$ to $v$: 
+        \[d\left(s, u\right) + w\left(u, v\right) \geq d\left(s, v\right) \iff d\left(s, v\right) - d\left(s, u\right) \leq w\left(u, v\right)\]
+        
+        This means that:
+        \[h\left(v\right) - h\left(u\right) = d\left(s, v\right) - d\left(s, u\right) \leq  w\left(u, v\right)\]
+        as required.
+
+        \qed
+    }
+}
+
+\parag{Johnson's algorithm}{
+    We now have all the keys to make Johnson's algorithm, in order to find the all-pair shortest path on a given graph.
+
+    First, we consider a new graph with a new vertex $s$ connected to all other vertices with edges of weight 0. We run Bellman-Ford on this modified graph from $s$, i.e. to get the shortest paths from $s$ to all vertices. We let $h\left(v\right) = d\left(s, v\right)$ for all vertex $v \in V$.
+
+    Second, we run $\left|V\right|$ times Dijkstra on another graph were we let $w_h\left(u, v\right) = w\left(u, v\right) + h\left(u\right) - h\left(v\right)$ (this can be done without modifying the graph, we just need to fake the way Dijkstra sees weights). At the same time, when we compute the distance $d_h\left(u, v\right)$ from a vertex $u$ to a vertex $v$, we output the distance $d\left(u, v\right) = d_h\left(u, v\right) - h\left(u\right) + h\left(v\right)$.
+
+    The first Bellman-Ford takes $O\left(VE\right)$. Then, the $\left|V\right|$ Dijkstra take $O\left(VE + V^2 \log\left(V\right)\right)$. This indeed yields an algorithm running in
+    \[O\left(VE + V^2 \log\left(V\right)\right).\]
+}
+
+
+\end{document}
