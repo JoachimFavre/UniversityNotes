@@ -346,6 +346,9 @@ def verify_content(content, file_name):
         
     if content.count("Fourrier") > 0:
         print("\t'Fourrier' instead of Fourier in {}.".format(file_name))
+        
+    if content.lower().count("rotationel") > 0:
+        print("\t'rotationel' instead of rotationnel in {}.".format(file_name))
     
     if one_contains(extract_all(content, r"\bvec"), "_"):
         print(f"\tWrong style bvec in {file_name}")
