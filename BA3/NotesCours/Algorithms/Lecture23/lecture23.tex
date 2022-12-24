@@ -243,6 +243,51 @@ procedure RandomisedQuicksort(A, p, r):  // the same
     }
 }
 
+\begin{filecontents*}[overwrite]{CountingSort.code}
+procedure CountingSort(A, B, n, k):
+    // Initialise i
+    let C[0...k] be a new array
+    for i = 0 to k:
+        C[i] = 0
+    
+    // Count occurences
+    for j = 1 to n:
+        C[A[j]] += 1
+
+    // Turn to cumulative sum
+    for i = 1 to k:
+        C[i] += C[i-1]
+
+    // Put the values in order in B
+    for j = n downto 1:
+        B[C[A[j]]] = A[j]  // place i in B[C[i]]
+        C[A[j]] -= 1  // if needs to be placed again, must not be at the same place
+\end{filecontents*}
+
+\parag{Counting sort}{
+    Let's try to make a sorting algorithm in $O\left(n\right)$. By our theorem above, it requires not to be a comparison sort.
+
+    Let's say that the array we receive $A\left[1\ldots n\right]$ has values $A\left[j\right] \in \left\{0, 1, \ldots, k\right\}$ for some $k$. Note that, as long as the array has integer values, we can always shift it like that by subtracting the minimum (found in $O\left(n\right)$). 
+
+    Now, the idea, is to make an array $C\left[0\ldots k\right]$ such that $C\left[i\right]$ represents the number of times the value $i$ appears in $A$ (it can be 0, or more). It can be constructed from $A$ in one pass. From this array, we can then make a new, sorted, array $B\left[1 \ldots n\right]$ with the values of $A$, in another single pass.
+
+    \subparag{Algorithm}{
+        We can realise that adding one more step can make the algorithm much simpler to implement. When we have computed our array $C$, we can then turn it to a cumulative sum, so that $C\left[i\right]$ represents the number of times the values $0, \ldots, i$ appear in $A$. However, we notice that, then, this values is exactly the place value $i$ would require to land in $B$ (if we need to add it to $B$), i.e. $B\left[C\left[i\right]\right] = i$.
+
+        \importcode{CountingSort.code}{pseudo}
+    }
+    
+    \subparag{Analysis}{
+        Our algorithm only consists of for loops with $\Theta\left(k\right)$ iterations and $\Theta\left(n\right)$ iterations. This gives us a runtime complexity of $\Theta\left(n + k\right)$.
+
+        Note that, in fact, because $k$ typically has to be very big, this is not better than the comparisons sort we saw for arrays we have no information about. However, if this $k$ is small enough, then it can be very powerful.
+    }
+    
+    \subparag{Remark}{
+        This algorithm will not be at the exam since we did not have time to see in the lecture.
+    }
+    
+}
 
 
 

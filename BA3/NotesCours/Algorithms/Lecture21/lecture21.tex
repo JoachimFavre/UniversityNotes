@@ -16,46 +16,10 @@
 
 \lecture{21}{2022-12-05}{Stochastic probabilistic randomness}{
 \begin{itemize}[left=0pt]
-    \item Explanation of Dijkstra's algorithm for finding a shortest path in a weighted graph.
-    \item Introduction to probabilistic analysis, and definition of indicator random variables.
+    \item Introduction to probabilistic analysis.
+    \item Definition of indicator random variables.
 \end{itemize}
 
-}
-
-\begin{filecontents*}[overwrite]{Dijkstra.code}
-procedure Dijkstra(G, w, s):
-    InitSingleSource(G, s)
-    let S be an empty set
-    let Q be an empty priority queue
-    insert all G.V into Q
-    while !Q.isEmpty():
-        u = ExtractMin(Q)
-        S = union(S, u)
-        for each v in G.Adj[u]:
-            Relax(u, v, w)
-\end{filecontents*}
-
-
-\parag{Dijksta's algorithm}{
-    Let's consider a much faster algorithm, which only works with non-negative weights. 
-
-    The idea is to make a version of BFS working with weighted graphs. We start with a set containing the source $S = \left\{s\right\}$. Then, we greedily grow the source $S$ by iteratively adding to $S$ the vertex that is closest to $S$ ($v \not\in S$ such that it minimises $\min_{u \in S} u.d + w\left(u, v\right)$). To find those, we use a priority queue. At any time, we have found the shortest path of every element in $S$.
-
-    \subparag{Implementation}{
-        The program looks like Prim's algorithm, but we are minimising $u.d + w\left(u, v\right)$ instead of $w\left(u, v\right)$:
-        \importcode{Dijkstra.code}{pseudo}
-        \later{update code from slides}
-    }
-
-    \subparag{Analysis}{
-        Just like Prim's algorithm, the running time is dominated by operations on the queue. If we implement it using a binary heap, each operation takes $O\left(\log\left(V\right)\right)$ time, meaning that we have a runtime of $O\left(E \log \left(V\right)\right)$.
-
-        Note that we can use a more careful implementation of the priority queue, leading to a runtime of $O\left(V \log\left(V\right) + E\right)$. This is almost as efficient as BFS.
-    }
-    
-    \subparag{Proof}{
-        The proof of optimality of this algorithm is considered trivial and left as an exercise to the reader. The idea is to show the loop invariant stating that, at the start of each iteration, we have for all $v \in S$ that the distance $v.d$ from $s$ to $v$ is equal to the shortest path from $s$ to $v$. This naturally uses the assumption that all weights are non-negative (positive or zero).
-    }
 }
 
 \section{Probabilistic analysis}

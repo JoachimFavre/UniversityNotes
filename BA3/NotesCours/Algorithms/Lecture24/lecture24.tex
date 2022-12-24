@@ -24,7 +24,6 @@
 
 }
 
-\section{And now back to graphs\ldots}
 \subsection{All-pairs shortest paths}
 \parag{Goal}{
     We want to find efficient ways to compute all-pairs shortest paths.
@@ -171,7 +170,7 @@
 \parag{Johnson's algorithm}{
     We now have all the keys to make Johnson's algorithm, in order to find the all-pair shortest path on a given graph.
 
-    First, we consider a new graph with a new vertex $s$ connected to all other vertices with edges of weight 0. We run Bellman-Ford on this modified graph from $s$, i.e. to get the shortest paths from $s$ to all vertices. We let $h\left(v\right) = d\left(s, v\right)$ for all vertex $v \in V$.
+    First, we consider a new graph with a new vertex $s$ connected to all other vertices with edges of weight 0. We run Bellman-Ford on this modified graph from $s$, i.e. to get the shortest paths from $s$ to all vertices. We let $h\left(v\right) = d\left(s, v\right)$ for all vertex $v \in V$ (note that this is useful if there are paths of negative weight going to $v$).
 
     Second, we run $\left|V\right|$ times Dijkstra on another graph were we let $w_h\left(u, v\right) = w\left(u, v\right) + h\left(u\right) - h\left(v\right)$ (this can be done without modifying the graph, we just need to fake the way Dijkstra sees weights). At the same time, when we compute the distance $d_h\left(u, v\right)$ from a vertex $u$ to a vertex $v$, we output the distance $d\left(u, v\right) = d_h\left(u, v\right) - h\left(u\right) + h\left(v\right)$.
 
