@@ -477,6 +477,23 @@ def create_main_tex(tmp_dir, tex_files, config, summaries):
     with open(FOREWORD_NAME[foreword_key], encoding='utf8') as foreword_file:
         foreword = foreword_file.read()
     # foreword = ""
+    
+    if config["english"]:
+        hommage = ("To Gilles Castel, whose work has \\\\ \n"
+                   "inspired me this note taking method.\n"
+                   "\n"
+                   "\\vspace{1em} \n"
+                   "\n"
+                   "Rest in peace, nobody\\\\ \n"
+                   "deserves to go so young.\n")
+    else:
+        hommage = ("À Gilles Castel, dont le travail m'a \\\\ \n"
+                   "inspiré cette méthode de prise de note.\n"
+                   "\n"
+                   "\\vspace{1em} \n"
+                   "\n"
+                   "Repose en paix, personne ne \\\\ \n"
+                   "mérite de partir si jeune.\n")
 
     main_tex_content = ("\\documentclass[a4paper]{book}\n"
                         + "\n"
@@ -516,6 +533,19 @@ def create_main_tex(tmp_dir, tex_files, config, summaries):
                         + "\\textit{Version " + get_version() + "}\n"
                         + "\\end{center}\n"
                         # + "\\vspace*{\\fill}\n"
+                        + "\n"
+                        + "\\clearemptydoublepage\n"
+                        + "\\thispagestyle{empty}\n"
+                        + "\\vspace*{\\fill}\n"
+                        + "\\begin{flushright}\n"
+                        + "\\begin{minipage}{7cm}\n"
+                        + "{\\itshape \n"
+                        + hommage
+                        + "}\n"
+                        + "\\end{minipage}\n"
+                        + "\\end{flushright}\n"
+                        + "\\vspace*{\\fill}\n"
+                        + "\\vspace*{\\fill}\n"
                         + "\n"
                         + "\\clearemptydoublepage\n"
                         + "\\tableofcontents\n"
