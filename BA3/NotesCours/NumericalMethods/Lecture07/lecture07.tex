@@ -212,8 +212,8 @@ float Q_rsqrt(float y) {
 \parag{Newton's method for multivariate root finding}{
     When we want to generalise our algorithms to more dimensions, we can basically replace everything by vectors and see if it still works. There is no generalisation of the bisection, but we can make a Newton's method in $n$-dimensions this way.
 
-    Thus, replacing our derivative by a Jacobian, we approximate $\bvec{f}\left(\bvec{x} + \bvec{h}\right) \approx \bvec{f}\left(\bvec{x_{k-1}}\right) + \nabla \bvec{f}\left(\bvec{x_{k-1}}\right)\bvec{h}$, yielding: 
-    \[\bvec{x_k} = \bvec{x_{k-1}} - \left(\nabla \bvec{f}\left(\bvec{x_{k-1}}\right)\right)^{-1} \bvec{f}\left(\bvec{x_{k-1}}\right)\]
+    Thus, replacing our derivative by a Jacobian, we approximate $\bvec{f}\left(\bvec{x} + \bvec{h}\right) \approx \bvec{f}\left(\bvec{x}_{k-1}\right) + \nabla \bvec{f}\left(\bvec{x}_{k-1}\right)\bvec{h}$, yielding: 
+    \[\bvec{x}_k = \bvec{x}_{k-1} - \left(\nabla \bvec{f}\left(\bvec{x}_{k-1}\right)\right)^{-1} \bvec{f}\left(\bvec{x}_{k-1}\right)\]
     
     \subparag{Pros and cons}{
         At first sight, we can see that this is a rapid quadratic convergence algorithm, but it may diverge. Also, there is no safe hybrid (such as the Newton-Bisection) in $N$-dimensions.
@@ -232,7 +232,7 @@ float Q_rsqrt(float y) {
 \parag{Broyden's method for computing a Jacobian}{
     We know that the Jacobian is expensive to compute, so instead of computing it we can guess it. We could start with a very bad approximation of the Jacobian (such as the identity matrix), and then iteratively make it better.
 
-    The idea is that, given a change in the function $\Delta \bvec{f} = \bvec{f}\left(\bvec{x_k}\right) - \bvec{f}\left(\bvec{x_{k-1}}\right)$, then we set the Jacobian to be $J_k = J_{k-1} + \Delta J$, in order to explain the change in the function value going from $\bvec{x_{k-1}}$ to $\bvec{x_k}$ (supposing the Jacobian did not change between $\bvec{x_k}$ and $\bvec{x_{k-1}}$, this should indeed get finer and finer): 
+    The idea is that, given a change in the function $\Delta \bvec{f} = \bvec{f}\left(\bvec{x}_k\right) - \bvec{f}\left(\bvec{x}_{k-1}\right)$, then we set the Jacobian to be $J_k = J_{k-1} + \Delta J$, in order to explain the change in the function value going from $\bvec{x}_{k-1}$ to $\bvec{x}_k$ (supposing the Jacobian did not change between $\bvec{x}_k$ and $\bvec{x}_{k-1}$, this should indeed get finer and finer): 
     \[J_k \Delta \bvec{x} = \Delta \bvec{f}\]
 
     There are many ways to do so, but the simplest and smallest solution can be proven to be: 
@@ -250,8 +250,8 @@ float Q_rsqrt(float y) {
 \parag{Broyden's method}{
     We have all the high-levels tools to make a quasi-Newton method: \important{Broyden's method}. Its high level idea is:
     \begin{enumerate}
-        \item Evaluate $\bvec{f}\left(\bvec{x_k}\right)$
-        \item Set $J_k$ based on the cached values of $J_{k-1}$, $\bvec{f}\left(\bvec{x_k}\right)$, $\bvec{f}\left(\bvec{x_{k-1}}\right)$
+        \item Evaluate $\bvec{f}\left(\bvec{x}_k\right)$
+        \item Set $J_k$ based on the cached values of $J_{k-1}$, $\bvec{f}\left(\bvec{x}_k\right)$, $\bvec{f}\left(\bvec{x}_{k-1}\right)$
         \item Update $J_k^{-1}$ using Sherman-Morrison formula.
         \item Take an approximate Newton step.
     \end{enumerate}

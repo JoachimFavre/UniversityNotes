@@ -24,7 +24,7 @@
 \end{itemize}
 }
 
-\section{Interpolation}
+\subsection{Interpolation}
 \parag{Goal}{
     The idea is that we have data at some points, and we want to access it at other points. 
 }
@@ -111,13 +111,13 @@
     What we have done so far works very well if we have well structured data (samples which we can evaluate ourselves for instance). However, if we are given very random samples in many dimensions, then they work much less well. Typically, let's say we have:
     \imagehere[0.5]{RBF.png}
 
-    The idea of \important{Radial Basis Function (RBF) interpolation}, is that, given $n$ evaluations $f\left(\bvec{x_i}\right)$ at positions $\bvec{x_i}$, we can just use a weighted average using also the distance to every point: 
-    \[g\left(\bvec{x}\right) = \sum_{i=0}^{n} w_i \phi\left(\left\|\bvec{x} - \bvec{x_i}\right\|\right) f\left(\bvec{x_i}\right)\]
+    The idea of \important{Radial Basis Function (RBF) interpolation}, is that, given $n$ evaluations $f\left(\bvec{x}_i\right)$ at positions $\bvec{x}_i$, we can just use a weighted average using also the distance to every point: 
+    \[g\left(\bvec{x}\right) = \sum_{i=0}^{n} w_i \phi\left(\left\|\bvec{x} - \bvec{x}_i\right\|\right) f\left(\bvec{x}_i\right)\]
 
     For the distance-weight influence, we can take many choices, but for instance we could take a Gaussian curve: 
     \[\phi\left(r\right) = e^{-\left(\epsilon r\right)^2}\]
     
-    Finally, we need to find the $w_i$ such that $g\left(\bvec{x_i}\right) = f\left(\bvec{x_i}\right)$ for all $i$ (those parameters are only here because, when doing interpolation, this property is quite important). This is just a linear system.
+    Finally, we need to find the $w_i$ such that $g\left(\bvec{x}_i\right) = f\left(\bvec{x}_i\right)$ for all $i$ (those parameters are only here because, when doing interpolation, this property is quite important). This is just a linear system.
 
     \subparag{Remark}{
         Since the radial basis function decays quickly, we can optimise our algorithm by not visiting points which are far apart from the point we are sampling.

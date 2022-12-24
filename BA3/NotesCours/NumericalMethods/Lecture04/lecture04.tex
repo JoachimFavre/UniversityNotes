@@ -55,7 +55,7 @@
     We can however use weighted least squares by adding a weight per point, minimising the following function: 
     \[\sum_{i=1}^{n} \left[w_i \left(\left(a x_i + b\right) - y_i\right)^2\right]\]
     
-    This can be done easily by realising that we have new points $\hat{x_i} = \sqrt{w_i} x_i$ and $\hat{y_i} = \sqrt{w_i} y_i$. Thus, we can simply scales the row of $A$ and $\bvec{b}$ by the square roots of the corresponding weight.
+    This can be done easily by realising that we have new points $\hat{x}_i = \sqrt{w_i} x_i$ and $\hat{y}_i = \sqrt{w_i} y_i$. Thus, we can simply scales the row of $A$ and $\bvec{b}$ by the square roots of the corresponding weight.
 
     \subparag{Standard deviation}{
         If we know the standard deviation $\sigma_i$, then we typically take:
@@ -109,11 +109,11 @@
     Tikhonov regularisation is the most common regularisation method for linear systems, since it is very simple to implement.
 
     The idea is that unstable solutions is often that $\bvec{x}$'s magnitude becomes too large. Thus, we will penalise $\bvec{x}$ with a too large $L_2$ norm: 
-    \[\bvec{x_{sol}} = \argmin \left[\left\|A \bvec{x} - \bvec{b}\right\|_2^2 + \lambda \left\|\bvec{x}\right\|_2^2\right]\]
+    \[\bvec{x}_{sol} = \argmin \left[\left\|A \bvec{x} - \bvec{b}\right\|_2^2 + \lambda \left\|\bvec{x}\right\|_2^2\right]\]
     where $\lambda$ is the parameter that controls the degree to which we prefer smaller solutions.
 
     We can rewrite our equation as:
-    \autoeq{\unexpanded{\bvec{x_{sol}} = \argmin \left(\bvec{x}^T A^T A \bvec{x} - 2\bvec{b}^T A \bvec{x} + \left\|\bvec{b}\right\|_2^2 + \lambda \left\|\bvec{x}\right\|_2^2\right) = \argmin\left(\bvec{x}^T \left(A^T A + \lambda I \right) \bvec{x} - 2 \bvec{b}^T A \bvec{x} + \left\|\bvec{b}\right\|_2^2\right)}}
+    \autoeq{\unexpanded{\bvec{x}_{sol} = \argmin \left(\bvec{x}^T A^T A \bvec{x} - 2\bvec{b}^T A \bvec{x} + \left\|\bvec{b}\right\|_2^2 + \lambda \left\|\bvec{x}\right\|_2^2\right) = \argmin\left(\bvec{x}^T \left(A^T A + \lambda I \right) \bvec{x} - 2 \bvec{b}^T A \bvec{x} + \left\|\bvec{b}\right\|_2^2\right)}}
 
     We can then solve this through the LU factorisation for instance, by adding $\lambda I$ to the normal equations $A^T A$. This can also be solved through the QR factorisation by constructing a new matrix $A$ and a new vector $\bvec{b}$.
     
@@ -159,8 +159,8 @@
     An \important{orthogonal matrix}, generally written $Q$, is a matrix where each of its columns are orthogonal to each other, and are of unit length.
 
     \subparag{Property}{
-        We notice that, if $Q$ is an orthogonal matrix with columns $\bvec{Q_1}, \ldots, \bvec{Q_n}$, then: 
-        \[Q^T Q = \begin{pmatrix} \bvec{Q_1}^T \bvec{Q_1} & \cdots & \bvec{Q_1}^T \bvec{Q}_n \\ \cdots & \ddots & \cdots \\ \bvec{Q_n}^T \bvec{Q_1} & \cdots & \bvec{Q_n}^T \bvec{Q_n} \end{pmatrix} = \begin{pmatrix} 1 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & 1 \end{pmatrix} = I \]
+        We notice that, if $Q$ is an orthogonal matrix with columns $\bvec{Q}_1, \ldots, \bvec{Q}_n$, then: 
+        \[Q^T Q = \begin{pmatrix} \bvec{Q}_1^T \bvec{Q}_1 & \cdots & \bvec{Q}_1^T \bvec{Q}_n \\ \cdots & \ddots & \cdots \\ \bvec{Q}_n^T \bvec{Q}_1 & \cdots & \bvec{Q}_n^T \bvec{Q}_n \end{pmatrix} = \begin{pmatrix} 1 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & 1 \end{pmatrix} = I \]
     }
     
     \subparag{Interest}{
@@ -180,9 +180,9 @@
 
 \parag{Householder QR decomposition}{
     At each iteration, we want to remove all elements below the pivot using an orthogonal matrix: 
-    \[Q \bvec{x} = Q \begin{pmatrix} x_1 \\ x_2 \\ \cdots \\ x_n \end{pmatrix} = \begin{pmatrix} \widetilde{x_1} \\ 0 \\ \cdots \\ 0 \end{pmatrix} \]
+    \[Q \bvec{x} = Q \begin{pmatrix} x_1 \\ x_2 \\ \cdots \\ x_n \end{pmatrix} = \begin{pmatrix} \widetilde{x}_1 \\ 0 \\ \cdots \\ 0 \end{pmatrix} \]
     
-    Let's first consider the case in 2 dimensions. Our goal is to project our vector onto the $\bvec{e_1}$ axis. The LU makes a basic projection, which does not preserves lengths:
+    Let's first consider the case in 2 dimensions. Our goal is to project our vector onto the $\bvec{e}_1$ axis. The LU makes a basic projection, which does not preserves lengths:
     \imagehere[0.5]{LUDecompositionProjection.png}
 
     To preserve our length, we could do a rotation. However, this usually involves sines and cosines, which are not very efficient numerically. Instead, let us do a reflection (letting $\bvec{v}$ to be a vector orthogonal to the reflection axis):
@@ -197,7 +197,7 @@
     This is named the Houseolder reflection. We notice that there always are two possibilities for choosing the axis of reflection. Here is the second one for our example above:
     \imagehere[0.5]{QRReflectionSecondAxis.png}
 
-    The difficulty comes from computing this $\bvec{v}$. This can be done by noting that we want $Q \bvec{v} = \bvec{e_1}$. However, the computations are non-trivial, and we don't really have to spend time developing the formula, only understand it (especially since those algorithms are implemented much better than what we could ever do in libraries).
+    The difficulty comes from computing this $\bvec{v}$. This can be done by noting that we want $Q \bvec{v} = \bvec{e}_1$. However, the computations are non-trivial, and we don't really have to spend time developing the formula, only understand it (especially since those algorithms are implemented much better than what we could ever do in libraries).
 
     \subparag{Remark}{
         Our goal was to do this factorisation for tall matrices, so this looks like:
