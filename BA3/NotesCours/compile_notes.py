@@ -41,9 +41,9 @@ PRINTED_VERSION = False
 CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
-COURSES_NAME = ["Analyse-3", "Algorithms", ("NumericalMethods", [(5, 6)]), "ComputerNetworks"]
+COURSES_NAME = ["Analyse-3", ("Algorithms", [(24, 21), (24, 22), (24, 23)]), ("NumericalMethods", [(5, 6)]), "ComputerNetworks"]
 # COURSES_NAME = ["Analyse-3"]
-# COURSES_NAME = ["Algorithms"]
+# COURSES_NAME = [("Algorithms", [(24, 21), (24, 22), (24, 23)])]
 # COURSES_NAME = [("NumericalMethods", [(5, 6)])]
 # COURSES_NAME = ["ComputerNetworks"]
 
