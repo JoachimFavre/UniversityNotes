@@ -10,11 +10,10 @@ import re
 import fitz  # pip install PyMuPDF
 
 COMPILED_DIR = "_CompiledNotes"
-# COURSE = "Analyse-2"
-COURSE = "AICC-2"
+COURSE = "Analyse-3"
 PDF = ".pdf"
 
-LECTURE_PATH = r"{}\Lecture{:02d}\lecture{}.tex"
+LECTURE_PATH = r"{}\Lecture{:02d}\lecture{:02}.tex"
 LECTURE_TOC_REGEX = r"(?:Lecture|Cours) (\d+) .* \d{4}\D*(\d+)\n"
 
 BEGIN_EXTRACTION = ["Liste des cours", "List of lectures"]
