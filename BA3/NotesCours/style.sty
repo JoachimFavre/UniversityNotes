@@ -4,7 +4,7 @@
 \usepackage[british]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{fontspec}
-\usepackage[utf8]{inputenc}
+% \usepackage[utf8]{inputenc}  % useless for LuaLaTex
 \usepackage[bottom=2.5cm, top=2.5cm, left=2.5cm, right=2.5cm]{geometry}
 \setlength{\columnsep}{1cm}
 \usepackage{fancyhdr}
@@ -22,7 +22,7 @@
 \usepackage{tabularx}
 
 \usepackage[nointegrals]{wasysym}
-\usepackage[binary-units]{siunitx}
+\usepackage{siunitx}
 \sisetup{parse-numbers = false}
 \sisetup{per-mode = symbol}
 \usepackage{xcolor}
@@ -415,7 +415,7 @@
 % inspired from https://tex.stackexchange.com/a/242086
 \newtcolorbox{tcbsiderules}[1][]{blanker, breakable,
      left=0pt, right=0pt, top=0pt, bottom=\parskip,
-     borderline west={0.1mm}{-2.5cm}{black}, parbox=false, #1}
+     borderline west={0.1mm}{-2.5cm}{black}, #1}
 
 \setlength{\TPHorizModule}{1cm}
 \newcommand{\paragsubparag}[3]{
@@ -444,21 +444,20 @@
     \setlength\neededspace{\subparagheight - \contentheight}
     \needspace{2\paragheight}
     \needspace{2\subparagheight}
-    \needspace{5em}
-    \begin{adjustwidth}{5.8cm}{0cm}
-        \begin{textblock}{3}(0, 0)\vspace{0pt}
-            \RaggedRight\fullbf{#1}
-        \end{textblock}
-        \begin{textblock}{2}(3.5, 0)
-            \vspace{0.5em}
-            \RaggedRight\textit{\footnotesize#2}
-        \end{textblock}
-        \begin{tcbsiderules}
+    \begin{adjustwidth}{5.8cm}{0cm}%
+        \begin{tcbsiderules}%
+            \begin{textblock}{3}(-5.8, -0.015)%
+                \RaggedRight\fullbf{#1}
+            \end{textblock}%5
+            \begin{textblock}{2}(-2.3, 0.015)  % 3.5 - 5.8 = -2.3
+                \RaggedRight\textit{\footnotesize#2}
+            \end{textblock}%
+            \nopagebreak%
             #3
             \ifthenelse{\subparagheight > \contentheight}{\vspace{2\neededspace}}{}  % Why 2? That's actually quite a good question, but it works perfectly.
         \end{tcbsiderules}
     \end{adjustwidth}
-    \vspace{\parskip}
+
 }
 
 % For the capital letter (it's a bad way to do it, but it's the only way I found)
@@ -492,11 +491,10 @@
     \def\datename{\DTMusedate{lectureDate}}
     \phantomsection
     \addcontentsline{lectures}{chapter}{\lecturename\ ---\ \datename}
-
     \hyperref[lecturesummary#1]{\textcolor{maincolour}{\hrulefill \hspace{5pt} \datename\ ---\ \lecturename}}
-
     \label{lecture#1}
     \vspace{1em}
+    \nopagebreak
 }
 
 \newcommand{\lecturetitlesummary}[3]{  % #1: lecture no, #2: date, #3: title
