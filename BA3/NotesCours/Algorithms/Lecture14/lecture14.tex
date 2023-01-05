@@ -132,7 +132,7 @@ procedure BFS(V, E, s):
     }
 
     \subparag{Observation}{
-        We note that BFS may not reach all the vertices.
+        We note that BFS may not reach all the vertices (if they are not connected).
     }
 
     \subparag{Remark}{
@@ -148,7 +148,7 @@ procedure DFS(G):
     time = 0
     for u in G.v:
         if u.color == WHITE:
-            DFSVisit(G, U)
+            DFSVisit(G, u)
 
 procedure DFSVisit(G, u):
     time = time + 1
@@ -156,14 +156,14 @@ procedure DFSVisit(G, u):
     u.color = GREY
     for v in G.Adj[u]:
         if v.color == WHITE:
-            DFSVisit(v)
+            DFSVisit(G, v)
     u.color = BLACK
     time = time + 1
     u.f = time
 \end{filecontents*}
 
 \parag{Depth-First Search}{
-    BFS goes through every vertex, but not necessarily every edge. We would now want to make an algorithm that goes through every edges. Note that this algorithm may seem very abstract and \textit{useless} for now but, as we will see right after, it gives us a very interesting insight about a graph.
+    BFS goes through every connected vertex, but not necessarily every edge. We would now want to make an algorithm that goes through every edges. Note that this algorithm may seem very abstract and \textit{useless} for now but, as we will see right after, it gives us a very interesting insight about a graph.
 
     The idea is, starting from a given point, we get going following a path until we get stuck, then backtrack, and get back going. Doing so, we want to output two timestamps on each vertex $v$: the discovery time $v.d$ (when we first start visiting a node) and the finishing time $v.f$ (when we finished visiting all neighbours of our node). This algorithm is named \important{Depth-First Search} (DFS).
     

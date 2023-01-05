@@ -38,6 +38,8 @@ procedure initSingleSource(G, s):
     s.d = 0
 
 procedure BellmanFord(G, w, s):
+    initSingleSource(G, s)
+
     // Main algorithm
     for i = 1 to len(G.V) - 1:
         for each edge (u, v) in G.E:
@@ -170,7 +172,7 @@ procedure Dijkstra(G, w, s):
 \end{filecontents*}
 
 
-\parag{Dijksta's algorithm}{
+\parag{Dijkstra's algorithm}{
     Let's consider a much faster algorithm, which only works with non-negative weights. 
 
     The idea is to make a version of BFS working with weighted graphs. We start with a set containing the source $S = \left\{s\right\}$. Then, we greedily grow the source $S$ by iteratively adding to $S$ the vertex that is closest to $S$ ($v \not\in S$ such that it minimises $\min_{u \in S} u.d + w\left(u, v\right)$). To find those, we use a priority queue. At any time, we have found the shortest path of every element in $S$.
