@@ -211,9 +211,9 @@
 \parag{Decision boundary}{
     A classifiers lead a decision boundary. This is an object of dimension $D-1$ (a line if our data lies on a plane for instance), which splits the space into two regions: one where samples are considered positive (the predicted value is closer to the value of positive samples), and one where they are considered to be negative (the predicted value is closer to the value of negative samples).
 
-    Since it is the set of points which are equivalently distance to both labels, the equation of this boundary is given by: 
-    \[\hat{\bvec{y}} = \frac{y_{pos} + y_{neg}}{2}\]
-
+    Since it is the set of points which are equivalently distant to both labels, the boundary is parametrised by the following equation: 
+    \[\hat{\bvec{y}}\left(\bvec{x}\right) = \frac{y_{pos} + y_{neg}}{2}\]
+    where $y_{pos}$ is the value for positive samples, and $y_{neg}$ is the value for negative samples.1
 }
 
 \paragsubparag{}{Remark}{
@@ -294,14 +294,14 @@
     where $\left\|W\right\|^2_F$ is the Frobenius norm of $W$, meaning the sum of the square of all its values, and $\lambda \geq 0$ is a hyperparameter.
 
     This can be solved explicitly: 
-    \[W^* = \left(\Phi^T \Phi + \lambda I_F\right)^{-1} \Phi^T \bvec{y}\]
+    \[W^* = \left(\Phi^T \Phi + \lambda I_F\right)^{-1} \Phi^T Y\]
     where $I_F$ is the $F \times F$ identity matrix.
     
 }
 
 \paragsubparag{}{Linear regression}{
         Leaving $\lambda = 0$, we get the special case of \important{linear regression}. Then, the closed-form formula can be rephrased as: 
-        \[W^* = \left(\Phi^T \Phi\right)^{-1} \Phi^T \bvec{y} = \Phi^{\dagger} \bvec{y}\]
+        \[W^* = \left(\Phi^T \Phi\right)^{-1} \Phi^T \bvec{y} = \Phi^{\dagger} Y\]
         where $\Phi^{\dagger}$ is the Moore-Penrose pseudo-inverse.
 }
 
@@ -309,12 +309,12 @@
 \paragsubparag{}{Kernelisation}{
 
         Using the representer theorem, we can find that: 
-        \[\bvec{\alpha}^* = K^{-1} \bvec{y}\]
+        \[A^* = \left(K + \lambda I_N\right)^{-1} Y\]
         
-        This is not of much use on its own, but we can use this result to find that: 
-        \[\hat{\bvec{y}} = \bvec{y}^T K^{-1} k\left(X, \bvec{x}\right)\]
+        This is not of much use on its own, but we can use this result to find how we predict a value $\hat{\bvec{y}}$ for a new $\bvec{x}$: 
+        \[\hat{\bvec{y}} = Y^T \left(K + \lambda I_N\right)^{-1} k\left(X, \bvec{x}\right)\]
         
-        Note that the value $\bvec{y}^T K^{-1}$ can be computed once during training, and the be reused at every evaluation of the model.
+        Note that the value $Y^T \left(K + \lambda I_N\right)^{-1}$ can be computed once during training, and then be reused at every evaluation of the model.
 }
 
 
