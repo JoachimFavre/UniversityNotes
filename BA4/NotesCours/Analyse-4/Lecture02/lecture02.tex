@@ -1,0 +1,149 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-02 at 15:05:32.
+
+\usepackage{../../style}
+
+\title{Analyse 4}
+\author{Joachim Favre}
+\date{Jeudi 02 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2023-03-02}{Exponentielles et logarithmes complexes}{
+\begin{itemize}[left=0pt]
+    \item Définition de l'exponentielle complexe, et explication de ses propriétés.
+    \item Définition du logarithme complexe, et explication de ses propriétés.
+\end{itemize}
+
+}
+
+\parag{Remarque}{
+    Si $f$ est holomorphe, alors $u, v$ sont en réalité de classe $C^{\infty}$.
+}
+
+
+\parag{Exemple 1}{
+    Considérons à nouveau la fonction suivante:
+    \[f\left(z\right) = z^2 = \left(x^2 - y^2\right) + i\left(2xy\right)\]
+     
+    Nous voulons vérifier les équations de Cauchy-Rieman pour cette fonction. Nous savons que $u\left(x, y\right) = x^2 - y^2$ et $v\left(x, y\right) = 2xy$, donc: 
+    \[u_x = 2x, \mathspace u_y = -2y\] 
+    \[v_x = 2y, \mathspace v_y = 2x\]
+    
+    Nous obtenons bien que $u_x = v_y$ et $u_y = -v_x$, donc notre fonction est bien holomorphe. Ainsi; 
+    \[f'\left(z\right) = u_x + i v_x = 2x + i 2y = 2\left(x + iy\right) = 2z\]
+}
+
+
+
+\parag{Example 2: Construction d'une fonction holomorphe}{
+    Soit $u\left(x, y\right) = x^2 - y^2 + x$ avec $x, y \in \mathbb{R}$. Nous voulons trouver une fonction $v\left(x, y\right)$ de classe $C^1$, telle que $u + iv$ soit holomorphe.
+
+    Nous pouvons simplement poser les équations de Cauchy-Riemann et les résoudre pour $v$: 
+    \[\begin{systemofequations} u_x = v_y \\ u_y = -v_x\end{systemofequations} \iff \begin{systemofequations} v_x = 2y \\ v_y = 2x + 1 \end{systemofequations}\]
+    
+    Nous pouvons maintenant utiliser une méthode similaire à ce que nous faisions pour trouver le potentiel dont dérive une fonction en Analyse 3. En utilisant la première équation, nous trouvons que: 
+    \[v_x = 2y \iff v\left(x, y\right) = \int2y dx = 2xy + C_1\left(y\right)\]
+    
+    Maintenant, en dérivant notre résultat selon $y$ et en utilisant la deuxième équation: 
+    \[v_y\left(x, y\right) = 2x + C_1'\left(y\right) = 2x + 1 \iff C_1'\left(y\right) = 1 \iff C_1\left(y\right) = \int dy = y + C\]
+    
+    Nous avons donc trouvé que: 
+    \[v\left(x, y\right) = 2xy + y + C, \mathspace C \in \mathbb{R}\]
+
+    En mettant tout cela ensemble, cela nous donne: 
+    \autoeq{f\left(x + yi\right) = u\left(x, y\right) + iv\left(x, y\right) = x^2 - y^2+ x + i\left(2xy + y + C\right) \implies f\left(z\right) = \left(x^2 - y^2 + 2xyi\right) + \left(x + yi\right) + Ci = z^2 + z + Ci}
+}
+
+\parag{Remarque}{
+    Les règles de dérivation (i.e. les règles pour l'addition, la soustraction, la multiplication, la division et la composition) dans $\mathbb{R}$ sont aussi vraies dans $\mathbb{C}$. Cependant, nous allons plutôt utiliser les équations de Cauchy-Riemann à travers ce cours.
+}
+
+
+\subsection{Fonctions exponentielle et logarithme}
+\parag{Définition: Exponentielle complexe}{
+    La fonction \important{exponentielle} complexe peut être définie de deux manière équivalente. La première, nommée la définition sommatoire est: 
+    \[e^{z} = \sum_{n=0}^{\infty} \frac{z^n}{n!}, \mathspace \forall z \in \mathbb{C}\]
+    
+    Nous pouvons aussi la définir, de manière équivalente, à travers \important{l'identité d'Euler}: 
+    \[e^{x + yi} = e^{x} e^{yi} = e^{x}\left(\cos\left(y\right) + i\sin\left(y\right)\right)\]
+
+    \subparag{Remarque personnelle}{
+        Cette deuxième définition ne vient pas de nulle part, il est possible de démontrer que c'est la seule généralisation de l'exponentielle qui préserve $\exp\left(a + b\right) = \exp\left(a\right)\exp\left(b\right)$, $\exp\left(0\right) = 1$, et $\exp\left(z\right)$ est dérivable partout.
+
+        Autrement, mais toujours de manière équivalente, c'est la seule fonction telle que $\frac{d}{dz} \exp\left(z\right) = \exp\left(z\right)$ pour tout $z \in \mathbb{C}$ et $\exp\left(0\right) = 1$.
+    }
+}
+
+\parag{Théorème: Propriétés de l'exponentielle}{
+    \begin{enumerate}[left=0pt]
+        \item La fonction $f\left(z\right) = e^z$ est holomorphe partout dans $\mathbb{C}$, et $f'\left(z\right) = e^z$.
+        \item $\left|e^z\right| = e^x$ et $\arg\left(e^z\right) = y$. Donc, en particulier, $\left|e^{yi}\right| = 1$.
+        \item $e^{z + 2\pi n i} = e^{z}$ pour tout $n \in \mathbb{Z}$.
+    \end{enumerate}
+
+    \subparag{Preuve}{
+        La preuve de ces propriétés est faite dans la première série d'exercices.
+    }
+    
+}
+
+\parag{Définition: Logarithme complexe}{
+    La fonction \important{logarithme} complexe est définie de la manière suivante: 
+    \[\begin{split}
+    \log: \mathbb{C} \setminus \left\{0\right\} &\longmapsto \mathbb{C} \\
+    z &\longmapsto \log\left(z\right) = \log\left(\left|z\right|\right) + i \arg\left(z\right)
+    \end{split}\]
+    où $\log\left(\left|z\right|\right)$ est le logarithme réel, et $\arg\left(z\right) \in \left]-\pi, \pi\right] $ est la détermination principale de l'argument.    
+
+    \subparag{Note personnelle}{
+        Informellement, cette définition fait du sens: 
+        \[\log\left(z\right) = \log\left(\left|z\right|e^{i\arg\left(z\right)}\right) = \log\left(\left|z\right|\right) + \log\left(e^{i\arg\left(z\right)}\right) = \log\left(\left|z\right|\right) + i\arg\left(z\right)\]
+    }
+
+    \subparag{Cours de Prof. David Strütt}{
+        Cette partie a été présentée par Prof. David Strütt quand il enseignait ce cours d'Analyse 4 en 2021.
+
+        Notre but est de construire plus formellement notre inverse. Nous supposons donc qu'il existe une fonction $f\left(x + iy\right) = u\left(x,y\right) + iv\left(x, y\right)$ telle que: 
+        \[e^{f\left(z\right)} = z\]
+        
+        Cependant, alors: 
+        \[x + iy = e^{f\left(z\right)} = e^{u\left(x, y\right) + iv\left(x, y\right)} = e^{u\left(x, y\right)}\left(\cos\left(v\left(x, y\right)\right) + i\sin\left(x, y\right)\right)\]
+        
+        On remarque qu'on a obtenu la forme polaire d'un nombre complexe. Or, pour que deux nombres complexes soit égaux, il faut que leur argument soient égaux, et que leur argument sont égaux modulo $2\pi$, donc: 
+        \[\begin{systemofequations} e^{u\left(x, y\right)} = \left\|x + yi\right\| \iff u\left(x, y\right) = \log\left(\left|z\right|\right) \\ \congruent{v\left(x, y\right)}{\arg\left(z\right)}{2\pi} \end{systemofequations}\]
+        
+        Nous devons faire attention au fait que $\arg\left(z\right)$ soit une fonction multivoque. Donc, la fonction $f\left(z\right) = \log\left(\left|z\right|\right) + i\arg\left(z\right)$ n'est pas toujours l'inverse de $\exp\left(z\right)$ comme nous le verrons dans les propriétés qui suivent.
+    }
+}
+
+\parag{Théorème: Propriétés du logarithme}{
+    \begin{enumerate}[left=0pt]
+        \item $\log\left(e^z\right) = z$ si $\cim\left(z\right) \in \left]-\pi, \pi\right]$.
+        \item $e^{\log\left(z\right)} = z$ si $z \neq 0$.
+        \item $\log\left(z\right)$ est holomorphe dans $\mathbb{C} \setminus \left\{x + yi \suchthat x \leq 0, y = 0\right\}$ ($\mathbb{C}$ sans le demi-axe des réels négatifs).
+    \end{enumerate}
+
+    \subparag{Preuve 3}{
+        Nous verrons les autres preuves dans les exercices, mais démontrons le point 3.
+
+        Notre allons même montrer que $\log\left(z\right)$ n'est pas continue sur $\left\{x + yi \suchthat x \leq 0, y = 0\right\}$. Considérons n'importe quel point $z_0 \in \mathbb{R}_{< 0}$ sur ce demi-axe. Nous allons montrer que deux chemins donnent des valeurs différentes pour la limite. 
+
+        Le premier chemin vient du deuxième quadrant et descent verticalement sur $z_0$, i.e. $z = z_0 + it$ avec $t \to 0^+$: 
+        \autoeq{\lim_{t \to 0^+} \log\left(z_0 + it\right) = \lim_{t \to 0^+} \left(\log\left(\left|z_0 + it\right|\right) + i\arg\left(z_0 + it\right)\right) = \log\left(\left|z_0\right|\right) + i\pi}
+
+        Le deuxième chemin vient du troisième quadrant et monte verticalement sur $z_0$, i.e. $z = z_0 - it$ avec $t \to 0^+$.
+        \autoeq{\lim_{t \to 0^+} \log\left(z_0 - it\right) = \lim_{t \to 0^+} \left(\log\left(\left|z_0 - it\right|\right) + i\arg\left(z_0 - it\right)\right) = \log\left(\left|z_0\right|\right) + i \left(-\pi\right) = \log\left(\left|z_0\right|\right) - i\pi}
+
+        Nous avons donc trouvé deux chemins qui convergent vers des valeurs différentes, donc $\log\left(z\right)$ n'est pas continue sur ce demi-axe. Ceci est dû au fait que l'argument soit une fonction multivoque.
+
+        \qed
+    }
+}
+
+\end{document}

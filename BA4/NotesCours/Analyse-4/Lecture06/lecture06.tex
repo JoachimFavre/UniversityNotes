@@ -1,0 +1,162 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-30 at 15:18:40.
+
+\usepackage{../../style}
+
+\title{Analyse 4}
+\author{Joachim Favre}
+\date{Jeudi 30 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2023-03-30}{Des exemples triviaux}{
+\begin{itemize}[left=0pt]
+    \item Beaucoup d'exemple de calcul de séries de Laurent, rayon de convergence, nature de points et résidus.
+    \item Esquisse de preuve d'une méthode pour trouver si un point est pôle d'ordre $m$.
+    \item Introduction à une méthode pour trouver le résidu à un point.
+\end{itemize}
+
+}
+
+\parag{Exemple 3}{
+    Nous voulons trouver la série de Laurent, son rayon de convergence, la nature de $z_0$ et le résidu en $z_0$ pour $z_0 = 0$ et la fonction: 
+    \[f\left(z\right) = \frac{e^{z}}{z^2}\]
+    
+    Nous savons que: 
+    \[e^z = \sum_{n=0}^{\infty} \frac{z^n}{n!}, \mathspace \forall z \in\mathbb{C}\]
+    
+    Ainsi, en divisant par $z^2$, nous obtenons que, pour tout $z \in \mathbb{C}^*$: 
+    \[f\left(z\right) = \frac{e^z}{z^2} = \sum_{n=0}^{\infty} \frac{z^n}{z^2 n!} = \sum_{n=0}^{\infty} \frac{z^{n-2}}{n!} = \sum_{n=-2}^{\infty} \frac{z^n}{\left(n+2\right)!}\]
+
+    Le rayon de convergence est donc $R = \infty$. De plus, $0$ est un pôle d'ordre 2, et $\Res_0\left(f\right) = \frac{1}{\left(-1+2\right)!} = 1$.
+}
+
+\parag{Exemple 4}{
+    Considérons la fonction suiante: 
+    \[f\left(z\right) = \frac{\sin\left(z\right)}{z}\]
+    
+    Nous voulons calculer sa série de Laurent en $z_0 = 0$. Nous pouvons utiliser la série de Taylor du sinus: 
+    \[L_0 f\left(z\right) = \frac{1}{z} \left(z - \frac{z^3}{3!} + \frac{z^5}{5!} - \ldots\right) = 1 - \frac{z^2}{3!} + \frac{z^4}{5!} - \ldots, \mathspace \forall z \in \mathbb{C}^*\]
+    
+    $z_0 = 0$ est un point régulier, nous appelons donc $z_0$ une singularité éliminable. Ainsi, $\Res_0\left(f\right) = 0$ et $R = \infty$.
+}
+
+\parag{Exemple 5}{
+    Considérons la fonction et $z_0$ suivants: 
+    \[f\left(z\right) = \frac{1}{z^2 + z} = \frac{1}{z\left(z + 1\right)}, \mathspace z_0 = 0\]
+    
+    Clairement, nous avons $R = 1$ à cause de la singularité en $z = -1$. En utilisant une décomposition par élément neutre (appelée la feinte du loup, en l'occurrence): 
+    \[f\left(z\right) = \frac{1 + z - z}{z\left(z+1\right)} = \frac{1}{z} - \frac{1}{z+1}\]
+    
+    On connait la série géométrique pour le deuxième terme, donc: 
+    \[f\left(z\right) = \frac{1}{z} - \sum_{n=0}^{\infty} \left(-z\right)^n = \frac{1}{z} - \sum_{n=0}^{\infty} \left(-1\right)^n z^n\]
+    pour $\left|-z\right| < 1$ et $z \neq 0$. 
+
+    Nous trouvons finalement que $0$ est un pôle d'ordre 1 et que $\Res_0\left(f\right) = 1$. De plus, puisque nous voulons $\left|-z\right| = \left|z\right| < 1$, nous avons $R = 1$ (comme attendu).
+}
+
+\parag{Exemple 6}{
+    Considérons la fonction et $z_0$ suivants: 
+    \[f\left(z\right) = e^{\frac{1}{z}}, \mathspace z_0 = 0\]
+    
+    À notre habitude, utilisons notre série de Taylor. Pour $z_0 \in \mathbb{C}^*$, nous avons: 
+    \[e^{\frac{1}{z}} = \sum_{n=0}^{\infty} \frac{\left(\frac{1}{z}\right)^{n}}{n!} = \sum_{n=0}^{\infty} \frac{z^{-n}}{n!} = \sum_{n=-\infty}^{0} \frac{z^{n}}{\left(-n\right)!}, \mathspace \forall z \in \mathbb{C}^*\]
+    
+    0 est donc une SEI. De plus, nous avons $\Res_0\left(f\right) = 1$ et $R = \infty$.
+}
+
+\parag{Exemple 7}{
+    Considérons la fonction suivante: 
+    \[f\left(z\right) = \log\left(z\right)\]
+    
+    Nous voulons trouver sa série de Laurent en $z_0 = 0$. Cependant, la fonction n'est pas holomorphe pour $z \in \mathbb{R}_{\leq 0}$. Ainsi, le théorème de Laurent ne s'applique pas.
+}
+
+\parag{Exemple 8}{
+    Considérons la fonction et le $z_0$ suivants: 
+    \[f\left(z\right) = \frac{1}{z-3}, \mathspace z_0 = 1\]
+    
+    Nous remarquons que la fonction est même holomorphe en $1$. Puisque $z_{0}$ est à une distance de 2 de la seule singularité, en $z = 3$, le rayon de convergence est $R = 2$. Nous pouvons aussi en déduire que $1$ est un point régulier et que $\Res_1\left(f\right) = 0$.
+
+    Pour notre série de Laurent, nous faisons une mise en évidence forcée (nous voulons quelque chose sous la forme $\frac{1}{a\left(z-z_0\right) + 1}$, afin d'utiliser la série géométrique): 
+    \[L_1 f\left(z\right) = \frac{1}{z-3} = \frac{1}{z - 1 -2} = \frac{1}{-2} \frac{1}{\frac{z-1}{-2} + 1}\]
+
+    Nous reconnaissons à nouveau la série géométrique: 
+    \[L_1 f\left(z\right) = \frac{1}{-2} \sum_{n=0}^{\infty} \left(\frac{z-1}{-2}\right)^n \left(-1\right)^n = \frac{-1}{2} \sum_{n=0}^{\infty} \frac{\left(z-1\right)^n}{2^n}\]
+    
+    Cette astuce est importante et doit être retenue.
+}
+
+\parag{Proposition: Caractérisation des pôles}{
+    Soit $\Omega \subset \mathbb{C}$ un ouvert, $z_0 \in \Omega$, $f: \Omega \setminus \left\{z_0\right\} \mapsto \mathbb{C}$ une fonction holomorphe, et $m \in \mathbb{N}^*$. Soit de plus: 
+    \[F\left(z\right) = \left(z-z_0\right)^m f\left(z\right)\]
+    
+    $z_0$ est un pôle d'ordre $m$ si et seulement si $F\left(z\right)$ est holomorphe dans $\Omega \setminus \left\{z_0\right\}$ et $\lim_{z \to z_0} F\left(z\right)$ existe et est non-nulle.
+
+    \subparag{Observation}{
+        L'hypothèse que la limite soit non-nulle empêche que $m$ soit trop grand, et l'hypothèse qu'elle existe empêche que $m$ soit trop petit.
+    }
+    
+    \subparag{Remarque personnelle}{
+        Cette méthode est très similaire à celle que nous utilisions pour étudier la convergence de séries et d'intégrales en Analyse 1.
+    }
+
+    \subparag{Esquisse de preuve}{
+        Nous supposons par hypothèse que $z_0$ est un pôle d'ordre $m$. Nous allons uniquement utiliser des équivalences, ce qui va permettre de démontrer les deux directions de la preuve d'un coup.
+
+        $z_0$ est un pôle d'ordre $m$ si et seulement si:
+        \[f\left(z\right) = \sum_{n=-m}^{\infty} c_n \left(z-z_0\right)^n = \sum_{n=0}^{\infty} c_{n-m} \left(z-z_0\right)^{n-m}\]
+        avec $c_{-m} = 0$.
+
+        Puisque $z \neq z_0$, ceci est équivalent à:
+        \autoeq{F\left(z\right) = f\left(z\right)\left(z-z_0\right)^m = \sum_{n=0}^{\infty} c_{n-m}\left(z-z_0\right)^{n-m}\left(z-z_0\right)^m = \sum_{n=0}^{\infty} c_{n-m} \left(z-z_0\right)^n = c_{-m} + c_{-m+1} \left(z-z_0\right) + \ldots}
+        
+        Ceci est donc équivalent au fait que $F\left(z\right)$ admet un développement en série de Taylor en $z_0$. Nous avions vu plutôt qu'une fonction est holomorphe si est seulement si elle admet une série de Taylor, donc $F$ est holomorphe. Pour être rigoureux, il faudrait montrer que $F$ est bien convergente.
+
+        On trouve aussi que le premier terme de la série de Taylor de $F\left(z\right)$ est $c_{-m}$ si et seulement si: 
+        \[\lim_{z \to z_0} F\left(z\right) = c_{-m}\]
+        
+        Ainsi, l'existence de $c_{-m} \neq 0$ est équivalent au fait que cette limite existe et est non-nulle.
+
+        \qed
+    }
+}
+
+\parag{Exemple}{
+    Considérons la fonction suivante: 
+    \[f\left(z\right) = \frac{1}{z \sin\left(z\right)}\]
+    
+    Nous voulons connaitre la nature de $z_0 = 0$. En appliquant notre série de Taylor, nous voyons que: 
+    \[f\left(z\right) = \frac{1}{z^2 + z^3\epsilon\left(z\right)}\]
+    
+    Nous en déduisons donc que $z_0$ est un pôle d'ordre 2. Démontrons le formellement:
+    \[F\left(z\right) = z^2 f\left(z\right) = \frac{z}{\sin\left(z\right)} \implies \lim_{z \to 0} \frac{z}{\sin\left(z\right)} = 1\]
+
+    Puisque notre limite existe est non-nulle, et puisque $\frac{z}{\sin\left(z\right)}$ est holomorphe autour de $0$, nous obtenons que $z = 0$ est un pôle d'ordre 2.
+}
+
+\section{Théorème des résidus}
+\parag{Exemple}{
+    Considérons la fonction et le $z_0$ suivants: 
+    \[f\left(z\right) = \frac{1}{z \sin\left(z\right)}, \mathspace z_0 = 0\]
+    
+    Nous voulons calculer le résidu en $z_0$. Nous avons déjà trouvé que $z_0$ était un pôle d'ordre 2, donc nous pouvons écrire: 
+    \[f\left(z\right) = L_0 f\left(z\right) = \frac{c_{-2}}{z^2} + \frac{c_{-1}}{z} + c_0 + \ldots\]
+    
+    Nous faisons plusieurs transformations, afin d'isoler $c_{-1}$: 
+    \autoeq{z^2 f\left(z\right) = c_{-2} + c_{-1} z + c_{0}z^2 + \ldots \implies \left(z^2 f\left(z\right)\right)' = c_{-1} + 2 c_0 z + \ldots \implies \lim_{z \to z_0} \left(z^2 f\left(z\right)\right)' = c_{-1}}
+    
+    Ainsi, nous avons: 
+    \[\Res_0\left(f\right) = \lim_{z \to 0} \left(\frac{z}{\sin\left(z\right)}\right)' = \lim_{z \to 0} \frac{-z\cos\left(z\right) + \sin\left(z\right)}{\sin^2\left(z\right)} = 0\]
+
+    Nous pouvons généraliser cette méthode.
+}
+
+
+
+\end{document}

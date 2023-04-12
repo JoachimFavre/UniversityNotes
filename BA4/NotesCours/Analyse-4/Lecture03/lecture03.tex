@@ -1,0 +1,288 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-09 at 15:15:30.
+
+\usepackage{../../style}
+
+\title{Analyse 4}
+\author{Joachim Favre}
+\date{Jeudi 09 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2023-03-09}{Des courbes simples sur un plan complexe}{
+\begin{itemize}[left=0pt]
+    \item Définition de courbe régulière, courbe simple, courbe fermée et courbe régulière par morceaux.
+    \item Définition de l'intégrale complexe.
+    \item Explication du théorème de Cauchy.
+    \item Explication de la formule intégrale de Cauchy.
+\end{itemize}
+
+}
+
+\section{Intégration complexe}
+\parag{Définition: Courbe régulière}{
+    L'ensemble $\Gamma \subset \mathbb{C}$ est une \important{courbe régulière} s'il existe $\left[a, b\right] \subset \mathbb{R}$, et une fonction $\gamma$, appelée une \important{paramétrisation} de $\Gamma$:
+    \[\begin{split}
+    \gamma: \left[a, b\right] &\longmapsto \Gamma \subset \mathbb{C} \\
+    t &\longmapsto \gamma\left(t\right) = \alpha\left(t\right) + i\beta\left(t\right)
+    \end{split}\]
+    
+    Cette paramétrisation doit suivre les propriétés suivantes:
+    \begin{enumerate}
+        \item $\Gamma = \left\{\gamma\left(t\right) \suchthat t \in \left[a, b\right]\right\}$.
+        \item $\gamma \in C^{1}\left(\left]a, b\right[, \mathbb{C}\right)$.
+        \item $\gamma'\left(t\right) = \alpha'\left(t\right) + i \beta'\left(t\right) \neq 0$ pour tout $t \in \left]a, b\right[$.
+    \end{enumerate}
+}
+
+\parag{Définition: Courbe régulière simple}{
+    Une courbe régulière $\Gamma$ de paramétrisation $\gamma: \left[a, b\right] \mapsto \Gamma$ est \important{simple} si $\gamma$ est injective sur $\left]a, b\right[ $. 
+
+    En d'autres mots, on veut: 
+    \[\gamma\left(t_1\right) = \gamma\left(t_2\right) \text{ si } t_1 \neq t_2\]
+
+    \subparag{Intuition}{
+        Intuitivement, cela veut simplement dire que la courbe ne s'intersecte pas.
+    }
+
+    \subparag{Remarque}{
+        Nous n'étudierons quel les courbes régulières simples dans ce cours.
+    }
+}
+
+\parag{Définition: Courbe régulière fermée}{
+    Une courbe régulière $\Gamma$ de paramétrisation $\gamma: \left[a, b\right] \mapsto \Gamma$ est \important{fermée} si: 
+    \[\gamma\left(a\right) = \gamma\left(b\right)\]
+    
+    \subparag{Remarque}{
+        Une courbe peut être régulière simple et fermée. En effet, l'injectivité n'est demandée que sur $\left]a, b\right[ $.
+    }
+}
+
+\parag{Définition: Intérieur}{
+    Une courbe fermée $\Gamma$ sépare le plan en deux ensembles: un intérieur borné et un extérieur non-borné \textit{(fun fact, cette proposition, appelée le théorème de Jordan, est connue pour la difficulté de sa démonstration)}.
+
+    Ainsi, on note $\text{int}\left(\Gamma\right)$ \important{l'intérieur} de $\Gamma$ qui est l'ouvert borné dont le bord est confondu avec $\Gamma$. 
+}
+
+\parag{Définition: Courbe régulière par morceaux}{
+    Une courbe $\Gamma$ est \important{régulière par morceaux} s'il existe des courbes régulières $\Gamma_1, \ldots, \Gamma_n$ de paramétrisations $\gamma_i : \left[a_i, b_i\right] \mapsto \Gamma_i$ telles que: 
+    \[\Gamma = \bigcup_{i=1}^{n} \Gamma_i\]
+    
+    De plus, les $\Gamma_i$ doivent être ``connectées'': 
+    \[\gamma_i\left(b_i\right) = \gamma_{i+1}\left(a_{i+1}\right), \mathspace \forall i = 1, \ldots, n-1\]
+
+    \subparag{Intuition}{
+        Une courbe régulière par morceaux a une paramétrisation dérivable partout, sauf aux points de jonctions.
+    }
+}
+
+\parag{Exemple 1}{
+    Considérons le segment entre $1$ et $1+i$ qu'on note: 
+    \[\Gamma = \left[1; 1 + i\right] = \left[1+i; 1\right]\]
+    
+    Nous pouvons considérer deux paramétrisations, pour parcourir la courbe dans un sens ou dans l'autre:
+    \[\gamma_1\left(t\right) = 1 + it, \mathspace t \in \left[0, 1\right]\] 
+    \[\gamma_2\left(t\right) = 1 + i\left(1 - t\right), \mathspace t \in \left[0, 1\right]\]
+    
+    Cela nous montre que, dans le plan complexe comme dans $\mathbb{R}^n$, les courbes peuvent avoir un sens de parcours différent.
+}
+
+\parag{Example 2}{
+    Soient $z_1, z_2 \in \mathbb{C}$ quelconques. Nous considérons le segment entre $z_1$ et $z_2$, noté: 
+    \[\Gamma = \left[z_1, z_2\right] = \left[z_2, z_1\right]\]
+    
+    Alors, nous avons les formules générales suivantes pour les paramétrisations de $\Gamma$: 
+    \[\gamma_1\left(t\right) = z_1 \left(1 -t\right) + z_2 t, \mathspace t \in \left[0, 1\right]\]
+    \[\gamma_2\left(t\right) = z_2\left(1- t\right) + z_1 t, \mathspace t \in \left[0, 1\right]\]
+
+    \subparag{Remarque}{
+        Lorsqu'on a des cas plus simple, comme dans le cas de l'exemple précédent, il est mieux de ne pas appliquer bêtement cette formule et d'y aller plus intuitivement.
+    }
+}
+
+\parag{Example 3}{
+    Soit $\Gamma$ le cercle de centre $z_0 \in \mathbb{C}$ et de rayon $R \in \mathbb{R}_{> 0}$. 
+
+    Nous pouvons simplement considérer la paramétrisation suivante:
+    \[\gamma\left(t\right) = z_0 + R\cos\left(t\right) + Ri\sin\left(t\right) = z_0 + Re^{it}, \mathspace t \in \left[0, 2\pi\right]\]
+
+    En particulier, si $z_0 = 0$ et $R = 1$, alors $\Gamma$ est le cercle unité.
+
+    \subparag{Remarque}{
+        Cette formule est très importante.
+    }
+}
+
+\parag{Définition: Intégrale complexe}{
+    Soit $\Omega \subset \mathbb{C}$ un ensemble ouvert, $f: \Omega \mapsto \mathbb{C}$ une fonction continue, et $\Gamma \subset \Omega$ une courbe.
+
+    Si $\Gamma \subset \Omega$ est une courbe régulière de paramétrisation $\gamma : \left[a, b\right] \mapsto \Gamma$, alors, \important{l'intégrale} de $f$ le long de $\Gamma$ est le nombre: 
+    \[\int_{\Gamma} f dz \over{=}{déf} \int_{a}^{b} f\left(\gamma\left(t\right)\right) \cdot \gamma'\left(t\right)dt\]
+    
+    Si $\Gamma = \Gamma_1 \cup \ldots \Gamma_n$ est une courbe régulière par morceaux où $\Gamma_i \subset \Omega$ pour tout $i$, alors: 
+    \[\int_{\Gamma} f dz = \sum_{i=1}^{n} \int_{\Gamma_i} f dz\]
+
+    \subparag{Remarque}{
+        Comme nous le verrons, le signe de ces intégrales dépend du sens de parcours.
+    }
+}
+
+\parag{Exemple 1}{
+    Soient $f\left(z\right) = z$ et la courbe $\Gamma = \left[1; 1 + i\right]$. 
+
+    Nous choisissons la paramétrisation suivante: 
+    \[\gamma_1\left(t\right) = 1 + it, \mathspace t \in \left[0, 1\right]\]
+
+    Cela nous donne ainsi: 
+    \[\int_{\Gamma} f \cdot dz = \int_{0}^{1} \left(1 + it\right)\left(1 + it\right)' dt = \int_{0}^{1} \left(1 + it\right)i dt = \int_{0}^{1} \left(i - t\right)dt = \left[it - \frac{t^2}{2}\right]_{0}^{1} = -\frac{1}{2} + i\]
+    
+
+    Cependant, choisissons maintenant la paramétrisation qui va dans l'autre sens: 
+    \[\gamma_2\left(t\right) = 1 + i\left(1 -t\right) \implies \gamma_2'\left(t\right) = -i\]
+    
+    Alors, on trouve: 
+    \[\int_{\Gamma} f \cdot dz = \int_{0}^{1} \left(1 + i - it\right) \left(-i\right)dt = \int_{0}^{1} \left(-i + 1 -t\right)dt = \left[-it + t - \frac{t^2}{2}\right]_0^1 = \frac{1}{2} - i\]
+
+    Nous voyons donc que le signe du résultat dépend du sens de parcours, comme attendu.
+}
+
+\parag{Exemple 2}{
+    Considérons la fonction $f\left(z\right) = \frac{1}{z}$ et le cercle unité $\Gamma$.
+
+    Nous prenons la paramétrisation suivante, qui parcours la courbe dans le sens trigonométrique: 
+    \[\gamma\left(t\right) = e^{it}, \mathspace t \in \left[0, 2\pi\right]\]
+    
+    Nous obtenons que $\gamma'\left(t\right) = ie^{it}$, donc: 
+    \[\int_{\Gamma} f dz = \int_{0}^{2\pi} \frac{1}{e^{it}} ie^{it} dt = i \int_{0}^{2\pi} dt = 2\pi i\]
+
+    Cette valeur est très importante, et elle va revenir dans une théorème très bientôt.
+
+    \subparag{Remarque}{
+        Comme nous l'avons vu en Analyse 3, une intégrale sur une courbe fermée ne donne pas toujours 0.
+    }
+}
+
+\parag{Définition: Orientation}{
+    Une courbe régulière fermée $\Gamma$ de paramétrisation $\gamma : \left[a, b\right] \mapsto \mathbb{C}$ est \important{orientée positivement} si elle ``laisse l'intérieur à gauche''.
+
+
+    \subparag{Example}{
+        Par exemple, nous pouvons considérer la courbe suivante, dont la flèche montre l'orientation positive:
+        \svghere[0.6]{CourbeOrienteePositivement.svg}
+    }
+}
+
+\parag{Théorème de Cauchy}{
+    Soit $\Omega \subset \mathbb{C}$ ouvert, $f: \Omega \mapsto \mathbb{C}$ holomorphe, et $\Gamma$ une courbe fermée et régulière par morceaux telle que $\text{int}\left(\Gamma\right) \cup \Gamma \subset \Omega$.
+
+    Alors, le théorème de Cauchy dit que: 
+    \[\int_{\Gamma} fdz = 0\]
+
+    \subparag{Remarque}{
+        L'hypothèse que $\text{int}\left(\Gamma\right) \cup \Gamma \subset \Omega$ est parfois décrite en demandant que $\Omega$ est simplement connexe; que ce domaine n'a ``pas de trou''.
+    }
+    
+    \subparag{Réciproque}{
+        La réciproque de ce théorème est vraie, et est appelée le théorème de Morera. 
+
+        En d'autres mots, si $\int_{\Gamma} f\left(z\right) = 0$ pour tout courbe $\Gamma \subset \Omega$ fermée, alors $f$ est holomorphe.
+    }
+
+    \subparag{Preuve}{
+        Soit $\Gamma$ une courbe quelconque, que nous pouvons écrire: 
+        \[\Gamma = \left\{\gamma\left(t\right) = \alpha\left(t\right) + i\beta\left(t\right), t \in \left[a, b\right]\right\} \subset \mathbb{C}\]
+
+        Nous considérons son équivalent dans $\mathbb{R}^2$: 
+        \[\widetilde{\Gamma} = \left\{\widetilde{\gamma}\left(t\right) = \left(\alpha\left(t\right), \beta\left(t\right)\right), t \in \left[a, b\right]\right\} \subset \mathbb{R}^2\]
+        
+        Nous notons de plus: 
+        \[f\left(z\right) = f\left(x + iy\right) = u\left(x, y\right) + iv\left(x, y\right)\]
+        
+        Nous utilisons ceci pour calculer notre intégrale: 
+        \autoeq[s]{\int_{\Gamma} fdz = \int_{a}^{b} f\left(\gamma\left(t\right)\right)\gamma'\left(t\right) dt = \int_{a}^{b} \left(u\left(\alpha\left(t\right), \beta\left(t\right)\right) + iv\left(\alpha\left(t\right), \beta\left(t\right)\right)\right)\left(\alpha'\left(t\right) + i\beta'\left(t\right)\right) =
+        \int_{a}^{b} \left(u\left(\alpha, \beta\right)\alpha' - v\left(\alpha, \beta\right)\beta'\right)dt + i\int_{a}^{b} \left(u\left(\alpha, \beta\right)\beta' + v\left(\alpha, \beta\right)\alpha'\right)dt = \int_{a}^{b} \begin{pmatrix} u\left(\alpha, \beta\right) \\ -v\left(\alpha, \beta\right) \end{pmatrix} \dotprod \begin{pmatrix} \alpha' \\ \beta' \end{pmatrix} dt + i\int_{a}^{b} \begin{pmatrix} v\left(\alpha, \beta\right) \\ u\left(\alpha, \beta\right)  \end{pmatrix} \dotprod \begin{pmatrix} \alpha' \\ \beta' \end{pmatrix} dt
+    = \int_{a}^{b} \begin{pmatrix} u\left(\widetilde{\gamma}\right) \\ -v\left(\widetilde{\gamma}\right) \end{pmatrix} \dotprod \gamma' dt + i \int_{a}^{b} \begin{pmatrix} v\left(\widetilde{\gamma}\right) \\ u\left(\widetilde{\gamma}\right) \end{pmatrix} \dotprod \gamma' dt
+    = \int_{\widetilde{\Gamma}} \left(u, -v\right) \dotprod d \ell + i \int_{\widetilde{\Gamma}} \left(v, u\right) \dotprod d \ell }
+
+    Puisque $f$ est holomorphe, $u$ et $v$ sont de classe $C_1$. De plus, puisque $\text{int}\left(\Gamma\right) \subset \Omega$, nous savons que $\text{int}\left(\widetilde{\Gamma}\right)$ est simplement connexe. Nous avons donc les hypothèses pour appliquer le théorème de Green: 
+    \autoeq{\int_{\Gamma} fdz = \int_{\text{int}\left(\widetilde{\Gamma}\right)} \rot\left(u, -v\right)dxdy + i \int_{\text{int}\left(\widetilde{\Gamma}\right)} \rot\left(v, u\right)dxdy = \int_{\text{int}\left(\widetilde{\Gamma}\right)} \underbrace{\left(-v - u_y\right)}_{= 0}dxdy + i \int_{\text{int}\left(\widetilde{\Gamma}\right)} \underbrace{\left(u_x - v_y\right)}_{= 0} dxdy = 0}
+    par les équations de Cauchy Riemann.
+
+    \qed
+    }
+}
+
+\parag{Théorème: Formule intégrale de Cauchy (FIC)}{
+    Soit $\Omega \subset \mathbb{C}$ ouvert, $f: \Omega \mapsto \mathbb{C}$ holomorphe, et $\Gamma$ une courbe fermée et régulière par morceaux telle que $\text{int}\left(\Gamma\right) \cup \Gamma = \bar{\text{int}\left(\Gamma\right)} \subset \Omega$.
+
+    Si de plus $\gamma$ est orienté positivement, et $z_0 \in \text{int}\left(\Gamma\right)$, alors la formule intégrale de Cauchy (FIC) dit que, pour tout $n \in \mathbb{N}$:
+    \[\int_{\Gamma} \frac{f\left(z\right)}{\left(z - z_0\right)^{n+1}} dz = 2\pi i \frac{f^{\left(n\right)}\left(z_0\right)}{n!}\]
+
+    Le $z_0$ est appelé une \important{singularité}. L'intégrale ne dépend que de la présence de cette singularité dans l'intérieur de la courbe.
+
+    Il est important de remarquer que, même si $f\left(z\right)$ est holomorphe, alors $\frac{f\left(z\right)}{\left(z - z_0\right)^{n+1}}$ ne l'est pas à cause de sa singularité.
+
+    \subparag{Cas $n = 0$}{
+        Dans le cas où $n = 0$, nous avons:
+        \[\int_{\Gamma} \frac{f\left(z\right)}{z-z_0}dz = 2\pi i f\left(z_0\right)\]
+    }
+
+    \subparag{Utilisation}{
+        Dès qu'on voit une singularité à l'intérieur de la courbe d'intégration, nous pouvons directement essayer d'utiliser ce théorème.
+    }
+
+    \subparag{Remarque}{
+        Ce théorème et le précédent montrent un des supers-pouvoirs \textit{[sic]} des fonctions holomorphes.
+    }
+
+    \subparag{Esquisse de preuve}{
+        Pour faire cette preuve, il faut commencer par démontrer le cas $n = 0$, puis l'appliquer pour démontrer le cas général. Nous n'allons pas faire ce premier point, mais uniquement le deuxième. \frownie
+
+        Nous supposons donc que l'égalité suivante est démontrée: 
+        \[f\left(z_0\right) = \frac{1}{2\pi i} \int_{\Gamma} \frac{f\left(z\right)}{z - z_0} dz\]
+
+        Nous allons supposer que l'opérateur dérivée et l'opérateur intégrale commutent (ce qu'on peut démontrer, dans ce cas, à l'aide de la définition de la dérivée; et ce qu'on devrait faire pour que la preuve soit formelle): 
+        \autoeq{f'\left(z_0\right) = \left(\frac{1}{2\pi i} \int_{\Gamma} \frac{f\left(z\right)}{z - z_0} dz\right)' = \frac{1}{2\pi i} \int_{\Gamma} f\left(z_0\right) \left(\frac{1}{z - z_0}\right)' = \frac{1}{2\pi i} \int_{\Gamma} f\left(z\right) \frac{-1}{\left(z- z_0\right)^2}\left(-1\right) dz = \frac{1}{2\pi i} \int_{\Gamma} \frac{f\left(z\right)}{\left(z - z_0\right)^2}dz}
+        
+        Nous avons démontré que le cas $n = 0$ implique le cas $n = 1$. Les autres se démontrent par dérivées successives.
+    }
+}
+
+\parag{Corollaire}{
+    Si $f$ est holomorphe, alors $f$ est infiniment dérivable.
+
+    \subparag{Intuition}{
+        Ce corollaire découle directement de la FIC. En effet, nous avons vu que nous pouvions écrire: 
+        \[f^{\left(n\right)}\left(z_0\right) = \frac{n!}{2\pi i} \int_{\Gamma} \frac{f\left(z\right)}{\left(z - z_0\right)^{n+1}} dz\]
+        
+        Ainsi, n'importe quelle dérivée peut être calculée à partir de la fonction de départ; toutes ces fonctions existent.
+    }
+    
+}
+
+
+\parag{Exemple 1}{
+    Nous voulons vérifier le théorème de Cauchy pour $f\left(z\right) = z^2$ sur le cercle unité $\Gamma$.
+
+    Nous avons simplement: 
+    \[\int_{\Gamma} z^2 dz = \int_{0}^{2\pi} \left(e^{it}\right)^2 e^{it} i dt = i \int_{0}^{2\pi} e^{3it}dt = \left[\frac{e^{3it}}{3}\right]_{0}^{2\pi} = \frac{e^{i6\pi} - e^{0}}{3} = \frac{1 - 1}{3} = 0\]
+
+    Le théorème est donc vérifié dans ce cas.
+}
+
+\parag{Exemple 2}{
+    Soient $f\left(z\right) = \frac{1}{z}$ et le cercle unitaire $\Gamma$. Nous voulons calculer l'intégrale de $f$ sur cette courbe en utilisant la FIC.
+
+    Nous pouvons choisir $g\left(z\right) = 1$ (qui est bien holomorphe sur un ouvert contenant $\bar{\text{int}\left(\Gamma\right)}$) et $z_0 = 0 \in \text{int}\left(\Gamma\right)$, ce qui nous donne:
+    \[\int_{\Gamma} \frac{1}{z} dz = \int_{\Gamma} \frac{g\left(z\right)}{z - z_0} dz \over{=}{FIC} 2\pi i g\left(z_0\right) = 2\pi i\]
+
+    Nous voyons bien que la FIC peut nous sauver beaucoup de temps.
+}
+
+\end{document}

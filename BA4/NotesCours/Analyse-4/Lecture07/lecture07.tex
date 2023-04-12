@@ -1,0 +1,200 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-04-06 at 15:17:09.
+
+\usepackage{../../style}
+
+\title{Analyse 4}
+\author{Joachim Favre}
+\date{Jeudi 06 avril 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2023-04-06}{LE MEILLEUR THÉORÈME ENFINENFINENFIN}{
+\begin{itemize}[left=0pt]
+    \item Explication de la proposition de la formule à résidus.
+    \item Présentation du théorème des résidus.
+    \item Application du théorème des résidus à une famille d'intégrales réelles.
+\end{itemize}
+
+}
+
+\parag{Proposition: Formule à résidus}{
+    Soit $\Omega \subset \mathbb{C}$ un ouvert, $z_0 \in \mathbb{C}$ et $f: \Omega \setminus \left\{z_0\right\} \mapsto \mathbb{C}$ holomorphe. Nous supposons de plus que $z_0$ est un pôle d'ordre $m \in \mathbb{N}^*$.
+
+    Alors, nous avons: 
+    \[\Res_{z_0}\left(f\right) =  \lim_{z \to z_0} \frac{1}{\left(m-1\right)!} \frac{d^{m-1}}{dz^{m-1}} \left[f\left(z\right)\left(z-z_0\right)^m\right]\]
+    
+    \subparag{Intuition}{
+        Nous multiplions par $\left(z-z_0\right)^m$ pour tuer les singularités, ce qui nous donne une fonction holomorphe. On dérive ensuite pour obtenir le résidu.
+    }
+}
+
+\parag{Exemple}{
+    Considérons la fonction suivante: 
+    \[f\left(z\right)= \frac{z+1}{z^2 \left(z-2\right)}\]
+    
+    Il est facile de voir que $z_1 = 0$ est un pôle d'ordre 2, ainsi: 
+    \[\Res_{0}\left(f\right) = \left(f\left(z\right)z^2\right)' \eval_{z=0}^{} = \left(\frac{z+1}{z-2}\right)' \eval_{z=0}^{} = \left(\frac{1\left(z-2\right) - \left(z+1\right)\cdot 1}{\left(z-2\right)^2}\right) \eval_{z=0}^{} = \frac{-2 - i}{4}\]
+
+    De plus, nous voyons que $z_2 = 2$ est un pôle d'ordre 1, donc: 
+    \[\Res_2\left(f\right) = \left(z-2\right)f\left(z\right) \eval_{z=2}^{} = \frac{z+1}{z^2} \eval_{z=2}^{} = \frac{2+i}{4}\]
+}
+
+
+\parag{Théorème des résidus}{
+    Soit $\Omega \subset \mathbb{C}$ un ensemble ouvert, $z_1, \ldots, z_n \in \Omega$ un nombre fini de singularités, $f: \Omega \setminus \left\{z_1, \ldots, z_n\right\} \mapsto \mathbb{C}$ holomorphe, avec $z_1, \ldots, z_n$ des pôles de $f$ (et non pas des SEI). Soit finalement $\Gamma \subset \Omega$ fermée et régulière par morceaux, telle que $\text{int}\left(\Gamma\right) \cup \Gamma \subset \Omega$.
+
+    Alors: 
+    \[\int_{\Gamma} f\left(z\right)dz = 2\pi i \sum_{z_i \in \text{int}\left(\Gamma\right)}^{} \Res_{z_i}\left(f\right)\]
+
+    Ce résultat est un des plus importants de l'analyse complexe.
+
+    \subparag{Observation}{
+        Ce théorème permet de calculer des intégrales à l'aide de dérivées.
+    }
+
+    \subparag{Remarque}{
+        Ce résultat généralise le théorème de Cauchy et la FIC.
+    }
+}
+
+\parag{Exemple 1}{
+    Prenons la fonction: 
+    \[f\left(z\right) = \frac{\sin\left(z\right)}{z^3}\]
+    
+    Nous voulons calculer son intégrale sur le cercle unitaire; ce pour quoi nous pouvons simplement utiliser le théorème des résidu. Nous voulons donc calculer son résidu en $z_0 = 0$. Nous pouvons trivialement calculer sa série de Laurent en passant par la série de Taylor: 
+    \[L_0 f \left(z\right) = \frac{1}{z^3} \left(z- \frac{z^3}{3!} + \frac{z^5}{5!} + \ldots\right) = \frac{1}{z^2} - \frac{1}{3!} + \frac{z^2}{5!} - \ldots\]
+    
+    Nous trouvons ainsi que $\Res_0\left(f\right) = 0$, et donc: 
+    \[\int_{\Gamma} f\left(z\right)dz = 0\]
+
+    \subparag{Remarque}{
+        Nous aurions bien sûr aussi pu utiliser la FIC: 
+        \[\int_{\Gamma} \frac{\sin\left(z\right)}{z^3} dz = \frac{2\pi i}{2!} \left[\sin\left(z\right)\right]'' \eval_{z=0}^{} = -2\pi i \sin\left(0\right) = 0\]
+    }
+}
+
+\parag{Example 2}{
+    Prenons la fonction suivante: 
+    \[f\left(z\right) = \frac{1}{1 + z - e^{z}}\]
+    
+    Nous voulons l'intégrer sur le cercle unitaire. Nous voyons que: 
+    \[1 + z - e^z = 1 + z - \left(1 + z + \frac{z^2}{2} + \frac{z^3}{3!} + \ldots\right) = -\frac{z^2}{2} - \frac{z^3}{3!} - \ldots\]
+
+    Par ce développement et par notre proposition de la caractérisation des pôles, nous trouvons que $z_0 = 0$ est un pôle d'ordre 2: 
+    \[\lim_{z \to 0} f\left(z\right) z^2 = \lim_{z \to 0} \frac{1}{\frac{-1}{2} - \frac{z}{3!} - \ldots} = -2 \in \mathbb{C}^*\]
+
+    Nous pouvons ensuite utiliser la formule à résidus: 
+    \[\Res_0\left(f\right) = \left(\frac{z^2}{1 + z - e^z}\right)' \eval_{z=0}^{} = \left(\frac{2z\left(1 + z - e^z\right) - z^2 \left(1 - e^z\right)}{\left(1 + z - e^z\right)^2}\right) \eval_{z=0}^{} = \ldots = 2\]
+    
+    Nous trouvons donc finalement que: 
+    \[\int_{\Gamma} f\left(z\right)dz = 2\pi i \cdot  2 = 4\pi i\]
+}
+
+\parag{Exemple 3}{
+    Nous prenons la fonction suivante: 
+    \[f\left(z\right) = \frac{z + i}{z^2 \left(z- 2\right)}\]
+    
+    Nous voulons l'intégrer sur une courbe quelconque telle que $z_1 = 0 \in \text{int}\left(\Gamma\right)$ et $z_2 = 2 \in \text{int}\left(\Gamma\right)$. Nous avons déjà calculé que: 
+    \[\Res_{z_1} \left(f\right) = \frac{-2 - i}{4}, \mathspace \Res_{z_2}\left(f\right) = \frac{2 + i}{4} = -\Res_{z_1}\left(f\right)\]
+    
+    Ainsi: 
+    \[\int_{\Gamma} f\left(z\right)dz = 2\pi i \left(\Res_0\left(f\right) + \Res_2\left(f\right)\right) = 2\pi i \cdot  0 = 0\]
+}
+
+\subsection{Application aux intégrales réelles}
+\parag{Exemple}{
+    Nous voulons calculer l'intégrale suivante: 
+    \[I = \int_{0}^{2\pi} \frac{1}{2 + \cos\left(t\right)}dt\]
+    
+    Cette intégrale peut être calculée en utilisant un changement de variable, mais nous voulons essayer d'utiliser une autre méthode. Notre idée est de transformer cette intégrale en une intégrale complexe. Nous voyons $2\pi$, donc nous allons faire une intégrale sur le cercle unité. 
+
+    \subparag{Étape 1: Transformation}{
+        La première étape est de transformer l'intégrale.
+
+        Nous allons essayer de transformer le cosinus en une exponentielle complexe. Or, nous savons que: 
+        \[\cos\left(t\right) = \frac{e^{it} + e^{-it}}{2}\]
+        
+        De plus, nous savons que le cercle unité est donné par: 
+        \[\Gamma = \left\{z = e^{it} \suchthat t \in \left[0, 2\pi\right]\right\}\]
+        
+        Nous voulons prendre un changement de variable (pour lequel nous pourrions être beaucoup plus rigoureux, mais nous allons simplement utiliser la même méthode que pour l'analyse réelle sans démontrer qu'elle marche): 
+        \[z = e^{it} \implies dz = i e^{it} dt = izdt \implies dt = \frac{1}{iz}dz\]
+        
+        Ainsi, cela nous permet d'écrire notre intégrale comme: 
+        \[I = \int_{\Gamma} \frac{1}{2 + \frac{z + \frac{1}{z}}{2}} \frac{1}{iz} dz = \frac{1}{i} \int_{\Gamma} \frac{1}{2z + \frac{z^2 + 1}{2}} dz = -\frac{2}{i} \int_{\Gamma} \frac{1}{z^2 + 4z + 1} dz\]
+    }
+    
+    \subparag{Étape 2: Calcul du résidu}{
+        Maintenant que nous avons une intégrale complexe, nous pouvons y appliquer le théorème des résidus.
+
+        Nous posons: 
+        \[f\left(z\right) = \frac{1}{z^2 + 4z + 1}\]
+        
+        Les singularités sont données par: 
+        \[z^2 + 4z + 1 = 0 \iff z_{1,2} = \frac{-4 \pm \sqrt{16 - 4}}{2} = -2 \pm \sqrt{3}\]
+
+        Nous voyons que: 
+        \[z_1 = -2 - \sqrt{3} < 2 \implies z_1 \not \in \text{int}\left(\Gamma_1\right)\] 
+        \[0 = -2 + \sqrt{4} > z_2 = -2 + \sqrt{3} > -2 + \sqrt{1} = -1 \implies z_2 \in \text{int}\left(\Gamma_1\right)\]
+        
+        Or, nous savons que nous pouvons écrire: 
+        \[f\left(z\right) = \frac{1}{\left(z + 2 + \sqrt{3}\right)\left(z - \sqrt{3} + 2\right)}\]
+        
+        Nous pouvons en déduire que $z_2 = \sqrt{3} -2$ est un pôle d'ordre 1, donc: 
+        \[\Res_{z_2}\left(f\right) = \left(z-z_2\right) f\left(z\right) \eval_{z=z_2}^{} \frac{1}{z + 2 + \sqrt{3}} \eval_{z = \sqrt{3}- 2}^{} = \frac{1}{2\sqrt{3}}\]
+    }
+
+    \subparag{Étape 3: Théorème des résidus}{
+        Le théorème des résidu nous donne donc finalement que: 
+        \[I = \frac{2}{i} \int_{\Gamma} f\left(z\right)dz = \frac{2}{i} 2\pi i \Res_{z_2}\left(f\right) = 4 \pi \cdot  \frac{1}{2\sqrt{3}} = \frac{2\pi}{\sqrt{3}}\]
+        
+        Nous obtenons bien une valeur réelle, comme attendu. Si le résultat avait une compose imaginaire non-nulle, c'est que nous avons fait une erreur: l'intégrale d'une fonction réelle donne une valeur réelle.
+    }
+}
+
+\parag{Méthode générale}{
+    La méthode que nous venons de voir permet de calculer des intégrales de la forme: 
+    \[I = \int_{0}^{2\pi} \frac{P\left(\sin\left(t\right), \cos\left(t\right)\right)}{Q\left(\sin\left(t\right), \cos\left(t\right)\right)}dt\]
+    où $P$ et $Q$ sont des polynômes.
+
+    Le changement de variable sera toujours: 
+    \[z = e^{it} \implies dz = i e^{it} dz = iz dz\implies dt = \frac{1}{iz} dz\]
+    
+    La transformation sera toujours de la forme suivante: 
+    \[\cos\left(t\right) = \frac{e^{it} + e^{-it}}{2} = \frac{z + \frac{1}{z}}{2}\] 
+    \[\sin\left(t\right) = \frac{e^{it} - e^{-it}}{2i} = \frac{z - \frac{1}{z}}{2i}\]
+
+    Cela nous donne donc: 
+    \[I = \int_{\Gamma} \frac{P\left(\frac{z - \frac{1}{z}}{2i}, \frac{z + \frac{1}{z}}{2}\right)}{Q\left(\frac{z - \frac{1}{z}}{2i}, \frac{z + \frac{1}{z}}{2}\right)} dz\]
+    où $\Gamma$ est le cercle unitaire.
+
+    Nous avons bien transformé notre intégrale réelle en une intégrale complexe, sur laquelle nous pouvons appliquer le théorème des résidus.
+
+    \subparag{Remarque}{
+        Cette méthode peut être généralisée pour des fonctions polynômes avec des termes de la forme $\sin\left(nt\right)$ et $\cos\left(nt\right)$.
+    }
+}
+
+\parag{Exemple}{
+    Considérons la fonction suivante: 
+    \[I = \int_{0}^{2\pi} \frac{1}{\sqrt{5} - \sin\left(t\right)} dt\]
+    
+    Nous allons uniquement transformer cette intégrale en une intégrale complexe. Ainsi, à notre habitude, nous posons: 
+    \[z = e^{iz} \implies dt = \frac{1}{iz}dz\]
+    
+    Cela nous donne donc: 
+    \[I = \int_{\Gamma} \frac{1}{\sqrt{5} - \frac{z - \frac{1}{z}}{2i}} \cdot  \frac{1}{iz} dz = 2 \int_{\Gamma} \frac{1}{2 \sqrt{5} i z - z^2 + 1} = -2 \int_{\Gamma} \frac{1}{z^2 - 2\sqrt{6} i z - 1} dz\]
+
+    Nous pouvons ensuite chercher les singularités, trouver quel est l'ordre des ces pôles, calculer leur résidu, puis appliquer le théorème des résidus. En faisant tout cela, il est possible de montrer que: 
+    \[I = \pi\]
+}
+
+
+
+\end{document}

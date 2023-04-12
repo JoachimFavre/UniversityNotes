@@ -1,0 +1,109 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-16 at 15:16:21.
+
+\usepackage{../../style}
+
+\title{Analyse 4}
+\author{Joachim Favre}
+\date{Jeudi 16 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2023-03-16}{Beaucoup de choses ont fini dans le cours précédent}{
+\begin{itemize}[left=0pt]
+    \item Exemple de l'étude d'une intégrale en fonction des courbes.
+    \item Rappel de la définition des fonctions analytiques.
+\end{itemize}
+
+}
+
+\parag{Exemple 3}{
+    Nous voulons discuter la valeur de l'intégrale suivante, selon $\Gamma$: 
+    \[\int_{\Gamma} \frac{z + i}{z^2 \left(z - 2\right)}dz\]
+
+    Nous avons un singularité en $z_0 = 0$ et en $z_1 = 2$. Nous considérons donc plusieurs cas différents.
+    \svghere[0.5]{ExempleDiscussionIntegraleSelonCourbe.svg}
+    
+    Commençons par considérer une courbe $\Gamma_1$ telle que $z_0, z_1 \not \in \bar{\text{int}\left(\Gamma_1\right)}$. On choisit $f\left(z\right) = \frac{z+i}{z^2\left(z-2\right)}$. Cette fonction est holomorphe sur $\Gamma_1$ et son intérieur, ce qui nous donne, par le théorème de Cauchy: 
+    \[\int_{\Gamma_1} \frac{z + i}{z^2 \left(z-2\right)} = \int_{\Gamma_1} f dz = 0\]
+
+    Considérons ensuite une courbe $\Gamma_2$ telle que $z_0 \in \Gamma_2$ ou $z_1 \in \Gamma_2$. Cependant, $\frac{z+i}{z^2 \left(z - 2\right)}$ n'est pas continue sur $\Gamma$, donc l'intégrale n'existe pas.
+
+    Considérons après cela une courbe $\Gamma_3$ telle que $z_0, z_1 \in \text{int}\left(\Gamma_3\right)$. La FIC ne s'applique pas, et nous reverrons ce genre de problèmes à l'aide du théorème des résidus.
+
+    Considérons maintenant une courbe $\Gamma_4$ telle que $z_0 \in \text{int}\left(\Gamma_4\right)$ mais $z_1 \not \in \bar{\text{int}\left(\Gamma_4\right)}$. Nous posons $f\left(z\right) = \frac{z+i}{z-2}$, qui est holomorphe sur ce domaine, et telle que: 
+    \[f'\left(z\right) = \left(\frac{z+i}{z-2}\right)' = \frac{1\left(z-2\right)-  \left(z+i\right)1}{\left(z-2\right)^2} = \frac{-i-2}{\left(z-2\right)^2}\]
+
+    On obtient donc, dans ce cas:
+    \[\int_{\Gamma_4} \frac{z+i}{z^2 \left(z-2\right)}dz = \int_{\Gamma_4} \frac{f\left(z\right)}{z^2} dz = 2\pi i f'\left(0\right) = 2\pi i \cdot  \frac{-i-2}{4} = \frac{\pi}{2} \left(1 - 2i\right)\]
+
+    Considérons finalement une courbe $\Gamma_5$ telle que $z_1 \in \text{int}\left(\Gamma_5\right)$ mais $z_0 \not \in \bar{\text{int}\left(\Gamma_5\right)}$. Nous posons $f\left(z\right) = \frac{z+i}{z^2}$, qui est holomorphe sur ce domaine. Ainsi: 
+    \[\int_{\Gamma_5} \frac{z+i}{z^2 \left(z-2\right)}dz = 2\pi i f\left(2\right) = 2\pi i \frac{2 + 1}{4} = \frac{\pi}{2}\left(2i - 1\right)\]
+    
+    Nous remarquons aussi que $\int_{\Gamma_4} fdz = -\int_{\Gamma_5} fdz $. Ce n'est pas une coincidence, et nous le verrons grâce au théorème des résidus.
+}
+
+\section{Séries de Laurent}
+\parag{Rappel: Fonction analytique}{
+    Soit $f \in C^{\infty}\left(I\right)$, pour $I \subset \mathbb{R}$.
+
+    On dit que $f$ est \important{analytique} sur $I$, si, $\forall x_0 \in I$, $\exists \epsilon > 0$ tel que: 
+    \[f\left(x\right) = \sum_{n=0}^{\infty} \frac{f^{\left(n\right)}\left(x_0\right)}{n!} \left(x-x_0\right)^n = T_{x_0}\left(x\right), \mathspace \forall x \in \left]x_0 - \epsilon, x_0 + \epsilon\right[ \]
+
+    On appelle le \important{rayon de convergence}, que l'on note $R$, le plus grand $\epsilon > 0$ possible tel que $f\left(x\right) = T_{x_0}\left(x\right)$.
+    
+    \subparag{Intuition}{
+        En d'autres mots, pour tout point de $I$, il doit exister un sous-intervalle de $I$ centré sur ce point où la fonction doit être égale à sa propre série de Taylor.
+    }
+}
+
+\parag{Exemple 1}{
+    Considérons la fonction exponentielle: 
+    \[f\left(x\right) = e^x\]
+    
+    Nous savons que, pour tout $x \in \mathbb{R}$: 
+    \[f\left(x\right) = \sum_{n=0}^{\infty} \frac{x^n}{n!}\]
+    
+    Nous avons donc un rayon de convergence infini, noté $R = \infty$.
+}
+
+\parag{Exemple 2}{
+    Considérons la fonction suivante: 
+    \[f\left(x\right) = \sin\left(x\right)\]
+    
+    De manière similaire, elle est analytique sur $\mathbb{R}$: 
+    \[\sin\left(x\right) = \sum_{n=0}^{\infty} \frac{x^{2n+1}}{\left(2n+1\right)!} \left(-1\right)^n, \mathspace \forall x \in \mathbb{R} \]
+
+    Nous avons aussi $R = \infty$.
+}
+
+\parag{Exemple 3}{
+    Nous prenons $f\left(x\right)$ défini par: 
+    \[f\left(x\right) = \frac{1}{1-x}\]
+    
+    Nous reconnaissons la série géométrique: 
+    \[\frac{1}{1-x} = \sum_{n=0}^{\infty} x^n, \mathspace \left|x\right| < 1\]
+
+    Ainsi, nous avons un rayon de convergence $R = 1$ quand $x_0 = 0$.
+}
+
+\parag{Exemple 4}{
+    Considérons la fonction suivante:
+    \begin{functionbypart}{f\left(x\right)}
+        0, & \text{si } x \leq 0 \\
+        e^{-\frac{1}{x}}, & \text{si } x > 0
+    \end{functionbypart}
+
+    Il est possible de démontrer que cette fonction est de classe $C^\infty \left(\mathbb{R}\right)$. De plus, il est aussi possible de démontrer que, pour tout $n$, $f^{\left(n\right)} = 0$. Ainsi:
+    \[T_0\left(x\right) = \sum_{n=0}^{\infty} \frac{f^{\left(n\right)}\left(0\right)}{n!} x^n = 0\]
+    
+    Or, cela veut donc dire que, sur le point $x_0 = 0$, il n'est pas possible de trouver de rayon de convergence; il n'existe aucun $\epsilon > 0$ telle que cette fonction est égale à sa série de Taylor autour de 0. $f$ n'est donc pas analytique en $x_0 = 0$.
+}
+
+\end{document}
+
