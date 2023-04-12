@@ -357,6 +357,9 @@ def verify_content(content, file_name):
     
     if one_contains(extract_all(content, r"\widetilde"), "_"):
         print(f"\tWrong style widetilde in {file_name}")
+        
+    if content.count(r"\unexpanded") > 0:
+        print(f"\t\\unexpanded left in {file_name}")
 
 
 def modify_tex_documents(tmp_dir, tex_files, relations, is_english,
