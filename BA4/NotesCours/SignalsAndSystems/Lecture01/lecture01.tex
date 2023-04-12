@@ -1,0 +1,216 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-02-24 at 13:17:03.
+
+\usepackage{../../style}
+
+\title{Signals and systems}
+\author{Joachim Favre}
+\date{Vendredi 24 février 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2023-02-24}{Notations (more or less good)}{
+\begin{itemize}[left=0pt]
+    \item Definition of discrete time and continuous time signal and systems.
+    \item Definition of periodic, even, odd, energy and power signals.
+    \item Definition of linear, time invariant, memoryless, causal, invertible and stable systems.
+\end{itemize}
+
+}
+
+\section{Introduction}
+\subsection{Signals}
+\parag{Definition: Signals}{
+    A \important{discrete time} (DT) signal, written $x\left[n\right]$, is a function $x: \mathbb{Z} \mapsto \mathbb{R}$. A \important{continuous time} (CT) signal, written $x\left(t\right)$, is a function $x: \mathbb{R} \mapsto \mathbb{R}$ or $x: \mathbb{R} \mapsto \mathbb{C}$.
+
+    \subparag{Remark}{
+        We will always use square brackets for DT signals and parenthesis for CT signals.
+    }
+}
+
+\parag{Definition: Periodic signal}{
+    A discrete time signal is \important{periodic} if there exists $N \in \mathbb{N}$ such that, for all $n \in \mathbb{N}$: 
+    \[x\left[n\right] = x\left[n + N\right]\]
+    
+    Similarly, a continuous time signal is periodic if there exists $T \in\mathbb{N}$ such that, for all $t \in \mathbb{R}$: 
+    \[x\left(t\right) = x\left(t + T\right)\]
+    
+    $N$ and $T$ are named \important{periods}. The \important{fundamental period}, if it exists, is the smallest such $N$ or $T$.
+}
+
+\parag{Definition: Parity of signals}{
+    A signal is \important{even} if: 
+    \[x\left(t\right) = x\left(-t\right), \mathspace x\left[n\right] = x\left[-n\right]\]
+    
+    Similarly, a signal is \important{odd} if: 
+    \[-x\left(t\right) = x\left(-t\right), \mathspace -x\left[n\right] = x\left[-n\right]\]
+}
+
+\parag{Definition: Energy of a signal}{
+    The \important{energy} of a signal is defined as: 
+    \[\mathcal{E} = \int_{-\infty}^{\infty} \left|x\left(t\right)\right|^2 dt, \mathspace \mathcal{E} = \sum_{n=-\infty}^{\infty} \left|x\left[n\right]\right|^2\]
+
+    Some signals have an infinite energy. If it has a final energy, then we call it an \important{energy signal}.
+}
+
+\parag{Definition: Power of a signal}{
+    The \important{power} of a signal is defined as: 
+    \[\mathcal{P} = \lim_{T \to \infty} \frac{1}{2T} \int_{-T}^{T} \left|x\left(t\right)^2\right|dt, \mathspace \mathcal{P} = \lim_{N \to \infty} \frac{1}{2N + 1} \sum_{n=-N}^{N} \left|x\left[n\right]\right|^2\]
+
+    Some signals have zero or infinite power. If a signal has a non-zero finite power, then we call it a \important{power signal}.
+
+    \subparag{Remark}{
+        If a signal is an energy signal, then it has a zero power, and thus it is not a power signal. Inversely, if a signal is a power signal, then it has an infinite energy and is thus not an energy signal.
+    }
+}
+
+\parag{Example: Continuous}{
+    Let's consider the following signal, which will be important in this course: 
+    \[x\left(t\right) = C e^{a t}, \mathspace C, a \in \mathbb{C}\]
+    
+    We have multiple cases. If we have both $C, a \in \mathbb{R}$, then this is just a real exponential, which will either blow up over time or exponentially decay.
+
+    If we have $a = \omega_0 j$ for $\omega_0 \in \mathbb{R}^*$ (it only has an imaginary component), then we get a periodic signal, with fundamental period $T = \frac{2\pi}{\omega_0}$:  
+    \[e^{j \omega_0 \left(T + t\right)} = e^{j \omega_0 t + 2\pi j} = e^{j \omega_0 t}\]
+    
+    If we have $a = r + j \omega_0$, then we get a damped sinusoids (its real part is a sinusoidal function which amplitude follows an exponential).
+}
+
+\parag{Example: Discrete}{
+    We can also consider the discrete exponential signal: 
+    \[x\left[n\right] = C \alpha^n = C e^{\beta n}, \mathspace \alpha = e^{\beta}\]
+
+    This is very similar to the continuous case, however we need to be careful about periodicity. For instance, $x\left[n\right] = e^{j \frac{3}{4} n}$ is not be periodic (there exists no integer period) but $y\left[n\right] = e^{j \frac{3}{4} \pi n}$ is periodic. 
+}
+
+\parag{Operations}{
+    We can make different operations on our signals. We can make a \important{time shift}, for some $n_0 \in \mathbb{N}$ or $t_0 \in \mathbb{R}$:
+    \[x\left[n - n_0\right], \mathspace x\left(t - t_0\right)\]
+
+    We can also make a \important{time reversal}:
+    \[x\left[-n\right], \mathspace x\left(-t\right)\] 
+
+    We can finally make all sorts of scaling of the time variable, making a \important{time scaling}, for some $\alpha \in \mathbb{R}^*$:
+    \[x\left(\alpha t\right)\]
+}
+
+
+\subsection{Systems}
+\parag{Definition: System}{
+   A \important{system}, $\mathcal{H}$, takes one or more input signals, and change them into one or more output signals. Formally, this is an operator.
+
+   A \important{discrete time} system takes a discrete time input signal $x\left[n\right]$ and outputs a DT signal: 
+   \[y\left[n\right] = \mathcal{H}\left\{x\left[n\right]\right\}\]
+   
+   Similarly, a \important{continuous time} system takes a CT signal $x\left(t\right)$ and outputs a CT signal: 
+   \[y\left(t\right) = \mathcal{H}\left\{x\left(t\right)\right\}\]
+   
+   \subparag{Example}{
+       For instance, the suspensions of a car can be seen as a system: it transforms the bumpiness of the road into something smoother. We can also see an audio compressor as a digital system.
+   }
+
+   \subparag{Personal remark}{
+       The notation presented here is, in my opinion, not great. The best notation would instead to write: 
+       \[y = \mathcal{H}\left\{x\right\} \implies y\left(t\right) = \mathcal{H}\left\{x\right\}\left(t\right)\]
+
+       In other words, $\mathcal{H}$ is an operator: it takes a function $x$ and outputs another function $y$. Then, we evaluate both sides at $t$.
+       
+       Then, if we have a function $z\left(t\right) = x\left(t+2\right)$, we can make the following shortcut: 
+       \[y\left(t\right) = \mathcal{H}\left\{z\right\}\left(t\right) = \mathcal{H}\left\{x\left(t+2\right)\right\}\left(t\right)\]
+       
+       In this course, we forget about the final parenthesis, writing: 
+       \[\mathcal{H}\left\{x\left(t+2\right)\right\}\left(t\right) = \mathcal{H}\left\{x\left(t+2\right)\right\}\]
+       
+       However, this can be very dangerous. For instance, if we let $y\left(t\right) = \mathcal{H}\left\{x\right\}\left(t\right)$, then in general the following does not hold: 
+       \[y\left(t+2\right) \neq \mathcal{H}\left\{x\left(t + 2\right)\right\}\left(t\right) = \mathcal{H}\left\{x\left(t+2\right)\right\}\]
+
+       However, the following does hold in general: 
+       \[y\left(t+2\right) = \mathcal{H}\left\{x\right\}\left(t+2\right) = \mathcal{H}\left\{x\left(t\right)\right\}\left(t+2\right)\]
+       
+       The difference is rather subtle. When we compute $\mathcal{H}\left\{x\left(t+2\right)\right\}$, we feed another function to the operator, thus possibly getting another function as result. When we compute $\mathcal{H}\left\{x\left(t\right)\right\}\left(t+2\right)$, we just evaluate the resulting function at another point. This difference is much clearer when keeping in mind that the evaluation of the function $y$ is at the end of the line, not inside the operator.
+   }
+}
+
+\parag{Definition: Linear system}{
+    A CT system is \important{linear} if, for all $a_1, a_2 \in \mathbb{R}$ and $x_1\left(t\right)$, $x_2\left(t\right)$: 
+    \[\mathcal{H}\left\{a_1 x_1\left(t\right) + a_2 x_2\left(t\right)\right\} = a_1 \mathcal{H}\left\{x_1\left(t\right)\right\} + a_2 \mathcal{H}\left\{x_2\left(t\right)\right\}\]
+    
+    Similarly, a DT system is linear if, for all $a_1, a_2 \in \mathbb{R}$ and $x_1\left[n\right]$, $x_2\left[n\right]$: 
+    \[\mathcal{H}\left\{a_1 x_1\left[n\right] + a_2 x_2\left[n\right]\right\} = a_1 \mathcal{H}\left\{x_1\left[n\right]\right\} + a_2 \mathcal{H}\left\{x_2\left[n\right]\right\}\]
+}
+
+\parag{Definition: Time invariant system}{
+    A CT system is time invariant if, for all $\tau \in \mathbb{R}$ and $x\left(t\right)$: 
+    \[y\left(t\right) = \mathcal{H}\left\{x\left(t\right)\right\} \implies y\left(t - \tau\right) = \mathcal{H}\left\{x\left(t - \tau\right)\right\}\]
+    
+    Similarly, a DT system is time invariant if, for all $n_0 \in \mathbb{N}$ and $x\left[n\right]$: 
+    \[y\left[n\right] = \mathcal{H}\left\{x\left[n\right]\right\} \implies y\left[n - n_0\right] = \mathcal{H}\left\{x\left[n - n_0\right]\right\}\]
+    
+    \subparag{Personal remark}{
+        This is a very good example where these notations are awful. Let's try an example with better notations, considering the following system: 
+        \[\mathcal{H}\left\{x\right\}\left(t\right) = x\left(t^2\right) = y\left(t\right)\]
+        
+        Now, we want to verify if, for any arbitrary $\tau \in \mathbb{R}$, $y\left(t - \tau\right) \over{=}{?} \mathcal{H}\left\{x\left(t - \tau\right)\right\}\left(t\right)$. The left hand side is given by: 
+        \[y\left(t - \tau\right) = x\left(\left(t - \tau\right)^2\right)\]
+        
+        To understand better the right hand side, let's remove the shortcut we took, writing $z\left(t\right) = x\left(t - \tau\right)$. This gives us that: 
+        \[\mathcal{H}\left\{x\left(t - \tau\right)\right\}\left(t\right) = \mathcal{H}\left\{z\right\}\left(t\right) = z\left(t^2\right) = x\left(t^2 - \tau\right)\]
+
+        Clearly, both hand sides are not equal, meaning that our system is not time invariant.
+    }
+}
+
+\parag{Definition: Memoryless system}{
+    A system is \important{memoryless} if the current system output only depends on the current system input.
+
+    In other words, for CT systems, for all signals $x\left(t\right)$ and $\tau \in \mathbb{R}$, we need that, if $y\left(t\right) = \mathcal{H}\left\{x\left(t\right)\right\}$, then $y\left(\tau\right)$ depends only on $x\left(\tau\right)$.
+
+    Similarly, for a DT system, for all signals $x\left[n\right]$ and all $n_0 \in \mathbb{N}$, we need that, if $y\left[n\right] = \mathcal{H}\left\{x\left[n\right]\right\}$ then $y\left[n_0\right]$ depends only on $x\left[n_0\right]$.
+}
+
+\parag{Definition: Causal system}{
+    A system is \important{causal} if  the output signal depends on current and past inputs only, not on future inputs.
+
+    In other words, for CT systems, for all signals $x\left(t\right)$ and $\tau \in \mathbb{R}$, we need that, if $y\left(t\right) = \mathcal{H}\left\{x\left(t\right)\right\}$, then $y\left(\tau\right)$ depends only on $x\left(t\right)$ for $-\infty\leq t \leq \tau$.
+
+    Similarly, for a DT system, for all signals $x\left[n\right]$ and all $n_0 \in \mathbb{N}$, we need that, if $y\left[n\right] = \mathcal{H}\left\{x\left[n\right]\right\}$ then $y\left[n_0\right]$ depends only on $x\left[n\right]$ for $-\infty \leq n \leq n_0$.
+
+    \subparag{Remark}{
+        If a system is memoryless, then it is causal.
+    }
+    
+    \subparag{Example}{
+        Let's consider the following system: 
+        \[y\left[n\right] = \sum_{k=n-1}^{n+1} x\left[k\right]\]
+        
+        This is like a non-normalised moving average. It is not causal since $y\left[n\right]$ depends on $y\left[n+1\right]$.
+    }
+}
+
+\parag{Definition: Invertible system}{
+    A system is \important{invertible} if distinct inputs lead to distinct outputs.
+
+    In other words, for CT signals: 
+    \[\mathcal{H}\left\{x_1\left(t\right)\right\} = \mathcal{H}\left\{x_2\left(t\right)\right\} \implies x_1\left(t\right) = x_2\left(t\right)\]
+    
+    Similarly, for DT signals: 
+    \[\mathcal{H}\left\{x_1\left[n\right]\right\} = \mathcal{H}\left\{x_2\left[n\right]\right\} \implies x_1\left[n\right] = x_2\left[n\right]\]
+}
+
+\parag{Definition: Stable system}{
+    A system is \important{stable} if bounded inputs lead to bounded outputs. This is thus known as BIBO stability.
+
+    In other words, for CT signals, there must exist $B, B_0 \in\mathbb{R}$ such that, for all $t \in \mathbb{R}$: 
+    \[\left|x\left(t\right)\right| \leq B \implies \left|\mathcal{H}\left\{x\left(t\right)\right\}\right| \leq B_0\]
+
+    Similarly, for DT signals there must exist $B, B_0 \in\mathbb{R}$ such that, for all $n \in \mathbb{N}$: 
+    \[\left|x\left[n\right]\right| \leq B \implies \left|\mathcal{H}\left\{x\left[n\right]\right\}\right| \leq B_0\]
+}
+
+
+\end{document}

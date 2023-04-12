@@ -1,0 +1,248 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-17 at 13:18:48.
+
+\usepackage{../../style}
+
+\title{Signals and systems}
+\author{Joachim Favre}
+\date{Vendredi 17 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2023-03-17}{I am sure copying those tables was worth it}{
+\begin{itemize}[left=0pt]
+    \item Definition of continuous-time Fourier transforms, and its inverse.
+    \item Example of some important CT Fourier transform pairs.
+    \item Example of some important CT Fourier transform properties.
+    \item Definition of CT frequency response, and application to differential equations.
+\end{itemize}
+
+}
+
+\section{Fourier transform}
+\subsection{Continuous time}
+\parag{Goal}{
+    The goal is to decompose a signal into a weighted integral of complex exponentials. Instead of looking at a signal as a function of time, we instead look at it as a function of frequency.
+}
+
+\parag{Definition: CTFT}{
+    Let $x\left(t\right)$ be some CT signal. Its \important{Continuous Time Fourier Transform} (CTFT) is given by: 
+    \[X\left(\omega\right) = \int_{-\infty}^{\infty} x\left(t\right) e^{-j\omega t} dt\]
+
+    $X$ is the \important{spectrum} of $x\left(t\right)$. It is the \important{frequency domain} representation, whereas $x\left(t\right)$ is the \important{time domain} representation.
+}
+
+\parag{Definition: Inverse Fourier transform}{
+    Let $X\left(\omega\right)$ be some function. Its \important{inverse Fourier Transform} is defined as: 
+    \[x\left(t\right) = \frac{1}{2 \pi} \int_{-\infty}^{\infty} X\left(\omega\right) e^{j \omega t} d\omega\]
+
+    \subparag{Remark}{
+        It is possible to show that the inverse Fourier transform is the inverse of Fourier transforms (as the name could have hinted).
+    }
+
+    \subparag{Notation}{
+        We sometimes write the pair $\left(x\left(t\right), X\left(\omega\right)\right)$ as: 
+        \[x\left(t\right) = \frac{1}{2\pi} \int_{-\infty}^{\infty} X\left(\omega\right)e^{j\omega t} \fourierpair X\left(\omega\right) = \int_{-\infty}^{\infty} x\left(t\right) e^{-j \omega t}\]
+    }
+}
+
+\parag{Remark}{
+    Fourier transform are well defined for absolutely integrable signals and thus finite energy signals. We will also consider it for periodic signals, since we will be able to use the Dirac delta function.
+}
+
+\parag{Exemple 1}{
+    Let's consider the following signal (the box function):
+    \begin{functionbypart}{b\left(t\right)}
+        1, & \left|t\right| \leq 1 \\
+        0, & \text{otherwise}
+    \end{functionbypart}
+
+    We want to compute its Fourier Transform: 
+    \[B\left(\omega\right) = \int_{-\infty}^{\infty} b\left(t\right) e^{-j \omega t} dt = \int_{-1}^{1} e^{j \omega t} dt = \left[\frac{-1}{j \omega} e^{-j \omega t}\right]_{-1}^{1} = \frac{1}{\omega} \cdot  \frac{e^{j \omega} - e^{-j \omega}}{j} = \frac{2 \sin\left(\omega\right)}{\omega}\]
+    
+    This function will be very useful, so we give it a name: 
+    \[\sinc\left(x\right) = \frac{\sin\left(\pi x\right)}{\pi x}\]
+
+    \imagehere{SincGraph.png}
+
+    This gives us: 
+    \[B\left(\omega\right) = 2\sinc\left(\frac{\omega}{\pi}\right)\]
+}
+
+\parag{Example 2}{
+    Let us consider the following signal, where $a \in \mathbb{C}$: 
+    \[x\left(t\right) = e^{-at} u\left(t\right)\]
+    
+    Let's compute its Fourier transform: 
+    \autoeq{X\left(\omega\right) = \int_{-\infty}^{\infty} x\left(t\right) e^{-j \omega t} dt = \int_{-\infty}^{\infty} e^{-at} u\left(t\right) e^{-j \omega t} dt = \int_{0}^{\infty} e^{-\left(a + j \omega\right)t} dt = \left[\frac{-1}{a + j \omega} e^{- \left(a+ j \omega\right)t}\right]_{0}^{\infty}}
+    
+    We notice that this is only converges when $\cre\left(a\right) > 0$, giving: 
+    \begin{functionbypart}{X\left(\omega\right)}
+        \frac{1}{a + j \omega}, & \cre\left(a\right) > 0 \\
+        \infty, & \text{otherwise}
+    \end{functionbypart}
+    
+    The Fourier Transform of this signal is not defined when $\cre\left(a\right) \leq 0$.
+}
+
+\parag{Example 3}{
+    Let us consider the following signal: 
+    \[Z\left(\omega\right) = \pi\left(\delta\left(\omega - \omega_0\right) + \delta\left(\omega + \omega_0\right)\right)\]
+    
+    We want to compute its inverse Fourier Transform: 
+    \autoeq{z\left(t\right) = \frac{1}{2\pi} \int_{-\infty}^{\infty} Z\left(\omega\right) e^{j \omega t} d \omega = \frac{\pi}{2 \pi} \int_{-\infty}^{\infty} \left(\delta\left(\omega - \omega_0\right) + \delta\left(\omega + \omega_0\right)\right)e^{j \omega t}d \omega = \frac{e^{j \omega_0 t} + e^{-j \omega_0 t}}{2} = \cos\left(\omega_0 t\right)}
+    
+    Indeed, $\delta\left(\omega - \omega_0\right)$ is $0$ everywhere, except at $\omega = \omega_0$ and, thus, $f\left(\omega\right)\delta\left(\omega - \omega_0\right) = f\left(\omega_0\right)\delta\left(\omega - \omega_0\right)$.
+    
+    We have thus seen that $Z\left(\omega\right)$ is the Fourier transform of $\cos\left(\omega_0 t\right)$. This function is not absolutely integrable, but since it is periodic we are fine with the Dirac Delta function. In fact, they allow to consider together Fourier transforms and Fourier series.
+}
+
+\parag{CTFT table}{
+    A typical way to compute Fourier transform is just to use a table. For $a$ such that $\cre\left(a\right) > 0$:
+    \begin{center}
+    \begin{tabular}{|rcl|}
+        \hline
+        $\displaystyle \delta\left(t\right)$ & \fourierpair & $\displaystyle 1$ \\
+        $\displaystyle \delta\left(t - t_0\right)$ & \fourierpair & $\displaystyle e^{-j t_0 \omega}$ \\
+        $\displaystyle \sum_{n=-\infty}^{\infty} \delta\left(t - nT\right)$ & \fourierpair & $\displaystyle \frac{2\pi}{T} \sum_{k=-\infty}^{\infty} \delta\left(\omega - \frac{2\pi k}{T}\right)$ \\
+        \hline
+        $\displaystyle1 $ & \fourierpair & $\displaystyle 2\pi \delta\left(\omega\right)$  \\
+        $\displaystyle e^{j \omega_0 t}$ & \fourierpair & $\displaystyle 2\pi \delta\left(\omega - \omega_0\right)$  \\
+        $\displaystyle \cos\left(\omega_0 t\right)$ & \fourierpair & $\displaystyle \pi \left(\delta\left(\omega - \omega_0\right) + \delta\left(\omega + \omega_0\right)\right)$  \\
+        $\displaystyle \sin\left(\omega_0 t\right)$ & \fourierpair & $\displaystyle \frac{\pi}{j} \left(\delta\left(\omega - \omega_0\right) - \delta\left(\omega + \omega_0\right)\right)$  \\
+        \hline
+        $\displaystyle u\left(t\right) = \expandafter\noexpand\piecewisefunc{1}{t \geq 0}{0}{t < 0}$ & \fourierpair & $\displaystyle U\left(\omega\right) = \frac{1}{j \omega} + \pi \delta\left(\omega\right)$  \\
+        \hline
+        $\displaystyle e^{-at} u\left(t\right)$ & \fourierpair & $\displaystyle \frac{1}{a + j  \omega}$  \\
+        $\displaystyle \frac{t^{n-1}}{\left(n-1\right)!} e^{-at} u\left(t\right)$ & \fourierpair & $\displaystyle \frac{1}{\left(a + j\omega\right)^n}$  \\
+        \hline
+        $\displaystyle e^{-a \left|t\right|}$ & \fourierpair & $\displaystyle \frac{2a}{a^2 + \omega ^2}$  \\
+        \hline
+        $\displaystyle \sqrt{\frac{\omega_0}{2\pi}} \sinc\left(\frac{\omega_0}{2\pi} t\right)$ & \fourierpair & $\displaystyle \expandafter\noexpand\piecewisefunc{\sqrt{\frac{2\pi}{\omega_0}}}{\left|\omega\right| \leq \frac{1}{2} \omega_0}{0}{\text{otherwise}}$  \\
+        \hline
+        $\displaystyle b\left(t\right) = \expandafter\noexpand\piecewisefunc{\frac{1}{\sqrt{t_0}}}{\left|t\right| \leq \frac{1}{2}t_0}{0}{\text{otherwise}}$ & \fourierpair & $\displaystyle B\left(\omega\right) = \sqrt{t_0} \sin\left(\frac{t_0}{2\pi} \omega\right)$  \\
+        \hline
+    \end{tabular}
+    \end{center}
+    
+}
+
+\parag{Property: Linearity}{
+    The Fourier transform of $\alpha x\left(t\right) + \beta y\left(t\right)$ is: 
+    \[\alpha X\left(\omega\right) + \beta Y\left(\omega\right)\]
+}
+
+\parag{Property: Shift in time}{
+    The Fourier transform of $x\left(t - t_0\right)$ is: 
+    \[e^{-j t_o \omega} X\left(\omega\right)\]
+
+    \subparag{Proof}{
+        We can just do a change of variable $\widetilde{t} = t - t_0$: 
+        \autoeq{\int_{-\infty}^{\infty} x\left(t - t_0\right) e^{-j \omega t} dt = \int_{-\infty}^{\infty} x\left(\widetilde{t}\right) e^{-j \omega\left(\widetilde{t} + t_0\right)} d\widetilde{t} = e^{-j\omega t_0}\int_{-\infty}^{\infty} x\left(\widetilde{t}\right) e^{-j\omega \widetilde{t}} d\widetilde{t} = e^{-j \omega t_0} X\left(\omega\right)}
+    }
+}
+
+\parag{Property: Differentiation in time}{
+    The Fourier transform of $\frac{dx\left(t\right)}{dt}$ is: 
+    \[j \omega X\left(\omega\right)\]
+
+    \subparag{Proof}{
+        Assuming the integral and the derivative operators commute, we can see that, using the inverse Fourier transform, we can write:
+        \[\frac{dx\left(t\right)}{dt} = \frac{1}{2\pi} \int_{-\infty}^{\infty} X\left(\omega\right) \frac{d e^{j \omega t}}{dt} d \omega = \frac{1}{2 \pi} \int_{-\infty}^{\infty} X\left(\omega\right) j\omega e^{j \omega t} d\omega\]
+
+        We can thus identify that its inverse Fourier transform is $X\left(\omega\right) j\omega$.
+    }
+}
+
+\parag{Property: Convolution in time}{
+    The Fourier transform of $\left(x * y\right)\left(t\right)$ is: 
+    \[X\left(\omega\right)Y\left(\omega\right)\]
+
+    \subparag{Proof}{
+        We can just use the definition of the Fourier transform: 
+        \autoeq{\int_{-\infty}^{\infty} \left(x * y\right)\left(t\right) e^{- j\omega t} dt = \int_{-\infty}^{\infty} \left[\int_{-\infty}^{\infty} x\left(\tau\right) y\left(t - \tau\right) d\tau\right] e^{-j \omega t} dt = \int_{-\infty}^{\infty} x\left(\tau\right) \left[\int_{-\infty}^{\infty} y\left(t - \tau\right) e^{-j \omega t} dt\right]d\tau = 
+        \int_{-\infty}^{\infty} x\left(\tau\right) e^{-j \omega \tau} Y\left(\omega\right) d\tau = Y\left(\omega\right) \int_{-\infty}^{\infty} x\left(\tau\right) e^{-j \omega \tau} d\tau = Y\left(\omega\right) X\left(\omega\right)}
+        as expected.
+    }
+    
+}
+
+\parag{CTFT properties table}{
+    We can also make a big table with all the properties of Fourier transforms (there are more than the ones we have just seen):
+    \begin{center}
+    \begin{tabular}{|rcl|}
+        \hline
+        $\displaystyle \alpha x\left(t\right) + \beta y\left(t\right)$ & \fourierpair & $\displaystyle \alpha X\left(\omega\right) +  \beta Y\left(\omega\right)$  \\
+        $\displaystyle x\left(t - t_0\right)$ & \fourierpair & $\displaystyle e^{-j t_0 \omega} X\left(\omega\right)$  \\
+        $\displaystyle e^{j \omega_0 t} x\left(t\right)$ & \fourierpair & $\displaystyle X\left(\omega - \omega_0\right)$   \\
+        $\displaystyle x\left(bt\right)$ & \fourierpair & $\displaystyle \frac{1}{\left|b\right|} X\left(\frac{\omega}{b}\right)$  \\
+        $\displaystyle x\left(-t\right)$ & \fourierpair & $\displaystyle X\left(-\omega\right)$  \\
+        \hline
+        $\displaystyle \frac{d^{n}}{dt^{n}} x\left(t\right)$ & \fourierpair & $\displaystyle \left(j \omega\right)^n X\left(\omega\right)$  \\
+        $\displaystyle \left(-jt\right)^n x\left(t\right)$ & \fourierpair & $\displaystyle \frac{d^{n}}{d\omega^{n}} X\left(\omega\right)$  \\
+        $\displaystyle \int_{-\infty}^{t} x\left(\tau\right)d\tau$ & \fourierpair & $\displaystyle \frac{1}{j\omega}X\left(\omega\right)$, if $X\left(0\right) = 0$  \\
+        \hline
+        $\displaystyle \left(x*y\right)\left(t\right)$ & \fourierpair & $\displaystyle X\left(\omega\right)Y\left(\omega\right)$  \\
+        $\displaystyle x\left(t\right)y\left(t\right)$ & \fourierpair & $\displaystyle \frac{1}{2\pi} \left(X * Y\right)\left(\omega\right)$  \\
+        \hline
+        $\displaystyle x^*\left(t\right)$ & \fourierpair & $\displaystyle X^*\left(-\omega\right)$  \\
+        \hline
+    \end{tabular}
+    \end{center}
+
+    And we finally have Parseval's equality:
+    \[\int_{-\infty}^{\infty} \left|x\left(t\right)\right|^2 dt = \frac{1}{2\pi} \int_{-\infty}^{\infty} \left|X\left(\omega\right)\right|^2 d\omega\]
+}
+
+\parag{Example}{
+    Let $x\left(t\right)$ be an arbitrary signal, of which we know the Fourier transform $X\left(\omega\right)$. We want to find the Fourier transform of: 
+    \[y\left(t\right) = x\left(1 - t\right) + x\left(-1 - t\right)\]
+    
+    First, using the time-shift property, we know that the Fourier transforms of $z_1\left(t\right) = x\left(1 + t\right)$ and $z_2\left(t\right) = x\left(-1 + t\right)$ are: 
+    \[Z_1\left(\omega\right) = e^{j \omega} X\left(\omega\right), \mathspace Z_2\left(\omega\right) e^{-j \omega} X\left(\omega\right)\]
+    
+    Finally, we know that $y\left(t\right) = z_1\left(-t\right) + z_2\left(-t\right)$, so using the time-reversal property and the linearity of Fourier transforms: 
+    \[Y\left(\omega\right) = e^{-j \omega} X\left(-\omega\right) + e^{j\omega} X\left(-\omega\right) X\left(-\omega\right) \left(e^{-j \omega} + e^{j \omega}\right) = 2 X\left(-\omega\right) \cos\left(\omega\right)\]
+}
+
+\subsection{Application to CT stable LTI systems}
+\parag{Definition: Frequency response}{
+    Let $\mathcal{H}$ be a continuous-time LTI system with impulse response $h\left(t\right)$. Its frequency response is the Fourier transform of the impulse response: 
+    \[H\left(\omega\right) = \int_{-\infty}^{\infty} h\left(t\right) e^{-j \omega t} dt\]
+    
+    \subparag{Remark}{
+        We know that an LTI system is stable if and only if its impulse response is absolutely integrable. Thus, if the system is stable, it has a frequency response. 
+    }
+}
+
+\parag{Theorem: Convolution property}{
+    Knowing that $y\left(t\right) = \left(h * x\right)\left(t\right)$ and the convolution property of Fourier transform, we get that: 
+    \[Y\left(\omega\right) = H\left(\omega\right)X\left(\omega\right)\]
+}
+
+\parag{Differential equation}{
+    We have a very useful property for derivatives, which we can use to solve differential equations.
+
+    For instance, let's say that we know a stable LTI system is described by the following equation: 
+    \[y\left(t\right) + 3 \frac{dy\left(t\right)}{dt} + \frac{d^2 y\left(t\right)}{dt^2} = x\left(t\right) + \frac{1}{2} \cdot \frac{dx\left(t\right)}{dt}\]
+    
+    We want to find the impulse response of this system. To do so, we apply a Fourier transform on both sides, applying linearity and the differentiation in time properties: 
+    \autoeq{Y\left(\omega\right) + 3 j \omega Y\left(\omega\right) + \left(j \omega\right)^2 Y\left(\omega\right) = X\left(\omega\right) +  \frac{1}{2} j \omega X\left(\omega\right) \iff Y\left(\omega\right) = X\left(\omega\right) \frac{1 + \frac{1}{2} j \omega}{1 + 3 j \omega + \left(j \omega\right)^2}}
+    
+    However, since we know that $Y\left(\omega\right) = X\left(\omega\right) H\left(\omega\right)$, we can identify: 
+    \[H\left(\omega\right) = \frac{1 + \frac{1}{2} j \omega}{1 + 3 j \omega + 2 \left(j \omega\right)^2} = \frac{\frac{3}{4}}{j \omega + \frac{1}{2}} - \frac{\frac{1}{2}}{j \omega + 1}\]
+    using partial fraction expansion.
+
+    Using a Fourier transform table, we finally get: 
+    \[h\left(t\right)= \frac{3}{4} e^{- \frac{1}{2}t}u\left(t\right) - \frac{1}{2}e^{- t} u\left(t\right)\]
+
+    We can for instance see that this system is causal, since $h\left(t\right) = 0$ for all $t < 0$.
+}
+
+
+\end{document}

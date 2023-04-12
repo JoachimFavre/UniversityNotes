@@ -1,0 +1,277 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-30 at 00:50:28.
+
+\usepackage{../../style}
+
+\title{Signals and systems}
+\author{Joachim Favre}
+\date{Jeudi 30 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2023-03-24}{From CTFT to DTFT}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the partial fraction expansion method.
+    \item Definition of the DTFT and of its inverse.
+    \item Example of some important DTFT pairs.
+    \item Example of some important DTFT properties.
+    \item Definition of DT frequency response, and application to difference equations.
+\end{itemize}
+
+}
+
+\parag{Partial fraction expansion}{
+    Partial fraction expansion is an algebra tool, which will be very useful throughout this course.
+}
+
+\parag{Example 1}{
+    Let us consider some stable LTI system describe by: 
+    \[\frac{d^2 y\left(t\right)}{dt} + 4 \frac{dy\left(t\right)}{dt} + 3y\left(t\right) = \frac{dx\left(t\right)}{dt} + 2x\left(t\right)\]
+    
+    As usual, we apply a Fourier transform on both side: 
+    \[\left(j \omega\right)^2 Y\left(\omega\right) + 4 j \omega Y\left(\omega\right) + 3 Y\left(\omega\right) = j \omega X\left(\omega\right) + 2 X\left(\omega\right) \implies Y\left(\omega\right) = \frac{j\omega + 2}{\left(j \omega \right)^2 + 4 j \omega + 3} X\left(\omega\right)\]
+    
+    We can thus identify: 
+    \[H\left(j \omega\right) = \frac{j\omega + 2}{\left(j \omega \right)^2 + 4 j \omega + 3}\]
+    
+    We need to invert this Fourier transform. To do so, we consider the following function:
+    \[G\left(v\right) = \frac{v + 2}{v^2 + 4v + 3} = \frac{v + 2}{\left(v+1\right)\left(v + 3\right)}\]
+
+    Our goal would be to write $G\left(v\right) = \frac{A}{v + 1} + \frac{B}{v + 3}$. To do so, we can see that (ignoring some divisions by 0, since everything works in the limit): 
+    \[A = G\left(v\right)\left(v + 1\right) \eval_{v=-1}^{} = \frac{1}{2}\]
+    \[B = \left(v + 3\right)G\left(v\right)  \eval_{v=-3}^{} = \frac{1}{2}\]
+
+    This means that: 
+    \[H\left(j \omega \right) = \frac{\frac{1}{2}}{j \omega + 1} + \frac{\frac{1}{2}}{j \omega + 3}\]
+
+    This is now pretty easy to inverse, using a table: 
+    \[h\left(t\right) = \frac{1}{2} e^{-t} u\left(t\right) + \frac{1}{2} e^{-3t} u\left(t\right)\]
+
+    Our method is very general.
+}
+
+\parag{Example 2}{
+    Let us consider a more complicated case, where we have repeated factors: 
+    \[Y\left(j \omega\right) = \frac{j \omega + 2}{\left(j \omega + 1\right)^2 \left(j \omega + 3\right)} \implies G\left(v\right) = \frac{v+2}{\left(v + 1\right)^2 \left(v+3\right)}\]
+    
+    The partial fraction in this case looks like: 
+    \[G\left(v\right) = \frac{A}{v+1} + \frac{B}{\left(v+1\right)^2} + \frac{C}{v+3}\]
+    
+    To find $A$, we also need to take the derivative to get rid of the $B$ term: 
+    \[A = \frac{1}{\left(2 - 1\right)!} \frac{d}{dv} \left[\left(v+1\right)^2 G\left(v\right)\right]_{v = -1} = \frac{1}{4}\]
+    
+    The other terms are then similar to the previous example: 
+    \[B = G\left(v\right)\left(v+1\right)^2 \eval_{v = -1}^{} = \frac{1}{2}\]
+    \[C = \left(v+3\right)G\left(v\right) \eval_{v=-3}^{} = -\frac{1}{4}\]
+
+    This finally gives us that: 
+    \[Y\left(j \omega\right) = \frac{\frac{1}{4}}{j \omega+ 1} + \frac{\frac{1}{2}}{\left(j\omega + 1\right)^2} - \frac{\frac{1}{4}}{j \omega+ 3}\]
+    
+    Which implies: 
+    \[y\left(t\right) = \left[\frac{1}{4} e^{-t} + \frac{1}{2} t e^{-t} - \frac{1}{4} e^{-3t}\right]u\left(t\right)\]
+}
+
+\parag{Example 3}{
+    Let's say we have the following function: 
+    \[H\left(e^{j \omega}\right) = \frac{2}{1 - \frac{3}{4} e^{-j \omega} + \frac{1}{8} e^{-2 j \omega}}\]
+    
+    Then, the trick is to let $v = e^{-j \omega}$:
+    \[G\left(v\right) = \frac{2}{ 1 - \frac{3}{4} v + \frac{1}{8}v^2} = \frac{2}{\left(1 - \frac{1}{2}v\right)\left(1 - \frac{1}{4}v\right)}\]
+    
+    The rest is similar.
+}
+
+\subsection{Discrete time Fourier transform}
+
+\parag{Definition: DTFT}{
+    The \important{Discrete Time Fourier Transform} (DTFT) is given by: 
+    \[X\left(e^{j \omega}\right) = \sum_{n=-\infty}^{\infty} x\left[n\right]e^{-j \omega n}\]
+
+    $X$ is the \important{spectrum} of $x\left[n\right]$. It is the \important{frequency domain} representation, whereas $x\left[n\right]$ is the \important{time domain} representation. Also, even though this is a function of $\omega$, we write the parameter as being $e^{j \omega}$ to make a difference with the CTFT and to remember that it is $2\pi$-periodic \textit{(and I personally think that this a horrible notation)}.
+
+    This is very similar to the CTFT, except that it is always $2\pi$-periodic.
+}
+
+\parag{Defintion: Inverse DTFT}{
+    The \important{inverse Fourier transform} is: 
+    \[x\left[n\right] = \frac{1}{2\pi} \int_{2\pi} X\left(e^{j\omega}\right) e^{j\omega n}d\omega\]
+
+    This integral is on any period (from $a$ to $a + 2\pi$, for any $a \in \mathbb{R}$).
+
+    \subparag{Remark}{
+         We can show that that this is the inverse operation of the DTFT.
+    }
+
+    \subparag{Notation}{
+        We sometimes write the DTFT pair $\left(x\left[n\right], X\left(e^{j\omega}\right)\right)$ as: 
+        \[x\left[n\right] = \frac{1}{2\pi} \int_{2\pi} X\left(e^{j\omega} e^{j\omega n}\right) d\omega \dtfourierpair \sum_{n=-\infty}^{\infty} x\left[n\right] e^{-j \omega n}\]
+        
+    }
+    
+    
+}
+
+\parag{Theorem: Periodicity}{
+    A DTFT is $2\pi$-periodic.
+
+    \subparag{Proof}{
+        We see that: 
+        \autoeq{X\left(e^{j\left(\omega + k2\pi\right)}\right) = \sum_{n=-\infty}^{\infty} x\left[n\right] e^{-j\left(\omega + k 2\pi\right)n} = \sum_{n=-\infty}^{\infty} x\left[n\right] e^{-j \omega n} \underbrace{e^{-j 2k \pi n}}_{= 1} = \sum_{n=-\infty}^{\infty} x\left[n\right]e^{-j\omega n} = X\left(e^{j \omega}\right)}
+        showing $2\pi$-periodicity.
+    }
+}
+
+\parag{Theorem: Convergence}{
+    A DTFT is well defined when it is absolutely summable and thus for finite energy signals. Also, we can make it converge for periodic signals, using Dirac deltas.
+}
+
+\parag{Example 1}{
+    Let us consider the following signal:
+    \begin{functionbypart}{x\left[n\right]}
+        1, & \left|n\right| \leq 2 \\
+        0, & \left|n\right| > 2
+    \end{functionbypart}
+
+    We want to find its Fourier transform. We see that: 
+    \autoeq{X\left(e^{j \omega}\right) = \sum_{n=-\infty}^{\infty} x\left[n\right] e^{-j\omega n} = e^{2 j \omega} + e^{j\omega} + 1 + e^{-j \omega} + e^{-2 j \omega} = 1 + 2 \cos\left(\omega\right) + 2\cos\left(2 \omega\right)}
+}
+
+\parag{Example 2}{
+    Let us consider the following signal: 
+    \[x\left[n\right] = \delta \left[n - n_0\right]\]
+    
+    We want to find its DTFT: 
+    \[X\left(e^{j \omega}\right) = \sum_{n=-\infty}^{\infty} \delta \left[n - n_0\right] e^{-j \omega n} = e^{-j \omega n_0}\]
+}
+
+\parag{Example 3}{
+    Let $\left|\omega_0\right| \leq \pi$. We consider the following function: 
+    \[Z\left(e^{j \omega}\right) = \sum_{\ell = -\infty}^{\infty} 2\pi \delta\left(\omega - \omega_0 - 2 \pi \ell \right)\]
+    which is periodic $2\pi$, with a spike at $\omega_0, \omega_0 + 2\pi, \omega_0 - 2\pi$ and so on.
+    
+    We find that: 
+    \autoeq{z\left[n\right]= \frac{1}{2\pi} \int_{-\pi}^{\pi} \sum_{\ell = -\infty}^{\infty} 2\pi \delta\left(\omega - \omega_0 - 2\pi \ell \right) e^{j \omega n} d\omega = \frac{1}{2\pi} \int_{-\pi}^{\pi} 2\pi \delta\left(\omega- \omega_0\right) e^{j \omega n} d \omega = e^{j \omega_0 n}}
+}
+
+\parag{DTFT Table}{
+    Just like for CTFT, we can use tables for DTFT. For a $\gamma$ such that $\left|\gamma\right| < 1$:
+    \begin{center}
+    \begin{tabular}{|rcl|}
+        \hline
+        $\displaystyle \delta \left[n\right]$ & $\dtfourierpair$ & $\displaystyle 1$ \\
+        $\displaystyle \delta \left[n - n_0\right]$ & $\dtfourierpair$ & $\displaystyle e^{-j n_0 \omega}$ \\
+        \hline
+        $\displaystyle 1 $ & $\dtfourierpair$ & $\displaystyle 2\pi \sum_{\ell = -\infty}^{\infty} \delta\left(\omega - 2\pi \ell \right)$  \\
+        $\displaystyle e^{j \omega_0 n}$ & $\dtfourierpair$ & $\displaystyle 2\pi \sum_{\ell = -\infty}^{\infty} \delta\left(\omega - \omega_0 - 2\pi \ell \right)$  \\
+        \hline
+        $\displaystyle u\left[n\right] = \expandafter\noexpand\piecewisefunc{1}{n \geq 0}{0}{n < 0}$ & $\dtfourierpair$ & $\displaystyle \frac{1}{1 - e^{-j \omega}} + \sum_{k=-\infty}^{\infty} \pi \delta\left(\omega - 2\pi k\right)$  \\
+        \hline
+        $\displaystyle \gamma^n u\left[n\right]$ & $\dtfourierpair$ & $\displaystyle \frac{1}{1 - \gamma e^{-j \omega}}$  \\
+        $\displaystyle n \gamma^n u\left[n\right]$ & $\dtfourierpair$ & $\displaystyle \frac{\gamma e^{-j \omega}}{\left(1 - \gamma e^{- j \omega}\right)^2}$  \\
+        \hline
+        $\displaystyle \sqrt{\frac{\omega_0}{2\pi}} \sinc\left(\frac{\omega_0}{2\pi} n\right)$ & $\dtfourierpair$ & $\displaystyle \expandafter\noexpand\piecewisefunc{\sqrt{\frac{2\pi}{\omega_0}}}{\left|\omega\right| \leq \frac{1}{2} \omega_0}{0}{\text{otherwise}}$  \\
+        \hline
+        $\displaystyle \expandafter\noexpand\piecewisefunc{\frac{1}{\sqrt{n_0}}}{\left|n\right| \leq \frac{1}{2}\left(n_0 - 1\right)}{0}{\text{otherwise}}$ & $\dtfourierpair$ & $\displaystyle \sqrt{n_0} \frac{\sinc\left(\frac{n_0}{2\pi} \omega\right)}{\sinc\left(\frac{1}{2\pi} \omega\right)}$ for an odd $n_0$ \\
+        \hline
+    \end{tabular}
+    \end{center}
+}
+
+\parag{Property: Shift in time}{
+    Let $x\left[n\right] \dtfourierpair X\left(e^{j\omega}\right)$. Then:
+    \[x\left[n - n_0\right] \dtfourierpair e^{-j n_0 \omega} X\left(e^{j \omega}\right)\]
+
+    \subparag{Proof: Shift in time}{
+        We see that, taking the change of variable $m = n - n_0$:
+        \autoeq{\sum_{n=-\infty}^{\infty} x\left[n-n_0\right] e^{-j \omega n} = \sum_{m = -\infty}^{\infty} x\left[m\right] e^{-j \omega \left(m + n_0\right)} = e^{-j \omega n_0} \sum_{m=-\infty}^{\infty} x\left[m\right] e^{-j \omega m} = e^{-j n_0 \omega} X\left(e^{j \omega}\right)}
+    }
+}
+
+\parag{Theorem: Properties}{
+     The properties are summed up in the following table:
+    \begin{center}
+    \begin{tabular}{|rcl|}
+        \hline
+        $\displaystyle \alpha x\left[n\right] + \beta y\left[n\right]$ & $\dtfourierpair$ & $\displaystyle \alpha X\left(e^{j \omega}\right) +  \beta Y\left(e^{j \omega}\right)$  \\
+        $\displaystyle x\left[n - n_0\right]$ & $\dtfourierpair$ & $\displaystyle e^{-j n_0 \omega} X\left(e^{j \omega}\right)$  \\
+        $\displaystyle e^{j \omega_0 n} x\left[n\right]$ & $\dtfourierpair$ & $\displaystyle X\left(e^{j\left(\omega - \omega_0\right)}\right)$   \\
+        $\displaystyle x\left[-n\right]$ & $\dtfourierpair$ & $\displaystyle X\left(e^{-j \omega}\right)$  \\
+        \hline
+        $\displaystyle n x\left[n\right]$ & $\dtfourierpair$ & $\displaystyle j \frac{dX\left(e^{j \omega}\right)}{d \omega}$  \\
+        \hline
+        $\displaystyle \left(x*y\right)\left[n\right]$ & $\dtfourierpair$ & $\displaystyle X\left(e^{j\omega}\right)Y\left(e^{j\omega}\right)$  \\
+        $\displaystyle x\left[n\right]y\left[n\right]$ & $\dtfourierpair$ & $\displaystyle \frac{1}{2\pi} \int_{2\pi} X\left(e^{j \theta}\right) Y\left(e^{j \left(\omega - \theta\right)}\right) d\theta$  \\
+        \hline
+        $\displaystyle x^*\left[n\right]$ & $\dtfourierpair$ & $\displaystyle X^*\left(e^{-j \omega}\right)$  \\
+        \hline
+    \end{tabular}
+    \end{center}
+
+    And we finally have Parseval's relation for Aperiodic signals:
+    \[\sum_{n=-\infty}^{\infty} \left|x\left[n\right]\right|^2 = \frac{1}{2\pi} \int_{2\pi} \left|X\left(e^{j\omega}\right)\right|^2 d\omega\]
+
+     Note that there is no differentiation in time, since the time is discrete. However, there is a differentiation in frequency since it is continuous.
+
+}
+
+\parag{Example}{
+    Let $x\left[n\right]$ be some signal of which we know the DTFT. We want to find the DTFT of the following signal: 
+    \[y\left[n\right] = x\left[1 - n\right] + x\left[-1 -n\right]\]
+    
+    Let us consider the following signals: 
+    \[z_1\left[n\right] = x\left[1 + n\right], \mathspace z_2\left[n\right] = x\left[-1 + n\right]\]
+    
+    Using the shift in time property: 
+    \[Z_1\left(e^{j \omega}\right) = e^{j \omega}X\left(e^{j \omega}\right), \mathspace Z_2\left(e^{j\omega}\right) = e^{-j \omega} X\left(e^{j \omega}\right)\]
+    
+    However, we notice that $y\left[n\right] = z_1\left[-n\right] + z_{2}\left[-n\right]$. Thus, using linearity and time reversal, we can write: 
+    \[Y\left(e^{j \omega}\right) = e^{-j \omega} X\left(e^{-j \omega}\right) + e^{j \omega} X\left(e^{-j \omega}\right) = X\left(e^{-j \omega}\right) \left(e^{-j \omega} + e^{j \omega}\right) = 2X\left(e^{-j \omega}\right) \cos\left(\omega\right)\]
+}
+
+\subsection{Application to DT stable LTI systems}
+\parag{Definition: Frequency response}{
+    The \important{frequency response} of some discrete-time LTI system is the DTFT of the impulse response: 
+    \[H\left(e^{j \omega}\right) = \sum_{k=-\infty}^{\infty} h\left[n\right] e^{-j \omega n}\]
+
+    We know this exists for any stable LTI system.
+}
+
+\parag{Theorem: Convolution property}{
+    Applying the convolution to the fact that an LTI system can be written as $y\left[n\right] = \left(h * x\right)\left[n\right]$, we get: 
+    \[Y\left(e^{j \omega}\right) = H\left(e^{j\omega}\right) X\left(e^{j \omega}\right)\]
+}
+
+\parag{Remark}{
+    The shift in time property is really useful to applications for difference equations describing LTI systems.
+}
+
+\parag{Example}{
+    Let us consider a stable LTI system described by: 
+    \[y\left[n\right] - \frac{3}{4} y\left[n-1\right] + \frac{1}{8} y\left[n-2\right] = 2x\left[n\right]\]
+
+    We want to find the impulse response for this system. To do so, we apply a DTFT on both sides of the equation: 
+    \autoeq{Y\left(e^{j \omega}\right) - \frac{3}{4} e^{-j \omega} Y\left(e^{j \omega}\right) + \frac{1}{8} e^{-2j \omega} Y\left(e^{j\omega}\right) = 2X\left(e^{j \omega}\right) \iff Y\left(e^{j\omega}\right) = \frac{2}{1 - \frac{3}{4} e^{-j \omega} + \frac{1}{8} e^{-2 j \omega}} X\left(e^{j\omega}\right)}
+    
+    We can thus identify: 
+    \[H\left(e^{j\omega}\right) = \frac{Y\left(e^{j \omega}\right)}{X\left(e^{j \omega}\right)} = \frac{2}{1 - \frac{3}{4} e^{-j\omega} + \frac{1}{8} e^{-2 j \omega}}\]
+    
+    We now need to inverse this signal. To do so, we use a partial fraction expansion to get: 
+    \[H\left(e^{j \omega}\right) = \frac{4}{1 - \frac{1}{2} e^{-j \omega}} - \frac{2}{1 - \frac{1}{4} e^{-j \omega}}\]
+    
+    Applying formulas from a DTFT pair table, we finally get:
+    \[h\left[n\right] = 4\frac{1}{2^n} u\left[n\right] - 2 \frac{1}{4^n} u\left[n\right]\]
+
+    Looking at this impulse response, we can see that the system is stable (since it is absolutely summable), and causal (since it is 0 for $n < 0$).
+
+    In fact, since the system is causal, we could also have solved the equation by using the condition of initial rest, though it would have been more complicated mathematically. Very generally, however, supposing that the system is stable (using DTFT) or causal (using the condition of initial rest) may give different results.
+}
+
+
+
+
+\end{document}
