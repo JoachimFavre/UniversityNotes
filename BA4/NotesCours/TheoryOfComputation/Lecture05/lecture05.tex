@@ -1,0 +1,215 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-20 at 15:18:31.
+
+\usepackage{../../style}
+
+\title{Theory of computation}
+\author{Joachim Favre}
+\date{Lundi 20 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2023-03-20}{Halting problem}{
+\begin{itemize}[left=0pt]
+    \item Proof of the existence of undecidable languages.
+    \item Proof that $HALT$ and $A_{TM}$ are undecidable.
+    \item Proof that $\bar{HALT}$ is unrecognisable.
+\end{itemize}
+
+}
+
+\parag{Definition: Encoding}{
+    Let $S$ be any object. We write its binary encoding $\left\langle S \right\rangle$.
+}
+
+\parag{Example 1}{
+    A Turing Machine can thus, for instance, decide whether a graph is connected, or find a shortest path.
+
+    To give a graph $G$ as an input to a Turing Machine, we just give $\left\langle G \right\rangle$.
+}
+
+\parag{Example 2}{
+    We want to make a Turing machine which checks if a DFA is empty, if it rejects every word.
+
+    The first idea may be to try all possibilities $s \in \left\{\epsilon, 0, 1, 00, \ldots\right\}$ and see if the DFA accepts it. The problem with this approach is that, if the DFA accepts nothing, then we will never halt.
+
+    A second, better idea, is to check if there exists a set of transitions bringing from the initial state to an accepting state. This can be done using BFS, considering the DFA as a graph; which always halts.
+}
+
+\parag{Example 3}{
+    We want to make a Turing Machine which decides whether two DFAs recognise the same language. 
+
+    We notice that $L\left(D\right) = L\left(D'\right)$ if and only if $L\left(D\right) \oplus L\left(D'\right) = \o$, where $\oplus$ is the symmetric difference of state (an element is in the symmetric difference if it is in one set xor the other).
+
+    Moreover, we can see that: 
+    \[L\left(D\right) \oplus L\left(D'\right) = \left(L\left(D\right) \cap \bar{L\left(D'\right)}\right) \cup \left(\bar{L\left(D\right)} \cap L\left(D'\right)\right)\]
+
+    We saw that complements, unions and intersections of regular languages were also regular, so $L\left(D\right) \oplus L\left(D'\right)$ is regular and there exists a DFA $D^{\oplus}$ accepting it. 
+
+    So, we can make a Turing Machine to create $D^{\oplus}$ from $D$ and $D'$, and then verify if it is empty using the program made right before. This always halts, so this is perfect.
+}
+
+\parag{Example 4: Halting problem}{
+    We now receive a Turing Machine and some input as input, and we want to output whether the machine halts. 
+
+    It is rather easy to show that this problem is recognisable. We can just simulate the Turing machine, and see if it halts. The problem is that it seems very hard to decide. We will develop some more theory and come back on this problem.
+}
+
+\parag{Definition: Cardinality of sets}{
+    Two sets $A$ and $B$ have the same cardinality, written $\left|A\right| = \left|B\right|$ if there exists a bijective function $f: A \mapsto B$.
+
+    \subparag{Example}{
+        For instance, we can show that $\left|\mathbb{N}\right| = \left|\mathbb{Q}\right|$ (and we did in AICC-1).
+    }
+    
+}
+
+\parag{Definition: Countable set}{
+    A set $A$ is \important{countable} if either it is finite or it has the same cardinality as $\mathbb{N}$.
+
+    \subparag{Example}{
+        As mentioned earlier, $\mathbb{Q}$ is countable.
+    }
+}
+
+\parag{Theorem: $\mathbb{R}$ is not countable}{
+    The set of real numbers is not countable:
+    \[\left|\mathbb{R}\right| \neq \left|\mathbb{N}\right|\]
+    
+    \subparag{Proof}{
+        The proof can be done using Cantor's diagonalisation. It was also done in AICC-1, but let's do it again.
+
+        Suppose for contradiction that there exists a bijection $f: \mathbb{N} \mapsto \mathbb{R}$. We want to find some $x \in \mathbb{R}$ for which there exists no $a \in \mathbb{N}$ such that $f\left(a\right) = x$.
+
+        We construct $x$ by taking a number different from the $n$\Th fractional digit of $f\left(n\right)$, effectively taking different digits over the diagonal. For instance, if we have the following $f$:
+        \begin{center}
+        \begin{tabular}{c|c}
+            $n$ & $f\left(n\right)$ \\
+            \hline
+            $1$ & $3.\underline{1}4159\ldots$ \\
+            $2$ & $55.5\underline{5}555\ldots$ \\
+            $3$ & $0.12\underline{3}45\ldots$ \\
+            $4$ & $0.500\underline{0}00\ldots$ \\
+            $\vdots$ & $\vdots$
+        \end{tabular}
+        \end{center}
+        
+        Then we could pick $0.3323\ldots$
+
+        There cannot exist some $m$ such that $f\left(m\right) = x$: the $m$\Th digit of $x$ is different from the $m$\Th digit of $f\left(m\right)$, by construction. This thus finishes our proof.
+
+        \qed
+    }
+}
+
+\parag{Theorem}{
+    There exists some language which is not decidable.
+
+    \subparag{Proof}{
+        We can build a table for Turing Machine: the rows list the Turing Machine (they are countable, so we can indeed make a list of them). The columns represent a binary representation of each machine, which we feed as an input to the machines (this is a bit meta, but this will be useful). Each entry of the table states if the machine accepts the given input, rejects it, or never halts.
+        \imagehere[0.9]{DiagTuringMachineConstruction.png}
+
+        Now, we construct a language $DIAG$ such that it contains all inputs $\left\langle M_i \right\rangle$ such that the $i$\Th machine $M_i$ does not accept this input. In this example, we would have: 
+        \autoeq{DIAG = \left\{\left\langle M_i \right\rangle \suchthat M_i \text{ doesn't accept } \left\langle M_i \right\rangle\right\}= \left\{\left\langle M_2 \right\rangle, \left\langle M_4 \right\rangle, \left\langle M_6 \right\rangle, \ldots\right\}}
+        
+        We want to show that $DIAG$ is undecidable. Let's suppose for contradiction that there exists some Turing Machine $M$ which decides $DIAG$. However, since we made the list of all possible machines, it means that $M = M_i$ for some $i \in \mathbb{N}$ in the table.
+
+        Now, we cannot have $\left\langle M_i \right\rangle \in L\left(M_i\right)$ since it would imply that the machine accepts itself and thus, by definition of $DIAG$, it would imply that $\left\langle M_i \right\rangle \not \in DIAG$.
+
+        Similarly, we cannot have $\left\langle M_i \right\rangle \not \in L\left(M_i\right)$ since it would imply that the machine does not accept itself and thus, by definition of $DIAG$, it would imply that $\left\langle M_i \right\rangle \in DIAG$.
+
+        We cannot have $\left\langle M_i \right\rangle \in L\left(M_i\right)$ and $\left\langle M_i \right\rangle \not \in L\left(M_i\right)$. This is our contradiction.
+
+        \qed
+    }
+}
+
+\begin{filecontents*}[overwrite]{HaltReductionToDiag.code}
+machine D(M):
+    if H(<M, <M>>) then  // meaning that M halts on input <M>
+        return !M(<M>)  // output accepted if rejected, and inversely
+    else
+        return accepted  // it loops, so we accept
+\end{filecontents*}
+
+\parag{Theorem}{
+    The following language is undecidable:
+    \[HALT = \left\{\left\langle M, w \right\rangle : M \text{ is a Turing Machine which halts on $w$}\right\}\]
+
+    \subparag{Proof}{
+        Let's assume that there exists some Turing Machine $H$ which decides $HALT$.
+
+        We construct a Turing Machine $D$ which decides $DIAG$, defined in the proof of the previous theorem. On an input $\left\langle M \right\rangle$, we run $H$ on the input $\left\langle M, \left\langle M \right\rangle \right\rangle$. If $H$ rejects (meaning that $M$ loops on $\left\langle M \right\rangle$), then we accept. If it accepts (meaning that $M$ halts on $\left\langle M \right\rangle$), then we run $M$ on the input $\left\langle M \right\rangle$, and output the opposite of $M$ (accept if it rejects, and inversely).
+
+        \importcode{HaltReductionToDiag.code}{pseudo}
+
+        We notice that $D$ halts on all inputs: we only run machines we are sure will end. Moreover, $D$ accepts $\left\langle M \right\rangle$ is equivalent to $M$ not accepting $\left\langle M \right\rangle$ and thus equivalent to $\left\langle M \right\rangle \in DIAG$.
+
+        This is a contradiction, since we showed that $DIAG$ was undecidable.
+
+        \qed
+    }
+}
+
+\begin{filecontents*}[overwrite]{AtmREductionToHalt.code}
+machine D(M):
+    return !H(<M, <M>>)
+\end{filecontents*}
+
+
+\parag{Theorem}{
+    The following language is undecidable: 
+    \[A_{TM} = \left\{\left\langle M, w \right\rangle \suchthat \text{$M$ is a Turing Machine and accepts $w$}\right\}\]
+    
+    \subparag{Proof}{
+        Let's assume for contradiction that there exists a decider $H$ for $A_{TM}$. 
+
+        Again, we construct a decider $D$ for $DIAG$ using $H$. To do so, we feed $M, \left\langle M \right\rangle$ to $H$, and output its opposite value (if it accepts, then we reject, and inversely). 
+        \importcode{AtmREductionToHalt.code}{pseudo}
+
+        As before, $D$ halts on all inputs and $D$ accepting $\left\langle M \right\rangle$ is equivalent to $\left\langle M \right\rangle \in DIAG$ (we output rejected if and only if the machine accepts itself). This indeed shows that $D$ decides $DIAG$, which is our contradiction.
+
+        \qed
+    }
+}
+
+\parag{Observation}{
+    We have seen undecidable languages, but there also exists unrecognisable languages.
+}
+
+\parag{Theorem}{
+    A language $L$ is decidable if and only if it is recognisable and its complement is also recognisable.
+
+    \subparag{Proof $\implies$}{
+        The proof is considered trivial and left as an exercise to the reader.
+    }
+
+    \subparag{Proof $\impliedby$}{
+        Let $L$ and $\bar{L}$ be recognisable, and $M_1, M_2$ be their corresponding recognisers.
+
+        We construct a machine $M$ which runs both $M_1$ and $M_2$ in parallel (we alternate between running 1 step of $M_1$ and one step of $M_2$), and stop as soon as $M_1$ or $M_2$ accepts $w$. If it is $M_1$ which accepted, then we output accept; if it is $M_2$, we output reject.
+
+        We notice that $M$ must always halt: $w \in L$ or $w \in \bar{L}$, so one of the two machines must halt and output accept. Thus, $M$ decides $L$.
+    }
+}
+
+\parag{Corollary}{
+    The language $\bar{HALT}$ is unrecognisable.
+
+    \subparag{Proof}{
+        We know that $HALT$ is undecidable but recognisable.
+
+        If $\bar{HALT}$ was recognisable, then it would mean that $HALT$ would be decidable by our theorem above, which is our contradiction.
+
+        \qed
+    }
+    
+}
+
+
+\end{document}

@@ -1,0 +1,138 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-13 at 15:16:20.
+
+\usepackage{../../style}
+
+\title{Theory of computation}
+\author{Joachim Favre}
+\date{Lundi 13 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2023-03-13}{Turing \smiley}{
+\begin{itemize}[left=0pt]
+    \item Definition of Turing machines and their configurations.
+    \item Definition of Turing-recognisable and Turing-decidable languages.
+\end{itemize}
+
+}
+
+\section{Turing machines}
+\subsection{Formal definition}
+
+\parag{Introduction}{
+    So far, it feels like we miss memory: we would need some kind of memory depending on the size of the input (while keeping a fixed-size program). This is where Turing machines come in.
+
+    The idea is that we have a tape on which we can write and read things. Thus, we have like a finite automaton where we can also take into account what is written on the tape. We still have a finite number of states (the program is finite), but the tape is infinite (allowing for different inputs to use different size of memory).
+}
+
+\parag{Observation}{
+    We only need a single tape since we can reserve some part of the memory for the input and the output.
+    \imagehere[0.5]{TuringMachineTape.png}
+
+    It is possible to show that having multiple tapes or a single one is completely equivalent.
+}
+
+\parag{Capabilities}{
+    Even though the tape is infinite, the Turing Machine can only see a specific symbol, where its current head is.
+
+    At any given step, it acts depending on what is written on the tape under the head and the current state. Just as for DFA, it goes to some state. However, moreover, it can move the tape right or left, and write any symbol on it (including a new symbol, $\sqcup$, representing an empty cell).
+
+    As soon as it reaches the accept or reject state, the machine stops immediately, unlike DFA. Because of that we can have a single accept and reject states (one of each), since it would not be useful to have more. Moreover, this means that it may never halt: it may never reach an accept or reject state.
+}
+
+\parag{Example}{
+    Let us consider the following diagram:
+    \imagehere[0.7]{Palindromes.png}
+
+    Let's say the head begins at the first character of ``1001''. We start at $q_0$ and read a 1, so we transition to state $q_1$, empty the current cell, and move the tape one to the right. We can continue this until the accepting state. 
+
+    We can in fact convince ourselves that this Turing machine accepts even length binary palindromes.
+
+    \subparag{Remark}{
+        This is a very inefficient algorithm to find palindromes. However, in this part of the course, we do not care about running time.
+    }
+}
+
+\parag{Definition: Turing Machine}{
+    A \important{Turing Machine} is a 7-tuple $\left(Q, \Sigma, \Gamma, \delta, q_o, q_{accept}, q_{reject}\right)$ (with $\Gamma$ and $q_{reject}$ being the new elements with respect to DFA), where:
+    \begin{enumerate}
+        \item $Q$ is the set of states.
+        \item $\Sigma$ is the input alphabet, not containing the blank symbol $\sqcup$.
+        \item $\Gamma$ is the tape alphabet, where $\Sigma \cup \left\{\sqcup\right\} \subseteq \Gamma$ (and it potentially contains more characters).
+        \item $\delta: Q \times \Gamma \mapsto Q \times \Gamma \times \left\{L, R\right\}$ is the transition function.
+        \item $q_0 \in Q$ is the start state.
+        \item $q_{accept} \in Q$ is the accept state.
+        \item $q_{reject} \in Q$ is the reject state, where $q_{reject} \neq q_{accept}$.
+    \end{enumerate}
+}
+
+\parag{Definition: TM configuration}{
+    Let's consider the Turing Machine $\left(Q, \Sigma, \Gamma, \delta, q_0, q_{accept}, q_{reject}\right)$. We still need to define how it computes.
+
+    We write $uqv$ where $u,v \in \Gamma^*$ and $q \in Q$ for the configuration where:
+    \begin{enumerate}
+        \item The current state is $q$.
+        \item The current tape content is $uv$.
+        \item The curent head location is the first symbol of $v$.
+        \item The cells whose content are unspecified are blank, they contain $\sqcup$.
+    \end{enumerate}
+
+    Given a configuration $ua q_i b v$ where $a, b \in \Gamma$, $u, v \in \Gamma^*$ and $q_i \in Q$, we move to: 
+    \[\begin{systemofequations} uq_j a c v, & \text{if } \delta\left(q_im b\right) = \left(q_j, c, L\right) \\ u a c q_j v, & \text{if } \delta\left(q_i, b\right) = \left(q_j, c, R\right) \end{systemofequations}\]
+    
+    We start at some configuration $C_1 = q_0 w$ for some $w \in \Sigma^*$. We then obtain new configurations $C_2, C_3, \ldots$ by valid transitions. We accept the word $w$ if the machine halts and if the state $q_{accept}$ is reached, but we reject it if it halts and the state $q_{reject}$ is reached.
+
+    Naturally, the program may not terminate. We can even show that some loops may happen even though no configurations are repeated (for instance if the machine writes a 1 to the current cell and moves to the right).
+
+    \subparag{Example}{
+        For instance, a Turing Machine with configuration $1011q_7 01111$ would look like: 
+        \imagehere[0.8]{TuringMachineConfigurationRepresentation.png}
+    }
+}
+
+\parag{Example}{
+    We want to make a Turing Machine which recognises the following language: 
+    \[L = \left\{w \suchthat w \text{ has an equal number of 0s and 1s}\right\}\]
+
+    We have an input alphabet $\Sigma = \left\{0, 1\right\}$. We consider a tape alphabet which has an extra character $X$, which represents a crossed off letter: 
+    \[\Gamma = \left\{0, 1, \sqcup, X\right\}\]
+    
+    The idea is to scan the input from left to right. Whenever we encounter an uncrossed 0 or 1, we replace it by a cross, and proceed to the right to find a corresponding 1 or 0 that we cross. We then go back at the start of the input, and start again. If we end up crossing out every characters, we accept it, but if we can't find a corresponding 1 or 0 to a 0 or 1, we reject it.
+
+    \imagehere[0.7]{EqualNumberOf0sAnd1s.png}
+
+    Note that we are doing something slightly more intelligent here: when we are at the left of the string and scan for the first non-$X$ character, we also replace all $X$ characters by $\sqcup$, in order to simplify the detection when we finished considering the whole word.
+}
+
+\subsection{Decidable and undecidable languages}
+
+\parag{Definition: Turing-Recognisable}{
+    A language $L$ is \important{Turing-Recognisable} (or Recognisable) if there exists a Turing Machine $M$ which recognises $L$.
+
+    In other words, all $w \in L$ must be accepted by $M$ and all $w \not \in L$ do not make $M$ stop or $M$ rejects $w$.
+}
+
+\parag{Definition: Turing-Decidable}{
+    A language $L$ is \important{Turing-Decidable} (or Decidable) if there exists a Turing Machine $M$ which decides $L$.
+
+    In other words, all $w \in L$ must be accepted by $M$ and all $w \not \in L$ must be rejected by $M$.
+
+    \subparag{Observation}{
+        This second definition is stronger: if a machine decides a language, then it recognises it. However, the converse may not be true. The machine may not stop on some words $w \not\in L$.
+    }
+}
+
+\parag{Church-Turing thesis}{
+    In 1936, two scientists gave different definitions for the concept of algorithms. Church defined it using $\lambda$-calculus, in an intuitive way. Turing defined it using his machines.
+
+    However, we can show that the two definitions are equivalent. This means that anything we can write in programming languages (such as C, Java, and so on) or with quantum computers can also be executed on Turing Machines; and conversely. Thus, when we want to show that a language is decidable or recognisable, we do not necessarily mean to make a formal Turing Machine, a program is sufficient.
+}
+
+
+\end{document}

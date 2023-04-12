@@ -1,0 +1,157 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-06 at 15:15:22.
+
+\usepackage{../../style}
+
+\title{Theory of computation}
+\author{Joachim Favre}
+\date{Lundi 06 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2023-03-06}{''Pigeon collisions''}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of the pumping lemma.
+    \item Examples of application of the pumping lemma to show that some languages are not regular.
+\end{itemize}
+}
+
+\subsection{Non-regular languages}
+
+\parag{Existence of non-regular languages}{
+    We have seen that many languages are regular: using a finite automaton, we can verify a number has a given substring, check if it is divisible modulo a given number, skip some prefix and suffix, do complements, unions, intersections, and so on.
+    
+    We now wonder if all languages are regular. In fact, sadly, no. Let us consider the following language: 
+    \[B = \left\{0^n 1^n \suchthat n \geq 0\right\} = \left\{\epsilon, 01, 0011, 000111, \ldots\right\}\]
+    
+    The problem is that we need some kind of memory depending on the size of the input: we need to recall how many zeroes we had when we are counting the ones. 
+
+    \subparag{Proof}{
+        Let us prove that $B$ is indeed not regular.
+
+        Let's suppose for contradiction that $B$ is recognised by a DFA with $p$ states. Note that $p$ has to be finite.
+
+        Now, let us consider the countable infinite set $\left\{0^1, 0^2, \ldots\right\}$. By the pigeon hole principle, since there is a finite number of states $p$ but an infinite number of $0^k$, there must exist $i, j$ such that $0^i$ and $0^j$ end up in the same state. We have a pigeon collision.
+        \imagehere[0.4]{PigeonCollision.png}
+
+        However, this means that if $0^i 1^i$ is accepted, then $0^j 1^i$ is also accepted. However, $0^j 1^i$ should not be accepted, which is our contradiction.
+
+        \qed
+    }
+}
+
+\parag{Remark}{
+    Note that, to show a language is not regular, we cannot just say ``it needs memory depending on the size of the input'' blindly. Let us consider the following language: 
+    \[D = \left\{w \suchthat w \text{ has an equal number of occurrences of 01 and 10 as substrings}\right\}\]
+    
+    In fact, we can show that it is equivalent to: 
+    \[D = \left\{w \suchthat w \text{ begins and ends with the same character, or } \text{length}\left(w\right) \leq 1\right\}\]
+
+    Thus, $D$ is regular.
+}
+
+\parag{Pumping lemma}{
+    If $A$ is a regular language, then there is a number $p$ (named the pumping length) such that, for every string $s$ in $A$ of length at least $p$, there exists a division of $s$ into three pieces, $s = xyz$, such that:
+    \begin{enumerate}
+        \item For any $i \geq 0$, $x y^i z \in A$.
+        \item $\left|y\right| \geq 1$.
+        \item $\left|xy\right| \leq p$.
+    \end{enumerate}
+    
+    \subparag{Intuition}{
+        It is much better to remember the proof of this lemma, instead of the lemma itself.
+
+        In fact, it just generalises the argument we had before. Let $p = \left|Q\right|$. By the pigeon hole principle, if we have a string of length at least $p$, we need to have a loop: let $y$ be a string which loops from a state $q_i$ to the same state $q_i$. Then, we also need $x$ to be a string bringing from the initial state to $q_i$, and $z$ to be a string bringing from $q_i$ to an accepting state. We can then go from the initial step to $q_i$, loop any number of times we want (even 0 times) and go to an accepting state.
+
+        \imagehere[0.5]{PumpingLemmaIntuition.png}
+
+        $\left|xy\right| \leq p$ just means that the state collision (which leads to the loop) has to take place before $p$.
+    }
+
+    \subparag{Proof}{
+        Let M be an arbitrary DFA accepting $A$, and let $p = \left|Q\right|$ be the number of states in $M$. Also, let $s$ be any arbitrary string of length $\left|s\right| \geq p$.
+
+        By the pigeonhole principle, since we have $p$ states and we visit $p+1$ states when reading a string of length $p$, this means that we must always have some collision for any string which length is less than or equal to $p$. Thus, when reading the $p$ first characters of $s$, there must be a loop: there must be some $x, y, z$ such that $\left|xy\right| \leq p$ (the loop must happen in the first $p$ characters of $s$), $\left|y\right| \geq 1$ (because of the loop) and:
+        \[\delta\left(q_0, x\right) = q, \mathspace \delta\left(q_0, xy\right) = q, \mathspace \delta\left(q, z\right) = r \in F\]
+        
+        In other words, $x$ takes us to some state $q$; then, $y$ loops us back to this same state; and finally $z$ brings us to an accepted state. 
+
+        However, this definitely means that: 
+        \[\delta\left(q_0, xy^i z\right) = r, \mathspace \forall i \geq 0\]
+
+        \qed
+    }
+}
+
+\parag{Example 1}{
+    Let us consider the following language: 
+    \[F = \left\{ww \suchthat w \in \left\{0, 1\right\}^*\right\}\]
+    
+    In other words, we only want words which left part is equal to its right part.
+
+    Let's suppose for contradiction that this language is regular. By the pumping lemma, it must have some pumping length $p$. Now, any long string can be pumped. Let's pick $s = 0^p 1^p 0^p 1^p \in F$ (note that the choice of which string to pick is the whole game when doing such proofs).
+
+    By the pumping lemma, we know that there exists some $x, y, z$ such that:
+    \[s = xyz, \mathspace \left|xy\right| \leq p, \mathspace \left|y\right| \geq 1, \mathspace xy^i z \in F,\ \forall i \geq 0\]
+
+    However, since $\left|xy\right| \leq p$, this necessarily means that $xy = 0^j$ for some $j$ by construction. Moreover, since $\left|y\right| \geq 1$, we get that $y = 0^k$ for some $k \geq 1$.
+
+    According to the pumping lemma, we must have $x y^2 z \in F$. However: 
+    \[xy^2 z = 0^{p+k} 1^p 0^p 1^p \not \in F\]
+    since the left part of this new string does not match the right one.
+    
+    This is our contradiction.
+}
+
+\parag{Example 2}{
+    Let us consider the following language: 
+    \[E = \left\{0^m 1^n \suchthat m > n\right\}\]
+ 
+    We want to show that $E$ is not regular. Let us suppose for contradiction that $E$ is regular, with $p$ as pumping length.
+
+    Let us consider the following string: 
+    \[s = 0^{p+1} 1^{p} \in E\]
+    
+    Since we know that $\left|xy\right| \leq p$ and $\left|y\right| \geq 1$, we necessarily have that $y = 0^k$ for some $k \geq 1$. However, we see that: 
+    \[x y^0 z = xy = 0^{p+1-k} 1^p \not \in E\]
+    since $p + 1 - k \leq p$. By the pumping lemma, we should have $xz \in E$, this is our contradiction.
+}
+
+\parag{Example 3}{
+    Let us consider the following language: 
+    \[C = \left\{w \suchthat w \text{ has an equal number of 0s and 1s}\right\}\]
+    
+    We again want to show that it is not regular. Thus, let's suppose for contradiction that $C$ is regular, and that $p$ is its pumping length.
+
+    Let us consider the following string:
+    \[s = 0^p 1^p \in C\]
+
+    Since we know that $\left|xy\right| \leq p$ and $\left|y\right| \geq 1$, we necessarily have that $y = 0^k$ for some $k \geq 1$. Moreover: 
+    \[x y^2 z = 0^{p+k} 1^p \not \in C\]
+    
+    However, since the pumping lemma tells us that $x y^2 z \in C$, we got our contradiction.
+
+    \subparag{Other proof}{
+        We can use an easier approach than the pumping lemma. 
+
+        Let us consider again a language we have proven not to be regular at the start of this lecture: 
+        \[B = \left\{0^n 1^n \suchthat n \geq 0\right\} = \left\{\epsilon, 01, 0011, 000111, \ldots\right\}\]
+        
+        However, we can see that: 
+        \[B = C \cap \left\{0^m 1^n \suchthat m, n \geq 0\right\}\]
+        
+        Let us now suppose for contradiction that $C$ is regular. However, we know that $\left\{0^m 1^n \suchthat m, n \geq 0\right\}$ is a regular language, and the intersection of two regular language is also regular. This thus means that $B$ is regular, which is a contradiction.
+
+        This shows that the pumping lemma, though very powerful, is not the always the only way to go.
+    }
+}
+
+
+
+
+\end{document}

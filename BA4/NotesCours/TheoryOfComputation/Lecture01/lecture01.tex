@@ -1,0 +1,201 @@
+% !Te program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-02-20 at 15:19:18.
+
+\usepackage{../../style}
+
+\title{Theory of computation}
+\author{Joachim Favre}
+\date{Lundi 20 février 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2023-02-20}{Deterministic finite automatons}{
+\begin{itemize}[left=0pt]
+    \item Definition of deterministic finite automatons, and many examples.
+    \item Explanation of how to prove that a given language is the one accepted by the finite automaton, and some examples.
+\end{itemize}
+
+}
+
+\section{Introduction}
+\parag{History}{
+    In the 1930s, people were asking themselves what can be mathematically proved (meaning, whether is maths limited), and what can be computed. Gödel answered the first one, and Turing the second one.
+
+    There are many people who work on theoretical computer science. Alan Turing is seen as the father of computer science: he defined mathematically what is an algorithm thanks to the Turing's machine, and he immediately proved limitations of it. Jack Edmonds introduced the class P, algorithms that can be solved efficiently (meaning in polynomial time). Stephen Cook and Leonid Levid introduced the concept of NP-complete problems, which we aim to understand in this course. 
+}
+
+\parag{Theoretical computer science}{
+    In theoretical computer science, we consider different problems and see how much time or space we would need to solve them. However, we don't stop there, and we try as well to make link between problems: see if one problem is easier than another, if randomness or quantum computers would help, if solving one implied another, and so on.
+
+    For instance, we want to understand efficiently solvable problem (P), efficiently verifiable problems (NP) and undecidable problems.
+}
+
+\section{Solving problems using constant memory}
+\subsection{Finite automaton and regular languages}
+\parag{Fixed memory}{
+    We will want to solve some problems using a fixed number of memory. This means that we scan the input from left to right and, for every symbol seen, we can only change the memory using a sate based on the current state and the current symbol.
+}
+
+\parag{Definition: DFA}{
+    A \important{deterministic finite automaton} (DFA) $M$ is a 5-tuple $\left(Q, \Sigma, \delta, q_0, F\right)$, where:
+    \begin{enumerate}
+        \item $Q$ is a finite set called the \important{states} (which must not depend on the length of the input).
+        \item $\Sigma$ is a finite set called the \important{alphabet}.
+        \item $\delta: Q \times \Sigma \mapsto Q$ is the \important{transition function}.
+        \item $q_0 \in Q$ is the \important{start state}.
+        \item $F \subseteq Q$ is the set of \important{accepting states} (where we allow $F = \o$).
+    \end{enumerate}
+
+    Note that $\delta\left(q, \sigma\right)$ encodes the state we go to from $q$ when reading $\sigma \in \Sigma$. We extend this definition such that, for a string $s$, we use $\delta\left(q, s\right)$ to denote the state obtained by reading all of $s$ starting in state $q$.
+
+    \subparag{Observation}{
+        We notice that, for the function $\delta$ to be complete, there must be one and exactly one new state for any state and any character.
+    }
+    
+    \subparag{Remark}{
+        Note that this may seem a bit abstract, but this will become very clear using the following examples and their diagrams. This abstraction will allow us to reason on it.
+    }
+}
+
+\parag{Language of a machine}{
+    We let $A$ to be the set of all string that the machine $M$ accepts. We call $A$ the \important{language of the machine} $M$ and write $L\left(M\right) = A$. We say that $M$ \important{recognises} or \important{accepts} $A$. For instance, if the machine accepts no string, it recognises the empty language $\o$.
+
+}
+
+
+\parag{Definition: Empty string}{
+    The \important{empty string}, meaning the string which does not contain any character, is written $\epsilon$.
+}
+
+
+
+\parag{Example 1: Parity}{
+    Let's say we receive as input a string $s$ made of symbols $M$ and $W$. We want to output yes if $M$ appears in $s$ an even number of times, and no otherwise. 
+
+    We want to solve this problem using 1-bit of memory and, to do so, we use a DFA. The alphabet is $\Sigma = \left\{M, W\right\}$ (given by the problem description), and we have some states (the circles), transition functions (the arrows), a starting state (the additional arrow pointing at even) and some accepting state (circles which are circled, ``even'' in this case). We can make a diagram of this:
+    \imagehere[0.5]{DFA-Parity.png}
+
+    We can draw the evolution of the state with the following table, if we for instance read MWWMWMM:
+    \begin{center}
+    \begin{tabular}{c|cccccccc}
+        \textbf{Read} & Initial & M & W & W & M & W & M & M  \\
+        \hline
+        \textbf{State} & E & O & O & O & E & E & O & E
+    \end{tabular}
+    \end{center}
+
+    Since we ended up in the accepting state, we return \texttt{true}.
+
+    \subparag{Remark}{
+        Note that our DFA accepts the empty string $\epsilon$.
+    }
+}
+
+\parag{Example 2}{
+    Let's consider the following DFA:
+    \imagehere[0.5]{DFA-ex1.png}
+
+    We want to know what it does. To do so, it is a good idea to try it on a few strings. For instance, 000 and 010 would not be accepted, but 011 would be. Spending a bit more time on it, we can see that when we read a 0, we always go to $q_1$. This means that it accepts all strings that end with a 1.
+}
+
+\parag{Example 3}{
+    Let's consider the following DFA:
+    \imagehere[0.5]{DFA-ex2.png}
+
+    It is very close to the last example. This one accepts all string ending with a 0, and the empty string $\epsilon$.
+}
+
+\parag{Example 4}{
+    Let's consider the following DFA, which accepts strings with at least a 1 and that end in an even number of 0s:
+    \imagehere[0.6]{DFA-ex3.png}
+
+    We can describe formally with $M = \left(Q, \Sigma, \delta, q_1, F\right)$ where $Q = \left\{q_1, q_2, q_3\right\}$, $q_1$ is the start state, $\Sigma= \left\{0, 1\right\}$, $F = \left\{q_2\right\}$ and $\delta$ is described as:
+    \begin{center}
+    \begin{tabular}{c|cc}
+        dgg & 0 & 1 \\
+        \hline
+        $q_1$ & $q_1$ & $q_2$ \\
+        $q_2$ & $q_3$ & $q_2$ \\
+        $q_3$ & $q_2$ & $q_2$
+    \end{tabular}
+    \end{center}
+
+    Then, we say that $M$ recognises the language:
+    \[L\left(M\right) = \left\{w \suchthat \text{$w$ contains at least one 1 and an even number of 0s follow the last 1}\right\}\]
+    
+    Note that this formal definition and the diagram above are completely equivalent.
+}
+
+\parag{Proving correctness}{
+    To prove the correctness of a DFA, that it indeed recognises a given set, we will use induction.
+}
+
+\parag{Example 1}{
+    Let us consider again the following DFA:
+    \imagehere[0.5]{DFA-ex4.png}
+
+    We want to prove that $M$ accepts exactly $L$ where: 
+    \[L = \left\{w \suchthat \text{count}\left(w, a\right) \text{ is even}\right\}\]
+    where $\text{count}\left(s, c\right)$ returns the number of times $c$ appears in $s$.
+
+    The following proof will be very pedantic, but it is a good way to understand how to make really formal proofs.
+
+    \subparag{Proof}{
+        We want to show that, for all strings $w$, $\delta\left(q_o, w\right) = q_0$ ($M$ accepts $w$) if and only if $\text{count}\left(w, a\right)$ is even.
+
+        Let's begin with the base case, $w = \epsilon$. We know that $\delta\left(q_0, \epsilon\right) = q_0$. However, for the empty string, $\text{count}\left(\epsilon, a\right) = 0$, which is indeed even.
+
+        Now, let's do the inductive case. We assume that our claim holds for an arbitrary string $x$, and we want to show that the claim works for $w = x . \sigma$ where $\sigma$ is a symbol ($a$ or $b$) and the dot represents appending a character to a string. We have four different cases for $\delta\left(q_0, x\right)$, which can be either equal to $q_0$ or $q_1$, and $\sigma$ can either be $a$ or $b$. We will only consider the case where $\delta\left(q_0, x\right) = q_0$ and $\sigma = b$, the others are similar.
+
+        By the inductive hypothesis, $\text{count}\left(x, a\right)$ is even. By definition of $\delta$, and since $\delta\left(q_0, x\right) = q_0$ (we just took this hypothesis when selecting one of the four cases):
+        \[\delta\left(q_0, x.b\right) = \delta\left(\delta\left(q_0, x\right), b\right) = \delta\left(q_0, b\right) = q_0\]
+
+        However, since adding a $b$ does not change the number of $a$'s a string contains, $\text{count}\left(x.b, a\right) = \text{count}\left(x, a\right)$, which is even by inductive hypothesis. This finishes our proof.
+
+        \qed
+    }
+}
+
+\parag{Example 2}{
+    Let's consider the following DFA:
+    \imagehere[0.7]{DFA-ex5.png}
+
+    We want to show that: 
+    \[L\left(M\right) = \left\{w \suchthat w \text{ contains at least two $a$'s}\right\}\]
+    
+    \subparag{Wrong proof}{
+        We want to prove that, for all strings $w$, $\delta\left(q_0, w\right) = q_2$ if and only if $\text{count}\left(w, a\right)$ is at least 2. This proof will fail. 
+
+        Let's start with the base case, $w = \epsilon$. By definition, $\delta\left(q_0, \epsilon\right) = q_0$. Also, $\text{count}\left(w, a\right) = 0 < 2$. Both sides of our equivalence are false, showing that base case holds.
+
+        Let's now make the inductive step, and let $\sigma \in \left\{a, b\right\}$. Let's consider the case where $\delta\left(q_0, x\right) = q_0$ and $\sigma = a$. In this case, by induction hypothesis, $\text{count}\left(x, a\right) < 2$. However, it would not break our hypothesises that $\text{count}\left(x, a\right) = 1$ (this would never happen in practice since the count must be 0 in $q_0$, but our hypotheses do not catch this). In this case, we would have $\text{count}\left(x.a, a\right) = 2$ but $\delta\left(q_0, x.a\right) = \delta\left(q_0, a\right) = q_1$, meaning that our claim does not hold.
+    }
+
+    \subparag{Better proof}{
+        Let's make a better proof. To do so, we need to prove something stronger than our claim, something that tells us more about the automata. We will thus try to prove:
+        \begin{functionbypart}{\delta\left(q_0, w\right)}
+            q_0 & \text{if } \text{count}\left(w, a\right) = 0 \\
+            q_1 & \text{if } \text{count}\left(w, a\right) = 1 \\
+            q_2 & \text{if } \text{count}\left(w, a\right) \geq 2
+        \end{functionbypart} 
+
+        The base case holds rather trivially. Concerning the inductive step, we have even more cases to consider. However, doing it is not too hard and completely solves the problem we have just had.
+    }
+}
+
+\parag{Remark}{
+    We can always prove the correctness of any automata using strong induction. Let's see the general recipe. 
+
+    Let's say that we are given an arbitrary language $L$ described by a mathematical constraint, and a DFA $M = \left(\left\{q_0, \ldots, q_n\right\}, \Sigma, \delta, q_0, F\right)$.
+
+    To prove $L\left(M\right) = L$, we need to start by finding a precise description of the sets $T_i$ of strings that make the machine go to state $q_i$, for all $i = 0, \ldots, n$. For instance, in our example above, $T_0$ was the set of strings such that $\text{count}\left(w, a\right) = 0$, and similarly for $T_1$ and $T_2$. Naturally, the language $L$ should match the sets corresponding to the accepting states.
+
+    Then, we need to prove by induction that, for any string $w$, $\delta\left(q_0, w\right) = q_i$ if $w$ is in set $T_i$; for all $i = 0, \ldots, n$.
+}
+
+\end{document}
