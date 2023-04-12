@@ -1,0 +1,76 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-04-06 at 13:18:30.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Jeudi 06 avril 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2023-04-06}{Linearity of expectation}{
+\begin{itemize}[left=0pt]
+    \item Proof that expectation is linear for any random variables.
+    \item Proof that variance is linear for any independent random variables.
+\end{itemize}
+
+}
+
+\parag{Theorem}{
+    Let $X, Y$ be random variables. If the required expectations exist, then: 
+    \[\exval\left[g\left(X, Y\right)\right] = \exval_X\left[\exval\left[g\left(X, Y\right) | X = x\right]\right]\] 
+    where $\exval_X$ represent expectation according to the distribution of $X$. 
+
+    This means that we can freeze a random variable ($X$ here), and then average this result over this variable.
+
+    \subparag{Proof}{
+        For the discrete case, we have that: 
+        \autoeq{\exval_X\left[\exval\left[g\left(X, Y\right) | X = x\right]\right] = \sum_{x}^{} \exval\left[g\left(X, Y\right) | X = x\right]f_X\left(x\right) = \sum_{x}^{} \sum_{y}^{} g\left(x, y\right) f_{Y|X}\left(y|x\right) f_X\left(x\right) = \sum_{x}^{} \sum_{y}^{} g\left(x, y\right) f_{X, Y}\left(x, y\right) = \exval\left[g\left(X, Y\right)\right]}
+    }
+}
+
+\parag{Properties}{
+    Let $X$ and $Y$ be random variables. The following equality \textit{always} (even if they are dependent) holds: 
+    \[\exval\left(X + Y\right) = \exval\left(X\right) + \exval\left(Y\right)\]
+    \[\Var\left(X + Y\right) = \Var\left(X\right) + \Var\left(Y\right) + 2\Cov\left(X, Y\right)\]
+    
+    If moreover $X$ and $Y$ are independent: 
+    \[\Var\left(X + Y\right) = \Var\left(X\right) + \Var\left(Y\right)\]
+    
+    \subparag{Proof 1}{
+        We want to show the first equality.
+
+        By definition of $\exval\left[g\left(x, y\right)\right]$, we need $f_{X, Y}\left(x, y\right)$ to compute $\exval\left(X + Y\right)$. Thus, let us pick $Z = g\left(X, Y\right) = X + Y$. By definition: 
+        \autoeq{\exval\left[X + Y\right] = \exval\left(Z\right) = \sum_{z}^{} z\prob\left(g\left(X, Y\right) = z\right) = \sum_{z}^{} z \prob\left(X + Y = z\right) = \sum_{z}^{} z \sum_{x}^{} \prob\left(X + Y = z | X = x\right)f_X\left(x\right) = \sum_{x}^{} \left[\sum_{z}^{} z \prob\left(X + Y = z | X = x\right)\right] f_X\left(x\right)}
+        
+        We consider the inner sum, by using the change of variable $u = z - x$: 
+        \autoeq{\sum_{z}^{} z \prob\left(X + Y = z | X = x\right) = \sum_{z}^{} z \prob\left(Y = z - x | X = x\right) = \sum_{u}^{} \left(u + x\right) f_{Y|X}\left(u|x\right) = \sum_{u}^{} u f_{Y|X} \left(u|x\right) + x \sum_{u}^{} f_{Y|X}\left(u|x\right) = \exval\left(Y|X=x\right) + x}
+        since $u$ is just a dummy variable.
+
+        Coming back to our sum, we find 
+        \autoeq{\exval\left[X + Y\right] = \sum_{x}^{} \left[\sum_{z}^{} z \prob\left(X + Y = z | X = x\right)\right] f_X\left(x\right) = \sum_{x}^{} \left[\exval\left(Y|X=x\right) + x\right] f_X\left(x\right) = \exval\left(Y\right) + \sum_{x}^{} x f_X\left(x\right) = \exval\left(Y\right) + \exval\left(X\right)}
+    }
+
+    \subparag{Proof 2}{
+        We want to show the first equality in a different way.
+
+        We know that:
+        \[\exval\left(g\left(X, Y\right)\right) = \sum_{x, y}^{} g\left(x, y\right)f_{X, Y}\left(x, y\right)\]
+        
+        Thus: 
+        \autoeq{\exval\left(X + Y\right) = \sum_{x,y}^{} \left(x+y\right)f_{X, Y}\left(x, y\right) = \sum_{x}^{} x \sum_{y}^{} f_{X, Y}\left(x, y\right) + \sum_{y}^{} y \sum_{x}^{} f_{X, Y}\left(x, y\right) = \sum_{x}^{} x f_X\left(x\right) + \sum_{y}^{} y f_Y\left(y\right) = \exval\left(X\right) + \exval\left(Y\right)}
+        
+        This proof is simpler.
+
+        \qed
+    }
+}
+
+
+\end{document}

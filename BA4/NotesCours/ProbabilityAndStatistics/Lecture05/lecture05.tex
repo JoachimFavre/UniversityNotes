@@ -1,0 +1,186 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-07 at 13:23:26.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Mardi 07 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2023-03-07}{Success rate at Trum school}{
+\begin{itemize}[left=0pt]
+    \item Definition of independence.
+    \item Definition of mutually independence, pairwise independence and conditional independence.
+    \item Explanation of Simpson's paradox.
+\end{itemize}
+
+}
+
+\parag{Theorem: Prediction decomposition}{
+    Let $A_1, \ldots, A_n$ be events in probability space. Then: 
+    \[\prob\left(A_1 \cap \cdots \cap A_n\right) = \left[\prod_{i=2}^{n} \prob\left(A_i | A_1 \cap \cdots \cap A_{i-1}\right)\right] \prob\left(A_1\right)\]
+
+    \subparag{Example}{
+        For instance, we have already seen: 
+        \[\prob\left(A_1 \cap A_2\right) = \prob\left(A_2 | A_{1}\prob\left(A_1\right)\right)\]
+
+        But also, for three events: 
+        \[\prob\left(A_1 \cap A_2 \cap A_3\right) = \prob\left(A_3 | A_1 \cap A_2\right)\prob\left(A_2 | A_1\right)\prob\left(A_1\right)\]
+    }
+}
+
+\subsection{Independence}
+\parag{Definition: Independence}{
+    Let $\left(\Omega, \mathcal{F}, \prob\right)$ be a probability space. Two event $A, B \in \mathcal{F}$ are defined to be \important{independent}, written $A \independent B$, if: 
+    \[\prob\left(A \cap B\right) = \prob\left(A\right)\prob\left(B\right)\]
+    
+    \subparag{Remark}{
+        When two events are independent, we get that: 
+        \[\prob\left(A|B\right) = \frac{\prob\left(A \cap B\right)}{\prob\left(B\right)} = \frac{\prob\left(A\right)\prob\left(B\right)}{\prob\left(B\right)} = \prob\left(A\right)\]
+
+        This is in fact an equivalence: 
+        \autoeq{\prob\left(A \cap B\right) = \prob\left(A\right) \prob\left(B\right) \iff \prob\left(A|B\right) = \prob\left(A\right) \iff \prob\left(B|A\right) = \prob\left(B\right)}
+    }
+
+    \subparag{Intuition}{
+        Saying that $A$ and $B$ are independent means that the occurrence of one of the two does not affect the occurrence of the other. We thus indeed intuitively get that we should have $\prob\left(A|B\right) = \prob\left(A\right)$.
+    }
+}
+
+\parag{Example}{
+    A family has two children, giving the following sample space (the first letter represents the sex of the first child, ans similarly for the second): 
+    \[\Omega = \left\{BB, BG, GB, GG\right\}\]
+
+    If we know that the first child is a boy (represented by the event $B_1 = \left\{BB, BG\right\}$), then the probability that the second child is a boy (the event $B_2 = \left\{GB, BB\right\}$) is: 
+    \[\prob\left(B_2|B_1\right) = \frac{\prob\left(B_1 \cap B_2\right)}{\prob\left(B_1\right)} = \frac{\prob\left(\left\{BB\right\}\right)}{\prob\left(B_1\right)} = \frac{\frac{1}{4}}{\frac{1}{2}} = \frac{1}{2} = \prob\left(B_2\right)\]
+    showing that those two events are actually independent.
+
+    However, if now know that at least a child is a boy (the event $C = B_1 \cup B_2$) and that we want the probability that both are boys (the event $D = \left\{BB\right\}$), we get: 
+    \[\prob\left(D|C\right) = \frac{\prob\left(C \cap D\right)}{\prob\left(C\right)} = \frac{\prob\left(D\right)}{\prob\left(C\right)} = \frac{\frac{1}{4}}{\frac{3}{4}} = \frac{1}{3} \neq \prob\left(D\right)\]
+    
+    This shows that those are not independent, rather unintuitively (this is known as the Two Child Paradox).
+}
+
+\parag{Remark}{
+    Independent does not mean disjoint. 
+
+    Disjoint means that two events cannot happen at the same time. For instance, if we roll a die, the event of getting a 3 and the one of getting a 6 are disjoint. In this case, we have: 
+    \[\prob\left(A \cap B\right) = \prob\left(\o\right) = 0 \iff \prob\left(A \cup B\right) = \prob\left(A\right) + \prob\left(B\right)\]
+
+    Independent means that one has no influence on the other. For instance, the event of rolling a 6 and that it is sunny outside are independent. In this case, we have: 
+    \[\prob\left(A \cap B\right) = \prob\left(A\right) \prob\left(B\right) \iff \prob\left(A|B\right) = \prob\left(A\right) \iff \prob\left(B|A\right) = \prob\left(B\right)\]
+}
+
+\parag{Example}{
+    Let us consider a pack of cards which is well shuffled. We pick a card at random, and we consider the three following events: the card is an ace $A$, the card is a king $K$ and the card is an heart $H$. We see that: 
+    \[\prob\left(A\right) = \prob\left(K\right) = \frac{1}{13}, \mathspace \prob\left(H\right) = \frac{1}{4} = \frac{13}{52}\]
+    
+
+    We can see that $A$ and $H$ are independent: 
+    \[\prob\left(A \cap H\right) = \frac{1}{52} = \prob\left(A\right)\prob\left(H\right)\]
+    
+    However, $A$ and $K$ are disjoint but not independent (if we know that one happened, the we definitely know that the other did not happened): 
+    \[\prob\left(A \cap K\right) = \prob\left(\o\right) = 0 \neq \prob\left(A\right)\prob\left(K\right)\]
+}
+
+\parag{Types of independence}{
+    The events $A_1, \ldots, A_n$ are \important{mutually independent} if, for all sets of indices $F \subset \left\{1, \ldots, n\right\}$: 
+    \[\prob\left(\bigcap_{i \in F}^{} A_i\right) = \prod_{i \in F}^{} \prob\left(A_i\right)\]
+    
+    They are \important{pairwise independent} if: 
+    \[\prob\left(A_i \cap A_j\right) = \prob\left(A_i\right)\prob\left(A_j\right), \mathspace 1 \leq i < j \leq n\]
+    
+    They are \important{conditionally independent given $B$} if for all sets of indices $F \subset \left\{1, \ldots, n\right\}$: 
+    \[\prob\left(\bigcap_{i \in F}^{} A_i | B\right) = \prod_{i \in F}^{} \prob\left(A_i| B\right)\]
+
+    \subparag{Remark}{
+        If we say that events $A_1, \ldots, A_n$ are independent, we generally mean that they are mutually independent.
+    }
+
+    \subparag{Implications}{
+        \begin{itemize}[left=0pt]
+            \item Mutual independence implies pairwise independence.
+            \item Pairwise independence only implies mutual independence when $n = 2$.
+            \item Mutual independence neither implies nor is implied by conditional independence.
+        \end{itemize}
+    }
+
+    \subparag{Remark}{
+        This subject is really important and almost always has questions during exams.
+    }
+    
+}
+
+\parag{Example}{
+    Let us consider a family with two children, and the events $B_1$ ``the first born is a boy'', $B_2$ ``the second child is a boy'' and $1B$ ``there is exactly one boy''.
+
+    We have: 
+    \[\prob\left(B_1\right) = \frac{1}{2}, \mathspace \prob\left(B_2\right) = \frac{1}{2}, \mathspace \prob\left(1B\right) = \frac{1}{2}\]
+
+    We can see that they are pairwise independent: 
+    \[\prob\left(B_1 \cap B_2\right) = \prob\left(B_1 \cap 1B\right) = \prob\left(B_2 \cap 1B\right) = \frac{1}{4}\]
+    
+    However, they are not mutually independent: 
+    \[\prob\left(B_1 \cap B_2 \cap 1B\right) = 0 \neq \frac{1}{8} = \prob\left(B_1\right)\prob\left(B_2\right)\prob\left(1B\right)\]
+}
+
+\parag{Series-Parallel system}{
+    Let's consider an electric system which has components labelled 1 to $n$, which fail independently of each other. Also, let $F_i$ be the event that the $i$\Th component is faulty, with some probability $\prob\left(F_i\right) = p_i$. The event that the system fails occurs if the current cannot pass from one end to the other (see the picture in the following example).
+
+    If the components are arranged in parallel, then for the system to fail all components need to fail: 
+    \[\prob_P\left(S\right) = \prob\left(F_1 \cap \cdots \cap F_n\right) = \prod_{i=1}^{n} p_i\]
+    
+    If the components are arranged in series, then the system fails as soon as any of the components fail: 
+    \[P_S\left(S\right) = \prob\left(F_1 \cup \cdots \cup F_n\right) = 1 - \prob\left(F_1^C \cap \cdots \cap F_n^C\right) = 1 - \prod_{i=1}^{n} \left(1-p_ i\right)\]
+}
+
+\parag{Example}{
+    Let us consider the following system:
+    \svghere[0.6]{SeriesParallelSystemExample.svg}
+
+    We want to compute the probability that it fails, knowing that all dots have a fail probability of $p$.
+
+    The idea is, just as for electronics, to replace some circuits by equivalent ones. We can make the following picture, where the red dot has a probability $p^3$ to fail and the blue one has a probability $p^2$.
+    \svghere[0.6]{SeriesParallelSystemExample-2.svg}
+
+    Now, we can merge the two probability from the top line to $1 - \left(1 - p\right)\left(1 - p^3\right)$. Finally, we can combine everything to get: 
+    \[p^2 \left(1-\left(1-p\right)\left(1-p^3\right)\right)\]
+}
+
+\subsection{Simpson's paradox}
+\parag{Simpson's paradox}{
+    Let's say that we read some statistics. \textit{(``What's the name of school which does not seem very nice?'')} At Trum school, there are 1000 males and 1000 females. The number of success this year was 500 males and 200 females.
+
+    However, if really look into the statistics, we could see that there are hard and easy departments, with the following repartition and success rate of people:
+    \begin{center}
+    \begin{tabular}{c|cc}
+        \textbf{Attendance} & Hard department & Easy department \\
+        \hline
+        Males & 1\% & 99\% \\
+        Females & 99\% & 1\%
+    \end{tabular}
+    \end{center}
+    
+    \begin{center}
+    \begin{tabular}{c|cc}
+        \textbf{Success} & Hard department & Easy department \\
+        \hline
+        Males & 10\% & 50\% \\
+        Females & 20\% & 100\%
+    \end{tabular}
+    \end{center}
+    
+    However, in fact, in both cases, the females have always better succeeded than the non-sportive ones. However, we still have $1 + 990\cdot 0.50 \approx 500$ males who passed and $990\cdot 0.2 + 10 \approx 200$ females. So, indeed, there were females who passed, but they were in fact better than the males.
+
+    This is an important concept because it happens a lot during studies, which leads to many mistakes (including some concerning males and females success at school). We always need to look deeper in the data, to see if there is some categories which can explain the differences.
+}
+
+\end{document}
+

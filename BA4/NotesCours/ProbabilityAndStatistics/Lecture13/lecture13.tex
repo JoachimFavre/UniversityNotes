@@ -1,0 +1,284 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-04-04 at 13:20:09.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Mardi 04 avril 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2023-04-04}{Correlation and some causation}{
+\begin{itemize}[left=0pt]
+    \item Definition of independent random variables.
+    \item Definition of IID random variables.
+    \item Definition of covariance, and explanation of its properties.
+    \item Definition of correlation, and explanation of its properties.
+    \item Definition of conditional expectation.
+\end{itemize}
+
+}
+
+\parag{Definition: Independence}{
+    Two random variables $X, Y$ defined on the same probability space are \important{independent} if, for any set $\mathcal{A}$ and $\mathcal{B}$: 
+    \[\prob\left(X \in \mathcal{A}, Y \in \mathcal{B}\right) = \prob\left(X \in \mathcal{A}\right)\prob\left(Y \in \mathcal{B}\right)\]
+    
+    \subparag{Implication}{
+        By letting $\mathcal{A} = \left]-\infty, x\right] $ and $\mathcal{B} = \left]-\infty, y\right[ $, this implies that: 
+        \[F_{X, Y}\left(x, y\right) = F_X\left(x\right) F_Y\left(y\right), \mathspace \forall x, y \in \mathbb{R}\]
+        
+        This also implies that: 
+        \[f_{X, Y}\left(x, y\right) = f_X\left(x\right) f_Y\left(y\right), \mathspace \forall x, y \in \mathbb{R}\]
+        
+        Moreover:
+        \[f_{Y|X}\left(y|x\right) = f_Y\left(y\right), \mathspace \forall y \in \mathbb{R}\]
+    }
+
+    \subparag{Equivalence}{
+        In fact, we can show that $X$ and $Y$ are independent if and only if: 
+        \[F_{X, Y}\left(x, y\right) = F_X\left(x\right)F_Y\left(y\right), \mathspace \forall x, y \in \mathbb{R}\]
+
+        This is also equivalent to:
+        \[f_{X, Y}\left(x, y\right) = f_X\left(x\right)f_Y\left(y\right), \mathspace \forall x, y \in \mathbb{R}\]
+        for both continuous and discrete random variables.
+    }
+}
+
+\parag{Example}{
+    Let us consider the following probability density function: 
+    \begin{functionbypart}{f_{X, Y}\left(x, y\right)}
+     ce^{-3x - 2y}, \mathspace x, y > 0 \\
+     0, \mathspace \text{otherwise}
+    \end{functionbypart}
+    where $c$ allows for normalisation.
+
+    We notice that we can write: 
+    \[f_{X, Y}\left(x, y\right) = c e^{-3x - 2y} I\left(x > 0\right) I\left(y > 0\right) = c\left(e^{-3x} I\left(x > 0\right)\right) \left(e^{-2y} I\left(y > 0\right)\right)\]
+    
+    Since we got that $f_{X, Y}\left(x, y\right) = g\left(x\right)h\left(y\right)$ for some functions $g$ and $h$, we can deduce the independence.
+
+    Note that, if we had $x \leq y$ instead of $x, y > 0$ as the condition for our PDF, then we could not have done the same proof and the two variables would, in fact, not be independent.
+}
+
+\parag{Definition: IID}{
+    A \important{random sample} of size $n$ from a distribution $F$ (or density $f$) is a set of $n$ independent random variables which all have a distribution $F$ (or density $f$).
+
+    Equivalently, we say that $X_1, \ldots, X_n$ are \important{independent and identically distributed} (iid) with distribution $F$ (or density $f$) and write $X_1, \ldots, X_n \iid F$ (or $X_1, \ldots, X_n \iid f$).
+
+    \subparag{PDF}{
+        By independence the joint density of $X_1, \ldots, X_n \iid f$ is: 
+        \[f_{X_1, \ldots, X_n}\left(x_1, \ldots, x_n\right) = \prod_{j=1}^{n} f\left(x_j\right)\]
+    }
+}
+
+\parag{Example}{
+    Let us consider $X_1, X_2, X_3 \iid \exp\left(\lambda\right)$, for some $\lambda > 0$. Then: 
+    \[f\left(x_1, x_2, x_3\right) = f\left(x_1\right)f\left(x_2\right)f\left(x_3\right) = \lambda^3 \exp\left[-\lambda \left(x_1 + x_2 + x_3\right)\right], \mathspace x_1, x_2, x_3 > 0\]
+}
+
+\subsection{Dependence}
+
+\parag{Definition: Expectation}{
+    Let $X, Y$ be random variables of density or mass $f_{X, Y}\left(x, y\right)$.
+
+    If $X, Y$ are discrete and the following sum converge for $\left|g\left(X, Y\right)\right|$, then the \important{expectation} of $g\left(X, Y\right)$ is: 
+    \[\exval\left[g\left(X, Y\right)\right] = \sum_{x, y}^{} g\left(x, y\right)f_{X, Y}\left(x, y\right)\]
+    
+    If $X, Y$ are continuous and the following integral converge for $\left|g\left(X, Y\right)\right|$, then the \important{expectation} of $g\left(X, Y\right)$ is: 
+    \[\exval\left[g\left(X, Y\right)\right] = \iint g\left(x, y\right) f_{X, Y}\left(x, y\right)dxdy\]
+}
+
+\parag{Definition: Joint and central moments}{
+    Let $X, Y$ be random variables of density or mass $f_{X, Y}\left(x, y\right)$ such that $\exval\left(\left|g\left(X,Y\right)\right|\right) < \infty$. Finally, let $r, s \in \mathbb{N}$.
+
+    The \important{joint moments} of $X$ and $Y$ are: 
+    \[\exval\left(X^r Y^s\right)\]
+    
+    The \important{joint central moments} of $X$ and $Y$ are: 
+    \[\exval\left[\left(X - \exval\left(X\right)\right)^r \left(Y - \exval\left(Y\right)\right)^s\right] \]
+
+    \subparag{Remark}{
+        Those definitions are not really important, they mostly allow to define the following (very important) concept.
+    }
+}
+
+\parag{Definition: Covariance}{
+    Let $X, Y$ be random variables of density or mass $f_{X, Y}\left(x, y\right)$ such that $\exval\left(\left|g\left(X,Y\right)\right|\right) < \infty$. Their covariance is: 
+    \[\Cov\left(X, Y\right) = \exval\left[\left(X - \exval\left(X\right)\right)\left(Y - \exval\left(Y\right)\right)\right]\]
+    \subparag{Remark}{
+        It is possible to show that: 
+        \[\Cov\left(X, Y\right) = \exval\left(XY\right) - \exval\left(X\right)\exval\left(Y\right)\]
+    }
+}
+
+\parag{Theorem: Covariance properties}{
+    Let $X, Y, Z$ be random variables, and $a, b, c, d \in \mathbb{R}$ be constants. The covariance has the following properties:
+    \begin{itemize}
+        \item $\Cov\left(X, X\right) = \Var\left(X\right)$
+        \item $\Cov\left(a, X\right) = 0$
+        \item Symmetry: $\Cov\left(X, Y\right) = \Cov\left(Y, X\right)$
+        \item Bilinearity: $\Cov\left(a + bX + cY, Z\right) = b\Cov\left(X, Z\right) + c\Cov\left(Y, Z\right)$
+        \item $\Cov\left(a + bX, c + dY\right) = bd\Cov\left(X, Y\right)$
+        \item $\Var\left(a + bX + cY\right) = b^2 \Var\left(X\right) + 2bc\Cov\left(X, Y\right) + c^2 \Var\left(Y\right)$
+        \item Cauchy-Schwarz inequality: $\Cov\left(X, Y\right)^2 \leq \Var\left(X\right)\Var\left(Y\right)$
+    \end{itemize}
+    
+    
+    \subparag{Digression: Cauchy-Scharz inequality}{
+        Cauchy-Schwarz inequality says that, on some Hilbert space (a vector space with a dot product), then: 
+        \[\left|\left\langle \bvec{u}, \bvec{v} \right\rangle\right| \leq \left\|\bvec{u}\right\| \left\|\bvec{v}\right\| \iff \left|\left\langle \bvec{u}, \bvec{v} \right\rangle\right|^2 \leq \left\|\bvec{u}\right\|^2 \left\|\bvec{v}\right\|^2\]
+        
+        This means that we can consider random variables as a vector space, with the dot product being the covariance, and the norm being the standard deviation (meaning the squared norm is the variance).
+    }
+
+    \subparag{Proof}{
+        We want to show the following property, since it is easier to remember its proof than its result. It directly comes from bilinearity:
+        \autoeq[s]{\Var\left(a + bX + cY\right) = \Cov\left(a + bX + cY, a + bX + cY\right) = b^2\Cov\left(X, X\right) + 2bc\Cov\left(X, Y\right) + c^2 \Cov\left(Y, Y\right) = b^2 \Var\left(X\right) + 2bc\Cov\left(X, Y\right) + c^2\Var\left(Y\right)}
+
+        \qed
+    }
+}
+
+\parag{Theorem: Expectation}{
+    If $X$ and $Y$ are independent, and $g\left(X\right)$ and $h\left(Y\right)$ are functions which expetations exist, then we have: 
+    \[\exval\left[g\left(X\right)h\left(Y\right)\right] = \exval\left[g\left(X\right)\right]\exval\left[h\left(Y\right)\right]\]
+    
+    \subparag{Proof}{
+        Let us consider the continuous case: 
+        \autoeq{\exval\left[g\left(X\right)h\left(Y\right)\right] = \iint g\left(x\right)h\left(y\right) f_{XY}\left(x, y\right) dxdy = \iint g\left(x\right) h\left(y\right) f_X\left(x\right) f_Y\left(y\right)dxdy = \int g\left(x\right)f_X\left(x\right)dx \int h\left(y\right) f_Y\left(y\right)dy = \exval\left[g\left(X\right)\right]\exval\left[h\left(Y\right)\right]}
+        
+        \qed
+    }
+}
+
+\parag{Corollary: Covariance}{
+    If $X$ and $Y$ are independent, then: 
+    \[\Cov\left(X, Y\right) = 0\]
+    
+    \subparag{Remark}{
+        The converse is wrong. It is possible to find random variables such that $\Cov\left(X, Y\right) = 0$ but $X$ and $Y$ are not independent.
+    }
+}
+
+\parag{Theorem: Linearity}{
+    Let $X_1, \ldots, X_n$ be random variables and $a, b_1, \ldots, b_n$ be constants. Then: 
+    \[\exval\left(a + b_1 X_1 + \ldots + b_n X_n\right) = a + \sum_{j=1}^{n} b_j \exval\left(X_j\right)\]
+    \[\Var\left(a + b_1 X_1 + \ldots + b_n X_n\right) = \sum_{j=1}^{n} b_j^2\Var\left(X_j\right) + \sum_{j \neq k}^{} b_j b_k \Cov\left(X_j, X_k\right)\]
+
+    If moreover $X_1, \ldots, X_n$ are independent, then $\Cov\left(X_j, X_k\right) = 0$ for $j \neq k$ and thus: 
+    \[\Var\left(a + b_1 X_1 + \ldots + b_n X_n\right) = \sum_{j=1}^{n} b_j^2 \Var\left(X_j\right)\]
+     
+    \subparag{Remark}{
+        Those properties can easily be fond back.
+
+        For instance, let us compute $\Var\left(16 + 5X_1 -  6 X_2\right)$. First, we know that constants do not matter, so we can write this as: 
+        \autoeq[s]{\Var\left(5 X_1 - 6 X_2\right) = \Cov\left(5 X_1 - 6 X_2, 5 X_1 - 6 X_2\right) = 25 \Cov\left(X_1, X_1\right) - 60 \Cov\left(X_1, X_2\right) + 36\Cov\left(X_2, X_2\right) = 25 \Var\left(X_1\right) - 60\Cov\left(X_1, X_2\right) + 36 \Var\left(X_2\right)}
+    }
+}
+
+\parag{Definition: Average}{
+    The \important{average} of random variables $X_1, \ldots, X_n$ is: 
+    \[\bar{X} = \frac{1}{n} \sum_{j=1}^{n} X_j\]
+}
+
+\parag{Theorem: Mean}{
+    Let $X_1, \ldots, X_n$ be \textit{independent} random variables which all have mean $\mu$ and variance $\sigma ^2$. Then: 
+    \[\exval\left(\bar{X}\right) = \mu, \mathspace \Var\left(\bar{X}\right) = \frac{\sigma ^2}{n}\]
+}
+
+\parag{Definition: Correlation}{
+    The \important{correlation} of $X, Y$ is defined as: 
+    \[\corr\left(X, Y\right) = \frac{\Cov\left(X, Y\right)}{\sqrt{\Var\left(X\right)\Var\left(Y\right)}}\]
+    
+    This measures the linear dependence between $X$ and $Y$. 
+
+    \subparag{Personal note: Intuition}{
+        We have seen that covariance was some kind of dot product, and variance was some kind of square norm. Thus, it is of the form: 
+        \[\frac{\left\langle \bvec{x}, \bvec{y} \right\rangle}{\left\|\bvec{x}\right\|\left\|\bvec{y}\right\|} = \frac{\left\|\bvec{x}\right\|\left\|\bvec{y}\right\| \cos\left(\bvec{x}, \bvec{y}\right)}{\left\|\bvec{x}\right\|\left\|\bvec{y}\right\|} = \cos\left(\bvec{x}, \bvec{y}\right)\]
+        
+        Thus, this indeed allows to know how colinear the two are. Considering two vectors in 2D, they are correlated if the angle between them is small. This is the same for random variables, except that it is more abstract.
+    }
+    
+}
+
+\parag{Remark}{
+    Two independent random variables are necessarily uncorrelated.
+
+    However, two uncorellated random variables are not necessarily independent. For instance, let us consider some random variables $\Theta \followsdistr U\left(0, 2\pi\right), X = \cos\left(\Theta\right), Y = \sin\left(\Theta\right)$. $X$ and $Y$ are definitely dependent (if we know $Y$, then $X$ only has two possibilities), however we can show that they are uncorrelated.
+
+    Correlation only sees linear dependence; and those random variable are dependent, but not linearly.
+}
+
+\parag{Example}{
+    Let us consider $Z_1, Z_2 \iid \mathcal{N}\left(0, 1\right)$ and: 
+    \[X = Z_1, \mathspace Y_1 = \rho Z_1 + \sqrt{1 - \rho^2} Z_2\]
+    for $0 < \rho < 1$.
+    
+    We see that: 
+    \[\Var\left(X\right) = \Var\left(Z_1\right) = 1\]
+    
+    Also, since $Z_1$ and $Z_2$ are independent: 
+    \autoeq{\Var\left(Y\right) = \Var\left(\rho Z_1 + \sqrt{1 - \rho ^2} Z_2\right) = \Var\left(\rho Z_1\right) + \Var\left(\sqrt{1 - \rho^2}Z_2\right) = \rho^2 \Var\left(Z_1\right) + \left(1 - \rho^2\right)\Var\left(Z_2\right) = \rho^2 + \left(1 - \rho^2\right) = 1}
+    
+    Moreover: 
+    \autoeq{\Cov\left(X, Y\right) = \Cov\left(Z_1, \rho Z_1 + \sqrt{1 - \rho^2} Z_2\right) = \rho \Cov\left(Z_1, Z_1\right) + \sqrt{1 - \rho^2} \Cov\left(Z_1, Z_2\right) = \rho\cdot 1 + \sqrt{1 - \rho^2} \cdot  0 = \rho}
+    
+    We finally get that: 
+    \[\corr\left(X, Y\right) = \rho\]
+}
+
+\parag{Theorem: Properties of correlation}{
+    Let $X, Y$ be random variables with correlation $\rho = \corr\left(X, Y\right)$. Then:
+    \begin{itemize}
+        \item $-1 \leq \rho \leq 1$. This directly comes from Cauchy-Schwarz inequality.
+        \item If $\rho = \pm1$, then there exist $a, b, c \in \mathbb{R}$ such that $\left(a, b\right) \neq \left(0, 0\right)$ and:
+        \[aX + bY + c = 0\]
+
+        In other words, $X$ and $Y$ are totally linearly dependent.
+        \item If $X, Y$ are independent, then $\corr\left(X, Y\right) = 0$.
+        \item Correlation is not affected by scaling. In other words, for $a, b, c, d \in \mathbb{R}$: 
+        \[\corr\left(a + bX, c + dY\right) = \sign\left(bd\right)\corr\left(X, Y\right)\]
+    \end{itemize}
+}
+
+
+\parag{Remark}{
+    Note that correlation does not imply causation. 
+
+    For instance, we may notice that the number of churches in cities is highly correlated with the number of criminals. However, churches do not imply criminals; the correct explanation is that a city with more inhabitants has more churches and more criminals. The only way to deduce something in statistics is to act on a value, and see if it changes the other.
+
+    Also, correlation only measures linear dependence. If we have some kind of quadratic dependence, then the correlation might be 0 (even though we could still say the data is correlated).
+}
+
+\parag{Definition: conditional Expectation}{
+    Let $X, Y$ be random variables, $x \in \mathbb{R}$ be such that $f_X\left(x\right) > 0$, and $g\left(X, Y\right)$ be a function such that the following sum and integral converge for $\left|g\left(X, Y\right)\right|$.
+
+    If $X, Y$ are discrete then the \important{conditional expectation} of $g\left(X, Y\right)$ given $X = x$ is: 
+    \[\exval\left[g\left(X, Y\right)|X = x\right] = \sum_{y}^{} g\left(x, y\right) f_{Y|X}\left(y|x\right)\]
+
+    If $X, Y$ are continuous then the \important{conditional expectation} of $g\left(X, Y\right)$ given $X = x$ is: 
+    \[\exval\left[g\left(X, Y\right) | X = x\right] = \int_{-\infty}^{\infty} g\left(x, y\right) f_{Y|X}\left(y|x\right)dy\]
+
+    \subparag{Remark}{
+        Note that $\exval\left[g\left(X, Y\right)| X = x\right]$ is a function of $x$.
+    }
+}
+
+\parag{Example}{
+    Let $Z = XY$ where $X, Y$ are independent, $X$ has a Bernoulli distribution and $Y$ has a Poisson distribution with parameter $\lambda$.
+
+    We have that: 
+    \[\exval\left(Z | X= x\right) = \exval\left(XY | X = x\right) = \exval\left(x Y | X= x\right) = x\exval\left(Y | X= x\right) = x\exval\left(Y\right) = x \lambda\]
+    since $x$ is a constant, and since $X$ and $Y$ are independent. The fact that we can replace $X$ by $x$ follows from the definition.
+
+    Thus: 
+    \[\exval\left(Z | X = 0\right) = 0, \mathspace \exval\left(Z | X = 1\right) = \lambda\]
+}
+
+\end{document}

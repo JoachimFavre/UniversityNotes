@@ -1,0 +1,243 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-28 at 13:18:40.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Mardi 28 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2023-03-28}{The Professor did not know the error function \frownie}{
+\begin{itemize}[left=0pt]
+    \item Proof of the theorem of general transformation.
+    \item Definition of the normal distribution, and explanation of its properties.
+    \item Explanation of De Moivre-Laplace's theorem.
+    \item Definition of joint PMF, PDF and CDF for several random variables.
+\end{itemize}
+
+}
+
+\parag{Theorem: General transformation}{
+    Let $Y = g\left(X\right)$ be a random variable, and $\mathcal{B}_y = \left]-\infty, y\right] $. We consider $g^{-1}\left(\mathcal{B}_y\right) = \left\{x \in \mathbb{R} \suchthat g\left(x\right) \leq y\right\}$.
+
+    If $X$ is continuous, then: 
+    \[F_Y\left(y\right) = \prob\left(Y \leq y\right) = \prob\left(X \in g^{-1}\left(\mathcal{B}_y\right)\right) = \int_{g^{-1}\left(\mathcal{B}_y\right)} f_X\left(x\right)dx\]
+
+    If $X$ is discrete:
+    \[F_Y\left(y\right) = \prob\left(Y \leq y\right) = \prob\left(X \in g^{-1}\left(\mathcal{B}_y\right)\right) = \sum_{x \in g^{-1}\left(\mathcal{B}_y\right)}^{} f_X\left(x\right)\]
+
+    If moreover $g$ is monotone and has a differentiable inverse, then: 
+    \[f_Y\left(y\right) = \left|\frac{dg^{-1}\left(y\right)}{dy}\right| f_X\left(g^{-1}\left(y\right)\right)\]
+
+
+    \subparag{Proof 1}{
+        We show the continuous case.
+
+        We know that $X \in g^{-1}\left(\mathcal{B}\right)$ if and only if $g\left(X\right) \in g\left(g^{-1}\left(\mathcal{B}\right)\right) = \mathcal{B}$. Thus: 
+        \[\prob\left(Y \in \mathcal{B}\right) = \prob\left(g\left(X\right) \in \mathcal{B}\right) = \prob\left(X \in g^{-1}\left(\mathcal{B}\right)\right)\]
+        
+        Now, to find $F_y\left(y\right)$, we only need to take $\mathcal{B}_y = \left]-\infty, y\right] $, giving: 
+        \[F_Y\left(y\right) = \prob\left(Y \leq y\right) = \prob\left(g\left(X\right) \in \mathcal{B}_y\right) = \prob\left(X \in g^{-1}\left(\mathcal{B}_y\right)\right)\]
+        as expected.
+    }
+    
+    \subparag{Proof 2}{
+        We show the part for the PDF.
+
+        We consider $g$ to be increasing, the case where it is decreasing is similar (two minuses cancel out). This implies that $g^{-1}\left(\left]-\infty, y\right] \right) = \left]-\infty, g^{-1}\left(y\right)\right] $, and thus, for $y \in \mathbb{R}$
+        \[F_Y\left(y\right) = \prob\left(X \in g^{-1}\left(\mathcal{B}_y\right)\right) = \prob\left(X \leq g^{-1}\left(y\right)\right) = F_X\left(g^{-1}\left(y\right)\right)\]
+    
+        If, moreover $X$ is continuous, we can differentiate: 
+        \[f_Y\left(y\right) = \frac{dg^{-1}\left(y\right)}{dy} f_X\left(g^{-1}\left(y\right)\right)\]
+        
+        Doing the case for the decreasing function, we get that, completely generally:
+        \[f_Y\left(y\right) = \left|\frac{dg^{-1}\left(y\right)}{dy}\right| f_X\left(g^{-1}\left(y\right)\right)\]
+    }
+
+    \subparag{Remark}{
+        To compute $\frac{d g^{-1}\left(y\right)}{dy}$, we can notice that: 
+        \autoeq{\left(g \circ g^{-1}\right)\left(y\right) = y \implies g'\left(g^{-1}\left(y\right)\right) \frac{d g^{-1}\left(y\right)}{dy} = 1 \implies \frac{dg^{-1}\left(y\right)}{dy} = \frac{1}{g'\left(g^{-1}\left(y\right)\right)}}
+    }
+
+    \subparag{Observation}{
+        We notice that, if $X \followsdistr U\left(0, 1\right)$ is uniform, and $g: \left[0, 1\right] \mapsto \mathbb{R}$ is increasing (and thus $0 \leq g^{-1} \leq 1$ is also increasing), then: 
+        \autoeq{F_Y\left(y\right) = F_X\left(g^{-1}\left(x\right)\right) = g^{-1}\left(x\right)}
+        since the CDF of some uniform random variable $U\left(0, 1\right)$ is $F\left(x\right) = x$, for $0 \leq x \leq 1$.
+
+        This gives us exactly the result we derived before, since a CDF is always increasing.
+    }
+}
+
+\parag{Example 1}{
+    Let $X \followsdistr \exp\left(\lambda\right)$ and $Y = \exp\left(X\right)$. We want to find $F_y$ and $f_y$.
+
+    We note that $g\left(x\right) = e^x$ is increasing, and $g^{-1}\left(y\right) = \log\left(y\right)$. Thus, for $y > 1$: 
+    \[\prob\left(Y \leq y\right) = \prob\left(Y \in \mathcal{B}\right) = \prob\left(g\left(X\right) \in \mathcal{B}\right) = \prob\left(X \in g^{-1}\left(\mathcal{B}\right)\right)\]
+
+    This is equal to:
+    \[\prob\left(X \in \left]-\infty, \log\left(y\right)\right] \right) = F_X\left(\log\left(y\right)\right) = 1 - \exp\left(-\lambda \log\left(y\right)\right) = 1 - y^{-\lambda}\]
+    
+    This implies that $Y$ has a Pareto distribution, with $\beta = 1$ and $\alpha = \lambda$. Finally, for $y > 1$: 
+    \[f_Y\left(y\right) = \left|\frac{dg^{-1}\left(y\right)}{dy} \right|f_X\left(g^{-1}\left(y\right)\right) = \left|\frac{1}{y}\right| \lambda e^{-\lambda \log\left(y\right)} = \lambda y^{-\lambda - 1}\]
+    
+    Moreover, $f_Y\left(y\right) = 0$ for $y \leq 1$ because, then, $\log\left(y\right) < 0$ and $f_X\left(x\right) = 0$ for $x < 0$. We could also naturally just have used the formula of the Pareto distribution to get the PDF.
+}
+
+\parag{Example 2}{
+    Let $X \followsdistr \exp\left(1\right)$ and $Y = \cos\left(X\right)$. We want to find the CDF of $Y$.
+
+    First, because the cosine only gives values in $\left[0, 1\right]$, we get that $F_Y\left(y\right) = 0$ for $y < -1$ and $F_Y\left(y\right) = 1$ for $y \geq 1$.
+
+    Moreover, we notice that, for $0 < x < 2\pi$: 
+    \[\cos\left(X\right) \leq y \iff \arccos\left(y\right) \leq X \leq 2\pi - \arccos\left(y\right)\]
+    
+    By periodicity, and since exponential random variables are always positive, we can split our case: 
+    \autoeq{\cos\left(X\right) \leq y \iff X \in g^{-1}\left(B_y\right) = \bigcup_{j=0}^{\infty} \left\{x \in \mathbb{R} \suchthat 2\pi j + \arccos\left(y\right) \leq x \leq 2\pi\left(j+1\right) - \arccos\left(y\right)\right\}}
+    
+    This yields that: 
+    \autoeq{\prob\left(Y \leq y\right) = \prob\left(X \in g^{-1}\left(\mathcal{B}\right)\right) = \sum_{j=0}^{\infty} \prob\left(2\pi j + \arccos\left(y\right) \leq X \leq 2\pi\left(j+1\right)- \arccos\left(y\right)\right) = \sum_{j=0}^{\infty} \left[\exp\left[-\lambda\left(2\pi j + \arccos\left(y\right)\right)\right] - \exp\left[-\lambda\left(2\pi\left(j+1\right) - \arccos\left(y\right)\right)\right]\right] = \frac{\exp\left(-\lambda\arccos\left(y\right)\right) - \exp\left(\lambda \arccos\left(y\right) - 2\pi \lambda\right)}{1 - \exp\left(-2\pi \lambda\right)}}
+    since this is a geometric series.
+
+}
+
+\subsection{Normal distribution}
+\parag{Definition: Normal distribution}{
+    Let $\mu \in \mathbb{R}$, $\sigma > 0$. A random variable $X$ has \important{normal distribution} if it has density: 
+    \[f\left(x\right) = \frac{1}{\sqrt{2\pi} \cdot \sigma} \exp\left(- \frac{\left(x - \mu\right)^2}{2 \sigma ^2}\right), \mathspace x \in \mathbb{R}\]
+    
+    We write $X \followsdistr \mathcal{N}\left(\mu, \sigma ^2\right)$. We will show that the standard deviation is $\sigma$ and the mean is $\mu$.
+
+    When $\mu = 0$ and $\sigma ^2 = 1$, we call $Z$ a \important{standard normal}, following: 
+    \[\phi\left(z\right) = \frac{1}{\sqrt{2\pi}} e^{-\frac{z^2}{2}}, \mathspace z \in \mathbb{R}\]
+    
+    \subparag{Observation}{
+        We note that: 
+        \[f\left(x\right) = \frac{1}{\sigma} \phi\left(\frac{x - \mu}{\sigma}\right), \mathspace x \in \mathbb{R}\]
+    }
+
+    \subparag{Integral}{
+        The fact that the integral of the PDF is equal to 1 is based on the fact that: 
+        \[I = \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}\]
+        
+        The classic way to show this is by computing its square and using a change of variable to polar coordinates: 
+        \autoeq{I^2 = \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} e^{-x^2} e^{-y^2}dx dy = \int_{0}^{2\pi} \int_{0}^{\infty} e^{-r^2} r dr d \theta = \left[\theta\right]_{0}^{2\pi} \left[-\frac{e^{-r ^2}}{2}\right]_{0}^{\infty} = \frac{2\pi}{2} = \pi}
+        which indeed yields that $I = \sqrt{\pi}$ (since $I > 0$).
+    }
+
+    \subparag{Interpretation}{
+        The standard deviation $\sigma$ is a measure of the spread of the values around $\mu$. $\SI{68}{\percent}$ of the probability lies in the interval $\mu \pm \sigma$, $\SI{95}{\percent}$ in $\mu \pm 2 \sigma$ and $\SI{99.7}{\percent}$ in $\mu \pm 3\sigma$.
+
+        This is often referred to as the 68-95-99.7 rule.
+    }
+}
+
+\parag{Theorem: Properties}{
+    Let $\phi\left(z\right)$ be the PDF, $\Phi\left(z\right)$ be the CDF and $z_p$ be the equantiles of $Z \followsdistr \mathcal{N}\left(0, 1\right)$.
+
+    Then, for all $z \in \mathbb{R}$:
+    \begin{itemize}
+        \item The density is symmetric with respect to $z=0$: 
+        \[\phi\left(z\right) = \phi\left(-z\right)\]
+        \item Using this symmetry of the PDF:
+        \[\prob\left(Z \leq z\right) = \Phi\left(z\right) = 1 - \Phi\left(-z\right) = 1 - \prob\left(Z \geq z\right)\]
+        \item The standard normal quantiles satisfy: 
+        \[z_p = -z_{1 - p}, \mathspace 0 < p < 1\]
+        \item For all $r > 0$: 
+        \[\lim_{z \to \pm\infty} z^r \phi\left(z\right) = 0\]
+        
+        In other words, the moment $\exval\left(Z^r\right)$ exist for all $r \in \mathbb{N}$.
+        \item We have: 
+        \[\phi'\left(z\right) = -z \phi\left(z\right), \mathspace \phi''\left(z\right) = \left(z^2 - 1\right)\phi\left(z\right), \mathspace \phi'''\left(z\right) = -\left(z^3 - 3z\right)\phi\left(z\right), \mathspace \ldots\]
+        
+        This implies that $\exval\left(Z\right) = 0$, $\Var\left(Z\right) = \exval\left(Z^2\right) = 1$, $\exval\left(Z^3\right) = 0$, and so on.
+        \item If $X \followsdistr \mathcal{N}\left(\mu, \sigma ^2\right)$, then: 
+        \[Z = \frac{X - \mu}{\sigma} \followsdistr \mathcal{N}\left(0, 1\right)\]
+        
+        This implies that, if $X \followsdistr \mathcal{N}\left(\mu, \sigma ^2\right)$, then, for $Z \followsdistr \mathcal{N}\left(0, 1\right)$: 
+        \[X = \mu + \sigma Z\]
+    \end{itemize}
+}
+
+\parag{Values}{
+    $\Phi\left(z\right)$ is a non-elementary function. Thus, a typical way to find its value is using a table:
+    \imagehere{TableCDFGaussian.png}
+
+    The rows represent the first digit of $x$ after the coma, and the columns its second digit. For instance: 
+    \[\Phi\left(1.54\right) \approx 0.93822\]
+}
+
+
+\parag{Example 1}{
+    The duration of a maths lecture is $\mathcal{N}\left(47, 4\right)$, and should be 45. We want to find the probability that the lecture finishes early: 
+    \[\prob\left(X \leq 45\right) = \prob\left(\frac{X - 47}{\sqrt{4}} \leq \frac{45 - 47}{\sqrt{4}}\right) = \prob\left(Z \leq -1\right) = \prob\left(Z \geq 1\right) = 1 - \prob\left(Z \leq 1\right) = 1 - \Phi\left(1\right)\]
+
+    Using a table of values, we get that: 
+    \[\prob\left(X \leq 45\right) = 1 - \Phi\left(1\right) = 1 - 0.84134 = 0.15866\]
+}
+
+\parag{Example 2}{
+    Let $Z \followsdistr \mathcal{N}\left(0, 1\right)$. We want to compute the PDF and CDF of $Y = \left|Z\right|$ and $W = Z^2$.
+
+    For $Y$, it is rather easy. We see that, for $y > 0$: 
+    \[\prob\left(Y \leq y\right) = \prob\left(Y \leq y\right) = \prob\left(-y \leq Z \leq y \right) = \Phi\left(y\right) - \Phi\left(-y\right) \implies p_Y\left(y\right) = 2 \phi\left(y\right)\]
+    
+    For $W$, we can use a similar argument: 
+    \[\prob\left(W \leq w\right) = \prob\left(-\sqrt{w} \leq Z \leq \sqrt{w}\right) = \Phi\left(\sqrt{w}\right) - \Phi\left(-\sqrt{w}\right)\]
+}
+
+\parag{Theorem: De Moivre-Laplace theorem}{
+    Let $0 < p < 1$, $X_n \followsdistr B\left(n, p\right)$, $Z \followsdistr \mathcal{N}\left(0, 1\right)$, and: 
+    \[\mu_n = \exval\left(X_n\right) = np, \mathspace \sigma_n^2 = \Var\left(X_n\right) = np\left(1 - p\right)\]
+    
+    Then:
+    \[\frac{X_n - \mu_n}{\sigma_n} \over{\to}{$D$} Z\]
+
+    \subparag{Remark}{
+        This means by definition that:
+        \[\lim_{n \to \infty} \prob\left(\frac{X_n - \mu_n}{\sigma_n} \leq z\right) = \Phi\left(z\right)\]
+    }
+
+    \subparag{Implication}{
+        This allows to give us an approximation of the probability that $X_n \leq r$: 
+        \[\prob\left(X_n \leq r\right) = \prob\left(\frac{X_n - \mu_n}{\sigma_n} \leq \frac{r - \sigma_n}{\sigma_n}\right) = \Phi\left(\frac{r - \mu_n}{\sigma_n}\right)\]
+        
+        In other words, $X_n \followsdistr \mathcal{N}\left(np, np\left(1-p\right)\right)$.
+
+        In practice, the approximation is bad when $\min\left\{np, n\left(1-p\right)\right\} < 5$. However, this is just a rule of thumb.
+    }
+}
+
+\section{Several random variables}
+\subsection{Basic notions}
+
+\parag{Definition: Discrete joint probability functions}{
+    Let $\left(X, Y\right)$ be a discrete random variable, meaning that the set of points $\left(x, y\right)$ such that $\prob\left[\left(X, Y\right) = \left(x, y\right)\right] > 0$ is countable.
+
+    The \important{(joint) probability mass function} of $\left(X, Y\right)$ is: 
+    \[f_{X, Y}\left(x, y\right) = \prob\left[\left(X, Y\right) = \left(x, y\right)\right], \mathspace \left(x, y\right) \in \mathbb{R}^2\]
+    
+    The \important{(joint) cumulative distribution function} of $\left(X, Y\right)$ is: 
+    \[F_{X, Y}\left(x, y\right) = \prob\left(X \leq x, Y \leq y\right), \mathspace \left(x, y\right) \in \mathbb{R}^2\]
+}
+
+\parag{Definition: Continuous joint probability functions}{
+    The random variables $\left(X, Y\right)$ is said to be \important{(jointly) continuous} if there exists a function $f_{X, Y}\left(x, y\right)$, called the \important{(joint) density} of $\left(X, Y\right)$, such that: 
+    \[\prob\left[\left(X, Y\right) \in A\right] = \iint_{\left(u, v\right) \in A} f_{X, Y}\left(u, v\right) du dv, \mathspace A \subset \mathbb{R}^2\]
+    
+    By letting $A = \left\{\left(u,v\right) \suchthat u \leq x, v \leq y\right\}$, we get the \important{(joint) cumulative distribution function} of $\left(X, Y\right)$: 
+    \[F_{X, Y}\left(x, y\right) = \prob\left(X \leq x, Y \leq y\right) = \int_{-\infty}^{x} \int_{-\infty}^{y} f_{X, Y}\left(u, v\right)dudv, \mathspace \left(x, y\right) \in \mathbb{R}^2\]
+
+    Which implies that:
+    \[f_{X, Y}\left(x, y\right) = \frac{\partial^{2} }{\partial x \partial y} F_{X, Y}\left(x, y\right)\]
+
+    For the functions we will study in this course, the order of differentiation does not matter.
+}
+
+\end{document}

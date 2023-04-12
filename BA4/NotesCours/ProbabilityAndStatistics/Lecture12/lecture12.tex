@@ -1,0 +1,120 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-30 at 13:19:38.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Jeudi 30 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2023-03-30}{Generalisation of our definitions}{
+\begin{itemize}[left=0pt]
+    \item Definition of marginal PMF and PDF, and proof that they work like we want them to.
+    \item Definition of conditional PMF and PDF for an arbitrary set of random variable.
+    \item Definition of the multinomial distribution.
+\end{itemize}
+}
+
+\parag{Theorem: Marginal PMF and PDF}{
+    The \important{marginal probability mass function} of a discrete random variable is: 
+    \[f_X\left(x\right) = \prob\left(X = x\right) = \sum_{y}^{} f_{X, Y}\left(x, y\right), \mathspace x \in \mathbb{R}\]
+    
+    The \important{marginal probability density function} of a continuous random variable is: 
+    \[f_X\left(x\right) = \int_{-\infty}^{\infty} f_{X, Y}\left(x, y\right)dy\]
+    
+    \subparag{Proof}{
+        We consider the discrete case, the continuous case is similar.
+
+        We are looking for $f_X\left(x\right) = \prob\left(X = x\right)$: 
+        \autoeq{\prob\left(X = x\right) = \sum_{y}^{} \prob\left(X = x | Y= y\right)\prob\left(Y = y\right) = \sum_{y}^{} \prob\left(X= x, Y = y\right) = \sum_{y}^{} f_{X, Y}\left(x, y\right)}
+
+        \qed
+    }
+}
+
+\parag{Definition: Conditional PMF and PDF}{
+    The \important{conditional probability mass/density function} of $Y$ given $X$ is, supposing that $f_X\left(x\right) > 0$: 
+    \[f_{Y|X}\left(y|x\right) = \frac{f_{X, Y}\left(x, y\right)}{f_X\left(x\right)}, \mathspace y \in \mathbb{R}\]
+    
+    If $\left(X, Y\right)$ is discrete, we also have that: 
+    \[f_{Y|X}\left(y|x\right) = \prob\left(Y = y | X = x\right)\]
+}
+
+\parag{Example}{
+    Let's say every day we receive $X \followsdistr P\left(100\right)$ emails (following a Poisson distribution with $\lambda = 100$). Each is a spam independently with probability $p = 0.9$. We want to find the distribution of the total number of emails we received, given that we received 15 good ones.
+
+    Let $Y$ be the number of good emails we received. This follows: 
+    \[Y | X = x \followsdistr B\left(x, 0.1\right) \implies \prob\left(Y = y | X = x\right) = \binom{x}{y} p^y \left(1-p\right)^{x-y}\]
+    
+    Now, we know that: 
+    \[f_Y\left(y\right) = \sum_{x}^{} f_{X, Y}\left(x, y\right) = \sum_{x}^{} f_{Y|X}\left(y|x\right) f_X\left(x\right) = \sum_{x}^{} \binom{x}{y} p^y \left(1-p\right)^{x-y} \frac{\lambda^x}{x!} e^{-\lambda}\]
+
+    We can show that this is a Poisson mass function with parameter $\lambda\left(1-p\right)$: 
+    \[f_Y\left(y\right) = \frac{\left[\lambda\left(1-p\right)^y\right]}{y!} e^{-\lambda\left(1-p\right)}\]
+}
+
+\parag{Definition: Joint CDF}{
+    Let $X_1, \ldots, X_n$ be random variables defined on the same probability space. Their \important{joint cumulative distribution function} is: 
+    \[F_{X_1, \ldots, X_n} \left(x_1, \ldots, x_n\right) = \prob\left(X_1 \leq x_1, \ldots, X_n \leq x_n\right)\]
+}
+
+\parag{Definition: Joint PMF/PDF}{
+    Let $X_1, \ldots, X_n$ be random variables defined on the same probability space. 
+
+    If they are continuous, their \important{joint probability density function} is: 
+    \[f_{X_1, \ldots, X_n}\left(x_1, \ldots, x_n\right) = \frac{\partial^n F_{X_1, \ldots, X_n}\left(x_1, \ldots, x_n\right)}{\partial x_1 \cdots \partial x_n}\]
+    where the order of derivatives does not mater with the functions we will consider.
+
+    If they are discrete, their \important{joint probability mass function} is: 
+    \[f_{X_1, \ldots, X_n}\left(x_1, \ldots, x_n\right) = \prob\left(X_1 = x_1, \ldots, X_n = x_n\right)\]
+}
+
+\parag{Definition: Marginal}{
+    Let $\mathcal{A} \subset \left\{1, 2, \ldots, n\right\}$. We consider a $n$-tuple of random variables $X_{\left\{1, \ldots, n\right\}} = \left(X_1, \ldots, X_n\right)$, writing for instance $X_{\left\{2, 3, 5\right\}} = \left(X_2, X_3, X_5\right)$.
+
+    If our random variables are continuous, the marginal distribution of $X_{\mathcal{A}}$ is: 
+    \[f_{X_{\mathcal{A}}}\left(x\right) = \int_{\bar{\mathcal{A}}}^{} f_{X_{\left\{1, \ldots, n\right\}}}\left(x_1, \ldots, x_n\right) dx_{\mathcal{A}}\]
+    
+    If our random variables are discrete, the marginal distribution of $X_{\mathcal{A}}$ is: 
+    \[f_{X_{\mathcal{A}}}\left(x\right) = \sum_{x_{\mathcal{A}} \in \bar{\mathcal{A}}} f_{X_{\left\{1, \ldots, n\right\}}}\left(x_1, \ldots, x_n\right)\]
+}
+
+\parag{Definition: Conditional density}{
+    Let $\mathcal{A}, \mathcal{B} \subset \left\{1, 2, \ldots, n\right\}$ be such that $\mathcal{A} \cap \mathcal{B} = \o$. The conditional probability mass/density function of some set of random variables $Y_{\mathcal{B}}$ given another set of random variables $X_{\mathcal{A}}$ is, supposing that $f_{X_{\mathcal{A}}}\left(x\right) > 0$: 
+    \[f_{Y_{\mathcal{B}}|X_{\mathcal{A}}}\left(y|x\right) = \frac{f_{X_{\mathcal{A}}, Y_{\mathcal{B}}}\left(x, y\right)}{f_{X_{\mathcal{A}}}\left(x\right)}, \mathspace y \in \mathbb{R}\]
+}
+
+
+\parag{Example}{
+    Let's say that we have $F_{X, Y}\left(x, y\right)$ and that we want to find $F_{X}\left(x\right)$. To do so, we notice that: 
+    \[F_{X}\left(x\right) = \prob\left(X \leq x\right) = \prob\left(X \leq x, Y < +\infty\right) = \lim_{y \to \infty} F_{X, Y}\left(x, y\right)\]
+}
+
+\parag{Definition: Multinomial distribution}{
+    Let $m \in \mathbb{N}$ and $p_1, \ldots, p_k \in \left[0, 1\right]$ such that $p_1 + \ldots + p_k = 1$.
+
+    The random variable $\left(X_1, \ldots, X_k\right)$ has the \important{multinomial distribution} of denominator $m$ and probabilities $\left(p_1, \ldots, p_k\right)$ if its mass function is: 
+    \[f\left(x_1, \ldots, x_k\right) = \frac{m!}{x_1! \cdots x_k!} p_1^{x_1} \cdots p_k^{x_k} \mathspace x_1, \ldots, x_k \in \left\{0, \ldots, m\right\} \text{ and } \sum_{j=1}^{k} x_j = m\]
+
+    This is written $\left(X_1, \ldots, X_k\right) \followsdistr B\left(m, p_1, \ldots, p_k\right)$
+
+    \subparag{Intuition}{
+        This is the probability that, having $m$ balls, we have $x_1$ balls of the first colour, $x_2$ balls of the second, and so on; knowing that the first colour has probability $p_1$ to appear, and so on.
+    }
+}
+
+\parag{Example}{
+    Let us say that $n$ people vote for three candidates, independently with probabilities $p_1 = 0.45$, $p_2 = 0.4$ and $p_3 = 0.15$ (where $p_i$ represents the probability to vote for the $i$\Th candidate). 
+
+    Let $X_1, X_2, X_3$ represent the number of votes for each candidate. This follows exactly a multinomial distribution:
+    \[\prob\left(X_1 = x_1, X_2 = x_2, X_3 = x_3\right) = \frac{n!}{x_1!x_2!x_3!} 0.45^{x_1} 0.4^{x_2} 0.15^{x_3}\]
+}
+
+\end{document}

@@ -41,8 +41,9 @@ PRINTED_VERSION = False
 CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
-COURSES_NAME = ["Analyse-4"]
+COURSES_NAME = ["Analyse-4", "ProbabilityAndStatistics"]
 # COURSES_NAME = ["Analyse-4"]
+# COURSES_NAME = ["ProbabilityAndStatistics"]
 
 COPY_EXTENSIONS = ["tex", "pdf", "png", "jpg", "jpeg", 'code', 'svg']
 FOREWORD_NAME = {'fr': 'foreword_fr.txt', 'en': 'foreword_en.txt'}

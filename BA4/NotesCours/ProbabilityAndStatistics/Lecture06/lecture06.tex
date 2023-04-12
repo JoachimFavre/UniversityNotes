@@ -1,0 +1,232 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-09 at 14:22:53.
+
+\usepackage{../../style}
+
+\title{Proba stats}
+\author{Joachim Favre}
+\date{Jeudi 09 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2023-03-09}{Lots of distributions}{
+\begin{itemize}[left=0pt]
+    \item Definition of discrete random variable.
+    \item Definition of Bernoulli random variable.
+    \item Definition of the probability mass function of some random variable.
+    \item Definition of binomial, geometric, negative binomial, hypergeometric discrete uniform, and Poisson distributions.
+\end{itemize}
+
+}
+
+\subsection{Random variables}
+\parag{Observation}{
+    When analysing some random event, we are often really interested in some values linked to each event (such as the money won at some game, or the number of successes).
+}
+
+
+\parag{Definition: Random variable}{
+    Let $\left(\Omega, \mathcal{F}, \prob\right)$ be a probability space.
+
+    A \important{random variable} $X: \Omega \mapsto \mathbb{R}$ is a function from the sample space $\Omega$ to real numbers $\mathbb{R}$.
+}
+
+\parag{Definition: Support}{
+    The \important{support} of some random variable $X$ is its codomain (the set of values it can take): 
+    \[D_X = \left\{x \in \mathbb{R} \suchthat \exists \omega \in \Omega \text{ such that } X\left(\omega\right) = x\right\}\]
+    
+    If $D_X$ is countable, then $X$ is named a \important{discrete random variable}.
+}
+
+\parag{Definition: Random variable probability}{
+    Let $X$ be some random variable, and $S \subset \mathbb{R}$. Then, we write: 
+    \[\prob\left(X \in S\right) = \prob\left(\left\{\omega \in \Omega \suchthat X\left(\omega\right) \in S\right\}\right)\]
+    
+    Also, we write: 
+    \[\prob\left(X = x\right) = \prob\left(X \in A_x\right)\]
+    where $A_x = \left\{\omega \in \Omega \suchthat X\left(\omega\right) = x\right\} \subset \mathcal{F}$.
+}
+
+\parag{Example}{
+    We toss a coin multiple times, with probability $p$ to give head, and we note $X$ to be the random variable representing the number of throws until we first get head.
+
+    We want to compute $\prob\left(X = 3\right)$. To do so, we need to first have 2 tails, followed by a head. So: 
+    \[\prob\left(X = 3\right) = \left(1-p\right)p^2\]
+    
+    We also have that: 
+    \[\prob\left(1.7 \leq X \leq 3.5\right) = \prob\left(X = 2\right) + \prob\left(X=3\right) = \left(1-p\right)p + \left(1-p\right)^2 p\]
+}
+
+\parag{Definition: Bernoulli random variable}{
+    A random variable that only takes the value 0 or 1 is named a \important{indicator variable} (or \important{Bernoulli random variable} or \important{Bernoulli trial}).
+}
+
+
+\parag{Definition: PMF}{
+    The \important{probability mass function} (PMF) of a discrete random variable $X$ is: 
+    \[f_X\left(x\right) = \prob\left(X = x\right) = \prob\left(A_x\right), \mathspace x \in \mathbb{R}\]
+    where: 
+    \[A_x = \left\{\omega \in \Omega \suchthat X\left(\omega\right) = x\right\}\]
+    
+    Note that this only works since $A_x$ is countable, since the random variable is discrete.
+
+    \subparag{Support}{
+        We notice that the support of $X$, also named the support of $f_X$ and noted $D_X$, is the set of all $x$ such that $f_X\left(x\right) > 0$.
+    }
+
+    \subparag{Terminology}{
+        When there is no risk of confusion, we write $f_X = f$ and $D_X = D$.
+    }
+    
+
+    \subparag{Properties}{
+        It has the following properties: 
+        \[f_X\left(x\right) \geq 0 ,\mathspace \sum_{x_i \in D_X}^{} f_X\left(x_i\right) = 1\]
+
+        Note that, for now, we always have $f_X\left(x\right) \leq 1$ for all $x$. However, this will no longer be the case for continuous probabilities.
+    }
+
+    \subparag{Remark 1}{
+        The PMF completely characterises a random variable.
+    }
+    
+    \subparag{Remark 2}{
+        The term ``mass'' in the PMF will make more sense when we will have seen continuous variable.
+    }
+}
+
+\parag{Definition: Distribution}{
+    A \important{distribution} defines the PMF of some random variable. We use the operator $X \followsdistr D$ to mean that the random variable $X$ follows the distribution $D$.
+}
+
+
+\parag{Definition: Binomial}{
+    Let $n \in \mathbb{N}$ and $0 \leq p \leq 1$. A \important{binomial} random variable $X$ has the following PMF: 
+    \[f\left(x\right) = \binom{n}{x} p^x \left(1 - p\right)^{n-x}, \mathspace x = 0, \ldots, n\]
+    
+    We write $X \followsdistr B\left(n, p\right)$ and call $n$ the \important{denominator} and $p$ the probability of success.
+
+    \subparag{Observation}{
+        With $n=1$, this is a Bernoulli variable.
+    }
+
+    \subparag{Intuition}{
+        We repeat $n$ times some experiment with success probability $p$, and the random variable represents the number of successes.
+    }
+}
+
+\parag{Definition: Geometric}{
+    Let $0 \leq p \leq1$. A \important{geometric} random variable $X$ has the following PMF: 
+    \[f_X\left(x\right) = p\left(1-p\right)^{x-1}, \mathspace x = 1, 2, \ldots\]
+    
+    We write $X \followsdistr \text{Geom}\left(p\right)$ and we call $p$ the \important{success probability}.
+
+    \subparag{Intuition}{
+        We repeat some experiment with success probability $p$, and the random variable represents the number of times we have to do it until we have the success (counting this last experiment). We indeed first need to do $x-1$ failures, followed by a success.
+    }
+}
+
+\parag{Theorem: Lack of memory}{
+    If $X \followsdistr \text{Geom}\left(p\right)$, then: 
+    \[\prob\left(X > n + m | X > m\right) = \prob\left(X > n\right)\]
+
+    This property is sometimes called \important{memorylessness}.
+
+    \subparag{Proof}{
+        We know that $\prob\left(X > n\right) = \left(1 - p\right)^n$, since it means we have made at least $n$ failures. Thus: 
+        \autoeq{\prob\left(X > n + m | X > m\right) = \frac{\prob\left(X > n + m \cap X > m\right)}{\prob\left(X > m\right)} = \frac{\prob\left(X > n + m\right)}{\prob\left(X > m\right)} = \frac{\left(1 - p\right)^{m + n}}{\left(1 - p\right)^m} = \left(1 - p\right)^n = \prob\left(X > n\right)}
+
+        \qed
+    }
+}
+
+\parag{Example}{
+    We throw a dice until we get a 6. The probability that we have to make a total of 4 rolls is given by: 
+    \[\prob\left(X = 6\right) = \left(1 - \frac{1}{6}\right)^{3} \frac{1}{6} = \frac{5^3}{6^4}\]
+}
+
+
+\parag{Definition: Negative binomial}{
+    Let $n \in \mathbb{N}$ and $0 \leq p \leq 1$. A \important{negative binomial} random variable $X$ has PMF: 
+    \[f_X\left(x\right) = \binom{x-1}{n-1} p^n \left(1 - p\right)^{x-n}, \mathspace x = n, n+1, \ldots\]
+    
+    We write $X \followsdistr \text{NegBin}\left(n, p\right)$.
+
+    \subparag{Observation}{
+        When $n = 1$, we see that $X \followsdistr \text{Geom}\left(p\right)$.
+    }
+
+    \subparag{Intuition}{
+        $X$ models the number of times we need to run an experiment with success probability $p$ to reach $n$ successes.
+    }
+}
+
+\parag{Example}{
+    We want to find the probability of seeing 2 heads before 5 tails in a repeated toss of a coin.
+
+    Let $X$ be the waiting time for $n = 2$ heads, we want the probability that $\prob\left(X \leq 6\right)$. We just have: 
+    \[\prob\left(X \leq6\right) = \sum_{i=2}^{6} P\left(X = i\right) = \sum_{i=2}^{6} \binom{i-1}{1} p^2 \left(1 - p\right)^{i - 2}\]
+}
+
+\parag{Definition: Hypergometric}{
+    Let $w, b, m \in \mathbb{N}$. A random variable $X$ follows an hypergeometric distribution if: 
+    \[\prob\left(X = x\right) = \frac{\binom{w}{x}\binom{b}{m-x}}{\binom{w+b}{m}}, \mathspace x = \text{max}\left(0, m-b\right), \ldots, \text{min}\left(w, m\right)\]
+    
+    We write $X \followsdistr \text{HyperGeom}\left(w, b; m\right)$.
+
+    \subparag{Intuition}{
+        We draw a sample of $m$ balls without replacement from an urn containing $w$ white balls and $b$ black balls. $X$ models the number of white balls drawn.
+
+        Indeed, we consider the number of times we can pick $x$ balls from our white balls and $m-x$ from our black balls, and we just divide by the number of ways to pick $m$ balls from $w + b$ balls.
+    }
+}
+
+\parag{Example}{
+    We have six tins of food without labelling, of which we know two contain fruits. We wonder what is the distribution of the number of tins of fruit we have when we pick three tins.
+
+    This is just an hypergeometric distribution: 
+    \[\prob\left(X = x\right) = \frac{\binom{2}{x}\binom{4}{3-x}}{\binom{6}{3}}, \mathspace x = 0, \ldots, 2\]
+    
+    We thus get that: 
+    \[\prob\left(X = 0\right) = \frac{1}{5}, \mathspace \prob\left(X = 1\right) = \frac{3}{5}, \mathspace \prob\left(X = 2\right) = \frac{1}{5}\]
+}
+
+\parag{Definition: Discrete uniform}{
+    Let $a, b \in \mathbb{Z}$ such that $a < b$. A \important{discrete uniform} random variable $X$ has PMF: 
+    \[f_X\left(x\right) = \frac{1}{b-a+1}, \mathspace x = a, \ldots, b\]
+    
+    We write $U \followsdistr \text{DU}\left(a, b\right)$.
+
+    \subparag{Intuition}{
+        This definition generalises the outcome of a die throw, which would correspond to the $\text{DU}\left(1, 6\right)$ distribution.
+    }
+}
+
+\parag{Definition: Poisson}{
+    Let $\lambda > 0$. A \important{Poisson} random variable $X$ has the PMF: 
+    \[f_X\left(x\right) = \frac{\lambda^x}{x!}e^{-\lambda}, \mathspace x = 0, 1, \ldots\]
+
+    We write $X \followsdistr \text{Pois}\left(\lambda\right)$.
+    
+    \subparag{Proof}{
+        We see that: 
+        \[\sum_{x=0}^{\infty} f_X\left(x\right) = e^{-\lambda}\sum_{x=0}^{\infty} \frac{\lambda^x}{x!} = e^{-\lambda} e^{\lambda} = 1\]
+
+        It is also rather trivial to see that $p_X\left(x\right) > 0$, showing that this is indeed a PMF.
+
+        \qed
+    }
+    
+    \subparag{Intuition}{
+        This distribution appears in many places in statistics. For instance, we can show that, supposing people arrive at random times, it models the length of a queue.
+    }
+}
+
+
+
+\end{document}

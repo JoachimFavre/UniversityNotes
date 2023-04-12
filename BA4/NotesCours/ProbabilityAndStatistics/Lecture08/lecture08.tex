@@ -1,0 +1,159 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-16 at 13:26:19.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Jeudi 16 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2023-03-16}{Le poisson du moment}{
+\begin{itemize}[left=0pt]
+    \item Proof of some properties of the expected value.
+    \item Definition of moments, central moments and factorial moments.
+    \item Definition of variance and standard deviation.
+    \item Explanation of some properties of the variance.
+    \item Proof of a theorem allowing to compute the expected value.
+\end{itemize}
+}
+
+\parag{Theorem: Expectancy properties}{
+    Let $X$ be a random variable with a finite expected value $\exval\left(X\right)$, and let $a, b \in \mathbb{R}$ be constants. Then:
+    \begin{enumerate}
+        \item $\exval$ is a linear operator: $\exval\left(aX + b\right) = a\exval\left(X\right) + b$
+        \item If $g\left(X\right)$ and $h\left(X\right)$ have finite expected values, then: 
+        \[\exval\left[g\left(X\right) + h\left(X\right)\right] = \exval\left[g\left(X\right)\right] + \exval\left[h\left(X\right)\right]\]
+        
+        \item If $\prob\left(X = b\right) = 1$, then $\exval\left(X\right) = b$.
+        \item If $\prob\left(a < X \leq b\right) = 1$, then $a < \exval\left(X\right) \leq b$.
+        \item $\exval\left(X\right)^2 \leq \exval\left(X^2\right)$
+    \end{enumerate}
+
+    \subparag{Remark}{
+        The three first properties are very useful.
+    }
+
+    \subparag{Proof}{
+        We will only prove the last property, the other are rather easy.
+
+        Let us consider the following expression, which we know is positive, for any $a \in \mathbb{R}$: 
+        \[0 \leq \exval\left[\left(X  - a\right)^2\right] = \exval\left[X^2- 2aX + a ^2\right] = \exval\left(X^2\right)  - 2a\exval\left(X\right) + a ^2\]
+
+        Now, we notice that we exactly get our property when $a = \exval\left(X\right)$: 
+        \[0 \leq \exval\left(X^2\right) - 2 \exval\left(X\right)^2 + \exval\left(X\right)^2 \iff \exval\left(X\right)^2 \leq \exval\left(X^2\right)\]
+        
+        \qed
+    }
+}
+
+\parag{Definition: Moments of a distribution}{
+    Let $X$ be a random variable with PMF $f\left(x\right)$ such that $\sum_{x}^{} \left|x\right|^r f\left(x\right) < \infty$ for some $r$. Then, we define:
+    \begin{itemize}
+        \item The $r$\Th \important{moment} of $X$ is $\exval\left(X^r\right)$.
+        \item The $r$\Th \important{central moment} of $X$ is $\exval\left[\left(X - \exval\left(X\right)\right)^r\right]$.
+        \item The \important{factorial moment} of $X$ is $\exval\left[X\left(X-1\right)\cdots\left(X - r + 1\right)\right]$.
+    \end{itemize}
+
+    \subparag{Observation}{
+        The expected value $\exval$ is the first moment of $X$. It represents the average value of $X$. Note that it has the same units as $X$.
+    }
+}
+
+\parag{Definition: Variance and standard deviation}{
+    Let $X$ be a random variable with PMF $f\left(x\right)$ such that $\sum_{x}^{} \left|x\right|^2 f\left(x\right) < \infty$.
+
+    Then, we define the \important{variance} of $X$ to be its second central moment, i.e.: 
+    \[\Var\left(X\right) = \exval\left[\left(X - \exval\left(X\right)\right)^2\right]\]
+    
+    The \important{standard deviation} of $X$ is defined as: 
+    \[\sigma\left(X\right) = \sqrt{\Var\left(X\right)}\]
+
+    \subparag{Remark}{
+        The variance represents the scatter of $X$ around its mean, the average squared distance to the mean. To make its unit match the ones of $X$, we take the square root, yielding the standard deviation.
+    }
+}
+
+\parag{Example 1}{
+    We throw a dice, and we want to compute its expected value and variance: 
+    \[\exval\left(X\right) = \frac{1 + \ldots + 6}{6} = \frac{7}{2}\]
+    \[\Var\left(X\right) = \exval\left[\left(X - \exval\left(X\right)\right)^2\right]= \sum_{x=1}^{6}  \frac{1}{6}\left(x - \frac{7}{2}\right)^2 = \frac{25 + 9 + 1 + 1 + 9 + 25}{6\cdot 4} = \frac{35}{12}\]
+
+}
+
+\parag{Example 2}{
+    We want to compute the factorial moment of the Poisson distribution: 
+    \autoeq{\exval\left[X\left(X-1\right)\cdots\left(X - r + 1\right)\right] = \sum_{x=0}^{\infty} x\left(x-1\right)\cdots\left(x-r+1\right) \frac{\lambda^x}{x!}e^{-\lambda} = \lambda^r \sum_{x-r = 0}^{\infty} \frac{\lambda^{x-r}}{\left(x-r\right)!} e^{-\lambda} = \lambda^r}
+    
+    This for instance gives us that $\exval\left(X\right) = \lambda$.
+}
+
+
+\parag{Theorem: Properties of variance}{
+    Let $X$ be a random variable which variance exists, and let $a, b$ be constants. Then:
+    \begin{enumerate}
+        \item $\Var\left(X\right) = \exval\left(X^2\right) - \exval\left(X\right)^2 = \exval\left[X\left(X - 1\right)\right] + \exval\left(X\right) - \exval\left(X\right)^2 $
+        \item $\Var\left(aX + b\right) = a ^2 \Var\left(X\right)$
+        \item $\Var\left(X\right) = 0$ implies that $X$ is constant with probability $1$.
+    \end{enumerate}
+    
+    \subparag{Intuition}{
+        The second property is important. It means that shifting the distribution by a constant $b$ does not have any impact on its average distance from the mean, which should make sense. Also, it means that if we expand it by a factor $a$, then the average squared distance to the mean is multiplied by a factor $a ^2$.
+
+        The third property just means that if there the average squared distance to the mean is 0, then the random variable must always give the mean.
+    }
+}
+
+\parag{Example}{
+    We have a random variable in $\left\{1, \ldots, 6\right\}$. We want to find the PMF which would maximise the variance. 
+
+    A good first guess would be with uniform probability distribution $f\left(x\right) = \frac{1}{6}$ for all $x$. We get: 
+    \[\Var\left(X\right) = \exval\left(X^2\right) - \exval\left(X\right)^2 = \frac{1}{6} \sum_{i=1}^{6} i^2 - \left(\sum_{i=1}^{6} \frac{i}{6}\right)^2 = \frac{35}{12}\]
+
+    Now, let us consider another random variable (which we will still call $X$ for simplicity), for which push all the mass to the extremities, giving $f\left(1\right) = f\left(6\right) = \frac{1}{2}$ and $f\left(x\right) = 0$ otherwise. Its variance is: 
+    \[\Var\left(X\right) = \exval\left(X^2\right) - \exval\left(X\right)^2 = \frac{1^2 + 6^2}{2} - \left(\frac{1 + 6}{2}\right)^2 = \frac{1}{4} \left(1 - 6\right)^2 = \frac{25}{4}\]   
+
+    This second PMF has the highest variance and, in fact, we cannot do better. To maximise the average squared distance from the mean, we need to put it further from the mean. The first PMF instead maximises entropy (which is the amount of randomness a random variable has).
+}
+
+\parag{Theorem}{
+    If $X$ takes its values in $\left\{0, 1, \ldots\right\}$ and $\exval\left(X\right) < \infty$, then: 
+    \[\exval\left(X\right) = \sum_{x=1}^{\infty} \prob\left(X \geq x\right)\]
+
+    We can generalise this result. Letting $r \geq 2$, we get: 
+    \[\exval\left[X\left(X-1\right)\cdots\left(X-r+1\right)\right] = r \sum_{x=r}^{\infty} \left(x-1\right)\cdots\left(x-r+1\right)\prob\left(X \geq x\right)\]
+    
+    Note that this only works with random variables taking their values in non-negative integers.
+
+    \subparag{Proof 1}{
+        We see that: 
+        \autoeq{\exval\left(X\right) = \sum_{x = 1}^{\infty} xf\left(x\right) = \sum_{x=1}^{\infty} \prob\left(X = x\right) \sum_{r=1}^{x} 1 = \sum_{x=1}^{\infty} \sum_{r=1}^{x} \prob\left(X = x\right) = \sum_{x=1}^{\infty} \prob\left(X \geq x\right)}
+    }
+
+    \subparag{Proof 2}{
+        Let us consider the following expression: 
+        \[r\left(x-1\right)\cdots\left(x-r+1\right) = r! \frac{\left(x-1\right)!}{\left(r-1\right)!\left(x-r\right)!} = r! \binom{x-1}{r-1}\]
+        
+        Thus, we can write: 
+        \autoeq{r \sum_{x=r}^{\infty} \left(x-1\right)\cdots\left(x-r+1\right)\prob\left(X \geq x\right) = \sum_{x=r}^{\infty} r! \binom{x-1}{r-1} \sum_{y=x}^{\infty} f_X\left(y\right) = \sum_{y=r}^{\infty} f_X\left(y\right) r! \sum_{x=r}^{y} \binom{x-1}{r-1}}
+
+        However, we can see that: 
+        \autoeq{r!\sum_{x=r}^{y} \binom{x-1}{r-1} = r \sum_{x=r}^{y} \left[\binom{x}{r} - \binom{x-1}{r}\right] = r! \binom{y}{r} = y\left(y-1\right)\cdots\left(y-r+1\right)}
+        
+        This gives us that:
+        \autoeq[s]{r \sum_{x=r}^{\infty} \left(x-1\right)\cdots\left(x-r+1\right)\prob\left(X \geq x\right) = \sum_{y=r}^{\infty} f_X\left(y\right) y\left(y-1\right)\cdots\left(y-r+1\right) = \exval\left[X\left(X-1\right)\cdots\left(X-r+1\right)\right]}
+        as required.
+
+        \qed
+    }
+}
+
+
+
+\end{document}

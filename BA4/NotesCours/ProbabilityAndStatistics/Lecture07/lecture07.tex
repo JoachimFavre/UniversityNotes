@@ -1,0 +1,109 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-03-14 at 13:28:20.
+
+\usepackage{../../style}
+
+\title{ProbaStats}
+\author{Joachim Favre}
+\date{Mardi 14 mars 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2023-03-14}{High expectations}{
+\begin{itemize}[left=0pt]
+    \item Definition of CDF, and explanation of some of its properties.
+    \item Proof of a formula giving the PMF of a function.
+    \item Definition of expected value.
+    \item Proof of a formula giving the expected value of a function.
+\end{itemize}
+
+}
+
+\parag{Definition: CDF}{
+    Let $X$ be some random variable with probability distribution $\prob$. Its \important{Cumulative Distribution Function} (CDF) is defined as: 
+    \[F_X\left(x\right) = \prob\left(X \leq x\right), \mathspace x \in \mathbb{R}\]
+    
+    If moreover $X$ is discrete, then we can write: 
+    \[F_X\left(x\right) = \sum_{\substack{x_i \in D_x \\ x_i \leq x}}^{} \prob\left(X = x_i\right)\]
+    
+    When there is no risk of confusion, we write $F = F_X$.
+}
+
+\parag{Theorem: Properties of CDF}{
+    Let $\left(\Omega, \mathcal{F}, \prob\right)$ be a probability space and $X: \Omega \mapsto \mathbb{R}$ be a random variable. Its cumulative distribution function $F_X$ satisfies:
+    \begin{enumerate}
+        \item $\lim_{x \to \infty} F_X\left(x\right) = 0$.
+        \item $\lim_{x \to \infty} F_X\left(x\right) = 1$
+        \item $F_X$ is non-decreasing: $F_X\left(x\right) \leq F_X\left(y\right)$ for $x \leq y$.
+        \item $F_X$ is continuous to the right: $\lim_{t \to x^+} F_X\left(x+t\right) = F_X\left(x\right)$
+        \item $\prob\left(X > x\right) = 1 - F_X\left(x\right)$
+        \item If $x < y$, then $\prob\left(x < X \leq y\right) = F_X\left(y\right) - F_X\left(x\right)$
+    \end{enumerate}
+}
+
+\parag{Observation}{
+    We can obtain the mass function of a discrete random variable from the CDF by using: 
+    \[f\left(x\right) = \lim_{z \to x^+} F\left(z\right) - \lim_{y \to x^-} F\left(y\right) = F\left(x\right) - \lim_{y \to x^-} F\left(y\right)\]
+
+    This means that describing a problem using a CDF or a PMF are completely equivalent in the discrete case.
+}
+
+\parag{Theorem: PMF Transformation}{
+    If $X$ is a random variable and $Y = g\left(X\right)$, then: 
+    \[f_Y\left(y\right) = \sum_{x \suchthat g\left(x\right) = y}^{} f_X\left(x\right)\]
+
+    \subparag{Proof}{
+        This is a direct proof: 
+        \[f_Y\left(y\right) = \prob\left(Y = y\right) = \sum_{x \suchthat g\left(x\right) = y}^{} \prob\left(X = x\right) = \sum_{x \suchthat g\left(x\right) = y}^{} f_X\left(x\right)\]
+        
+        \qed
+    }
+}
+
+\parag{Example}{
+    Let us consider $Y = I\left(X \geq 1\right)$. We have: 
+    \[f_Y\left(0\right) = \prob\left(Y = 0\right) = \prob\left(X = 0\right) = e^{-\lambda}\]
+    \[f_Y\left(1\right) = \prob\left(Y = 1\right) = \sum_{x=1}^{\infty} \prob\left(X = x\right) = \sum_{x=1}^{\infty} \frac{\lambda^x}{x!} e^{-\lambda} = 1 - e^{-\lambda}\]
+}
+
+
+\subsection{Expectation}
+\parag{Definition: Expectation}{
+    Let $X$ e a discrete random variable for which $\sum_{x \in D_X}^{} \left|x\right|f_X\left(x\right) < \infty$, where $D_X$ is the support of $f_X$. The \important{expectation} (or \important{expected value} or \important{mean}) of $X$ is: 
+    \[\exval\left(X\right) = \sum_{x \in D_X}^{} x\prob\left(X = x\right) = \sum_{x \in D_x}^{} x f_X\left(x\right)\]
+}
+
+\parag{Example}{
+    Let us compute the expected value of some Bernoulli random variable $I$: 
+    \[\exval\left(I\right) = 0\left(1-p\right) + 1\left(p\right) = p\]
+}
+
+
+\parag{Theorem: Expected value of a function}{
+    Let $X$ be a random variable with mass function $f$, and let $g$ be a real-values function of $X$. Then: 
+    \[\exval\left[g\left(X\right)\right] = \sum_{x \in D_x}^{} g\left(x\right)f\left(x\right)\]
+    when $\sum_{x \in D_X}^{} \left|g\left(x\right)\right|f\left(x\right) < \infty$.
+
+    \subparag{Proof}{
+        We let $Y = g\left(X\right)$. By a theorem we saw previously, we have: 
+        \[f_Y\left(y\right) = \sum_{x \in D_x \suchthat g\left(x\right) = y}^{} f_X\left(x\right)\]
+        
+        Therefore: 
+        \autoeq{\exval\left(Y\right) = \sum_{y \in D_y}^{} y f_Y\left(y\right) = \sum_{y \in D_y}^{} y \sum_{x \in D_x \suchthat g\left(x\right) = y}^{} f_X\left(x\right) = \sum_{y \in D_y}^{} \sum_{x \in D_x \suchthat g\left(x\right) = y}^{}  g\left(x\right) f_X\left(x\right) = \sum_{x \in D_x}^{} g\left(x\right) f_X\left(x\right)}
+    }
+}
+
+\parag{Example}{
+    Let $X \followsdistr \text{Pois}\left(\lambda\right)$. We want to calculate $\exval\left(X\left(X-1\right)\right)$. We can use our theorem: 
+    \[\exval\left(X\left(X-1\right)\right) = \sum_{x=0}^{\infty} x\left(x-1\right) \frac{\lambda^x}{x!} e^{-\lambda} = \lambda^2 \sum_{x=2}^{\infty} \frac{\lambda^{x-2}}{\left(x-2\right)!} e^{-\lambda} = \lambda^2 \cdot  1 = \lambda ^2\]
+    since we recognised the PMF of the Poisson distribution, which, as all PMF, sums to 1.
+}
+
+
+
+\end{document}
