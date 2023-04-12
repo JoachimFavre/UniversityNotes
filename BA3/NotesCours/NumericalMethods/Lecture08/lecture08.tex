@@ -328,6 +328,18 @@ class ADVar:
     \imagehere[0.8]{AutomaticDifferentiationTablesExample.png}
 
     We could show that we get the same results at the end, $\delta a$ of the forward mode is the same as $\delta e$ of the reverse mode. However, reverse mode is much more interesting when we have many more inputs than outputs.
+    
+    \subparag{Personal note}{
+        I write this after the end of the semester, because during the exam I felt this was lacking. $\delta x$ does not mean the same thing in forward mode and in reverse mode.
+
+        In forward mode, this means $\delta x = \frac{\partial x}{\partial a}$. We thus indeed know that $\delta a = \frac{\partial a}{\partial a} = 1$ are we looking for $\delta e = \frac{\partial e}{\partial a}$. Note that, in this case, we indeed have the following property (using first the inverse rule, then the chain rule): 
+        \[\frac{\delta x}{\delta y} = \frac{\frac{\partial x}{\partial a}}{\frac{\partial y}{\partial a} } = \frac{\partial x}{\partial a} \frac{\partial a}{\partial y}  = \frac{\partial x}{\partial y} \]
+
+        However, in reverse mode, we define $\delta x = \frac{\partial e}{\partial x}$. We thus indeed know that $\delta e = \frac{\partial e}{\partial e} = 1$, and we are looking for $\delta a = \frac{\partial e}{\partial a}$ (note that this was $\delta e$ in forward mode). However, in this case, this notation is very dangerous since we have that: 
+        \[\frac{\delta x}{\delta y} = \frac{\frac{\partial e}{\partial x} }{\frac{\partial e}{\partial y} } = \frac{\partial e}{\partial x} \frac{\partial y}{\partial e} = \frac{\partial y}{\partial x} = \frac{1}{\frac{\partial x}{\partial y} }\]
+        
+        In my opinion, we should write $\delta x$ in forward mode but $\delta^{-1} x$ in reverse mode (for instance). The fact that we name them the same when they represent different things is very misleading, especially since $\frac{\delta x}{\delta y} = \frac{\partial y}{\partial x} \neq \frac{\partial x}{\partial y} $ in reverse mode.
+    }
 }
 
 
