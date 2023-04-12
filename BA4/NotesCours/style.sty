@@ -174,11 +174,15 @@
 \newcommand{\bcheck}[1]{\bm{\check{#1}}}
 \newcommand{\degree}{^\circ}
 \newcommand{\telque}{\text{ tel que }}
+\newcommand{\suchthat}{\text{\ |\ }}
 \newcommand{\contradiction}{\text{\lightning}}
 \newcommand{\imagehere}[2][1]{\begin{center}\includegraphics[width=#1\textwidth]{#2}\end{center}}
 \newcommand{\svghere}[2][1]{\begin{center}\includesvg[width=#1\textwidth]{#2}\end{center}}
 \newcommand{\svgherenolatex}[2][1]{\begin{center}\includesvg[inkscapelatex=false, width=#1\textwidth]{#2}\end{center}}
 \newcommand{\pdfhere}[1]{{\centering\includegraphics{#1}}}
+
+\DeclareMathOperator{\cre}{\mathbb{R}e}
+\DeclareMathOperator{\cim}{\mathbb{I}m}
 
 % Source: https://latex.org/forum/viewtopic.php?t=10866
 \newcommand{\fullbf}[1]{{\boldmath\textbf{#1}}}
@@ -207,7 +211,12 @@
 \newcommand{\ndivides}{\centernot\divides}
 \newcommand{\exval}{\mathbb{E}}
 \newcommand{\prob}{\mathbb{P}}
-\newcommand{\Var}{\mathbb{V}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\corr}{corr}
+\newcommand{\independent}{\mathrel{\perp\!\!\!\perp}}
+\newcommand{\followsdistr}{\sim}
+\newcommand{\iid}{\over{\sim}{iid}}
 
 \let\originalbar\bar
 \renewcommand{\bar}{\overline}
@@ -245,6 +254,8 @@
 \DeclareMathOperator{\grad}{grad}
 \DeclareMathOperator{\rot}{rot}
 
+\DeclareMathOperator{\Res}{Res}
+
 % Source: https://tex.stackexchange.com/a/97246
 \DeclareMathOperator{\tg}{tg}
 \DeclareMathOperator{\tgh}{tgh}
@@ -266,6 +277,8 @@
 \DeclareMathOperator{\arccsch}{arccsch}
 \DeclareMathOperator{\arccoth}{arccoth}
 
+\DeclareMathOperator{\sinc}{sinc}
+
 \DeclareMathOperator{\Arcsin}{Arcsin}
 \DeclareMathOperator{\Arccos}{Arccos}
 \DeclareMathOperator{\sh}{sh}
@@ -279,6 +292,7 @@
 \DeclareMathOperator{\Tr}{Tr}
 
 \DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\sign}{sign}
 
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator*{\argmax}{argmax}
@@ -300,12 +314,28 @@
 \let\originalphi\phi
 \renewcommand{\phi}{\varphi}
 
+% taken from https://www.ctan.org/pkg/trfsigns
+\newcommand{\fourierpair}{%
+    \ %
+    \mbox{\setlength{\unitlength}{0.1em}%
+    \begin{picture}(20,10)%
+        \put(2,3){\circle{4}}%
+        \put(4,3){\line(1,0){13}}%
+        \put(18,3){\circle*{4}}%
+    \end{picture}%
+    }% 
+    \ %
+}
+
+\newcommand{\dtfourierpair}{\longleftrightarrow}
+
 % Source: https://tex.stackexchange.com/a/5652
 \NewEnviron{multiequality}{\begin{equation*}\begin{split} \BODY \end{split}\end{equation*}}
 \NewEnviron{multiequation}{\begin{equation*}\begin{split} \BODY \end{split}\end{equation*}}
 
 \NewEnviron{systemofequations}{\begin{cases} \BODY \end{cases}}
 \NewEnviron{functionbypart}[1]{\begin{equation*}#1 = \begin{dcases} \BODY \end{dcases}\end{equation*}}
+\newcommand{\piecewisefunc}[4]{\unexpanded{\begin{systemofequations} #1, & #2 \\ #3, & #4 \end{systemofequations}}}
 
 \newcommand{\multicolumnX}[2]{\multicolumn{#1}{>{\hsize=\dimexpr#1\hsize+#1\tabcolsep+\arrayrulewidth\relax}X}{#2}}
 
@@ -615,8 +645,8 @@
                 while bracketLevel > 0 do
                     currentIndex = currentIndex + 1
                     currentChar = txt:sub(currentIndex, currentIndex)
-                    if currentChar == "{" then bracketLevel = bracketLevel + 1
-                    elseif currentChar == "}" then bracketLevel = bracketLevel - 1
+                    if (currentChar == "{" or currentChar == "(" or currentChar == "[") then bracketLevel = bracketLevel + 1
+                    elseif (currentChar == "}" or currentChar == ")" or currentChar == "]") then bracketLevel = bracketLevel - 1
                     end
                     %
                     if bracketLevel ~= 0 then
@@ -629,13 +659,14 @@
                 % Consider next \over{symbol}{...}
                 void, currentIndex = txt:find("\\over {" .. symbol .. [[}{]], currentIndex)       --[[} (we need to close the bracket for LaTeX)]]
             end
-            % After having considered all \over{symbol}{...}, we replace all symbols which are not in brackets. This is important, because we don't want to replace the = in "\sum_{i=1}^{n}", nore the ones that were already replaced in the "\over{symbol}"
+            % After having considered all \over{symbol}{...}, we replace all symbols which are not in brackets. This is important, because we don't want to replace the = in "\sum_{i=1}^{n}", nor the ones that were already replaced in the "\over{symbol}"
             bracketLevel = 0
             i = 1
             while i <= \#txt do
                 currentChar = txt:sub(i,i)
-                if currentChar == "{" then bracketLevel = bracketLevel + 1
-                elseif currentChar == "}" then bracketLevel = bracketLevel - 1
+                % texio.write("symbol=" .. symbol .. " i=" .. i .. " currentChar=" .. currentChar .. " bracketLevel=" .. bracketLevel .. "\noexpand\n")
+                if (currentChar == "{" or currentChar == "(" or currentChar == "[") then bracketLevel = bracketLevel + 1
+                elseif (currentChar == "}" or currentChar == ")" or currentChar == "]") then bracketLevel = bracketLevel - 1
                 end
                 startSymb, endSymb = txt:find(symbol, i)
                 if bracketLevel == 0 and startSymb == i then
@@ -651,6 +682,10 @@
     function literalise(str)  % from https://stackoverflow.com/a/1746473. We need to escape characters which we don't want to be considered as patterns for regular expressions when using gsub.
         return str:gsub("[\%(\%)\%.\%\%\%+\%-\%*\%?\%[\%]\%^\%$]", function(c) return "\%" .. c end)  --[[$ close dollar sign for LaTeX]]
     end
+    function countSub(text, sub)
+        void, count = text:gsub(sub, "")
+        return count
+    end
     %
     %
     equationSymbols = {[[\noexpand\iff]], [[\noexpand\implies]], [[\noexpand\impliedby]]}
@@ -658,7 +693,7 @@
     %
     optional = [[#1]]
     sloppyEquality = optional == "s"
-    text = [[#2]]
+    text = [[ \expandonce{ #2 } ]]  % the space at the end is very very very important if #2 ends with a ] (else lua does not understand); and it seems like the spaces inside the expand once are also important so I put some everywhere.
     if \ifdim \eqwidth > \textwidth true \else false \fi then  % line is too long
         % Check if in equation (contains given symbols)
         inEquation = false
@@ -686,8 +721,8 @@
                         void, endIndex = text:find(symbol, j)
                         if endIndex then
                             head = text:sub(1, endIndex)
-                            void, openCount = head:gsub("{", "") --[[ }{ close brackets for LaTeX]]
-                            void, closeCount = head:gsub("}", "")
+                            openCount = countSub(head, "{") + countSub(head, "\%(") + countSub(head, "\%[")
+                            closeCount = countSub(head, "}") + countSub(head, "\%)") + countSub(head, "\%]")
                         end
                         j = j + 1
                     until(not endIndex or openCount == closeCount or j > \#text)
