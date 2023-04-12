@@ -10,7 +10,7 @@ import re
 import fitz  # pip install PyMuPDF
 
 COMPILED_DIR = "_CompiledNotes"
-COURSE = "[Course-Name]"
+COURSE = "ProbabilityAndStatistics"
 PDF = ".pdf"
 
 LECTURE_PATH = r"{}\Lecture{:02d}\lecture{:02}.tex"
