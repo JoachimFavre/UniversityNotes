@@ -1,0 +1,222 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-04-17 at 15:18:20.
+
+\usepackage{../../style}
+
+\title{Theory of computation}
+\author{Joachim Favre}
+\date{Lundi 17 avril 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2023-04-17}{$P$ and $NP$}{
+\begin{itemize}[left=0pt]
+    \item Definition of big-$O$ and small-$o$.
+    \item Definition of TIME complexity classes.
+    \item Definition of polynomial time verifiable language.
+    \item Definition of $P$ and $NP$ complexity classes.
+\end{itemize}
+
+}
+
+\section{Complexity classes}
+
+\parag{Observation}{
+    We have already noticed that having a decider for some language is better than a recogniser. Now, amongst deciders, we would like to distinguish which is better.
+}
+
+\parag{Definition: Running time}{
+    Let $M$ be a Turing Machine that halts on all inputs (in other words, it is a decider). The \important{running time} (or time complexity) of $M$ is the function $t: \mathbb{N} \mapsto \mathbb{N}$ where: 
+    \[t\left(n\right) = \max_{w \in \Sigma^* \suchthat \left|w\right| = n} \text{number of steps $M$ takes on $w$}\]
+    
+    \subparag{Intuition}{
+        Intuitively, we consider the worst case for all inputs of size $1$, then the worst case for all inputs of size $2$, and so on.
+    }
+}
+
+\parag{Asymptotic growth}{
+    We may do this for two Turing Machine and get two functions, where one is sometimes smaller than the other, and the other is sometimes smaller. We need a way to compare them , so we will only consider asymptotic growth.
+}
+
+\parag{Definition: Big-$O$}{
+    Let $f, g: \mathbb{N} \mapsto \mathbb{R}_{\geq 0}$. We say that $f\left(n\right) = O\left(g\left(n\right)\right)$ if $\exists C > 0$ and $\exists n_0 \in \mathbb{N}$ such that: 
+    \[\forall n \geq n_0, f\left(n\right) \leq C g\left(n\right)\]
+    
+    \subparag{Intuition}{
+        This means that, asymptotically, $f$ grows at most as fast as $g$.
+    }
+    
+
+    \subparag{Example}{
+        For instance, we have: 
+        \[5 n^3 + 1 = O\left(2^n\right)\]
+        \[5n^3 + 1 \neq O\left(20n + 5\right)\]
+    }
+}
+
+\parag{Definition: Small-$o$}{
+    Let $f, g: \mathbb{N} \mapsto \mathbb{R}_{\geq 0}$. We say $f\left(n\right) = o\left(g\left(n\right)\right)$ if, for all $c > 0$, $\exists n_0 \in \mathbb{N}$ such that: 
+    \[\forall n \geq n_0, f\left(n\right) < c g\left(n\right)\]
+    
+    \subparag{Intuition}{
+        This is like saying that, asymptotically, $f$ grows strictly slower than $g$.
+    }
+
+    \subparag{Example}{
+        For instance, we have: 
+        \[\sqrt{n} = o\left(n\right)\]
+        \[f\left(n\right) \neq o\left(f\left(n\right)\right)\]
+    }
+}
+
+\parag{Definition: Time complexity class}{
+    We define \important{complexity classes} as: 
+    \[\text{TIME}\left(t\left(n\right)\right) = \left\{L \subset \Sigma^* \suchthat L \text{ is decided by a TM with running time $O\left(t\left(n\right)\right)$}\right\}\]
+    
+    \subparag{Property}{
+        We notice that: 
+        \[\text{TIME}\left(n\right) \subseteq \text{TIME}\left(n^2\right) \subseteq \ldots \subseteq \text{TIME}\left(2^n\right) \subseteq \ldots\]
+
+        Also, we notice that we have: 
+        \[\text{REGULAR} \subseteq \text{TIME}\left(n\right)\]
+    }
+}
+
+
+\parag{Definition: Complexity class $P$}{
+    \important{$P$} is the class of languages that are decidable in polynomial time on a deterministic Turing machine. In other words: 
+    \[P = \bigcup_{k=1}^{\infty} \text{TIME}\left(n^k\right)\]
+
+    Note that this definition is robust to different model of computations. Thus, describing an algorithm working on a Turing Machine, or making one in C++, are equivalent.
+    
+    \subparag{Example}{
+        For instance, sorting an array and traversing a graph using BFS are algorithms in the class $P$.
+    }
+    
+    \subparag{Extended Church-Turing thesis}{
+        The extended Churing-Turing thesis states that $P$ corresponds to the class of problems that are ``realistically'' solvable in our universe.
+
+        However, this claim is a little controversial since randomisation and quantum may help solving problems faster than anything doable on a Turing Machine. However, we don't know if this is really true, we just found some algorithms running faster on a quantum computer, though we did not prove that regular computers could not have any faster algorithms.
+    }
+}
+
+\parag{SAT-verify and SAT}{
+    We want to define some language SAT-verify and some harder language SAT. For it, we need to first define some other objects.
+
+    \subparag{CNF}{
+        A CNF (conjunctive normal form) is an expression with sub-expression composed of OR and NOT, which are composed using AND. For instance: 
+        \[\phi_1 = \left(\bar{x} \lor \bar{y} \lor z_0\right) \land \left(x \lor \bar{y} \lor z_1\right) \land \left(\bar{x} \lor y \lor z_2\right) \land \left(x \lor y \lor z_3\right)\]
+        \[\phi_2 = \bar{x}_1 \land \left(x_1 \lor \bar{x}_2\right) \land \left(x_1 \lor x_2 \lor \bar{x}_3\right) \land \left(x_1 \lor x_2 \lor x_3 \lor \bar{x}_4\right)\]
+        \[\phi_3 = \bar{x}_1 \land \left(x_1 \lor \bar{x}_2\right) \land \left(x_1 \lor x_2\right)\]
+    }
+    
+    \subparag{Satisfiable sentence}{
+        A satisfying assignment is a set of variables which make the variable true. A sentence is satisfiable if there exists at least one satisfying assignments. For instance, $\phi_1$ has 32 satisfying assignments, $\phi_2$ has only one and $\phi_3$ has zero.
+    }
+    
+    \subparag{SAT-verify}{
+        We define the following language: 
+        \[\text{SAT-verify} = \left\{\left\langle \phi, C \right\rangle \suchthat C \text{ is a satisfying assignment of $\phi$}\right\}\]
+        
+        It is clearly in $P$ since we can just substitute for the literals according to $C$, and see if the result is true.
+    }
+
+    \subparag{SAT}{
+        We now define the following, harder, language: 
+        \autoeq{\text{SAT} = \left\{\left\langle \phi \right\rangle \suchthat \phi \text{ is satisfiable}\right\} = \left\{\left\langle \phi \right\rangle \suchthat \exists C \text{ such that } \left\langle \phi, C \right\rangle \in \text{SAT-verify}\right\}}
+        
+        We notice that we can iterate over all possible assignments $C$, and see if $\left\langle \phi, C \right\rangle \in \text{SAT-verify}$. However, this runs in exponential time. There are lots of much more complicated algorithms which are a bit better, but they all run in expected exponential time.
+    }
+}
+
+\parag{GI-verify and GI}{
+    We want to define some languages GI-verify and GI. We will need to define some objects first.
+
+    \subparag{Graph isomorphism}{
+        A graph isomorphism is a bijection $f: V\left(G_1\right) \mapsto V\left(G_2\right)$ which preserves adjacency: 
+        \[\left\{u, v\right\} \in E\left(G_1\right) \iff \left\{f\left(u\right), f\left(v\right)\right\} \in E\left(G_2\right)\]
+
+        Two graphs are isomorphic if they have at least one graph ismorphism. In other words, they are isomorphic if we can just re-label the vertices, to get one another.
+    }
+
+    \subparag{GI-verify}{
+        We define the following language: 
+        \autoeq[s]{\text{GI-verify} = \left\{\left\langle G_1, G_2, C \right\rangle \suchthat C: V\left(G_1\right) \mapsto V\left(G_2\right) \text{ is a graph ismorophism}\right\}}
+        
+        We notice that GI-verify is $P$. Indeed, we only need to iterate over the edges (which is quadratic in the number of vertices) and check that: 
+        \[\left\{u, v\right\} \in E\left(G_1\right) \iff \left\{C\left(u\right), C\left(v\right)\right\} \in E\left(G_2\right)\]
+    }
+
+    \subparag{GI}{
+        Now, let's consider the following language: 
+        \autoeq{\text{GI} = \left\{\left\langle G_1, G_2 \right\rangle \suchthat G_1 \text{ and } G_2 \text{ are isomorphic}\right\} = \left\{\left\langle G_1, G_2 \right\rangle \suchthat \exists C \text{ such that } \left\langle G_1, G_2, C \right\rangle \in \text{GI-verify}\right\}}
+
+        Again, this problem is very hard to solve, and we don't have any solution in polynomial time. However, the naive way, to try all the possible isomorphisms, is not the best asymptotic one known so far. The best known runs in quasi-polynomial time, $n^{O\left(\log\left(n\right)\right)}$, but this is still not polynomial.
+    }
+}
+
+\parag{INDET-verify and INDSET}{
+    \subparag{Independent set}{
+        In a graph, an independent set is a subset $S \subseteq V\left(G\right)$ such that no two vertices in $S$ are adjacent in $G$. 
+
+        For instance, in the following graph, $\left\{1, 3, 5\right\}$, $\left\{6\right\}$ and $\o$ are indepedent sets.
+        \imagehere[0.5]{GraphIndependentSubsetExample.png}
+    }
+
+    \subparag{INDSET-verify}{
+        Let us consider the following language: 
+        \autoeq[s]{\text{INDSET-verify} = \left\{\left\langle G, k, C \right\rangle \suchthat C \text{ is an independent set of size $k$ in $G$}\right\}}
+        
+        This can be checked in polynomial time. Indeed, we can first check that $\left|C\right| = k$. Then, we loop for each $u, v \in C$, and we verify that: 
+        \[\left\{u, v\right\} \not \in E\left(G\right)\]
+    }
+    
+    \subparag{INDSET}{
+        Let us now define the following, more complicated language: 
+        \autoeq{\text{INDSET} = \left\{\left\langle G, k \right\rangle \suchthat G \text{ has an independent set of size $k$}\right\} = \left\{\left\langle G, k \right\rangle \suchthat \exists C \text{ such that } \left\langle G, k, C \right\rangle \in \text{INDSET-verify}\right\}}
+
+        Again, the naive solution of looping over all possible inputs of size $k$ takes exponential time: $\binom{n}{k} = n^{O\left(k\right)}$ (which is not polynomial since $k$ is not constant; we might have $k = \frac{n}{2}$). As for the two other problems, we do not know any solution solving this in polynomial time.
+    }
+}
+
+\parag{Definition: Verifier}{
+    A \important{verifier} for a language $L$ is a TM $M$ such that for each $x \in \Sigma^*$: 
+    \[x \in L \implies \exists C \text{ such that $M$ accepts $\left\langle x, C \right\rangle$}\]
+    \[x \not \in L \implies \forall C,\ \text{$M$ rejects $\left\langle x, C \right\rangle$}\]
+
+    We call those $C$ a \important{certificate} (or witness).
+}
+
+
+\parag{Definition: Polynomial time verifier}{
+    A \important{polynomial time verifier} (poly-time verifier) is a verifier which has a running time in $x$ on any $\left\langle x, C \right\rangle$ is polynomial in $x$.
+
+    \subparag{Remark}{
+        This allows to know that $\left|C\right|$ is polynomial in $\left|x\right|$, since we will need to read the whole certificate and it must thus not be longer than the time we are allowed to take.
+    }
+
+    \subparag{Observation}{
+        We can turn any verifiable language to a decidable language, by iterating over all the possible inputs. However, for a polynomial verifiable language, this gives a decider running in exponential time.
+    }
+}
+
+\parag{Definition: $NP$}{
+    \important{$NP$} is the class of languages that have polynomial-time verifiers.
+}
+
+\parag{Observations}{
+    We trivially notice that: 
+    \[P \subseteq NP\]
+    
+    Indeed, we can make a verifier which just uses the decider, and ignores the given certificate. It indeed runs in polynomial time.
+
+    Now, we don't know if $P = NP$. This is actually one of the 7 millennium problems, showing its difficulty. However, most researchers actually think that $P \neq NP$, since, otherwise, it would for instance be very easy to prove theorems (since we can verify that a proof is correct in polynomial time).
+}
+
+
+\end{document}
