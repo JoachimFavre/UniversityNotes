@@ -1,0 +1,150 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-04-20 at 15:17:46.
+
+\usepackage{../../style}
+
+\title{Analyse 4}
+\author{Joachim Favre}
+\date{Jeudi 20 avril 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2023-04-20}{Ses transformées sont cool, ses démons sont mieux}{
+\begin{itemize}[left=0pt]
+    \item Explication de l'inégalité triangulaire.
+    \item Application du théorèmes des résidus à une autre famille d'intégrales réelles.
+    \item Définition des transformées de Laplace.
+\end{itemize}
+
+}
+
+\parag{Proposition: Inégalité triangulaire}{
+    Soient $\Gamma \subset \mathbb{C}$ une courbe régulière \textit{quelconque} (donc pas nécessairement fermée) de paramétrisation $\gamma: \left[a, b\right] \mapsto \Gamma$ et $f: \Gamma \mapsto \mathbb{C}$ une fonction continue.
+
+    Alors: 
+    \[\left|\int_{\Gamma} f\left(z\right)dz\right| \leq \int_{a}^{b} \left|f\left(g\left(t\right)\right) \gamma'\left(t\right)\right| dt\]
+    
+    Cette inégalité est nommée l'\important{inégalité triangulaire}.
+
+    \subparag{Preuve}{
+        Cette inégalité découle directement de son équivalent pour les intégrales réelles.
+    }
+}
+
+\parag{Exemple}{
+    Soient $\omega, a \in \mathbb{R}_{\geq 0}$. Nous voulons calculer: 
+    \[I = \int_{-\infty}^{\infty} \frac{1}{x^2 + \omega^2} e^{iax}dx\]
+    
+    Pour faire cela, nous allons d'abord considérer cette intégrale entre $-R$ et $R$, puis faire tendre notre résultat vers l'infini. Cependant, nous voudrions une courbe fermée pour utiliser le théorème des résidus, donc nous allons fermer notre courbe à l'aide d'une courbe le plus simple possible: un demi-cercle de rayon $R$.
+    \svghere[0.5]{ExempleIntegraleDemiCercle.svg}
+    
+    Nous posons donc: 
+    \[f\left(z\right) = \frac{e^{i a z}}{z^2 + \omega^2}, \mathspace z \neq \pm i \omega\]
+    
+    Nous avons ainsi: 
+    \[I_R = \int_{\Gamma_R} f\left(z\right)dz = \int_{I_R} \frac{e^{i a z}}{z^2 + \omega^2} dz + \int_{C_R} \frac{e^{i a z}}{z^2 + \omega^2} dz\]
+    
+    Clairement, par construction, nous pouvons calculer l'intégrale sur $\Gamma_R$ par le théorème des résidus. De plus, l'intégrale $I_R$ tend vers $I$, c'est ce qu'on cherche. Finalement, l'intégrale sur $C_R$ est un peu plus compliquée, nous voudrons voir ce qui se passe avec.
+
+    \subparag{Intégrale sur $\Gamma_R$}{
+        Commençons donc par calculer notre intégrale sur $\Gamma_R$ à l'aide du théorème des résidus. Nous remarquons sur notre dessin que pour tout $R$ suffisamment grand, seul $z_0 = i \omega$ sera à l'intérieur de la courbe. 
+
+        Nous savons que nous pouvons écrire: 
+        \[f\left(z\right) = \frac{e^{i a z}}{\left(z - i \omega\right)\left(z + i \omega\right)}\]
+
+        Puisque $z - i\omega$ est à la puissance 1, $z_0 = i \omega$ est un pôle d'ordre 1. Nous pouvons ainsi utiliser la formule à résidus: 
+        \[\Res_{i \omega} f = \lim_{z \to i\omega}  f\left(z\right)\left(z - i\omega\right) = \lim_{z \to i \omega} \frac{e^{i a z}}{z + i\omega} = \frac{e^{-a \omega}}{2i \omega}\]
+        
+        Nous avons donc trouvé que: 
+        \[\int_{\Gamma_R} f\left(z\right)dz = 2\pi i \Res_{i \omega} f = 2\pi i \frac{e^{-a \omega}}{2 i \omega} = \frac{\pi e^{-a \omega}}{\omega}\]
+    }
+
+    \subparag{Intégrale sur $C_R$}{
+        Nous voulons montrer que: 
+        \[\lim_{R \to \infty} \int_{C_R} \frac{e^{i a z}}{z^2 + \omega^2} dz = 0\]
+        
+        Pour faire cela, nous allons plutôt montrer que le module de cette intégrale tend vers 0 (puisque $\left|z\right| = 0 \iff z = 0$):
+        \[\lim_{R \to \infty} \left|\int_{C_R} \frac{e^{i a z}}{z^2 + \omega^2} dz\right| = 0\]
+
+        Nous avons besoin d'une paramétrisation de notre demi-cercle. Nous pouvons donc simplement prendre: 
+        \[\gamma\left(t\right) = R e^{it}, \mathspace t \in \left[0, \pi\right]\]
+
+        Nous pouvons maintenant l'utiliser, avec l'inégalité triangulaire: 
+        \autoeq{\left|\int_{C_R} f\left(z\right)dz\right| \leq \int_{0}^{\pi} \left|f\left(Re^{it}\right)\right| \left|Ri e^{it}\right| dt = \int_{0}^{\pi} \left|\frac{e^{i a R e^{it}}}{R^2 e^{2it} + \omega^2}\right| \underbrace{\left|i\right|}_{=1}\left|R\right| \underbrace{\left|e^{it}\right|}_{= 1} dt = \int_{0}^{\pi} \frac{\left|e^{i a R \left(\cos\left(t\right) + i \sin\left(t\right)\right)}\right|}{\left|R^2 e^{2it} + \omega^2\right|} R dt}
+
+        Cependant, nous savons que: 
+        \[\left|e^{x + iy}\right| = \left|e^x\right|\left|e^{iy}\right| = e^x\]
+
+        Nous connaissons aussi l'identité triangulaire inverse: 
+        \[\left|x + y\right| \geq \left|\left|x\right| - \left|y\right|\right| \implies \frac{1}{\left|x+y\right|} \leq \frac{1}{\left|\left|x\right| - \left|y\right|\right|}\]
+
+        Nous pouvons donc simplifier notre résultat en utilisant ces deux faits:
+        \autoeq{\left|\int_{C_R} f\left(z\right) dz\right| \leq \int_{0}^{\pi} \frac{\left|e^{i a R \left(\cos\left(t\right) + i \sin\left(t\right)\right)}\right|}{\left|R^2 e^{2it} + \omega^2\right|} R dt \leq \int_{0}^{\pi} \frac{e^{-a R \sin\left(t\right)}}{\left|\left|R^2 e^{2i t}\right| - \left|\omega^2\right|\right|} R dt = \int_{0}^{\pi} \frac{e^{-a R \sin\left(t\right)}}{\left|R^2 - \omega^2\right|} R dt}
+
+        De plus, pour $R$ suffisamment grand, $R > \omega$, donc: 
+        \[\left|\int_{C_R} f\left(z\right) dz\right| \leq \int_{0}^{\pi} \frac{e^{-a R \sin\left(t\right)}}{\left|R^2 - \omega^2\right|} R dt = \frac{R}{R^2 - \omega^2} \int_{0}^{\pi} e^{-a R \sin\left(t\right) dt}\]
+        
+        Maintenant, nous savons que $aR\sin\left(t\right) \geq 0$ pour tout $t \in \left[0, \pi\right]$, donc l'exponentielle est majorée par $e^0 = 1$. Nous utilisons ici le fait que nous avons choisi d'utiliser le demi-cercle supérieur puisque, sinon, $\sin\left(t\right)$ ne serait pas positif. Nous obtenons ainsi:
+        \autoeq{\left|\int_{C_R} f\left(z\right) dz\right| \leq \frac{R}{R^2 - \omega^2} \int_{0}^{\pi} e^{-a R \sin\left(t\right) }dt \leq \frac{R}{R^2 - \omega^2} \int_{0}^{\pi} dt = \frac{\pi R}{R^2 - \omega^2}}
+        
+        Cela tend clairement vers $0$ quand $R \to \infty$ , donc nous obtenons par le théorème des gendarmes que: 
+        \[\lim_{R \to \infty} \left|\int_{C_R} f\left(z\right) dz\right| = 0\]
+        comme attendu.
+    }
+
+    \subparag{Résultat}{
+        Considérons à nouveau nos intégrales:
+        \[I_R = \int_{\Gamma_R} f\left(z\right)dz = \int_{I_R} \frac{e^{i a z}}{z^2 + \omega^2} dz + \int_{C_R} \frac{e^{i a z}}{z^2 + \omega^2} dz\]
+
+        Quand $R \to +\infty$, cette égalité tend vers: 
+        \[\pi \frac{e^{-a \omega}}{\omega} = \lim_{R \to \infty} \int_{I_R} \frac{e^{a i z}}{z^2 + \omega^2} dz + 0 = \int_{-\infty}^{\infty} \frac{e^{ai x}}{x^2 + \omega^2} dx = I\]
+
+        Nous avons donc réussi à trouver que: 
+        \[I = \pi \frac{e^{-a \omega}}{\omega}\]
+    }
+}
+ 
+\parag{Méthode générale}{
+    Nous pouvons généraliser cette méthode pour les intégrales de la forme suivante: 
+    \[\int_{-\infty}^{\infty} \frac{N\left(x\right)}{D\left(x\right)} e^{i a x} dx\]
+    où $D\left(x\right)$ et $N\left(x\right)$ sont des polynômes tels que $\text{Deg}\left(D\right) - \text{Deg}\left(N\right) \geq 2$. 
+
+    Nous devons choisir le demi-cercle $\Gamma_R$ en fonction du signe de $a$. Si $a > 0$, alors il faut prendre le demi-cercle supérieur (comme dans l'exemple ci-dessus); si $a < 0$, alors il faut prendre le demi-cercle inférieur (et il faudra faire \textit{très} attention au signe de parcours pour avoir une courbe orientée positivement); et si $a = 0$, alors nous pouvons prendre le demi-cercle que nous voulons.
+
+    \subparag{Remarque}{
+        C'est une procédure qui peut sembler lourde, mais une fois que nous avons pris l'habitude, nous verrons que c'est toujours la même chose. La seule partie qui dépend de notre fonction $f\left(x\right)$ est le calcul des résidus.
+    }
+}
+
+\section{Analyse de Laplace}
+\subsection{Transformée de Laplace}
+\parag{Définition: Transformée de Laplace}{
+    Soit $f: \left[0, +\infty\right] \mapsto \mathbb{R}$ et $\gamma_0 \in \mathbb{R}$ tels que: 
+    \[\int_{0}^{\infty} \left|f\left(t\right)\right| e^{-\gamma_0 t} dt < \infty\]
+
+    Alors, nous définissons la \important{transformée de Laplace} de $f$ par:
+    \[\begin{split}
+    \mathcal{L}\left(f\right): \left\{z \in \mathbb{C} \suchthat \cre\left(z\right) \geq \gamma_0\right\} &\longmapsto \mathbb{C} \\
+    z &\longmapsto \mathcal{L}\left(f\right)\left(z\right) = \int_{0}^{\infty} f\left(t\right) e^{-z t} dt
+    \end{split}\]
+
+    La transformée de Laplace est donc uniquement définie sur un demi-plan complexe. Le $\gamma_0$ est appelé un abscisse de convergence.
+
+    \subparag{Observation}{
+        L'hypothèse d'intégrabilité est beaucoup plus souple que celle de la transformée de Fourier: on rajoute une exponentielle.
+    }
+    
+    \subparag{Remarque}{
+        $\mathcal{L}\left(f\right)\left(z\right)$ est bien définie si $x = \cre\left(z\right) \geq \gamma_0$, grâce à l'hypothèse d'intégrabilité. En effet, en utilisant l'inégalité triangulaire: 
+        \autoeq{\left|\int_{0}^{\infty} f\left(t\right) e^{- z t} dt\right| \leq \int_{0}^{\infty} \left|f\left(t\right)\right| \left|e^{-z t}\right| dt = \int_{0}^{\infty} \left|f\left(t\right)\right| e^{-xt} dt \leq \int_{0}^{\infty} \left|f\left(t\right)\right| e^{- \gamma_0 t} dt < \infty}
+        ce qui montre bien la convergence.
+    }
+}
+
+
+\end{document}
