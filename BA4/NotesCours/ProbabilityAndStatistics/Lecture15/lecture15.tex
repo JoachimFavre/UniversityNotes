@@ -1,0 +1,162 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-04-18 at 13:28:09.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Mardi 18 avril 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{15}{2023-04-18}{The calm before the storm}{
+\begin{itemize}[left=0pt]
+    \item Definition of moment-generating function.
+    \item Explanation of some of the properties of MGFs.
+    \item Explanation of the continuity theorem for MGFs.
+\end{itemize}
+
+}
+
+\subsection{Moment generating functions}
+
+\parag{Definition: Moment-generating function}{
+    The \important{moment-generating function} (MGF) of a random variable $X$ (also known as the \important{Laplace transform} of $f_X\left(x\right)$) is: 
+    \[M_X\left(t\right) = \exval\left(e^{tX}\right)\]
+    for all $t$ such that $M_X\left(t\right)$ is defined.
+
+    \subparag{Property}{
+        By using properties of the expected value, we see that: 
+        \[M_X\left(t\right) = \exval\left(e^{tX}\right) = \exval\left(\sum_{r=0}^{\infty} \frac{t^r X^r}{r!}\right) = \sum_{r=0}^{\infty} \frac{t^r}{r!} \exval\left(X^r\right)\]
+        
+        Thus, we can get all the moments by differentiation: 
+        \[\exval\left(X^r\right) = M_X^{\left(r\right)}\left(0\right)\]
+
+        In particular, we always have: 
+        \[M_X\left(0\right) = 1, \mathspace M_x'\left(0\right) = \exval\left(X\right)\]
+    }
+}
+
+\parag{Example 1}{
+    Let us consider $X$ to be an indicator variable with probability $p$. We get that its MGF is: 
+    \[M_X\left(t\right) = \left(1-p\right)e^{t\cdot 0} + pe^{t\cdot 1} = 1 - p + pe^{t}\]
+    
+    We notice that, indeed: 
+    \[M_X\left(0\right) = 1\]
+    \[M'\left(t\right) = p e^t \implies \exval\left(X\right) = M'\left(0\right) = p\]
+}
+
+\parag{Example 2}{
+    Let $X \followsdistr B\left(n, p\right)$. We want to find its MGF: 
+    \[M_X\left(t\right) = \sum_{x=0}^{n} e^{tx} \binom{n}{x}p^x \left(1-p\right)^{n-x} = \sum_{x=0}^{n} \binom{n}{x} \left(p e^t\right)^x \left(1 - p\right)^{n-x} = \left(1 - p + pe^t\right)^n\]
+    for any $t \in \mathbb{R}$.
+}
+
+\parag{Example 3}{
+    Let $X \followsdistr \text{Pois}\left(\lambda\right)$, we want to find its MGF: 
+    \[M_X\left(t\right) = \sum_{x=0}^{\infty} e^{xt} \frac{\lambda^x}{x!} e^{-\lambda} = \sum_{x=0}^{\infty} \frac{\left(\lambda e^t\right)^x}{x!}e^{-\lambda} = \exp\left(\lambda e^t\right) e^{-\lambda} = \exp\left(\lambda \left(e^t - 1\right)\right), \mathspace t \in \mathbb{R}\]
+}
+
+\parag{Example 4}{
+    Let us consider $X \followsdistr \mathcal{N}\left(\mu, \sigma^2\right)$ and $Z \followsdistr \mathcal{N}\left(0, 1\right)$. To compute $M_X\left(t\right)$, we first need $M_Z\left(t\right)$: 
+    \[\exval\left(e^{tZ}\right) = \int_{-\infty}^{\infty} e^{tz} \phi\left(z\right)dz = \int_{-\infty}^{\infty} e^{tz} \frac{1}{\sqrt{2\pi}} e^{-\frac{z^2}{2}} dz\]
+    
+    To compute this integral, we use the fact that normal PDFs integrate to 1: 
+    \autoeq{1 = \frac{1}{\sigma \sqrt{2\pi}} \int_{-\infty}^{\infty} e^{- \frac{\left(x - \mu\right)^2}{2 \sigma ^2}} dx = \frac{e^{\frac{-\mu ^2}{2 \sigma ^2}}}{\sigma \sqrt{2 \pi}} \int_{-\infty}^{\infty} e^{\frac{-x^2}{2 \sigma ^2} + \frac{2x \mu}{2 \sigma ^2}} dx \iff \int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi}} e^{-\frac{x^2}{2 \sigma ^2} + x \frac{\mu}{\sigma ^2}}dx = \sigma e^{\frac{\mu^2}{2 \sigma^2}}}
+
+    Leaving $\sigma = 1$ and $\mu = t$, this allows us to get: 
+    \[\exval\left(e^{tZ}\right) = \int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi}} e^{\frac{-z^2}{2} + zt} dz = e^{\frac{t^2}{2}}\]
+    
+    So, we get that: 
+    \[\exval\left(e^{tX}\right) = \exval\left[e^{t\left(\mu + \sigma Z\right)}\right] = e^{t \mu} \exval\left[e^{t\sigma Z}\right] = e^{t \mu + \frac{t^2 \sigma ^2}{2}}\]
+}
+
+\parag{Theorem: Properties}{
+    If $M_X\left(t\right)$ is the MGF of a random variable $X$, then we have:
+    \begin{itemize}
+        \item $M_X\left(0\right) = 1$
+        \item $M_{a + bX}\left(t\right) = e^{at} M_X\left(bt\right)$
+        \item $\exval\left(X^r\right) = M_X^{\left(r\right)}\left(0\right)$
+        \item $\exval\left(X\right) = M'_X\left(0\right)$
+        \item $\Var\left(X\right) = M''_X\left(0\right) - M'_X\left(0\right)^2$
+    \end{itemize}
+}
+
+\parag{Theorem: Linear combinations}{
+    Let $a, b_1, \ldots, b_n \in \mathbb{R}$ and $X_1, \ldots, X_n$ be independent random variables which MGF exist. Then $Y = a + b_1 X_1 + \ldots + b_n X_n$ has the following MGF: 
+    \[M_Y\left(t\right) = e^{ta} \prod_{j=1}^{n} M_{X_j} \left(t b_j\right)\]
+
+    If moreover they are identically distributed (meaning that, overall, they are IID), $S = X_1 + \ldots + X_n$ has the following MGF: 
+    \[M_S\left(t\right) = M_X\left(t\right)^n\]
+    
+    \subparag{Remark}{
+        This is really what makes MGFs appealing: they allow to turn sums into products when we have independent random variables.
+    }
+}
+
+\parag{Example}{
+    We want to compute the expectation and the variance of $X \followsdistr \exp\left(\lambda\right)$. It seems easier to use a MGF: 
+    \[M_X\left(t\right) = \int_{0}^{\infty} e^{xt} \lambda e^{-\lambda x} dx = \lambda \int_{0}^{\infty} e^{-\left(\lambda - t\right)x} dx = \frac{\lambda}{\lambda - t}\]
+    
+    Which we can differentiate to get: 
+    \[M'_X\left(t\right) = \frac{\lambda}{\left(\lambda - t\right)^2}, \mathspace M''_X\left(t\right) = \frac{2 \lambda}{\left(\lambda - t\right)^3}\]
+    
+    This indeed gives us: 
+    \[\exval\left(X\right) = M'_X\left(0\right) = \frac{1}{\lambda}, \mathspace \Var\left(X\right) = M''_X\left(0\right) - M'_X\left(0\right)^2 = \frac{1}{\lambda ^2}\]
+}
+
+\parag{Theorem}{
+    There exists an injection between CDFs and moment-generating functions. 
+
+    \subparag{Intuition}{
+        In other words, if we recognise the moment-generating function, then we can deduce the probability distribution.
+
+        In fact, for all the functions we will see in this class, there is a bijection between CDFs and MGFs.
+    }
+}
+
+\parag{Example}{
+    Let $X_1 \followsdistr \text{Pois}\left(\lambda_1\right)$ and $X_2 \followsdistr \text{Pois}\left(\lambda_2\right)$ be independent random variables. We want to find the distribution of $X_1 + X_2$.
+
+    We notice that: 
+    \[M_{X_1 + X_2}\left(t\right) = M_{X_1}\left(t\right)  M_{X_2}\left(t\right) = \exp\left(\left(\lambda_1 + \lambda_2\right)\left(e^t - 1\right)\right)\]
+    
+    We recognise the MGF of a Poisson variable with parameter $\lambda_1 + \lambda_2$. By our theorem, this indeed implies that $X_1 + X_2 \followsdistr \text{Pois}\left(\lambda_1 + \lambda_2\right)$.
+}
+
+\parag{Theorem: Continuity}{
+    Let $\left\{X_n\right\}, X$ be random variables with cumulative distribution functions $\left\{F_n\right\}, F$ and which MGFs $M_n\left(t\right), M\left(t\right)$ exist at all $\left|t\right| < b$, for some $b \in \mathbb{R}$ (i.e. they exist in a neighbourhood of $t = 0$).
+
+    If there exists a $a < b$ such that $\lim_{n \to \infty} M_n\left(t\right) = M\left(t\right)$ for all $\left|t\right| \leq a$, then $X_n \over{\to}{D} X$.
+    
+    \subparag{Intuition}{
+        In other words, if $\lim_{n \to \infty} M_n\left(t\right) = M\left(t\right)$ in a neighbourhood of $t = 0$, then $F_n\left(x\right) \to F\left(x\right)$ at each $x \in \mathbb{R}$ where $F$ is continuous. 
+    }
+
+    \subparag{Remark}{
+        This theorem is sometimes called Lévy's continuity theorem.
+    }
+    
+}
+
+\parag{Example}{
+    Let $X_n \followsdistr B\left(n, p_n\right)$ and $X \followsdistr \text{Pois}\left(\lambda\right)$ such that $\lim_{n \to \infty} n p_n = \lambda$. We want to prove the law of small numbers, meaning that $X_n \over{\to}{D} X$, in another way.
+
+    For a binomial random variable, we know that: 
+    \[M_{X_n}\left(t\right) = \left(1 - p_n + p_n e^t\right)^{n}, \mathspace \forall t \in \mathbb{R}\]
+    
+    Moreover, for a Poisson random variable, we have seen that: 
+    \[M_X\left(t\right) = \exp\left(\lambda\left(e^t - 1\right)\right), \mathspace \forall t \in \mathbb{R}\]
+    
+    So, using that $\lim_{n \to \infty} \left(1 + \frac{a}{n}\right)^n = e^a$, we can see that, for all $t \in \mathbb{R}$: 
+    \autoeq{\lim_{n \to \infty} M_{X_n}\left(t\right) = \lim_{n \to \infty} \left(1 - p_N + p_n e^t\right)^n = \left(1 + \frac{n p_n \left(e^t - 1\right)}{n}\right)^n = \exp\left(\lambda\left(e^t - 1\right)\right) = M_X\left(t\right)}
+    
+    We have thus shown our theorem, more easily that what we had done.
+}
+
+\end{document}

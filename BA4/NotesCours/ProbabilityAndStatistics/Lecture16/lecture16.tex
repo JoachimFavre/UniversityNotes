@@ -1,0 +1,275 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-04-25 at 13:19:41.
+
+\usepackage{../../style}
+
+\title{ProbaStats}
+\author{Joachim Favre}
+\date{Mardi 25 avril 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{16}{2023-04-25}{The storm}{
+\begin{itemize}[left=0pt]
+    \item Definition of mean vector and variance matrix.
+    \item Definition of the moment-generating function of random vectors.
+    \item Explanation of some of the properties of MGFs of random vectors.
+    \item Definition of the multivariate normal distribution.
+    \item Proof of some of the properties of the multivariate normal distribution.
+\end{itemize}
+
+}
+
+\parag{Definition: Mean vector}{
+    Let $X = \left(X_1, \ldots, Xp\right)^T \in \mathbb{R}^{p}$ be a vector of random variables. Its \important{expectation} (or \important{mean vector}) is: 
+    \[\exval\left(X\right)_{p \times 1} = \begin{pmatrix} \exval\left(X_1\right) \\ \vdots \\ \exval\left(X_p\right) \end{pmatrix} \]
+}
+
+\parag{Definition: PSD matrix}{
+    Let $\Omega$ be a matrix. It is \important{positive semi-definite} (PSD), denoted $\Omega \succeq 0$, if it is symmetric and, for all vector $x$: 
+    \[x^T \Omega x \geq 0\]
+    
+    \subparag{Implications}{
+        Since it is symmetric, it is orthonormally diagonalisable with real eigenvalues by the spectral theorem. In other wrods, there exists a diagonal matrix $D$ and matrix $U$ for which $UU^T = I_p$, such that: 
+        \[\Omega = U D U ^T\]
+
+        Moreover, since $x^T \Omega x \geq 0$ for any vector $x$, it implies that all its eigenvalues are positive.
+    }
+}
+
+\parag{Definition: positive definite matrix}{
+    Let $\Omega$ be a matrix. It is \important{positive definite}, denoted $\Omega \succ 0$, if it is symmetric and, for all vector $x$: 
+    \[x^T \Omega x > 0\]
+    
+    \subparag{Implications}{
+        A positive definite matrix has all the properties of a PSD matrix, except that all its eigenvalues are strictly positive, and thus it is full rank (meaning that it is inversible).
+    }
+}
+
+\parag{Definition: (co)-variance matrix}{
+    Let $X = \left(X_1, \ldots, X_p\right)^T$ be a vector of random variables. Its \important{(co)-variance matrix} is: 
+    \[\Var\left(X\right)_{p\times p} = \begin{pmatrix} \Var\left(X_1\right) & \Cov\left(X_1, X_2\right) & \cdots & \Cov\left(X_1, X_p\right) \\ \Cov\left(X_1, X_2\right) & \Var\left(X_2\right) & \cdots & \Cov\left(X_2, X_p\right) \\ \vdots & \vdots & \ddots & \vdots \\ \Cov\left(X_1, X_p\right) & \Cov\left(X_2, X_p\right) & \cdots & \Var\left(X_p\right) \end{pmatrix} \]
+
+    \subparag{Remark}{
+        We notice that, for any vector $a = \left(a_1, \ldots, a_p\right)^T \in \mathbb{R}^p$, we have:
+        \autoeq{\Var\left(\sum_{j=1}^{p} a_j X_j\right) = \sum_{i = 1}^{p} \sum_{j=1}^{p} \Cov\left(a_i X_i, a_j X_j\right)= \sum_{i=1}^{p} \sum_{j=1}^{p} a_i a_j \Cov\left(X_i, X_j\right) = a^T \Var\left(X\right) a}
+
+        However this matrix is symmetric (since $\Cov\left(X, Y\right) = \Cov\left(Y, X\right)$). We can combine this with the following fact to get this matrix is positive semi-definite: 
+        \[a^T \Var\left(X\right) a = \Var\left(\sum_{j=1}^{p} a_j X_j\right) \geq 0\]
+    }
+}
+
+\parag{Definition: MGF of random vector}{
+    Let $X_{p\times 1} = \left(X_1, \ldots, X_p\right) \in \mathbb{R}^p$ be a random vector. Its \important{moment-generating function} (MGF) is: 
+    \[M_X\left(t\right) = \exval\left(e^{t \dotprod X}\right) = \exval\left(e^{t^T X}\right) = \exval\left(e^{\sum_{r=1}^{p} t_r X_r}\right), \mathspace \forall t \in \mathcal{T}\]
+    where $\mathcal{T}$ is the set of $t \in \mathbb{R}^p$ where this converges, meaning:
+    \[\mathcal{T} = \left\{t \in \mathbb{R}^p \suchthat M_X\left(t\right) < \infty\right\}\]
+}
+
+\parag{Proposition: Properties of MGF}{
+    Let $X_{p\times 1}$ be a random vector. Its MGF has the following properties:
+    \begin{itemize}
+        \item $0 \in \mathcal{T} \subset \mathbb{R}^p$ and $M_X\left(0\right) = 1$.
+        \item The mean vector of $X_{p\times1}$ is: 
+        \[\exval\left(X\right)_{p \times 1} = M'_X\left(0\right) = \frac{\partial M_X}{\partial t}\left(0\right) = \begin{pmatrix} \frac{\partial M_x}{\partial t_1} \left(0\right) \\ \vdots \\ \frac{\partial M_x}{\partial t_p} \left(0\right) \end{pmatrix} \in \mathbb{R}^p\]
+        
+        \item The variance matrix of $X_{p \times 1}$ is: 
+        \[\Var\left(X\right)_{p \times p} = \frac{\partial^{2} M_X}{\partial t \partial t^T}\left(0\right) - M'_X\left(0\right) M'_X\left(0\right)^T\]
+        where $\frac{\partial^{2} M_X}{\partial t \partial t^T}$ is the Hessian matrix of $M_X$:
+        \[\frac{\partial^{2} M_X}{\partial t \partial t^T}\left(t\right) = \begin{pmatrix} \frac{\partial^2 M_X}{\partial t_1^2}\left(t\right)  & \cdots & \frac{\partial^2 M_X}{\partial t_1 \partial t_p}\left(t\right) \\ \vdots & \ddots & \vdots \\ \frac{\partial^2 M_X}{\partial t_p \partial t_1}\left(t\right) & \cdots & \frac{\partial^2 M_X}{\partial t_p^2}\left(t\right) \end{pmatrix} \]
+        \item Let $\mathcal{A}, \mathcal{B} \subset \left\{1, \ldots, p\right\}$ be such that they are disjoint (meaning $\mathcal{A} \cap \mathcal{B} = \o$). As usual, we denote $X_{\mathcal{A}}$ for the subvector of $X$ containing $\left\{X_j \suchthat j \in \mathcal{A}\right\}$ (for instance $X_{\left\{1, 5\right\}} = \left(X_1, X_5\right)^T$). $X_{\mathcal{A}}$ and $X_\mathcal{B}$ are independent if and only if: 
+        \[M_X\left(t\right) = \exval\left(e^{t_{\mathcal{A}} \dotprod X_{\mathcal{A}} + t_{\mathcal{B}} \dotprod X_{\mathcal{B}}}\right) = M_{X_{\mathcal{A}}}\left(t_{\mathcal{A}}\right) M_{X_{\mathcal{B}}}\left(t_{\mathcal{B}}\right), \mathspace t \in \mathcal{T}\]
+        \item There is an injective mapping from MGFs to probability distributions. In other words, different probability distributions which MGFs exist lead to different MGFs.
+        \end{itemize}
+}
+
+\parag{Definition: Characteristic function}{
+    The \important{characteristic function} of some random variable $X$ is: 
+    \[\phi_X\left(t\right) = \exval\left(e^{i t X}\right), \mathspace t \in \mathbb{R}\]
+
+    This is also known as a \important{Fourier transform}.
+
+    \subparag{Remark}{
+        Many distributions do not have a MGF, their Laplace transform does not converge. Thus, using a Fourier transform can be very useful for proofs, even though they are a bit trickier since they require complex analysis.
+    }
+}
+
+\subsection{Multivariate normal distribution}
+\parag{Definition: Multivariate normal distribution}{
+    Let some random vector $X = \left(X_1, \ldots, X_p\right)^T$. It follows a \important{multivariate normal distribution} (or it is jointly Gaussian) if there exists a $p \times 1$ vector $\mu = \left(\mu_1, \ldots, \mu_p\right)^T \in \mathbb{R}^p$ and a $p \times p$ symmetric matrix with elements $\omega_{jk}$ such that: 
+    \[u^T X \followsdistr \mathcal{N}\left(u^T \mu, u^T \Omega u\right), \mathspace u \in \mathbb{R}^p\]
+    
+    We write $X \followsdistr \mathcal{N}_p\left(\mu, \Omega\right)$.
+
+    \subparag{Remark}{
+        If they exist, then we have:
+        \[\mu = \exval\left(X\right), \mathspace \Omega = \Var\left(X\right)\]
+    }
+
+    \subparag{Observation}{
+        Since $0 \leq \Var\left(u^T X\right) = u^T \Omega u$ for any $\mathbb{R}^p$, this means that $\Omega$ must be positive semi-definite.
+    }
+    
+    \subparag{Terminology}{
+        Saying that a random vector follows a normal distribution is ambiguous. It may mean that each component follows a normal distribution, or that the vector follows a multivariate normal distribution.
+    }
+
+    \subparag{Intuition}{
+        The idea is that it is constructed such that, no matter the line on which we project our variables, it is a 1D Gaussian distribution.
+    }
+    
+}
+
+\parag{Example}{
+    Let us consider: 
+    \[X_1 \followsdistr  \mathcal{N}\left(0, 1\right), \mathspace X_2 = - X_1\]
+    
+    We notice that: 
+    \[\Cov\left(X_1, X_2\right) = \Cov\left(X_1, -X_1\right) = -\Var\left(X_1\right) = -1\]
+
+    This implies that:
+    \[\begin{pmatrix} X_1 \\ X_2 \end{pmatrix} \followsdistr \mathcal{N}\left(\begin{pmatrix} 0 \\ 0 \end{pmatrix}, \begin{pmatrix} 1 & -1 \\ -1 & 1 \end{pmatrix} \right)\]
+    
+    However, in this case, if we consider $u = \left(1, 1\right)^T \in \mathbb{R}^2$: 
+    \[u^T X = X_1 + X_2 \followsdistr \mathcal{N}\left(0, 0\right)\]
+    
+    This is a degenerate case, which is slightly problematic since we divide by the standard deviation in the PDF of the normal distribution. However, since this only happens when we have a linear dependence between $X_1$ and $X_2$, we will consider this to be fine.
+}
+
+\parag{Proposition: Mean and covariance of joint normal distribution}{
+    Let $X \followsdistr N_p\left(\mu, \Omega\right)$, with $\omega_{ij} = \Omega_{ij}$. 
+
+    Then: 
+    \[\exval\left(X_j\right) = \mu_j, \mathspace \Var\left(X_j\right) = \omega_{jj}, \mathspace \Cov\left(X_j, X_k\right) = \omega_{jk}\]
+    
+    \subparag{Proof}{
+        Let $e_j \in \mathbb{R}^p$ be the vector with a 1 at the $j$\Th place and zeros everywhere else. We then have that: 
+        \[X_j = e_j^T X \followsdistr \mathcal{N}\left(\mu_j, \omega_j\right)\]
+        
+        It follows that: 
+        \[\exval\left(X_j\right) = \mu_j, \mathspace \Var\left(X_j\right) = \omega_{jj}\]
+
+        For the final property, we can see that: 
+        \[X_j + X_k = \left(e_j + e_k\right)^T X \followsdistr \mathcal{N}\left(\mu_j + \mu_k, \omega_{jj} + \omega_{kk} + 2 \omega_{jk}\right)\]
+        
+        This gives us: 
+        \autoeq{\Var\left(X_j + X_k\right) = \omega_{jj} + \omega_{kk} + 2\omega_{jk} \iff \Var\left(X_j\right) + \Var\left(X_k\right) + 2\Cov\left(X_j, X_k\right) = \omega_{jj} + \omega_{kk} + 2\omega_{jk} \iff \Cov\left(X_j, X_k\right) = \omega_{jk}}
+
+        \qed
+    }
+}
+
+\parag{Theorem: Properties of the joint normal distribution}{
+    Let $X \followsdistr N_p\left(\mu, \Omega\right)$. We have the following properties:
+    \begin{enumerate}
+        \item The moment-generating function of $X$ is: 
+        \[M_X\left(u\right) = \exp\left(u^T \mu + \frac{1}{2} u^T \Omega u\right), \mathspace u \in \mathbb{R}^p\]
+        \item Let $\mathcal{A}, \mathcal{B} \subset \left\{1, \ldots, p\right\}$ be such that $\mathcal{A} \cap \mathcal{B} = \o$. $X_{\mathcal{A}}$ and $X_{\mathcal{B}}$ are independent ($X_{\mathcal{A}} \independent X_{\mathcal{B}}$) if and only if: 
+        \[\Omega_{\mathcal{A}\times\mathcal{B}} = 0\]
+
+        In other words, $X_1, \ldots, X_n$ are mutually independent if and only if $\Omega$ is diagonal.
+        \item If moreover $X_1, \ldots, X_n \iid \mathcal{N}\left(\mu, \sigma^2\right)$, then: 
+        \[X \followsdistr \mathcal{N}_n\left(\mu 1_n, \sigma^2 I_n\right)\]
+        where $1_n \in \mathbb{R}^n$ is a vector with only ones, and $I_n \in \mathbb{R}^{n \times n}$ is the identity matrix.
+        \item Any linear combination of our variables is also normal. In other words, letting $a \in \mathbb{R}^{r}$ and $B \in \mathbb{R}^{r \times p}$, we get:
+        \[a + B X \followsdistr \mathcal{N}_r\left(a + B \mu, B \Omega B^T\right)\]
+    \end{enumerate}
+    
+    \subparag{Remark}{
+        The second property is very important. For instance, if $\left(X_1, X_2\right)$ is a multivariate Gaussian, we simply have: 
+        \[\Cov\left(X_1, X_2\right) = 0 \iff X_1 \independent X_2\]
+    }
+
+    \subparag{Proof 1}{
+        We know that $u^T X \followsdistr \mathcal{N}\left(u^T \mu, u^T \Omega u\right)$ by hypothesis. We know the MGFs of 1D normal distributions, giving us:
+        \[M_{u^T X}\left(t\right) = \exval\left(e^{t u^T X}\right) = \exp\left(t u^T \mu + \frac{1}{2} t^2 u^T \Omega u\right)\]
+        
+        However, we notice that: 
+        \[M_X\left(u\right) = \exval \left(e^{u^T X}\right) = \exval\left(e^{1\cdot  u^T X}\right) = M_{u^T X}\left(1\right)\]
+
+        This thus gives us: 
+        \[M_X\left(u\right) = \exp\left(u^T \mu + \frac{1}{2} u^T \Omega u\right), \mathspace \forall u \in \mathbb{R}^p\]
+        as required.
+    }
+
+    \subparag{Proof 2}{
+        We only prove the 2D case, but the complete proof is very similar.
+
+        Let us consider the moment generating functions. By the first property, we have:
+        \autoeq{M_X\left(t\right) = \exp\left(t^T \mu + \frac{1}{2} t^T \Sigma t \right) = \exp\left(t_1 \mu_1 + t_2 \mu_2 + \frac{1}{2}t_1^2 \sigma_1^2 + \frac{1}{2}t_2^2 \sigma_2^2 + t_1 t_2 \Sigma_{1, 2}\right)}
+
+        Then, because both our variables $X_1 = \begin{pmatrix} 1 & 0 \end{pmatrix}^T X$ and $X_2 = \begin{pmatrix} 0 & 1 \end{pmatrix}^T X $ are 1D Gaussian, we know that: 
+        \[M_{X_1}\left(t\right) = \exp\left(t_1 \mu_1 + \frac{1}{2}t_1^2 \sigma_1^2\right), \mathspace M_{X_2}\left(t\right) = \exp\left(t_2 \mu_2 + \frac{1}{2}t_2^2 \sigma_2^2\right)\]
+        
+        Now, we know that two polynomials are equal for all $t \in \mathbb{R}$ if and only if their coefficients are equal. Thus, we get that: 
+        \[M_{X}\left(t\right) = M_{X_1}\left(t\right) M_{X_2}\left(t\right) \iff \Sigma_{1,2} = 0\]
+        
+        However, we know that $M_{X}\left(t\right) = M_{X_1}\left(t\right) M_{X_2}\left(t\right)$ if and only if $X_1$ and $X_2$ are independent, finishing our proof.
+    }
+    
+    \subparag{Proof 3}{
+        Let $X_1, \ldots, X_n \iid \mathcal{N}\left(\mu, \sigma^2\right)$. We notice that $X \followsdistr \mathcal{N}_n\left(\mu 1_n, \sigma^2 I_n\right)$ indeed works, since they all have a mean $\mu$, $\Var\left(X_i\right) = \sigma^2$ and $\Cov\left(X_i, X_j\right) = 0$ for $i \neq j$.
+    }
+
+    \subparag{Proof 4}{
+        Let us consider the MGF of $a + BX$: 
+        \autoeq{\exval\left[\exp\left(t^T \left(a + BX\right)\right)\right] = \exval\left[\exp\left(t^T a + \left(B^T t\right)^T X\right)\right] = e^{t^T a} \exval\left[\exp\left(\left(B^T t\right)^T X\right)\right] = e^{t^T a} M_X\left(B^T t\right) = \exp\left(t^T a + \left(B^T t\right)^T \mu + \frac{1}{2} \left(B^T t\right)^T \Omega \left(B^T t\right)\right) = \exp\left(t^T \left(a + B \mu\right) + \frac{1}{2} t^T \left(B \Omega B^T\right)t\right)}
+
+        However, we recognise that this is the MGF of the $\mathcal{N}_r\left(a + B \mu, B \Omega B^T\right)$ distribution. Because of the injectivity of MGFs, we indeed get that: 
+        \[a + BX \followsdistr \mathcal{N}_r\left(a + B \mu, B \Omega B^T\right)\]
+
+        \qed
+    }
+}
+
+\parag{Example}{
+    Let $X \followsdistr \mathcal{N}_p\left(0, \Omega\right)$. We know that $\Omega$ is positive semi-definite, and thus that it is orthonornormally diagonalisable: 
+    \[\Omega = U D U^T\]
+    
+    If $X$ is non-degenerate (meaning that $\Omega$ is also positive definite and thus that its eigenvalues are non-zero), then: 
+    \[D^{-\frac{1}{2}} U^T X \followsdistr \mathcal{N}_p\left(0, I_p\right)\]
+    
+    \subparag{Remark}{
+        Since $D$ is diagonal, we can compute its inverse square root by computing the inverse square root of all of its elements. We notice that it indeed has the property: 
+        \[\left(D^{-\frac{1}{2}}\right)^2 = \begin{pmatrix} \frac{1}{\sqrt{\lambda_1}} & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & \frac{1}{\sqrt{\lambda_n}} \end{pmatrix}^2 = \begin{pmatrix} \frac{1}{\lambda_1} & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & \frac{1}{\lambda_n} \end{pmatrix} = D^{-1}\]
+    }
+
+    \subparag{Intuition}{
+        Let's try to make a parallel with the 1D case, where if $X \followsdistr \mathcal{N}\left(0, \sigma^2\right)$, then $\frac{1}{\sigma} X \followsdistr \mathcal{N}\left(0, 1\right)$. 
+
+        We thus want to make sense of $\left(\sqrt{\Omega}\right)^{-1}$, since it plays the role of $\frac{1}{\sigma}$. To do so, we notice that: 
+        \[\Omega = U D U^T = U D^{\frac{1}{2}} D^{\frac{1}{2}} U^T = \left(U D^{\frac{1}{2}}\right) \left(U D^{\frac{1}{2}}\right)^T\]
+        where we used the fact that $D^{\frac{1}{2}}$ is diagonal.
+
+        Thus, it makes a lot of sense to define $\sqrt{\Omega} = U D^{\frac{1}{2}}$, since it gives: 
+        \[\Omega = \sqrt{\Omega} \sqrt{\Omega}^T\]
+        
+        Now, we can finally see that: 
+        \[\left(\sqrt{\Omega}\right)^{-1} = \left(U D^{\frac{1}{2}}\right)^{-1} = \left(D^{\frac{1}{2}}\right)^{-1} U^{-1} = D^{-\frac{1}{2}} U^T\]
+        since $U$ is orthogonal.
+
+        Finally, we indeed get that $\left(\sqrt{\Omega}\right)^{-1} X \followsdistr \mathcal{N}_p\left(0, I_p\right)$
+    }
+    
+
+    \subparag{Proof}{
+        Let's make a constructive proof. We want to find an $A$ such that $A X \followsdistr \mathcal{N}_p\left(0, I_p\right)$. By our theorem, we know that: 
+        \[AX \followsdistr  \mathcal{N}_r\left(0, A \Omega A^T\right)\]
+        
+        We thus want to solve $A \Omega A^T = I_p$. Since $\Omega$ is positive semi-definite, we can orthonormally diagonalise it:
+        \[\Omega = U D U^T = U D^{\frac{1}{2}} D^{\frac{1}{2}} U^T\]
+        where $D$ is diagonal, $D_{ii} > 0$ (thanks to the positive definitness of $\Omega$) and $U^T U = I_n$ (thanks to the orthonormality of $U$).
+
+        Now, we can pick $A = D^{-\frac{1}{2}} U^T$ which indeed gives:
+        \[A \Omega A^T = D^{-\frac{1}{2}} \underbrace{U^T U}_{I} D^{\frac{1}{2}} D^{\frac{1}{2}} \underbrace{U^T U}_{I} D^{-\frac{1}{2}} = D^{-\frac{1}{2}} D^{\frac{1}{2}} D^{\frac{1}{2}} D^{-\frac{1}{2}} = I\]
+        where we used $\left(D^{-\frac{1}{2}}\right)^{T} = D^{-\frac{1}{2}}$ since it is diagonal.
+
+    }
+}
+
+\end{document}
