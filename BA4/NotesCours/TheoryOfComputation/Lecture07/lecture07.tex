@@ -14,17 +14,19 @@
 \begin{document}
 \maketitle
 
-\lecture{7}{2023-04-17}{$P$ and $NP$}{
+\lecture{7}{2023-04-17}{P and NP}{
 \begin{itemize}[left=0pt]
     \item Definition of big-$O$ and small-$o$.
     \item Definition of TIME complexity classes.
     \item Definition of polynomial time verifiable language.
-    \item Definition of $P$ and $NP$ complexity classes.
+    \item Definition of P and NP complexity classes.
 \end{itemize}
 
 }
 
 \section{Complexity classes}
+
+\subsection{P complexity class}
 
 \parag{Observation}{
     We have already noticed that having a decider for some language is better than a recogniser. Now, amongst deciders, we would like to distinguish which is better.
@@ -88,22 +90,25 @@
 }
 
 
-\parag{Definition: Complexity class $P$}{
-    \important{$P$} is the class of languages that are decidable in polynomial time on a deterministic Turing machine. In other words: 
-    \[P = \bigcup_{k=1}^{\infty} \text{TIME}\left(n^k\right)\]
+\parag{Definition: Complexity class P}{
+    \important{P} is the class of languages that are decidable in polynomial time on a deterministic Turing machine. In other words: 
+    \[\text{P} = \bigcup_{k=1}^{\infty} \text{TIME}\left(n^k\right)\]
 
     Note that this definition is robust to different model of computations. Thus, describing an algorithm working on a Turing Machine, or making one in C++, are equivalent.
     
     \subparag{Example}{
-        For instance, sorting an array and traversing a graph using BFS are algorithms in the class $P$.
+        For instance, sorting an array and traversing a graph using BFS are algorithms in the class P.
     }
     
     \subparag{Extended Church-Turing thesis}{
-        The extended Churing-Turing thesis states that $P$ corresponds to the class of problems that are ``realistically'' solvable in our universe.
+        The extended Churing-Turing thesis states that P corresponds to the class of problems that are ``realistically'' solvable in our universe.
 
         However, this claim is a little controversial since randomisation and quantum may help solving problems faster than anything doable on a Turing Machine. However, we don't know if this is really true, we just found some algorithms running faster on a quantum computer, though we did not prove that regular computers could not have any faster algorithms.
     }
 }
+
+\subsection{NP complexity class}
+
 
 \parag{SAT-verify and SAT}{
     We want to define some language SAT-verify and some harder language SAT. For it, we need to first define some other objects.
@@ -123,7 +128,7 @@
         We define the following language: 
         \[\text{SAT-verify} = \left\{\left\langle \phi, C \right\rangle \suchthat C \text{ is a satisfying assignment of $\phi$}\right\}\]
         
-        It is clearly in $P$ since we can just substitute for the literals according to $C$, and see if the result is true.
+        It is clearly in P since we can just substitute for the literals according to $C$, and see if the result is true.
     }
 
     \subparag{SAT}{
@@ -148,7 +153,7 @@
         We define the following language: 
         \autoeq[s]{\text{GI-verify} = \left\{\left\langle G_1, G_2, C \right\rangle \suchthat C: V\left(G_1\right) \mapsto V\left(G_2\right) \text{ is a graph ismorophism}\right\}}
         
-        We notice that GI-verify is $P$. Indeed, we only need to iterate over the edges (which is quadratic in the number of vertices) and check that: 
+        We notice that GI-verify is P. Indeed, we only need to iterate over the edges (which is quadratic in the number of vertices) and check that: 
         \[\left\{u, v\right\} \in E\left(G_1\right) \iff \left\{C\left(u\right), C\left(v\right)\right\} \in E\left(G_2\right)\]
     }
 
@@ -205,17 +210,17 @@
     }
 }
 
-\parag{Definition: $NP$}{
-    \important{$NP$} is the class of languages that have polynomial-time verifiers.
+\parag{Definition: NP}{
+    \important{NP} is the class of languages that have polynomial-time verifiers.
 }
 
 \parag{Observations}{
     We trivially notice that: 
-    \[P \subseteq NP\]
+    \[\text{P} \subseteq \text{NP}\]
     
     Indeed, we can make a verifier which just uses the decider, and ignores the given certificate. It indeed runs in polynomial time.
 
-    Now, we don't know if $P = NP$. This is actually one of the 7 millennium problems, showing its difficulty. However, most researchers actually think that $P \neq NP$, since, otherwise, it would for instance be very easy to prove theorems (since we can verify that a proof is correct in polynomial time).
+    Now, we don't know if $\text{P} = \text{NP}$. This is actually one of the 7 millennium problems, showing its difficulty. However, most researchers actually think that $\text{P} \neq \text{NP}$, since, otherwise, it would for instance be very easy to prove theorems (since we can verify that a proof is correct in polynomial time).
 }
 
 
