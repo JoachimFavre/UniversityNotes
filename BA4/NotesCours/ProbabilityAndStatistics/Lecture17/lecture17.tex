@@ -1,0 +1,90 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-04-27 at 13:20:20.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Jeudi 27 avril 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{17}{2023-04-27}{Blackboard lesson}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the theorem allowing to compute the marginal distribution of any jointly Gaussian random vector.
+    \item Explanation of the theorem allowing to compute the conditional distribution of any jointly Gaussian random vector.
+\end{itemize}
+
+}
+
+\parag{Example 2}{
+    Let $X \followsdistr \mathcal{N}\left(1, 4\right)$ and $Y \followsdistr \mathcal{N}\left(-1, 9\right)$ such that $\left(X, Y\right)$ are jointly Gaussian, and: 
+    \[\corr\left(X, Y\right) = -\frac{1}{6}\]
+
+    We want to compute the distribution of $W = X + Y$. Let us begin by computing $\Cov\left(X, Y\right)$: 
+    \[\Cov\left(X, Y\right) = \sqrt{\Var\left(X\right)\Var\left(Y\right)}\corr\left(X, Y\right) = 2\cdot 3\cdot \frac{-1}{6} = -1\]
+
+    Now, we compute the distribution of $\begin{pmatrix} X & Y \end{pmatrix}^T$. The expectation vector is the expectancies stacked, and the covariance matrix has $\Cov\left(X, Y\right)$ on its non-diagonal element: 
+    \[\begin{pmatrix} X \\ Y \end{pmatrix} \followsdistr \mathcal{N}_2\left(\begin{pmatrix} 1 \\ -1 \end{pmatrix}, \begin{pmatrix} 4 & -1 \\ -1 & 9 \end{pmatrix}\right)\]
+
+    We finally notice that we can write $W = \begin{pmatrix} 1 & 1 \end{pmatrix} \begin{pmatrix} X \\ Y \end{pmatrix} $, so, by our theorem, we have: 
+    \[\begin{pmatrix} 1 & 1 \end{pmatrix} \begin{pmatrix} X \\ Y \end{pmatrix} \followsdistr \mathcal{N}\left(\begin{pmatrix} 1 & 1 \end{pmatrix} \begin{pmatrix} 1 \\ -1 \end{pmatrix} , \begin{pmatrix} 1 & 1 \end{pmatrix} \begin{pmatrix} 4 & -1 \\ -1 & 9 \end{pmatrix} \begin{pmatrix} 1 \\ 1 \end{pmatrix} \right) = \mathcal{N}\left(0, 1\right)\]
+    
+    We notice that the fact the expectancy is 0 makes sense: $X$ and $Y$ have opposite expectancies, so adding them up should indeed give: 
+    \[\exval\left(X + Y\right) = \exval\left(X\right)+ \exval\left(Y\right) = 1 - 1 = 0\]
+}
+
+\parag{Example 3}{
+    Let us consider $X_1, \ldots, X_4 \iid \mathcal{N}\left(0, \sigma^2\right)$, and $Y = BX$ where: 
+    \[B = \begin{pmatrix} 1 & -1 & -1 & -1 \\ 1 & -1 & 1 & 1 \\ 1 & 1 & -1 & 1 \\ 1 & 1 & 1 & -1 \end{pmatrix} \]
+
+    We notice that $B$ has orthogonal vectors, which are all of squared norm 4. This means $B B^T = 4 I_4$.
+    
+    Since $X = \begin{pmatrix} X_1 & X_2 & X_3 & X_4 \end{pmatrix}^T$ are independent and Gaussian, they are jointly Gaussian: 
+    \[X \followsdistr \mathcal{N}_4\left(0, \sigma^2 I_4\right)\]
+    
+    We then get that: 
+    \[Y = BX \followsdistr \mathcal{N}_4\left(0, \sigma^2 B B^T \right) = \mathcal{N}_4\left(0, 4\sigma^2 I_4\right)\]
+}
+
+\parag{Theorem: Marginal}{
+    Let $X \followsdistr \mathcal{N}_p\left(\mu_{p\times 1}, \Omega_{p \times p}\right)$ and  $\mathcal{A} \subset \left\{1, \ldots, p\right\}$. 
+
+    Then, we have:
+    \[X_{\mathcal{A}} \followsdistr \mathcal{N}_{\left|\mathcal{A}\right|} \left(\mu_{\mathcal{A}}, \Omega_{\mathcal{A}}\right)\]
+    
+    \subparag{Remark}{
+        The important thing to remember from this theorem is that any marginal distribution of some jointly Gaussian distribution, is also jointly Gaussian.
+    }
+}
+
+\parag{Theorem: Conditional}{
+    Let $X \followsdistr \mathcal{N}_p\left(\mu_{p\times 1}, \Omega_{p \times p}\right)$, and $\mathcal{A}, \mathcal{B} \subset \left\{1, \ldots, p\right\}$ such that $\mathcal{A} \cap \mathcal{B} = \o$ and $\mathcal{A} \cup \mathcal{B} = \left\{1, \ldots, p\right\}$ (in other words, $\mathcal{A}$ and $\mathcal{B}$ partition $\left\{1, \ldots, p\right\}$).
+
+    If $\Omega$ is positive-definite, then:
+    \[X_{\mathcal{A}}|X_{\mathcal{B}} = x_{\mathcal{B}}\followsdistr \mathcal{N}_{\left|\mathcal{A}\right|} \left(\mu_{\mathcal{A}} + \Omega_{\mathcal{AB}} \Omega^{-1}_{\mathcal{B}} \left(x_{\mathcal{B}} - \mu_{\mathcal{B}}\right), \Omega_{\mathcal{A}} - \Omega_{\mathcal{A}\mathcal{B}}\Omega_{\mathcal{B}}^{-1} \Omega_{\mathcal{B}\mathcal{A}}\right)\]
+    where $\Omega_{\mathcal{A}\mathcal{B}}$ is the matrix $\Omega$ where we keep the rows $\mathcal{A}$ and the columns $\mathcal{B}$.
+
+    \subparag{Remark}{
+        This formula must definitely not be learnt by heart, and will be given at the exam. However, the important thing to remember is that conditioning a jointly Gaussian distribution over another jointly Gaussian distribution also gives a jointly Gaussian distribution.
+    }
+}
+
+\parag{Example}{
+    Let's consider the following random variable vector: 
+    \[\begin{pmatrix} X_1 \\ X_2 \end{pmatrix} \followsdistr \mathcal{N}_2\left(\begin{pmatrix} 180 \\ 70 \end{pmatrix}, \begin{pmatrix} 225 & 90 \\ 90 & 100 \end{pmatrix} \right)\]
+    
+    We notice $\mathcal{A} = \left\{1\right\}$ and $\mathcal{B} = \left\{2\right\}$, so we can then plug everything in the formula to get $X_1 | X_2 = x_2$: 
+    \[\exval\left(X_1 | X_2 = x_2\right) = \mu_{\mathcal{A}} + \Omega_{\mathcal{AB}} \Omega_{\mathcal{B}}^{-1} \left(x_{\mathcal{B}} - \mu_{\mathcal{B}}\right) = 180 + 90\cdot \frac{1}{100} \left(x_2 - 70\right) = 117 + 0.9x_2\] 
+    \[\Var\left(X_1 | X_2 = x_2\right) = \Omega_{\mathcal{A}} - \Omega_{\mathcal{AB}} \Omega_{\mathcal{B}}^{-1} \Omega_{\mathcal{BA}} = 225 - 90\cdot \frac{1}{100} \cdot 90 = 144\]
+
+    This thus means that: 
+    \[X_1 | X_2 = x_2 \followsdistr \mathcal{N}\left(117 + 0.9x_2, 144\right)\]
+}
+
+\end{document}

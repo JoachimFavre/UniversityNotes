@@ -1,0 +1,225 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-05-04 at 13:19:38.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Jeudi 04 mai 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{19}{2023-05-04}{Slowly starting to do statistics}{
+\begin{itemize}[left=0pt]
+    \item Definition of convolutions.
+    \item Proof of the theorem making a link between the sum of random variables and the convolution of their PMFs or PDFs.
+    \item Definition of order statistics, minimum and maximum.
+    \item Proof of a theorem giving the CDF of the minimum and maximum of IID random variables.
+\end{itemize}
+
+}
+
+\parag{Example 1}{
+    Let $X_1, X_2 \iid \mathcal{N}\left(0, 1\right)$. We want to compute the joint distribution $Y = \left(X_1 + X_2, X_1 - X_2\right)$.
+
+    We want to use transformation theorem. We notice that: 
+    \[\left|J\left(x_1, x_2\right)\right| = \left|\det B\right| = \left|-2\right| = 2\]
+
+    Now, we also need to be able to write our $x$'s as functions of $y$'s: 
+    \[\begin{pmatrix} X_1 \\ X_2 \end{pmatrix} = B^{-1} \begin{pmatrix} Y_1 \\ Y_2 \end{pmatrix} = -\frac{1}{2} \begin{pmatrix} -1 & -1 \\ -1 & 1 \end{pmatrix} \begin{pmatrix} Y_1 \\ Y_2 \end{pmatrix} \]
+    
+    This tells us that: 
+    \autoeq{f_{Y_1, Y_2}\left(y_1, y_2\right) = f_{X_1, X_2}\left(\frac{y_1 + y_2}{2}, \frac{y_1 - y_2}{2}\right) \frac{1}{\left|J\left(\frac{y_1 + y_2}{2}, \frac{y_1 - y_2}{2}\right)\right|} = \frac{1}{2} \cdot  \frac{1}{2\pi} \exp\left(-\frac{1}{4} \left(y_1^2 + y_2^2\right)\right)}
+    
+    We thus see that $Y_1, Y_2 \iid \mathcal{N}\left(0, 2\right)$. Naturally, we could  also have used the properties of jointly Gaussian distributions, since IID Gaussian variables are jointly Gaussian.
+}
+
+\parag{Example 2}{
+    Let us consider $X_1, X_2 \iid \exp\left(\lambda\right)$. We want to compute the joint density of: 
+    \[Y = \begin{pmatrix} Y_1 \\ Y_2 \end{pmatrix} = \begin{pmatrix} X_1 + X_2 \\ \frac{X_1}{X_1 + X_2} \end{pmatrix} = g\left(X\right)\]
+    
+    Since they are IID, we have that: 
+    \[f\left(x_1, x_2\right) = \lambda^2 \exp\left(-\lambda\left(x_1 + x_2\right)\right)I\left(x_1 \geq 0\right)I\left(x_2 \geq 0\right)\]
+    
+    Now, we need to compute the inverse map of $g$, $h$. This is not affine, so there is no general formula. From the problem, we notice that: 
+    \[y_1 y_2 = x_1\]
+    
+    Now, we can use this to get: 
+    \[y_1 = x_1 + x_2 = y_1 y_2 + x_2 \iff x_2 = y_1\left(1 - y_2\right)\]
+    
+    This finally gives us that: 
+    \[x = h\left(y_1, y_2\right) = \begin{pmatrix} y_1y_2 \\ y_1\left(y_1 - y_2\right) \end{pmatrix} \]
+
+    After that, we need to compute the Jacobian of $g$:
+    \[\left|J_g\left(x_1, x_2\right)\right| = \left|\det \begin{pmatrix} 1 & 1 \\ \frac{x_2}{\left(x_1 + x_2\right)^2} & -\frac{x_1}{\left(x_1 + x_2\right)^2} \end{pmatrix}\right| = \left|-\frac{x_1 + x_2}{\left(x_1 + x_2\right)^2}\right| = \frac{1}{x_1 + x_2} = \frac{1}{y_1}\] 
+    
+    Another way to see this is that: 
+    \[\left|J_g\left(x_1, x_2\right)\right| = \left|J_h\left(y_1, y_2\right)\right|^{-1} = \left|\det\begin{pmatrix} y_2 & y_1 \\ 1 - y_2 & -y_1 \end{pmatrix} \right|^{-1} = \left|y_1\right|^{-1} = \frac{1}{y_1}\]
+    
+    By using our transformation theorem, this yields that: 
+    \autoeq{f_{Y_1, Y_2}\left(y_1, y_2\right) = \left|\frac{1}{J_g\left(x_1, x_2\right)}\right| f_{X_1, X_2}\left(x_1, x_2\right) = y_1 \lambda^2 \exp\left(-\lambda \left(x_1 + x_2\right)\right) I\left(x_1 > 0\right)I\left(x_2 > 0\right) = y_1 \lambda^2 \exp\left(-\lambda y_1\right)I\left(y_1 y_2 > 0\right) I \left(y_1 \left(1 - y_2\right) > 0\right) = \underbrace{y_1 \lambda^2 \exp\left(-\lambda y_1\right)I\left(y_1 > 0\right)}_{f_{Y_1}\left(y_1\right)}\underbrace{I\left(0 < y_2 < 1\right)}_{f_{Y_2}\left(y_2\right)}}
+    
+    We notice that this is a product of two densities meaning that they are independent. This tells us that $Y_1 \followsdistr \text{Gamma}\left(2, \lambda\right)$ and $Y_2 \followsdistr U\left(0, 1\right)$ independently.
+}
+
+\parag{Definition: Discrete convolution}{
+    Let $X, Y$ be discrete random variables with PMFs $f_X, f_Y$. The convolution of their PMFs is: 
+    \[f_X * f_Y\left(s\right) = \sum_{x}^{} f_X\left(x\right)f\left(s- x\right)\]
+    
+}
+
+\parag{Definition: Continuous convolution}{
+    Let $X, Y$ be continuous random variable with PDFs $f_X, f_y$. The convolution of their PDFs is: 
+    \[f_X * f_Y\left(s\right) = \int_{-\infty}^{\infty} f_X\left(x\right)f_Y\left(s- x\right)dx\]
+}
+
+\parag{Remark}{
+    The convolution $f_{X_1} * f_{X_2}$ produces a new function, which we can evaluate: $\left(f_{X_1}* f_{X_2}\right)\left(x\right)$. However, in this course, we simplify the notation by writing: 
+    \[\left(f_{X_1}* f_{X_2}\right)\left(x\right) = f_{X_1}* f_{X_2}\left(x\right)\]
+}
+
+
+\parag{Theorem}{
+    Let $X, Y$ be independent random variables with PMF or PDF $f_X, f_Y$.
+
+    The PMF of PDF of their sum $S = X + Y$ is: 
+    \[f_S\left(s\right) = f_X * f_Y\left(s\right)\]
+    
+    \subparag{Proof}{
+        The idea is to make the following change of variable: 
+        \[\begin{pmatrix} W \\ S \end{pmatrix} = \begin{pmatrix} X \\ X + Y \end{pmatrix} = \begin{pmatrix} 1 & 0 \\ 1 & 1 \end{pmatrix} \begin{pmatrix} X \\ Y \end{pmatrix} \implies \begin{pmatrix} X \\ Y \end{pmatrix} = \begin{pmatrix} W \\ S - W \end{pmatrix} \]
+        
+        The Jacobian is: 
+        \[\left|J\left(x, y\right)\right| = \left|\det \begin{pmatrix} 1 & 0 \\ 1 & 1 \end{pmatrix} \right| = 1\]
+        
+        Thus, by applying our transformation theorem: 
+        \[f_{W, S}\left(w, s\right) = f_{X, Y}\left(x, y\right) \frac{1}{\left|J\left(x, y\right)\right|} = f_{X}\left(x\right)f_Y\left(y\right) = f_X\left(w\right)f_Y\left(s-w\right)\]
+        since $X$ and $Y$ are independent.
+
+        We can now marginalise this distribution to get the one of $S$. In the continuous case, we get: 
+        \[f_S\left(s\right) = \int_{-\infty}^{\infty} f_X\left(w\right)f_Y\left(s-w\right)dw\]
+        as required.
+
+        \qed
+    }
+
+    \subparag{Other proof}{
+        We want to make another proof, which will be more intuitive and natural.
+
+        Let's start with the CDF, since it is easier to reason about them. We notice that, using the theorem of total probability: 
+        \autoeq{F_{X + Y}\left(y\right) = \prob\left(X + Y \leq y\right) = \int_{-\infty}^{\infty} \prob\left(X + Y \leq y | X = z\right)f_{X}\left(z\right)dz = \int_{-\infty}^{\infty} \prob\left(Y \leq y - z | X = z\right) f_{X}\left(z\right)}
+        
+        Now, we now that $X$ and $Y$ are indepdnent, so $\prob\left(Y \leq y-z | X = z\right) = \prob\left(Y \leq y- z\right)$, giving us that: 
+        \autoeq{F_{X+ Y}\left(y\right) = \int_{-\infty}^{\infty} \prob\left(Y \leq y - z\right) f_X\left(z\right)dz = F_{Y}\left(y-z\right) f_{X}\left(z\right)dz}
+        
+        After that, we can differentiate to get the PDF. In this course, we are always working with sufficiently well-behaved functions, so we can bring the derivative inside of the integral: 
+        \autoeq{f_{X_1 + X_2}\left(y\right) = \int_{-\infty}^{\infty} \frac{d}{dy} F_{Y}\left(y - z\right) f_X\left(z\right)dz = \int_{-\infty}^{\infty} f_Y\left(y-z\right)f_X\left(z\right)dz}
+        
+        \qed
+    }
+    
+
+    \subparag{Personal remark}{
+        There is a great 3Blue1Brown video where they explain the intuition behind this result:
+        \begin{center}
+            \url{https://www.youtube.com/watch?v=KuXjwB4LzSA}
+        \end{center}
+    }
+}
+
+\parag{Theorem}{
+    Let $X_1, \ldots, X_n$ be independent random variables with PDF $f_{X_1}, \ldots, f_{X_n}$.
+
+    The PDF of their sum $S = X_1 + \ldots + X_n$ is: 
+    \[f_S\left(s\right) = f_{X_1} * \ldots * f_{X_n}\left(s\right)\]
+    
+    \subparag{Remark}{
+        This theorem is nice, but it is often not usable in practice: convolutions can be really heavy to compute. 
+
+        Often, if $n > 2$, it is easier to use MGFs to turn sum of independent random variables into products, and handle such expressions without using any convolution.
+    }
+}
+
+
+\subsection{Order statistics}
+
+\parag{Definition: Order statistics}{
+    Let $X_1, \ldots, X_n$ be random variables.
+
+    The \important{order statistics} of those random variables are the ordered values: 
+    \[X_{\left(1\right)} \leq \ldots \leq X_{\left(n\right)}\]
+    
+    If moreover they are continuous, then we cannot have any equality, so: 
+    \[X_{\left(1\right)} < \ldots < X_{\left(n\right)}\]
+}
+
+\parag{Definition: Minimum}{
+     Let $X_1, \ldots, X_n$ be random variables. The \important{minimum} is $X_{\left(1\right)}$.
+}
+
+\parag{Definition: Maximum}{
+     Let $X_1, \ldots, X_n$ be random variables. The \important{maximum} is $X_{\left(n\right)}$.
+}
+
+
+\parag{Definition: Median}{
+     Let $X_1, \ldots, X_n$ be random variables. The \important{median}, the central value, is 
+     \[\begin{systemofequations} X_{\left(m+1\right)}, & n = 2m + 1 \\ \dfrac{X_{\left(m\right)} + X_{\left(m+1\right)}}{2}, & n = 2m \end{systemofequations}\]
+
+     \subparag{Remark}{
+         This definition is not important.
+     }
+}
+
+\parag{Theorem}{
+    Let $X_1, \ldots, X_n \iid F$ be continuous random variables with PDF $f$ and CDF $F$. Then:
+    \begin{enumerate}
+        \item $\prob\left(X_{\left(1\right)} \leq x\right) = 1 - \left(1 - F\left(x\right)\right)^n$
+        \item $\prob\left(X_{\left(n\right)} \leq x\right) = F\left(x\right)^n$
+        \item $f_{X_{\left(r\right)}}\left(x\right) = \frac{n!}{\left(r-1\right)!\left(n-r\right)!} F\left(x\right)^{r-1} f\left(x\right)\left(1 - F\left(x\right)\right)^{n-r}$
+    \end{enumerate}
+    
+    \subparag{Remark}{
+        The last property does not have to be known.
+    }
+    
+    \subparag{Proof 1}{
+        We notice that: 
+        \autoeq{\prob\left(X_{\left(1\right)} \leq y\right) = \prob\left(\min\left(X_1, \ldots, X_n\right) \leq y\right) = 1 - \prob\left(\min\left(X_1, \ldots, X_n\right) \geq y\right) = 1 - \prob\left(X_1 \geq y \cap \ldots \cap X_n \geq y\right) = 1 - \prob\left(X_1 > y\right) \cdots \prob\left(X_n > y\right) = 1 - \prob\left(X > n\right)^n = 1 - \left(1 - \prob\left(X < n\right)\right)^n = 1 - \left(1 - F\left(x\right)\right)^n}
+        
+    }
+
+    \subparag{Proof 2}{
+        This proof is very similar to the one we just did: 
+        \[\prob\left(X_{\left(n\right)} \leq x\right) = \prob\left(\max\left(X_1, \ldots, X_n\right) \leq x\right) = \prob\left(X \leq x\right)^n = F\left(x\right)^n\]
+
+        \qed
+    }
+}
+
+\parag{Example}{
+    Two people arrive late uniformly at random from 0 to 1 hour after the appointed time. We want to compute the expected time at which they will have both arrived.
+
+    We have $X_1, X_2 \iid U\left(0, 1\right)$, and we want to compute the PDF of $V = X_{\left(2\right)}$. By our theorem, we know that: 
+    \[F_{V}\left(v\right) = v^2\]
+    
+    Thus, we get that: 
+    \[f_V\left(v\right) = \frac{d\left(v^2\right)}{dv} = 2v\]
+    
+    We can now compute the expected value: 
+    \[\exval\left(V\right) = \int_{0}^{1} 2v \cdot v dv = \frac{2}{3}\]
+
+    This means that, on average, they will both have arrived 40 minutes after the appointed time.
+
+    We could do a similar analysis to get that $\exval\left(X_{\left(1\right)}\right) = \exval\left(U\right) = \frac{1}{3}$. Now, if we wanted to know the average waiting time of the first arrived $W = V - U$, we can use the linearity of the expectations to get: 
+    \[\exval\left(W\right) = \exval\left(V - U\right) = \exval\left(V\right) - \exval\left(U\right) = \frac{1}{3}\]
+    
+    Note that $U$ and $V$ are definitely not independent, but we do not need this property for the expectations to be linear.
+}
+
+\end{document}

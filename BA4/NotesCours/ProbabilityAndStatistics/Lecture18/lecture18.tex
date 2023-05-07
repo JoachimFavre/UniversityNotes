@@ -1,0 +1,152 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-05-02 at 13:18:12.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Mardi 02 mai 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{18}{2023-05-02}{Weird structure}{
+\begin{itemize}[left=0pt]
+    \item Proof of the PDF of jointly Gaussian random variables.
+    \item Explanation of the formula allowing to do transformations of jointly continuous random variable.
+\end{itemize}
+
+}
+
+\parag{Proposition}{
+    Let $X = \left(X_1, \ldots, X_p\right)^T$ and $X_i \followsdistr \mathcal{N}\left(0, \sigma_i^2\right)$ are all independent. In other words:
+    \[X \followsdistr \mathcal{N}_p\left(0, \begin{pmatrix} \sigma_1^2 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & \sigma_p^2 \end{pmatrix}\right) = \mathcal{N}_p\left(0, \Omega\right)\]
+
+    Then:
+    \[f_X\left(x\right) = \frac{1}{\sqrt{2\pi}^p \sqrt{\det \Omega}} \exp\left(-\frac{1}{2} x^T \Omega^{-1} x\right)\]
+    
+    \subparag{Observation}{
+        This allows us to compute the PDF of $X$ when $\Omega$ is diagonal, but we are not yet able to compute it for the other cases.
+    }
+    
+    \subparag{Remark}{
+        This follows the observation we made earlier: any independent Gaussian variables are jointly Gaussian (which is not necessarily true if they are dependent).
+    }
+
+    \subparag{Proof}{
+        The proof is rather straightforward:
+        \autoeq{f_X\left(x\right) = \prod_{i=1}^{p} f_{X_i}\left(x_i\right) = \prod_{i=1}^{p} \frac{1}{\sqrt{2\pi \sigma_i}} \exp\left(-\frac{x_i^2}{2 \sigma_i}\right)= \frac{1}{\sqrt{2\pi}^p \prod_{i=1}^{p}  \sigma_i} \exp\left(- \frac{1}{2}x^T \begin{pmatrix} \frac{1}{\sigma_1^2} & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & \frac{1}{\sigma_p^2} \end{pmatrix} x\right) = \frac{1}{\sqrt{2\pi}^p \sqrt{\det \Omega}} \exp\left(-\frac{1}{2} x^T \Omega^{-1} x\right)}
+
+        \qed
+    }
+}
+
+\parag{Theorem: PDF of jointly Gaussian variables}{
+    Let $X \followsdistr \mathcal{N}_p\left(0, \Omega\right)$ be non-degenerate (meaning that $\Omega$ is positive definite). Then: 
+    \[f_X\left(x\right) = \frac{1}{\sqrt{2\pi}^p \sqrt{\det \Omega}} \exp\left(-\frac{1}{2} x^T \Omega^{-1} x\right)\]
+    
+    \subparag{Proof}{
+        We want to use a random variables transformation. Transformation of random vectors comes right after \textit{(and I'm not sure why the structure was chosen to be that way in this course)}, but this is very similar to the 1D case.
+
+        Let $X \followsdistr \mathcal{N}\left(0, I\right)$. We define $Y = AX$ such that $Y \followsdistr \mathcal{N}\left(0, \Omega\right)$. As we saw some lectures ago, this requires: 
+        \autoeq{A = \sqrt{\Omega}^{-1} = \sqrt{U D U^T}^{-1} = \sqrt{U D^{\frac{1}{2}} \left(U D^{\frac{1}{2}}\right)^T}^{-1} \implies A  = \left(U D^{\frac{1}{2}}\right)^{-1} = D^{-\frac{1}{2}} U^T}
+
+        Now, we need to compute the Jacobian. We notice that the element in the $i, j$ position is: 
+        \[\left(J\left(X\right)\right)_{i, j} = \frac{\partial A_i x}{\partial x_j}  = \frac{\partial \left(\sum_{k=1}^{p} A_{ik} x_k\right)}{\partial x_j} = A_{ij}\]
+        
+        We thus get that $J\left(X\right) = A$. Now, we can apply the transformation equation (again, it will be explained shortly after, though this is completely analogous to the 1D case):
+        \[f_Y\left(y\right) = \frac{1}{\left|\det J\left(X\right)\right|} f_X\left(x\right) = \frac{1}{\left|\det A\right|} \frac{1}{\sqrt{2\pi}^p} e^{-\frac{1}{2} y^T \left(A^{-1}\right)^T A^{-1} y}\]
+
+        However, we know that: 
+        \autoeq{\det\left(A\right) = \det\left(U\right) \det\left(D^{\frac{1}{2}}\right) = 1 \cdot \det\left(\sqrt{\lambda_1} \cdots \sqrt{\lambda_n}\right) \implies \left|\det\left(A\right)\right| = \left|\sqrt{\lambda_1 \cdots \lambda_n}\right| = \sqrt{\det\left(\Omega\right)}}
+        
+        Moreover, by definition of $A$, we know that:
+        \[A A^T = \Omega \iff \left(A^{-1}\right)^T A^{-1} = \Omega^{^{-1}}\]
+
+        We have thus indeed got that: 
+        \[f_Y\left(y\right) = \frac{1}{\sqrt{2\pi}^p \sqrt{\det\left(\Omega\right)}} e^{-\frac{1}{2} y^T \Omega^{-1} y}\]
+
+        \qed
+    }
+}
+
+\parag{Example}{
+    Let us consider: 
+    \[\begin{pmatrix} X_1 \\ X_2 \end{pmatrix} \followsdistr \mathcal{N}\left(0, \begin{pmatrix} 1 & \rho \\ \rho & 1 \end{pmatrix} \right)\]
+    
+    By our conditioning of jointly Gaussian random variables theorem, we know that:
+    \[X_1 | X_2 = x_2 \followsdistr \mathcal{N}\left(\rho x_2, 1- \rho^2\right)\]
+
+    We want to verify this particular case using the PDF of jointly Gaussian random variables.
+
+    \subparag{Verifiation}{
+        By definition, we know that: 
+        \[f_{X_2|X_1}\left(x_2|x_1\right) = \frac{f_{X_1, X_2}\left(x_1, x_2\right)}{f_{X_1}\left(x_1\right)}\]
+        
+        Now, we can apply our formulas: 
+        \autoeq{f_{X_2|X_1}\left(x_2|x_1\right) = \frac{\frac{1}{\left(2\pi\right)^{\frac{2}{2}}} \frac{1}{\sqrt{\det \Omega}} \exp\left(-\frac{1}{2} \begin{pmatrix} x_1 & x_2 \end{pmatrix} \Omega^{-1} \begin{pmatrix} x_1 \\ x_2 \end{pmatrix}\right)}{\frac{1}{\sqrt{2\pi}} \exp\left(-\frac{x_1^2}{2}\right)} = \frac{1}{\sqrt{2\pi}\sqrt{\det \Omega}} \exp\left(-\frac{1}{2} \begin{pmatrix} x_1 & x_2 \end{pmatrix} \Omega^{-1} \begin{pmatrix} x_1 \\ x_2 \end{pmatrix} + \frac{x_1^2}{2}\right)}
+        
+        To inverse a positive semi-definite matrix, a good idea is to diagonalise it (we could naturally also use the formula for inverting 2D matrices, though this would be less general). We notice that its eigenvalue-eigenvector pairs are: 
+        \[\left(1+p, \frac{1}{\sqrt{2}} \begin{pmatrix} 1 \\ 1 \end{pmatrix} \right), \mathspace \left(1-p, \frac{1}{\sqrt{2}} \begin{pmatrix} 1 \\ -1 \end{pmatrix} \right)\]
+        
+        This gives us that: 
+        \autoeq{\Omega^{-1} = U D^{-1} U^T = \frac{1}{2}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} \begin{pmatrix} \frac{1}{1 + \rho} & 0 \\ 0 & \frac{1}{1 -\rho} \end{pmatrix} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} = \frac{1}{1 - \rho^2}\begin{pmatrix} 1 & -\rho \\ -\rho & 1 \end{pmatrix}}
+        
+        We then get that: 
+        \[\frac{1}{2}\begin{pmatrix} x_1 & x_2 \end{pmatrix} \Omega^{-1} \begin{pmatrix} x_1 \\ x_2 \end{pmatrix} = \frac{x_1^2  - 2\rho x_1 x_2 + x_2^2}{1 - \rho^2} \]
+
+        Let us now consider the exponent of $f_{X_2|X_1}\left(x_2|x_1\right)$: 
+        \[-\frac{x_1^2  - 2\rho x_1 x_2 + x_2^2}{1 - \rho^2} + \frac{x_2^2}{2} = -\frac{\left(x_1 - \rho x_2\right)^2}{2\left(1 - \rho^2\right)}\]
+        
+        We thus finally get that: 
+        \[f_{X_1|X_2}\left(x_1|x_2\right) = \frac{1}{\sqrt{2\pi} \left(1 - \rho^2\right)} \exp\left(-\frac{1}{2\left(1 - \rho^2\right)}\left(x_1 - \rho x_2\right)^2\right)\]
+        since $\det \Omega = \left(1 - \rho\right)\left(1 + \rho\right)$ because it is the product of the eigenvalues.
+
+        We recognise the formula of the 1D Gaussian distribution, which indeed tells us that:
+        \[X_1 | X_2 = x_2 \followsdistr \mathcal{N}\left(\rho x_2, 1- \rho^2\right)\]
+        
+    }
+}
+
+\subsection{Transformation}
+\parag{Definition: Jacobian}{
+    Let $X = \left(X_1, \ldots, X_n\right)$ be a continuous random vector, and let $Y = g\left(X\right)$: 
+    \[Y = \begin{pmatrix} Y_1 \\ \vdots \\ Y_n \end{pmatrix} = \begin{pmatrix} g_1\left(X_1, \ldots, X_n\right) \\ \vdots \\ g_n\left(X_1, \ldots, X_n\right) \end{pmatrix} \]
+    
+    Their \important{Jacobian} is given by: 
+    \[J_g\left(x_1, \ldots, x_n\right) = \det\begin{pmatrix} \frac{\partial g_1}{\partial x_1}  & \cdots & \frac{\partial g_1}{\partial x_n}  \\ \vdots & \ddots & \vdots \\ \frac{\partial g_n}{\partial x_1}  & \cdots & \frac{\partial g_n}{\partial x_n}  \end{pmatrix} \in \mathbb{R}\]
+
+    If this is unambiguous, we shorten $J_g\left(X\right) = J\left(X\right)$.
+}
+
+
+\parag{Theorem: Transformation}{
+    Let $X = \left(X_1, \ldots, X_n\right)$ be a continuous random vector, and let $Y = g\left(X\right)$.
+
+    If their Jacobian is non-zero (meaning that $g$ is invertible), then: 
+    \autoeq{f_{Y_1, \ldots, Y_n}\left(y_1, \ldots, y_n\right) = f_{X_1, \ldots, X_n}\left(x_1, \ldots, x_n\right) \frac{1}{\left|J_g\left(x_1, \ldots, x_n\right)\right|} \eval_{x = g^{-1}\left(y\right)} = f_{X_1, \ldots, X_n}\left(g^{-1}\left(y_1, \ldots, y_n\right)\right) \left|J_{g^{-1}}\left(y_1, \ldots, y_n\right)\right|}
+    
+    \subparag{Remark}{
+        This is very similar to the 1D-case:
+        \[f_Y\left(y\right) = f_X\left(g^{-1}\left(y\right)\right) \left|\frac{dg^{-1}\left(y\right)}{dy}\right|\]
+    }
+
+    \subparag{Personal remark: Intuition}{
+        First, we note that, when we map a square of area $dA$ centered at $x$ through $g$, its area will be stretched by a factor $\left|\det J_g\left(x\right)\right|$. This is an important property of the Jacobian.
+
+        Let's now say that we have a probability $p$ to land in this square of area $dA$. When we map it through $g$, this probability must definitely not change. However, since the area increased by a factor $\left|\det J_g\left(x\right)\right|$, the probability density must decrease by a factor $\left|\det J_g\left(x\right)\right|^{-1}$.
+    }
+}
+
+\parag{Corollary}{
+    Let's say that we are given $f_X\left(x\right)$ and $Y = AX$ for some full-rank matrix $A$.
+
+    Then, we know that $\left|J\left(x\right)\right| = \left|\det\left(A\right)\right|$, and thus:
+    \[f_Y\left(y\right) = f_X\left(x\right) \left|J\left(x\right)\right|^{-1} \eval_{x = A^{-1} y}^{} = \frac{f_X\left(A^{-1} y\right)}{\left|\det A\right|}\]
+}
+
+\end{document}
