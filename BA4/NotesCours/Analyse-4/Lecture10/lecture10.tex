@@ -1,0 +1,155 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-05-04 at 15:16:30.
+
+\usepackage{../../style}
+
+\title{Analyse 4}
+\author{Joachim Favre}
+\date{Jeudi 04 mai 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2023-05-04}{Les équations différentielles \smiley}{
+\begin{itemize}[left=0pt]
+    \item Explication de la formule de Bromwich.
+    \item Explication d'un corollaire de la formule de Bromwich permettant de calculer la transformée de Laplace inverse de certaines fonctions rationnelles.
+    \item Application des transformées de Laplace au calcul d'équations différentielles linéaires à coefficients constants.
+\end{itemize}
+
+}
+
+\parag{Exemple 2}{
+    Considérons la fonction suivante: 
+    \[F\left(z\right) = \frac{1}{\left(z+1\right)\left(z^2 - 2z + 5\right)}\]
+    
+    Nous voulons trouver sa transformée de Laplace inverse. Nous allons faire une décomposition en élément simple, mais nous avons un problème: le polynôme de deuxième degré n'est pas factorisable avec des coefficients réels (et utiliser des coefficients complexes est plus calculatoire car, puisque nous commençons avec une fonction réelle, nous voulons finir avec une fonction réelle, et ceci est non-trivial). Nous sommes donc forcés de faire une décomposition en élément simple de deuxième espèce: 
+    \[F\left(z\right) = \frac{A}{z+1} + \frac{Bz + C}{z^2 - 2z + 5}\]
+
+    Nous savons que le premier terme est égal à $A\mathcal{L}\left(e^{-t}\right)$. Le deuxième terme peut être calculé en utilisant un formulaire de transformées de Laplace (par exemple à la page 261 du livre de cours).  En faisant cela, nous pouvons remarquer que: 
+    \[\mathcal{L}\left(e^{\alpha t} \cos\left(\omega t\right)\right)\left(z\right) = \frac{z - \alpha}{\left(z - \alpha\right)^2 + \omega^2}, \mathspace \cre\left(z\right) > \alpha\]
+    \[\mathcal{L}\left(e^{\alpha t} \sin\left(\omega t\right)\right)\left(z\right) = \frac{\omega}{\left(z - \alpha\right)^2 + \omega^2}, \mathspace \cre\left(z\right) > \alpha\]
+    
+    Cependant, nous nous remarquons ainsi que la décomposition en élément simple que nous avions originellement posée n'a pas une forme pratique pour nous. Utilisons plutôt la complétion du carré pour trouver que: 
+    \[z^2 - 2z + 5 = \left(z^2 - 2z + 1\right) + \left(- 1 + 5\right) = \left(z-1\right)^2 + 4 = \left(z - \alpha\right)^2  + \omega^2\]
+
+    Nous posons donc une meilleure décomposition: 
+    \autoeq{F\left(z\right) = \frac{1}{\left(z+1\right)\left(z^2 - 2z + 5\right)} = \frac{A}{z+1} + \frac{B\left(z - \alpha\right) + C \omega}{\left(z- \alpha\right)^2 + \omega^2} = \frac{A}{z+1} + B\cdot \frac{z+1}{\left(z-1\right)^2 + 4} + C \cdot \frac{2}{\left(z-1\right)^2 + 4}}
+
+    Nous cherchons donc maintenant à résoudre l'équation suivante (obtenue en multipliant les deux côtés de l'équation par $\left(z+1\right)\left(z^2 - 2z + 5\right)$):
+    \[1 = \left(\left(z-1\right)^2 + 4\right) + B\left(z-1\right)\left(z+1\right) + 2C\left(z+1\right)\]
+    
+    Nous supposons que des coefficients résolvant cette équation existent. Quand $z \to -1$, notre équation devient: 
+    \[1 = A\left(2^2 + 4\right) + 0 + 0 \iff A = \frac{1}{8}\]
+    
+    Quand $z \to 1$, nous obtenons aussi: 
+    \[1 = 4A + 0 + 4C \iff C = \frac{1}{4} - A = \frac{1}{4} - \frac{1}{8} = \frac{1}{8}\]
+    Finalement, nous n'avons plus de grosse simplification, donc nous pouvons simplement prendre $z = 0$: 
+    \[1 = A\left(1 + 4\right) + B\left(-1\right)\left(1\right) + 2\cdot C\left(1\right) \iff B = -1 + 5A + 2C = -1 + \frac{5}{8} + \frac{2}{8} = -\frac{1}{8}\]
+
+    Nous avons donc trouvé que, s'ils existent, alors $\left(A, B, C\right) = \left(\frac{1}{8}, -\frac{1}{8}, \frac{1}{8}\right)$. Nous pouvons bien vérifier ce résultat. Nous avons donc maintenant pratiquement terminé: 
+    \autoeq{f\left(t\right) = \mathcal{L}^{-1}\left(F\right)\left(t\right) = \frac{1}{8}\mathcal{L}^{-1}\left(\frac{1}{z+1}\right)\left(t\right) - \frac{1}{8}\mathcal{L}^{-1}\left(\frac{z-1}{\left(z-1\right)^2 + 4}\right)\left(t\right) + \frac{1}{8}\mathcal{L}^{-1}\left(\frac{2}{\left(z-1\right)^2 + 4}\right)\left(t\right) = \frac{1}{8}e^{-t} - \frac{1}{8} e^{t} \cos\left(2t\right) + \frac{1}{8} e^{t}\sin\left(2t\right)}
+}
+
+\parag{Théorème: Formule de Bromwich}{
+    Soient $f: \left[0, \infty\right[ \mapsto \mathbb{R}$ une fonction continue, $\gamma_0 \in \mathbb{R}$ son abscisse de convergence, $F\left(z\right) = \mathcal{L}\left(f\right)\left(z\right)$, et $\gamma > \gamma_0$ tel que: 
+    \[\int_{-\infty}^{\infty} \left|F\left(\gamma + is\right)\right|ds < \infty\]
+
+    Alors: 
+    \[f\left(t\right) = \mathcal{L}^{-1}\left(F\right)\left(t\right) = \frac{1}{2\pi}\int_{-\infty}^{\infty} F\left(\gamma + is\right) e^{t\left(\gamma + is\right)}ds\]
+    
+    
+    \subparag{Observation}{
+        La condition d'intégrabilité est extrêmement similaire à la transformée de Fourier: nous demandons à ce que la fonction soit intégrable en valeur absolue sur la droite verticale donnée par $\cre\left(z\right) = \gamma$.
+    }
+
+    \subparag{Remarque}{
+        En pratique, cette formule est rarement utilisée. Il est souvent beaucoup plus simple d'utiliser la méthode présentée dans les deux exemples précédents. Cependant, cette formule peut être utilisée pour calculer certaines intégrales si on connait une fonction et sa transformée de Laplace.
+    }
+}
+
+\parag{Exemple}{
+    Soit la fonction suivante: 
+    \[f\left(t\right) = t, \mathspace t \geq 0\]
+    
+    Nous savons déjà que: 
+    \[F\left(z\right) = \mathcal{L}\left(f\right)\left(z\right) = \frac{1}{z^2}, \mathspace \gamma_0 > 0\]
+    
+    La formule d'inversion nous dit que, pour tout $\gamma > 0$: 
+    \[t = \frac{1}{2\pi} \int_{-\infty}^{\infty} \frac{1}{\left(\gamma + is\right)^2} e^{t\left(\gamma + is\right)}ds\]
+    
+    La formule d'inversion nous a donc permis de calculer très facilement une intégrale très difficile.
+}
+
+\parag{Corollaire}{
+    Soit $F\left(z\right) = \frac{N\left(z\right)}{D\left(z\right)}: \mathbb{C} \setminus \left\{z_1, \ldots, z_n\right\}$, avec $N$ et $D$ des polynômes et tels que:
+    \[\deg\left(N\right) \geq \deg\left(D\right) + 2\]
+
+    Alors, pour $t \geq 0$: 
+    \[\mathcal{L}^{-1}\left(F\right)\left(t\right) = \sum_{i=1}^{n} \Res_{z_i}\left(F\left(z\right) e^{zt}\right)\]
+
+    \subparag{Preuve}{
+        Nous n'allons pas faire la preuve. Cependant, il est intéressant de noter qu'elle suit exactement une méthode que nous avions utilisé pour calculer la deuxième famille d'intégrales réelles à l'aide du théorème des résidus (en considérant la droite $x = \gamma$ plutôt que $x = 0$): elle utilise le théorème des résidus et la ``technique du demi-cercle''. 
+    }
+
+    \subparag{Remarque}{
+        Il y a des problèmes où la décomposition en éléments simples est plus rapide, et d'autres où il est meilleur d'utiliser ce corollaire.
+    }
+}
+
+\parag{Exemple}{
+    Considérons la fonction suivante: 
+    \[F\left(z\right) = \frac{1}{\left(z-a\right)\left(z-b\right)}\]
+    
+    Nous avons déjà vu deux manières pour calculer sa transformée de Laplace inverse. Utilisons maintenant une troisième méthode: notre corollaire. Nos hypothèses sont bien respectées, et nous avons $z_1 = a, z_2 = b$. Ce sont deux pôles d'ordre 1.
+
+    Nous posons maintenant la fonction suivante: 
+    \[\widetilde{F}\left(z\right) = \frac{e^{tz}}{\left(z-a\right)\left(z-b\right)}\]
+    
+    Nous pouvons appliquer la formule à résidus pour trouver que: 
+    \[\Res_a\left(\mathcal{F}\right) = \lim_{z \to a} \widetilde{F}\left(z\right)\left(z-a\right) = \lim_{z \to a} \frac{e^{tz}}{z-b} = \frac{e^{ta}}{a-b}\]
+    
+    Par symétrie, nous trouvons que:
+    \[\Res_b\left(\mathcal{F}\right) = \frac{e^{tb}}{b-a}\]
+
+    Nous pouvons finalement appliquer notre corollaire: 
+    \[\mathcal{L}^{-1}\left(F\right)\left(t\right) = \frac{e^{ta}}{a-b} + \frac{e^{tb}}{b - a} = \frac{e^{ta} - e^{tb}}{a - b}\]
+}
+
+\subsection{Application aux équations différentielles ordinaires}
+
+\parag{But}{
+    Le but est d'appliquer les transformées de Laplace et leurs propriétés pour résoudre des équations différentielles, à la manière des transformées de Fourier. 
+}
+
+\parag{Exemple}{
+    Nous voulons résoudre le problème de Cauchy suivant: 
+    \[\begin{systemofequations} u''\left(t\right) + u\left(t\right) = t, \mathspace t \geq 0 \\ u\left(0\right) = u'\left(0\right) = 0 \end{systemofequations}\]
+    
+    Nous appliquons une transformée de Laplace des deux cotés de l'équation différentielle, ce qui nous donne: 
+    \[\mathcal{L}\left(t\right) = \mathcal{L}\left(u'' + u\right) = \mathcal{L}\left(u''\right) + \mathcal{L}\left(u\right) = \mathcal{L}\left(u\right)z^2 - \underbrace{u\left(0\right)}_{= 0}z - \underbrace{u'\left(0\right)}_{= 0} + \mathcal{L}\left(u\right) = \mathcal{L}\left(u\right)\left(1 + z^2\right)\]
+    
+    Nous obtenons ainsi que: 
+    \[\mathcal{L}\left(u\right) = \frac{\mathcal{L}\left(t\right)}{1 + z^2} = \frac{1}{z^2\left(1 + z^2\right)}\]
+
+    Nous voulons donc maintenant uniquement trouver la transformée inverse de $\frac{1}{z^2\left(1 + z^2\right)}$. Nous pouvons utiliser le corollaire pour le calcul de transformées inverses de fonctions rationnelles, ce qui nous donne: 
+    \[u\left(t\right) = \mathcal{L}^{-1}\left(\frac{1}{z^2\left(z^2 + 1\right)}\right) = \ldots = t - \sin\left(t\right)\]
+}
+
+\parag{Remarque}{
+    La méthode que nous venons d'utiliser peut être utilisée pour résoudre n'importe quelle équation différentielle de la forme: 
+    \[\begin{systemofequations} u''\left(t\right) + bu'\left(t\right) + cu\left(t\right) = f\left(t\right), \mathspace t \geq 0 \\ u\left(0\right) = u_0, u'\left(0\right) = u_1 \end{systemofequations}\]
+    
+    Alors, la solution générale est: 
+    \[u\left(t\right) = \mathcal{L}^{-1}\left(\frac{\mathcal{L}\left(f\right)\left(z\right) + a u_0 z + a u_1 + b u_0}{az^2 + bz + c}\right)\left(t\right)\]
+    
+    Il est naturellement plus simple de réutiliser la méthode utilisée dans l'exemple précédent que de retenir cette solution générale.
+}
+
+
+
+\end{document}
