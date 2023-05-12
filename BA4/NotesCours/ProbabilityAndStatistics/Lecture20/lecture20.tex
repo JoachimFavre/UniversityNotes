@@ -1,0 +1,240 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-05-09 at 13:19:00.
+
+\usepackage{../../style}
+
+\title{ProbaStats}
+\author{Joachim Favre}
+\date{Mardi 09 mai 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{20}{2023-05-09}{Approximations}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of Markov's inequality and some of its corollaries. 
+    \item Explanation of Jensen's inequality.
+    \item Explanation of Hoeffding's inequality.
+    \item Definition of almost sure, mean square, probability and distribution convergence, and explanation of which implies which.
+\end{itemize}
+
+}
+
+\section{Approximations}
+
+\subsection{Inequalities}
+
+\parag{Theorem: Markov inequality}{
+    Let $X$ be a random variable such that $X \geq 0$, and let $a > 0$.
+
+    Then: 
+    \[\prob\left(X \geq a\right) \leq \frac{\exval\left(X\right)}{a}\]
+    
+    \subparag{Proof}{
+        Since $X \geq 0$, we can see the following inequality, using an indicator variable: 
+        \[X \geq X I\left(X \geq a\right) \geq a I\left(X \geq a\right)\]
+        
+        Taking an expectation on both sides, we get that: 
+        \[\exval\left(X\right) \geq a \exval\left(I\left(X \geq a\right)\right) = a \prob\left(X \geq a\right)\]
+        
+        This indeed allows us to conclude that: 
+        \[\prob\left(X \geq a\right) \leq \frac{\exval\left(X\right)}{a}\]
+
+        \qed
+    }
+}
+
+\parag{Corollaries}{
+    Let $X$ be an arbitrary random variables. We have the following corollaries.
+
+    \begin{enumerate}
+        \item Let $g$ be a function non-negative everywhere. Then:
+        \[\prob\left(g\left(X\right) \geq a\right) \leq \frac{\exval\left(g\left(X\right)\right)}{a}\]
+        \item We have that: 
+        \[\prob\left(\left|X\right| \geq a\right) \leq \frac{\exval\left(\left|X\right|\right)}{a}\]
+        \item (Chebyshov's inequality) We have that:
+        \[\prob\left(X \geq a\right) \leq \frac{\exval\left(X^2\right)}{a^2}\]
+        \item Let $g$ be an increasing function non-negative everywhere. Then: 
+        \[\prob\left(X \geq a\right) \leq \frac{\exval\left(g\left(x\right)\right)}{g\left(a\right)}\]
+        \item We have that: 
+        \[\prob\left(\left|X - \exval\left(X\right)\right| \geq a\right) \leq \frac{\Var\left(X\right)}{a^2}\]
+        
+            
+    \end{enumerate}
+    
+    \subparag{Proof 3}{
+        We know that: 
+        \[\prob\left(X \geq a\right) \leq \prob\left(\left|X\right| \geq a\right) = \prob\left(\left|X\right|^2 \geq a^2\right)\]
+        
+        However, we can now apply Markov's inequality to get: 
+        \[\prob\left(X \geq a\right) \leq \prob\left(X^2 \geq a^2\right) \leq \frac{\exval\left(X^2\right)}{a^2}\]
+    }
+
+    \subparag{Proof 4}{
+        We know that: 
+        \[\prob\left(X \geq a\right) = \prob\left(g\left(X\right) \geq g\left(a\right)\right) \leq \frac{\exval\left(g\left(X\right)\right)}{g\left(a\right)}\]
+    }
+    
+    \subparag{Proof 5}{
+        We can use the fact that $\prob\left(\left|Y\right| \geq a\right) \leq \frac{\exval\left(Y^2\right)}{a^2}$ by letting $Y = X - \exval\left(X\right)$: 
+        \[\prob\left(\left|X - \exval\left(X\right)\right| \geq a\right) \leq \frac{\exval\left(\left(X - \exval\left(X\right)^2\right)\right)}{a^2} = \frac{\Var\left(X\right)}{a^2}\]
+
+        \qed
+    }
+    
+}
+
+\parag{Theorem: Jensen's inequality}{
+    Let $g$ be a convex function, and $X$ be a random variable. Then: 
+    \[g\left(\exval\left(X\right)\right) \leq \exval\left(g\left(X\right)\right)\]
+    
+    \subparag{Intuition}{
+        We consider the simpler case where $X$ is a binary random variable: it outputs $a$ with probability $p$ and $b$ with probability $1-p$.
+
+        We know that $g\left(\exval\left(X\right)\right) = g\left(pa + \left(1-p\right)b\right)$ and $\exval\left(g\left(X\right)\right) = pg\left(a\right) + \left(1-p\right)g\left(b\right)$. This can be visualised as:
+        \svghere[0.9]{JensensInequality.svg}
+
+        However, the fact that $g$ is convex means that any straight line which both endpoints are on the function, is above the function. This indeed means that: 
+        \[\exval\left(g\left(X\right)\right) \geq g\left(\exval\left(X\right)\right)\]
+        
+        It is possible to use this argument to make a proof for any discrete random variable. For continuous random variables, we must use other arguments; this one is really only for the intuition.
+    }
+
+    \subparag{Remark}{
+        This result is important.
+    }
+}
+
+\parag{Exemple}{
+    Let $X_1, \ldots, X_n \iid \text{Bern}\left(p\right)$, and: 
+    \[\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i\]
+    
+    We want to bound $\prob\left(\left|\bar{X} - p\right| \geq \epsilon\right)$ for any $\epsilon > 0$.
+
+    The absolute value is not easy to manipulate, so let us begin with squaring both sides: 
+    \[\prob\left(\left|\bar{X} - p\right| \geq \epsilon\right) = \prob\left(\left(X - p\right)^2 \geq \epsilon^2\right) \leq \frac{\exval\left(\left(\bar{X} - p\right)^2\right)}{\epsilon^2}\]
+    
+    However, we notice that the numerator is the variance of $\bar{X}$. Indeed, we have that: 
+    \[\exval\left(\bar{X}\right) = \exval\left(\frac{1}{n}\sum_{i=1}^{n} X_i\right) = \frac{1}{n}\exval\left(\sum_{i=1}^{n} X_i\right) = \frac{1}{n} \cdot  n \exval\left(X_i\right) = p\]
+
+    Thus, the numerator is indeed of the form $\exval\left(\left(\bar{X} - \exval\left(X\right)\right)^2\right) = \Var\left(\bar{X}\right)$. Let us compute this: 
+    \[\Var\left(\bar{X}\right) = \Var\left(\frac{1}{n} \sum_{i=1}^{n} X_i\right) = \frac{1}{n^2} \Var\left(\sum_{i=1}^{n} X_i\right) = \frac{1}{n^2} \cdot n \Var\left(X_i\right) = \frac{p\left(1-p\right)}{n}\]
+    since $X_1, \ldots, X_n$ are independent.
+    
+    Putting everything together, we get that: 
+    \[\prob\left(\left|\bar{X} - p\right| > \epsilon\right) \leq \frac{\Var\left(\bar{X}\right)}{\epsilon^2} = \frac{p\left(1-p\right)}{n \epsilon^2}\]
+    
+    This is very interesting since the right hand side tends towards 0 as $n \to \infty$. This means that, the average of Bernoulli random variables tends towards their mean $p = \exval\left(X_i\right)$.
+}
+
+\parag{Theorem: Hoeffding's inequality}{
+    Let $Z_1, \ldots, Z_n$ be independent random variables such that $\exval\left(Z_i\right) = 0$ and such that there exists constants $a_i < b_i$ for which $a_i \leq Z_i \leq b_i$ for all $i$. Also, let $\epsilon > 0$.
+
+    Then, for all $t > 0$: 
+    \[\prob\left(\sum_{i=1}^{n} Z_i \geq \epsilon\right) \leq e^{-t \epsilon} \prod_{i=1}^{n} \exp\left(\frac{t^2 \left(b_i - a_i\right)^2}{8}\right)\]
+    
+    \subparag{Remark}{
+        Since this is true for any $t$, we can look for the $t$ which minimises the expression on the right hand side (which only requires to minimise a polynomial since the exponential is an increasing function). This usually yields an inequality which is much better than the theorems we saw before.
+    }
+
+    \subparag{Intuition}{
+        Let $X \geq 0$. We know that: 
+        \[\prob\left(X \geq a\right) \leq \frac{\exval\left(X\right)}{a}\]
+        
+        However, since $e^x$ is an increasing function which is non-negative everywhere, we get that, for an arbitrary $t > 0$: 
+        \[\prob\left(X \geq a\right) = \prob\left(e^{tX} > e^{ta}\right) \leq \frac{\exval\left(e^{tX}\right)}{e^{ta}}\]
+        
+        This inequality is known as Chernhoff's bound. Hoeffding's inequality's idea is similar, except that it uses the fact that the random variables are bounded instead of non-negative.
+    }
+}
+
+\parag{Example}{
+    Let $X_1, \ldots, X_n \iid \text{Bern}\left(p\right)$, and: 
+    \[\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i\]
+    
+    We again want to bound $\prob\left(\left|\bar{X} - p\right| \geq \epsilon\right)$ for any $\epsilon > 0$, but using a better inequality.
+
+    Let $Z_i = \frac{X_i - p}{n}$. We notice that we indeed have the main hypothesis for the Hoeffding's inequality:
+    \[\exval\left(Z_i\right) = \frac{\exval\left(X_i\right) - p}{n} = \frac{p-p}{n} = 0\]
+    
+    We now see that our expression is equivalent to: 
+    \[\prob\left(\left|\bar{X} - p\right| > \epsilon\right) = \prob\left(\bar{X} - p > \epsilon\right) + \prob\left(-\left(\bar{X} - p\right) > \epsilon\right) = \prob\left(\sum_{i=1}^{n} Z_i > \epsilon\right) + \prob\left(- \sum_{i}^{n} Z_i > \epsilon\right)\]
+
+    We know that $0 \leq X_i \leq 1$ and thus $\frac{-p}{n} \leq Z_i \leq \frac{1-p}{n}$. We can thus let $a_i = \frac{-p}{n}$ and $b_i = \frac{1-p}{n}$, giving us that: 
+    \[\left(b_i - a_i\right)^2 = \left(\frac{1}{n}\right)^2 = \frac{1}{n^2}\]
+    
+    We can then plug everything in our formula, noticing it gives the same result for $\sum_{i=1}^{n} Z_i$ and $\sum_{i=1}^{n} \left(-Z_i\right)$: 
+    \autoeq{\prob\left(\left|\bar{X} - p\right| > \epsilon\right) = \prob\left(\sum_{i=1}^{n} Z_i > \epsilon\right) + \prob\left(-\sum_{i=1}^{n} Z_i > \epsilon\right) \leq 2 e^{t \epsilon} \exp\left(t^2 \frac{1}{n^2} \frac{1}{8}\right)^n = \exp\left(\frac{t^2}{8n} - t \epsilon\right)}
+
+    We can then finally optimise this by minimising the parabola $\frac{t^2}{8n} - t \epsilon$, which is minimal at $t = 4 \epsilon n$. This gives us:
+    \[\prob\left(\left|\bar{X} - p\right| > \epsilon\right) \leq 2e^{-2n \epsilon^2}\]
+
+    This inequality converges much faster to 0: this is an exponential decay whereas Markov's inequality gave something decaying in $\Theta\left(\frac{1}{n}\right)$.
+}
+
+\subsection{Convergence}
+
+\parag{Example}{
+    Let us consider the sequence of random variables defined as: 
+    \[\prob\left(X_n = 0\right) = 1 - \frac{1}{n}, \mathspace \prob\left(X_n = n^2\right) = \frac{1}{n}\]
+    
+    We notice that: 
+    \[\lim_{n \to \infty} \prob\left(X_n = 0\right) = 1\]
+    
+    However, we also get that: 
+    \[\lim_{n \to \infty} \exval\left(X_n\right) = \lim_{n \to \infty} \left(0\left(1 - \frac{1}{n}\right) + n^2 \frac{1}{n}\right) = +\infty\]
+    
+    We thus notice that $X_n$ converges in distribution to $X = 0$ constant, even though the moments do not converge to the ones of $X = 0$.
+}
+
+\parag{Definition: Convergence}{
+    Let $X, X_1, X_2, \ldots$ be random variables with cumulative distribution function function $F, F_1, \ldots$.
+
+    Then, we define:
+    \begin{enumerate}
+        \item $X_n$ converges to $X$ \important{almost surely}, written $X_n \over{\to}{a.s.} X$, if: 
+        \[\prob\left(\lim_{n \to \infty} X_n = X\right) = 1\]
+        \item $X_n$ converges to $X$ \important{in mean square}, written $X_n \over{\to}{2} X$, if $\exval\left(X^2_n\right) < \infty$ for all $n$, $\exval\left(X^2\right) < \infty$ and: 
+        \[\lim_{n \to \infty} \exval\left(\left(X_n - X\right)^2\right) = 0\]
+        
+        \item $X_n$ converges to $X$ \important{in probability}, written $X_n \over{\to}{P} X$, if, for all $\epsilon > 0$: 
+        \[\lim_{n \to \infty} \prob\left(\left|X_n - X\right| > \epsilon\right) = 0\]
+        
+        \item $X_n$ converges to $X$ \important{in distribution}, writen $X_n \over{\to}{D} X$, if: 
+        \[\lim_{n \to \infty} F_n\left(x\right) = F\left(x\right)\]
+        everywhere $F\left(x\right)$ is continuous.
+    \end{enumerate}
+    
+    \subparag{Remark}{
+        The first definition is not important and must not be remembered, but the third one is really important.
+    }
+}
+
+\parag{Theorem}{
+    Let $X, X_1, X_2 \ldots$ be random variables. The modes of convergence imply one another as:
+    \svghere[0.5]{ConvergenceModeImplications.svg}
+
+    Note that any other implication is false in general.
+
+    \subparag{Proof}{
+        We want to show the following proposition: 
+        \[X_n \over{\to}{2} X \implies X_n \over{\to}{P} X\]
+
+        Let $\epsilon > 0$. We want to show that: 
+        \[\prob\left(\left|X_n - X\right| > \epsilon\right) = 0\]
+        
+        Markov's inequality yields: 
+        \[\prob\left(\left|X_n - X\right| > \epsilon\right) = \prob\left(\left(X_n - X\right)^2 > \epsilon^2\right) \leq \frac{\exval\left(\left(X_n - X\right)^2\right)}{\epsilon^2}\]
+        
+        However, by the definition of mean square convergence, $\exval\left(\left(X_n - X\right)^2\right)$ tends towards 0 as $n \to \infty$. Thus, this indeed means that: 
+        \[\lim_{n \to \infty} \prob\left(\left|X_n - X\right| > \epsilon\right) = 0\]
+        
+        \qed
+    }
+}
+
+\end{document}
