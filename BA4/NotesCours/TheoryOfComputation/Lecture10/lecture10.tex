@@ -1,0 +1,156 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-05-08 at 15:17:57.
+
+\usepackage{../../style}
+
+\title{Theory of computation}
+\author{Joachim Favre}
+\date{Lundi 08 mai 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2023-05-08}{More fun proofs}{
+\begin{itemize}[left=0pt]
+    \item Definition of PERFECT-3-MATCHING.
+    \item Proof that PERFECT-3-MATCHING is NP-complete.
+    \item Definition of SUBSET-SUM.
+    \item Proof that SUBSET-SUM is NP-complete.
+\end{itemize}
+
+}
+
+\parag{Definition: Perfect matchings}{
+    Let $G = \left(U \cup V, E\right)$, where $E \subseteq U \times V$, be a bipartite graph, meaning that there is some ``left part'' and some ``right part'' and edges can only go from left to right:
+    \svghere[0.25]{BipartiteGraph.svg}
+
+    We call $M \subseteq E$ a \important{matching} if each $v \in U \cup V$ has at most one incident edge. It is moreover named a \important{perfect matching} (in red in the graph above) if each $v \in U \cup V$ has exactly one incident edge, which is equivalent to having $M$ being a matching and $\left|M\right| = \left|U\right| = \left|V\right|$.
+}
+
+\parag{Definition: PERFECT-MATCHING}{
+    We define the following language: 
+    \[\text{PERFECT-MATCHING} = \left\{\left\langle G \right\rangle \suchthat G \text{ admits a perfect matching} \right\}\]
+    
+    \subparag{NP}{
+        We notice that this problem is clearly in NP: if we are given some $M$, we can easily check that it is a matching and $\left|M\right| = \left|U\right| = \left|V\right|$ in polynomial time.
+    }
+
+    \subparag{Complement}{
+        We notice that the complement of PERFECT-MATCHING is also in NP. 
+
+        We can define the neighbourhood of some $S \subseteq U$ as: 
+        \[N\left(S\right) = \left\{v \in V \suchthat \exists u \in S, \left(u, v\right) \in E\right\}\]
+        
+        In other words, it is the set of vertices reachable in $V$ from $S$. Clearly, a very reasonable necessary condition for $G$ not to admit any perfect matching is the existence of $S$ such that if $\left|S\right| > \left|N\left(s\right)\right|$. However, Hall's theorem states that this is also a sufficient condition: $G$ contains a perfect matching if and only if $S \leq \left|N\left(S\right)\right|$ for all $S \subseteq U$.
+
+        So, we can use our certificate as a subset of $U$, and check whether Hall's condition is met. This is done in polynomial time, and indeed reaches the goals of certificates.
+
+        Note that this is an open question, but many people think that, if both a language and its complement are in NP, then the language is in P; we have always managed to show that languages with this property where in P so far. In fact, if we managed to prove that this is false, we would have shown that $\text{P} \neq \text{NP}$ since P is closed under complement.
+    }
+}
+
+\parag{Edmonds' theorem}{
+    PERFECT-MATCHING is solvable efficiently: 
+    \[\text{PERFECT-MATCHING} \in P\]
+
+    \subparag{Proof}{
+        We can for instance use max flows, as seen in the Algorithms course.
+    }
+}
+
+\parag{Definition: PERFECT-3-MATCHING}{
+    Let $G = \left(U \cup V \cup W, E\right)$, where $E \subseteq U \times V \times W$, be a tripartie graph. 
+
+    A \important{perfect 3-matching} is a subset $M \subseteq E$ where each $v \in U \cup V \cup W$ appears exactly once in $M$.
+
+    We then naturally define: 
+    \[\text{PERFECT-3-MATCHING} = \left\{G \suchthat \text{$G$ admits a perfect 3-matching}\right\}\]
+    
+    \subparag{NP}{
+        Again, this problem is definitely in NP.
+    }
+}
+
+\parag{Theorem}{
+    We have the following reduction:
+    \[\text{SAT} \leq_p \text{PERFECT-3-MATCHING}\]
+
+    Since we know that PERFECT-3-MATCHING is in NP, it is also NP-complete.
+
+    \subparag{Proof}{
+        Let $\phi$ be a CNF with $n$ clauses and $m$ different variables.
+
+        The idea is to construct a graph using three types of vertices, with a total of $3mn$ vertices. The first $n$ ones are in $W$, they each represent one of the clause. We then have $mn - n$ other vertices in $W$, which will be helper ones. We finally make $m$ groups of $2n$ vertices: each group represents a different variable, and half of their vertices are in $U$, whereas the other half is in $V$.
+
+        The main thing to realise for this reduction is that we are able to link the vertices in each group using 2-edges from vertices of $U$ to vertices of $V$ so that there is only two choices for each variable (see the picture below, where vertices in green are in $U$, ones in red are in $V$ and ones in blue are in $W$): in a given group, either we always go clockwise (choosing green edges), or always go counterclockwise (choosing red edges). If we decide to go once clockwise, and once counterclockwise, then it necessarily means that a vertex will not be reached, or that it will be reached more than once. That way, we can encode the choice of setting $x_i = T$ xor $x_i = F$.
+
+        Then, we can extend each 2-edge into multiple 3-edges, by happening some vertices from $W$. First, we use a different edge representing $x_i = T$ to link to each clause where we have $x_i$, and a different edge representing $x_i = F$ to each clause where we have $\bar{x}_i$. That way, to reach each of the vertices in $W$ representing a clause, we need to make a (consistent) choice of variables to set to true. We then need to extend \textit{every} 2-edge to reach every helper vertices in $W$, which allows variables not to appear in every clause.
+
+        A partial drawing of the graph representing $\left(x \lor \bar{y}\right) \land \left(x \lor y\right) \land \left(\bar{x} \lor \bar{z}\right)$ would look like:
+        \svghere{SAT-PERFECT-3-MATCHING-reduction.svg}
+
+        It is then possible to show that this reduction indeed has the reduction property:
+        \[\phi \in \text{SAT} \iff f\left(\phi\right) \in \text{PERFECT-3-MATCHING}\]
+    }
+}
+
+\parag{Definition: SUBSET-SUM}{
+    Let $X$ be a multiset of positive integers (meaning that elements can appear multiple times in it). We define the following language: 
+    \[\text{SUBSET-SUM} = \left\{\left\langle X, s \right\rangle \suchthat \text{$X$ contains a subset whose elements sum to $s$}\right\}\]
+    
+    \subparag{Example}{
+        For instance, let us consider: 
+        \[X = \left\{1, 3, 4, 6, 13, 13\right\}\]
+        
+        Then, we have $\left\langle X, 8 \right\rangle \in \text{SUBSET-SUM}$ since we can take $T = \left\{1, 3, 4\right\}$. However, $\left\langle X, 12 \right\rangle \not \in \text{SUBSET-SUM}$.
+    }
+
+    \subparag{NP}{
+        We can notice that this problem is in NP: if we are given a multiset of number, we can verify that it is indeed a subset and that its sum equals $s$ in polynomial time.
+    }
+}
+
+\parag{Remark}{
+    We notice that we can encode the SUBSET-SUM problem in multiple ways: using binary (writing $101_2 = 5$) or unary (writing $11111_1 = 5$). Using $n$ bits we can encode number up to $2^n$ in binary, whereas we can only encode numbers up to $n$ in unary.
+
+    This is important because we measure the speed of some algorithm as a function of the size of the input. For instance, encoding everything in SUBSET-SUM using unary, makes it go in P: we can make an algorithm which is polynomial in the value of the input. However, as we will se right after, if we encode everything using binary, SUBSET-SUM is in fact NP-complete: there probably does not exist any algorithm which running time is a polynomial of the number of binary digits of the input.
+
+    When we don't mention anything, binary encoding is naturally implicit.
+}
+
+\parag{Theorem}{
+    We have the following reduction: 
+    \[\text{PERFECT-3-MATCHING} \leq_p \text{SUBSET-SUM}\]
+    
+    Since SUBSET-SUM is in NP, it implies that it is NP-complete.
+
+    \subparag{Proof}{
+        Let $n = \left|E\right|$ be the number of edges. The idea is to encode each 3-edge $e\in E \subseteq U \times V \times W$ as a $3n$-bit number in base $b = n + 1$, using only 0s and 1s.
+
+        Each vertex is represented by an $n$-digit number: it contains only zeroes except for a 1 at the $i$\Th position. Since each edge goes through three vertices, we are concatenating three $n$-bits numbers, and we thus indeed get that each edges are $3n$-digits, and that they all have $3n- 3$ zeroes and $3$ ones. 
+        \svghere{Perfect3Matching-SubsetSum-reduction.svg}
+
+        Now, we can define the SUBSET-SUM target to be a $3n$-digits number containing only 1s. This models the fact that each node is picked exactly once.
+
+        Let's suppose that $x \in \text{PERFECT-3-MATCHING}$. We know that there is a set of edges which hits each vertex exactly once. This means that, if we choose to sum their binary encoding, then there will be exactly one 1 in each column and thus the sum will contain $3n$ ones. This indeed show that, then, $f\left(x\right) \in \text{SUBSET-SUM}$.
+
+        Let's now suppose that $f\left(x\right) \in \text{SUBSET-SUM}$. We may think that carry bits are a problem since, in binary, we would have $001 + 100 + 001 + 001 = 111$ even though we did not choose a set of edges which yields a unique 1 in each column. However, since we chose to work in base $\left|E\right| + 1$, there cannot be any carry when adding at most $\left|E\right|$ numbers which digits are all at most 1. This thus means that, indeed, we can interpret the result of SUBSET-SUM as a valid 3-matching, and thus $x \in \text{PERFECT-3-MATCHING}$.
+
+        \qed
+    }
+}
+
+
+\parag{Observation}{
+    We have seen the following reduction tree of NP-complete languages:
+    \svghere{ReductionTree.svg}
+
+    We can naturally use any of those NP-complete problems when we want to show another language is NP-complete.
+}
+
+
+\end{document}
