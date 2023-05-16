@@ -1,0 +1,194 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-05-15 at 15:18:58.
+
+\usepackage{../../style}
+
+\title{Theory of computations}
+\author{Joachim Favre}
+\date{Lundi 15 mai 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2023-05-15}{I thought this would never happen}{
+\begin{itemize}[left=0pt]
+    \item Formal definition of circuits.
+    \item Proof that any Turing Machine can be converted to a circuit efficiently.
+    \item Proof of Cook-Levin theorem.
+\end{itemize}
+
+}
+
+\subsection{Cook-Levin theorem}
+\parag{Remark}{
+    We have not proven the Cook-Levin problem; that SAT is NP-complete. We will finish this course by doing this.
+}
+
+\parag{Definition: WITNESS-EXISTENCE}{
+    We define the following language: 
+    \[\text{WITNESS-EXISTENCE} = \left\{\left\langle V, x, 1^t \right\rangle \suchthat \exists y, V\left(x, y\right) = 1 \text{ in $t$ steps}\right\}\]
+    where $V$ is a verifier, $x$ is an input to this TM, and $1^t$ is a running time $t$ written in unary.
+
+    \subparag{Observation}{
+        This problem is definitely in NP: we can just consider the certificate to be $y$. This indeed runs in polynomial time in the size of the input, since it does one step per digit of $1^t$. We notice that we absolutely need $t$ to be written using unary, binary would not have allowed to do this computation in polynomial time.
+    }
+}
+ 
+\parag{Lemma: WITNESS-EXISTENCE}{
+    WITNESS-EXISTENCE is NP-hard.
+
+    Since moreover it is in NP, it is NP-complete.
+
+    \subparag{Proof}{
+        Let $L \in \text{NP}$ be an arbitrary language in NP. We want to show that $L \leq_P \text{WITNESS-EXISTENCE}$.
+
+        By definition of NP, there exists a polynomial-time verifier $V$ for $L$. In other words: 
+        \[L = \left\{x \suchthat \exists y \text{ such that } V\left(x, y\right) = 1 \text{ in time $\left|x\right|^k$}\right\}\]
+        
+        Our reduction $f$ is very trivial: 
+        \[f\left(x\right) = \left\langle V, x, 1^{\left(\left|x\right|^k\right)} \right\rangle\]
+        
+        This can indeed be computed in polynomial time: we only need $\left|x\right|^k$ steps to write $1^{\left(\left|x\right|^k\right)}$, $\left|x\right|$ steps to write $x$ and a constant time to write $V$. The rest of the proof directly comes from the definition of this reduction and of WITNESS-EXISTENCE.
+
+        \qed
+    }
+
+    \subparag{Remark}{
+        This problem is nice, but it is not very useful in this form. Let us thus introduce another concept to make it usable.
+    }
+}
+
+\parag{Observation}{
+    Any computer is done using electronics circuits. Let us try to formalise this, and see where it can bring us.
+}
+
+\parag{Definition: Circuit}{
+    A \important{circuit} is some acyclic directed graph which nodes are input variables (which do not have any incoming edge) or gates (which can only consist in $\lor$, $\land$ and $\lnot$). The directed edges are wires. Finally, we have one or more output wires.
+
+    \imagehere[0.4]{CircuitExample.png}
+
+    \subparag{Remark}{
+        The fact that we are asking an acyclic graph may seem problematic, since we sometimes use the output of a circuit as its own input. However, this can easily be bypassed, since we can just copy the circuit multiple times.
+    }
+}
+
+\parag{Definition: Size of a circuit}{
+    The \important{size} of some circuit is its number of wires.
+}
+
+\parag{Proposition: DNF}{
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be an arbitrary boolean function.
+
+    Then, we can express $f$ using a DNF of size $O\left(2^n\right)$.
+
+    \subparag{Proof}{
+        The idea is to just convert the truth table of $f$ using a DNF: 
+        \[f\left(x\right) = \bigvee_{y: f\left(y\right) = 1} \left(x \over{=}{?} y\right) = \bigvee_{y: f\left(y\right) = 1} \bigwedge_{i=1}^n \begin{systemofequations} x_i & \text{if } y_i = 1 \\ \bar{x}_i & \text{if } y_i = 0 \end{systemofequations} \]
+        
+        \qed
+    }
+}
+
+\parag{Proposition: CNF}{
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be an arbitrary boolean function.
+
+    Then, we can express $f$ using a CNF of size $O\left(2^n\right)$.
+
+    \subparag{Proof}{
+        We can just construct the CNF of $\lnot f$, and then take its negation. Every $\land$ will be turned to an $\lor$, and inversely, thanks to Morgan's Laws. This indeed implies that we get a CNF.
+    }
+    
+    \subparag{Remark}{
+        This is already great, but other circuits are often more expressive. We will in fact even show in exercises that there are some circuits which CNFs and DNFs are exponentially larger.
+    }
+}
+
+\parag{Theorem}{
+    Let $M$ be some Turing machine, $n \in \mathbb{N}$ be an input length, and $t\left(n\right)$ be its runtime.
+
+    Then, we can compute in $t\left(n\right)^{O\left(1\right)}$ (meaning in time polynomial in $t\left(n\right)$) a circuit $C_n$ of size $O\left(t\left(n\right)^2\right)$ such that: 
+    \[C_n\left(x\right) = M\left(x\right), \mathspace \forall x \in \left\{0, 1\right\}^n\]
+    
+    \subparag{Proof sketch}{
+        Let us consider a $t \times t$ table for $M$. It is constructed such that its $i$\Th row contains the configuration of the Turing machine at step $i$ (recall that it encodes what is written on the tape, where the head is, and in what state the machine is in). 
+
+        Since the runtime is $t$, it means that the machine halted before iteration $t$. Moreover, it can only consider at most the $t$\Th first bits of input, since it considers a bit at a time. We can thus store everything important for the machine in this $t\times t$ table. Our goal is now to show that we can construct such a table efficiently using a circuit, which input variables are the $n$ input squares in the first row.
+
+        We notice that any cell in the table is determined by 4 cells below (meaning in the previous iteration of the machine). Indeed, if we don't see the head in the four cells below, the cell cannot change. Else, the head can move in or out of this column, or modify it. 
+
+        However, this means that we can always make a circuit which can use the bits of 4 cells to produce the bits of the next cell. Putting such a circuit everywhere, we get a constant amount of wires for each cells, meaning that we get a circuit of size $t^2 O\left(1\right) = O\left(t^2\right)$, as required.
+    }
+}
+
+
+\parag{Definition: CIRCUIT-SAT}{
+    We define the following language:  
+    \[\text{CIRCUIT-SAT} = \left\{\left\langle C_n \right\rangle \suchthat \exists x \in \left\{0, 1\right\}^n \text{ such that } C_n\left(x\right) = 1\right\}\]
+    where $C_n$ is an arbitrary circuit.
+
+    \subparag{NP}{
+        We notice that this problem is definitely in NP: we can simply consider the certificate to be $x$.
+    }
+    
+}
+
+\parag{Lemma: CIRCUIT-SAT}{
+    We have the following reduction: 
+    \[\text{WITNESS-EXISTENCE} \leq_p \text{CIRCUIT-SAT}\]
+    
+    Since WITNESS-EXISTENCE is NP-complete and CIRCUIT-SAT is in NP, this implies that CIRCUIT-SAT is NP-complete.
+
+    \subparag{Proof}{
+        Let $\left(V, x, 1^t\right)$ be an arbitrary input to WITNESS-EXISTENCE.
+
+        The reduction makes the circuit $C_V$ from $V$ using an input length $\left|x\right|$ and simulating it for $t$ steps. We hard-code $x$ in the circuit, so that this is only a function of $y$, yielding:
+        \[f\left(V, x, 1^t\right) = C\left(y\right) = C_V\left(x, y\right)\]
+        where, by construction, $C_V\left(x, y\right) = V\left(x, y\right)$.
+
+        The rest of the reduction is considered trivial and left as an exercise to the reader.
+
+        \qed
+    }
+}
+
+
+\parag{Lemma: SAT}{
+    We have the following reduction:
+    \[\text{CIRCUIT-SAT} \leq_p \text{SAT}\]
+
+    Since CIRCUIT-SAT is NP-complete, it implies that SAT is NP-hard.
+
+    \subparag{Proof}{
+        Let $C_n$ be an arbitrary circuit.
+
+        We notice that we are not allowed to convert the circuit to its CNF formula because the construction we have seen takes size $O\left(2^n\right)$.
+
+        The idea instead is to introduce new variables, one for which wire of $C_n$: $y_1, \ldots, y_m$. For instance, let us consider the following circuit:
+        \imagehere[0.2]{ReductionCSAT-SAT.png}
+
+        We want to force $y_1 = x_2 \lor y_3$, which can be done by using an equivalence, $y_1 \leftrightarrow y_2 \lor y_3$. We can thus make our reduction by forcing every wire to match its definition, and adding the condition that the output wire must be true:
+        \[f\left(C_n\right) = y_1 \land \left(y_1 \leftrightarrow x_1 \land x_2\right) \land \left(y_3 \leftrightarrow \lnot x_2\right) \land \left(y_2 \leftrightarrow y_1 \lor y_3\right)\]
+        
+        We notice that applying any operator exactly once leads a CNF and a DNF formula: $x_1 \lor \ldots \lor x_n$, $x_1 \land \ldots \land x_n$ and $\lnot x_1$ are all both CNFs and DNFs. Moreover, $a \leftrightarrow b$ where $a$ and $b$ are CNFs or DNFs can be converted into a CNF in constant time. Finally, and-ing CNF formulas also yield a CNF formula. This means that we managed to turn our circuit into a CNF formula in constant time.
+
+        The rest of the reduction is considered trivial and left as an exercise to the reader.
+        
+        \qed
+    }
+}
+
+\parag{Cook-Levin theorem}{
+    SAT is NP-complete.
+
+    \subparag{Proof}{
+        We have already seen that SAT is in NP, and we have just shown that it is NP hard. Thus, it is indeed NP-complete. \smiley
+
+        \qed
+    }
+}
+
+\end{document}
