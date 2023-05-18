@@ -1,0 +1,193 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-05-11 at 15:13:10.
+
+\usepackage{../../style}
+
+\title{Analyse 4}
+\author{Joachim Favre}
+\date{Jeudi 11 mai 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2023-05-11}{Enfin un cours où on fait des choses formelles}{
+\begin{itemize}[left=0pt]
+    \item Résolution de l'équation de Sturm-Liouville.
+    \item Explication et preuve des trois propositions de Sturm-Liouville.
+\end{itemize}
+
+}
+
+\parag{Exemple 1}{
+    Soient $\lambda, u_0, u_1 \in \mathbb{R}$. Nous posons l'équation différentielle suivante:
+    \[\begin{systemofequations} u''\left(t\right) + \lambda u\left(t\right) = 0 \\ u\left(0\right) = u_1 \\ u'\left(0\right) = u_1\end{systemofequations}\]
+
+    Cette équation est nommée l'équation de Sturm-Liouville.
+
+    Par la formule générale, nous obtenons: 
+    \[u\left(t\right) = \mathcal{L}^{-1}\left(\frac{u_0 z + u_1}{z^2 + \lambda}\right)\left(t\right)\]
+    
+    Nous considérons plusieurs cas. Si $\lambda = 0$, alors: 
+    \autoeq{u\left(t\right) = \mathcal{L}^{-1}\left(\frac{u_0}{z} + \frac{u_1}{z^2}\right)\left(t\right) = u_0 \mathcal{L}^{-1}\left(\frac{1}{z}\right)\left(t\right) + u_1 \mathcal{L}^{-1}\left(\frac{1}{z^2}\right)\left(t\right) = u_0 + u_1 t}
+    
+    Considérons maintenant $\lambda > 0$, ce qui nous permet de poser $\omega = \sqrt{\lambda} \implies \omega^2 = \lambda$: 
+    \autoeq{u\left(t\right) = u_0\mathcal{L}^{-1}\left(\frac{z}{z^2 + \lambda}\right)\left(t\right) + u_1 \mathcal{L}^{-1}\left(\frac{1}{z^2 + \lambda}\right)\left(t\right) = u_0\mathcal{L}^{-1}\left(\frac{z}{z^2 + \omega^2}\right)\left(t\right) + \frac{u_1}{\omega} \mathcal{L}^{-1}\left(\frac{\omega}{z^2 + \omega^2}\right)\left(t\right) = u_0 \cos\left(\omega t\right) + \frac{u_1}{\omega} \sin\left(\omega t\right) = u_0 \cos\left(\sqrt{\lambda} t\right) + \frac{u_1}{\sqrt{\lambda}} \sin\left(\sqrt{\lambda}t\right)}
+    
+    Si finalement $\lambda < 0$, alors nous pouvons prendre $\omega = \sqrt{-\lambda} \implies -\omega^2 = \lambda$: 
+    \autoeq{u\left(t\right) = u_0 \mathcal{L}^{-1}\left(\frac{z}{z^2 + \lambda}\right)\left(t\right) + u_1 \mathcal{L}^{-1}\left(\frac{1}{z^2 + \lambda}\right)\left(t\right) = u_0 \mathcal{L}^{-1}\left(\frac{z}{z^2 - \omega^2}\right)\left(t\right) + \frac{u_1}{\omega} \mathcal{L}^{-1}\left(\frac{\omega}{z^2 - \omega^2}\right)\left(t\right) = u_0 \cosh\left(\omega t\right) + \frac{u_1}{\omega}\sinh\left(\omega t\right) = u_0 \cosh\left(\sqrt{-\lambda} t\right) + \frac{u_1}{\sqrt{-\lambda}} \sinh\left(\sqrt{-\lambda}t\right)}
+}
+
+\parag{Exemple 2}{
+    Considérons l'équation intégrale suivante:
+    \[\begin{systemofequations} u'\left(t\right) + 2u\left(t\right) + 4 \int_{0}^{t} u\left(s\right) e^{4\left(t-s\right)}ds = 3 e^{4t} \\ u\left(0\right) = 0 \end{systemofequations}\] 
+
+    Posons $f\left(t\right) = e^{4t}$. Nous pouvons voir que notre intégrale est une convolution: 
+    \[\int_{0}^{t} u\left(s\right) e^{4\left(t-s\right)}ds = \left(u * f\right)\left(t\right)\]
+    
+    Ainsi, en prenant une transformée de Laplace des deux côtés de notre équation, nous obtenons que: 
+    \[\mathcal{L}\left(u' + 2u + 4 \left(u* f\right)\right) = \mathcal{L}\left(3f\right) \implies \mathcal{L}\left(u'\right) + 2\mathcal{L}\left(u\right) + 4 \mathcal{L}\left(u\right)\mathcal{L}\left(f\right) = 3 \mathcal{L}\left(f\right)\]
+    
+    Nous connaissons la transformée de Laplace de l'exponentielle: 
+    \[\mathcal{L}\left(f\right) = \mathcal{L}\left(e^{4t}\right) = \frac{1}{z - 4}\]
+    
+    Ainsi, notre équation devient: 
+    \[z \mathcal{L}\left(u\right) - \underbrace{u\left(0\right)}_{= 0} + 2 \mathcal{L}\left(u\right) + \frac{4 \mathcal{L}\left(u\right)}{z-4} = \frac{3}{z-4}\]
+    
+    Nous isolons maintenant le $\mathcal{L}\left(u\right)$, pour trouver que: 
+    \[\mathcal{L}\left(u\right)\left(z + 2 + \frac{4}{z-4}\right) = \frac{3}{z-4} \implies \mathcal{L}\left(u\right) = \frac{3}{z-4} \cdot \frac{z-4}{\left(z+2\right)\left(z-4\right) + 4} = \frac{3}{z^2 - 2z - 4}\]
+    
+    Nous voulons maintenant calculer la transformée inverse de notre résultat. Nous pouvons soit appliquer la formule des résidus, soit utiliser la complétion du carré puis utiliser un formulaire. Dans ce cas, la deuxième méthode est beaucoup plus simple: 
+    \[\mathcal{L}\left(u\right) = \frac{3}{z^2 - 2z - 4} = \frac{3}{\left(z - 1\right)^2 - 5} = \frac{3}{\sqrt{5}} \cdot \frac{\sqrt{5}}{\left(z-1\right)^2 - 5}\]
+
+    Ainsi, nous avons trouvé que: 
+    \[u\left(t\right) = \frac{3}{\sqrt{5}} e^t \sinh\left(\sqrt{5}t\right)\]
+}
+
+\parag{Proposition 1 de Sturm-Liouville}{
+    Soit $L > 0$. Nous considérons l'équation suivante:
+    \[\begin{systemofequations} u''\left(t\right) + \lambda u\left(t\right) = 0, \mathspace t \in \left[0, L\right] \\ u\left(0\right) = u\left(L\right) = 0 \end{systemofequations}\]
+
+    Cette équation admet des solutions non-triviales (c'est-à-dire qui ne sont pas 0 partout) si et seulement si: 
+    \[\lambda = \left(\frac{n\pi}{L}\right)^2, \mathspace n \in \mathbb{N}^*\]
+
+    Cette solution est donnée par: 
+    \[u\left(t\right) = \beta \sin\left(\frac{tn \pi}{L}\right), \mathspace t \in \left[0, L\right]\]
+    
+    \subparag{Remarque}{
+        La condition de bord $u\left(0\right) = u\left(L\right) = 0$ est appelée la condition de Dirichlet.
+    }
+
+    \subparag{Preuve}{
+        Nous séparons notre preuve en trois cas.
+
+        Si $\lambda = 0$, alors on sait que la solution doit être de la forme (nous avions vu cette équation ci-dessus):
+        \[u\left(t\right) = u\left(0\right) + u'\left(0\right)t\]
+        
+        Or, nous savons que $u\left(0\right) = 0$ et $u\left(L\right) = 0$, donc nous pouvons injecter cela dans notre équation: 
+        \[u\left(t\right) = u'\left(0\right)t \implies 0 = u\left(L\right) = u'\left(0\right) L\]
+        
+        Puisque $L \neq 0$, nous obtenons nécessairement que $u'\left(0\right) = 0$. Il est donc impossible d'avoir des solutions non-triviales quand $\lambda = 0$.
+
+        Considérons maintenant le cas $\lambda > 0$. Nous posons à nouveau $\omega = \sqrt{\lambda}$, et nous savons que la solution doit être de la forme: 
+        \[u\left(t\right) = u\left(0\right)\cos\left(\omega t\right) + \underbrace{\frac{u'\left(0\right)}{\omega}}_{= \beta} \sin\left(\omega t\right) = \beta \sin\left(\omega t\right)\]
+        
+        La condition $u\left(L\right) = 0$ nous donne en plus que: 
+        \[0 = u\left(L\right) = \beta \sin\left(\omega L\right)\]
+        
+        Une solution est $\beta = 0$, cependant cela donne une solution triviale $u\left(t\right) = 0$. Si $\beta \neq 0$, alors nous avons besoin que $\omega L$ soit un multiple de $\pi$, donc qu'il existe un $n \in \mathbb{Z}^*$ (on prend $n \neq 0$ pour ne pas avoir une solution triviale) tel que: 
+        \[\omega L = n \pi \implies \omega = \sqrt{\lambda} = \frac{n \pi}{L} \implies \lambda = \left(\frac{n \pi}{L}\right)^2\]
+        
+        Cependant, puisque $\sqrt{\lambda} = \frac{n \pi}{L}$, nous devons poser $n \geq 0$, donc nous avons $n \in \mathbb{N}^*$.
+
+        Considérons maintenant le dernier cas, $\lambda < 0$. Nous posons à nouveau $\omega = \sqrt{-\lambda} > 0$, et nous savons que notre solution est donnée par: 
+        \[u\left(t\right) = \underbrace{u\left(0\right)}_{= 0} \cosh\left(\omega t\right) + \underbrace{\frac{u'\left(0\right)}{\omega}}_{= \beta} \sinh\left(\omega t\right) = \beta \sinh\left(\omega t\right)\]
+        
+        Nous savons que $u\left(L\right) = 0$, donc: 
+        \[0 = u\left(L\right) = \beta \sinh\left(\omega L\right)\]
+        
+        Si $\beta = 0$, alors nous avons une solution triviale, donc nous voulons $\sinh\left(\omega L\right)$. De plus, $\omega > 0$ et $L > 0$, donc $\omega L \neq 0$. Cependant, la seule solution de $\sinh\left(x\right) = 0$ est $x = 0$, donc il ne peut pas y avoir de solution non-triviale dans ce cas.
+
+        \qed
+    }
+}
+
+\parag{Proposition 2 de Sturm-Liouville}{
+    Soit $L > 0$. Nous considérons l'équation suivante:
+    \[\begin{systemofequations} u''\left(t\right) + \lambda u\left(t\right) = 0, \mathspace t \in \left[0, L\right] \\ u'\left(0\right) = u'\left(L\right) = 0 \end{systemofequations}\]
+
+    Elle admet des solutions non-triviales (c'est-à-dire qui ne sont pas nulles partout) si et seulement si: 
+    \[\lambda = \left(\frac{n \pi}{L}\right)^2, \mathspace n \in \mathbb{N}_0\]
+    
+    Dans ce cas, la solution est donnée par: 
+    \[u\left(t\right) = \alpha \cos\left(\frac{t n \pi}{L}\right), \mathspace t \in \left[0, L\right]\]
+    
+
+    \subparag{Remarque}{
+        La condition de bord $u'\left(0\right) = u'\left(L\right) = 0$ est appelée la condition de Neuman. 
+    }
+
+    \subparag{Preuve}{
+        La preuve est très similaire à la proposition précédente. De plus, nous allons la faire en exercice dans la série 11.
+    }
+}
+
+\parag{Proposition 3 de Sturm-Liouville}{
+    Soit $L > 0$. Nous considérons l'équation suivante:
+    \[\begin{systemofequations} u''\left(t\right) + \lambda u\left(t\right) = 0, \mathspace t \in \left[0, L\right] \\ u\left(0\right) = u\left(L\right) \\ u'\left(0\right) = u'\left(L\right) \end{systemofequations}\]
+
+    Elle admet des solutions non-triviales (c'est-à-dire qui ne sont pas nulles partout) si et seulement si: 
+    \[\lambda = \left(\frac{{\color{red}2} n \pi}{L}\right)^2, \mathspace n \in \mathbb{N}_0\]
+    
+    Dans ce cas, la solution est donnée par: 
+    \[u\left(t\right) = \alpha \cos\left(\frac{t n 2\pi}{L}\right) + \beta \sin\left(\frac{t n 2\pi}{L}\right)\]
+
+    \subparag{Remarque 1}{
+        Les conditions de bord $u\left(0\right) = u\left(L\right)$ et $u'\left(0\right) = u'\left(L\right)$ sont appelées les conditions mixtes.
+    }
+
+    \subparag{Remarque 2}{
+        Ces trois propositions sont nommées les trois propositions de Sturm-Liouville.
+    }
+    
+    \subparag{Preuve}{
+        Cette preuve est plus difficile. Nous allons en faire une partie ici, l'autre partie sera en exercice dans la série 11.
+
+        Nous séparons notre preuve en plusieurs cas. Si $\lambda = 0$, alors nous savons que notre équation doit être de la forme: 
+        \[u\left(t\right) = u\left(0\right) + u'\left(0\right) t\]
+        
+        Nous avons le système d'équations suivant: 
+        \[\begin{systemofequations} u\left(0\right) = u\left(L\right) \\ u'\left(0\right) = u'\left(L\right) \end{systemofequations} \implies \begin{systemofequations} u\left(0\right) = u\left(0\right) + u'\left(0\right) L \\ u'\left(0\right) = u'\left(0\right) \end{systemofequations}\]
+
+        Nous ne considérons que l'équation qui n'est pas une tautologie:
+         \[u'\left(0\right)L = 0 \implies u'\left(0\right) = 0 \implies u\left(t\right) = u\left(0\right) = \alpha\]
+        
+        Cela donne bien une de nos solutions, quand $n = 1$.
+
+        Considérons maintenant le cas $\lambda > 0$. Nous posons $\omega = \sqrt{\lambda}$ à notre habitude, ce qui nous dit que notre solution doit être de la forme. 
+        \[u\left(t\right) = \underbrace{u\left(0\right)}_{= \alpha}\cos\left(t \omega\right) + \underbrace{\frac{u'\left(0\right)}{\omega}}_{= \beta} \sin\left(t \omega\right)\]
+        
+        Nous avons ainsi le système d'équations suivant: 
+        \autoeq{\begin{systemofequations} u\left(0\right) = u\left(L\right) \\ u'\left(0\right) = u'\left(L\right) \end{systemofequations} \implies \begin{systemofequations} \alpha = \alpha \cos\left(\omega L\right)+ \beta \sin\left(\omega L\right) \\ \omega \beta = -\omega \alpha \sin\left(\omega L\right) + \omega \beta \cos\left(\omega L\right)  \end{systemofequations} \implies \begin{systemofequations} \alpha \left(\cos\left(\omega L\right) - 1\right) + \beta \sin\left(\omega L\right) = 0 \\ - \alpha \sin\left(\omega L\right) + \beta\left(\cos\left(\omega L\right) - 1\right) = 0 \end{systemofequations}}
+        
+        Nous pouvons mettre cette équation au format matriciel: 
+        \[\begin{pmatrix} \cos\left(\omega L\right) - 1 & \sin\left(\omega L\right) \\ -\sin\left(\omega L\right) & \cos\left(\omega L\right) - 1 \end{pmatrix} \begin{pmatrix} \alpha \\ \beta \end{pmatrix} = 0\]
+
+        Si la matrice est non-singulière, alors les seules solutions sont $\alpha = \beta = 0$. Or, pour avoir des solutions non-triviales, il faut avoir $\left(\alpha, \beta\right) \neq \left(0, 0\right)$, donc il faut que la matrice soit singulière. Nous posons ainsi l'équation suivante: 
+        \autoeq{0 = \det \begin{pmatrix} \cos\left(\omega L\right) - 1 & \sin\left(\omega L\right) \\ -\sin\left(\omega L\right) & \cos\left(\omega L\right) - 1 \end{pmatrix} = \left(\cos\left(\omega L\right) - 1\right)^2 + \sin^2\left(\omega L\right) = \cos^2\left(\omega L\right) - 2\cos\left(\omega L\right) + 1 + \sin^2\left(\omega L\right) = 2 - 2\cos\left(\omega L\right)}
+        
+        Nous voulons donc $\cos\left(\omega L\right) = 1$ \textit{(qui est une équation que nous aurions aussi simplement pu obtenir en additionnant le carré de la première équation au carré de la deuxième équation, sans passer par de l'algèbre linéaire)}. Or, ceci n'arrive que si, pour un $n \in \mathbb{Z}$: 
+        \[\omega L = 2\pi n \implies \sqrt{\lambda} = \frac{2 \pi n}{L} \implies \lambda = \left(\frac{2\pi n}{L}\right)^2\]
+
+        Cependant, puisque $\sqrt{\lambda} = \frac{2\pi n}{L}$, nous devons poser $n \geq 0$, donc nous avons $n \in \mathbb{N}$.
+
+        Le cas $\lambda < 0$ ne donne aucune solution non-triviale, la preuve est similaire à celle que nous avons faite pour la première proposition de Sturm-Liouville.
+
+        \qed
+    }
+}
+
+\end{document}
