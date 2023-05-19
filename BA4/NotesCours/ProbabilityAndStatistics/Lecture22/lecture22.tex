@@ -1,0 +1,132 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-05-16 at 13:20:53.
+
+\usepackage{../../style}
+
+\title{ProbaStats}
+\author{Joachim Favre}
+\date{Mardi 16 mai 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{22}{2023-05-16}{Oh, that's why there's statistics in the course name}{
+\begin{itemize}[left=0pt]
+    \item Introduction to statistical inference.
+    \item Definition of the method of moments.
+    \item Definition of the maximum likelihood method.
+\end{itemize}
+
+}
+
+\section{Statistical inference}
+\subsection{Introduction}
+\parag{Goal}{
+    The goal is, given some observations, we want to make some inference on their probability space. We don't know their distribution, but we know that it is in some family and we want to infer the parameters. 
+
+    In fact, in the past, we even used the term inverse probability to speak about inveferential statistics.
+
+
+    An \important{estimator} of the unknown parameters is a function of $y_1, \ldots, y_n$. We can also consider a random variable lead by the estimator, $T\left(Y_1, \ldots, Y_n\right)$.
+}
+
+\parag{Definition: Random sample}{
+    We will always take $Y_1, \ldots, Y_n$ to be IID from the distribution we don't know, named a \important{random sample}, and $y_1, \ldots, y_n$ to be a \important{realisation} of such random variables. Using those observations, we want to estimate the parameters of the distribution. 
+}
+
+\parag{Definition: Statistical model}{
+    A \important{statistical model} is a probability distribution $f\left(y\right)$ chosen to learn from observed data $y$ or potential data $Y$.
+
+    We note it $f\left(y\right) = f\left(y; \theta\right)$ to represent the fact that $\theta$ is a parameter of the model.
+}
+
+\parag{Definition: Statistic}{
+    A \important{statistic} is a function of the random variables, $T = t\left(Y_1, \ldots, Y_n\right)$.
+}
+
+\parag{Example}{
+    Let $y_1, \ldots, y_n$ be a random sample from a Bernoulli distribution with unknown parameter $p$. Then, the statistic $t = \sum_{j=1}^{n} y_j$ is considered to be a realisation of the random variable: 
+    \[T = \sum_{j=1}^{n} Y_j \followsdistr B\left(n, p\right)\]
+}
+
+\subsection{Point estimation}
+\parag{Method of moments}{
+    The idea of the \important{method of moments} is to use the law of large numbers: 
+    \[\frac{1}{n} \sum_{i=1}^{n} y_i^r \over{\to}{P} \exval\left(Y_1^r\right)\]
+    
+    Thus, we simply set:
+    \[\exval\left(Y^r\right) = \frac{1}{n}\sum_{j=1}^{n} y_j^r\]
+
+    We take $r = 1, \ldots, p$ to have the smallest number of equations which would give  a unique solution.
+}
+
+\parag{Example 1}{
+    Let $Y_1, \ldots, Y_n \followsdistr U\left(0, \theta\right)$. We want to use the method of moments to estimate $\theta$.
+
+    We let: 
+    \[\frac{1}{n}\sum_{i=1}^{n} y_i = \exval\left(Y_1\right) \iff \bar{y} = \frac{\theta}{2}\]
+    
+    This thus gives us:
+    \[\hat{\theta}_{MoM} = 2 \bar{y} \implies \hat{\Theta}_{MoM} = 2 \bar{Y}_n\]
+}
+
+\parag{Example 2}{
+    Let $Y_1, \ldots, Y_n \followsdistr \mathcal{N}\left(\mu, \sigma^2\right)$, where $\mu$ and $\sigma^2$ are unknown. We can estimate them using the method of moments: 
+    \[\begin{systemofequations} \frac{1}{n}\sum_{i=1}^{n} y_i = \mu \\ \frac{1}{n}\sum_{i=1}^{n} y_i^2 = \exval\left(Y_i^2\right) = \Var\left(y_i\right) + \exval\left(Y_i\right)^2 = \sigma^2 + \mu^2 \end{systemofequations}\]
+    
+    We notice that this is solved by: 
+    \[\begin{systemofequations} \hat{\mu}_{MoM} = \bar{y} \\ \hat{\sigma}_{MoM}^2 = \frac{1}{n} \sum_{i=1}^{n} y_i^2 - \bar{y}^2 \end{systemofequations}\]
+}
+
+\parag{Definition: Likelihood}{
+    Let $y_1, \ldots, y_n$ be a random sample from a density $f\left(y; \theta\right)$. The \important{likelihood} for $\theta$ is defined as: 
+    \[L\left(\theta\right) = f\left(y_1, \ldots, y_n; \theta\right)=  f\left(y_1;\theta\right) \cdots f\left(y_n; \theta\right)\]
+    since all samples independent.
+}
+
+
+\parag{Maximum likelihood method}{
+    The \important{maximum likelihood estimate} (MLE) $\hat{\theta}$ of a parameter $\theta$ is the value that maximises the likelihood: 
+    \[\hat{\theta}_{MLE} = \argmax_{\theta} L\left(\theta\right)\]
+
+    \subparag{Remark}{
+        We often simplify the calculations by maximising $\ell \left(\theta\right) = \log\left(L\left(\theta\right)\right)$, which is equivalent to maximising $L\left(\theta\right)$ since the logarithm is an increasing function. This is often simpler since we will use derivatives (when the function is differentiable) and differentiating additions is easier than differentiating multiplications.
+    }
+}
+
+\parag{Example 1}{
+    Let us consider a random sample $y_1, \ldots, y_n$ from an exponential density with unknown $\lambda$.
+
+    We want to maximise: 
+    \[L\left(\theta\right) = \lambda e^{-\lambda y_1} \cdots \lambda e^{-\lambda y_n} = \lambda^n \exp\left(-\lambda\left(y_1 + \ldots + y_n\right)\right)\]
+    
+    Applying a natural logarithm on both sides, we get: 
+    \[\ell \left(\lambda\right) = \log\left(L\left(\lambda\right)\right) = n \log\left(\lambda\right) - n \lambda \bar{y}\]
+    
+    We want to maximise this function, so let us compute its derivative: 
+    \[\frac{d \ell \left(\lambda\right)}{d \lambda} = \frac{n}{\lambda} - n \bar{y}\]
+    
+    Setting $\frac{d \ell \left(\lambda\right)}{d \lambda} = 0$, we get $\lambda = \frac{1}{\bar{y}}$ (since $n > 0$). We notice that we have: 
+    \[\frac{d^2 \ell \left(\frac{1}{\bar{y}}\right)}{d \lambda^2} = -\frac{n}{\left(\frac{1}{\bar{y}}\right)^2} < 0\]
+    
+    This critical point is thus indeed a maximum. This yields that: 
+    \[\hat{\lambda}_{MLE} = \frac{1}{\bar{y}}\]
+}
+
+\parag{Example 2}{
+    Let us consider a random sample $y_1, \ldots, y_n$ from a uniform density with unknown $\theta$.
+
+    We want to maximise: 
+    \[L\left(\theta\right) = \prod_{j=1}^{n} \frac{I\left(0 < y_j \leq \theta\right)}{\theta} = \frac{I\left(0 < y_1, \ldots, y_n \leq \theta\right)}{\theta^n} = \frac{I\left(\max\left(y_1, \ldots, y_n\right) \leq \theta\right)}{\theta^n}\]
+    
+    We cannot differentiate this function because the indicator random variable is not even continuous. However, we notice that we want $\theta$ to be the smallest possible for $\theta^{-n}$ to be the greatest. Thus we need to take: 
+    \[\hat{\theta}_{MLE} = \max\left(y_1, \ldots, y_n\right)\]
+    
+    We notice that this is different from $\hat{\theta}_{MoM} = 2 \bar{y}$, even though both make sense.
+}
+
+\end{document}
