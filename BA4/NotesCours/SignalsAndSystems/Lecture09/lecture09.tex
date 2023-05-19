@@ -1,0 +1,204 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-05-19 at 22:32:28.
+
+\usepackage{../../style}
+
+\title{Signals and systems}
+\author{Joachim Favre}
+\date{Vendredi 19 mai 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2023-05-19}{A new composition type}{
+\begin{itemize}[left=0pt]
+    \item Application of Laplace transform for solving differential equations.
+    \item Definition of feedback composition of systems.
+    \item Definition of three types of block diagrams: direct form, cascade form and parallel form.
+\end{itemize}
+
+}
+
+\parag{Property: Stability}{
+    Let $\mathcal{H}$ be a LTI system with transfer function $H\left(s\right)$.
+
+    $\mathcal{H}$ is stable if and only if the ROC of $H\left(s\right)$ includes the imaginary axis.
+
+    \subparag{Proof}{
+        This comes directly from our earlier observations.
+    }
+}
+
+\parag{Property: Causality}{
+    Let $\mathcal{H}$ be a LTI system with transfer function $H\left(s\right)$.
+
+    $\mathcal{H}$ is causal implies that the ROC of $H\left(s\right)$ is right-sided.
+    
+    \subparag{Proof}{
+        If $\mathcal{H}$ is causal, then its impulse response $h\left(t\right)$ is right-sided and thus $H\left(s\right)$ is also right-sided.
+
+        \qed
+    }
+}
+
+\parag{Property: Rational function causality}{
+    Let $\mathcal{H}$ be a LTI system with a \textit{rational} transfer function $H\left(s\right) = \frac{P\left(s\right)}{Q\left(s\right)}$.
+
+    $\mathcal{H}$ is causal \textit{if and only if} the ROC of $H\left(s\right)$ is right-sided.
+
+    \subparag{Justification}{
+        It is possible to prove this theorem by doing a partial fraction decomposition of $H\left(s\right)$, and arguing that the inverse Laplace transform of the result, $h\left(t\right)$, must be right-sided. This indeed implies that $\mathcal{H}$ is causal.
+    }
+}
+
+\parag{Example}{
+    Let us consider the following impulse response: 
+    \[h\left(t\right) = e^{-a\left(t - t_0\right)} u\left(t - t_0\right)\]
+    
+    We can see in a table that: 
+    \[h\left(t\right) \laplacepair H\left(s\right) = \frac{e^{-s t_0}}{s + a}, \mathspace \cre\left(s\right) > -a\]
+    
+    We can see that the ROC of this transfer function is always right-sided. However, if $t_0 < 0$, the system is not causal. This shows that the previous theorem does not hold if $H\left(s\right)$ is not a rational function. In this case, we only have an implication, not an equivalence.
+}
+
+\parag{Differential equations}{
+    We know the following property of Laplace transforms: 
+    \[\frac{d}{dt} x\left(t\right) \laplacepair sX\left(s\right)\]
+    
+    We can  use this property to solve differential equations representing both stable and non-stable LTI systems (which is better than Fourier transforms).
+}
+
+\parag{Example 1}{
+    Let's suppose that a LTI system satisfies the following equation: 
+    \[y\left(t\right) + 3 \frac{d}{dt}y\left(t\right) + 2\frac{d^2}{dt^2}y\left(t\right) = x\left(t\right) + \frac{1}{2} \frac{d}{dt} x\left(t\right)\]
+    
+    We apply a Laplace transform on both sides, giving: 
+    \[Y\left(s\right) + 3sY\left(s\right) + 2s^2 Y\left(s\right) = X\left(s\right) + \frac{1}{2} s X\left(s\right)\]
+    
+    We can arrange everything as: 
+    \[H\left(s\right) = \frac{Y\left(s\right)}{X\left(s\right)} = \frac{1 + \frac{1}{2}s}{1 + 3s + 2s^2} = \frac{\frac{3}{2}}{2s + 1} - \frac{\frac{1}{2}}{s + 1}\]
+    
+    We need to know its ROC to get a unique solution for this equation; all three ROCs are coherent. The first is anti-causal, the second is neither causal nor anti-causal and the third is stable and causal system. 
+    \imagehere[0.5]{LaplaceDifferentialEquationExample1ROCPlot.png}
+}
+
+\parag{Example 2}{
+    Let's suppose that we know a causal LTI system satisfies the following equation: 
+    \[\frac{d^2}{dt^2}y\left(t\right) - y\left(t\right) = \frac{d^2}{dt^2} x\left(t\right)\]
+    
+    Applying a Laplace transform on both sides, we get: 
+    \[s^2 Y\left(s\right)-  Y\left(s\right) = s^2 X\left(s\right) \implies H\left(s\right) = \frac{Y\left(s\right)}{X\left(s\right)} = \frac{s^2}{s^2 - 1} = \frac{s}{2}\left(\frac{1}{s+1} + \frac{1}{s-1}\right)\]
+    
+    We see that we have two poles: $s = -1$ and $s = 1$. Since we know the LTI is causal, this implies that the ROC is right-sided and thus that: 
+    \[\cre\left(s\right) > 1\]
+}
+
+\parag{System composition}{
+    Since we have the same properties as Fourier transforms, everything works the same for Laplace transforms when doing system composition.
+
+    A parallel composition yields a transfer function of:
+    \[H\left(s\right) = H_1\left(s\right)H_2\left(s\right)\]
+    
+    A series composition yields a transfer function of: 
+    \[H\left(s\right) = H_1\left(s\right) + H_2\left(s\right)\]
+}
+
+\parag{Feedback composition}{
+    Let us consider the following new type of composition, named \important{feedback composition}:
+    \imagehere[0.5]{FeedbackComposition.png}
+
+    Note that the result of $\mathcal{H}_2$ is subtracted from $x\left(t\right)$ (there is a minus sign).
+
+    \subparag{Transfer function}{
+        We see that we have the following system of equations: 
+        \[\begin{systemofequations} Y\left(s\right) = H_1\left(s\right) W\left(s\right) \\ W\left(s\right) = X\left(s\right) - H_2\left(s\right)Y\left(s\right) \end{systemofequations}\]
+        
+        This implies that: 
+        \autoeq{Y\left(s\right) = H_1\left(s\right) X\left(s\right) - H_1\left(s\right) H_2\left(s\right) Y\left(s\right) \implies H\left(s\right) = \frac{Y\left(s\right)}{X\left(s\right)} = \frac{H_1\left(s\right)}{1 + H_1\left(s\right)H_2\left(s\right)}}
+    }
+}
+
+\parag{Example 1: Feedback control system}{
+    Let us consider the following type of feedback composition systems:
+    \imagehere[0.9]{FeedbackControlSystem.png}
+
+    A system of this form is called a \important{feedback control system}. Its transfer function is: 
+    \[H_{tot}\left(s\right) = \frac{H\left(s\right) G\left(s\right)}{1 + H\left(s\right)G\left(s\right)B\left(s\right)}\]
+
+    This type of systems is used a lot in practice, though we often need to consider many other subtleties.
+
+    \subparag{Example}{
+        An example of such a system is heating in a house. In that case, $x\left(t\right)$ is the temperature we aim, and $y\left(t\right)$ is the actual temperature in the house. The controller determines how hard the heater $\mathcal{H}$ should behave. The sensor verifies everything goes as planned by measuring the output, and using this to compute the error $e\left(t\right)$.
+    }
+}
+
+\parag{Example 2}{
+    Let us consider a causal LTI system which satisfies the equation: 
+    \[\frac{dy\left(t\right)}{dt} + 3y\left(t\right) = x\left(t\right)\]
+    
+    This implies that: 
+    \[H\left(s\right) = \frac{1}{s+3}, \mathspace \cre\left(s\right) > -3\]
+    
+    However, we can write this using a feedback composition of systems: 
+    \[H\left(s\right) = \frac{\frac{1}{s}}{1 + \frac{3}{s}} = \frac{H_1\left(s\right)}{1 + H_2\left(s\right)H_1\left(s\right)}\]
+    
+    \imagehere[0.5]{BlockDiagramExample.png}
+
+    However, we know that: 
+    \[\int_{-\infty}^{t} x\left(\tau\right)d\tau \laplacepair \frac{1}{s}X\left(s\right)\]
+    
+    Thus, $\mathcal{H}_1$ is an integrator and $\mathcal{H}_2$ is a scaling. Writing differential equations using such diagrams is really interesting for their understanding, let us thus dig deeper in this.
+} 
+
+\parag{Block diagrams}{
+    We will develop three types of \important{block diagrams} hereinafter. They work for any causal LTI system with a rational transfer function.
+}
+
+\parag{Direct form representation}{
+    Let us now consider a causal LTI system which satisfies the following differential equation: 
+    \[\frac{d^2 y\left(t\right)}{dt^2} + 3\frac{dy\left(t\right)}{dt} + 2y\left(t\right) = x\left(t\right)\]
+    
+    Let us define the following intermediate signals:
+    \[e\left(t\right) = \frac{d^2 y\left(t\right)}{dt^2}, \mathspace f\left(t\right) = \frac{dy\left(t\right)}{dt}\]
+    
+    This implies that:
+    \[f\left(t\right) = \int_{-\infty}^{t} e\left(\tau\right)d\tau, \mathspace y\left(t\right) = \int_{-\infty}^{t} f\left(\tau\right)d\tau\]
+    \[e\left(t\right) = x\left(t\right) - 3 f\left(t\right) -2 y\left(t\right)\]
+
+    We can thus write this in the following form, named \important{direct form representation}:
+    \imagehere[0.8]{DirectFormRepresentationExample.png}
+
+    This is named direct form representation since we can very easily convert to and from the differential equation, even without having to compute the transfer function.
+}
+
+\parag{Cascade form representation}{
+    Let us consider again a causal LTI system which satisfies the same differential equation: 
+    \[\frac{d^2 y\left(t\right)}{dt^2} + 3\frac{dy\left(t\right)}{dt} + 2y\left(t\right) = x\left(t\right)\]
+
+    We can find that: 
+    \[H\left(s\right) = \left(\frac{1}{s+1}\right)\left(\frac{1}{s + 2}\right), \mathspace \cre\left(s\right) > -1\]
+
+    However, using the same trick that we used in the example that made us dig into block diagrams, we notice that we can write both $\frac{1}{s+1}$ and $\frac{1}{s+2}$ as feedback composition of systems. We then only need to put them in series to get a multiplication:
+    \imagehere[0.8]{CascadeFormExample.png}
+
+    This is named the \important{cascade form}.
+}
+
+\parag{Parallel form representation}{
+    Let us consider again a causal LTI system which satisfies the same differential equation: 
+    \[\frac{d^2 y\left(t\right)}{dt^2} + 3\frac{dy\left(t\right)}{dt} + 2y\left(t\right) = x\left(t\right)\]
+
+    Using partial fraction expansion, we can find that: 
+    \[H\left(s\right) = \frac{1}{s+1} - \frac{1}{s+2}, \mathspace \cre\left(s\right) > -1\]
+
+    We again use the same trick to write both fraction as a feedback composition of systems. Then, to add them, we can just put everything in parallel:
+    \imagehere[0.6]{ParallelFormExample.png}
+
+    This is named the \important{parallel form}.
+}
+
+\end{document}

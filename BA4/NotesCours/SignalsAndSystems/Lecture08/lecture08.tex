@@ -25,6 +25,8 @@
 
 \section{Laplace transform}
 
+\subsection{General properties}
+
 \parag{Transfer function derivation}{
     Let $\mathcal{H}$ be some LTI system with impulse response. We want to input a signal $x\left(t\right) = e^{st}$. We know this is just a convolution: 
     \[y\left(t\right) = \int_{-\infty}^{\infty} e^{s\left(t - \tau\right)} h\left(\tau\right) d\tau = e^{st} \int_{-\infty}^{\infty} e^{- s \tau}h\left(\tau\right)d \tau = H\left(s\right) e^{s t}\]
@@ -61,7 +63,7 @@
     which converges if and only if $\cre\left(c\right) > 0$.
 }
 
-\parag{Theorem: Inversion Laplace transform}{
+\parag{Theorem: Inverse Laplace transform}{
     Let $x\left(t\right)$ be a CT signal and $X\left(s\right)$ be its Laplace transform. Then: 
     \[x\left(t\right) = \frac{1}{2\pi j} \int_{\cre\left(s\right) - j\infty}^{\cre\left(s\right) + j\infty} X\left(s\right) e^{s t}ds\]
     
@@ -106,7 +108,7 @@
 \parag{Theorem}{
     Let $x\left(t\right)$ be a function with Laplace transform $X\left(s\right)$.
 
-    $x\left(t\right)$ is stable if and only if its region of convergence contains the imaginary axis..
+    $x\left(t\right)$ is stable if and only if its region of convergence contains the imaginary axis.
 
     \subparag{Proof}{
         We have seen that the Laplace transform of $x\left(t\right)$ at $s = a + bj$ is the Fourier transform of $x\left(t\right)e^{-at}$ at $b$. This means that the Fourier transform $x\left(t\right)$ exists if and only $s = bj$, the imaginary axis, belongs to the ROC. 
@@ -125,6 +127,11 @@
 
     We define the roots of $Q$ to be \important{poles}. In general, there is one more region of convergence than there are poles, since a region can never contain the poles of $H\left(s\right)$ and they are parallel vertical strips (though this is not always true, since poles could be aligned on the same vertical line). 
 }
+
+\parag{Definition: Zero-pole plot}{
+    A \important{zero-pole} plot for a rational function $H\left(s\right) = \frac{P\left(s\right)}{Q\left(s\right)}$ is the complex plane, on which we mark its poles (the roots of $Q\left(s\right)$) as crosses, and its roots (the roots of $P\left(s\right)$) as zeroes.
+}
+
 
 \parag{Example}{
     Let us consider the following transfer function: 
@@ -190,13 +197,16 @@
     \end{center}
 }
 
-\parag{LTI systems}{
-    Using the convolution property, we see that: 
-    \[\left(h* x\right)\left(t\right) \laplacepair H\left(s\right)X\left(s\right)\]
-
-    Therefore, we have that: 
-    \[Y\left(s\right) = H\left(s\right) X\left(s\right)\]
-    where $\text{ROC}\left(Y\left(s\right)\right) \supseteq \text{ROC}\left(X\left(s\right)\right) \cap \text{ROC}\left(H\left(s\right)\right)$.
+\parag{Example}{
+    Let us consider three signals $x\left(t\right), x_1\left(t\right), x_2\left(t\right)$ such that:
+    \[x\left(t\right) = x_1\left(t\right) - x_2\left(t\right)\]
+    \[X_1\left(s\right) = \frac{1}{s+1}, \mathspace \cre\left(s\right) >-1\]
+    \[X_2\left(s\right) = \frac{1}{\left(s+1\right)\left(s+2\right)}, \mathspace \cre\left(s\right) > -1\]
+    
+    Using the linearity property, we get that:
+    \[X\left(s\right) = \frac{1}{s+1} - \frac{1}{\left(s+1\right)\left(s+2\right)} = \frac{s+1}{\left(s+1\right)\left(s+2\right)} = \frac{1}{s+2}, \mathspace \cre\left(s\right) > -2\]
+    
+    We notice that $R \supsetneq R_1 \cap R_2$. Thus, when using the linearity property, $R$ is not just given by $R_1 \cap R_2$.
 }
 
 \parag{Definition: Right-sided signal}{
@@ -256,7 +266,7 @@
 \parag{Theorem}{
     Let $x\left(t\right)$ be some signal which transfer function $H\left(s\right)$ exists.
 
-    If $x\left(t\right)$ is right-sided, then $H\left(s\right)$ is right-sided.
+    If $x\left(t\right)$ is right-sided, then $H\left(s\right)$ is right-sided. 
 
     \subparag{Proof}{
         This comes directly from the previous lemma.
@@ -265,6 +275,22 @@
     \subparag{Reciprocal}{
         The reciprocal is not true.
     }
+}
+
+\parag{Theorem}{
+    Let $x\left(t\right)$ be some signal which transfer function $H\left(s\right)$ exists.
+
+    If $x\left(t\right)$ is left-sided, then $H\left(s\right)$ is left-sided. 
+}
+
+\subsection{Application to LTI systems}
+\parag{LTI systems}{
+    Using the convolution property, we see that: 
+    \[\left(h* x\right)\left(t\right) \laplacepair H\left(s\right)X\left(s\right)\]
+
+    Therefore, we have that: 
+    \[Y\left(s\right) = H\left(s\right) X\left(s\right)\]
+    where $\text{ROC}\left(Y\left(s\right)\right) \supseteq \text{ROC}\left(X\left(s\right)\right) \cap \text{ROC}\left(H\left(s\right)\right)$.
 }
 
 
