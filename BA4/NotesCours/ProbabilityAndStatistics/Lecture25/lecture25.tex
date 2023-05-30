@@ -1,0 +1,66 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-05-30 at 13:19:33.
+
+\usepackage{../../style}
+
+\title{ProbaStats}
+\author{Joachim Favre}
+\date{Mardi 30 mai 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{25}{2023-05-30}{Will we manage to finish the course content?}{
+\begin{itemize}[left=0pt]
+    \item Definition of $P$-value.
+    \item Definition of test significance.
+\end{itemize}
+}
+
+\parag{Definition: $P$-value}{
+    Let $H_0$ be a null hypothesis, and $H_1$ be its corresponding alternative hypothesis. Moreover, let $T$ be some test statistic  we apply on our data, and $t_{obs}$ be its observed value.
+
+    The \important{$P$-value} is defined to be: 
+    \[p_{obs} = \prob_0\left(T \geq t_{obs}\right)\]
+
+    \subparag{Interpretation}{
+        If $p_{obs}$ is small, then either $H_0$ is true but we observed something unlikely, or $H_0$ is false.
+    }
+}
+
+\parag{Definition: Test significance}{
+    Let $T$ be some statistical test, and $p_{obs}$ be its observed $P$-value.
+
+    We say that the test is \important{significant at level $\alpha$} if $p_{obs} < \alpha$.
+}
+
+
+\parag{Example}{
+    We consider again the case where we throw a coin 200 times, observe 115 heads and we want to know if the coin is fair. This times, instead of a confidence interval, we want to answer this question using the Pearson statistic and a $P$-value.
+
+    Let $S \followsdistr \text{Binom}\left(200, \theta\right)$ be the number of heads, where $\theta = \frac{1}{2}$ under the null hypothesis, and $\theta \neq \frac{1}{2}$ otherwise. We see that we can also interpret our problem as a multinomial distribution:
+    \[\left(O_1, O_2\right) \followsdistr \text{Multinomial}\left(200, \left(\theta, 1 - \theta\right)\right)\]
+    where $O_1 = S$ is the number of heads and $O_2 = 200 - S$ is the number of tails.
+
+    We can compute the Pearson statistic under the null hypothesis: 
+    \[T = \frac{\left(O_1 - E_1\right)^2}{E_1} + \frac{\left(O_2 - E_2\right)^2}{E_2} = \frac{\left(115 - 100\right)^2}{100} + \frac{\left(85 - 100\right)^2}{100} = 4.5\]
+    since, under the null hypothesis $E_1 = E_2 = n p_i = 100$.
+
+    However, we know that $\exval\left(T\right) = k-1 = 1$. To know if this is a reasonable fluctuation of the Pearson statistic, we can compute its $P$-value using quantiles of the chi-square distribution (which can be computed numerically using a computer, or found in a table): 
+    \[p_{obs} = \prob_0\left(T > t_{obs}\right) = 0.034 \implies \SI{1}{\percent} < p_{obs} < \SI{5}{\percent}\]
+    
+    This means that we can reject the null hypothesis that the coin is fair under significance $\SI{5}{\percent}$. However, under a $\SI{1}{\percent}$ significance, we must accept.
+}
+
+\parag{Measure of evidence}{
+    The $P$-value allows us reject the null hypothesis. However, it is often better to consider it as a measure of evidence against $H_0$: the smaller it is, the more evidence we have that $H_0$ should be rejected. In fact, knowing $p_{obs}$ is often better than knowing whether $H_0$ was rejected.
+
+    As a rule of thumb, if $p_{obs} = \SI{5}{\percent}$, we have weak evidence against $H_0$. If $p_{obs} = \SI{1}{\percent}$ this is good evidence, and then, as this decreases, this gives more and more evidence.
+}
+
+
+\end{document}
