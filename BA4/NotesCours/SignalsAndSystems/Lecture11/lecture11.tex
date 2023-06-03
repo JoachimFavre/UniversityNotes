@@ -1,0 +1,106 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-06-02 at 14:36:37.
+
+\usepackage{../../style}
+
+\title{Signals and systems}
+\author{Joachim Favre}
+\date{Vendredi 02 juin 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2023-06-02}{Even this title will evoke some memories}{
+\begin{itemize}[left=0pt]
+    \item Explanation on how to do system composition for $Z$-transforms.
+    \item Explanation on how to do direct form, cascade form and parallel form block diagrams for $Z$-transforms.
+\end{itemize}
+
+}
+
+\parag{Example 2}{
+    Let $a \in \mathbb{R}^*_+$. We consider an LTI system described by: 
+    \[y\left[n\right] - ay\left[n-1\right] = x\left[n\right]\]
+    
+    Applying the same method, we get: 
+    \[H\left(z\right) = \frac{1}{1 - az^{-1}}\]
+    
+    This only has a pole at $z = a$, meaning that we can have any of the two following ROCs: 
+    \[\left|z\right| < a, \mathspace a < \left|z\right|\]
+    
+    In particular, $z = 0$ belongs to the first ROC, and all $\left|z\right| = \infty$ belong to the second one. This means that the first ROC yields an anti-causal system, whereas the second yields a causal one. If we moreover know that $a = \frac{1}{2}$, it means that the first ROC yields an unstable system, whereas the second gives a stable one.
+}
+
+\parag{System composition}{
+    Doing the exact same reasoning we have already done three times, we get that, for $Z$-transforms, a parallel system composition yields a transfer function of the form: 
+    \[H\left(z\right) = H_1\left(z\right) H_2\left(z\right)\]
+    
+    Similarly, a series system composition gives a transfer function of the form: 
+    \[H\left(z\right) = H_1\left(z\right) + H_2\left(z\right)\]
+    
+    Finally, using the same reasoning as what we did for Laplace transforms, a feedback system composition yields: 
+    \[H\left(z\right) = \frac{H_1\left(z\right)}{1 + H_1\left(z\right)H_2\left(z\right)}\]
+}
+
+\parag{Example}{
+    Let us consider a causal LTI system which satisfies the following difference equation: 
+    \[y\left[n\right] - \frac{1}{4}y\left[n-1\right] = x\left[n\right]\]
+
+    We get that its transfer function is of the form: 
+    \[H\left(z\right) = \frac{1}{1 - \frac{1}{4}z^{-1}} = \frac{H_1\left(z\right)}{1 + H_1\left(z\right)H_2\left(z\right)}, \mathspace \left|z\right| > \frac{1}{4}\]
+    
+    We notice that this has the form of a feedback system composition, where $H_1\left(z\right) = 1$ and $H_2\left(z\right) = -\frac{1}{4}z^{-1}$. Thus, we can write this as (splitting $H_2$ into two systems for generalisation purposes; and not writing $H_1$ since it is an identity system):
+    \imagehere[0.5]{ZTransformFeedbackCompositionExample.png}
+
+    We notice that $H\left(z\right) = z^{-1}$ yields a time shift, so this again gives us some insight on our difference equation. We thus want to dig deeper in this kind of representations.
+}
+
+\parag{Block diagrams}{
+    Such representations are called \important{block diagrams}, and we will see three of them hereinafter. They work for any causal LTI system with a rational transfer function.
+
+    As usual, the block diagrams for $Z$-transforms are very similar to the Laplace transforms' ones.
+}
+
+\parag{Direct form representation}{
+    Let us consider a causal LTI system which satisfies the following difference equation: 
+    \[y\left[n\right] + \frac{1}{4} y\left[n-1\right] - \frac{1}{8}y\left[n-2\right] = x\left[n\right]\]
+    
+    We define the two following signals: 
+    \[f\left[n\right] = y\left[n-1\right], \mathspace e\left[n\right] = y\left[n-2\right]\]
+    
+    We can thus write our equation in the following form: 
+    \[y\left[n\right] = -\frac{1}{4}f\left[n\right] + \frac{1}{8}e\left[n\right] + x\left[n\right]\]
+
+    This yields the \important{direct form representation}:
+    \imagehere[0.4]{ZTransformDirectFormRepresentation.png}
+    
+    This is direct since we don't have to compute the transfer function; we can easily convert from and to the difference equation..
+}
+
+\parag{Cascade form representation}{
+    Let us consider again a causal LTI system which satisfies the same difference equation: 
+    \[y\left[n\right] + \frac{1}{4} y\left[n-1\right] - \frac{1}{8}y\left[n-2\right] = x\left[n\right]\]
+    
+    It is possible to find that: 
+    \[H\left(z\right) = \left(\frac{1}{1 + \frac{1}{2}z^{-1}}\right) \left(\frac{1}{1 - \frac{1}{4}z^{-1}}\right), \mathspace \left|z\right| > \frac{1}{2}\]
+
+    We can write both factor as a feedback composition of systems. Then, we can put them in series to get a multiplication, yielding the \important{cascade form representation}:
+    \imagehere[0.7]{ZTransformCascadeFormRepresentation.png}
+}
+
+\parag{Parallel form representation}{
+    Let us consider again a causal LTI system which satisfies the same difference equation: 
+    \[y\left[n\right] + \frac{1}{4} y\left[n-1\right] - \frac{1}{8}y\left[n-2\right] = x\left[n\right]\]
+    
+    Applying partial fraction expansion, we can find that: 
+    \[H\left(z\right) = \frac{\frac{2}{3}}{1 + \frac{1}{2}z^{-1}} + \frac{\frac{1}{3}}{1 - \frac{1}{4}z^{-1}}, \mathspace \left|z\right| > \frac{1}{2}\]
+    
+    We can again write both terms as a feedback composition of systems.. Then, we can put them in parallel to get an addition, yielding the \important{parallel form representation}: 
+    \imagehere[0.7]{ZTransformParallelFormRepresentation.png}
+}
+
+\end{document}
