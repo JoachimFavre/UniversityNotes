@@ -1,0 +1,104 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-06-01 at 15:16:54.
+
+\usepackage{../../style}
+
+\title{Analyse 4}
+\author{Joachim Favre}
+\date{Jeudi 01 juin 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2023-06-01}{Un cours frustrant pour son manque de détails}{
+\begin{itemize}[left=0pt]
+    \item Explication de comment résoudre une équation différentielle en utilisant les transformées de Fourier.
+\end{itemize}
+
+}
+
+\parag{Rappels d'Analyse 3}{
+    Soit $f: \mathbb{R} \mapsto \mathbb{R}$, une fonction absolument intégrable: 
+    \[\int_{-\infty}^{\infty} \left|f\left(x\right)\right| < \infty\]
+
+    Alors, nous avons:
+    \begin{itemize}
+        \item La transformée de Fourier est donnée par: 
+        \[\mathcal{F}\left(f\right)\left(\alpha\right) = \hat{f}\left(\alpha\right) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} f\left(x\right) e^{-i \alpha x}dx\]
+        \item Si de plus $\hat{f}\left(\alpha\right)$ est aussi absolument intégrable, alors nous pouvons inverser la transformée de Fourier: 
+        \[f\left(x\right) = \mathcal{F}^{-1}\left(\hat{f}\right)\left(x\right) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \hat{f}\left(\alpha\right)e^{i \alpha x} d\alpha\]
+        \item La transformée de Fourier interagit très bien avec les dérivées:
+        \[\mathcal{F}\left(f'\right)\left(\alpha\right) = i \alpha \mathcal{F}\left(f\right)\left(\alpha\right) = i \alpha \hat{f}\left(\alpha\right)\]
+    \end{itemize}
+}
+
+
+\parag{Équation de la chaleur dans une barre finie}{
+    Soit $c \neq 0$, et $f: \mathbb{R} \mapsto \mathbb{R}$.
+
+    Nous voulons trouver une fonction $u\left(x, t\right)$ avec $x \in \mathbb{R}$ et $t \geq 0$, telle que: 
+    \[\begin{systemofequations} u_t = c^2 u_{x x}, & x \in \mathbb{R}, t > 0 \\ u\left(x, 0\right)= f\left(x\right), & x \in \mathbb{R} \end{systemofequations}\]
+    
+    Cette équation est très similaire à l'équation de la chaleur dans une barre finie, mais nous avons une barre infinie à la place.
+
+    \subparag{Résolution}{
+        Soit $v\left(\alpha, t\right)$ la transformée de Fourier de $u$ selon la variable $x$: 
+        \[v\left(\alpha, t\right) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} u\left(x, t\right) e^{-i \alpha x}dx = \mathcal{F}_x\left(u\right)\left(\alpha\right)\]
+        
+        En appliquant la transformée de Fourier selon $x$ des deux côtés de notre équation, nous obtenons: 
+        \[\begin{systemofequations} \mathcal{F}_x\left(u_t\right) = \mathcal{F}_x\left(c^2 u_{x x}\right), & \alpha \in \mathbb{R}, t > 0 \\ \mathcal{F}_x\left(u\left(x, 0\right)\right)\left(\alpha\right) = \mathcal{F}_x\left(f\right)\left(\alpha\right), & \alpha \in \mathbb{R}\end{systemofequations}\]
+
+        Nous pouvons simplifier ce résultat:
+        \[\begin{systemofequations} v_t\left(\alpha, t\right) = c^2 \left(i \alpha\right)^2 v\left(\alpha, t\right) \\ v\left(\alpha, 0\right) = \hat{f}\left(\alpha\right) \end{systemofequations}\]
+
+        En effet, informellement, nous avons: 
+        \autoeq{\mathcal{F}_x\left(u_t\right)\left(\alpha\right) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \frac{\partial}{\partial t}u\left(x,t\right) e^{-i \alpha x}dx = \frac{\partial}{\partial t} \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} u\left(x, t\right) e^{-i \alpha x}dx = v_t\left(\alpha, t\right)}
+        
+
+        Notre équation se réécrit simplement: 
+        \[\begin{systemofequations} v_t + c^2 \alpha^2 v = 0 \\ v\left(\alpha, 0\right) = \hat{f}\left(\alpha\right) \end{systemofequations}\]
+        
+        Cette équation est trivialement resolvable, c'est une EDL1 homogène avec condition initiale: 
+        \[v\left(\alpha, t\right) = \hat{f}\left(\alpha\right) e^{-c^2 \alpha^2 t}\]
+
+        Il ne ne nous reste maintenant plus qu'à inverser notre transformée de Fourier: 
+        \[u\left(x, t\right) = \mathcal{F}_{\alpha}^{-1}\left(v\left(\alpha, t\right)\right)\left(x\right) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \hat{f}\left(\alpha\right) e^{-c^2 \alpha^2 t} e^{i \alpha x} d\alpha\]
+
+        Il est important de noter que nous avons fait beaucoup d'étapes non-formelles: nous n'avons pas montré que notre résultat était dérivable, que cela convergeait, que nous pouvions sortir l'opérateur dérivée de l'intégrale, etc. Il faut croire les mathématiciens sur parole que cela fonctionne \textit{(chouette c'est pour ça que je suis un cours de maths, pour croire les gens sur parole)}.
+    }
+}
+
+\parag{Application}{
+    Soit $c \neq 0$. Nous voulons trouver une fonction $u\left(x, t\right)$ avec $x \in \mathbb{R}$ et $t \geq 0$, telle que: 
+    \[\begin{systemofequations} u_t = c^2 u_{x x}, & x \in \mathbb{R}, t > 0 \\ u\left(x, 0\right) = e^{-x^2}, & x \in \mathbb{R} \end{systemofequations}\]
+
+    Il est possible de trouver (par exemple à l'aide d'un formulaire) que: 
+    \[\mathcal{F}_x\left(e^{-x^2 \omega^2}\right)\left(\alpha\right) = \frac{1}{\sqrt{2\pi}\left|\omega\right|} e^{-\frac{x^2}{4\omega^2}}\]
+    
+
+    En utilisant ce que nous avons tout juste trouvé, nous obtenons que notre solution est: 
+    \[u\left(x, t\right) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \left(\frac{1}{\sqrt{2\pi}} e^{-\frac{\alpha^2}{4}}\right) e^{-c^2 \alpha^2 t} e^{i \alpha x} d\alpha\]
+    puisque $\omega = 1$.
+
+    Nous pouvons écrire $u\left(x, t\right)$ sous la forme d'une transformée inverse de Fourier: 
+    \[u\left(x, t\right) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \frac{1}{\sqrt{2\pi}} e^{-\frac{\alpha^2}{4} \left(1 + 4c^2 t\right)} e^{i\alpha x}dx = \mathcal{F}^{-1}\left(\frac{1}{\sqrt{2\pi}}e^{-\frac{\alpha^2}{4}\left(1 + 4 c^2 t\right)}\right)\left(x\right)\]
+
+    Nous pouvons donc poser $\omega^2 = \frac{1}{1 + 4c^2 t}$, ce qui nous donne: 
+    \[u\left(x,t\right) = \left|\omega\right| \mathcal{F}^{-1}\left(\frac{1}{\sqrt{2\pi} \left|\omega\right|}e^{-\frac{\alpha^2}{4\omega^2}}\right)\left(x\right) = \left|\omega\right| e^{-x^2 \omega^2} = \frac{1}{\sqrt{1 + 4c^2 t}} e^{-\frac{x^2}{1 + 4c^2 t}}\]
+}
+
+\parag{Méthode générale}{
+    La méthode d'appliquer une transformée de Fourier des deux côtés de l'équation est très générale et peut souvent être utilisée quand nous avons un $x$ non-borné.
+
+    \subparag{Remarque}{
+        Il est intéressant de voir que, puisque les équations de Sturm-Liouville demandent un intervalle borné pour $x$, alors l'autre méthode n'était pas applicable dans ce contexte.
+
+        De manière générale, nous devrions utiliser une séparation de variable et les équations de Sturm-Liouville quand nous avons un intervalle borné pour $x$, et une transformée de Fourier quand nous avons un ensemble non-borné pour cette variable.
+    }
+}
+
+\end{document}
