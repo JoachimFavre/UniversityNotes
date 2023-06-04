@@ -1,0 +1,164 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-06-01 at 13:23:37.
+
+\usepackage{../../style}
+
+\title{Probability and statistics}
+\author{Joachim Favre}
+\date{Jeudi 01 juin 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{26}{2023-06-01}{The answer is yes}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of the Neymnan-Pearson lemma.
+    \item Explanation of optimal hypothesis test under average error probability, and computation of a nice way to compute the average error probability.
+\end{itemize}
+
+}
+
+\subsection{Comparison of tests}
+
+\parag{Observation}{
+    We notice that we cannot optimise both the power and the size of a test. Now, if we freeze the size, we would like to have a way to maximise the power.
+}
+
+\parag{Definition: Rejection region}{
+    A test allows to split our data $Y$ into two regions, the \important{rejection region}, written $\mathcal{Y}$, and its complement $\bar{\mathcal{Y}}$, such that: 
+    \[Y \in \mathcal{Y} \iff \text{Reject $H_0$}\]
+
+    Equivalently:
+    \[Y \in \bar{\mathcal{Y}} \iff \text{Reject $H_1$}\]
+}
+
+\parag{Neyman-Pearson lemma}{
+    Let $H_0$ and $H_1$ be simple hypotheses, and let $f_0\left(y\right)$ and $f_1\left(y\right)$ be the densities of $Y$ under those hypotheses. Finally, let $\alpha \in \left[0, 1\right]$ be a size for our test.
+
+    We construct the following set: 
+    \[\mathcal{Y}_{\alpha} = \left\{y \in \Omega \suchthat \frac{f_1\left(y\right)}{f_0\left(y\right)} > t\right\}\]
+    where the $t \geq 0$ is chosen such that $\prob_0\left(Y \in \mathcal{Y}_{\alpha}\right) = \alpha$.
+
+    If such a $\mathcal{Y}_{\alpha}$ exists, then it is the most powerful test of size $\alpha$. In other words, it maximises $\prob_1\left(Y \in \mathcal{Y}_{\alpha}\right)$ amongst all the $\mathcal{Y}'$ for which $\prob_0\left(Y \in \mathcal{Y}'\right) \leq \alpha$.
+
+    \subparag{Proof}{
+        By hypothesis, $\mathcal{Y}_{\alpha}$ exists, meaning that there exists some $t_{\alpha} \geq 0$ for which $\prob_0\left(Y \in \mathcal{Y}_{\alpha}\right) \leq \alpha$.
+
+        Let $\mathcal{Y}'$ be an arbitrary critical region of size $\alpha$ or less. Our goal is to show that: 
+        \[\prob_1\left(Y \in \mathcal{Y}_{\alpha}\right) \geq \prob_1\left(Y \in \mathcal{Y}'\right) \iff \int_{\mathcal{Y}_{\alpha}} f_1\left(y\right)dy \geq \int_{\mathcal{Y}'} f_1\left(y\right)dy\]
+        
+        We take a step of abstraction, considering an arbitrary PDF $f_j \in \left\{f_0, f_1\right\}$ since we will need this later. We aim to show that the following is non-negative, for $j=1$ (meaning $f_j = f_1$): 
+        \autoeq{I_j = \prob_j\left(Y \in \mathcal{Y}_{\alpha}\right) - \prob_j\left(Y \in \mathcal{Y}'\right) = \int_{\mathcal{Y}_{\alpha}} f_j\left(y\right)dy - \int_{\mathcal{Y}'} f_j\left(y\right)dy = \int_{\mathcal{Y}_{\alpha} \cap \mathcal{Y}'} f_j\left(y\right)dy + \int_{\mathcal{Y}_{\alpha} \cap \bar{\mathcal{Y}}'} f_j\left(y\right)dy \fakeequal - \int_{\mathcal{Y}' \cap \mathcal{Y}_{\alpha}} f_j\left(y\right)dy - \int_{\mathcal{Y}' \cap \bar{\mathcal{Y}}_{\alpha}} f_j\left(y\right)dy}
+        where we partitioned $\mathcal{Y}_{\alpha} = \left(\mathcal{Y}_{\alpha} \cap \mathcal{Y}'\right) \cup \left(\mathcal{Y}_{\alpha} \cap \bar{\mathcal{Y}}'\right)$, and similarly for $\mathcal{Y}'$.
+
+        Since the intersection operator is commutative, our sum of integrals simplifies to: 
+        \[I_j = \int_{\mathcal{Y}_{\alpha} \cap \bar{\mathcal{Y}}'} f_j\left(y\right)dy - \int_{\mathcal{Y}' \cap \bar{\mathcal{Y}}_{\alpha}} f_j\left(y\right)dy\]
+        
+        Now, by hypothesis, we see that:
+        \autoeq{\prob_0\left(Y \in \mathcal{Y}'\right) \leq \alpha = \prob_0\left(Y \in \mathcal{Y}_{\alpha}\right)}
+
+        However, this implies that:
+        \[I_0 = \prob_0\left(Y \in \mathcal{Y}_{\alpha}\right) - \prob_0\left(Y \in \mathcal{Y}'\right) \geq 0\]
+
+        We thus want to make a link from $I_1$ to $I_0$. By construction of $\mathcal{Y}_{\alpha}$, we know that:
+        \[y \in \mathcal{Y}_{\alpha} \iff \frac{f_1\left(y\right)}{f_0\left(y\right)} > t_{\alpha} \iff f_1\left(y\right) > f_0\left(y\right)t_{\alpha}\]
+
+        In particular, this allows us to see that:
+        \[\begin{systemofequations} f_1\left(y\right) > t_{\alpha} f_0\left(y\right), & y \in \mathcal{Y}_{\alpha} \\ f_1\left(y\right) \leq t_{\alpha} f_0\left(y\right), & y \in \bar{\mathcal{Y}}_{\alpha} \end{systemofequations}\]
+
+        Since our sets are split according to whether $y \in \mathcal{Y}_{\alpha}$ or $y \in \bar{\mathcal{Y}}_{\alpha}$, this allows to simplify our inequality: 
+        \autoeq{I_1 = \int_{\mathcal{Y}_{\alpha} \cap \bar{\mathcal{Y}}'} f_1\left(y\right)dy - \int_{\mathcal{Y}' \cap \bar{\mathcal{Y}}_{\alpha}} f_1\left(y\right)dy \geq \int_{\mathcal{Y}_{\alpha} \cap \bar{\mathcal{Y}}'} t_{\alpha} f_0\left(y\right)dy - \int_{\mathcal{Y}' \cap \bar{\mathcal{Y}}_{\alpha}} t_{\alpha} f_0\left(y\right)dy = t_{\alpha} I_0 \geq 0}
+
+        This indeed completes our proof.
+
+        \qed
+    }
+}
+
+\parag{Example}{
+    We throw a coin $n$ times. We want to make an optimal test for the null hypothesis that the coin is fair, for a given size.
+
+    Each throw is a Bernoulli variable $Y_i$ so, leaving $R = \sum_{i=1}^{n} Y_i$, we get:
+    \[g\left(r\right) = \frac{f_1\left(y\right)}{f_0\left(y\right)} = \frac{\theta^r \left(1 - \theta\right)^{n-r}}{\left(\frac{1}{2}\right)^r\left(1 - \frac{1}{2}\right)^{n-r}} = \left(2\left(1 - \theta\right)\right)^n \left(\frac{\theta}{1 - \theta}\right)^r\]
+
+    We notice that if $\theta > \frac{1}{2}$, then $g\left(r\right)$ is increasing; and that it is decreasing when $\theta < \frac{1}{2}$. Let us suppose that $\theta > \frac{1}{2}$ for simplicity, the other case is very similar, except that all inequalities are reversed. In this case, we have:
+    \[g\left(r\right) = \frac{f_1\left(y\right)}{f_0\left(y\right)} > t \iff r \geq r_1\]
+    for some $r_1 \in \mathbb{R}$, because $g$ increases.
+
+    We could try to isolate it, but this quickly becomes really unmanageable. Instead, since $R$ is a sum of Bernoulli random variables, we can estimate $r_1$ using the central limit theorem: 
+    \[\alpha = \prob_0\left(Y \in \mathcal{Y}_1\right) = \prob_0\left(R \geq r_1\right) = \prob_0\left(\frac{R - \frac{n}{2}}{\sqrt{\frac{n}{4}}} \geq \frac{r_1 - \frac{n}{2}}{\sqrt{\frac{n}{4}}}\right) = 1 - \Phi\left(\frac{r_1 - \frac{n}{2}}{\sqrt{\frac{n}{4}}}\right)\]
+
+    Now, $\alpha$ is given, so we want to invert this. We know that $\Phi\left(z_{\beta}\right) = \beta$, by definition of quantiles and since $\Phi$ is continuous, so our equation implies that: 
+    \[\Phi\left(\frac{r_1 - \frac{n}{2}}{\sqrt{\frac{n}{4}}}\right) = 1 -\alpha \implies z_{1-\alpha} = \frac{r_1 - \frac{n}{2}}{\sqrt{\frac{n}{4}}} \iff r_1 = \frac{n + \sqrt{n} z_{1-\alpha}}{2}\]
+    
+    Let's say that we made $n = 200$ throws and that we want a size $\alpha = 0.05$. This then yields: 
+    \[r_1 \approx 111.6\]
+
+    In other words, if we have more than $111.6$ heads, we can reject the null hypothesis that the coin is fair.
+}
+
+\parag{Optimal hypothesis test under average error probability}{
+    Let $H_0$ and $H_1$ be hypotheses with PMFs or PDFs $f_0$ and $f_1$, and let $H \in \left\{0, 1\right\}$ be a random variable stating which hypothesis is correct (meaning that, if $H = 0$, then $H_0$ should be accepted). Moreover, let $Y$ be some observations.
+
+    We want to make a test minimising the average probability of error (the bar over the $\prob$ represents the fact that it is an average, not a complement): 
+    \autoeq{\bar{\prob}_e = \prob\left(\text{accept $H_1$} | H = 0\right)\prob\left(H = 0\right) + \prob\left(\text{accept $H_0$} | H = 1\right)\prob\left(H = 1\right) = \prob_0\left(\text{accept $H_1$}\right)\prob\left(H = 0\right) + \prob_1\left(\text{accept $H_0$}\right)\prob\left(H = 1\right)}
+
+    We will moreover consider the prior that, if we don't make any observation, then $\prob\left(\text{truth} = H_1\right) = \prob\left(\text{truth} = H_0\right) = \frac{1}{2}$. In other words, we have maximal entropy since we have no information without any observation. This means that we are trying to minimise:
+    \[\bar{\prob}_e = \frac{\prob_0\left(\text{accept $H_1$}\right) + \prob_1\left(\text{accept $H_0$}\right)}{2}\]
+
+    \subparag{Estimator}{
+        Now, the idea of our estimator $\hat{H}$ of $H$, which purpose is decide which hypothesis is correct while minimising the average error, is to always pick the one which has highest probability to take place:
+        \autoeq{\hat{H}\left(y\right) = \argmax_{h \in \left\{0, 1\right\}} \prob\left(H = h | Y = y\right) = \argmax_{h \in \left\{0, 1\right\}} \frac{\prob\left(Y = y | H = h\right)\prob\left(H = h\right)}{\prob\left(Y = y\right)} = \argmax_{h \in \left\{0, 1\right\}} \frac{1}{2\prob\left(Y = y\right)} \prob\left(Y = y | H = h\right)}
+        
+        We notice that $\frac{1}{2\prob\left(Y = y\right)}$ is just a constant with respect to $h$, so it has no impact on the maximisation of this function. This means that we can just remove it: 
+        \autoeq{\hat{H}\left(y\right) = \argmax_{h \in \left\{0, 1\right\}} \prob\left(Y = y | H = h\right) = \argmax_{h \in \left\{0, 1\right\}} f_h\left(y\right)}
+        where we recognised the PMFs of our hypotheses. The case for continuous random variables is similar, and gives the PDFs.
+    }
+    
+    \subparag{Analysis of error}{
+        Let us consider the following graph to understand what happens. We notice that the probability of accepting $H_1$ when the truth is $H_0$, $\prob_0\left(\text{accept $H_1$}\right)$, is the red area (places where the PMF of $H_0$ is lower than the one of $H_1$), and $\prob_1\left(\text{accept $H_0$}\right)$ is the blue area.
+
+        \svghere{AverageErrorProbability_AnalysisOfError.svg}
+
+        By definition of $\bar{\prob}_e$, we want to average those areas, meaning to compute half of their sum. However, we notice that their sum is given by the integral of the minimum between those two functions:
+        \[\bar{\prob}_e = \frac{b + r}{2} = \frac{1}{2} \int_{-\infty}^{\infty} \min\left(f_0\left(y\right), f_1\left(y\right)\right)dy\]
+
+        Now, to simplify this expression, we notice that the sum of the orange, blue and red regions gives 1, since we exactly have the PDF of $H_0$: 
+        \[o + b + r = 1\]
+
+        We can do the exact same reasoning to see that the sum of the blue, red and green regions give $1$: 
+        \[b + r + g = 1\]
+        
+        Summing our two equations, we get that: 
+        \[2 = \left(o + g\right) + 2\left(b + r\right) = \int_{-\infty}^{\infty} \left|f_0\left(y\right) - f_1\left(y\right)\right|dy + 4\bar{\prob}_e\]
+        where we noticed that $o + g$ can be computed using the integral of the absolute difference of the two functions; since they represent the area bounded by the two PDFs. We moreover recognise that the integral is an $L_1$ norm for functions, telling us that: 
+        \[\bar{\prob}_e = \frac{1}{2} - \frac{1}{4} \left\|f_0 - f_1\right\|_1\]
+        
+        As a general intuition, it makes sense that the more distant $f_0$ and $f_1$ are (here, according to the $L_1$ norm), the less we will make wrong predictions. However, let us consider two extreme cases to understand this better. If $f_0$ and $f_1$ are completely separated, meaning that $f_0\left(y\right) = 0$ when $f_1\left(y\right) \neq 0$ and inversely, then $\left\|f_0 - f_1\right\|_1 = 2$ and thus:
+        \[\bar{\prob}_e = \frac{1}{2} - \frac{2}{4} = 0\]
+
+        This makes sense since, when the PDFs are completely separated, we should always be able to find the correct answer.
+
+        If however $f_0\left(y\right) = f_1\left(y\right)$, meaning that, for any observation, there is no hypothesis which has a higher probability, then $\left\|f_0 - f_1\right\|_1 = 0$ and thus: 
+        \[\bar{\prob}_e = \frac{1}{2} - \frac{0}{4} = \frac{1}{2}\]
+        
+        This also makes sense since we can only make a uniformly random guess in that case.
+    }
+
+    \subparag{Personal remark after a discussion with Marco Lourenço}{
+        In practice, this kind of ideas is not really used. We usually first choose our size (depending on the context), and then try to minimise the false negative probability. Minimising the average of the two is something which is very rarely used.
+
+        As an interesting side note, it seems like this is a special case of the maximum a posteriori probability estimate, where we only have two hypotheses, and do not give any prior advantage to any of them:
+        \begin{center}
+            \url{https://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation}
+        \end{center}
+
+        However, again, this over-specialisation of this test makes it not really used in practice.
+    }
+}
+
+\end{document}
