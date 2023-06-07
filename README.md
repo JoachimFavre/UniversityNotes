@@ -4,7 +4,7 @@
 You can find my latest notes (if I updated them) in the [Releases section](https://github.com/JoachimFavre/EPFLNotesIN/releases). If you want to have a single lesson (because I forgot to update the full document, for example), do not hesitate to pull this repository and compile the lecture using *PdfLaTeX* for the BA1 and BA2, and *LuaLaTeX* for the others.
 
 ## Remarks
-I made those documents for my own use, but I thought that typed notes might be of interest to others. So, I shared it (with you, if you are reading this!); since it did not cost me anything. I just ask you to keep in mind that there are mistakes, it is impossible not to make any. If you find some, please feel free to share them with me (grammatical and vocabulary errors are of course also welcome). You can contact me at my EMFL e-mail address.
+I made those documents for my own use, but I thought that typed notes might be of interest to others. So, I shared it (with you, if you are reading this!); since it did not cost me anything. I just ask you to keep in mind that there are mistakes, it is impossible not to make any. If you find some, please feel free to share them with me (grammatical and vocabulary errors are of course also welcome). You can contact me at my EPFL e-mail address.
 
 Please note that those contents do not belong to me. I have made some structural changes, reworded some parts, and added some personal notes; but the wording and explanations come mainly from the Professors, and from the books on which they based their course.
 
