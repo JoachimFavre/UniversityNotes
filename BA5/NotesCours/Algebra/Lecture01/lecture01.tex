@@ -1,0 +1,371 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-09-25 at 15:20:03.
+
+\usepackage{../../style}
+
+\title{Algebra}
+\author{Joachim Favre}
+\date{Lundi 25 septembre 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2023-09-25}{Pretty colours}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the simple induction principle, the well ordering principle and the strong induction principle; and proof that they are equivalent.
+    \item Definition of divisibility, prime and composite numbers.
+    \item Proof of the Euclidean division theorem.
+    \item Definition of greatest common divisor.
+    \item Proof of the Euclidean algorithm, and of Bézout's construction.
+    \item Definition of Euler's totient function.
+\end{itemize}
+
+}
+
+\section{Introduction}
+
+\subsection{Axioms of natural numbers}
+
+\begin{parag}{Definition: Natural numbers}
+    The set of \important{natural numbers} is the set of non-negative numbers: 
+    \[\mathbb{N} = \left\{0, 1, 2, \ldots\right\}\]
+
+    \begin{subparag}{Remark}
+        When we want to exclude the zero, we can write: 
+        \[\mathbb{Z}_+ = \left\{1, 2, \ldots\right\}\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Axiom: Induction principle}
+    Let $S \subset \mathbb{N}$ be a set such that $0 \in S$ and $n \in S \implies n+1 \in S$.
+
+    Then, $S = \mathbb{N}$.
+\end{parag}
+
+\begin{parag}{Axiom: Well ordering principle}
+    Let $S \subset \mathbb{N}$ be non-empty.
+
+    Then, $S$ has a least element.
+\end{parag}
+
+\begin{parag}{Axiom: Strong induction principle}
+    Let $S \subset \mathbb{N}$ be a set such that $0 \in S$ and $\left\{0, \ldots, n\right\} \subset S \implies n + 1 \in S$.
+
+    Then, $S = \mathbb{N}$.
+\end{parag}
+
+\begin{parag}{Theorem: Equivalence}
+    We have the following implications: 
+    \[\text{induction} \implies \text{strong induction} \implies \text{well ordering} \implies \text{induction}\]
+    
+    In other words, all three axioms are equivalent. We can take any of the propositions as an axiom, and the other two will come from that.
+
+    \begin{subparag}{Proof 1}
+        We want to show that the induction principle implies the strong induction principle. In other words, we suppose the induction principle holds and we want to prove the strong induction principle.
+
+        Let $S \subset \mathbb{N}$ be an arbitrary set such that $0 \in S$ and $\left\{0, \ldots, n\right\} \subset S \implies n + 1 \in S$. Also, let $P\left(n\right)$ be the proposition $\left\{0, \ldots, n\right\} \subseteq S$. 
+
+        We know that $P\left(0\right)$ is true since $0 \in S$.
+
+        Now, let's assume that $P\left(k\right)$ is true. This means that $\left\{0, \ldots, k\right\} \subset S$. By our supposition on $S$, this implies that $k+1 \in S$. Putting both together, we get that $\left\{0, \ldots, k+1\right\} \subset S$ and thus that $P\left(k+1\right)$ is true. However, we have proven that $P\left(k\right) \implies P\left(k+1\right)$. This implies by regular induction that $P\left(n\right)$ is true for all $n \in \mathbb{N}$, and thus that strong induction indeed holds. 
+    \end{subparag}
+    
+    \begin{subparag}{Proof 2}
+        The proof that the strong induction principle implies the well ordering principle will be done in the first exercise series.
+    \end{subparag}
+
+    \begin{subparag}{Proof 3}
+        We want to show that the well ordering principle implies the induction principle.
+
+        Let $S \subset \mathbb{N}$ be an arbitrary set such that $0 \in S$ and $n \in S \implies n + 1 \in S$; and let $S' = \mathbb{N} \setminus S$.
+
+        We suppose for contradiction that $S' \neq \o$. By the well ordering principle, this implies that there exists a least element $k \in S'$.
+
+        We know that $0 \not \in S'$ because $0 \in S$ by hypothesis. This means that $m = k-1 \in \mathbb{N}$. We know $m \not \in S'$ since $k$ was the least element; and thus $m \in S$. Moreover, we know that $m \in S \implies m+1 \in S$ and thus $k \in S$. We have shown that $k \in S$ and $k \in S'$ even though $S \cap S' = \o$. This is our contradiction, showing that $S' = \o$ and thus $S = \mathbb{N}$. We have thus indeed shown the induction principle.
+
+        \qed
+    \end{subparag}
+    
+    \begin{subparag}{Remark}
+        This last proof uses a structure named ``the minimal criminal''. We pick an element which should be minimal with a certain property, but we construct a smaller one with the same property.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Division}
+    Let $a, b \in \mathbb{Z}$, such that $a \neq 0$. We define that $a$ \important{divides} $b$, written $a \divides b$ or $b \in a\mathbb{Z}$ (or $b = a \mathbb{Z}$ \textit{(though this notation is awful))}, when $\exists c \in \mathbb{Z}$ such that: 
+    \[b = ac\]
+\end{parag}
+
+\begin{parag}{Definition: Prime number}
+    Let $n \in \mathbb{Z}_+ = \left\{1, 2, \ldots\right\}$.
+
+    If $p > 1$ and its only divisors are $1$ and $p$, then it is said to be a \important{prime}. Otherwise, it is said to be a \important{composite}.
+\end{parag}
+
+\begin{parag}{Theorem}
+    Any natural number $n > 1$ has a prime divisor.
+
+    \begin{subparag}{Proof}
+        Let $S \subset \mathbb{N}_{n \geq 2}$ be the set of numbers strictly greater than 1 which have no prime divisor. 
+
+        Let's suppose for contradiction that $S \neq \o$. Then, there exists a least element $k \in S$. We notice that $k$ cannot be a prime since, otherwise, $k \divides k$ would be a prime divisor. Since $k$ is composite, we can write $k = ab$ for $1 < a, b < k$. Since $a < k$ and $k$ was the least element, we know that $a \not \in S$. Thus, $a$ must have a prime divisor $p$, meaning that we can write $a = pt$ for some $t \in \mathbb{N}$. This yields that: 
+        \[k = ab = ptb\]
+        
+        However, this means that $k$ has a prime divisor $p$, which is our contradiction. This implies that $S = \o$, which concludes our proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Any integer $n > 1$ is a product of primes.
+
+    \begin{subparag}{Proof}
+        The proof is left as an exercise to the reader, since it is very similar to the previous one.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $n \in \mathbb{N}$ be such that $n > 1$. 
+
+    The prime factorisation of $n$ is unique.
+
+    \begin{subparag}{Proof}
+        Let $n$ be the smallest number be the smallest integer greater than 1 with two different factorisations: 
+        \[n = p_1 \cdots p_k = q_1 \cdots q_m\]
+        
+        For all $\left(i, j\right)$, we have $p_i \neq q_j$ since, otherwise, we could simplify it on both side and get another smaller integer $n$ with the same property. 
+
+        Let's suppose without loss of generality that $q_1 > p_1$ and let:
+        \[t = \left(q_1 - p_1\right)q_2 \cdots q_m > 0\]
+
+        Then: 
+        \autoeq{t = \overbrace{q_1 \cdots q_m}^{= n} - p_1 q_2 \cdots q_m = n - p_1 q_2 \cdots q_m = p_1 \cdots p_k - p_1 q_2 \cdots q_m = p_1 \left(p_2 \cdots p_k - q_2 \cdots q_m\right)}
+        
+        However, this implies that $p_1 \divides t$. Thus, this implies that $t \geq p_1 > 1$. Now, we saw that $t = \left(q_1 - p_1\right)q_2 \cdots q_m$ and $p_1 \neq q_j$ for all $j$, so $p_1 \divides t$ implies that $p_1$ must necessarily divide $\left(q_1 - p_1\right)$. In other words, there exists a $s \in \mathbb{N}$ such that: 
+        \[q_1 - p_1 = sp_1 \iff q_1 = \left(s+1\right)p_1 \iff p_1 \divides q_1\]
+
+        This is our contradiction, a prime cannot divide a different prime.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Basic properties of integer arithmetic}
+
+\begin{parag}{Theorem: Euclidean division}
+    Let $n \in \mathbb{Z}$ and $d \in \mathbb{Z}_+$. There exists two integers $q, r \in \mathbb{Z}$ such that $n = qd + r$ and $0 \leq r < d$. Moreover, these $q, r$ are unique.
+
+    The $q$ is named the \important{quotient}, and the $r$ is named the \important{remainder}.
+
+    \begin{subparag}{Proof of existence}
+        Let $n \in \mathbb{Z}$ and $d \in \mathbb{Z}_+$.
+
+        We consider the following set: 
+        \[S = \left\{n - k d | k \in \mathbb{Z}\right\} \cap\mathbb{N} = \left\{n - kd | k \in \mathbb{Z} \text{ such that } n \geq kd\right\} \subset \mathbb{N}\]
+        
+        Intuitively, this represents the set of non-negative numbers with the same rest modulo $d$ as $n$.
+
+        We know that $S \neq \o$. Indeed, if $n \geq 0$, we can pick $k = 0$ to get $n \in S$. Otherwise, if $n < 0$, we can take $k = \left|n\right| + 1$, which is such that $kd > \left|n\right|$ and thus $n + kd \in S$.
+
+        By the well-ordering principle, this means that there exists a smallest element $r \in S$, i.e.: 
+        \[r = n - kd \iff n = kd + r\]
+        
+        Now, let's suppose for contradiction that $r \geq d$. This means that: 
+        \[n - \left(k+1\right)d = n - kd - d = r - d \geq 0\]
+        
+        However, this is a contradiction since $r$ was the least element in $S$, and we constructed a new one smaller. We have thus indeed shown the existence of $r, k$ such that $n = kd + r$ and $0 \leq r < d$.
+    \end{subparag}
+
+    \begin{subparag}{Proof of unicity}
+        Let's suppose for contradiction that we can write: 
+        \[n = r_1 + q_1 d = r_2 + q_2 d\]
+        
+        If $q_1 = q_2$, then necessarily we have $r_1 = r_2$ and they are not unique. Thus, let's suppose without loss of generality that $q_1 > q_2$. This implies that: 
+        \[r_2 = \underbrace{\left(q_1 - q_2\right)}_{> 0}d + \underbrace{r_1}_{\geq 0} \geq d\]
+        
+        However, this is a contradiction to the definition of $r_2$, which should be such that $0 \leq r_2 < d$.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The integers $\left(q, r\right)$ can be found by doing an integer long division \textit{(division en colonne} in French).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: GCD}
+    Let $a, b \in \mathbb{Z}$.
+
+    Their \important{greatest common divisor}, written $\gcd\left(a, b\right)$, is the greatest positive integer $c$ such that $c \divides a$ and $c \divides b$.
+\end{parag}
+
+\begin{parag}{Theorem: Euclidean algorithm}
+    Let $n, q \in \mathbb{Z}$ and $d \in \mathbb{Z}_+$ such that $n = dq + r$ and $0 \leq r < d$.
+
+    Then, $\gcd\left(n, d\right) = \gcd\left(d, r\right)$.
+
+    \begin{subparag}{Proof}
+        Let $c_1$ be an arbitrary divisor of both $n$ and $d$. Since $n = qd + r$, this means that $c_1$ also divides $r = n - qd$.
+
+        Let $c_2$ be an arbitrary divisor of both $d$ and $r$. Since $n = qd + r$, this means that $c_2$ also divides $n$.
+
+        However, this implies that the set of common divisors of both $n$ and $d$ is the same as the set of common divisors of $d$ and $r$. This indeed yields that: 
+        \[\gcd\left(n, d\right) = \gcd\left(d, r\right)\]
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Euclidean algorithm}
+        This lemma is a proof that the Euclidean algorithm works. 
+
+        Let $d_1 = q_1 d_2 + d_3$. We know that $\gcd\left(d_1, d_2\right) = \gcd\left(d_2, d_3\right)$. Thus, we can divide $d_1$ by $d_2$ to get $d_3$, then divide $d_2$ by $d_3$, and so on until we get $d_k = 0$. We then know that: 
+        \[\gcd\left(d_1, d_2\right) = d_{k-1}\]
+        
+        This always terminate since the sequence of the $d_i$ is strictly decreasing.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Let us consider: 
+        \[\gcd\left({\color{MyGreen}492}, {\color{red}126}\right)\]
+
+        We make the following divisions, computed using long division: 
+        \[{\color{MyGreen}492} = {\color{red}126}\cdot 3 + {\color{blue}114}, \mathspace {\color{red}126} = {\color{blue}114}\cdot 1 + {\color{orange}12}, \mathspace {\color{blue}114} = {\color{orange}12}\cdot 9 + {\color{MyPurple}6}, \mathspace {\color{orange}12} = {\color{MyPurple}6}\cdot 2 + 0\]
+        
+        Since we got a rest of 0 at the end, it yields that the GCD was the rest of the division right before, \textcolor{MyPurple}{6}: 
+        \[\gcd\left({\color{MyGreen}492}, {\color{red}126}\right) = {\color{MyPurple}6}\]
+        
+    \end{subparag}
+    
+\end{parag}
+
+\begin{parag}{Corollary 1}
+    Let $a, b \in \mathbb{Z}_+$. Then, there exists $x, y \in \mathbb{Z}$ such that: 
+    \[\gcd\left(a, b\right) = ax + by\]
+    
+    \begin{subparag}{Proof}
+        This can be proven by using an algorithm. The idea is to first use the Euclidean algorithm, and then rewind back to our numbers.
+
+        Let's make a proof by example. In the previous example, we found that: 
+        \[\gcd\left({\color{MyGreen}492}, {\color{red}126}\right) = {\color{MyPurple}6}\]
+
+        The intermediate steps of the Euclidean algorithm were:
+        \[{\color{MyGreen}492} = {\color{red}126}\cdot 3 + {\color{blue}114}, \mathspace {\color{red}126} = {\color{blue}114}\cdot 1 + {\color{orange}12}, \mathspace {\color{blue}114} = {\color{orange}12}\cdot 9 + {\color{MyPurple}6}, \mathspace {\color{orange}12} = {\color{MyPurple}6}\cdot 2 + 0\]
+
+        We start with the second-to-last equality: 
+        \[\gcd\left(492, 126\right) = {\color{MyPurple}6} = {\color{blue}114} - {\color{orange}12}\cdot 9\]
+        
+        We then use  the third-to-last equality to see that ${\color{orange}12} = {\color{red}126} - {\color{blue}114}\cdot 1$, so: 
+        \[{\color{MyPurple}6} = {\color{blue}114} - \left({\color{red}126} - {\color{blue}114}\cdot 1\right)\cdot 9 = {\color{blue}114}\cdot 10 - {\color{red}126}\cdot 9\]
+        
+        Finally, the first equality yields that ${\color{blue}114} = {\color{MyGreen}492} - {\color{red}126}\cdot 3$, and thus:
+        \[{\color{MyPurple}6} = \left({\color{MyGreen}492} - 3\cdot {\color{red}126}\right)\cdot 10 - {\color{red}126}\cdot 9 = {\color{MyGreen} 492}\cdot 10 - {\color{red}126}\cdot 39\]
+
+        To sum up, we found that: 
+        \[{\color{MyPurple}6} = \gcd\left({\color{MyGreen}492}, {\color{red}126}\right) = {\color{MyGreen} 492}\cdot 10 - {\color{red}126}\cdot 39\]
+
+        This is the end of our algorithm.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary 2}
+    Let $a, b \in \mathbb{Z}_+$ and $d = \gcd\left(a, b\right)$.
+
+    The equation $ax + by = c \in \mathbb{Z}$ has a solution $x, y \in \mathbb{Z}$ if and only if $c \in d \mathbb{Z}$ (meaning $d \divides c$).
+
+    \begin{subparag}{Proof $\implies$}
+        Let $c \in \mathbb{Z}$ and $x, y \in \mathbb{Z}$ be solutions to $ax + by = c$.
+
+        We notice that, by definition of the greatest common divisor, $d \divides a$ and $d \divides a$. In particular, this means that $d \divides ax + by$, and thus this necessarily means that $d \divides c$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        Let $c = kd$ for some $k \in \mathbb{Z}$. 
+
+        By our first corollary, we know we can find $x, y \in \mathbb{Z}$ such that: 
+        \[ax + by = \gcd\left(a, b\right) = d\]
+
+        Multiplying both sides by $k$, this implies that: 
+        \[akx + bky = kd \iff a \widetilde{x} + b \widetilde{y} = c\]
+        for $\widetilde{x} = kx$ and $\widetilde{y} = ky$.
+        
+        We have indeed found a solution to $ax + by = c$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Relatively prime}
+    Let $a, b \in \mathbb{Z}_+$. 
+
+    We say that they are \important{relatively prime} if: 
+    \[\gcd\left(a, b\right) = 1\]
+\end{parag}
+
+
+\begin{parag}{Bézout's theorem}
+    Let $a, b \in \mathbb{Z}_+$.
+
+    They are relatively prime if and only if there exists $x, y \in \mathbb{Z}$ such that: 
+    \[ax + by = 1\]
+    
+    \begin{subparag}{Proof}
+        This is a special case of the second corollary.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Euler's totient function}
+    Let $n \in \mathbb{Z}_+$.
+
+    We define $\phi\left(n\right)$ to be the number of positive integers $k$, such that $1 \leq k \leq n$ and: 
+    \[\gcd\left(n, k\right) = 1\]
+    
+    \begin{subparag}{Example}
+        For instance, since 1 is only coprime with 1: 
+        \[\phi\left(1\right) = 1\]
+        
+        Also, since 3 is coprime with both 1 and 2: 
+        \[\phi\left(3\right) = 2\]
+   \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    Let $p$ be a prime number. Then: 
+    \[\phi\left(p\right) = p-1\]
+
+    \begin{subparag}{Proof}
+        Any of the $p-1$ numbers strictly smaller than $p$ is coprime with $p$, so this gives our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    Let $p$ and $q$ be different prime numbers. Then: 
+    \[\phi\left(pq\right) = \left(p-1\right)\left(q-1\right)\]
+
+    \begin{subparag}{Proof}
+        There are $pq$ numbers from $1$ to $pq$. $p$ of them are divisible by $q$ and $q$ of them are divisble by $p$. We finally need to be careful by not double counting that $pq$ is divisible by both $p$ and $q$. Thus: 
+        \[\phi\left(pq\right) = pq - p - q + 1 = \left(p-1\right)\left(q-1\right)\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    Let $m, n$ such that $\gcd\left(m, n\right) = 1$. 
+
+    Then: 
+    \[\phi\left(nm\right) = \phi\left(n\right)\phi\left(m\right)\]
+    
+    \begin{subparag}{Proof}
+        The proof will be done later, using ring theory.
+    \end{subparag}
+\end{parag}
+
+\end{document}
+
