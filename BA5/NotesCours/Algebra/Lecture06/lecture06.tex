@@ -1,0 +1,385 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-10-30 at 21:36:41.
+
+\usepackage{../../style}
+
+\title{Algebra}
+\author{Joachim Favre}
+\date{Lundi 30 octobre 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2023-10-30}{Enlarge your orbit}{
+\begin{itemize}[left=0pt]
+    \item Proof of the sign invariance of a permutation.
+    \item Definition of the alternating group.
+    \item Definition of a group acting on itself by permutation.
+    \item Definition of the orbit and the conjugacy class.
+    \item Definition of the stabiliser and the centraliser.
+    \item Proof of the orbit-stabiliser theorem.
+    \item Definition of the center of a group.
+    \item Proof of the class equation of a group.
+\end{itemize}
+
+}
+
+\begin{parag}{Definition: Inversion}
+    Let $a_1, \ldots, a_n$ be a permutation of $1, \ldots, n$ 
+
+    An inversion is a pair of numbers $\left(a_i, a_j\right)$ such that $i < j$ and $a_i > a_j$.
+
+    \begin{subparag}{Example}
+        For instance, there is no inversion in $1, 2, 3, 4, 5, 6$. However, in $1, 2, {\color{red}4, 3}, 5, 6$, there is an inversion: $\left(4, 3\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Sign invariance}
+    Let $\sigma \in S_n$. Also, let $k$ be the number of inversions in $\sigma\left(1, \ldots, n\right)$ and $j$ be the number of transpositions in an expression of $\sigma$.
+
+    Then: 
+    \[\left(-1\right)^{k} = \left(-1\right)^j\]
+
+    We call this value the \important{sign} of $\sigma$, written $\text{sgn}\left(\sigma\right)$.
+    
+    \begin{subparag}{Proof idea}
+        Let $\sigma \in S_n$. We notice that this permutations maps $\left(1, \ldots, n\right)$ to:
+        \[\sigma\left(1, 2, \ldots, n\right) = \left(a_1, \ldots, a_{\alpha}, i, b_1, \ldots, b_{\beta}, j, c_1, \ldots, c_{\gamma}\right)\]
+
+        Let us consider the action of the transposition $\left(i, j\right)$, to see how it changes the number of inversions in the permutation. We notice that the elements $a_t$ and $c_s$ do not contribute to the change of number of inversions: for instance, if $\left(i, a_t\right)$ was an inversion, it will stay that way. Also, if $b_k < i$ and $b_k < j$, then $b_k$ also does not contribute; and similarly if $b_k > i$ and $b_k > j$. Thus, the only interesting case appears when $i < b_k < j$ or $j < b_k < i$. In that case, it will contribute $+2$ or $-2$ to the number of inversions: $\left(i, b_k\right)$ and $\left(b_k, j\right)$ will either both become an inversion, or stop being inversions.
+
+        The only inversion that will change is the one of $\left(i, j\right)$ which will either stop being one or become one. Thus, the action by a transposition changes the number of inversions by 1.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    The function $\text{sgn}: S_n \mapsto \left\{1, -1\right\}$ is a group homomorphism.
+
+    \begin{subparag}{Proof}
+        Let $\sigma, \tau \in S_n$. We need to show:
+        \[\text{sgn}\left(\sigma \tau\right) = \text{sgn}\left(\sigma\right)  \text{sgn}\left(\tau\right)\]
+
+        Letting $t\left(\sigma\right)$ to count the number of tranpositions in an expression of $\sigma$, we have:
+        \[\text{sgn}\left(\sigma \tau\right) = \left(-1\right)^{t\left(\sigma \tau\right)} = \left(-1\right)^{t\left(\sigma\right) + t\left(\tau\right)} = \left(-1\right)^{t\left(\sigma\right)}\left(-1\right)^{t\left(\tau\right)} = \text{sgn}\left(\sigma\right)\text{sgn}\left(\tau\right)\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Alternating group}
+    The \important{alternating group} is defined as $A_n = \text{ker}\left(\text{sgn}\right) \normalsubgroup S_n$: 
+    \[\text{ker}\left(\text{sgn}\right) = \left\{\sigma \in S_n | \sigma \text{ is a product of an even number of transpositions}\right\}\]
+    
+    \begin{subparag}{Remark}
+        Since this is the kernel of a group homomorphism of $S_n$, it is a normal subgroup of $S_n$.
+    \end{subparag}
+    
+    \begin{subparag}{Observation}
+        $A_n$ has $\left|A_n\right| = \frac{\left|S_n\right|}{\left|\left\{1, -1\right\}\right|} = \frac{n!}{2}$ elements.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, let us consider $S_3$: 
+        \[S_3 = \left\{1, \left(1, 2\right), \left(1, 3\right), \left(2, 3\right), \left(1, 2, 3\right), \left(1, 3, 2\right)\right\}\]
+        
+        Then: 
+        \[A_3 = \left\{1, \left(1,2,3\right), \left(1, 3, 2\right)\right\}\]
+        since $\left(1, 2, 3\right) = \left(1, 3\right)\left(1, 2\right)$ and $\left(1, 3, 2\right) = \left(1, 2\right)\left(1, 3\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $h = \rho_{\ell _1} \cdots \rho_{\ell _r} \in S_n$ be a product of disjoint cycles of lengths $\ell_1, \ldots, \ell _r$.
+
+    Then:
+    \begin{enumerate}
+        \item For any $g \in S_n$, the conjugation $g h g^{-1}$ is a product of disjoint cycles of the same lengths.
+        \item For any product of disjoint cycles of the same lengths $x = \gamma_{\ell _1} \cdots \gamma_{\ell _r} \in S_n$, there exists some $g \in S_n$ such that $x = g h g^{-1}$.
+    \end{enumerate}
+
+    \begin{subparag}{Proof 1}
+        Let $\rho_{\ell} = \left(i_1, \ldots, i_{\ell }\right)$ be a cycle. Then, we know that $\gamma_{\ell } = g \rho_{\ell } g^{-1} = \left(g\left(i_1\right), \ldots, g\left(i_{\ell }\right)\right)$ is a cycle of the same length.
+
+        Now, if $h = \rho_{\ell _1} \cdots \rho_{\ell _r}$, then we can express $g h g^{-1}$ as a product of cycles of the same length: 
+        \[g h g^{-1} = g \rho_{\ell _1} \rho_{\ell _2} \cdots \rho_{\ell _r} g^{-1} = g \rho_{\ell _1} \underbrace{g^{-1} g}_{= 1} \rho_{\ell _2} g^{-1} \cdots g \rho_{\ell _r} g^{-1} = \gamma_{\ell _1} \cdots \gamma_{\ell _r}\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        Let $\beta_{\ell _1} \cdots \beta_{\ell _r}$ be a product of disjoint cycles of the same length. We want to find a $t$ such that $t \rho_{\ell _1} \cdots \rho_{\ell _r} t^{-1} = \beta_{\ell _1} \cdots \beta_{\ell _r}$. We can just pick $t$ so that it sends each number in each of the disjoint cycles $\rho_{\ell _1}, \ldots, \rho_{\ell _r}$ to the corresponding element of the disjoint cycles $\beta_{\ell _1}, \ldots, \beta_{\ell_r}$.
+
+        For instance, let us consider a $t$ which would map $\left(1, 2\right)\left(3, 6, 7\right) \mapsto \left(4, 3\right)\left(1, 5, 6\right)$. The goal is thus to map $1\to4$, $2\to3$, $3\to1$, $6\to5$, $7\to6$. We can thus take: 
+        \[t = \left(1, 4, 2, 3\right)\left(6, 5, 7\right)\]
+        also mapping $4 \mapsto 2$ and $5 \mapsto 7$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Conjugacy class}
+    Let $G$ be a finite group and let $h \in G$.
+
+    The \important{conjugacy class} of $h$ in $G$, written $C_h$, is the set of all elements conjugated to $h$: 
+    \[C_h = \left\{ghg^{-1} | g \in S_n\right\}\]
+    
+    \begin{subparag}{Observation}
+        We proved that all elements of the of the same conjugacy class in $S_n$ have cycles of the same length; meaning that two classes cannot intersect.
+    \end{subparag}
+    
+    \begin{subparag}{Remark}
+        Let $G$ be an Abelian group. Then: 
+        \[C_h = \left\{g h g^{-1}\right\}_{g \in G} = \left\{g h g^{-1}\right\}_{g \in G} = \left\{h\right\}\]
+        
+        Thus, $\left|C_h\right| = 1$ for any $h \in G$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Partition of an integer}
+    Let $n \in \mathbb{N}^*$.
+
+    The partitions of $n$ is the set of $\left(i_1, \ldots, i_k\right)$ such that $i_1 + \ldots + i_k = n$, $i_1 \geq i_2 \geq \ldots \geq i_k \geq 1$ and $k \in \mathbb{N}^*$.
+
+    \begin{subparag}{Example}
+        For instance, the partitions of 4 are: 
+        \[\left\{\left(4\right), \left(3, 1\right), \left(2, 2\right), \left(2, 1, 1\right), \left(1, 1, 1, 1\right)\right\}\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    The conjugacy classes of $S_n$ are in bijection with the partitions of $n$: we can interpret the $\left(i_1, \ldots, i_k\right)$ as the lengths of the cycles in the disjoint cycle decomposition.
+\end{parag}
+
+\begin{parag}{Example}
+    Let $G = S_4$. We want to find its conjugacy classes.
+
+    We have one conjugacy class per partition of $4$, meaning that they are in bijection with: 
+    \[\left\{\left\{4\right\}, \left\{3, 1\right\}, \left\{2, 2\right\}, \left\{2, 1, 1\right\}, \left\{1, 1, 1, 1\right\}\right\}\]
+    
+    Then, $\left\{4\right\}$ represents the set of 4-cycles: 
+    \[\left(1, 2, 3, 4\right), \mathspace \left(3, 1, 2, 4\right), \mathspace, \ldots\]
+    
+    $\left\{3, 1\right\}$ represents the set of 3-cycles: 
+    \[\left(1, 2, 3\right), \mathspace \left(2, 3, 4\right), \mathspace \ldots\]
+    
+    $\left\{2, 2\right\}$ represents the set of products of 2 disjoint 2-cycles: 
+    \[\left(1, 2\right)\left(3, 4\right), \mathspace \left(1, 3\right)\left(2, 4\right), \mathspace \ldots\]
+
+    $\left\{2, 1, 1\right\}$ represents the set of 2-cycles: 
+    \[\left(1, 2\right), \mathspace \left(3, 1\right), \ldots\]
+    
+    $\left\{1, 1, 1, 1\right\}$ finally represents the trivial element, $1$.
+    
+    We can do combinatorics to verify that we indeed get the correct number of elements.
+\end{parag}
+
+\subsection{Action of a finite group on a set by permutation}
+
+\begin{parag}{Definition: Action of a group}
+    Let $G$ be a finite group and $E$ be a finite set.
+
+    We say that $G$ \important{acts} on $E$ by permutation if, for any $x \in E$ and $g \in G$, we can define an element $g\cdot x$ such that:
+    \begin{enumerate}
+        \item $gx \in E$ for any $x \in E$ and $g \in G$
+        \item $1\cdot x = x$ for any $x \in E$
+        \item $\left(g_1 g_2\right) x = g_1 \left(g_2 x\right)$ for any $x \in E$, $g_1, g_2 \in G$.
+    \end{enumerate}
+\end{parag}
+
+\begin{parag}{Definition: Orbit}
+    Let $G$ be a finite group and $E$ be a finite set.
+
+    The \important{orbit} of $x \in E$ under the action of $G$ is the subset of $E$ given by: 
+    \[\text{Orb}_x = \left\{gx | g \in G\right\} \]
+\end{parag}
+
+\begin{parag}{Property}
+    Let $G$ be a finite group, $E$ be a finite set and $x,y \in E$.
+
+    Then: 
+    \[\text{Orb}_x = \text{Orb}_y \mathspace \text{ or } \mathspace \text{Orb}_x \cap \text{Orb}_y = \o\]
+    
+    \begin{subparag}{Implication}
+        Since every element of $E$ belongs to some orbit, it means that we can partition our set $E$ using orbits. In fact it is possible to show that this creates an equivalence relation.
+
+        We thus define $\left\{x_1, \ldots, x_r\right\}$ to be \important{a complete set of representatives of orbits} if it such that: 
+        \begin{enumerate}[left=0pt]
+            \item $\displaystyle \text{Orb}_{x_i} \cap \text{Orb}_{x_j} = \o$ for any $x_i, x_j \in \left\{x_1, \ldots, x_r\right\}$ such that $x_i \neq x_j$.
+            \item $\displaystyle E = \bigcup_{i=1}^{r} \text{Orb}_{x_i}$.
+        \end{enumerate}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Group acting on itself by conjugation}
+    Let $G$ be a finite group.
+
+    We say that it \important{acts on itself by conjugation} when it acts on the set $G$ using the following action on a $h \in G$:     
+    \[g h g^{-1} \in G\]
+    
+    \begin{subparag}{Observation}
+        We notice that, in that case, the orbit of some $h \in G$ is the conjugacy class of $h$ in $G$:
+        \[\text{Orb}_h = C_h\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $G$ be a finite group.
+
+    Then, $G$ can be written as a disjoint union of conjugacy classes:
+    \[G = \bigcup_{i=1}^{r} C_{h_i}\]
+    where $C_{h_i} \cap C_{h_j} = \o$ for $h_i \neq h_j$.
+
+    \begin{subparag}{Proof}
+        Let us consider $G$ acting on itself by conjugation. We know that, in that case, $\text{Orb}_h = C_h$. By our previous property, we know that $G$ can be written as a disjoint union of orbits, giving us our result immediately.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Stabiliser}
+    Let $G$ be a finite group acting on a finite set $E$, and let $x \in E$.
+
+    The \important{stabiliser} of $x$ is: 
+    \[\text{Stab}_x = \left\{g \in G | gx = x\right\}\]
+\end{parag}
+
+\begin{parag}{Definition: Centraliser}
+    Let $G$ be a finite group and $h \in G$.
+
+    The \important{centraliser} of $h$ in $G$, written $G_h$, is $\text{Stab}_h$ with respect to $G$ acting on itself by conjugation:
+    \[G_{x_i} = \left\{g \in G | g x_i g^{-1} = x_i\right\}\]
+\end{parag}
+
+\begin{parag}{Property}
+    Let $G$ be a finite group acting on a finite set $E$, and let $x \in E$.
+
+    Then, $\text{Stab}_x \subset G$ is a subgroup.
+
+    \begin{subparag}{Proof}
+        \begin{itemize}[left=0pt]
+            \item By definition of a group acting on a set, we know that $1\cdot x = x$ for all $x \in E$, so $1 \in \text{Stab}_x$.
+            \item Let's suppose that $g_1, g_2 \in \text{Stab}_x$, meaning that $g_1 x = x$ and $g_2 x = x$. Then: 
+            \[g_1 g_2 x = g_1 x = x\]
+            
+            This indeed shows that $g_1 g_2 \in \text{Stab}_x$.
+            \item Let's suppose that $g \in \text{Stab}_x$, meaning that $gx = x$. Then, by the properties of groups acting on sets: 
+            \[x = \left(g^{-1} g\right)x = g^{-1} \underbrace{\left(g x\right)}_{g \in \text{Stab}_x} = g^{-1} x\]
+            
+            This indeed shows that $g^{-1} \in \text{Stab}_x$.
+        \end{itemize}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Orbit-Stabiliser theorem}
+    Let $G$ be a finite group acting on a finite set $E$, and let $x \in E$.
+
+    Then, the number of elements in the orbit of $x$ is equal to the index of $\text{Stab}_x$ in $G$, i.e.: 
+    \[\left|\text{Orb}_x\right| = \left[G : \text{Stab}_x\right]\]
+
+    \begin{subparag}{Proof}
+        Let $H = \text{Stab}_x \subset G$, to simplify the notation.
+
+        We know that $\left[G : \text{Stab}_x\right] = \left[G : H\right]$ is equal to the number of left $H$-cosets in $G$. To show that there are as many left $H$-cosets as there are elements in $\text{Orb}_x$, we can make a bijection between the set of left $H$-cosets and $\text{Orb}_x$. Thus, let us consider the following function:
+        \[\begin{split}
+        \mu: \left\{gH\right\}_{g \in G} &\longmapsto \text{Orb}_x \\
+        gH &\longmapsto g x
+        \end{split}\]
+        
+        We notice that $\mu$ is surjective: any $gx \in \text{Orb}_x$ can be constructed. Indeed, considering an arbitrary $gx \in \text{Orb}_x$, we know that $g \in gH$ and thus $\mu\left(gH\right) = gx$.
+
+        Moreover, $\mu$ is injective. Indeed, let's suppose that $\mu\left(g H\right) = \mu\left(f H\right)$ (we want to show that $gH = fH$). However, by definition of $\mu$, this means that: 
+        \[gx = fx \implies f^{-1} g x = x \implies f^{-1} g \in \text{Stab}_x = H\]
+        
+        We can thus consider the left coset of $H$ with respect to $f^{-1} g$ which, by definition, is a subset of $H$: 
+        \[f^{-1} g H \subset H \implies gH \subset fH\]
+        using properties of left-cosets.
+
+        However, we can do the exact same reasoning but starting with $gx = fx \implies g^{-1} f x = x$, giving us that $fH \subset gH$. This indeed means that $fH = gH$ and thus that $\mu$ is injective.
+
+        We have shown that $\mu$ is bijective, and thus that: 
+        \[\left|\text{Orb}_x\right| = \left|\left\{gH\right\}_{g \in G}\right| = \left[G : \text{Stab}_x\right]\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let $G$ be the group of rotational symmetries of a cube. We want to find $\left|G\right|$.
+
+    We notice that $G$ acts on the set of faces by permutation, so $E$ is the set of faces. Let $x \in E$ be an arbitrary face. Then, $\text{Stab}_x = \left\{1, r, r^2, r^3\right\}$ where $r$ is the rotation of $x$ by 90°: rotating along the axis which is normal to the face $x$ does not move this face, and rotating any other axis would move it. Since we can move $x$ to any other face, $\text{Orb}_x = E$, and thus: 
+    \[\left|\text{Orb}_x\right| = 6\]
+    
+    By the orbit-stabiliser theorem, we finally get that: 
+    \[\left|\text{Orb}_x\right| = \frac{\left|G\right|}{\left|\text{Stab}_x\right|} \implies \left|G\right| = \left|\text{Orb}_x\right|\left|\text{Stab}_x\right| = 6\cdot4 = 24\]
+\end{parag}
+
+\begin{parag}{Definition: Center}
+    Let $G$ be a group.
+
+    The \important{center} of $G$ is the set of all elements that commute with any $g \in G$: 
+    \[Z\left(G\right) = \left\{x \in G | xg = gx, \forall g \in G\right\} = \left\{x \in G | g x g^{-1} = x, \forall g \in G\right\}\]
+    
+    \begin{subparag}{Remark}
+        We notice that $Z\left(G\right)$ is also the set of 1-element conjugacy classes in $G$.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Theorem: Class equation of a group}
+    Let $G$ be a finite group.
+
+    Then: 
+    \[\left|G\right| = \left|Z\left(G\right)\right| + \sum_{i=1}^{r} \left|C_{x_i}\right|\]
+    where the $C_{x_i}$ are the non-trivial conjugacy classes, i.e. the conjugacy classes with more than one element.
+
+    Equivalently:
+    \[\left|G\right| = \left|Z\left(G\right)\right| + \sum_{i=1}^{r} \left[G : G_{x_i}\right]\]
+    where the $G_{x_i}$ are the non-trivial centralisers.
+
+    \begin{subparag}{Proof}
+        We know we can write $G$ as a disjoint union of its conjugacy classes: 
+        \[G = \bigcup_{i=1}^{m} C_{x_i}\]
+        
+        Then, we can write: 
+        \[\left|G\right| = \sum_{i=1}^{m}\left|C_{x_i}\right| = \sum_{i=1}^{t} \underbrace{\left|C_{x_i}\right|}_{\text{one element}}  + \sum_{i=1}^{r} \underbrace{\left|C_{x_i}\right|}_{\text{more than one element}}\]
+
+        We recognise the center, telling us that: 
+        \[\left|G\right| = \left|Z\left(G\right)\right| + \sum_{i=1}^{r} \left|C_{x_i}\right|\]
+
+        The orbit-stabiliser theorem finally tells us that $\left|C_{x_i}\right| = \left[G : G_{x_i}\right]$, giving us: 
+        \[\left|G\right| = \left|Z\left(G\right)\right| + \sum_{i=1}^{r} \left[G : G_{x_i}\right]\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let $G$ be a group of order $\left|G\right| = p^n$ for $p \in \mathbb{P}$ prime.
+
+    Then, $G$ has a nontivial center.
+
+    Indeed, we have that: 
+    \[p^n = \left|G\right| = \left|Z\left(G\right)\right| + \sum_{i=1}^{r} \frac{\left|G\right|}{\left|G_{x_i}\right|}\]
+    
+    We know that $\left|G_{x_i}\right| < \left|G\right|$ for any $i$, since $1 \in C_1$ with $\left|C_1\right| = 1$, telling us $1 \not \in G_{x_i}$. This shows that: 
+    \[\frac{p^n}{\left|G_{x_i}\right|} = \frac{\left|G\right|}{\left|G_{x_i}\right|} > 1\]
+    
+    However, since this term is greater than one and only has factors $p$ in its prime decomposition, this means that it is divisible by $p$. Since all the other terms of the expression are divisible by $p$, $\left|Z\left(G\right)\right|$ is also divisible by $p$.
+
+    However, since $1 \in Z\left(G\right)$, we know that $\left|Z\left(G\right)\right| > 0$. This tells us that $\left|Z\left(G\right)\right|$ is a non-trivial multiple of $p$, and thus indeed that $\left|Z\left(G\right)\right| \geq 2$.
+\end{parag}
+
+\begin{parag}{Terminology}
+    Let $G$ be a finite group acting on a finite set $E$, and let $h \in G$ and $x \in E$. Let's sum up our terminology.
+
+    In the general case, we have $\text{Orb}_x \subset E$ and $\text{Stab}_x \subset G$. 
+
+    However, when $G$ acts on itself by conjugation, we have that the orbit is the conjugacy class and the stabiliser is the centraliser: 
+    \[C_h = \text{Orb}_h \subset G, \mathspace G_h = \text{Stab}_h \subset G\]
+\end{parag}
+
+\end{document}

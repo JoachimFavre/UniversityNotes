@@ -1,0 +1,374 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-11-18 at 22:47:22.
+
+\usepackage{../../style}
+
+\title{Algebra}
+\author{Joachim Favre}
+\date{Samedi 18 novembre 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2023-11-06}{A complete description of abelian group (nice!! \smiley)}{
+\begin{itemize}[left=0pt]
+    \item Definition of direct products.
+    \item Proof of the elementary divisors characterisation of abelian groups.
+    \item Explanation of the invariant factors characterisation of abelian groups.
+    \item Explanation of algorithms to find the elementary divisors and invariant factors characterisation of abelian groups.
+\end{itemize}
+
+}
+
+\subsection{Classification of finite abelian group}
+
+
+\begin{parag}{Observation}
+    We have only seen the cyclic group as an abelian group. We wonder if there are other abelian groups.
+\end{parag}
+
+\begin{parag}{Cauchy's theorem}
+    Let $G$ be a finite group, and $p$ be a prime number such that $p \divides \left|G\right|$.
+
+    Then, $G$ has an element of order $p$.
+
+    \begin{subparag}{Proof idea 1}
+        Let's first consider abelian groups $G$. 
+
+        We suppose towards contradiction that the proposition is not true, and we thus let $G$ be the smallest counter-example. Let $g \in G$ be an arbitrary non-trivial element. Then, the order of $g$ is not divisible by $p$ since, otherwise, $g^{kp}= 1$ and thus $g^k$ would have an order $p$. 
+
+        We know that $\left|\left\langle g \right\rangle\right| = \text{order}\left(g\right)$. Moreover, since $G$ is abelian and $\left\langle g \right\rangle \subset G$ is a subgroup, we know that $\left\langle g \right\rangle \normalsubgroup G$ is a normal subgroup. We can thus consider $G / \left\langle G \right\rangle$. We know that $p$ divides $\left|G / \left\langle g \right\rangle\right| = \frac{\left|G\right|}{\left|\left\langle g \right\rangle\right|} < \left|G\right|$.
+
+        Now, since $G$ was the smallest counter-example to our proposition, this implies that there exists some $h\left\langle g \right\rangle \in G / \left\langle g \right\rangle$ such that the order of $h \left\langle g \right\rangle$ in $G / \left\langle g \right\rangle$ is $p$. By definition of the quotient group and of the order, this means that $h^p \left\langle g \right\rangle = \left\langle g \right\rangle$, and thus $h^p \in \left\langle g \right\rangle$. 
+
+        This implies that there exists a $s$ such that $h^p = g^s$. However, for $k = \text{order}\left(g\right)$, this yields: 
+        \[h^p = g^s \implies \left(h^p\right)^k = \left(g^s\right)^k \iff \left(h^k\right)^p = \left(g^k\right)^p \iff \left(h^k\right)^p = 1\]
+        This tells us that the order of $h^k$ is $p$.
+    \end{subparag}
+
+    \begin{subparag}{Proof idea 2}
+        The case for non-abelian groups $G$ will be done in the seventh exercise series.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Proper subgroups}
+    Let $G$ be a group, and $H \subset G$ be a subgroup.
+
+    $H$ is said to be \important{proper} if $H \neq G$.
+\end{parag}
+
+\begin{parag}{Definition: Trivial subgroups}
+    Let $G$ be a group.
+
+    The subgroup $H = \left\{1\right\} \subset G$ is named the \important{trivial} subgroup of $G$.
+\end{parag}
+
+\begin{parag}{Definition: Simple group}
+    Let $G$ be a group.
+
+    $G$ is said to be \important{simple}, if none of its proper non-trivial subgroups are normal.
+\end{parag}
+
+\begin{parag}{Corollary}
+    If $G$ is a simple finite abelian group, then $G \simeq C_p$ for some prime $p$, where $C_p$ is the cyclic group of order $p$.
+
+    \begin{subparag}{Intuition}
+        Since all subgroups of an abelian group are normal, an abelian group is simple if it has no non-trivial subgroup. All subgroups of $C_p$ are non-proper or trivial.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We can write $\left|G\right|$ as its prime factorisation, $\left|G\right| = p_1^{n_1} \cdots p_k^{n_k}$. By Cauchy's theorem, there exists an element of order $p_1$ in $G$, $g \in G$. However, since $G$ is abelian, $\left\langle g \right\rangle \subset G$ is normal. Since moreover $\left|\left\langle g \right\rangle\right| = p_1$, it is nontrivial. It is finally proper if and only if $\left|G\right| > \left|\left\langle g \right\rangle\right| = p_1$.
+
+        For $G$ to be simple, $\left\langle g \right\rangle$ must not be proper; and $G$ thus has to be of order $p_1$, telling us $G = \left\langle g \right\rangle$, which is indeed homeomorphic to $C_{p_1}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Direct product of groups}
+    Let $G, H$ be groups.
+
+    The \important{direct product} $G \times H$ is the set $G \times H = \left\{\left(g, h\right) | g \in G, h \in H\right\}$, where multiplication is: 
+    \[\left(g_1, h_2\right)\left(g_2, h_2\right) = \left(g_1 g_2, h_1 h_2\right)\]
+    
+    \begin{subparag}{Observation}
+        We notice that this is indeed a group, of neutral element $\left(1_G, 1_H\right)$ and inverse $\left(g, h\right)^{-1} = \left(g^{-1}, h^{-1}\right)$.
+
+        Moreover, by properties of the Cartesian product: 
+        \[\left|G \times H\right| = \left|G\right|\cdot \left|H\right|\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider $C_2 = \braket{a}{a^2 = 1}, C_3 = \braket{b}{b^3 = 1}$. Then: 
+    \[C_2 \times C_3 = \left\{\left(g, h\right) | g \in C_2, h \in C_3\right\}\]
+    
+    We can write all elements: 
+    \[C_2 \times C_3 = \left\{\left(1, 1\right), \left(1, b\right), \left(1, b^2\right), \left(a, 1\right), \left(a, b\right), \left(a, b^2\right)\right\}\]
+    
+    Now, let $t = \left(a, b\right)$. We notice that: 
+    \[t^2 = \left(a^2, b^2\right) = \left(1, b^2\right), \mathspace t^3 = \left(a, b^3\right) = \left(a, 1\right), \mathspace t^4 = \left(1, b\right), \mathspace t^5 = \left(a, b^2\right), \mathspace t^6 = \left(1, 1\right)\]
+    
+    This yields that $t$ has order $6$. Since this is a generator, $C_2 \times C_3 \simeq C_6$ is isomorphic to the cyclic group of order $6$.
+    
+    \begin{subparag}{Generalisation}
+         We will generalise this right after. However this is not always true. We can for instance consider: 
+         \[C_2 \times C_2 = \left\{\left(1, 1\right), \left(1, b\right), \left(a, 1\right), \left(a, b\right)\right\}\]
+
+         However, all three non-trivial elements have order $2$, showing this group has no generator and thus that there is no element of order $4$. This shows that it cannot be isomorphic to $C_4$ (which has an element of order 4).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Properties}
+    Let $G, H$ be groups. Then:
+    \begin{enumerate}[left=0pt]
+        \item $G \times H \simeq H \times G$.
+        \item $H \subset G \times H$ and $G \subset G \times H$ are subgroups.
+        \item $G \times H$ is abelian if and only if both $G$ and $H$ are abelian.
+    \end{enumerate}
+
+    \begin{subparag}{Proof 2}
+        We notice that $H \simeq \left\{\left(1, h\right) | h \in H\right\}$, which is a subgroup of $G \times H$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $n, m \in \mathbb{N}^*$, $a \in C_n$ and $b \in C_m$ be generators of their respective group.
+
+    Then: 
+    \[\text{order}\left(a, b\right) = \text{lcm}\left(n, m\right)\]
+    where we note $\text{order}\left(\left(a, b\right)\right) = \text{order}\left(a, b\right)$ for the simplicity of the notation as usual with functions of vectors.
+
+    \begin{subparag}{Proof}
+        Since $a$ and $b$ are generators, we have: 
+        \[\text{order}\left(a\right) = n, \mathspace \text{order}\left(b\right) = m\]
+        
+        Then: 
+        \[\left(a, b\right)^s = \left(a^s, b^s\right) := \left(1, 1\right) \implies n \divides s \text{ and } m \divides s\]
+        
+        Thus, the order of $\left(a, b\right)$, the smallest number that is divisible by both $n$ and $m$, is $\text{lcm}\left(n, m\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $n, m \in \mathbb{N}^*$. 
+
+    Then:
+    \[C_n \times C_m = C_{nm} \iff \text{gcd}\left(n, m\right) = 1\]
+
+    \begin{subparag}{Proof $\implies$}
+        We do this proof by the contrapositive, we thus suppose by hypothesis that $\text{gcd}\left(n, m\right) = d > 1$. Let $a \in C_n$ and $b \in C_m$ be generators. We have that, by our lemma: 
+        \[\text{order}\left(a, b\right) = \text{lcm}\left(n, m\right) = \frac{nm}{ \text{gcd}\left(n, m\right)} = \frac{nm}{d} < nm\]
+        
+        Moreover, if we consider arbitrary other elements $a^t$ and $b^q$: 
+        \[\left(a^t, b^q\right)^{\frac{nm}{d}} = \left(\left(a^{\frac{nm}{d}}\right)^t, \left(b^{\frac{nm}{d}}\right)^q\right) = \left(1, 1\right)\]
+        
+        This tells us that there is no element of order $nm$ in $C_n \times C_m$, showing that $C_n \times C_m$ cannot be cyclic, and thus that $C_n \times C_m \neq C_{nm}$.
+    \end{subparag}
+    
+    \begin{subparag}{Proof $\impliedby$}
+        We suppose by hypothesis that $\text{gcd}\left(n, m\right) = 1$. We notice that it implies by our lemma that: 
+        \[\text{order}\left(a, b\right) = \text{lcm}\left(n, m\right)= \frac{nm}{\text{gcd}\left(n, m\right)} = nm\]
+
+        However, $\left|C_n \times C_m\right| = \left|C_n\right| \left|C_m\right| = nm$, telling us that $\left(a, b\right)$ is a generator. Thus, $C_n \times C_m \simeq C_{nm}$ is cyclic.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $C_n$ be a cyclic group, and $n = p_1^{k_1} \cdots p_r^{k_r}$ be the prime factorisation of $n$.
+
+    Then: 
+    \[C_n \simeq C_{p_1^k} \times \ldots \times C_{p_r^{k_r}}\]
+    
+    \begin{subparag}{Proof}
+        Let $m = p_2^{k_2} \cdots p_r^{k_r}$. We notice that $\text{gcd}\left(p_1^{k_1}, m\right) = 1$, so, by our proposition: 
+        \[C_n \simeq C_{p_1^{k_1}} \times C_m\]
+        
+        We can repeat this recursively to get our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $G$ be a group, and $H\subset G$ and $K \subset G$ be subgroups such that:
+    \begin{enumerate}
+        \item $H \cap K = \left\{1\right\}$
+        \item For any $h \in H$ and $k \in K$, we have $hk = kh$.
+        \item $HK = \left\{hk | h \in H, k \in K\right\} = G$
+    \end{enumerate}
+    
+    Then: 
+    \[G \simeq H \times K\]
+
+    \begin{subparag}{Proof}
+        We consider the following function $\phi: H \times K \mapsto G$: 
+        \[\phi\left(h, k\right) = hk\]
+        
+        We want to show that this is an isomorphism. We first see that this is an homomorphism, using the second hypothesis:
+        \[\phi\left(h_1, k_1\right)\phi\left(h_2, k_2\right) = h_1 k_1 \cdot  h_2 k_2 = h_1 h_2 k_1 k_2 = \phi\left(h_1 h_2, k_1 k_2\right)\]
+        which we recognise to be $\phi\left(\left(h_1, k_1\right)\cdot \left(h_2, k_2\right)\right)$.
+        
+        We now want to show that $\phi$ is bijective. It is indeed surjective thanks to the third property. For injectivity, we have that: 
+        \[\phi\left(h_1, k_1\right) = \phi\left(h_2, k_2\right) \implies h_1 k_1 = h_2 k_2 \implies \underbrace{h_2^{-1} h_1}_{h} = \underbrace{k_2 k_1^{-1}}_{k}\]
+        for some $h \in H$ and $k \in K$.
+
+        However, since $H \cap K = \left\{1\right\}$, this necessarily means that $h = k = 1$ and thus $h_1 = h_2$ and $k_1 = k_2$, which ends this proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem of classification of finite abelian groups}
+    Let $G$ be a finite abelian group. 
+
+    Then, $G$ is isomorphic to a direct product of prime power orders, i.e: 
+    \[G \simeq C_{p_1^{n_1}} \times \cdots \times C_{p_m^{n_m}}\]
+    where $\left\{p_1, \ldots, p_m\right\}$ are primes, which are not necessarily distinct but are such that $p_1^{n_1} \cdots p_m^{n_m} = \left|G\right|$. Those numbers $\left(p_1^{n_1}, \ldots, p_m^{n_m}\right)$ are named the \important{elementary divisors} of $G$.
+
+    This presentation is moreover unique, up to the order of factors.
+
+    \begin{subparag}{Example}
+        For instance, $C_2 \times C_2 \simeq G$ is not cyclic, but it is a finite abelian group of order $4$.
+    \end{subparag}
+
+    \begin{subparag}{Proof idea}
+        Let $G = \braket{g_1, \ldots, g_k}{R_1, \ldots, R_{\ell }}$. The $j$\Th relation can be expressed as $g_1^{n_{1, i}} \cdots g_k^{n_{k, i}}$. Thus, the numbers $n_{i, j}$ completely represent our relations. This means that we can encode our set of relations as a matrix: 
+        \[\begin{pmatrix} n_{1, 1} & \cdots & n_{k, 1} \\ \vdots & \ddots & \vdots \\ n^{1, \ell } & \cdots & n_{k, \ell } \end{pmatrix} \]
+        
+        It is possible to show that we don't change the set of relations when adding an integer multiple of one row to another row, when adding an integer multiple of one column to another column, when swapping columns and when swapping rows. This means that we can use Gaussian elimination to turn our matrix to an equivalent diagonal matrix
+        \[\begin{pmatrix} d_{1} & 0 & \cdots & 0 \\ 0 & d_{2} & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & d_{r} \end{pmatrix} \]
+        where $r = \min\left(k, \ell \right)$ and some columns or rows full of zeros were removed.
+
+        This allows us to find that $G = \braket{g_1,\ldots,g_r}{g_1^{d_1} = 1, \ldots, g_r^{d_r} = 1}$; and thus that $G_i = \left\langle g_i \right\rangle \simeq C_{d_i}$ are cyclic subgroups of $G$. Now, it is possible to show that all those $G_i$ meet the hypotheses of our lemma: 
+        \begin{enumerate}
+            \item $G_i \cap G_j = \left\{1\right\}$ for any $i \neq j$.
+            \item For any $g_i \in G_i$ and $g_j \in G_j$, we have $g_i g_j = g_j g_i$ (since $G$ is abelian).
+            \item $G_1 \cdots G_r = G$ by construction.
+        \end{enumerate}
+
+        Therefore, we have that: 
+        \[G \simeq G_1 \times \ldots \times G_r \simeq C_{d_1} \times \ldots \times C_{d_r}\]
+
+        Now, taking the prime factor decomposition of $d_i = p_1^{k_1}\cdots p_s^{k_s}$, we know that $C_{d_i} \simeq C_{p_1^{k_1}} \times \ldots \times C_{p_s^{k_s}}$. This finally gives us our result.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $G$ be a finite abelian group, such that $\left|G\right| = p^n$ for some prime $p$.
+
+    Then, $G$ is a direct product of cyclic groups: 
+    \[G \simeq C_{p^{i_1}} \times \ldots \times C_{p^{i_k}}\]
+    where $i_1 + \ldots + i_k = n$.
+
+    \begin{subparag}{Remark}
+        This means that all possible groups of order $p^n$ are in bijection with the partitions of $n$.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Let us consider all possible abelian groups $G$ of order $\left|G\right| = 8 = 2^3$.
+
+        We need to find the partitions of $3$. They are: 
+        \[\left(3\right), \mathspace \left(2, 1\right), \mathspace \left(1, 1, 1\right)\]
+
+        Thus, we have three different abelian groups of order $8$: 
+        \[C_{2^3} = C_8, \mathspace C_{2^2} \times C_{2^1} = C_4 \times C_2, \mathspace C_2 \times C_2 \times C_2\]
+
+        There cannot be any other group, and they are pairwise not isomorphic (since, as we have seen, $C_n \times C_m \simeq C_{nm}$ if and only if $\text{gcd}\left(n, m\right)$, which is not the case here).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $G$ be a finite abelian group. 
+
+    Then, $G$ is isomorphic to a direct product of cylic groups:
+    \[G \simeq C_{d_1} \times \ldots \times C_{d_n}\]
+    where $d_n \divides d_{n-1} \divides \ldots \divides d_1$ ($d_i$ divides $d_{i-1}$ for all $i$), and $\left|G\right| = d_1 \cdots d_n$. Those numbers $\left(d_1, \ldots, d_n\right)$ are moreover called the \important{invariant factors} of $G$.
+
+    This presentation is unique.
+
+    \begin{subparag}{Remark}
+        This is another, equivalent, presentation of any abelian group.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    An abelian group is uniquely determined by its elementary divisors, or by its invariant factors.
+\end{parag}
+
+\begin{parag}{Algorithm 1: Elementary divisors}
+        We want to make an algorithm to find all abelian groups of a given order $n$, through elementary divisors.
+
+        The algorithm goes as follows:
+        \begin{enumerate}
+            \item Decompose $\left|G\right| = n$ as its prime factorisation, $n = p_1^{k_1} \cdots p_n^{k_n}$.
+            \item Find the possible partitions for each power $k_1, \ldots, k_n$.
+            \item For each partition of $k_i$, there is a unique group of order $p_i^{k_i}$. In other words, if $k_i = a_1 + \ldots + a_j$, then: 
+            \[C_{p_i^{k_i}} \simeq C_{p_i^{a_1}} \times \ldots \times C_{p_i ^{a_j}}\]
+        \end{enumerate}
+        
+        The possible groups $G$ are the direct products of all possible groups of orders $p_i^{k_i}$.
+\end{parag}
+
+\begin{parag}{Algorithm 2: Invariant factors}
+    Let us now make an algorithm to find the invariant factors of all abelian groups of order $n$.
+
+    The algorithm goes as follows:
+    \begin{enumerate}
+        \item Decompose the Abelian groups using elementary divisors.
+        \item We consider each group separately, say $G = C_{p_1^{a_1}} \times \ldots \times C_{p_k}^{a_k}$.
+        \item We write the $C_{p_i^{a_i}}$ in a table as follows: $C_{p_i^{a_i}}$ and $C_{p_j^{a_j}}$ are on the same line if and only if $p_i = p_j$, and, groups are written in decreasing order of $a_i$ on any given line. This table representation is unique up to the order of lines.
+        \item Since the direct product is commutative, we can consider a direct product of the columns independently. Since they have coprime order, it can be simplified to a single cyclic group $C_{d_i}$. $G$ is finally the direct product of each column.
+    \end{enumerate}
+    
+    By construction, we do have $d_n \divides d_{n-1} \divides \ldots \divides d_1$.
+\end{parag}
+
+\begin{parag}{Example}
+    We want to find all abelian groups of order $\left|G\right| = 72 = 2^3 \cdot 3^2$.
+
+    We have the following partitions of $3$: 
+    \[\left(3\right), \mathspace \left(2, 1\right), \mathspace \left(1, 1\right)\]
+    
+    We moreover have the following partitions of $2$: 
+    \[\left(2\right), \mathspace \left(1, 1\right)\]
+    
+
+    This yields that we can consider the 6 possibilities: 
+    \[C_{2^3} \times C_{3^2}, \mathspace C_{2^3} \times C_3 \times C_3, \mathspace C_{2^2} \times C_2 \times C_{3^2}\] 
+    \[C_{2^2} \times C_{2} \times C_3 \times C_3, \mathspace C_2 \times C_2 \times C_2 \times C_{3^2}, \mathspace C_2 \times C_2 \times C_2 \times C_3 \times C_3\]
+    
+    In other words, there is a total of 6 non-isomorphic abelian groups of order 72. Their elementary divisors are: 
+    \[\left\{\left(2^3, 3^2\right), \left(2^3, 3, 3\right), \left(2^2, 2, 3^2\right), \left(2^2, 2, 3, 3\right), \left(2, 2, 2, 3^2\right), \left(2, 2, 2, 3, 3\right)\right\}\]
+
+    Let's now compute the invariant factors. We represent our 6 possibilities in the table form:
+    \imagehere[1]{InvariantFactorsDecompositions.png}
+
+    For instance, $C_4 \times C_2 \times C_9 \simeq C_{36} \times C_2$. Indeed, the order does not matter in the direct product, and $C_4 \times C_9 \simeq C_{36}$ since $\text{gcd}\left(4, 9\right) = 1$. This yields that our 6 possibilities are respectively isomorphic to: 
+    \[C_{72}, \mathspace C_{24} \times C_3, \mathspace C_{36} \times C_2\]
+    \[C_{12} \times C_6, \mathspace C_{18} \times C_2 \times C_2, \mathspace C_6 \times C_6 \times C_2\]
+    
+    Their invariant factors are therefore: 
+    \[\left\{\left(72\right), \left(24, 3\right), \left(36, 2\right), \left(12, 6\right), \left(18, 2, 2\right), \left(6, 6, 2\right)\right\}\]
+    
+    \begin{subparag}{Remark}
+        This type of questions, finding all elementary divisors and invariant factors of abelian groups of order $n$, is typically at the exam.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    We have classified of all abelian finite groups. Classification of non-abelian finite groups is a lot harder.
+
+    They can be split into four categories, including one containing 26 groups, the sporadic groups. They are basically the exception to the three other categories. The biggest in this category, named the monster group, has order:
+    \[808\,017\,424\,794\,512\,875\,886\,459\,904\,961\,710\,757\,005\,754\,368\,000\,000\,000 \approx 8\cdot 10^{53}\]
+\end{parag}
+
+\end{document}
