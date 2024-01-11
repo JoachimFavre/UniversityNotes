@@ -41,9 +41,7 @@ PRINTED_VERSION = False
 CONFIG_NAME = "config.json"
 STYLE_DIR = "style.sty"
 RESULT_DIR = "_CompiledNotes"
-COURSES_NAME = ["Algebra", "MetricAndTopologicalSpaces"]
-# COURSES_NAME = ["Algebra"]
-# COURSES_NAME = ["MetricAndTopologicalSpaces"]
+COURSES_NAME = ["Algebra"]
 
 COPY_EXTENSIONS = ["tex", "pdf", "png", "jpg", "jpeg", 'code', 'svg']
 FOREWORD_NAME = {'fr': 'foreword_fr.txt', 'en': 'foreword_en.txt'}
