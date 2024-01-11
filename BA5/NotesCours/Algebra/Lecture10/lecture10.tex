@@ -1,0 +1,446 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-12-05 at 23:27:40.
+
+\usepackage{../../style}
+
+\title{Algebra}
+\author{Joachim Favre}
+\date{Mardi 05 décembre 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2023-11-27}{Generalising Euclidean division}{
+\begin{itemize}[left=0pt]
+    \item Proof of the Chinese remainder theorem.
+    \item Proof of the CRT for integers, and examples on how to use it.
+    \item Definition of polynomial rings, and proof of some properties.
+    \item Definition of Euclidean domain, and proof of some properties.
+\end{itemize}
+
+}
+
+\subsection{Chinese remainder theorem}
+
+\begin{parag}{Chinese remainder theorem (CRT)}
+    Let $A$ be a commutative ring, and $I, J \subset A$ be ideals such that $I + J = A$.
+
+    Then, there exists a ring isomorphism defined by:
+    \[\begin{split}
+    f:  A / \left(I \cap J\right) &\longmapsto A / I \times A / J \\
+    f\left(\left[x\right]_{I \cap J}\right) &\longmapsto \left(\left[x\right]_{I}, \left[x\right]_{J}\right)
+    \end{split}\]
+    
+    This proposition is known as the \important{Chinese remainder theorem} (CRT).
+
+    \begin{subparag}{Proof}
+        First, we notice that the map $g: \left[x\right]_{I \cap J} \mapsto \left[x\right]_I$ is a ring homomorphism: it preserves all ring operations. This therefore implies that $f: x \mapsto \left(\left[x\right]_I, \left[x\right]_J\right)$ is also a ring homomorphism.
+
+        We now want to show that it is bijective. We begin by showing that $f$ is surjective. Let $a_1, a_2 \in A$. We want to show that there exists some $a \in A$ such that $\congruent{a}{a_1}{I}$ and $\congruent{a}{a_2}{J}$. Since $I + J = A$, we have that $a_1 - a_2 \in A$ can be written as: 
+        \[a_1 - a_2 = -i + j \iff a_1 + i = a_2 + j \over{=}{def} a\]
+        for some $i \in I$ and $j \in J$. We have indeed got that $\congruent{a}{a_1}{I}$ and $\congruent{a}{a_2}{J}$, meaning that $f$ is surjective.
+
+        We now want to show that $f$ is injective. We keep our $a = a_1 + i = a_2 + j \in A$, and we let $b \in A$ such that $\congruent{b}{a_1}{I}$ and $\congruent{b}{a_2}{J}$. Then, by definition of quotient rings, there exists $i' \in I$ and $j' \in J$ such that: 
+        \[b = a_1 + i' = a_2 + j' \implies a - b = \underbrace{i - i'}_{\in I} = \underbrace{j - j'}_{\in J} \in I \cap J\]
+        
+        Therefore, $\left[a\right]_{I \cap J} = \left[b\right]_{I \cap J}$, meaning that $f$ is indeed injective.
+
+        Since $f$ is both surjective and injective, it is bijective. Since it is also a ring homomorphism, it is a ring isomorphism.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary: CRT for integers}
+    Let $n, m \in \mathbb{Z}$ be coprime, i.e $\gcd\left(n, m\right) = 1$.
+
+    Then, for any $a_1, a_2 \in \mathbb{Z}$, there exists some $a \in A$ such that: 
+    \[\begin{systemofequations} \congruent{a}{a_1}{n}\\ \congruent{a}{a_2}{m} \end{systemofequations}\]
+    
+    The full set of solutions of this pair of congruences is $\left\{a + nm \mathbb{Z}\right\}$.
+
+    \begin{subparag}{Proof}
+        We know by hypothesis that $\gcd\left(n, m\right) = 1$. This implies by Bézout's theorem that there exists $x, y \in \mathbb{Z}$ such that: 
+        \[xn + ym = 1 \implies n\mathbb{Z} + m\mathbb{Z} = \mathbb{Z}\]
+        since an ideal which contains $1$ is non-proper.
+
+        By the CRT, we know that $\mathbb{Z} / \left(\left(n\right) \cap \left(m\right)\right) \simeq \mathbb{Z}/n\mathbb{Z} \times \mathbb{Z}/m\mathbb{Z}$. Thus, for any pair $\left(\left(a_1 \Mod n\right), \left(a_2 \Mod m\right)\right) \in \mathbb{Z}/n\mathbb{Z} \times \mathbb{Z}/m\mathbb{Z}$, there exists a unique $a \in \mathbb{Z}/\left(n\mathbb{Z} \cap m\mathbb{Z}\right)$ such that: 
+        \[\congruent{a}{a_1}{n}, \mathspace \congruent{a}{a_2}{m}\] 
+
+        Now, an element of $\mathbb{Z}$ is equal to this $a$ if and only if it is of the form:
+        \[\left\{a + \left(n\right) \cap \left(m\right)\right\} = \left\{a + nm\mathbb{Z}\right\}\]
+        where we used that $\lcm\left(n, m\right) = \frac{nm}{\gcd\left(n, m\right)} = nm$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Pairwise coprime}
+    Let $d_1, \ldots, d_r \in \mathbb{Z}$.
+
+    We say that they are \important{pairwise coprime}, if $\gcd\left(d_i, d_j\right) = 1$ for any $i \neq j$.
+\end{parag}
+
+
+\begin{parag}{Theorem: Generalisation}
+    Let $d_1, \ldots, d_r \in \mathbb{Z}$ be pairwise coprime.
+
+    Then, for any $a_1, \ldots, a_r \in \mathbb{Z}$, there exists a $a \in \mathbb{Z}$ such that: 
+    \[\begin{systemofequations} \congruent{a}{a_1}{d_1} \\ \vdots \\ \congruent{a}{a_r}{d_r}\end{systemofequations}\]
+    
+    The full set of solutions is: 
+    \[\left\{a + \left(d_1 \cdots d_r\right)\mathbb{Z}\right\}\]
+    
+    \begin{subparag}{Proof}
+        This proof can be done by induction. The base case was done by the previous corollary, and, for the inductive step, we suppose that we have a solution $a_k$ to the first $k$ equations, and we construct a $a_{k+1}$ which is a solution to the first $k+1$ equations.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We want to find all solutions $a \in \mathbb{Z}$ of: 
+    \[\begin{systemofequations} \congruent{a}{2}{5}\\ \congruent{a}{-1}{11}\\ \congruent{a}{3}{7}\\ \congruent{a}{0}{2} \end{systemofequations}\]
+    
+    Since $\left\{5, 11, 7, 2\right\}$ are pairwise coprime, we know that a solution exists by the CRT. We need to find a particular solution. A good way is just guesswork. We notice that $a = 10$ satisfies the last three equations: 
+    \[\congruent{10}{3}{7}, \mathspace \congruent{10}{0}{2}, \mathspace \congruent{10}{-1}{11}\]
+    
+    By the CRT, We can therefore turn our system to the following equivalent one: 
+    \[\begin{systemofequations} \congruent{a}{2}{5}\\ \congruent{a}{10}{154} \end{systemofequations}\]
+    where $154 = \lcm\left(7, 2, 11\right) = 7\cdot 2\cdot 11$.
+
+    Now, to solve this, we can use a direct method. A solution is of the form: 
+    \[a = 154t + 10 = 5s + 2 \iff 154t - 5s = -8\]
+    for some $t, s \in \mathbb{Z}$.
+
+    We can use the extended Euclidean algorithm, or we can notice that 154 is one below a multiple of 5, i.e: 
+    \[154\cdot 1 - 5\cdot 31 = -1 \implies 154\cdot 8 - 5\cdot \left(31\cdot 8\right) = -8 \implies 154\cdot 8 - 5\cdot 248 = -8\]
+    
+    We have thus got $t = 8$ and $s = 248$, telling us: 
+    \[a = 154t + 10 = 154\cdot 8 + 10 = 1232 + 10 = 1242\]
+    
+    By the CRT, it tells us that the full set of solutions is: 
+    \[\left\{1242 + 770\mathbb{Z}\right\}\]
+    where $770 = 5\cdot 11 \cdot  7 \cdot 2$.
+
+    In particular, this tells us that the smallest positive solution is $1242 - 770 = 472$.
+
+    \begin{subparag}{Algorithmic method}
+        Note that we can solve this kind of problem using a more algorithmic method. We find a solution $a_1$ such that: 
+        \[\begin{systemofequations} \congruent{a_1}{1}{5}\\ \congruent{a_1}{0}{11}\\ \congruent{a_1}{0}{7}\\ \congruent{a_1}{0}{2} \end{systemofequations} \implies \begin{systemofequations} \congruent{a_1}{1}{5} \\ \congruent{a_1}{0}{11\cdot 7\cdot 2} \end{systemofequations}\]
+        
+        This can be easily done using the extended Euclidean algorithm. Indeed, $a_1$ must be of the form: 
+        \[a_1 = 5s + 1 = \left(11\cdot 7\cdot 2\right)t \iff 5s - 154t = 1\]
+        which can be indeed solved using this algorithm.
+        
+        Then, we find a solution $a_2$ such that:
+        \[\begin{systemofequations} \congruent{a_2}{0}{5}\\ \congruent{a_2}{1}{11}\\ \congruent{a_2}{0}{7}\\ \congruent{a_2}{0}{2} \end{systemofequations}\]
+
+        Continuing this way, we then just have: 
+        \[a = 2 a_1 - a_2 + 3a_3 + 0a_4\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Explaining why a solution exists, describing the set of all solutions and finding the smallest positive solution is a typical exam question.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Group of units}
+    Let $A$ be a ring. 
+
+    Its \important{group of unit}, written $A^*$, is the subset of invertible elements with respect to multiplication.
+
+    \begin{subparag}{Property 1}
+        The group of unit is a multiplicative group.
+    \end{subparag}
+
+    \begin{subparag}{Property 2}
+        Let $A, B$ be rings. Then: 
+        \[\left(A \times B\right)^* \simeq A^* \times B^*\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $A, B$ be commutative rings.
+
+    If $A \simeq B$ are isomorphic, then $A^* \simeq B^*$ are also isomorphic.
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $n, m \in \mathbb{Z}$ such that $\gcd\left(n, m\right) = 1$.
+
+    Then, $\phi\left(n m\right) = \phi\left(n\right)\phi\left(m\right)$.
+
+    \begin{subparag}{Proof}
+        By the CRT, we know that $\mathbb{Z}/mn\mathbb{Z} \simeq \mathbb{Z}/n\mathbb{Z} \times \mathbb{Z}/m\mathbb{Z}$, which means that: 
+        \[\left(\mathbb{Z}/nm\mathbb{Z}\right)^* \simeq \left(\mathbb{Z}/n\mathbb{Z} \times \mathbb{Z}/m\mathbb{Z}\right)^* \simeq \left(\mathbb{Z}/n\mathbb{Z}\right)^* \times \left(\mathbb{Z}/m\mathbb{Z}\right)^*\]
+
+        However: 
+        \[\phi\left(nm\right) = \left|\left(\mathbb{Z}/nm\mathbb{Z}\right)^*\right| = \left|\left(\mathbb{Z}/n\mathbb{Z}\right)^*\right| \left|\left(\mathbb{Z}/m\mathbb{Z}\right)^*\right| = \phi\left(n\right)\phi\left(m\right)\]
+        since isomorphic groups have the same number of elements.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Together with the fact that $\phi\left(p^a\right) = p^a - p^{a-1}$ for $p \in \mathbb{P}$ and $a \in \mathbb{N}^*$, it allows us to $\phi\left(n\right)$ for any $n$ for which we can find the prime factorisation.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition: Converse of the CRT for integers}
+    Let $n, m \in \mathbb{Z}$.
+
+    If $\mathbb{Z}/nm\mathbb{Z} \simeq \mathbb{Z}/n\mathbb{Z} \times \mathbb{Z}/m\mathbb{Z}$, then $\gcd\left(n, m\right) = 1$.
+
+    \begin{subparag}{Remark}
+        This means that the converse of the CRT is true for integers. Note that this is not true for any field.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We know by hypothesis that $\mathbb{Z}/nm\mathbb{Z} \simeq \mathbb{Z}/n\mathbb{Z} \times \mathbb{Z}/m\mathbb{Z}$. Therefore, their chacteristic must be equal: 
+        \autoeq{nm = \tau\left(\mathbb{Z}/nm\mathbb{Z}\right) = \tau\left(\mathbb{Z}/n\mathbb{Z} \times \mathbb{Z}/m\mathbb{Z}\right) = \lcm\left(\tau\left(\mathbb{Z}/n\mathbb{Z}\right), \tau\left(\mathbb{Z}/m\mathbb{Z}\right)\right) = \lcm\left(n, m\right) = \frac{nm}{\gcd\left(n, m\right)}}
+        
+        However, this implies that $\gcd\left(n, m\right) = 1$, finishing our proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We know that, since $\gcd\left(16, 5\right) = 1$ and $16\cdot 5 = 80$, we have by the CRT that:
+    \[\mathbb{Z}/80\mathbb{Z} \simeq \mathbb{Z}/16\mathbb{Z} \times \mathbb{Z}/5\mathbb{Z}\]
+    
+    However, even though $8\cdot 10 = 80$, we have by the converse of the CRT for integers that:
+    \[\mathbb{Z}/80\mathbb{Z} \not\simeq \mathbb{Z}/8\mathbb{Z} \times \mathbb{Z}/10\mathbb{Z}\]
+    since $\gcd\left(8, 10\right) = 2 \neq 1$.
+\end{parag}
+
+\subsection{Polynomial ring}
+
+\begin{parag}{Definition: Polynomial ring}
+    Let $A$ be a commutative ring. 
+
+    The \important{ring of polynomials} over $A$ is:
+    \[A \left[x\right] = \left\{a_0 + a_1 x + \ldots + a_n x^n | n \in \mathbb{N}, a_1, \ldots, a_n \in A\right\}\]
+    with the usual addition and multiplication of polynomials.
+\end{parag}
+
+\begin{parag}{Definition: Degree}
+    Let $f\left(x\right) \in A\left[x\right]$ be a polynomial.
+
+    If it is non-zero, the \important{degree} of $f\left(x\right) = a_0 + \ldots + a_k x^k$ is defined as the largest $n \in \mathbb{N}$ such that $a_n \neq 0$. We note $\text{deg}\left(f\right) = n$.
+
+    We also define the degree of the zero-polynomial to be $\text{deg}\left(0\right) = -\infty$.
+    
+    \begin{subparag}{Example}
+        We for instance have: 
+        \[\text{deg}\left(3\right) = 0, \mathspace \text{deg}\left(3x^2 - 5\right) = 2\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Properties}
+    Let $f, g \in A\left[x\right]$ be polynomials. Then:
+    \begin{enumerate}
+        \item $\deg\left(f + g\right) \leq \max\left(\deg f, \deg g\right)$
+        \item If $A$ is an integral domain, $\deg\left(fg\right) = \deg f + \deg g$
+    \end{enumerate}
+
+    \begin{subparag}{Proof 1}
+        We know that $\deg\left(f + g\right) = \max\left(\deg f, \deg g\right)$, unless $\deg f = \deg g$ and $a_n = -b_n$.
+
+        For instance, summing two polynomials of degree 2, we can get a polynomial of degree 1:
+        \[\left(3x^2 + 2x\right) + \left(-3x^2 + 5\right) = 2x + 5\]
+    \end{subparag}
+    
+    \begin{subparag}{Proof 2}
+        We notice that: 
+        \autoeq{f\left(x\right)g\left(x\right) = \left(a_0 + a_1 x + \ldots + a_n x^n\right)\left(b_0 + b_1 x + \ldots + b_m x^m\right) = a_n b_m x^{n+m} + \text{lower degree terms}}
+        
+        Let's suppose that neither $f$ nor $g$ is $0$. Since the degree of $f$ is $n$ and the degree of $g$ is $m$, we know that that $a_n \neq 0$ and $a_m \neq 0$ by definition. Since $A$ is an integral domain, $a_n b_m \neq 0$, and thus $f\left(x\right)g\left(x\right)$ has degree $n + m$.
+
+        Now, if $f$ or $g$ is the zero polynomial, then $fg = 0$. However, then, our property reads: 
+        \[-\infty = -\infty + c\]
+        for some $c \in \mathbb{N}_0 \cup \left\{-\infty\right\}$, which we take as a definition (which makes sense). This justifies the definition $\deg\left(0\right) = -\infty$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $A$ be an integral domain.
+
+    Then:
+    \begin{enumerate}
+        \item $A\left[x\right]$ is an integral domain.
+        \item The units of $A\left[x\right]$ are the units of $A$.
+    \end{enumerate}
+
+    \begin{subparag}{Proof 1}
+        Let's suppose that $f\left(x\right)g\left(x\right) = 0$. This means that: 
+        \[\deg\left(fg\right) = -\infty\]
+
+        However, we also know that $\deg\left(f\right) + \deg\left(g\right) = \deg\left(fg\right)$ since $A$ is an integral domain. If both $\deg\left(f\right)$ and $\deg\left(g\right)$ are finite, then their sum is also finite. This requires that either is $-\infty$, telling us that $f\left(x\right) = 0$ or $g\left(x\right) = 0$. This implies by definition that $A\left[x\right]$ is an integral domain.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        Let's suppose that $f\left(x\right)g\left(x\right) = 1$. This means that: 
+        \[\deg\left(fg\right) = 0\]
+        
+        However, we also know that $\deg\left(f\right) + \deg\left(g\right) = \deg\left(fg\right)$ since $A$ is an integral domain. If any of the terms is $-\infty$, then the sum will also be $-\infty$. If either one is strictly positive, then their sum will also be strictly positive. This therefore means that they are both constant. In other words, $f\left(x\right) = a_0$ and $g\left(x\right) = b_0$, which are such that $a_0 \cdot b_0 = 1$ in $A$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    For instance, the following rings are integral domains: 
+    \[\mathbb{R}\left[x\right], \mathspace \mathbb{Q}\left[x\right], \mathspace \mathbb{Z}\left[x\right]\]
+    
+    However, $\mathbb{Z}/6\mathbb{Z}\left[x\right]$ is not an integral domain. We for instance have that $\left(2x\right)\left(3x\right) = 0$ where $2x \neq 0$ and $3x \neq 0$.
+\end{parag}
+
+\begin{parag}{Theorem: Euclidean division in polynomial fields}
+    Let $F$ be a field, and let $f\left(x\right), d\left(x\right) \in F\left[x\right]$ such that $\deg\left(d\right) \geq 1$.
+
+    Then, there exists polynomials $q\left(x\right), r\left(x\right) \in F\left[x\right]$ be such that: 
+    \[f\left(x\right) = q\left(x\right)d\left(x\right) + r\left(x\right)\]
+    where $r\left(x\right) = 0$ or $\deg\left(r\right) < \deg\left(d\right)$.
+
+    \begin{subparag}{Proof}
+        Let's first suppose that $\deg\left(f\right) < \deg\left(g\right)$. Then, we can take: 
+        \[f\left(x\right) = 0\cdot d\left(x\right) + f\left(x\right)\]
+        
+        Let's now suppose that $\deg\left(f\right) \geq \deg\left(g\right)$. The idea is that we can use the regular polynomial division algorithm. Let's describe it formally. We can write: 
+        \[f\left(x\right) = a_0 + \ldots + a_m x^m\]
+        \[d\left(x\right) = b_0 + \ldots + b_n x^n\]
+        
+        We now construct the following polynomial:
+        \[p_1\left(x\right) = f\left(x\right) - d\left(x\right) \cdot \frac{a_m}{b_n} x^{m-n}\]
+        where $\frac{a_m}{b_n} = a_m b_n^{-1} \in F$ since it is a field. 
+
+        If $\deg\left(p_1\right) < \deg\left(f\right)$, we are done. Otherwise, we can can repeat: 
+        \autoeq{p_2\left(x\right) = p_1\left(x\right) - d\left(x\right)\frac{a_{m-1}}{b_n}x^{m - n -1} = f\left(x\right) - d\left(x\right)\frac{a_m}{b_n}x^{m-n} - d\left(x\right)\frac{a_{m-1}}{b_n}x^{m-n-1}}
+        
+        The sequence of degrees is strictly decreasing, so, at some point, the process terminates with a $p\left(x\right) = f\left(x\right) - d\left(x\right) q\left(x\right)$ such that: 
+        \[f\left(x\right) -d\left(x\right)q\left(x\right) = r\left(x\right)\]
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        As mentioned above, this is just the regular polynomial division algorithm. For instance, if we have $f\left(x\right) = 3x^5 + x^3 - 2x^2 + 1$ and $d\left(x\right) = x^2 - 2$, we have: 
+        \imagehere[0.6]{PolynomialDivisionExample.png}
+        where, for example, the first term of $q\left(x\right)$ was chosen to be $3x^3$ since $3x^3\left(x^2 - 2\right) = 3x^5 + \ldots$, which allows to decrease the degree of $f\left(x\right)$.
+
+        This allows us to write:
+        \autoeq{f\left(x\right) = d\left(x\right)q\left(x\right) + r\left(x\right) \iff 3 x^5 + x^3 - 2x^2 + 1 = \left(x^2 - 2\right)\left(3x^3 + 7x - 2\right) + \left(14x - 3\right)}
+    \end{subparag}
+\end{parag}
+
+\subsection{Euclidean domain}
+
+\begin{parag}{Definition: Euclidean domain}
+    Let $A$ be a commutative ring. 
+
+    It is said to be a \important{Euclidean domain} if:
+    \begin{enumerate}
+        \item $A$ is an integral domain.
+        \item There exists a function $\nu: A \setminus \left\{0\right\} \mapsto \mathbb{N}$ such that for any $a, b \in A$ where $b \neq 0$, there exists $q, r \in A$ such that: 
+        \[a = qb + r\]
+        and either $r = 0$ or $\nu\left(r\right) < \nu\left(b\right)$.
+    \end{enumerate}
+
+    \begin{subparag}{Intuition}
+        This generalises abstractly any space which admits a Euclidean division.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        We can for instance consider the following Euclidean domain, which is the main one we have been worked with since the beginning of the course:
+        \[\mathbb{Z}, \mathspace \nu\left(n\right) = \left|n\right|\]
+
+        It is also possible (though harder than exam material) to show that the following integral domain is a Euclidean domain: 
+        \[\mathbb{Z}\left[i\right] = \left\{a + ib \suchthat a, b \in \mathbb{Z}\right\}, \mathspace \nu\left(a + ib\right) = \left|a + ib\right|^2 = a^2 + b^2\]
+        
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $A$ be a field.
+
+    Then, $A$ is a Euclidean domain.
+
+    \begin{subparag}{Proof}
+        For any $a, b \in A$, we can find a $q \in A$ such that: 
+        \[a = qb + 0 = qb\]
+        
+        We can therefore take $\nu$ to be any function.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $\mathbb{F}$ be a field.
+
+    Then, $\mathbb{F}\left[x\right]$ is a Euclidean domain.
+
+    \begin{subparag}{Proof}
+        We can just take $\nu = \deg$. 
+
+        Then, given $f\left(x\right), d\left(x\right) \in \mathbb{F}\left[x\right]$, we know that we can find $q\left(x\right), r\left(x\right)$ such that
+        \[f\left(x\right) = q\left(x\right)d\left(x\right) + r\left(x\right)\]
+        where $r\left(x\right) = 0$ or $\deg\left(r\right) < \deg\left(d\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $A$ be a Euclidean domain.
+
+    Then, $A$ is a PID (principal ideal domain).
+
+    \begin{subparag}{Proof}
+        Let $E$ be a Euclidean domain of function $\nu$, and $I \subset E$ be an ideal.
+
+        If $I = \left\{0\right\}$, then we directly have $I = \left(0\right)$.
+
+        Let's now suppose that $I \neq \left\{0\right\}$. We can pick a $d \in I \setminus \left\{0\right\}$ such that $\nu\left(d\right)$ is the minimum on $I$. Now, let $a \in I$ be arbitrary. This yields that there exists $q, r$ such that $\nu\left(r\right) < \nu\left(d\right)$ or $r = 0$, and: 
+        \[a = qd + r \implies r = \underbrace{a}_{\in I} - \underbrace{qd}_{\in I} \in I\]
+
+        However, since $r \in I$ and we picked $d$ such that $\nu\left(d\right)$ was the minimum on $I$, we cannot have $\nu\left(r\right) <\nu\left(d\right)$. This means that $r = 0$, and thus that: 
+        \[a = qd \implies I = \left(d\right)\]
+        
+        Any ideal is principal, showing this is indeed a PID.
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This for instance implies that, for a field $F$, $F\left[x\right]$ is a PID, i.e. all its ideals are generated by a single element.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    We have proven the following inclusions: 
+    \[\text{Fields} \subset \text{Euclidean domains} \subset \text{PID} \subset \text{Integral domain} \subset \text{Commutative rings}\]
+    
+    We have the following examples:
+    \begin{enumerate}
+        \item Fields: 
+        \[\mathbb{R}, \mathspace \mathbb{C}, \mathspace \mathbb{Z}/p\mathbb{Z}\]
+        for $p \in \mathbb{P}$ prime.
+        \item Euclidean domains that are not fields: 
+        \[\mathbb{Z}, \mathspace \mathbb{R}\left[x\right]\]
+        \item PID that are not Euclidean domain: \textit{``They exist, but don't worry about it.''}
+        \item Integral domains that are not PIDs:
+        \[\mathbb{R}\left[x, y\right]\]
+        \item Commutative rings that are not integral domains: 
+        \[\mathbb{Z}/n\mathbb{Z}\]
+        for $n \in \mathbb{N}_{\geq 2} \setminus \mathbb{P}$ composite.
+    \end{enumerate}
+\end{parag}
+
+\end{document}

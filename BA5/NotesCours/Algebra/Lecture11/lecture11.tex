@@ -1,0 +1,389 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-12-26 at 16:00:44.
+
+\usepackage{../../style}
+
+\title{Algebra}
+\author{Joachim Favre}
+\date{Mardi 26 décembre 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2023-12-04}{Polynomials don't appear so strong yet}{
+\begin{itemize}[left=0pt]
+    \item Definition of lcm and gcd.
+    \item Proof of the CRT for an arbitrary number of factors.
+    \item Explanation on how to use the CRT to solve a system of congruences of polynomials.
+    \item Definition of irreducible elements and maximal ideals.
+\end{itemize}
+
+}
+
+\begin{parag}{Definition: Divisibility}
+    Let $A$ be a commutative ring, and $a, b \in A$.
+
+    We say that $a$ \important{divides} $b$, written $a \divides b$, if there exists a $c \in A$ such that: 
+    \[b = ac\]
+\end{parag}
+
+\begin{parag}{Definition: GCD}
+    Let $A$ be an integral domain, and $a, b \in A$.
+
+    We say that $d$ is a \important{greatest common divisor} of $a$ and $b$, written $d = \gcd\left(a, b\right)$ if $d \divides a$, $d \divides b$ and, for any $c \in A$ such that $c \divides a$ and $c \divides b$, then $c \divides d$.
+
+    \begin{subparag}{Remark}
+        This is not unique in general.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: LCM}
+    Let $A$ be an integral domain, and $a, b \in A$.
+
+    We say that $\ell$ is a \important{least common multiple} of $a$ and $b$, written $\ell = \lcm\left(a, b\right)$, if $a \divides \ell $, $b \divides \ell $ and for any $m \in A$ such that $a \divides m$ and $b \divides m$, then $\ell \divides m$.
+
+    \begin{subparag}{Remark}
+        This is not unique in general.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Associate elements}
+    Let $A$ be an integral domain, and $a, b \in A$.
+
+    $a$ and $b$ are said to be \important{associates} if there exists a unit $u \in A^*$ such that: 
+    \[b = au\]
+
+    Or, equivalently, if there exists a unit $v \in A^*$ such that: 
+    \[a = bv\]
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $A$ be an integral domain, and $a, b \in A \setminus \left\{0\right\}$ be nonzero elements.
+
+    \begin{itemize}
+        \item If $d_1, d_2$ are $\gcd\left(a, b\right)$, then $d_1$ and $d_2$ are associates.
+        \item If $\ell _1, \ell _2$ are $\lcm\left(a, b\right)$, then $\ell _1$ and $\ell _2$ are associates.
+    \end{itemize}
+
+    \begin{subparag}{Proof 1}
+        Since $d_1 \divides a, b$ and $d_2$ is a gcd, we know by definition that $d_1 \divides d_2$ and thus that $d_1 = x d_2$ for some $x \in A$. Doing the same reasoning, we get that $d_2 = zd_1$ for some $z \in A$. This yields: 
+        \[d_1 = x d_2 = xz d_1 \implies d_1\left(1 - xz\right) = 0\]
+        
+        However, since this is an integral domain, one of the two terms is 0. Since $d_1 \neq 0$ by definition of the gcd, we get: 
+        \[1 - xz = 0 \implies xz = 1\]
+        showing that both $x$ and $z$ are units. This indeed means that $d_1$ and $d_2$ are associates, by definition.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        The case for lcms is similar.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $A$ be a PID and $f, g \in A$.
+
+    $f$ and $g$ are associates if and only if: 
+    \[\left(f\right) = \left(g\right)\]
+
+    \begin{subparag}{Proof $\implies$}
+        We know by hypothesis that $f$ and $g$ are associates, i.e. that there exists a unit $u$ such that: 
+        \[g = uf\]
+        
+        This however means that $g \in \left(f\right)$ and thus $\left(g\right) \subset \left(f\right)$.
+
+        We can do the exact same reasoning from the fact that $f = u^{-1} g$ to get that $\left(f\right) \subset \left(g\right)$. This indeed yields that: 
+        \[\left(f\right) = \left(g\right)\]
+    \end{subparag}
+    
+    \begin{subparag}{Proof $\impliedby$}
+        This case is left as an exercise to the reader.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    Let us consider $A = \mathbb{Z}$. The only units are $\left\{-1, 1\right\}$. 
+
+    We therefore get that $n, m \in \mathbb{Z}$ are associates if and only if $\left|n\right| = \left|m\right|$. And, we do have that: 
+    \[\left(m\right) = \left(-m\right)\]
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let $F$ be a field, and $A = F\left[x\right]$.
+
+    The units of $A$ are the non-zero constants since all non-zero elements of a field are invertible, i.e. $A^* = F^* = F \setminus \left\{0\right\}$. This means that $f\left(x\right)$ and $g\left(x\right)$ are associates if and only if there exists a $\alpha \in F^*$ such that $f\left(x\right) = \alpha g\left(x\right)$. We do also have that: 
+    \[\left(f\left(x\right)\right) = \left(\alpha f\left(x\right)\right) \subset F\left[x\right]\]
+\end{parag}
+
+\begin{parag}{Properties}
+    Let $E$ be a Euclidean domain, and $a, b, c \in E \setminus \left\{0\right\}$.
+
+    Then:
+    \begin{enumerate}
+        \item $\gcd\left(a, b\right)$ can be found by the Euclidean division algoriithm.
+        \item $\left(a\right) + \left(b\right) = \left(\gcd\left(a, b\right)\right)$
+        \item $\left(a\right) \cap \left(b\right) = \left(\lcm\left(a, b\right)\right)$
+        \item If $\gcd\left(a, b\right) = 1$ and $\gcd\left(a, c\right) = 1$, then $\gcd\left(a, bc\right) = 1$.
+        \item If $\gcd\left(a, b\right) = 1$, then $\lcm\left(a, b\right) = ab$.
+    \end{enumerate}
+\end{parag}
+
+\begin{parag}{Chinese remainder theorem}
+    Let $E$ be a Euclidean domain, and $m_1, \ldots, m_r \in E$ such that $\gcd\left(m_i, m_j\right) = 1$ for any $i, j$ such that $i \neq j$.
+
+    Then, the following function is a ring isomorphism: 
+    \[\begin{split}
+    f: E / \left(m_1 \cdots m_r\right) &\longmapsto E / \left(m_1\right) \times \ldots \times E / \left(m_r\right) \\
+    \left[x\right]_{\left(m_1 \cdots m_r\right)} &\longmapsto \left(\left[x\right]_{\left(m_1\right)}, \ldots, \left[x\right]_{\left(m_r\right)}\right)
+    \end{split}\]
+    
+    \begin{subparag}{Proof idea}
+        We first notice that this is a ring homomorphism by construction, using a similar argument as in the proof of the CRT for two factors.
+
+        We now need to prove bijectivity. Let's begin with surjectivity. By the CRT for 2 factors, we know that there exists $a_{12} \in E$ such that: 
+        \[\congruent{a_{12}}{a_1}{m_1}, \mathspace \congruent{a_{12}}{a_2}{m_2}\]
+        
+        Since $\gcd\left(m_1, m_2\right) = 1$ by hypothesis, this means that $\left(m_1\right) + \left(m_2\right) = E$. We moreover know that $\gcd\left(m_3, m_1\right) = \gcd\left(m_3, m_2\right) = 1$ by hypothesis. By one of our properties, we know that: 
+        \[\gcd\left(m_3, m_1 m_2\right) = 1\]
+        
+        But then, this means that $\left(m_3\right) + \left(m_1 m_2\right) = E$. We can thus again use the CRT for 2 factors, to get that there exists $a_{123} \in E$ such that: 
+        \[\congruent{a_{123}}{a_{12}}{m_1m_2}, \mathspace \congruent{a_{123}}{a_3}{m_3}\]
+        
+        We can continue until we get all congruences, showing surjectivity.
+
+        Let's now show injectivity. We thus suppose that, for all $i$: 
+        \[\congruent{a}{a_i}{m_i}, \mathspace \congruent{b}{a_i}{m_i}\]
+        
+        However, this means that $\congruent{a-b}{0}{m_i}$ for any $i$. This implies by definition of quotient rings that $a - b \in \bigcap_{i=1}^{r} \left(m_i\right) = \left(\lcm\left(m_1, \ldots, m_r\right)\right)$. However, since $\gcd\left(m_i, m_j\right) = 1$, we get that:
+        \[a - b \in \left(m_1 \cdots m_r\right)\]
+
+        Now, by definition of quotient rings, we indeed get that: 
+        \[\congruent{a}{b}{m_1 \cdots m_r}\]
+        showing injectivity in $E / \left(m_1 \cdots m_r\right)$.
+
+        Since this map is both injective and surjective, it is bijective. Since it is moreover a ring homomorphism, it is a ring isomorphism.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $F$ be a field, and $\left\{f_1\left(x\right), \ldots, f_r\left(x\right)\right\} \subset F\left[x\right]$ be polynomials satisfying $\gcd\left(f_i\left(x\right), f_j\left(x\right)\right) = 1$ for any $i \neq j$.
+
+    Then:
+    \[F\left[x\right] / \left(f_1\left(x\right) \cdots f_r\left(x\right)\right) \simeq F\left[x\right] / \left(f_1\left(x\right)\right) \times \ldots \times F\left[x\right] / \left(f_r\left(x\right)\right)\]
+\end{parag}
+
+\begin{parag}{Observation}
+    We know that $\gcd\left(f\left(x\right), g\left(x\right)\right)$ is not unique. However, since any gcd are associates, they are determined up to a nonzero constant in $F$. There therefore exists a unique gcd with leading coefficient equal to 1. This yields the following definition.
+\end{parag}
+
+\begin{parag}{Definition: Monic}
+    Let $F$ be a field, and $f\left(x\right) \in F\left[x\right]$.
+
+    $f$ is said to be \important{monic} if its leading coefficient is $1$.
+
+    \begin{subparag}{Remark}
+        By our observation, for any nonzero $f\left(x\right), g\left(x\right)$, there exists a unique monic $\gcd\left(f\left(x\right), g\left(x\right)\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We want to find the monic $\gcd\left(f\left(x\right), g\left(x\right)\right)$ where: 
+    \[f\left(x\right) = x^4 - x^3 + 3x^2 + 2x - 5, \mathspace g\left(x\right) = x^2 - 2x + 1\]
+    
+    As usual, we use the Euclidean algorithm. Doing regular polynomial division, we get that: 
+    \[x^4 - x^3 + 3x^2 + 2x - 5 = \left(x^2 - 2x + 1\right)\left(x^2 + x + 4\right) + \underbrace{9x - 9}_{= r_1}\]
+    
+    Then: 
+    \[x^2 - 2x + 1 = \left(9x - 9\right)\left(\frac{1}{9} x - \frac{1}{9}\right) + \underbrace{0}_{= r_2}\]
+    
+    Since we have found a rest of 0, we finished the algorithm. This means that: 
+    \[r_1 = 9x - 9 = \gcd\left(f\left(x\right), g\left(x\right)\right)\]
+    
+    We however want a monic gcd, so we divide by the leading coefficient, giving that the monic gcd of $f\left(x\right)$ and $g\left(x\right)$ is: 
+    \[\frac{1}{9}\left(9x + 9\right) = x + 1\]
+
+    \begin{subparag}{Remark}
+         This is a typical exam question.
+    \end{subparag}
+\end{parag}
+
+\subsection{Using CRT to solve systems of congruences of polynomials}
+
+\begin{parag}{Goal}
+    We want to find a way to use the CRT to solve systems of congruences of polynomials.
+\end{parag}
+
+\begin{parag}{Example}
+    Let $\mathbb{F}_3 = \left\{0, 1, 2\right\} = \mathbb{Z}/3\mathbb{Z}$ be a field. We consider $\mathbb{F}_3\left[x\right]$. We want to find all solutions of the following system of congruences:
+    \[\begin{systemofequations} \congruent{f\left(x\right)}{x+1}{x^2 + 1} \\ \congruent{f\left(x\right)}{1}{x} \\ \congruent{f\left(x\right)}{-x}{x^2 - 1} \end{systemofequations}\]
+
+    We first notice that $\left(x^2 + 1\right), x$ and $\left(x^2 - 1\right)$ are pariwise coprime. Indeed, we know that $\gcd\left(g_1\left(x\right), g_2\left(x\right)\right) = 1$ if and only if there exists $a\left(x\right), b\left(x\right) \in \mathbb{F}_3\left[x\right]$ such that $a\left(x\right)g_1\left(x\right) + b\left(x\right)g_2\left(x\right) = 1$. With a bit of trial and error, we indeed find that: 
+    \[\left(x^2 + 1\right)\cdot 1 + \left(x\right)\cdot 2x = 1\] 
+    \[\left(x^2 + 1\right)\cdot 2 + \left(x^2 - 1\right)\cdot 1 = 1\] 
+    \[\left(x^2 - 1\right)\cdot 2 + \left(x\right)\cdot x = 1\]
+    
+    Since they are pairwise coprime, the CRT tells us that there exists solutions of the form: 
+    \[a\left(x\right) + k\left(x^2 + 1\right)\left(x^2 - 1\right)x, \mathspace k \in \mathbb{F}_3\]
+   
+    We now need to find such a $a\left(x\right)$. We start with 2 congruences: 
+    \[\begin{systemofequations} \congruent{f\left(x\right)}{x+1}{x^2 + 1} \\ \congruent{f\left(x\right)}{1}{x} \end{systemofequations}\]
+    
+    We therefore try to find $h\left(x\right), g\left(x\right)$ such that: 
+    \[f\left(x\right) = \left(x^2 + 1\right)h\left(x\right) + \left(x+1\right) = xg\left(x\right) + 1 \iff \left(x^2 + 1\right)h\left(x\right) - xg\left(x\right) = -x\]
+    
+    However, we have already found that:
+    \[\left(x^2 + 1\right)\cdot 1 + \left(x\right)\cdot 2x = 1\] 
+
+    Therefore, multiplying both sides by $-x$: 
+    \[\left(x^2 + 1\right)\underbrace{\left(-x\right)}_{h\left(x\right)} + x\underbrace{\left(-2x^2\right)}_{-g\left(x\right)} = -x\]
+
+    From this, we can deduce that, modulo $x\left(x^2 + 1\right)$: 
+    \[f\left(x\right) = \left(x^2 + 1\right)h\left(x\right) + \left(x+1\right) = \left(x^2 + 1\right)\left(-x\right) + x + 1 = -x^3 + 1\]
+
+    We can simplify it to get that: 
+    \[\congruent{f\left(x\right)}{x+1}{x^3 + x}\]
+
+    Now, taking back the third equation, we have the following system of equations:
+    \[\begin{systemofequations} \congruent{f\left(x\right)}{x+1}{x^3 + x} \\ \congruent{f\left(x\right)}{-x}{x^2 - 1} \end{systemofequations}\]
+
+    We can repeat the exact same method to solve this, which gives: 
+    \[\congruent{f\left(x\right)}{x^4 + 2x^3 + x^2 + 1}{x^5 - x}\]
+\end{parag}
+
+\begin{parag}{General method for two equations}
+    Let's generalise the previous example. We suppose that we have the following system of equations: 
+    \[\begin{systemofequations} \congruent{f\left(x\right)}{h_1\left(x\right)}{g_1\left(x\right)} \\ \congruent{f\left(x\right)}{h_2\left(x\right)}{g_2\left(x\right)} \end{systemofequations}\]
+    where $\gcd\left(g_1, g_2\right) = 1$.
+
+    Then, we know that there exists $t_1\left(x\right), t_2\left(x\right) \in F\left[x\right]$ such that: 
+    \[t_1\left(x\right)g_1\left(x\right) + t_2\left(x\right)g_2\left(x\right) = 1\]
+    which we can find using the Euclidean algorithm backwards, just like integers; or by guessing, which is typically faster.
+
+    But then, the following is a solution: 
+    \[f\left(x\right) = h_1\left(x\right)t_2\left(x\right)g_2\left(x\right) + h_2\left(x\right)t_1\left(x\right)g_1\left(x\right)\]
+    
+    Indeed, using the fact that $t_1\left(x\right)g_1\left(x\right) + t_2\left(x\right)g_2\left(x\right) = 1$: 
+    \[f\left(x\right) = h_1\left(x\right)\left(1 - t_1\left(x\right) g_1\left(x\right)\right) + h_2\left(x\right)t_2\left(x\right)g_2\left(x\right) \implies \congruent{f\left(x\right)}{h_1\left(x\right)}{g_1\left(x\right)}\]
+    \[f\left(x\right) = h_1\left(x\right)t_2\left(x\right)g_2\left(x\right) + h_2\left(x\right)\left(1 - t_2\left(x\right)g_2\left(x\right)\right) \implies \congruent{f\left(x\right)}{h_2\left(x\right)}{g_2\left(x\right)}\]
+\end{parag}
+
+\begin{parag}{General method}
+    Let's now suppose that we have a general system of equations $\congruent{f\left(x\right)}{h_i\left(x\right)}{g_i\left(x\right)}$ for pairwise coprime $g_i\left(x\right)$. 
+
+    We define $G\left(x\right) = g_1\left(x\right) \cdots g_r\left(x\right)$ and $G_i\left(x\right) = \frac{G\left(x\right)}{g_i\left(x\right)}$. By hypothesis, we have that $\gcd\left(G_i, g_i\right) = 1$ for any $i$. This means that, for all $i$, there exists some $t_i\left(x\right), s_i\left(x\right)$ such that: 
+    \[t_i\left(x\right)G_i\left(x\right) + s_i\left(x\right)g_i\left(x\right) = 1\]
+    which we can again find using the Euclidean algorithm, or by guesssing.
+
+    Our answer can then be expressed as:
+    \[f\left(x\right) = \sum_{i=1}^{r} h_i\left(x\right)G_i\left(x\right)t_i\left(x\right)\]
+    
+    \begin{subparag}{Example}
+        Let us consider $r = 3$. Then: 
+        \autoeq{f\left(x\right) = \left(h_1 G_1 t_1 + h_2 G_2 t_2 + h_3 G_3 t_3\right)\left(x\right) = \left(h_1\left(1 - g_1 s_1\right) + h_2 G_2 t_2 + h_3 G_3 t_3\right)\left(x\right)}
+        which indeed implies that: 
+        \[\congruent{f\left(x\right)}{h_1\left(x\right)}{g_1\left(x\right)}\]
+
+        This is similar for $h_2\left(x\right)$ and $h_3\left(x\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We consider again the following system of equations in $\mathbb{F}_3\left[x\right]$:
+    \[\begin{systemofequations} \congruent{f\left(x\right)}{x+1}{x^2 + 1} \\ \congruent{f\left(x\right)}{1}{x} \\ \congruent{f\left(x\right)}{-x}{x^2 - 1} \end{systemofequations}\]
+
+    By construction we have: 
+    \[G_1\left(x\right) = x\left(x^2 - 1\right) = x^3 - x\] 
+    \[G_2\left(x\right) = \left(x^2 + 1\right)\left(x^2 - 1\right) = x^4 - 1\]
+    \[G_3\left(x\right) = \left(x^2 + 1\right)x = x^3 + x\]
+    
+    
+    By guessing, we find that: 
+    \begin{center}
+    \setlength{\tabcolsep}{2pt}
+    \begin{tabular}{rcl}
+        $\left(x^2 + 1\right)\left(x^2 + 1\right)$ & $-x\left(x^3 - x\right)$ & $= 1$ \\
+        $x^3\cdot x$ & $-1\left(x^4 - 1\right)$ & $=1$ \\
+        $\left(x^2 - 1\right)\left(x^2 - 1\right)$ & $\displaystyle \underbrace{-x\left(x^3 + x\right)}_{t_i\left(x\right)G_i\left(x\right)}$ & $=1$ \\
+    \end{tabular}
+    \end{center}
+
+    Now, we know that the solution is: 
+    \autoeq{f\left(x\right) = \sum_{i=1}^{3} h_i\left(x\right)t _i\left(x\right)G_i\left(x\right) = \left(x+1\right)\left(-x\right)\left(x^3 - x\right) + 1\left(-1\right)\left(x^4 -1\right) + \left(-x\right)\left(-x\right)\left(x^3 + x\right) = x^4 + 2x^3 + x^2 + 1}
+    
+    This is a solution modulo $x\left(x^2 - 1\right)\left(x^2 + 1\right) = x^5 - x$, meaning that the set of all solutions is: 
+    \[\left\{x^4 + 2x^3 + x^2 + 1 + \left(x^5 - x\right)k \suchthat k \in \mathbb{F}_3\left[x\right]\right\}\]
+
+    We can verify this using polynomial division.
+\end{parag}
+
+\subsection{Irreducible elements and maximal ideals}
+
+\begin{parag}{Definition: Irreducible element}
+    Let $A$ be a commutative ring, and $c \in A$.
+
+    $c$ is \important{irreducible} if it has all the following properties:
+    \begin{enumerate}
+        \item $c \neq 0$.
+        \item $c$ is not a unit.
+        \item For any $a, b$ such that $ab = c$, then either $a$ or $b$ is a unit.
+    \end{enumerate}
+
+    \begin{subparag}{Personal remark}
+        This can be understood as some kind of generalisation of prime numbers. This is not completely true since ``prime elements'' are defined differently and are a different concept. However, irreducible elements share some properties with prime numbers that allow us to make a link between them for intuition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider $A =\mathbb{Z}/9\mathbb{Z}$. We know that the units are: 
+    \[A^* = \left\{\left[1\right], \left[2\right], \left[4\right], \left[5\right], \left[7\right], \left[8\right]\right\}\]
+    
+    The candidates for being irreducible elements are $\left[3\right]$ and $\left[6\right]$. We consider the products of non-units non-zero elements:
+    \[\left[3\right]\left[3\right] = \left[0\right], \mathspace \left[3\right]\left[6\right] = \left[0\right], \mathspace \left[6\right]\left[6\right] = \left[0\right]\]
+    
+    This means that, if $ab = \left[3\right]$, then either $a$ or $b$ is a unit; it is impossible that they are both non-unit; and similarly for $\left[6\right]$. This means that both $\left[3\right]$ and $\left[6\right]$ are irreducible.
+\end{parag}
+
+\begin{parag}{Definition: Maximal ideal}
+    Let $A$ be a commutative ring, and $I \subset A$ be an ideal.
+
+    $I$ is said to be \important{maximal} if there is no ideal $J \subset A$ such that: 
+    \[I \subsetneq J \subsetneq A\]
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $A$ be a PID, and $p \in A$.
+
+    $p$ is irreducible if and only if $p \neq 0$ and $\left(p\right)$ is maximal.
+
+    \begin{subparag}{Proof $\implies$}
+        Let $p$ be an irreducible element. We suppose towards contradiction that there exists an ideal $J \subset A$ such that: 
+        \[\left(p\right) \subsetneq J \subsetneq A\]
+
+        Since $A$ is a PID, we know there exists a $d$ such that $J = \left(d\right)$. Since $\left(p\right) \subset J$, we know $p \in \left(d\right)$ and thus $p = dt$ for some $t \in A$. However, since $p$ is irreducible, we have two cases. If $d$ is a unit, this yields that $d$ and $1$ are associates and thus $\left(d\right) = \left(1\right) = A$. If however $t$ is a unit, we get that $d$ and $p$ are associates and thus that $\left(d\right) = \left(p\right)$. In both case, it contradicts they hypothesis that $\left(p\right) \subsetneq J \subsetneq A$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        We do this proof by the contrapositive. We therefore suppose that $p$ is not irreducible, i.e. that there exists $y, z$ both non units such that $p = yz$. We want to show that $\left(p\right)$ is not maximal.
+
+        By construction, we have that: 
+        \[\left(p\right) \subset \left(y\right) \subset A\]
+
+        Since $y$ is not a unit, $\left(y\right) \neq A$. We still need to show that  $\left(p\right) \neq \left(y\right)$. This is true since, otherwise, $y = pt$, which would yield that: 
+        \[p = yz = ptz \implies p\left(1 - tz\right) = 0 \over{\implies}{$p \neq 0$} tz = 1 \implies z \text{ is a unit}\]
+
+        This means that: 
+        \[\left(p\right) \subsetneq \left(y\right) \subsetneq A\]
+        which indeed shows that $\left(p\right)$ is not maximal. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

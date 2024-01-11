@@ -1,0 +1,451 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-12-30 at 17:17:21.
+
+\usepackage{../../style}
+
+\title{Algebra}
+\author{Joachim Favre}
+\date{Samedi 30 décembre 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2023-12-11}{And now they do}{
+\begin{itemize}[left=0pt]
+    \item Proof that an ideal is maximal if and only if its quotient ring is a field.
+    \item Proof of theorems allowing to know when a polynomial is irreducible.
+    \item Proof of theorems doing a classification of the finite fields.
+\end{itemize}
+
+}
+
+\begin{parag}{Proposition}
+    Let $A$ be a commutative ring, and $I \subset A$ be an ideal.
+
+    $I$ is maximal if and only if $A / I$ is a field.
+
+    \begin{subparag}{Proof $\implies$}
+        We do this proof by the contrapositive. We therefore want to show that $A/I$ is not a field implies that $I \subset A$ is not maximal.
+
+        Since it is not a field, there exists some non-zero non-unit $\left[b\right] \in A/I$. Our goal is to show that $J = I + \left(b\right)$ is such that $I \subsetneq J \subsetneq A$. 
+
+        By definition of quotient rings, we know that $\left[b\right] \neq \left[0\right] \iff b \notin I$. We moreover trivially now that $I \subset J = I + \left(b\right)$. This directly gives us that $I \subsetneq J$.
+
+        Since $J$ is an ideal, we also know that $J \subset A$. Let us therefore suppose towards contradiction that $J = A$. This yields that $1 \in J = I + \left(b\right)$ and thus, by definition of the addition of ideals and of $\left(b\right)$, that there exists some $a \in I$ and $y \in A$ such that: 
+        \[a + by = 1\]
+        
+        This however implies that $\left[by\right]_{I} = \left[1\right]_{I}$, showing that $\left[b\right]$ is a unit in $A/I$, which is a contradiction. 
+
+        We have therefore indeed constructed a $J$ such that $I \subsetneq J \subsetneq A$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        We will only do this proof for PIDs, but this is valid for any commutative ring.
+
+        We consider two cases. We first suppose that $I = \left(0\right)$. This means that $A/ I = A$; which is a field by hypothesis. This means that any $b \in A \setminus \left\{0\right\}$ is a unit in $A$, and thus that $\left(b\right) = A$. Since adding any non-zero element of $A$ to the ideal makes it non-proper, this indeed means that $\left(0\right)$ is maximal.
+
+        We now consider $I = \left(a\right)$ for some $a \neq 0$. We do this proof by the contrapositive, i.e. we suppose that $\left(a\right)$ is not maximal and we want to show that $A / I$ is not a field. Since $\left(a\right)$ is not maximal, there must exist some $b \in A$ such that $\left(a\right) \subsetneq \left(b\right) \subsetneq A$. This however means that $a \in \left(b\right)$ and thus that $a = bt$ for some $t \in A$. We want to show that $\left[b\right], \left[t\right] \neq \left[0\right]$ since they would then represent zero-divisors in $A/\left(a\right)$.
+ 
+        We directly notice that $\left[b\right] \neq \left[0\right]$ by definition of quotient rings, since $b \not \in \left(a\right)$. Now, let us suppose towards contradiction that $t \in \left(a\right)$. This means that there exists some $s \in A$ such that: 
+        \[t = sa \implies a = bt = bsa \iff a\left(1 - bs\right) = 0\]
+
+        Since we are considering a PID, this is an integral domain. We have moreover seen that $a \neq 0$, telling us that: 
+        \[1 - bs = 0 \iff bs = 1\]
+        
+        However, this means that $1 \in \left(b\right)$, which implies that $\left(b\right) = A$. This is our contradiction.
+
+        This allows us to know that $\left[b\right]$ and $\left[t\right]$ are non-trivial zero-divisors in $A / \left(a\right)$:
+        \[\left[b\right]_{\left(a\right)} \left[t\right]_{\left(a\right)} = \left[bt\right]_{\left(a\right)} = \left[0\right]_{\left(a\right)}\]
+        
+        This shows that $A / \left(a\right)$ cannot be a field.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Personal remark 1}
+        This is analogous to the following proposition we already saw: $p \in \mathbb{P}$ is prime (which, in this context, is equivalent to it being irreducible and thus that $\left(p\right)$ is maximal) if and only if $\mathbb{Z}/p\mathbb{Z}$ is a field.
+
+        This is one of the observations that justify my remark on the definition of irreducible: even if irreducible elements are not exactly prime elements, we can make a link between them to get a stronger intuition.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark 2}
+        I thank Zichen Gao for their help on these proofs:
+        \begin{center}
+        \url{https://edstem.org/eu/courses/719/discussion/83995}
+        \end{center}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $F$ be a field, and $f\left(x\right) \in F\left[x\right]$ be a polynomial.
+
+    $F\left[x\right] / \left(f\left(x\right)\right)$ is a field if and only if $f\left(x\right)$ is irreducible.
+
+    \begin{subparag}{Goal}
+        We therefore now want to understand when a polynomial is irreducible.
+    \end{subparag}
+\end{parag}
+
+\subsection{Irreducible polynomials}
+\begin{parag}{Theorem: Polynomial irreducibility 1}
+    Let $F$ be a field, and $f\left(x\right) \in F\left[x\right]$ be a polynomial of degree 1.
+
+    Then, it is irreducible in $F\left[x\right]$.
+
+    \begin{subparag}{Proof}
+        Let $f\left(x\right)$ be a polynomial of degree 1. Let's suppose that there exists $g\left(x\right), h\left(x\right)$ such that: 
+        \[f\left(x\right) = g\left(x\right)h\left(x\right)\]
+        
+        This yields that:
+        \[1 = \deg f = \deg g + \deg h\]
+        
+        This means that one of $g\left(x\right)$ and $h\left(x\right)$ has degree 1, and the other has degree 0. However, degree 0 means that it is a constant, and therefore a unit since we are working over a field $F$. This means that $f\left(x\right)$ is irreducible by definition.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Polynomial irreducibility 2}
+    Let $F$ be a field, and $f\left(x\right) \in F\left[x\right]$ be a polynomial of degree 2 or 3.
+    
+    $f\left(x\right)$ is irreducible in $F\left[x\right]$ if and only if it has no root in $F$.
+    
+    \begin{subparag}{Proof $\implies$}
+        Let $f\left(x\right)$ be a polynomial of degree 2 or 3, which is reducible. This yields that there exists $g\left(x\right), h\left(x\right)$ both non-units such that: 
+        \[f\left(x\right) = g\left(x\right)h\left(x\right)\]
+
+        Since they are not units, they cannot have degree $0$. This means that one of them has degree 1 and the other has degree 1 or 2. We suppose without loss of generality that $g\left(x\right)$ has degree $1$, i.e. $g\left(x\right) = ax + b$ for some $a, b \in F$ and $a \neq 0$. However, we then notice that $x = -\frac{b}{a}$ is a root: 
+        \[f\left(-\frac{b}{a}\right) = g\left(-\frac{b}{a}\right)h\left(-\frac{b}{a}\right) = 0\cdot h\left(-\frac{b}{a}\right) = 0\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This is not true for polynomials of degree strictly greater than three. Indeed, for instance, $\left(x^2 + 1\right)\left(x^2 + 2\right)$ has no roots in $\mathbb{Q}$, but it is not irreducible.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    We consider the commutative ring $\mathbb{Q}\left[x\right]$. Let $f\left(x\right) \in \mathbb{Q}\left[x\right]$ be a polynomial with integer coefficient: 
+    \[f\left(x\right) = a_n x^n + \ldots + a_1 x + a_0  \in \mathbb{Z}\left[x\right]\]
+    
+    If $\alpha\in \mathbb{Q}$ is a root of $f\left(x\right)$ with reduced fraction form $\alpha = \frac{r}{s}$, then $s \divides a_n$ and $r \divides a_0$.
+
+    \begin{subparag}{Proof}
+        We notice that: 
+        \[0 = f\left(\frac{r}{s}\right)s^n = a_n r^n + \ldots + a_1 r s^{n-1} + a_0 s^n\]
+        
+        Since $r$ divides the left hand side and all terms of the right hand side except possibly $a_0 s^n$, we must have $r \divides a_0 s^n$. However, since $\frac{r}{s}$ is a reduced fraction we get that $\gcd\left(r, s\right) = 1$ and thus that $r$ cannot divide $s^n$. This indeed yields that $r \divides a_0$.
+
+        For a similar reasoning, $s$ divides everything of the right hand side except possibly $a_n r^n$, meaning that $s \divides a_n$.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        This allows us to find rational roots of polynomials with integer coefficients: we only have few terms to verify.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark: Mnemonic}
+        To recall if $s \divides a_n$ or $s \divides a_0$, one can think of a simple example such as $x^2 - 4$. The roots are $\pm\frac{2}{1}$, telling us indeed that $\pm 2 = r \divides a_0 = 4$ and $1 = s \divides a_n = 1$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Eisenstein criterion}
+    Let $f\left(x\right) = a_0 + \ldots + a_n x^n \in \mathbb{Z}\left[x\right]$ be a polynomial such that: 
+    \[\gcd\left(a_0, \ldots, a_n\right) = 1\]
+    
+    Also, let $p \in \mathbb{P}$ be a prime such that $p \divides a_i$ for all $0 \leq i \leq n-1$, but $p \ndivides a_n$ and $p^2 \ndivides a_0$.
+
+    Then, $f\left(x\right)$ is irreducible in $\mathbb{Q}\left[x\right]$.
+
+    \begin{subparag}{Proof}
+        This proof is available in the course notes on Moodle.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    We consider the following polynomial over $\mathbb{Q}\left[x\right]$: 
+    \[g\left(x\right) = 2x^3 + 4x^2 + 11x + 1\]
+    
+    We know that, if $\frac{r}{s} \in \mathbb{Q}$ is a root, then $r \divides 1$ and $s \divides 2$. We therefore have: 
+    \[r \in \left\{\pm 1\right\}, \mathspace s \in \left\{\pm 1, \pm 2\right\}\]
+    
+    This yields: 
+    \[\alpha = \frac{r}{s} \in \left\{\pm \frac{1}{2}, \pm 1\right\}\]
+    
+    However, checking all the four values, none of them is a root. Since $\deg g = 3$ and it has no roots, it is irreducible.
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let us consider the following polynomial over $\mathbb{Q}\left[x\right]$: 
+    \[f\left(x\right) = 7x^6 + 21 x^4 + 12 x^2 + 9x + 3\]
+    
+    Since this is of degree greater than 3, we cannot use the same strategy. Even if we find that it has no root, it would tell us no information on whether $f\left(x\right)$ is reducible. We therefore want to use Eisenstein's criterion. We find that $p = 3 \in \mathbb{P}$ works: 
+    \[3 \ndivides 7, \mathspace 3 \divides 21, \mathspace 3 \divides 12, \mathspace 3\divides 9, \mathspace 3 \divides 3, \mathspace 9 \ndivides 3\]
+    
+    By Eisenstein's criterion, this means that $f\left(x\right)$ is irreducible in $\mathbb{Q}\left[x\right]$.
+\end{parag}
+
+\begin{parag}{Example 3}
+    Let $p \in \mathbb{P}$. We consider the following polynomial over $\mathbb{Q}\left[x\right]$: 
+    \[g\left(x\right) = x^k - p\]
+    
+    This is irreducible by Eisenstein's criterion. Indeed: 
+    \[p \ndivides 1, \mathspace p \divides p, \mathspace p^2 \ndivides p\]
+    
+    \begin{subparag}{Remark}
+        However, the following polynomial is not irreducible: 
+        \[h\left(x\right) = x^{2k} - p^2 = \left(x^k - p\right)\left(x^k + p\right)\]
+        
+        All hypotheses of Eisenstein's criterion apply, except that $p^2 \ndivides a_0^2$. This show that this hypothesis is very important.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $F$ be a field with $q$ elements, $f\left(x\right) \in F\left[x\right]$ be of degree $n$, and $K = F\left[x\right] / \left(f\left(x\right)\right)$.
+
+    If $f\left(x\right)$ is irreducible, then any element of $K$ has degree $n-1$ or less, i.e. any element has the form: 
+    \[a_0 + a_1 \bar{x} + \ldots + a_{n-1} \bar{x}^{n-i1}\]
+    where $a_i \in F$ and $\bar{x}^i = \left\{x^i + f\left(x\right)g\left(x\right) \suchthat g\left(x\right) \in F\left[x\right]\right\}$.
+
+    Moreover, the field $K$ has $q^n$ elements.
+
+    \begin{subparag}{Proof idea}
+        We can use Euclidean division to find: 
+        \[a\left(x\right) = f\left(x\right)q\left(x\right) + r\left(x\right)\]
+        where $f\left(x\right)q\left(x\right) \in \left(f\left(x\right)\right)$ and $\deg r \leq n-1$.
+
+        Then, we have $q$ choices for $a_0$, $q$ for $a_1$, and so on until $a_{n-1}$; showing that $K$ has $q^n$ elements.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    We consider the following polynomial over $\mathbb{F}_2 = \mathbb{Z}/2\mathbb{Z} = \left\{0, 1\right\}$: 
+    \[f\left(x\right) = x^3 + x^2 + 1 \in \mathbb{F}_2\left[x\right]\]
+    
+    We notice that $f$ has no roots in $\mathbb{F}_2$, trying all elements of the set: $f\left(0\right) = f\left(1\right) = 1$. Moreover, since $\deg f = 3$, it is irreducible.
+
+    Now, let us consider $K = \mathbb{F}_2\left[x\right] / \left(f\left(x\right)\right)$, which we know is a field since $f\left(x\right)$ is irreducible. We also know that: 
+    \[\left|K\right| = \left|\mathbb{F}_2\right|^3 = 2^3 = 8\]
+    
+    Furthermore, any element of $K$ has the form: 
+    \[a\bar{x}x^2 + b \bar{x} + c, \mathspace a, b, c \in \mathbb{F}_2\]
+    
+    This means that: 
+    \[K = \left\{0, 1, \bar{x}, \bar{x}^2, \bar{x} + 1, \bar{x}^2 + 1, \bar{x}^2 + \bar{x}, \bar{x}^2 + \bar{x} + 1\right\}\]
+    
+    It is quite surprising that $K$ is a field; it might not appear at first that all its non-zero elements must have an inverse. Note that we know that $\mathbb{F}_2\left[x\right]$ is definitely not a field on the other hand since, for instance, $x$ has no multiplicative inverse. Let's find the inverse of $\bar{x}$. 
+
+    We know that $\gcd\left(x, x^3 + x^2 + 1\right) = 1$ by construction of $K$ (otherwise, $\bar{x}$ would not have an inverse). This means that there exists $h\left(x\right),  g\left(x\right)$ such that: 
+    \[x g\left(x\right) + \left(x^3 + x^2 + 1\right)h\left(x\right) = 1\]
+    
+    Doing guesswork, we can find that: 
+    \[x \left(x^2 + x\right) + \left(x^3 + x^2 + x + 1\right) = 2x^3 + 2x^2 + 1 = 1\]
+    over $\mathbb{F}_2$.
+
+    This means that, indeed, $\bar{x}$ has an inverse, which is: 
+    \[\left(\bar{x}\right)^{-1} = \bar{x}^2 + \bar{x} \in K\]
+    
+    \begin{subparag}{Remark}
+        This is a typical exam question.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let's consider the following polynomial, over the field $F = \mathbb{R}$: 
+    \[f\left(x\right) = x^2 + 1\]
+    
+    This yields that $K = \mathbb{R}\left[x\right] / \left(x^2 + 1\right)$ is a field. This is in fact also a vector space of dimension 2 over $\mathbb{R}$, with all elements of the form: 
+    \[\left\{a + b \bar{x} \suchthat a, b \in \mathbb{R}\right\}\]
+    
+    We moreover notice that: 
+    \[\bar{x}^2 = \bar{x}^2 - \left(\bar{x}^2 + 1\right) = -1\]
+    
+    We notice that this has the structure of $\mathbb{C}$. We managed to construct this set algebraically.
+\end{parag}
+
+\begin{parag}{Remark}
+    We have seen the great power of polynomials: given some field $F$, they allow us to create a bigger field $F\left[x\right] / \left(f\left(x\right)\right)$. \textit{I definitely did not see that coming!}
+\end{parag}
+
+\subsection{Finite fields and their classification}
+
+\begin{parag}{Fundamental theorem of Algebra}
+    Let $F$ be a field, and $f\left(x\right) \in K\left[x\right]$ be a polynomial of degree $n = \deg f$.
+
+    If $f$ is non-zero, then it has as most $n$ roots.
+
+    \begin{subparag}{Proof idea}
+         Let $a_1 \in F$ be a root of $f\left(x\right)$, i.e. $f\left(a_1\right) = 0$. Then, doing Euclidean division, we can find that $g_2\left(x\right) = \frac{f\left(x\right)}{x - a_1}$ has a rest of $0$. Now, we again take $a_2 \in F$ to be a root of $g_2\left(x\right)$, and compute $g_3\left(x\right) = \frac{f\left(x\right)}{\left(x - a_1\right)\left(x - a_2\right)}$. We stop when $g_k$ has no root.
+
+        Every iteration, we decrease the degree of $g_k$ by $1$. We cannot decrease the degree of a constant polynomial, there can therefore be at most $\deg f = n$ roots.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Over rings that are not fields, polynomials of degree $m$ may have more than $m$ roots. Indeed, let's consider the following polynomial of degree 2 over $\mathbb{Z}/8\mathbb{Z}$: 
+        \[f\left(x\right) = x^2 - 1\]
+        
+        It has 4 roots: 
+        \[\left\{\left[1\right], \left[3\right], \left[5\right], \left[7\right]\right\}\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Proposition}
+    Let $K$ be a finite field.
+
+    Then, its group of units, $K^* = K \setminus \left\{0\right\}$ (a field only has 0 as non-unit) with multiplication, is cyclic.
+
+    \begin{subparag}{Proof}
+        Let $n = \left|K^*\right|$. 
+
+        We moreover know that $\left(K^*, \cdot \right)$ is a finite Abelian group, it has all properties thanks to the definition finite fields. We can therefore express it using invariant factors: 
+        \[K^* \simeq C_{d_1} \times \ldots \times C_{d_s}\]
+        where $d_1 \divides \ldots \divides d_s$ and $d_1 \cdots d_s = n$.
+
+        Let $m = d_s$. We notice that this is the maximal order of an element of $K^*$, since $m = \lcm\left(d_1, \ldots, d_s\right)$. However, since the order of an element is less than or equal to the order of the group, we have that $m \leq n$.
+
+        Moreover, $t^m = 1$ for any $t \in K^*$, since $d_1, \ldots, d_{s-1} \divides d_s$. This yields that the elements of $K^*$ are solutions of $t^m - 1 = 0$. However, a polynomial of degree $m$ has at most $m$ roots in a field by the fundamental theorem of Algebra. This yields that $n \leq m$.
+
+        Putting those two facts together, we get that $n = m$. Since also $d_1 \cdots d_s = n$, this forces $s = 1$. This indeed means that $K^* \simeq C_m$ is a cyclic group.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This is again not true over rings that are not fields. For instance, the group of units of $\mathbb{Z}/8\mathbb{Z}$ is not cyclic: 
+        \[\left(\mathbb{Z}/8\mathbb{Z}\right)^* = \left\{\left[1\right], \left[3\right], \left[5\right], \left[7\right]\right\} \simeq C_2 \times C_2 \not\simeq C_4\]
+        which we can show using the following isomorphism: 
+        \[\left(1, 1\right) \mapsto \left[1\right], \mathspace \left(1, t\right) \mapsto \left[3\right], \mathspace \left(q, 1\right) \mapsto \left[5\right], \mathspace \left(q, t\right) \mapsto \left[7\right]\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the following polynomial over $\mathbb{F}_2\left[x\right]$: 
+    \[f\left(x\right) = x^3 + x^2 + 1\]
+
+    We have already shown that $K = \mathbb{F}_2\left[x\right] / \left(f\left(x\right)\right)$ is a field in a previous example. Therefore, $K^*$ is cyclic. Since $\left|K\right| = 8$, we have that $\left|K^*\right| = 7$, and thus: 
+    \[K^* \simeq C_7\]
+    
+    We found that: 
+    \[K = \left\{0, 1, \bar{x}, \bar{x}^2, \bar{x} + 1, \bar{x}^2 + 1, \bar{x}^2 + \bar{x}, \bar{x}^2 + \bar{x} + 1\right\}\]
+
+    Let us check that $\bar{x} \in K^*$ is indeed a generator of $K^*$: 
+    \[\bar{x}^2, \mathspace \bar{x}^3 = \bar{x}^2 + 1, \mathspace \bar{x}^4 = \bar{x}^2 + \bar{x} + 1, \mathspace \bar{x}^5 = \bar{x} + 1, \mathspace \bar{x}^6 = \bar{x}^2 + \bar{x}, \mathspace \bar{x}^7 = 1\]
+    where we used that: 
+    \[\bar{x}^3 = -\bar{x}^2 - 1 = \bar{x}^2 + 1\]
+    
+    \begin{subparag}{Remark}
+        This is a typical exam question.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition 1}
+    Let $K$ be a finite field.
+
+    Then, the characteristic of $K$ is a prime number: 
+    \[c\left(K\right) = p \in \mathbb{P}\]
+    
+    \begin{subparag}{Proof}
+        We do this proof by the contrapositive.
+
+        Thanks to the characteristic, we know that there exists a ring homorphism $\tau: \mathbb{Z} \mapsto K$ such that $\tau\left(1\right) = 1$. Moreover: 
+        \[\tau\left(m\right) = m\cdot 1\]
+
+        We know that the characteristic of an integral domain is either a prime or 0. Now, if the characteristic is 0, then $\tau\left(m\right) \neq 0$ for any $m \in \mathbb{N}$. This yields that $K$ is infinite.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition 2}
+    Let $K$ be a finite field of characteristic $c\left(K\right) = p$.
+
+    Then, $K$ contains a subfield isomorphic to $\mathbb{Z}/p\mathbb{Z} \over{=}{def} \mathbb{F}_p$.
+
+    \begin{subparag}{Proof idea}
+        Let $\tau: \mathbb{Z} \mapsto K$ be the usual characteristic homomorphism. We know that $x = p$ is the smallest positive integers such that $\tau\left(x\right) = 0$, since $c\left(K\right) = p$.
+
+        This means that $\hat{\tau}: \mathbb{Z}/p\mathbb{Z} \mapsto \tau\left(\mathbb{Z}/p\mathbb{Z}\right)$, the restriction of $\tau$ to $\mathbb{Z}/p\mathbb{Z}$, is injective. We can verify that this is also a homomorphism, which is surjective by definition of its image. This yields that $\tau\left(\mathbb{Z}/p\mathbb{Z}\right) \simeq \mathbb{Z}/p\mathbb{Z}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition 3}
+    Let $K$ be a finite field of size $\left|K\right| = p$.
+
+    Then: 
+    \[K \simeq \mathbb{F}_p\]
+
+    \begin{subparag}{Remark}
+        This means that the finite fields of a prime size are always unique.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition 4}
+    Let $K$ be a finite field of characteristic $c\left(K\right) = p$.
+
+    Then, $\left|K\right| = p^n$ for some $n \in \mathbb{N}^*$. Moreover, $K$ is a vector space over $\mathbb{F}_p$.
+\end{parag}
+
+\begin{parag}{Proposition 5}
+    Let $p \in \mathbb{P}$ be a prime, and $n \in \mathbb{N}^*$.
+
+    There exists a finite field $K$ with $\left|K\right| = p^n$ and an irreducible polynomial $f\left(x\right) \in \mathbb{F}_p\left[x\right]$ such that $\mathbb{F}_p\left[x\right] / \left(f\left(x\right)\right) \simeq K$.
+
+    If $g\left(x\right)$ is another irreducible polynomial of degree $n$ over $\mathbb{F}_p$, then: 
+    \[K \simeq \mathbb{F}_p\left[x\right] / \left(f\left(x\right)\right) \simeq \mathbb{F}_p\left[x\right] / \left(g\left(x\right)\right)\]
+\end{parag}
+
+\begin{parag}{Summary}
+    To sum up, we have seen the following (very powerful) classification of finite fields:
+    \begin{enumerate}
+        \item For any prime $p$ and any $n\geq 1$, there exists a unique field $\mathbb{F}_{p^n}$ of $p^n$ elements. It has a characteristic $c\left(\mathbb{F}_{p^n}\right) = p$.
+        \item For $n = 1$, this unique field is isomorphic to $\mathbb{F}_p \simeq \mathbb{Z}/p\mathbb{Z}$.
+        \item For $n > 1$, this unique field can be constructed as a quotient $F_{p^n} \simeq \mathbb{F}_p\left[x\right] / \left(f\left(x\right)\right)$, where $f\left(x\right)$ is any irreducible polynomial of degree $n$ over $\mathbb{F}_p$.
+    \end{enumerate}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the following polynomials over $\mathbb{F}_2$: 
+    \[f\left(x\right) = x^3 + x^2 + 1, \mathspace g\left(x\right) = x^3 + x + 1\]
+    
+    Then: 
+    \[\mathbb{F}_2\left[x\right] / \left(f\left(x\right)\right) \simeq \mathbb{F}_2\left[x\right] / \left(g\left(x\right)\right)\]
+    which have size $2^3 = 8$.
+    
+    We will find an explicit isomorphism in the problem set 13.
+\end{parag}
+
+\begin{parag}{Corollary}
+    Over $\mathbb{F}_p$, there exists an irreducible polynomial of any degree $n \in \mathbb{N}_{\geq 1}$. 
+
+    \begin{subparag}{Remark}
+        This may however fail for fields of characteristic $0$. For instance, over $\mathbb{R}$, the only irreducible polynomials are of degree 1 or 2. Similarly, over $\mathbb{C}$, polynomials are irreducible if and only if they are of degree 1.
+
+        On the other hand, for $\mathbb{Q}$, we can always take $x^n - p$, which is irreducible in $\mathbb{Q}$ by Eisenstein s criterion.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Algebraically closed field}
+    Let $F$ be a field.
+
+    If its only irreducible polynomials are of degree $1$, it is called \important{algebraically closed}.
+
+    \begin{subparag}{Example}
+        $\mathbb{C}$ is algebraically closed, but $\mathbb{R}, \mathbb{Q}$ and $\mathbb{F}_p$ are not.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    We know that $\mathbb{F}_p = \mathbb{Z}/p\mathbb{Z}$. We may therefore wonder whether $\mathbb{Z}/p^n\mathbb{Z}$ and $\mathbb{F}_{p^n}$ are isomorphic.
+
+    However, we directly notice that $\mathbb{Z}/p^n\mathbb{Z}$ is not a field.
+
+    For instance, $\mathbb{Z}/4\mathbb{Z}$ has zero-divisors: $\left[2\right]\cdot \left[2\right] = \left[0\right]$ for example. Another way to see this is not a field is to see that it has a characteristic $4$, which is not a prime.
+
+    This means that:
+    \[\mathbb{F}_{p^n} \not\simeq \mathbb{Z}/p^n\mathbb{Z}\]
+\end{parag}
+
+\end{document}
