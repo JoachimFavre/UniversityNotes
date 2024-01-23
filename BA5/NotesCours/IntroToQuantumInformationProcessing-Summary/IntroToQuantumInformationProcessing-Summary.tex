@@ -1,0 +1,1074 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-12-08 at 23:55:56.
+
+\usepackage{texdate}
+\usepackage{../style}
+
+\usepackage{titling}
+\setlength{\droptitle}{-8em}
+
+\title{Introduction to quantum information processing \\ Detailed summary}
+\author{Joachim Favre \\ Course by Prof. Nicolas Macris \\ Inspiration from Prof. Giuseppe Carleo's Quantum physics I course}
+\date{Autumn semestre 2023}
+
+\begin{document}
+\maketitle
+
+\cftsetindents{paragraph}{1.5em}{1em}
+\setcounter{tocdepth}{5}
+
+\tableofcontents
+
+\initcurrdate
+\def\setdateformat{Y--m--d}
+\vspace*{\fill}
+\begin{center}
+    \textit{Version \printdate}
+\end{center}
+\vspace*{\fill}
+\vspace*{\fill}
+\newpage
+
+\section{Mathematical tools}
+
+\begin{parag}{Hilbert space}
+    A \important{Hilbert space} is a vector space (of possibly infinite dimension) together with a dot product.
+
+    \begin{subparag}{Remark}
+        In this course, we mostly work with $\mathbb{C}^2$. In it, the dot product is defined as: 
+        \[\begin{pmatrix} a \\ b \end{pmatrix} \dotprod \begin{pmatrix} c \\ d \end{pmatrix} = a^* c + b^* d\]
+        where $x^*$ is the complex conjugate of $x$.
+
+        Note that this is so that we can define a norm: 
+        \[\left\|\begin{pmatrix} a \\ b \end{pmatrix} \right\|^2 = \begin{pmatrix} a \\ b \end{pmatrix} \dotprod \begin{pmatrix} a \\ b \end{pmatrix} = a^* a + b^* b = \left|a\right|^2 + \left|b\right|^2 \in \mathbb{R}_+\]
+
+        This dot product has almost all the properties of the dot product in $\mathbb{R}^n$, except that it is not commutative: 
+        \[\bvec{a} \dotprod \bvec{b} = \left(\bvec{b} \dotprod \bvec{a}\right)^*\]
+
+        We moreover also typically need a transpose operation. Just like in $\mathbb{R}^n$, we want it to be such that:
+        \[\bvec{x} \dotprod \bvec{y} = \bvec{x}^T \bvec{y}\]
+
+        To work that way, we use the hermitian transpose, written $\bvec{x}^{\dagger}$, which is both a transpose and a complex conjugation: 
+        \[\bvec{x} = \begin{pmatrix} a \\ b \end{pmatrix} \implies \bvec{x}^{\dagger} = \left(\bvec{x}^T\right)^* = \begin{pmatrix} a^* & b^* \end{pmatrix} \]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Dirac notation}
+    In quantum physics we don't use classical linear algebra notations, but ones that ares typically much more elegant for quantum problems. In it, we write a vector as a ket: 
+    \[\ket{\psi}\]
+    
+    We can write the text we want inside a ket, here it is a $\psi$, but we could write $\ket{\text{elephant}}$. 
+
+    \begin{subparag}{Bra}
+        The hermitian transpose of a ket is written using a bra: 
+        \[\bra{\psi} = \ket{\psi}^{\dagger}\]
+        
+        That way, the dot product between $\ket{\phi}$ and $\ket{\psi}$ is given by: 
+        \[\braket{\phi}{\psi}\]
+
+        As mentioned above, this dot product has many properties of the usual dot product, except that it is not commutative: 
+        \[\braket{\phi}{\psi} = \braket{\psi}{\phi}^*\]
+    \end{subparag}
+
+    \begin{subparag}{Basis representation}
+        We may want to represent a ket $\ket{\psi}$ in an orthonormal basis $\ket{A_1}, \ldots, \ket{A_n}$. In other words, we want to find the coefficients $a_1, \ldots, a_n$ such that: 
+        \[\ket{\psi} = \sum_{i=1}^n a_i \ket{A_i}\]
+        
+        To do so, we directly notice that, thanks to the fact that the basis is orthonormal: 
+        \[\braket{A_j}{\psi} = \sum_{i} a_i \braket{A_j}{A_i} = a_i\]
+        
+        We therefore have the result we wanted:
+        \[\ket{\psi} = \sum_{i} \underbrace{\braket{A_i}{\psi}}_{\in \mathbb{C}} \ket{A_i} = \sum_{i} \ket{A_i} \braket{A_i}{\psi}\]
+    \end{subparag}
+    
+    \begin{subparag}{Operators}
+        Operators are simply a generalisation of matrices to a possibly infinite number of dimensions. In this course, we only work with finite-dimension operators, meaning matrices.
+
+        An important thing we must be able to do with our operators is diagonalise them, i.e. finding eigenkets (just a fancy name for eigenvectors) and their corresponding eigenvalues. Note that we may write an eigenket of an operator $\hat{A}$ as $\ket{A}$, and its corresponding eigenvalue $A$. However those three values are different (one is an operator, one is a ket and one is a complex number) and must therefore not be mistaken: 
+        \[\hat{A}\ket{A} = A \ket{A}\]
+    \end{subparag}
+
+    \begin{subparag}{Operator transpose}
+        We can take the Hermitian transpose of an operator, just like what we do for kets. In this case, it acts on bras instead of kets. This can intuitively be understood with eigenvalues. Let $\ket{A}$ be an eigenket of $\hat{A}$ with eigenvalue $a$. Then, its corresponding bra is an eigenbra of $\hat{A}^{\dagger}$: 
+        \[\bra{A} \hat{A}^{\dagger} = \left(\hat{A} \ket{A}\right)^{\dagger} = \left(a \ket{A}\right)^{\dagger} = \bra{A} a^*\]
+        
+        However, $\ket{A}$ might not be an eigenket of $\hat{A}^{\dagger}$.
+    \end{subparag}
+    
+    \begin{subparag}{Operator representation}
+        We might be interested in representing an operator in a basis. To do so, we can notice that: 
+        \[\bvec{e}_{1}^T \begin{pmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{pmatrix} \bvec{e}_2 = \begin{pmatrix} 1 & 0 \end{pmatrix} \begin{pmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{pmatrix} \begin{pmatrix} 0 \\ 1 \end{pmatrix} = a_{12}\]
+
+        Therefore, in a basis $\ket{A_j}$, the operator $\hat{B}$ has components: 
+        \[b_{ij} = \bra{A_i} \hat{B} \ket{A_j}\]
+        
+        This notably means that we can write our operator as: 
+        \[\hat{B} = \sum_{i, j} b_{ij}\ket{A_i} \bra{A_j}\]
+        
+        Again, making a link with 2x2 matrices, this makes sense since: 
+        \autoeq[s]{a\begin{pmatrix} 1 \\ 0 \end{pmatrix} \begin{pmatrix} 1 & 0 \end{pmatrix} + b\begin{pmatrix} 1 \\ 0 \end{pmatrix} \begin{pmatrix} 0 & 1 \end{pmatrix} + c\begin{pmatrix} 0 \\ 1 \end{pmatrix} \begin{pmatrix} 1 & 0 \end{pmatrix} + d\begin{pmatrix} 0 \\ 1 \end{pmatrix} \begin{pmatrix} 0 & 1 \end{pmatrix} = \begin{pmatrix} a & 0 \\ 0 & 0 \end{pmatrix} + \begin{pmatrix} 0 & b \\ 0 & 0 \end{pmatrix} + \begin{pmatrix} 0 & 0 \\ c & 0 \end{pmatrix} + \begin{pmatrix} 0 & 0 \\ 0 & d \end{pmatrix}  = \begin{pmatrix} a & b \\ c & d \end{pmatrix} }
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Tensor product}
+    Let $\mathcal{H}_1$ and $\mathcal{H}_2$ be Hilbert spaces of dimensions $n$ and $m$, respectively. Let $\ket{A_1}, \ldots, \ket{A_{n}}$ be a basis of the first one, and $\ket{B_1}, \ldots, \ket{B_m}$ be a basis for the second one.
+
+    We can construct a new Hilbert space, the \important{tensor product} of $\mathcal{H}_1$ and $\mathcal{H}_2$, denoted as $\mathcal{H}_1 \otimes \mathcal{H}_2$ such that:
+    \begin{enumerate}
+        \item It has $nm$ basis kets, written $\ket{A_i} \otimes \ket{B_j}$.
+        \item $\otimes$ is a linear operation, i.e: 
+        \[\alpha\left(\ket{\phi} \otimes \ket{\psi}\right) = \left(\alpha \ket{\phi}\right) \otimes \ket{\psi} = \ket{\phi} \otimes \left(\alpha \ket{\psi}\right)\]
+        \item $\otimes$ is distributive over the addition: 
+        \[\ket{\phi} \otimes \left(\ket{\psi_1} + \ket{\psi_2}\right) = \ket{\phi} \otimes \ket{\psi_1} + \ket{\phi} \otimes \ket{\psi_2}\]
+        \item If $\hat{A}$ is an operator that acts on $\mathcal{H}_1$ and $\hat{B}$ acts on $\mathcal{H}_2$, then: 
+        \[\left(\hat{A} \otimes \hat{B}\right) \left(\ket{\phi}\otimes \ket{\psi}\right) = \left(\hat{A} \ket{\phi}\right) \otimes \left(\hat{B}\ket{\psi}\right)\]
+        \item The dot product between $\ket{\phi_1} \otimes \ket{\psi_1}$ and $\ket{\phi_2} \otimes \ket{\psi_2}$ is given by: 
+        \[\left(\bra{\phi_1} \otimes \bra{\psi_1}\right) \left(\ket{\phi_2} \otimes \ket{\psi_2}\right) = \braket{\phi_1}{\phi_2}\braket{\psi_1}{\psi_2}\]
+        \item The outer product between $\ket{\phi_1} \otimes \ket{\psi_1}$ and $\ket{\phi_2} \otimes \ket{\psi_2}$ is given by: 
+        \[\left(\ket{\phi_1} \otimes \ket{\psi_1}\right) \left(\bra{\phi_2} \otimes \bra{\psi_2}\right) = \left(\ket{\phi_1}\bra{\phi_2}\right) \otimes \left(\ket{\psi_1} \bra{\psi_2}\right)\]
+    \end{enumerate}
+
+    The three last properties are very close one to another.
+
+    \begin{subparag}{Personal remark}
+        I'm not sure this definition is completely formal.
+    \end{subparag}
+    
+    \begin{subparag}{Notation 1}
+        When everything is clear, we might write $\ket{\phi} \otimes \ket{\psi} = \ket{\phi \psi}$. 
+    \end{subparag}
+
+    \begin{subparag}{Notation 2}
+        Note that, since $\ket{\phi}$ and $\ket{\psi}$ might be in different Hilbert spaces, the tensor product is definitely not commutative: 
+        \[\ket{\phi} \otimes \ket{\psi} \neq \ket{\psi} \otimes \ket{\phi}\]
+
+        This may however be a bit cumbersome to always keep those terms in order, especially when have multiple tensor products. Therefore, we might use another notation where, instead of using the order to represent the position in the tensor product, we use numbers outside the kets: 
+        \[\ket{\phi}_1 \otimes \ket{\psi}_2 = \ket{\psi}_2 \otimes \ket{\phi}_1\]
+
+        This simplifies the notation, but we have to be careful when using it. For instance: 
+        \[\left(\bra{a}_1 \otimes \bra{b}_2\right) \left(\ket{c}_2 \otimes \ket{d}_1\right) = \braket{a}{d} \braket{b}{c}\]
+    \end{subparag}
+
+    \begin{subparag}{Property}
+        Let $\hat{A}$ and $\hat{B}$ be operators acting in $\mathcal{H}_1$ and $\mathcal{H}_2$, respectively. Let $\ket{A}$ be an eigenket of $\hat{A}$ with eigenvalue $a$, and $\ket{B}$ be an eigenket of $\hat{B}$ with eigenvalue $b$. Then, $\ket{A} \otimes \ket{B}$ is an eigenket of $\hat{A} \otimes \hat{B}$ with eigenvalue $ab$: 
+        \[\left(\hat{A} \otimes \hat{B}\right) \left(\ket{A} \otimes \ket{B}\right) = \left(\hat{A} \ket{A}\right) \otimes \left(\hat{B} \ket{B}\right) = ab \ket{A} \otimes \ket{B}\]
+    \end{subparag}
+    
+    \begin{subparag}{Basis representation}
+        Let $\ket{\phi} \in \mathcal{H}_1$ and $\ket{\psi} \in \mathcal{H}_2$. Let's suppose that we can represent them in the bases of $\mathcal{H}_1$ and $\mathcal{H}_2$: 
+        \[\ket{\phi} = \sum_{i} \phi_i \ket{A_i}, \mathspace \ket{\psi} = \sum_{j} \psi_j \ket{B_j}\]
+        
+        Then, we can use all our properties to represent $\ket{\phi} \otimes \ket{\psi}$ in the basis $\ket{A_i B_j} = \ket{A_i} \otimes \ket{B_j}$: 
+        \[\ket{\phi} \otimes \ket{\psi} = \left(\sum_{i} \phi_i \ket{A_i}\right) \otimes \left(\sum_{j} \psi_j \ket{B_j}\right) = \sum_{i, j} \phi_i \psi_j \ket{A_i B_j}\]
+
+        This directly gives us that the coefficients are $\phi_i \psi_j$. We can translate this in array form. If $\ket{\phi} = \begin{pmatrix} a & b \end{pmatrix} ^T$ and $\ket{\psi} = \begin{pmatrix} c & d \end{pmatrix} ^T$, we have, ordering the basis as $\left(\ket{A_0 B_0}, \ket{A_0 B_1}, \ket{A_1 B_0}, \ket{A_1 B_1}\right)$:
+        \[\ket{\phi} \otimes \ket{\psi} = \begin{pmatrix} ac \\ ad \\ bc \\ bd \end{pmatrix} = \begin{pmatrix} a \ket{\psi} \\ b \ket{\psi} \end{pmatrix} \]
+        
+        It is possible to generalise this to general operators, and get that, in array form:
+        \autoeq{\begin{pmatrix} a_{00} & a_{01} \\ a_{10} & a_{11} \end{pmatrix} \otimes \begin{pmatrix} b_{00} & b_{01} \\ b_{10} & b_{11} \end{pmatrix} = \begin{pmatrix} a_{00} b_{00} & a_{00}b_{01} & a_{01}b_{00} & a_{01}b_{01} \\ a_{00}b_{10} & a_{00}b_{11} & a_{01} b_{10} & a_{01} b_{11} \\ a_{10} b_{00} & a_{10}b_{01} & a_{11}b_{00} & a_{11}b_{01} \\ a_{10}b_{10} & a_{10}b_{11} & a_{11} b_{10} & a_{11} b_{11} \end{pmatrix} = \begin{pmatrix} a_{00} B & a_{01} B \\ a_{10}B & a_{11}B \end{pmatrix} }
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Unitary operator}
+    An operator $\hat{A}$ is said to be \important{unitary} if: 
+    \[\hat{A}^{\dagger} \hat{A} = \hat{I}\]
+    where $\hat{I}$ is the identity operator.
+
+    \begin{subparag}{Property 1}
+        Note that we have the following equivalence: 
+        \[\hat{A}^{\dagger} \hat{A} = \hat{I} \iff \hat{A} \hat{A}^{\dagger} = \hat{I}\]
+        
+        One can therefore check any of those two to prove that an operator is unitary.
+    \end{subparag}
+
+    \begin{subparag}{Property 2}
+        Unitary operators preserve the norm: 
+        \[\left\|\hat{A} \ket{\psi}\right\| = \left\|\ket{\psi}\right\|\]
+
+        This can be shown directly, using the squared norm: 
+        \[\left\|\hat{A}\ket{\psi}\right\|^2 = \bra{\psi} A^{\dagger} A \ket{\psi} = \braket{\psi}{\psi} = \left\|\ket{\psi}\right\|^2\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Hermitian operator}
+    An operator $\hat{A}$ is said to be \important{hermitian} if: 
+    \[\hat{A}^{\dagger} = \hat{A}\]
+\end{parag}
+
+\begin{parag}{Spectral theorem}
+    Let $\hat{A}$ be an Hermitian operator. Then, it can be diagonalised into an orthonormal eigenbasis with real eigenvalues.
+
+    In other words, we can find eigenkets $\ket{A_1}, \ldots, \ket{A_n}$ such that their corresponding eigenvalues are real, and: 
+    \begin{functionbypart}{\braket{A_i}{A_j}}
+        1, & \text{if } i = j \\
+        0, & \text{if } i \neq j
+    \end{functionbypart}
+
+    \begin{subparag}{Implication}
+        This means that we can write any Hermitian operator as: 
+        \[\hat{A} = \sum_{i} a_i \ket{A_i}\bra{A_i}\]
+        where $\ket{A_i}$ are eigenkets of $\hat{A}$ and $a_i$ are the corresponding eigenvalues.
+
+        Indeed, we know that the coefficient $a_{ij}$ of $\hat{A}$ is given by: 
+        \[a_{ij} = \bra{A_i} \hat{A} \ket{A_j} = a_j \braket{A_i}{A_j} = \begin{systemofequations} a_j, & \text{if } i = j \\ 0, & \text{otherwise} \end{systemofequations}\]
+        
+        This justifies why we use the term ``diagonalise'': in this basis, $\hat{A}$ is diagonal.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Semi-positive definite operator}
+    An operator $\hat{A}$ is \important{semi-postive definite} if all its eigenvalues are nonnegative. Equivalently: 
+    \[\bra{\psi} A \ket{\psi} \geq 0, \mathspace \forall \ket{\psi}\]
+\end{parag}
+
+\begin{parag}{Operator exponential}
+    Let $\hat{A}$ be an operator. Its exponential is defined as: 
+    \[\exp\left(\hat{A}\right) = \sum_{n=0}^{\infty} \frac{\hat{A}^n}{n!}\]
+    
+    \begin{subparag}{Property 1}
+        We have that: 
+        \[\frac{d}{dt} \exp\left(\hat{A} t\right) = \hat{A} \exp\left(\hat{A} t\right)\]
+
+        This is the property that justifies this definition. It notably means that the general solution to $\hat{A} \ket{\psi\left(t\right)} = \frac{d}{dt} \ket{\psi\left(t\right)}$ is: 
+        \[\ket{\psi\left(t\right)} = \exp\left(At\right) \ket{\psi\left(0\right)}\]
+    \end{subparag}
+
+    \begin{subparag}{Property 2}
+        Let $\ket{A}$ be an eigenket of $\hat{A}$ of eigenvalue $a$. Then: 
+        \[\exp\left(\hat{A}\right)\ket{A} = \exp\left(a\right) \ket{A}\]
+
+        In other words, the eigenvectors of $\hat{A}$ and $\exp\left(\hat{A}\right)$ are the same, with eigenvalues $a$ and $\exp\left(a\right)$ respectively.
+
+        Indeed, this can be shown directly: 
+        \[\exp\left(\hat{A}\right) \ket{A} = \sum_{n=0}^{\infty} \frac{\hat{A}^n \ket{A}}{n!} = \sum_{n=0}^{\infty} \frac{a^n \ket{A}}{n!} = \exp\left(a\right) \ket{A}\]
+    \end{subparag}
+
+    \begin{subparag}{Property 3}
+        If two operators commute, meaning $\hat{A} \hat{B} = \hat{B}\hat{A}$, then: 
+        \[\exp\left(\hat{A}\right) \exp\left(\hat{B}\right) = \exp\left(\hat{A} + \hat{B}\right)\]
+        
+        Note that this is not true in general if the operators do not commute.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Operator logarithm}
+    Let $\hat{A}$ be a semi-positive definite hermitian operator. We know we can find eigenvectors $\ket{A_j}$ with non-negative real eigenvalues $a_j \geq 0$, yielding that it can be written as: 
+    \[\hat{A} = \sum_{j}^{} a_j \ket{A_j} \bra{A_j}\]
+    
+    Its logarithm is defined as: 
+    \[\ln\left(\hat{A}\right) = \sum_{j}^{} \ln\left(a_j\right) \ket{A_j} \bra{A_j}\]
+    
+    \begin{subparag}{Remark}
+        By definition, this yields that: 
+        \[\ln\left(\hat{A}\right) \ket{A_j} = \ln\left(a_j\right) \ket{A_j}\]
+
+        In other words, the eigenvectors of $\hat{A}$ and $\ln\left(\hat{A}\right)$ are the same, with eigenvalues $a_i$ and $\ln\left(a_i\right)$ respectively.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Trace}
+    The \important{trace} of an operator $\hat{A}$ is defined as the sum of its diagonal elements: 
+    \[\Tr\left(\hat{A}\right) = \sum_{i=1}^{n} \bra{B_i} \hat{A} \ket{B_i}\]
+    where $\left\{\ket{B_i}\right\}$ is an arbitrary basis, the choice of which does not change the result.
+
+    \begin{subparag}{Property 1}
+        If $\hat{A}$ can be diagonalised, we can take $\left\{\ket{B_i}\right\}$ to be a basis of eigenvectors of $\hat{A}$, yielding that, in this case, $\Tr\left(\hat{A}\right)$ is the sum of eigenvalues of $\hat{A}$.
+    \end{subparag}
+
+    \begin{subparag}{Property 2}
+        The trace is cyclic. This means that, if the multiplications make sense: 
+        \[\Tr\left(\hat{A}\hat{B}\right) = \Tr\left(\hat{B}\hat{A}\right)\]
+        
+        This for instance yields that: 
+        \[\Tr\left(\hat{A} \hat{B} \hat{C}\right) = \Tr\left(\hat{C} \hat{A} \hat{B}\right)\]
+
+        However, in general: 
+        \[\Tr\left(\hat{A} \hat{B} \hat{C}\right) \neq \Tr\left(\hat{A} \hat{C} \hat{B}\right)\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Partial trace}
+    Let $\hat{A}$ be an operator acting on a Hilbert space $\mathcal{H}_{S \cup E} = \mathcal{H}_S \otimes \mathcal{H}_E$, and let $\ket{A_i} \otimes \ket{B_j}$ be a basis of this Hilbert space for $i \in \left\{1, \ldots, I\right\}$ and $j \in \left\{1, \ldots, J\right\}$. The $\left(k, \ell\right)$ component of the \important{partial trace} of $\hat{A}$ with respect to $\mathcal{H}_S$ is: 
+    \[\left(\Tr_{\mathcal{H}_S}\left(\hat{A}\right)\right)_{k, \ell } = \sum_{j=1}^{J} \hat{A}_{\left(j, k\right), \left(j, \ell \right)} = \sum_{j=1}^{J} \bra{A_j B_k} \hat{A} \ket{A_j B_\ell }\]
+
+    This is a $I \times I$ matrix.
+
+    \begin{subparag}{Property 1}
+        Just like the regular trace, the partial trace is additive: 
+        \[\Tr_{\mathcal{H}_S}\left(\hat{A} + \hat{B}\right) = \Tr_{\mathcal{H}_S}\left(\hat{A}\right) + \Tr_{\mathcal{H}_S}\left(\hat{B}\right)\]
+    \end{subparag}
+
+    \begin{subparag}{Property 2}
+        If our operator can be written as $\hat{A} = \hat{S} \otimes \hat{E}$, then: 
+        \[\Tr_{\mathcal{H}_S}\left(\hat{A}\right) = \Tr\left(\hat{S}\right)\hat{E}\]
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Let us consider an arbitrary operator: 
+        \[\hat{A} = \sum_{i, j, i', j'}^{}  a_{i,j, i', j'}\ket{A_i B_j}\bra{A_{i'} B_{j'}}\]
+        
+        We notice that we can always write it as: 
+        \[\hat{A} = \sum_{i, i'}^{} \ket{A_i} \bra{A_{i'}} \otimes \left(\sum_{j, j'}^{} a_{ij, i', j'} \ket{B_j}\bra{B_{j'}}\right)\]
+        
+        This allows us to compute its partial trace, thanks to its properties: 
+        \[\Tr_{\mathcal{H}_S}\left(\hat{A}\right) = \sum_{i, i'}^{} \Tr\left(\ket{A_i}\bra{A_{i'}}\right) \sum_{j, j'}^{} a_{ij, i', j'} \ket{B_j}\bra{B_{j'}}\]
+        
+        Now, by the cylicity of the trace: 
+        \[\Tr\left(\ket{A_i}\bra{A_{i'}}\right) = \Tr\left(\braket{A_{i'}}{A_i}\right) = \braket{A_{i'}}{A_i} = \begin{systemofequations} 1, & \text{if } i = i' \\ 0, & \text{if } i \neq i' \end{systemofequations}\]
+        
+        This finally yields: 
+        \[\Tr_{\mathcal{H}_S}\left(\hat{A}\right) = \sum_{i, j, j'}^{} a_{i, j, i, j'} \ket{B_j}\bra{B_{j'}}\]
+        which is indeed $I \times I$.
+
+        Intuitively, this means that, to compute the coefficient at $j, j'$ in basis $\ket{B_j}$, we take the trace of the submatrices where $j$ and $j'$ are constant (i.e., we compute the sum of the diagonal elements of those submatrices). For instance, for $\mathbb{C}^2 \otimes \mathbb{C}^2$, ordering the basis as $\ket{A_0 B_0}, \ket{A_1 B_0}, \ket{A_0 B_1}, \ket{A_1 B_1}$ (this is not the classical basis ordering, but it allows a better visualisation): 
+        \autoeq{\Tr_{\mathcal{H}_S} \begin{pmatrix} a & b & c & d \\ e & f & g & h \\ i & j & k & l \\ m & n & o & p \end{pmatrix} = \begin{pmatrix} \Tr \begin{pmatrix} a & b \\ e & f \end{pmatrix} & \Tr\begin{pmatrix} c & d \\ g & h \end{pmatrix} \\ \Tr\begin{pmatrix} i & j \\ m & n \end{pmatrix}  & \Tr\begin{pmatrix} k & l \\ o & p \end{pmatrix} \end{pmatrix} = \begin{pmatrix} a + f & c + h \\ i + n & k + p \end{pmatrix}}
+    \end{subparag}
+\end{parag}
+
+\section{Axioms}
+
+\begin{parag}{Superposition}
+    The state of a quantum system is a vector $\ket{\psi}$ in a Hilbert space of field $\mathbb{C}$. This vector is normalised: 
+    \[\braket{\psi}{\psi} = 1\]
+
+    Each possible state that could be obtained after a measurement yields a different orthonormal basis.
+
+    \begin{subparag}{Example}
+        For instance, if a photon can either go through a mirror or not, the dimension of the corresponding Hilbert space is 2, and any state can be represented as: 
+        \[a\ket{\text{went through}} + b \ket{\text{bounced}}\]
+
+        However measuring the position of a particle yields a Hilbert space of infinite dimensions since there are infinitely many possibilities after every measurement.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Composition of quantum systems}
+    The composition of two quantum systems which are described by Hilbert spaces $\mathcal{H}_1$ and $\mathcal{H}_2$ respectively, is described by the tensor product $\mathcal{H}_1 \otimes \mathcal{H}_2$.
+\end{parag}
+
+\begin{parag}{Born rule}
+    There is a one-to-one correspondance between hermitian operator and observables (something that we can measure). In other words, the result of any physical measurement can be represented by a hermitian operator, and any hermitian operator can be measured.
+
+    Let $\hat{A}$ be the hermitian operator linked to a measurement. By the spectral theorem, we know we can find orthonormal eigenkets $\ket{A_1}, \ldots, \ket{A_n}$ with real eigenvalues $a_1, \ldots, a_n$. When we use it to measure a state $\ket{\psi}$, we measure one of the eigenvalues $a_i$ and the state collapses to $\ket{A_i}$, the $i$ being chosen with probability: 
+    \[\left|\braket{A_i}{\psi}\right|^2\]
+
+    Note that the fact that the eigenvalues are real is very important, since we can never measure a complex value in physics.
+
+    \begin{subparag}{Intuition}
+        Representing our state in the basis formed by the eigenkets of $\hat{A}$ helps us understand what is happening: 
+        \[\ket{\psi} = \psi_1 \ket{A_1} + \ldots + \psi_n \ket{\psi_n}\]
+        
+        Since the eigenkets are orthonormal, we have: 
+        \[\braket{A_i}{\psi} = \psi_i\]
+        which it the $i$\Th composant of the vector $\ket{\psi}$ in the basis of the eigenkets of $\hat{A}$.
+
+        We can moreover verify that the probabilities sum to $1$:
+        \[\sum_{i=1}^{n} \prob\left(\text{collapses to $i$}\right) = \sum_{i=1}^{n}\left|\braket{A_i}{\psi}\right|^2 = \sum_{i=1}^{n}\left|\psi_i\right|^2 = \braket{\psi}{\psi} = \left\|\ket{\psi}\right\|^2 = 1\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        In many cases, it is worth noticing that: 
+        \[\left|\braket{\phi}{\psi}\right|^2 = \braket{\phi}{\psi}^* \braket{\phi}{\psi} = \braket{\psi}{\phi}\braket{\phi}{\psi}\]
+        
+        More generally, computing norms using the complex conjugates often helps to compute those values much more easily. For instance: 
+        \[\left|1 + e^{i\theta}\right| = \left(1 + e^{-i\theta}\right)\left(1 + e^{i\theta}\right) = 1 + e^{i\theta - i\theta} + e^{i\theta} + e^{-i\theta} = 2 + 2\cos\left(\theta\right)\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Partial measurement}
+    In a quantum system described by a Hilbert space $\mathcal{H}_1 \otimes \mathcal{H}_2$, we can do a measurement on a state $\ket{\psi}$ using an observable $\hat{A}$ on one of the particules (let's say the one of $\mathcal{H}_1$), while leaving the other untouched. The particule collapses to some eigenket $\ket{A_i}$, and the whole states becomes proportional to: 
+    \[c \ket{\psi'} = \left(\ket{A_i}\bra{A_i} \otimes \hat{I}\right) \ket{\psi} = \hat{P} \ket{\psi}\]
+
+    The term $\hat{P}$ is named a projector, and we can verify that it is such that $\hat{P}^{\dagger} = \hat{P}$ and $\hat{P}^2 = \hat{P}$. The probability that this $i$ is chosen is given by: 
+    \[\left|c\right|^2 = \left\|\hat{P} \ket{\psi}\right\|^2 = \bra{\psi} \hat{P} \ket{\psi}\]
+
+    \begin{subparag}{Remark}
+        This a generalisation of the born rule. Indeed, we can always write our particle using the orthonormal basis given by the eigenkets of $\hat{A}$ for $\mathcal{H}_1$, and another orthonormal basis for $\mathcal{H}_2$: 
+        \[\ket{\psi} = \sum_{i, j}^{} \psi_{i,j} \ket{A_i B_j}\]
+        
+        We can then write this state as: 
+        \[\ket{\psi} = \sum_{i}^{} \ket{A_i} \otimes \left(\sum_{j}^{} \psi_{i, j} \ket{B_j}\right)\]
+        
+        Therefore, it makes sense that, when we measure and the state of the first particle collapses to $\ket{A_i}$, then the whole state simply collapses to something proportional to: 
+        \[c\ket{\psi'} = \ket{A_i} \otimes \left(\sum_{j}^{} \psi_{i, j} \ket{B_j}\right) = \sum_{j}^{} \psi_{i, j}\ket{A_i B_j}\]
+
+        Then, the probability that it happens is given by: 
+        \[\left|c\right|^2 = \left\|c \ket{\psi'}\right\|^2 = \left\|\sum_{j}^{} \psi_{i, j}\ket{A_i B_j}\right\|^2 = \sum_{j} \left|\psi_{i, j}\right|^2\]
+        which is indeed a generalisation of the Born rule.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Unitary time evolution}
+    Let $\ket{\psi\left(t\right)}$ be a quantum state at time $t$ living in an isolated system. Its time evolution is given by an operator $\hat{U}\left(t_1, t_0\right)$, which is such that: 
+    \[\ket{\psi\left(t_1\right)} = \hat{U}\left(t_1, t_0\right)\ket{\psi\left(t_0\right)}\]
+
+    This operator must have the following properties:
+    \begin{enumerate}
+        \item $\hat{U}$ is unitary.
+        \item $\hat{U}\left(t_2, t_1\right) \hat{U}\left(t_1, t_0\right) = \hat{U}\left(t_2, t_0\right)$
+    \end{enumerate}
+
+    It is also possible to be given a time-evolution operator, which does not depend on time. This gives a way to describe a state after enough time has passed (supposing $\hat{U}\left(t, t_0\right) = \hat{I}$ for any big enough $t$). In this case, all we need to verify is that this operator is unitary.
+
+    \begin{subparag}{Intuition}
+        The first property is necessary for $\psi\left(t\right)$ to always be normalised, when we start with a normalised state $\psi\left(t_0\right)$: recall that unitary operator preserve the norm.
+
+        The second property means that leaving the system evolve from a time $t_0$ to $t_1$ and then from $t_1$ to $t_2$ is equivalent to letting it evolve from $t_0$ to $t_2$.
+    \end{subparag}
+
+    \begin{subparag}{Notation}
+        We typically write: 
+        \[\hat{U}\left(t, 0\right) = \hat{U}\left(t\right)\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        It is possible to show that those properties require $\ket{\psi\left(t\right)} = \hat{U}\ket{\psi\left(0\right)}$ respects the following differential equation, named \important{Schrödinger's equation}: 
+        \[i \hbar \frac{\partial}{\partial t} \ket{\psi\left(t\right)} = \hat{H} \ket{\psi\left(t\right)}\]
+        where $\hat{H}$ is an Hermitian operator, i.e. an observable; and $\hbar$ is a physical constant that notably allows $\hat{H}$ to have the unit of energy.
+
+        This $\hat{H}$ is named the \important{Hamiltonian}. It is very important: it is what describes the time evolution. By doing a deeper analysis, we can make a link with the classical case to consider this as the energy of the system. In other words, when we measure this observable, we will get a real value (as for any observable), which is the energy of the system.
+
+        Note that if $\hat{H}$ does not depend on time, the general solution is then just: 
+        \[\hat{U}\left(t\right) = \exp\left(-\frac{i}{\hbar} \hat{H}t\right)\]
+
+        This can be solved by finding the eigenkets of $\hat{H}$, $\ket{E_1}, \ldots, \ket{E_n}$ with eigenvalues $E_1, \ldots, E_n$ since: 
+        \autoeq{\ket{\psi\left(t\right)} = \exp\left(-\frac{i}{\hbar} \hat{H}t\right) \ket{\psi\left(0\right)} = \exp\left(-\frac{i}{\hbar} \hat{H}t\right) \left(\psi_1 \ket{E_1} + \ldots + \psi_n \ket{E_n}\right) = \psi_1 \exp\left(-\frac{i}{\hbar} E_1 t\right) \ket{E_1} + \ldots + \psi_n \exp\left(-\frac{i}{\hbar} E_n t\right) \ket{E_n}}
+        where we used the fact that $\exp\left(\hat{H}\right) \ket{E_1} = \exp\left(E_1\right) \ket{E_1}$, as explained when describing exponential of matrices. This is the representation of $\ket{\psi\left(t\right)}$ in the eigenbasis $\ket{E_1}, \ldots, \ket{E_n}$.
+    \end{subparag}
+\end{parag}
+
+\section{Quantum physics}
+
+\begin{parag}{Global phase}
+    We notice that none of the axioms allow us to get the global phase of some state: there is no way to let a state evolve in time in some system and to then do a measurement that would allow us to measure its global phase. This means that, for any $\gamma \in \mathbb{R}$, the two following states are physically equivalent: 
+    \[e^{i \gamma} \ket{\psi} \equiv \ket{\psi}\]
+
+    \begin{subparag}{Remark}
+        Note however that we cannot say the same of local phase. The two following states are physically different: 
+        \[\frac{1}{\sqrt{2}}\ket{0} + \frac{1}{\sqrt{2}}\ket{1} \not\equiv \frac{1}{\sqrt{2}}\ket{0} - \frac{1}{\sqrt{2}}\ket{1}\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Expected values}
+    The expected value got when measuring a state $\ket{\psi}$ with an observable $\hat{A}$, written $\left\langle \hat{A} \right\rangle_{\psi}$, is given by: 
+    \[\left\langle \hat{A} \right\rangle_{\psi} = \bra{\psi} \hat{A} \ket{\psi}\]
+    
+    \begin{subparag}{Intuition}
+        Recall that, when doing a measure, a state changes. Therefore, this value can be measure experimentally by preparing a particle in state $\ket{\psi}$, measuring it using $\hat{A}$, preparing another particle in this state $\ket{\psi}$ and so on.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        By the Born rule, when we measure a state using an operator $\hat{A}$, the state collapses to some eigenket $\ket{A_i}$ with probability $\left|\braket{A_i}{\psi}\right|^2$, and the measure gets $a_i$. Therefore, the expected value is given by: 
+        \autoeq{\left\langle \hat{A} \right\rangle_{\psi} = \sum_{i}^{} a_i \prob\left(\text{collapsed to $i$}\right) = \sum_{i}^{} a_i \left|\braket{A_i}{\psi}\right|^2 = \sum_{i}^{} a_i \braket{\psi}{A_i}\braket{A_i}{\psi} = \bra{\psi}\left(\sum_{i}^{} a_i \ket{A_i}\bra{A_i}\right) \ket{\psi}}
+        
+        We recognise the sum to be the diagonal representation of $\hat{A}$ in its eigenbasis, giving us our result: 
+        \[\left\langle \hat{A} \right\rangle_{\psi} = \bra{\psi} \hat{A} \ket{\psi}\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Q-bit}
+    To represent q-bits, we need quantum states that live in $\mathcal{H} = \mathbb{C}^2$, i.e. which have two possibilities.
+
+    The physical way to represent this is to consider the spin of electrons (some kind of intrinsic properties that is analogous to the electron spinning on itself). Since electrons are spin-$\frac{1}{2}$ particles, they only have two possibility when we measure their spin in some $\hat{z}$ direction: up $\ket{0}$ or down $\ket{1}$. This is named the computation basis. When we measure the up particle we register a $1$, and when we measure a down, we register a $-1$, giving us   that our observable is:
+    \[\hat{\sigma}_z = 1 \ket{0}\bra{0} -1 \ket{1}\bra{1} = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}\]
+
+    Now, it is possible to measure the spin in other directions, $\hat{x}$ and $\hat{y}$. Doing so, we can make physical experiments to see that measuring in one direction, then in an orthogonal one, and then back in the first one, the first and third measure will not necessarily yield the same result. This basically means that the second measure destroyed the value we measured. It is possible to show that the observable linked to those measurement directions can be chosen to be: 
+    \[\hat{\sigma}_x = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} , \mathspace \hat{\sigma}_y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix} \]
+
+    The eigenkets of $\hat{\sigma}_x$ are quite important. They are given by: 
+    \[\hat{H}\ket{0} = \frac{\ket{0} + \ket{1}}{\sqrt{2}}, \mathspace \hat{H}\ket{1} = \frac{\ket{0} - \ket{1}}{\sqrt{2}}\]
+    where $\hat{H}$ is an important matrix, named the \important{Hadamard matrix}: 
+    \[\hat{H} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} \]
+
+    \begin{subparag}{Pauli matrices}
+        The matrices $\hat{\sigma}_x, \hat{\sigma}_y, \hat{\sigma}_z$ are so important they are given a name, they are the \important{Pauli matrices}. They are sometimes written: 
+        \[\hat{X} = \hat{\sigma}_x, \mathspace \hat{Y} = \hat{\sigma}_y, \mathspace \hat{Z} = \hat{\sigma}_z\]
+
+        Those matrices all have the following properties:
+        \[\hat{\sigma}_z = \hat{\sigma}_z^{\dagger}, \mathspace \hat{\sigma}_z^2 = \hat{I}\]
+
+        Moreover, by construction, their eigenvalues are $-1$ and $1$ (the values that are measured when using them as observables).
+
+        Finally, we sometimes need to consider $a_x \hat{\sigma}_x + a_y \hat{\sigma}_y + a_z \hat{\sigma}_z$. To do so, we use a pseudo-vector: 
+        \[\bvec{\hat{\sigma}} = \begin{pmatrix} \hat{\sigma}_x \\ \hat{\sigma}_y \\ \hat{\sigma}_z \end{pmatrix} \]
+        
+        Then, leaving $\bvec{a} = \begin{pmatrix} a_x & a_y & a_z \end{pmatrix} ^T$, we simply have: 
+        \[\bvec{a} \dotprod \bvec{\hat{\sigma}} = a_x \hat{\sigma}_x + a_y \hat{\sigma}_y + a_z \hat{\sigma}_z\]
+        
+        This must mostly be understood as some notation shortcut, more than a meaningful definition.
+    \end{subparag}
+
+    \begin{subparag}{Light polarisation}
+        It is also possible to define the q-bits using light polarisation. If the light is horizontally polarised we note $\ket{0}$, and if it is vertically polarised we note $\ket{1}$. This can be measured using a horizontal polariser filter, followed by photodector. If the detector clicks, the photon was not absorbed and thus collapsed to its horizontal polarisation state. If the detector does not click, the photon was absorbed by the filter, and thus collapsed to its vertical state. Then, $\hat{\sigma}_x$ is equivalent to a polariser filter which is at $\SI{45}{\degree}$ and $\hat{\sigma}_y$ is equivalent to measuring light circular polarisation.
+
+        This is a completely equivalent definition, but it allows to make sense of the following eigenbasis, which is appears when setting the polariser at angle $\alpha$:
+        \[\ket{\alpha} = \cos\left(\alpha\right) \ket{0} + \sin\left(\alpha\right)\ket{1}, \mathspace \ket{\alpha_{\perp}} = \cos\left(\alpha\right) \ket{0} - \sin\left(\alpha\right) \ket{1}\]
+    \end{subparag}
+
+    \begin{subparag}{Notation}
+        As a reference to spins, it is possible to write: 
+        \[\ket{0} = \ket{\uparrow}, \mathspace \ket{1} = \ket{\downarrow}\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Euler's identity for operators}
+    Let $\hat{A}$ be an operator such that $\hat{A}^2 = 1$. Then: 
+    \[\exp\left(i \theta \hat{A}\right) = \cos\left(\theta\right) \hat{I} + i\sin\left(\theta\right)\hat{A}\]
+    
+    \begin{subparag}{Remark}
+        This is in particular valid for: 
+        \[\hat{A} = \bvec{n} \dotprod \bvec{\hat{\sigma}}\]
+        where $\bvec{n}$ is a unit vector, i.e. $\bvec{n} \dotprod \bvec{n} = 1$.
+
+        This can be useful when solving Schrödinger's equation.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We notice that, for any $n$: 
+        \[\hat{A}^{2n} = \left(\hat{A}^2\right)^n = \hat{I}^n = \hat{I}\]
+
+        Therefore, using the definition of the operator exponential, and splitting the sum on the even and odd terms, we get: 
+        \autoeq{\exp\left(i \theta \hat{A}\right) = \sum_{n=0}^{\infty} \frac{\left(i \theta \hat{A}\right)^n}{n!} = \sum_{n=0}^{\infty} \frac{\left(i \theta \hat{A}\right)^{2n}}{\left(2n\right)!} + \sum_{n=0}^{\infty} \frac{\left(i \theta \hat{A}\right)^{2n + 1}}{\left(2n + 1\right)!} = \sum_{n=0}^{\infty} \frac{\left(i^2\right)^n \theta^{2n} \left(\hat{A}^2\right)^n}{\left(2n\right)!} + i \hat{A} \sum_{n=0}^{\infty} \frac{\left(i^2\right)^n \theta^{2n+1} \left(\hat{A}^{2}\right)^n}{\left(2n + 1\right)!} = \hat{I}\sum_{n=0}^{\infty} \frac{\left(-1\right)^n \theta^{2n}}{\left(2n\right)!} + i \hat{A} \sum_{n=0}^{\infty} \frac{\left(-1\right)^n \theta^{2n+1}}{\left(2n + 1\right)!}}
+        which gives our result, recognising the Taylor expansions of $\cos\left(\theta\right)$ and $\sin\left(\theta\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Entangled state}
+    Let $\ket{\psi} \in \mathcal{H}_1 \otimes \mathcal{H}_2$ be some state, such that we can find $\ket{\phi_1} \in \mathcal{H}_1$ and $\ket{\phi_2} \in \mathcal{H}_2$ where: 
+    \[\ket{\psi} = \ket{\phi_1} \otimes \ket{\phi_2}\]
+    
+    Then, this sate is named a \important{product state}. If there does not exist such $\ket{\phi_1}, \ket{\phi_2}$, it is named an \important{entangled state}.
+
+    \begin{subparag}{Characterisation}
+        We want to characterise when a state $\ket{\psi}$ that lives in a Hilbert space $\mathbb{C}^2 \otimes \mathbb{C}^2$ is entangled. $\ket{\psi}$ can always be written as: 
+        \[\ket{\psi} = a \ket{00} + b \ket{01} + c \ket{10} + d \ket{11}\]
+
+        Then, $\ket{\phi_1} \otimes \ket{\phi_2}$ can always be written as: 
+        \autoeq{\ket{\phi_1} \otimes \ket{\phi_2} = \left(\alpha \ket{0} + \beta \ket{1}\right) \otimes \left(\gamma \ket{0} + \delta \ket{1}\right) = \alpha \gamma \ket{00} + \alpha \delta \ket{01} + \beta \gamma \ket{10} + \beta \delta \ket{11}}
+        
+        For the two equations to be equal, all components must be equal. We can represent this equation using matrices:
+        \[\begin{pmatrix} a & b \\ c & d \end{pmatrix} = \begin{pmatrix} \alpha \gamma & \alpha \delta \\ \beta \gamma &  \beta \delta \end{pmatrix} = \begin{pmatrix} \alpha \\ \beta \end{pmatrix} \begin{pmatrix} \gamma & \delta \end{pmatrix}\]
+        
+        However, the matrix on the right has rank 1. For the state to be a product state, we also need the matrix on the left to be rank 1. We can show that this implies that a state living in $\mathbb{C}^2 \otimes \mathbb{C}^2$ is a product state if and only if: 
+        \[\det \begin{pmatrix} a & b \\ c & d \end{pmatrix} = 0 \iff ad - bc = 0\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Bell states}
+    The following states are examples of ``very-entangled'' states; that are, in some form the most entangled states in $\mathbb{C}^2 \otimes\mathbb{C}^2$ can possibly be. They are named \important{Bell sates} or \important{EPR pairs}: 
+    \[\ket{B_{00}} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}, \mathspace \ket{B_{01}} = \frac{\ket{01} + \ket{10}}{\sqrt{2}},\] 
+    \[\ket{B_{10}} = \frac{\ket{00} - \ket{11}}{\sqrt{2}}, \mathspace \ket{B_{11}} = \frac{\ket{01} - \ket{10}}{\sqrt{2}}.\]
+    
+    We can notice that they are orthonormal. Thus, we can make an observable which eigenkets are the bell states.
+
+    \begin{subparag}{Property}
+        It does not matter the basis we choose to represent those states: 
+        \[\ket{B_{00}} = \frac{\ket{\alpha \alpha} + \ket{\alpha_{\perp} \alpha_{\perp}}}{\sqrt{2}}\]
+        and similarly for the other states.
+
+        This can be shown directly by computing the elements in the computation basis: 
+        \[\braket{00}{B_{00}} = \frac{\cos\left(\alpha\right)^2 + \sin\left(\alpha\right)^2}{\sqrt{2}} = \frac{1}{\sqrt{2}}\] 
+        \[\braket{01}{B_{00}} = \frac{\cos\left(\alpha\right)\sin\left(\alpha\right) - \sin\left(\alpha\right)\cos\left(\alpha\right)}{\sqrt{2}} = 0\]
+        and similarly for the other terms, indeed yielding that $\ket{B_{00}} = \frac{1}{\sqrt{2}}\ket{00} + \frac{1}{\sqrt{2}}\ket{11}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Bloch sphere}
+    Let $\ket{\psi} = \alpha \ket{0} + \beta \ket{1} \in \mathbb{C}^2$ be an arbitrary q-bit. Then, there exists unique $\theta \in \left[0, \pi\right]$ and $\phi \in \left[0, 2\pi\right[$ such that $\ket{\psi}$ is physically equivalent to:
+    \[\ket{\psi} \equiv \cos\left(\frac{\theta}{2}\right)\ket{0} + \sin\left(\frac{\theta}{2}\right) e^{i \phi} \ket{1}\]
+    
+    \begin{subparag}{Interpretation}
+        This means that we can always represent a q-bit on a sphere, using $\theta$ and $\phi$ as spherical coordinates. 
+        \svghere[0.6]{BlochSphere.svg}
+
+        The north pole is the eigenket of $\hat{\sigma}_z$ with positive eigenvalue $\ket{0}$ (written as $\ket{\hat{\sigma}_z, +}$ on the diagram) and the south pole is the eigenket of $\hat{\sigma}_z$ with negative eigenvalue $\ket{1}$ (written as $\ket{\hat{\sigma}_z, -}$). On the equator, there are the eigenkets of $\hat{\sigma}_x$ and $\hat{\sigma}_y$. 
+
+        Thus, in some form, $\theta$ tells us how close we are to an eigenket of $\hat{\sigma}_z$, and $\phi$ how close to an eigenket of $\hat{\sigma}_x$ and $\hat{\sigma}_y$.
+
+        We finally notice that the ket that is orthonormal to some ket $\ket{\psi}$ is simply the one that goes to the opposite point on the sphere (the north pole for the south pole, for instance).
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let us represent $\alpha, \beta \in \mathbb{C}$ in their polar coordinates: 
+        \[\ket{\psi} = a e^{i \delta} \ket{0} + b e^{i \gamma} \ket{1}\]
+        for $a, b \in \mathbb{R}_+$ and $\delta, \gamma \in \left[0, 2\pi\right[$. 
+
+        Since the global phase does not matter, this state is physically equivalent to: 
+        \[\ket{\psi} = e^{i\delta}\left(a \ket{0} + b e^{i \left(\gamma - \delta\right)}\ket{1}\right) \equiv a \ket{0} + be^{i \left(\gamma - \delta\right)} \ket{1}\]
+
+        Since this is a quantum state, we moreover have the normalisation constraint that: 
+        \[\left|\alpha\right|^2 + \left|\beta\right|^2 = 1 \iff a^2 + b^2 = 1\]
+
+        Together with the fact that $a > 0$ and $b > 0$, this constraint yields by the parametrisation of the circle that we can always find an angle $\frac{\theta}{2} \in \left[0, \frac{\pi}{2}\right[ $ such that:
+        \[a = \cos\left(\frac{\theta}{2}\right), \mathspace b = \sin\left(\frac{\theta}{2}\right)\]
+
+        This gives our result by leaving $\phi = \left(\gamma - \delta\right) \Mod 2\pi$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{No cloning theorem}
+    Let $\ket{\phi_1} \neq \ket{\phi_2}$ be two states that are not orthonormal: 
+    \[\braket{\phi_1}{\phi_2} = 0\]
+    
+    Then, there exists no $\hat{U}$ and $\ket{o}$ for which: 
+    \[\hat{U} \ket{\phi_1} \otimes \ket{o} = \ket{\phi_1} \otimes \ket{\phi_1}, \mathspace \hat{U} \ket{\phi_2} \otimes \ket{o} = \ket{\phi_2} \otimes \ket{\phi_2}\]
+
+    \begin{subparag}{Intuition}
+        This theorem is very restrictive. It notably means that we cannot make a ``cloning machine'' which would allow to copy an arbitrary state $\ket{\phi}$ onto a blank state $\ket{o}$, without destroying the first state.
+
+        In other words, there does not exist a $\hat{U}$ and $\ket{o}$ such that:
+        \[\hat{U} \ket{\phi} \otimes \ket{o} = \ket{\phi} \otimes \ket{\phi}, \mathspace \forall \ket{\phi}\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We suppose towards contradiction that this $\hat{U}$ and $\ket{o}$ exists, giving us:
+        \[\hat{U} \ket{\phi_1} \otimes \ket{o} = \ket{\phi_1} \otimes \ket{\phi_1}, \mathspace \hat{U} \ket{\phi_2} \otimes \ket{o} = \ket{\phi_2} \otimes \ket{\phi_2}\]
+
+        Multiplying the Hermitian transpose of the first equation with the second one, we get: 
+        \[\bra{\phi_1} \otimes \bra{o} \hat{U}^{\dagger} \hat{U} \ket{\phi_2} \otimes \ket{o} = \left(\bra{\phi_1} \otimes \bra{\phi_1}\right)\left(\ket{\phi_2} \otimes \ket{\phi_2}\right)\]
+        
+        Now, we know that $\hat{U}^{\dagger} \hat{U} = \hat{I}$ by the time evolution principle, giving us that: 
+        \[\braket{\phi_1}{\phi_2} \braket{o}{o} = \braket{\phi_1}{\phi_2}\braket{\phi_1}{\phi_2} \iff \braket{\phi_1}{\phi_2}\left(1 - \braket{\phi_1}{\phi_2}\right) = 0\]
+        
+        This either means that $\braket{\phi_1}{\phi_2} = 0$, which yields that they are orthonormal, or $\braket{\phi_1}{\phi_2} = 1$, which yields that $\ket{\phi_1} = \ket{\phi_2}$. Both cases are not possible by hypothesis, which gives us our contradiction.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Bell inequalities}
+    A source sends an EPR pair split between Alice and Bob (each have one q-bit). Alice has two possible measurement bases, $\left\{\ket{\alpha}, \ket{\alpha_{\perp}}\right\}$ at angle $\alpha$, and one at angle $\alpha'$. We model her part of the experiment using two random variables: $A$ and $A'$. $A \in \left\{-1, 1\right\}$ is the value she would get if she used the basis $\alpha$, and similarly for $A'$. Completely analogously, Bob has two measurement bases $\beta$ and $\beta'$, which measurement results are $B$ and $B'$.
+
+    It is possible to measure experimentally the following value:
+    \[x = \exval\left(AB \suchthat \alpha, \beta\right) + \exval\left(A B' \suchthat \alpha, \beta'\right) - \exval\left(A' B \suchthat \alpha', \beta\right) + \exval\left(A'B' \suchthat \alpha', \beta'\right)\]
+    where $\exval\left(AB \suchthat \alpha, \beta\right)$ means that Alice chooses the basis $\alpha$ and Bob chooses the basis $\beta$ to measure their value. Note that we must estimate the terms one by one: Alice cannot measure both $A\ |\ \alpha$ and $A'\ |\ \alpha'$ at once, since doing a measurement modifies the state.
+
+    We want to test the quantum theories, so we consider another possible explanation. In this one, we say that the measurement in a lab does not impact the measurement in the other lab; but, in fact that, when creating the Bell state, both q-bit registered a same value $\lambda$ (a ``hidden variable'') that they use when we measure them. This $\lambda$ is given to these q-bits randomly when entangling them, following a PDF $h\left(\lambda\right)$. Mathematically, the fact that the measure only depends on $\lambda$ means that:
+    \[\prob\left(A = a, B = b \suchthat \lambda\right) = \prob\left(A = a \suchthat \lambda\right) \prob\left(B = b \suchthat \lambda\right)\]
+
+    In this case, we have: 
+    \[\left|x\right| \leq 2\]
+
+    This inequality is also named the CHSH inequality.
+    
+    If we consider the usual quantum theories, we can choose $\alpha, \beta, \alpha', \beta'$ such that: 
+    \[x = 2\sqrt{2}\]
+
+    Measuring $x$ experimentally, we can get that $x = 2\sqrt{2}$, showing that the theory of hidden variables does not hold physically. More specifically, it shows that the locality assumption we took is not correct: the measure in Alice's lab depends on the result of the measure in Bob's lab and inversely.
+
+    \begin{subparag}{Remark}
+        Here, we measure $A, B, A', B'$ using a Bell state. However, we can use an arbitrary state $\ket{\psi}$. This gives us that $\left|x\right| \leq 2$ is a necessary condition for a state to be a product state. Indeed, if it is a product state, then the locality assumption holds, and we are back in the classical inequality.
+
+        In fact, we can show that we can always find angles $\alpha, \beta, \alpha', \beta'$ such that $\left|x\right| > 2$ for an entangle state. This yields that if we can find some $\alpha, \beta, \alpha', \beta'$ where $\left|x\right| > 2$, then this necessarily yields that $\ket{\psi}$ is entangled. If however there exists no $\alpha, \beta, \alpha', \beta'$ where $\left|x\right| > 2$, then $\ket{\psi}$ is a product state.
+
+        This is named the Tsirelson bound.
+    \end{subparag}
+
+    \begin{subparag}{Classical proof}
+        We begin by proving the inequality for the classical case. 
+
+        For the simplicity of the notation, we will note $\prob\left(A = a\right) = \prob\left(a\right)$, and similarly for the other random variables. 
+
+        We have that: 
+        \autoeq{\exval\left(AB \suchthat \alpha, \beta\right) = \sum_{a, b} ab \prob\left(a, b \suchthat \alpha, \beta\right) = \int_{-\infty}^{\infty} d\lambda h\left(\lambda\right) \sum_{a, b} ab\prob\left(a, b \suchthat \alpha, \beta, \lambda\right) = \int_{-\infty}^{\infty} d\lambda h\left(\lambda\right) \sum_{a, b} ab \prob\left(a \suchthat \alpha, \lambda\right) \prob\left(b \suchthat \beta, \lambda\right) = \int_{-\infty}^{\infty} d\lambda h\left(\lambda\right) \sum_{a} a \prob\left(a \suchthat \alpha, \lambda\right) \sum_{b} b\prob\left(b \suchthat \beta, \lambda\right) = \int_{-\infty}^{\infty} d\lambda h\left(\lambda\right) \exval\left(A \suchthat \alpha, \lambda\right) \exval\left(B \suchthat \beta, \lambda\right)}
+        
+        To again simplify the notation, we let $\exval\left(A \suchthat \alpha, \lambda\right) = \hat{a}$ and similarly for the other terms. Doing the same reasoning for the other terms and putting everything together, we get: 
+        \autoeq{x = \int_{-\infty}^{\infty} d\lambda h\left(\lambda\right) \left(\hat{a} \hat{b} + \hat{a} \hat{b}' - \hat{a}' \hat{b} + \hat{a} \hat{b}\right) = \int_{-\infty}^{\infty} d\lambda h\left(\lambda\right) \left[\hat{a}\left(\hat{b} + \hat{b}'\right) - \hat{a}' \left(\hat{b}' - \hat{b}\right)\right]}
+        
+        However, we notice that $\hat{a} = \exval\left(A \suchthat \alpha, \lambda\right) \in \left\{-1, 1\right\}$: the value of $A$ solely depends on the value of $\lambda$ so, when we do our measurement in the basis $\alpha$, we will always get the same value, which is either $-1$ or $1$; and similarly for all other terms. We now want to use this fact to show that: 
+        \[u = \hat{a}\left(\hat{b} + \hat{b}'\right) - \hat{a}' \left(\hat{b}' - \hat{b}\right) \in \left\{-2, 2\right\}\]
+        
+        Indeed, we can consider two cases. If $\hat{b} = \hat{b}' \in \left\{-1, 1\right\}$, it yields that the second term is 0, and that the first term is either $-2$ or $2$. If however, $\hat{b} \neq \hat{b}'$, it means that one is $-1$ and the other is $1$, showing that the first term is $0$. By the same reasoning, we get that $u \in \left\{-2, 2\right\}$.
+
+        All this yields that, using the triangle inequality: 
+        \[\left|x\right| = \left|\int_{-\infty}^{\infty} d\lambda h\left(\lambda\right) u\left(\lambda\right)\right| \leq \int_{-\infty}^{\infty} d\lambda h\left(\lambda\right) \left|u\left(\lambda\right)\right| = 2 \int_{-\infty}^{\infty} h\left(\lambda\right) d\lambda = 2\]
+        since this is a PDF. This gives our expected result.
+    \end{subparag}
+
+    \begin{subparag}{Quantum proof}
+        We now prove the quantum equality.
+
+        When doing her measure in basis $\ket{\alpha}$, Alice uses the following operator: 
+        \[\hat{A} = \left(+1\right) \ket{\alpha}\bra{\alpha} + \left(-1\right)\ket{\alpha_{\perp}} \bra{\perp}\]
+        
+        We know how to compute expected values in the quantum realm, let us use this property:
+        \autoeq{x = \bra{B_{00}} \hat{A} \otimes \hat{B} \ket{B_{00}} + \bra{B_{00}} \hat{A} \otimes \hat{B}' \ket{B_{00}} \fakeequal - \bra{B_{00}} \hat{A}' \otimes \hat{B} \ket{B_{00}} + \bra{B_{00}} \hat{A}' \otimes \hat{B}' \ket{B_{00}}}
+        
+        Let us focus on $y = \bra{B_{00}} A \otimes B \ket{B_{00}}$. We can use the following property of the Bell states: 
+        \[\ket{B_{00}} = \frac{\ket{\gamma \gamma} + \ket{\gamma_{\perp} \gamma_{\perp}}}{\sqrt{2}}, \mathspace \forall \gamma\]
+
+        So: 
+        \autoeq{y = \frac{\bra{\alpha \alpha} + \bra{\alpha_{\perp} \alpha_{\perp}}}{\sqrt{2}} \fakeequal \cdot \left(\ket{\alpha \beta} \bra{\alpha \beta} - \ket{\alpha_{\perp} \beta} \bra{\alpha_{\perp} \beta} - \ket{\alpha \beta_{\perp}} \bra{\alpha \beta_{\perp}} + \ket{\alpha_{\perp} \beta_{\perp}} \bra{\alpha_{\perp} \beta_{\perp}}\right) \fakeequal \cdot \frac{\ket{\alpha \alpha} + \ket{\alpha_{\perp} \alpha_{\perp}}}{\sqrt{2}} = \frac{1}{2}\left[2\braket{\alpha}{\beta} \braket{\beta}{\alpha} + 2\braket{\alpha_{\perp}}{\beta_{\perp}} \braket{\beta_{\perp}}{\alpha_{\perp}}\right] = \cos\left(\alpha - \beta\right)^2 - \sin\left(\alpha - \beta\right)^2 = \cos\left(2\left(\alpha - \beta\right)\right)}
+        
+        We can do the same reasoning for the other terms and, putting everything together, we get: 
+        \[x = \cos\left(2\left(\alpha - \beta\right)\right) + \cos\left(2\left(\alpha - \beta'\right)\right) - \cos\left(2\left(\alpha' - \beta\right)\right) + \cos\left(2\left(\alpha' - \beta'\right)\right)\]
+        
+        Leaving $\alpha = 0$, $\alpha' = \frac{\pi}{4}$, $\beta = \frac{\pi}{8}$ and $\beta' = -\frac{\pi}{8}$, we finally get: 
+        \[x = 4\cdot \frac{\sqrt{2}}{2} = 2\sqrt{2}\]
+        ending our proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Mach-Zehnder interferometer}
+    We consider an experiment where we have perfect mirrors $\hat{R}$ and semi-transparent mirrors $\hat{S}$ that let half of light go through. We construct the following experiment device:
+    \svghere[0.8]{MachZehnderInterferometer.svg}
+
+    There are two rays that merge to form the one that goes to the photodetector $\hat{D}_1$, and similarly for $\hat{D}_2$. We can construct this in a way that $\hat{D}_2$ receives no light because the waves interfere destructively; and $\hat{D}_1$ gets all the light because the waves interfere constructively.
+
+    Now, we send a single photon. However, we see that the photon manages to ``interfere with itself'': $\hat{D}_2$ will never see a photon, but $\hat{D}_1$ will always see one.  This is however a unit of light, so it cannot have taken the two paths simultaneously. We have a problem with the classical description, we therefore need quantum. The quantum description was done in the first exercise series.
+\end{parag}
+
+\begin{parag}{Spin precession}
+    We consider a particle of spin-$\frac{1}{2}$ in a space with constant magnetic field $\bvec{B}$. We can make a physical analysis while making analogies with the classical case to know that the Hamiltonian is given by: 
+    \[\hat{H} = -\gamma \frac{\hbar}{2} \bvec{\hat{\sigma}} \dotprod \bvec{B} = -\gamma \frac{\hbar}{2} \begin{pmatrix} B_z & B_x - i B_y \\ B_x + i B_y & -B_z \end{pmatrix} \]
+    
+    Let us consider a magnetic field with only a $\hat{z}$ component, $\bvec{B} = \begin{pmatrix} 0 & 0 & B_0 \end{pmatrix} ^T$: 
+    \[\hat{H} = \begin{pmatrix} -\gamma \frac{\hbar}{2} B_0 & 0 \\ 0 & \gamma \frac{\hbar}{2} B_0 \end{pmatrix} \]
+    
+
+    Then, we know that the solution to the Schrödinger's equation is: 
+    \[\hat{U}\left(t\right) = \exp\left(-\frac{i}{\hbar}\hat{H}t\right) = \begin{pmatrix} \exp\left(\frac{i t \gamma B_0}{2}\right) & 0 \\ 0 & \exp\left(\frac{-i t \gamma B_0}{2}\right) \end{pmatrix} \]
+    where we used the fact that the exponential of a diagonal matrix is the exponential of the diagonal entries (this comes directly from the fact that that the exponential of a matrix has the same eigenkets but its eigenvalues are the exponential of the original ones).
+    
+    Let us consider a starting state as its Bloch sphere representation: 
+    \[\ket{\psi\left(0\right)} = \cos\left(\frac{\theta}{2}\right)\ket{0} + \sin\left(\frac{\theta}{2}\right) e^{i \phi} \ket{1}\]
+    
+    At time $t$, the state is given by: 
+    \[\ket{\psi\left(t\right)} = U\left(t\right) \ket{\psi\left(0\right)} = \exp\left(\frac{i t \gamma B_0}{2}\right) \left(\cos\left(\frac{\theta}{2}\right)\ket{0} + \sin\left(\frac{\theta}{2}\right) e^{i\left(\phi - t \gamma B_0\right)} \ket{1}\right)\]
+    
+    However, since the global phase does not matter, this is equivalent to: 
+    \[\ket{\psi\left(t\right)} \equiv \cos\left(\frac{\theta}{2}\right) \ket{0} + \sin\left(\frac{\theta}{2}\right) e^{i\left(\phi - t \gamma B_0\right)}\ket{1}\]
+    
+    This yields that the state precesses on the Bloch sphere around the $\hat{z}$ axis, at an angular frequency $\nu = \gamma B_0$. This is named the \important{Larmor frequency}. 
+
+    This reasoning can be generalised to an arbitrary magnetic field $\bvec{B}$, which yields that the state precesses around the axis given by this vector $\bvec{B}$.
+
+    \begin{subparag}{Remark}
+        In class, in lectures 5 and 6, we saw more complex examples with more complex non-constant Hamiltonians. This does not appear here, since this is pure computations, and it would thus be equivalent to reading the correction of the corresponding series.
+
+        However, as a general advice, it can often be useful to consider the fact that $\hat{A} \otimes \hat{B}$ and $\exp\left(\hat{A} \otimes \hat{B}\right)$ have the same eigenkets, which are the tensor products of the eigenkets of $\hat{A}$ and the ones of $\hat{B}$. Getting the eigenkets of the Hamiltonian solves Schrödinger's equation (as mentioned in the paragraph on this equation), so it might suffice to get the eigenkets of $\hat{A}$ and $\hat{B}$.
+    \end{subparag}
+\end{parag}
+
+\section{Communication protocols}
+
+\begin{parag}{Quantum key distribution}
+    The goal of the \important{quantum key distribution} (QKD) protocol is to share a common secret between Alice and Bob, while making sure nobody else can have it too. This requires a classical and a quantum channel between them.
+
+    This goes in four phases:
+    \begin{enumerate}
+        \item Alice generates two IID strings uniformly at random of classical bits: $e_1, \ldots, e_n$ and $x_1, \ldots, x_n$. She sends $n$ photons to Bob, in states: 
+        \[\ket{\psi_i} = \hat{H}^{x_i} \ket{e_i}, \mathspace \hat{H} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} \]
+        where $\hat{H}$ is the Hadamard matrix.
+        \item Bob generates a IID string uniformly at random of classical bits $d_1, \ldots, d_n$. If $d_i = 0$, he measures the corresponding photo $\ket{\psi_i}$ in the basis of $\sigma_z$, $\left\{\ket{0}, \ket{1}\right\}$; if $d_i = 1$, he measures it in the basis of $\sigma_x$, $\left\{\frac{1}{\sqrt{2}}\left(\ket{0} + \ket{1}\right), \frac{1}{\sqrt{2}}\left(\ket{0} - \ket{1}\right)\right\}$. This gives him a sequence of classical bits $y_1, \ldots, y_n$.
+        \item Alice and Bob reveal the choices of encoding and decoding basis $e_1, \ldots, e_n$ and $d_1, \ldots, d_n$; while keeping $x_1, \ldots, x_n$ and $y_1, \ldots, y_n$ secret. They get rid of all $\left(x_i, y_i\right)$ where $e_i \neq d_i$, and keep all the others. Those bits are the same for Alice and Bob, i.e. $\prob\left(x_i = y_i \suchthat e_i = d_i\right) = 1$; this is a shared secret of expected size $\frac{n}{2}$ that can for instance be used as one-time pad.
+        \item Alice and Bob finally need to do a security check. They sacrifice a small part of their shared secret, $s = \epsilon \frac{n}{2}$ where $\epsilon \ll 1$ is very small. They verify that the number of bits that are equal is approximately $s$. Otherwise, there was a lot of noise or an eavesdropper.
+    \end{enumerate}
+    
+    \begin{subparag}{Shared secret proof}
+        To show that this protocol indeed yields a shared secret, we need to show that: 
+        \[\prob\left(x_i = y_i \suchthat e_i = d_i\right) = 1, \mathspace \prob\left(x_i = y_i \suchthat e_i \neq d_i\right) = \frac{1}{2}\]
+        
+        Now, we know that the probability to go from $H^{e_i} \ket{x_i}$ (the state sent by Alice) to $H^{d_i}\ket{y_i}$ (the state after Bob's measure) is, by Born's rule: 
+        \[\prob\left(x_i = y_i \suchthat e_i, d_i\right) = \left|\bra{y_i} \left(\hat{H}^{d_i}\right)^{\dagger} \hat{H}^{e_i} \ket{x_i}\right|^2 = \left|\bra{y_i} \hat{H}^{d_i + e_i} \ket{x_i}\right| \]
+        where we used the fact that the Hadamard matrix is hermitian.
+
+        We moreover know that $\hat{H}^2 = \hat{I}$. This means that, for any $e_i, d_i \in \left\{0, 1\right\}$ such that $e_i = d_i$, we always have that $\hat{H}^{e_i + d_i} = \hat{I}$. This yields: 
+        \[\prob\left(x_i = y_i \suchthat e_i = d_i\right) = \left|\braket{y_i}{x_i}\right|^2 = \begin{systemofequations} 1, & \text{if } x_i = y_i \\ 0, & \text{otherwise} \end{systemofequations}\]
+        
+        Now, when $e_i \neq d_i$, we always have $\hat{H}^{e_i + d_i} = \hat{H}$. This gives us: 
+        \[\prob\left(x_i = y_i \suchthat e_i \neq d_i\right) = \left|\ket{y_i}\hat{H}\ket{x_i}\right|^2 = \left|\bra{y_i} \frac{1}{\sqrt{2}}\left(\ket{0} + \left(-1\right)^{x_i}\right)\ket{1}\right|^2 = \frac{1}{2}\]
+        as required.
+    \end{subparag}
+
+    \begin{subparag}{Eavesdropper detection proof}
+        We now want to show that we are able to correctly detect eavesdroppers. They can never copy the state because of the no-cloning theorem, so the only thing they can do is observe the q-bits in some basis. 
+
+        Let's say that Eve follows what Bob does, generating a random IID string uniformly at random $E_1, \ldots, E_n$ and using it to measure in the $\hat{\sigma}_z$ or $\hat{\sigma}_x$ basis. She then sends the q-bits to Bob so that he does not know Eve looked at the q-bits. In this case, we have: 
+        \autoeq[s]{\prob\left(x_i = y_i \suchthat e_i = d_i\right) = \prob\left(x_i = y_i \suchthat e_i = d_i, E_i = e_i\right) \prob\left(E_i = e_i \suchthat e_i = d_i\right) \fakeequal + \prob\left(x_i = y_i \suchthat e_i = d_i, E_i \neq e_i \right) \prob\left(E_i \neq e_i \suchthat e_i = d_i\right) = \prob\left(x_i = y_i \suchthat E_i = e_i\right) \prob\left(E_i = e_i\right) + \prob\left(x_i = y_i \suchthat E_i \neq e_i \right) \prob\left(E_i \neq e_i\right) = 1 \cdot \frac{1}{2} + \frac{1}{2}\cdot \frac{1}{2} = \frac{3}{4}}
+        since, in the first case, Eve did not change the state; but, in the second, she changed it to a wrong superposition due to her measurement. 
+
+        We have $\prob\left(x_i = y_i \suchthat e_i = d_i\right) < 1$, so Alice and Bob will notice that there is an issue in the fourth phase.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Teleportation}
+    The goal of the \important{teleportation} protocol is to send an arbitrary q-bit to Bob, using a pre-shared Bell state split between the two and two bits sent over a classical channel.
+    
+    In other words, the starting state is $\ket{\psi}_{123} = \ket{\phi}_1 \otimes \ket{B_{00}}_{23}$, where the two first q-bits belong to Alice, and the third q-bit (the second half of the Bell state) belongs to Bob. The goal is to end up with something of the form $\ket{\text{something}}_{12} \otimes \ket{\phi}_3$. 
+
+    This goes in two phases:
+    \begin{enumerate}
+        \item Alice measures in the Bell state basis her two q-bits. She sends the value $v \in \left\{00, 01, 10, 11\right\}$ measured to Bob.
+        \item According to the value Bob receives, he can apply a unitary operation on his q-bit $\ket{\phi'}$ to get $\ket{\phi}$:
+        \begin{functionbypart}{\ket{\phi}}
+            \ket{\phi'}, & \text{if } v = 00 \\
+            \hat{\sigma}_X\ket{\phi'}, & \text{if } v = 01 \\
+            \hat{\sigma}_Z\ket{\phi'}, & \text{if } v = 10 \\
+            i\hat{\sigma}_Y\ket{\phi'}, & \text{if } v = 11 \\
+        \end{functionbypart}
+    \end{enumerate}
+
+    \begin{subparag}{Proof}
+        The state Alice wants to send is $\ket{\phi} = \alpha \ket{0} + \beta \ket{1}$ for some $\alpha, \beta \in \mathbb{C}$. This yields that the total state before any measurement is: 
+        \autoeq{\ket{\psi} = \ket{\phi} \otimes \ket{B_{00}} = \left(\alpha \ket{0} + \beta \ket{1}\right) \otimes \frac{\ket{00} + \ket{11}}{\sqrt{2}} = \frac{\alpha \ket{000} + \alpha \ket{011} + \beta \ket{100} + \beta \ket{111}}{\sqrt{2}}}
+        
+        We only prove that this result is correct when Alice gets $v = 01$ after her measurement, the other cases are similar. 
+
+        Since Alice measured $v = 01$, it means the first two q-bits collapsed to:
+        \[\ket{B_{01}} = \frac{1}{\sqrt{2}} \left(\ket{01} + \ket{10}\right)\]
+
+        By the theory of partial measurements, after her measurement, the total state is proportional to: 
+        \autoeq{c \ket{\psi'} = \left(\ket{B_{01}}\bra{B_{01}} \otimes \hat{I}\right) \ket{\psi} = \left(\frac{\ket{01}\bra{01}+ \ket{10}\bra{01} + \ket{01}\bra{10} + \ket{10}\bra{10}}{2} \otimes \hat{I}\right) \fakeequal \cdot \frac{\alpha \ket{000} + \alpha \ket{011} + \beta \ket{100} + \beta \ket{111}}{\sqrt{2}}}
+
+        The maths here is not particularly hard, but we have to be careful to handle not to make a mistake. We for instance have:
+        \[\left(\ket{10}\bra{01} \otimes \hat{I}\right) \ket{abc} = \ket{10}\braket{01}{ab} \otimes \hat{I}\ket{c} = \begin{systemofequations} \ket{10c}, & \text{if } ab = 01 \\ 0, & \text{otherwise} \end{systemofequations}\]
+
+        This yields us that: 
+        \autoeq{c \ket{\psi'} = \frac{\alpha \ket{011} + \alpha \ket{101} + \beta \ket{010} + \beta \ket{100}}{2\sqrt{2}} = \frac{1}{2} \frac{\ket{01} + \ket{10}}{\sqrt{2}} \otimes \left(\alpha \ket{1} + \beta \ket{0}\right) = \frac{1}{2} \ket{B_{01}} \otimes \ket{\phi'}}
+        
+        Now, to get $\phi$ back, Bob can do: 
+        \[\hat{\sigma}_X \ket{\phi'} =  \alpha \hat{\sigma}_X\ket{1} +\beta \hat{\sigma}_X\ket{0} = \alpha \ket{0} + \beta \ket{1} = \ket{\phi}\]
+        
+        The other cases are completely similar.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Dense coding}
+    The goal of the \important{dense coding} protocol is to send two classical bits to Bob, using a pre-shared Bell state split between the two and a quantum channel.
+
+    This goes in two phases:
+    \begin{enumerate}
+        \item Depending on the value $v \in \left\{00, 01, 10, 11\right\}$ Alice wants to send, she applies a unitary operation $\hat{U}_A$ on her q-bit: 
+            \begin{functionbypart}{\hat{U}_A}
+                \hat{I}, & \text{if } v = 00 \\
+                \hat{\sigma}_x, & \text{if } v = 01 \\
+                \hat{\sigma}_z, & \text{if } v = 10 \\
+                \hat{\sigma}_x\hat{\sigma}_z, & \text{if } v = 11 \\
+            \end{functionbypart}
+        She then sends her q-bit to Bob.
+        \item Bob measures the two q-bit using the Bell state basis. The value measured is $v$.
+    \end{enumerate}
+
+    \begin{subparag}{Proof}
+        The starting state is the first Bell state: 
+        \[\ket{\psi} = \ket{B_{00}} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}\]
+        
+        We only consider the case where $v = 01$, the other cases are similar. This means that Alice applies a unitary operation $\hat{U}_A = \hat{\sigma}_x$, yielding that the new state is: 
+        \[\ket{\psi'} = \left(\hat{U}_A \otimes \hat{I}\right) \ket{\psi} = \left(\hat{\sigma}_x \otimes \hat{I}\right) \frac{\ket{00} + \ket{11}}{\sqrt{2}}\]
+        
+        $\hat{\sigma}_x$ has the effect of flipping the bit it acts on, so: 
+        \[\ket{\psi'} = \frac{\ket{10} + \ket{01}}{\sqrt{2}} = \ket{B_{01}}\]
+        
+        When Bob measures $\ket{\psi'}$, he will indeed get $v = 01$. The other cases are completely similar.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Density matrices and information theory}
+
+\begin{parag}{Density matrix}
+    A matrix $\hat{\rho}$ is named a \important{density matrix} if it has the following properties:
+    \begin{enumerate}
+        \item It is hermitian.
+        \item It is positive semi-definite.
+        \item $\Tr\left(\hat{\rho}\right) = 1$.
+    \end{enumerate}
+    
+    \begin{subparag}{Remark}
+        This is a generalisation of the concept of quantum states. Indeed, if we have a state $\ket{\psi}$, then we can always form the following density matrix: 
+        \[\hat{\rho} = \ket{\psi} \bra{\psi}\]
+
+        If $\hat{\rho}$ can be written in this form, it is named a \important{pure state}. This must not be mistaken with entangled states: if $\psi$ is entangled, $\hat{\rho}$ is also a pure state. States that are not pure states are \important{mixed states}.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        Since $\hat{\rho}$ is hermitian, we can find an orthonormal basis $\ket{\phi_i}$ of real eigenvalues $p_i$:
+        \[\hat{\rho} = \sum_{i=1}^{n} p_i \ket{\phi_i} \bra{\phi_i}\]
+
+        The fact that it is positive semi-definite tells us that $p_i \geq 0$ for all $i$. The fact that the trace is 1 tells us that $p_1 + \ldots + p_n = 1$. Those $p_i$ can therefore be interpreted as some form of probabilities.  
+
+        This yields the following concept.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Statistical mixture}
+    A system that is a \important{statistical mixture} of pure states can be represented using a density matrix. Let's say that it has a fraction $p_i$ of state $\ket{\phi_i}$ (for $i \in \left\{1, \ldots, k\right\}$), where $p_1 + \ldots + p_k = 1$. In other words, if we consider a random particle inside the statistical mixture, it has state $\ket{\phi_i}$ with probability $p_i$.
+
+    Then the density matrix of this statistical mixture is given by: 
+    \[\hat{\rho} = \sum_{i}^{} p_i \ket{\phi_i}\bra{\phi_i}\]
+
+    This indeed has the three properties of a density matrix.
+
+    \begin{subparag}{Remark}
+        This situation is the best way to get intuition about a density matrix. Given a density matrix $\hat{\rho}$, one can diagonalise it to see what statistical mixture would yield this $\hat{\rho}$. We can then interpret our system as a box where, when we look inside, we get state $\ket{\phi_i}$ with probability $p_i$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Expected value}
+    The expected value of an observable $\hat{A}$ (of eigenkets $\ket{A_i}$ and eigenvalues $a_i$) over a state represented by a density matrix $\hat{\rho}$ is given by: 
+    \[\left\langle \hat{A} \right\rangle = \Tr\left(\hat{\rho} \hat{A}\right)\]
+
+    \begin{subparag}{Mnemonic}
+        We can recall this formula by seeing the trace as a sum, $\hat{\rho}$ as probabilities and $\hat{A}$ as values. This is then completely analogous to random variables: 
+        \[\exval\left(X\right) = \sum_{i}^{} p_i X_i\]
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        This means that the expected value of an observable $\hat{A}^p$ under the state $\hat{\rho}$ is: 
+        \[\left\langle \hat{A}^p \right\rangle = \Tr\left(\hat{\rho} \hat{A}^p\right)\]
+
+        We moreover know that $\Var\left(X\right) = \exval\left(X^2\right) - \exval\left(X\right)^2$. This means that the variance of our observable over the state $\hat{\rho}$ is: 
+        \[\left\langle \hat{A}^2 \right\rangle - \left\langle \hat{A} \right\rangle^2 = \Tr\left(\hat{\rho} \hat{A}^2\right) - \Tr\left(\hat{\rho} \hat{A}\right)^2\]
+    \end{subparag}
+    
+    \begin{subparag}{Pure state}
+        Let us verify this makes sense for a pure state $\hat{\rho} = \ket{\psi}\bra{\psi}$. By the cyclicity of the trace, we have: 
+        \[\left\langle \hat{A} \right\rangle = \Tr\left(\hat{\rho} \hat{A}\right) = \Tr\left(\ket{\psi} \bra{\psi} \hat{A}\right) = \Tr\left(\bra{\psi}\hat{A} \ket{\psi}\right) = \bra{\psi}\hat{A} \ket{\psi}\]
+        since $\Tr\left(a\right) = a$ for any $a \in \mathbb{C}$.
+
+        This is indeed the result we got for pure states.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We know that we can always diagonalise $\hat{A}$ and $\hat{\rho}$: 
+        \[\hat{A} = \sum_{i}^{} a_i \ket{A_i}\bra{A_i}, \mathspace \hat{\rho} = \sum_{j}^{} p_j \ket{\phi_j} \bra{\phi_j}\]
+        
+        When measuring something in this statistical mixture with our observable, we will get a random sate $\ket{\phi_j}$ with probability $p_j$. By the Born rule, this state then collapses to $\ket{A_i}$ with probability $\left|\braket{A_i}{\phi_j}\right|^2$, outputting a value $a_i$ to the measure instrument. We therefore have: 
+        \autoeq{\sum_{i}^{} a_i \prob\left(\text{measure $a_i$}\right) = \sum_{i}^{} a_i \sum_{j}^{} \left|\braket{A_i}{\phi_j}\right|^2 \prob\left(\text{chose $\phi_j$}\right) = \sum_{i}^{} \sum_{j}^{} a_i p_j \braket{\phi_j}{A_i}\braket{A_i}{\phi_j} = \sum_{j}^{} p_j \bra{\phi_j} \left(\sum_{i}^{} a_i \ket{A_i} \bra{A_i}\right)\ket{\phi_j} = \sum_{j}^{} p_j \bra{\phi_j} \hat{A} \ket{\phi_j}}
+        where we recognised the diagonal representation of $\hat{A}$ in its eigenbasis.
+
+        However, by definition of eigenvalues: 
+        \[p_j \bra{\phi_j} = \bra{\phi_j} p_j = \bra{\phi_j} \hat{\rho}^{\dagger} = \bra{\phi_j} \hat{\rho}\]
+        
+        This yields: 
+        \[\sum_{i}^{} a_i \prob\left(\text{measure $a_i$}\right) = \sum_{j}^{} \bra{\phi_j} \hat{\rho} A \ket{\phi_j} = \Tr\left(\hat{\rho} A\right)\]
+        as \textit{expected}.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Non-isolated system}
+    A non-isolated system $S$ can also be represented using a density matrix. To do so, we need to find its environment $E$ such that $S \cup E$ is isolated. By regular quantum physics, a state in $\mathcal{H}_S \otimes \mathcal{H}_E$ is always pure since this system is isolated. The density matrix of $S \cup E$ is therefore easily found:  
+    \[\hat{\rho}_{SE} = \ket{\psi} \bra{\psi}\]
+    
+    To get the density matrix of $S$, we then use a partial trace: 
+    \[\hat{\rho}_S = \Tr_{\mathcal{H}_E} \left(\hat{\rho}_{SE}\right)\]
+
+    \begin{subparag}{Remark}
+        For this to make sense with the previous theorem, we require that, for any observable $\hat{A}$ in $\mathcal{H}_S$, its expected value must be given by $\Tr_{\mathcal{H}_S}\left(\hat{A} \hat{\rho}_S\right)$. Indeed, considering the whole system $\mathcal{H}_S \otimes \mathcal{H}_E$, we do have:
+        \[\left\langle \hat{A} \otimes \hat{I}_E \right\rangle = \Tr\left(\hat{\rho}_{SE} \hat{A} \otimes \hat{I}_E\right) = \Tr_{\mathcal{H}_S}\left(\hat{\rho}_S \hat{A}\right)\]
+        as expected.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Bloch ball}
+    The density matrix $\hat{\rho}$ of one q-bit (meaning that it is $2\times2$) can be represented as: 
+    \[\hat{\rho} = \frac{1}{2}\left(\hat{I} + \bvec{a} \dotprod \bvec{\hat{\sigma}}\right)\]
+    where the vector $\bvec{a} \in \mathbb{R}^3$ is such that: 
+    \[\left\|\bvec{a}\right\| \leq 1\]
+    
+    \begin{subparag}{Interpretation}
+        This means that we can always represent a density matrix on a ball (a filled sphere). A state is on the surface if and only if it is pure; and, in this case, it behaves just like the Bloch sphere. A state that is in the centre is a Bernoulli random variable that gives $\ket{0}$ or $\ket{1}$ both with probability $\frac{1}{2}$. Any state in between is a mix of the two.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        It is possible to show that $\left(\hat{I}, \hat{\sigma}_x, \hat{\sigma}_y, \hat{\sigma}_z\right)$ form an orthonormal basis for $2\times2$ matrices. Therefore, we can always express a $2 \times 2$ matrix as: 
+        \[\hat{\rho} = a_0 \hat{I} + a_1 \hat{\sigma}_x + a_2 \hat{\sigma}_y + a_3 \hat{\sigma}_z\]
+
+        We know that $\Tr\left(\hat{\rho}\right) = 1$, thus: 
+        \autoeq{1 = a_0\Tr\left(\hat{I}\right) + a_1 \Tr\left(\hat{\sigma}_x\right) + a_2 \Tr\left(\hat{\sigma}_y\right) + a_3 \Tr\left(\hat{\sigma}_z\right) = a_0\cdot 2 + a_1\cdot 0 + a_2\cdot 0 + a_3\cdot 0 = 2a_0}
+        which yields that $a_0 = \frac{1}{2}$.
+
+        We now leave $a_x = 2a_1$, $a_y = 2a_2$ and $a_z = 2a_3$ in order to simplify the notations. So far, we got that we can write: 
+        \[\hat{\rho} = \frac{1}{2}\left(\hat{I} + a_x \hat{\sigma}_x + a_y \hat{\sigma}_y + a_z \hat{\sigma}_z\right)\]
+        
+        We only need to show that $\left\|\bvec{a}\right\| \leq 1$. To do so, we can compute the determinant. We know that it is positive: it is equal to the product of the eigenvalues, which are positive since density matrices are positive semi-definite. This gives us:
+        \autoeq{0 \leq \det\left(\hat{\rho}\right) = \frac{1}{4} \left(\det\left(\hat{I}\right) + a_x^2 \det\left(\hat{\sigma}_x\right) + a_y^2 \det\left(\hat{\sigma}_y\right) + a_z^2 \det\left(\hat{\sigma}_z\right)\right) = \frac{1}{4} \left(1 - a_x^2 - a_y^2 - a_z^2\right)= \frac{1}{4}\left(1 - \left\|\bvec{a}\right\|^2\right)}
+        
+        We indeed get that $\left\|\bvec{a}\right\| \leq 1$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Von Neumann entropy}
+    The \important{Von Neumann (quantum) entropy} of a density matrix $\hat{\rho}$ is given by: 
+    \[S\left(\hat{\rho}\right) = -\Tr\left(\hat{\rho} \ln\left(\hat{\rho}\right)\right)\]
+
+    \begin{subparag}{Intuition}
+        We know that the trace is the sum of eigenvalues. The eigenvalues of $\hat{\rho} \ln\left(\hat{\rho}\right)$ are $p_i \ln\left(p_i\right)$ (where the $p_i$ are the eigenvalues of $\hat{\rho}$). This yields that: 
+        \[S\left(\hat{\rho}\right) = -\sum_{i}^{} p_i \ln\left(p_i\right)\]
+        where we use the continuity extension $0\cdot \ln\left(0\right) \over{=}{def} 0$.
+        
+        This is completely analogous to the classical Shannon entropy.
+    \end{subparag}
+
+    \begin{subparag}{Property 1}
+        For a Hilbert space of dimension $d$, we have: 
+        \[0 \leq S\left(\hat{\rho}\right) \leq \ln\left(d\right)\]
+        
+        We moreover have $S\left(\hat{\rho}\right) = 0$ if an only if $\hat{\rho}$ is a pure state, and $S\left(\hat{\rho}\right) = \ln\left(d\right)$ if and only if $\hat{\rho} = \frac{1}{d} \hat{I}$.
+    \end{subparag}
+
+    \begin{subparag}{Property 2}
+        The entropy has the subadditivity property: 
+        \[S\left(\hat{\rho}_{AB}\right) \leq S\left(\hat{\rho}_A\right) + S\left(\hat{\rho}_B\right)\]
+    \end{subparag}
+
+    \begin{subparag}{Property 3}
+        Given a density matrix representing a q-bit, $\hat{\rho} = \frac{1}{2}\left(\hat{I} + \bvec{a} \dotprod \bvec{\hat{\sigma}}\right)$, its entropy is given by: 
+        \[S\left(\hat{\rho}\right) = -\frac{1 + \left\|\bvec{a}\right\|}{2}\ln\left(\frac{1 + \left\|\bvec{a}\right\|}{2}\right) - \frac{1- \left\|\bvec{a}\right\|}{2}\ln\left(\frac{1-\left\|\bvec{a}\right\|}{2}\right)\]
+
+        This can be found directly by solving the following equation, that gives us the eigenvalues $p_1$ and $p_2$ of $\hat{\rho}$: 
+        \[\begin{systemofequations} p_1p_2 = \det\left(\hat{\rho}\right) = \frac{1}{4}\left(1 - \left\|\bvec{a}\right\|^2\right) \\ p_1 + p_2 = \Tr\left(\hat{\rho}\right) = 1 \end{systemofequations}\]
+
+        We then simply have: 
+        \[S\left(\hat{\rho}\right) = -p_1\ln\left(p_1\right) - p_2\ln\left(p_2\right)\]
+        
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Schmidt theorem}
+    If a statistical mixture $\hat{\rho}_{AB}$ is pure, i.e. $\hat{\rho}_{AB} = \ket{\psi}\bra{\psi}$, then $\hat{\rho}_A$ and $\hat{\rho}_B$ have the same eigenvalues with same multiplicity. 
+
+    This notably implies that:
+    \[S\left(\hat{\rho}_A\right) = S\left(\hat{\rho}_B\right)\]
+    
+    This value is named the \important{entanglement entropy} of $\ket{\psi}$. 
+
+    \begin{subparag}{Example}
+        Let us consider a Bell state in $\mathcal{H}_A \otimes \mathcal{H}_B$: 
+        \[\ket{\psi} = \frac{1}{\sqrt{2}} \left(\ket{00} + \ket{11}\right)\]
+        
+        The density matrix in the whole Hilbert space is given by: 
+        \[\hat{\rho}_{AB} = \ket{\psi}\bra{\psi} = \frac{1}{2}\left(\ket{00}\bra{00} + \ket{00}\bra{11} + \ket{11}\bra{00} + \ket{11}\bra{11}\right)\]
+
+        We notice that, using properties of the partial trace: 
+        \[\Tr_{B}\left(\ket{ab}\bra{cd}\right) = \ket{a}\bra{c} \Tr\left(\ket{b}\bra{d}\right) = \ket{a}\bra{c} \braket{d}{b}\]
+        
+        Then, the density matrix in the Hilbert space $\mathcal{H}_A$ is: 
+        \autoeq{\hat{\rho}_A = \Tr_{B}\left(\hat{\rho}_{AB}\right) = \frac{1}{2}\left(\ket{0}\bra{0} \braket{0}{0} + \ket{0}\bra{1} \braket{1}{0} + \ket{1}\bra{0} \braket{0}{1} + \ket{1}\bra{1} \braket{1}{1}\right) = \frac{1}{2}\left(\ket{0}\bra{0} + \ket{1}\bra{1}\right) = \frac{1}{2} \hat{I}}
+        
+        This is the $2\times2$ matrix that has maximum entropy, telling us that this Bell state has maximal entanglement entropy, $\ln\left(2\right)$.
+
+        We can do the same reasoning on the following state, which would have 0 entanglement entropy since it is a product sate: 
+        \[\ket{\psi} = \frac{1}{\sqrt{2}}\left(\ket{00} + \ket{01}\right) =  \ket{0} \otimes \frac{\ket{0} + \ket{1}}{\sqrt{2}}\]
+    \end{subparag}
+\end{parag}
+
+\end{document}
+
