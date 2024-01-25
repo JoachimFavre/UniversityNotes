@@ -1,0 +1,434 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-11-19 at 11:29:14.
+
+\usepackage{../../style}
+
+\title{Algebra}
+\author{Joachim Favre}
+\date{Dimanche 19 novembre 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2023-11-13}{Gollum's favourite subject}{
+\begin{itemize}[left=0pt]
+    \item Definition of commutative ring.
+    \item Definition of zero divisor, and proof that multiplicative inverses are not divisors.
+    \item Definition of fields and integral domains, and proof that the first one implies the second one.
+    \item Definition of ideal.
+    \item Proof of a proposition allowing to generate more ideals from known ideals.
+\end{itemize}
+
+}
+
+\section{Rings and fields}
+\subsection{Definitions}
+
+
+\begin{parag}{Definition: Ring}
+    A ring is a set $A$ with 2 operations $+$ and $\cdot $, satisfying:
+    \begin{enumerate}
+        \item $\left(A, +\right)$ is an abelian group of neutral element $0 \in A$.
+        \item $\cdot $ is associative: 
+        \[a\cdot \left(b\cdot c\right) = \left(a\cdot b\right)\cdot c, \mathspace \forall a,b,c \in A\]
+        \item $\cdot $ has a neutral element $1 \in A$, such that:
+        \[1\cdot a = a\cdot 1 = a, \mathspace \forall a \in A\]
+        \item $\cdot $ distributes on $+$ on the left: 
+        \[a\cdot \left(b+c\right) =  ab + ac, \mathspace \forall a, b, c \in A\]
+
+        And it distributes on the right: 
+        \[\left(a + b\right)\cdot c = ac + bc, \mathspace \forall a, b, c \in A\]
+    \end{enumerate}
+    
+    \begin{subparag}{Remark}
+        We don't require $\cdot $ to have inverses, nor to be commutative.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Commutative ring}
+    Let $\left(A, +, \cdot \right)$ be a ring.
+
+    We say that this is a \important{commutative ring} if the multiplication is commutative, $ab = ba$ for any $a, b \in A$.
+
+    \begin{subparag}{Remark}
+        We will only consider commutative rings in this course.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example 1}
+    $\left(\mathbb{Z}, +, \cdot \right)$ is a commutative ring.
+
+    We notice that some elements don't have a multiplicative inverse. For instance, $2 \in \mathbb{Z}$ but $\frac{1}{2} \not \in \mathbb{Z}$.
+\end{parag}
+
+\begin{parag}{Notation}
+    Let $k \in \mathbb{R}$ and $S$ be some set. We define the following notation: 
+    \[S \left[k\right] = \left\{a + b k \suchthat a, b \in S\right\}\]
+    
+    \begin{subparag}{Observation}
+        We notice that, for any $k \in \mathbb{R}$ and set $S$, then:
+        \[0, 1 \in S\left[k\right]\]
+
+        Indeed, we can just set $b = 0$, and $a \in \left\{0, 1\right\}$.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example 2}
+    Let us consider: 
+    \[A = \mathbb{Z} \left[\sqrt{2}\right] = \left\{a + b \sqrt{2} \suchthat a, b \in \mathbb{Z}\right\}\]
+    
+    This is a ring. Indeed, $0, 1 \in A$. Moreover, addition is closed in $A$: 
+    \[\left(a + b\sqrt{2}\right) + \left(c + d\sqrt{2}\right) = \left(a+c\right) + \left(b+d\right)\sqrt{2} \in A\]
+
+    Any element $a + b\sqrt{2} \in A$ has an additive inverse, $-a - b\sqrt{2} \in A$.
+
+    Multiplication is also closed in $A$: 
+    \[\left(a + b\sqrt{2}\right)\left(c + d\sqrt{2}\right) = \left(ac + 2bd\right) + \sqrt{2}\left(bc + ad\right) \in A\]
+    
+    The other properties come from the fact that we are using the regular additions and multiplications.
+
+    However, we notice that there are no multiplicative inverses in $A$ in general: 
+    \[\frac{1}{a + b\sqrt{2}} = \frac{a - b\sqrt{2}}{a^2 - 2b^2} = \underbrace{\frac{a}{a^2 - 2b^2}}_{\not \in \mathbb{Z} \text{ in general}} - \underbrace{\frac{b}{a^2 - 2b^2}}_{\not\in\mathbb{Z} \text{ in general}}\sqrt{2} \not \in A \text{ in general}\]
+    in general.
+\end{parag}
+
+\begin{parag}{Example 3}
+    Let us consider: 
+    \[B = \mathbb{Q}\left[\sqrt{2}\right] = \left\{a + b\sqrt{2} \suchthat a, b \in \mathbb{Q}\right\}\]
+    
+    It is possible to show that $B$ is a ring such that every non-zero element has a multiplicative inverse (i.e, a field as we will define later).
+\end{parag}
+
+\begin{parag}{Remark}
+    Let $\left(A, +, \cdot \right)$ be a commutative ring, and let $a \in A$ (which is not necessarily an integer). We notice that given $n \in \mathbb{Z}$, it makes sense to consider $n\cdot a$.
+
+    If $n > 0$, we can write: 
+    \[na = a + a + \ldots + a \in A\]
+    
+    If $n < 0$, then: 
+    \[na = -\left(-n\right)a \in A\]
+
+    And, if $n = 0$, then $na = 0$.
+
+    \begin{subparag}{Implication}
+        Many formulas thus hold in commutative rings. For instance, we can show that, for any $a, b \in A$: 
+        \[\left(a+ b\right)^n = \sum_{k=0}^{n} \binom{n}{k} a^k b^{n-k}\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Zero divisor}
+    Let $\left(A, +, \cdot \right)$ be a commutative ring, and $a \in A$.
+
+    $a$ is a \important{zero divisor} if there exists a $x \in A \setminus \left\{0\right\}$ such that: 
+    \[ax = 0\]
+    
+    \begin{subparag}{Trivial zero divisor}
+        For instance, $0 \in A$ is always a zero divisor: 
+        \[0\cdot x = \left(0 + 0\right)\cdot x = 0\cdot x + 0\cdot x \implies 0\cdot x = 0\]
+
+        This is called the \important{trivial} zero divisor.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    The following sets with addition and multiplication are rings without non-trivial zero divisors: 
+    \[\mathbb{Z}, \mathspace \mathbb{R}, \mathspace \mathbb{C}\]
+\end{parag}
+
+\begin{parag}{Example 2}
+    We want to find a ring with non-trivial zero divisors. 
+
+    We can consider the set of equivalence classes modulo $n$: 
+    \[A = \mathbb{Z}/n\mathbb{Z} = \left\{\left[0\right], \ldots, \left[n-1\right]\right\}\]
+
+    This is indeed a ring with addition and multiplication modulo $n$: we do have that $\left(\mathbb{Z}/n\mathbb{Z}, +\right) \simeq \left(C_n, +\right)$ is an abelian group, $\cdot $ is associative, we have the neutral multiplicative element $\left[1\right]$ and multiplication distributes over addition.
+
+    Let $a \in A \setminus \left\{\left[0\right]\right\}$. $a$ is a nontrivial zero divisor if and only if $\gcd\left(a, n\right) > 1$.
+
+    \begin{subparag}{Proof $\implies$}
+        We do this proof by the contrapositive. We thus suppose by hypothesis that $d = \gcd\left(a, n\right) = 1$. We want to show that $a$ is not a zero divisor. By Bézout's theorem, there exists $x, y \in \mathbb{Z}$ such that: 
+        \[ax + ny = 1 \iff \congruent{ax}{1}{n} \iff \left[a\right]\left[x\right] = \left[1\right] \iff \left[x\right] = \left[a\right]^{-1}\]
+        
+        Now, this yields that: 
+        \[\left[b\right]\left[a\right] = \left[0\right] \implies \left[b\right]\underbrace{\left[a\right]\left[x\right]}_{= \left[1\right]} = \left[0\right] \left[x\right] \implies \left[b\right] = \left[0\right]\]
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+         We suppose by hypothesis that $d = \text{gcd}\left(a, n\right) > 1$. We indeed have that $\left[a\right]$ is a nontrivial zero divisor: 
+    \[\left[a\right] \cdot \left[\frac{n}{d}\right] = \left[\frac{an}{d}\right] = \left[\frac{a}{d}\right] \underbrace{\left[n\right]}_{= \left[0\right]} = \left[0\right]\]
+    
+        Indeed, because $d > 1$, we do have that $\left[\frac{n}{d}\right] \neq \left[0\right]$.
+    \end{subparag}
+    
+    \begin{subparag}{Observation}
+        An element $\left[a\right] \in \mathbb{Z}/n\mathbb{Z}$ is thus either a zero divisor, or invertible.
+
+        This tells us that we have $n - \phi\left(n\right)$ zero divisors in $\mathbb{Z}/n\mathbb{Z}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Integral domain}
+    Let $\left(A, +, \cdot \right)$ be a commutative ring.
+
+    If the only zero divisor of $A$ is the trivial zero divisor, then $A$ is called an \important{integral domain}.
+\end{parag}
+
+\begin{parag}{Definition: Field}
+    Let $\left(A, +, \cdot \right)$ be a commutative ring.
+
+    It is called a \important{field} if all non-zero elements have multiplicative inverses. In other words, for any $a \in A \setminus \left\{0\right\}$, there exists a $b \in A$ such that $ab = 1$.
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $n \in \mathbb{N}_{\geq 2}$. We have that:
+    \begin{enumerate}
+        \item $\left(\mathbb{Z}/n\mathbb{Z}, +, \cdot \right)$ has non-trivial zero divisors if and only if $n \not \in \mathbb{P}$ is not a prime.
+        \item $\left(\mathbb{Z}/n\mathbb{Z}, +, \cdot \right)$ is a field if and only if $n \in \mathbb{P}$ is a prime.
+    \end{enumerate}
+
+    \begin{subparag}{Proof 1}
+        We see that the following propositions are equivalent:
+        \begin{itemize}
+            \item There exists a nontrivial zero divisor, $a \in \mathbb{Z}/n\mathbb{Z} \setminus \left\{\left[0\right]\right\}$.
+            \item There exists some $a$ such that $1 \leq a \leq n-1$ and $\gcd\left(a, n\right) > 1$, by our previous example.
+            \item There exists some $a$ such that $1 \leq a \leq n-1$, and $n$ is divisible by $a$.
+            \item $n$ is not a prime.
+        \end{itemize}
+    \end{subparag} 
+
+    \begin{subparag}{Proof 2}
+        We see that the following propositions are equivalent:
+        \begin{itemize}
+            \item $n$ is a prime.
+            \item For any $\left[b\right] \in \mathbb{Z}$, we have $\gcd\left(b, n\right) = 1$.
+            \item Any $\left[b\right] \in \mathbb{Z}$ has a multiplicative inverse.
+            \item $\mathbb{Z}/n\mathbb{Z}$ is a field, by definition. 
+        \end{itemize}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    Let us consider: 
+    \[\mathbb{Z}/5\mathbb{Z} = \left\{\left[0\right], \left[1\right], \left[2\right], \left[3\right], \left[4\right]\right\}\]
+    
+    Since $5$ is prime, this is a field. Thus, all elements different from $\left[0\right]$ have a multiplicative inverse: 
+    \[\left[1\right]^{-1} = \left[1\right], \mathspace \left[2\right]^{-1} = \left[3\right], \mathspace \left[3\right]^{-1} = \left[2\right], \mathspace \left[4\right]^{-1} = \left[4\right]\]
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let us consider $\mathbb{Z}/6\mathbb{Z}$. We notice that $\left[2\right]\left[3\right] = \left[0\right]$, and thus it is not an integral domain.
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\left(A, +, \cdot \right)$ be a commutative ring, and $a \in A$.
+
+    If $a$ has a multiplicative inverse, then $a$ is not a zero divisor.
+
+    \begin{subparag}{Proof}
+        We know by hypothesis that there exists some $a^{-1} \in A$ such that $aa^{-1} = 1$.
+
+        Now, let's suppose that $ab = 0$. This yields that: 
+        \[0 = a^{-1} 0 = a^{-1} ab = b\]
+        
+        Thus, $a$ is not a zero-divisor by definition.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Converse}
+        The converse is wrong. For instance, in $\mathbb{Z}$, $2$ is neither a zero-divisor nor inversible.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Proposition}
+    Let $\left(A, +, \cdot \right)$ be a commutative ring.
+
+    If it is a field, then it is an integral domain.
+
+    \begin{subparag}{Proof}
+        We know that all non-zero element of a field are invertible, so they aren't zero divisors. This shows that $A$ is an integral domain.
+    \end{subparag}
+
+    \begin{subparag}{Converse}
+        The converse is false: $\mathbb{Z}$ is an integral domain, but not a field.
+
+        However, as we showed earlier, $A = \mathbb{Z}/n\mathbb{Z}$ is an integral domain if and only if it is a field.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    We have thus found the following inclusions:
+    \[\text{Fields} \subset \text{Integral domains} \subset \text{Commutative rings}\]
+\end{parag}
+
+\subsection{Ideals}
+
+\begin{parag}{Definition: Ideal}
+    Let $A$ be a commutative ring, and $I \subset A$.
+
+    $I$ is called an \important{ideal} if it has the following properties:
+    \begin{enumerate}
+        \item $\left(I, +\right)$ is a subgroup of $\left(A, +\right)$.
+        \item For any $x \in A$ and $a \in I$, then $xa \in I$.
+    \end{enumerate}
+\end{parag}
+
+\begin{parag}{Proposition: Trivial ideal}
+    Let $\left(A, +, \cdot \right)$ be a commutative ring.
+
+    Then, $\left\{0\right\}$ is an ideal, named the \important{trivial ideal}.
+\end{parag}
+
+\begin{parag}{Proposition: Non-proper ideal}
+    Let $\left(A, +, \cdot \right)$ be a commutative ring.
+
+    Then, $A$ is an ideal, named the \important{non-proper ideal}.
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the ring $A = \mathbb{Z}$, and let $d \in \mathbb{Z}$. 
+
+    Then, the following is an ideal: 
+    \[d\mathbb{Z} = \left\{dk \suchthat k \in \mathbb{Z}\right\} \subset \mathbb{Z}\]
+    
+    $\left(d\mathbb{Z}, +\right)$ is indeed a subgroup since this is closed under addition, it contains $0$, and it contains additive inverses. It moreover also follows the multiplicative property: 
+    \[da \cdot  x \in d\mathbb{Z}, \mathspace \forall x \in \mathbb{Z}\]
+\end{parag}
+
+\begin{parag}{Properties}
+    Let $A$ be a commutative ring, and let $I, J \subset A$ be ideals.
+
+    Then:
+    \begin{enumerate}
+        \item If $1 \in I$, then $I = A$.
+        \item $I \cap J$ is an ideal.
+        \item $I + J \over{=}{def} \left\{x + y \suchthat x \in I, Y \in J\right\}$ is an ideal.
+        \item $\displaystyle  I\cdot J \over{=}{def} \left\{\sum_{i=1}^{k} x_i y_i \suchthat x_i \in I, y_i \in J, k \in \mathbb{N}\right\} \subset A$ is an ideal.
+    \end{enumerate}
+    
+    \begin{subparag}{Proof 1}
+        Let $a \in A$ be arbitrary. Since $1 \in I$ by hypothesis, we know by the multiplicative property that: 
+        \[1\cdot a \in I \implies a \in I\]
+        
+        Thus, $A \subset I$. Since we always have $I \subset A$, this yields that $A = I$.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        Let $I, J$ be ideals in $A$, and let $x, y \in I \cap J$.
+
+        We first notice that $\left(I \cap J, +\right)$ is indeed an additive subgroup:
+        \begin{enumerate}
+            \item Since $\left(I, +\right)$ and $\left(J, +\right)$ are additive subgroups, we know that $x+y \in I$ and $x + y \in J$. This implies by set theory that $x + y \in  I \cap J$.
+            \item By a similar reasoning, we know that $-x \in I$ and $-x \in J$. This indeed means that $-x \in I \cap J$.
+            \item By the exact same reasoning, we get $0 \in I \cap J$. 
+        \end{enumerate}
+        
+        We still need to show the multiplicative property. Let $a \in A$. We know that $ax \in I$ and $ax \in J$ since they are ideals. This indeed means that $ax \in I \cap J$.
+    \end{subparag}
+
+    \begin{subparag}{Proof 3}
+        Let $I, J$ be ideals in $A$, let $x_1 + x_2, y_1 + y_2 \in I + J$. 
+
+        This closed under addition: 
+        \[x_1 + x_2 + y_1 + y_2 = \underbrace{x_1 + y_1}_{\in I} + \underbrace{x_2 + y_2}_{\in J}\]
+
+        We can check the other properties to show that $I + J$ is an additive subgroup.
+
+        Now, let's consider the multiplicative property. Let $a \in A$ . Then: 
+        \[a\left(x + y\right) = \underbrace{ax}_{\in I} + \underbrace{ay}_{\in J} \in I + J\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 4}
+        Let $I, J$ be ideals in $A$.
+
+        We directly see that $I\cdot J$ is closed with respect to addition. We can check all other properties to see that this is an additive subgroup.
+
+        Now, let's check the multiplicative property. Let $a \in A$. We have: 
+        \[a \sum_{i=1}^{k} x_i y_i = \sum_{i=1}^{k} \underbrace{\left(a x_i\right)}_{\in I}y_i = \sum_{i=1}^{k} z_i y_i \in I J\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    Let $A$ be a commutative ring, and let $I, J \subset A$ be ideals.
+
+    Then, $I \cup J$ is not necessarily an ideal.
+
+    \begin{subparag}{Proof}
+        We want to show that $I \cup J$ is not an additive subgroup in general. We do this using a counter-example.
+
+        Let $I = 3\mathbb{Z} \subset \mathbb{Z}$ and $J = 5\mathbb{Z} \subset \mathbb{Z}$. Then, $I \cup J$ is the multiples of 3 and the ones of 5: 
+        \[I \cup J = \left\{0, \pm 3, \pm 5, \pm 6, \pm 9, \pm 10, \ldots\right\}\]
+        
+        However, $3 + 5 = 8 \not \in I \cup J$. It is thus not an additive subgroup, and not an ideal.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let $A = \mathbb{Z}$, $I = 6\mathbb{Z}$ and $J = 10\mathbb{Z}$. Then, the following are ideals:
+    \begin{enumerate}
+        \item $\displaystyle I \cap J = \left\{z \in \mathbb{Z} \suchthat z = 6n \text{ and } z = 10m; n, m \in \mathbb{Z}\right\} = \lcm\left(6, 10\right)\mathbb{Z} = 30 \mathbb{Z}$.
+        \item $\displaystyle I + J = \left\{6n + 10m \suchthat n, m \in \mathbb{Z}\right\} = \text{gcd}\left(6, 10\right)\mathbb{Z} = 2\mathbb{Z}$, by Bézout's theorem.
+        \item $\displaystyle IJ = \left\{\sum_{i=1}^{k} 6x_i\cdot 10y_i \suchthat x_i, y_i \in \mathbb{Z}\right\} = \left\{60 \sum_{i=1}^{k} x_i y_i \suchthat x_i, y_i \in \mathbb{Z}\right\} = 60 \mathbb{Z}$
+    \end{enumerate}
+
+    \begin{subparag}{Generalisation}
+        We can generalise our result. Let $n, m \in \mathbb{Z}^*$. The ideals $I = n\mathbb{Z}$ and $J = m\mathbb{Z}$ generate:
+        \begin{enumerate}
+            \item $I \cap J = \text{lcm}\left(n, m\right)\mathbb{Z}$
+            \item $I + J = \text{gcd}\left(n, m\right)\mathbb{Z}$
+            \item $IJ = nm\mathbb{Z}$
+        \end{enumerate}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    Let $I, J \subset A$ be two ideals. Then: 
+    \[IJ \subset I \cap J \subset I \subset I + J\]
+    
+    By symmetry, we naturally also have 
+    \[IJ \subset I \cap J \subset J \subset I + J\]
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the set of polynomials in one variable with real coefficients: 
+    \[A = \mathbb{R}\left[x\right] = \left\{a_0 + a_1 x + \ldots + a_n x^n \suchthat a_0, \ldots, a_n \in \mathbb{R}, n \in \mathbb{N}\right\}\]
+   
+    This is indeed a commutative ring: it closed under addition and multiplication, which are commutative and associative, and we have additive inverses.
+
+    We can consider the set of polynomials divisible by $\left(x+5\right)$: 
+    \[I = \left\{\left(x+5\right)f\left(x\right) \suchthat f\left(x\right) \in \mathbb{R}\left[x\right]\right\}\]
+
+    And, similarly, the set of polynomials divisible by $\left(x^2 + 2\right)$: 
+    \[J = \left\{\left(x^2 + 2\right) f\left(x\right) \suchthat f\left(x\right) \in \mathbb{R}\left[x\right]\right\}\]
+    
+    It is possible to verify that $I$ and $J$ are indeed ideals. Then, the following are ideals:
+    \begin{enumerate}
+        \item $I \cap J = \left\{\left(x + 5\right)\left(x^2 + 2\right)f\left(x\right) \suchthat f\left(x\right) \in \mathbb{R}\left[x\right]\right\}$
+        \item $IJ$ is expressed as:
+        \autoeq{IJ = \left\{\sum_{i=1}^{k} \left(x+5\right) f_i\left(x\right)\left(x^2 + 2\right)g_i\left(x\right) \suchthat f_i\left(x\right), g_i\left(x\right) \in \mathbb{R}\left[x\right]\right\} = \left\{\left(x+5\right)\left(x^2 + 2\right)f\left(x\right) \suchthat f\left(x\right) \in \mathbb{R}\left[x\right]\right\}}
+
+        \item $I + J = \left\{\left(x + 5\right)f\left(x\right) + \left(x^2 + 2\right)g\left(x\right) \suchthat f\left(x\right), g\left(x\right) \in \mathbb{R}\left[x\right]\right\}$. It seems like this ideal contains many element, so we want to see if it contains 1, to see if it is not proper. To compensate with the $x^2$, we can let $f\left(x\right)$ be degree one and $g\left(x\right)$ be degree zero. We can thus solve the following equation: 
+        \[\left(x+5\right)\left(ax + b\right) + \left(x^2 + 2\right)c = 1\]
+        
+        Doing so, we get that: 
+        \[\left(x + 5\right)\left(x-5\right)\frac{-1}{27} - \left(x^2 + 2\right)\left(\frac{-1}{27}\right) =  1 \in \mathbb{R}\left[x\right]\]
+        
+        Thus, $I + J = \mathbb{R}\left[x\right]$.
+    \end{enumerate}
+
+    In some form, it would make sense to say that $\text{gcd}\left(x+5, x^2 + 2\right) = 1$. We will dig into this later.
+\end{parag}
+
+
+\end{document}

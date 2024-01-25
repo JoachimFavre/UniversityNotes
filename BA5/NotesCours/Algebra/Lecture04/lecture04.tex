@@ -1,0 +1,299 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-10-20 at 20:23:17.
+
+\usepackage{../../style}
+
+\title{Algebra}
+\author{Joachim Favre}
+\date{Vendredi 20 octobre 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2023-10-16}{Defining normality mathematically}{
+\begin{itemize}[left=0pt]
+    \item Definition of normal subgroup.
+    \item Definition of the kernel of a homomorphism, and proof that it is a normal subgroup.
+    \item Definition of image of a homomorphism, and proof that it is a subgroup.
+    \item (Very) quick introduction to elliptic curves.
+    \item Definition of the group of rigid symmetries of a flat regular $n$-gon, and proof of its representation in generators and relations.
+    \item Definition of quotient groups, and proof that they make sense for normal subgroups.
+\end{itemize}
+
+}
+
+
+\begin{parag}{Definition: Kernel}
+    Let $\phi: G \mapsto H$ be a homomorphism.
+
+    Its \important{kernel} is the set of elements $g \in G$ such that $\phi\left(g\right) = 1_H$.
+
+    \begin{subparag}{Example}
+        For instance, considering the previous example: 
+        \[\ker \phi_1 = \left\{1, q^4\right\}\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $\phi: G \mapsto H$ be a group homomorphism.
+
+    Then, $\ker \phi \subset G$ is a subgroup.
+
+    \begin{subparag}{Proof}
+        \begin{itemize}[left=0pt]
+            \item We first notice that the identity belongs to the kernel. Indeed, $\phi\left(1\right) = 1$, and thus $1 \in \ker \phi$.
+            \item It is closed under the group operation. Indeed, if $a, b \in \ker \phi$, it means that $\phi\left(a\right) = 1$ and $\phi\left(b\right) = 1$. This implies that $\phi\left(ab\right) = \phi\left(a\right)\phi\left(b\right) = 1$, and thus that $ab \in \ker \phi$.
+            \item It is also closed under the inverse. Indeed, if $a \in \ker \phi$, it means that $\phi\left(a\right) = 1$. This implies that $\phi\left(a^{-1}\right) = \phi\left(a\right)^{-1} = 1$, and thus $a^{-1} \in \ker \phi$.
+        \end{itemize}
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Normal subgroup}
+    Let $G$ be a group, and $H \subset G$ be a subgroup.
+
+    $H$ is a \important{normal subgroup}, written $H \normalsubgroup G$, if for any $h \in H$ and $g \in G$, we have:
+    \[g h g^{-1} \in H\]
+
+    \begin{subparag}{Remark}
+        We will justify the usefulness of this definition a bit after, showing that normal subgroups allow us to create new groups out of cosets.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        Let $G$ be Abelian group, and $H \subset G$ be a subgroup.
+
+        Then, $H$ is a normal subgroup: 
+        \[g h g^{-1} = g g^{-1} h = h \in H, \mathspace \forall h \in H, g \in G\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $\phi: G \mapsto H$ be a group homomorphism.
+
+    Then, $\ker \phi \normalsubgroup G$ is a normal subgroup.
+
+    \begin{subparag}{Proof}
+        Let $h \in \ker \phi$ and $g \in G$ be both arbitrary.
+
+        To show that $g h g^{-1} \in \ker \phi$, we want to show that $\phi\left(g h g^{-1}\right) = 1$. And, indeed:
+        \[\phi\left(g h g^{-1}\right) = \phi\left(g\right)\underbrace{\phi\left(h\right)}_{= 1}\phi\left(g^{-1}\right) = \phi\left(g\right)\phi\left(g\right)^{-1} = 1\]
+        since $h \in \ker \phi$ and thus $\phi\left(h\right) = 1$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Image}
+    Let $\phi: G \mapsto H$ be a group homomorphism.
+
+    Its \important{image} is $\phi\left(G\right) = \left\{h \in H | \exists g \in G, \phi\left(g\right) = h\right\}$, the set of all elements that it reaches.
+
+    \begin{subparag}{Example}
+        In our previous example, we had: 
+        \[\phi_2\left(C_8\right) = \left\{1, t^2\right\}\]
+        
+    \end{subparag}
+    
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $\phi: G \mapsto H$ be a homomorphism.
+
+    Its image $\phi\left(G\right)$ is a subgroup of $H$.
+
+    \begin{subparag}{Proof}
+        \begin{itemize}[left=0pt]
+            \item We notice that the identity is in the image. Indeed, $\phi\left(1_G\right) = 1_H$.
+            \item This is moreover closed under the group operation. Indeed, if $a_1, a_2 \in \phi\left(G\right)$, then there exists $g_1, g_2 \in G$ such that $a_1 = \phi\left(g_1\right)$ and $a_2 = \phi\left(g_2\right)$. Now, $g = g_1 g_2$ is such that: 
+            \[\phi\left(g\right) = \phi\left(g_1\right)\phi\left(g_2\right) = a_1 a_2\]
+            
+            This shows that $a_1 a_2 \in \phi\left(G\right)$.
+            \item This is finally closed under the inverse. Indeed, if $a \in \phi\left(G\right)$, then there exists a $g \in G$ such that $\phi\left(g\right) = a$. However, $g^{-1}$ is such that $\phi\left(g^{-1}\right) = \phi\left(g\right)^{-1} = a^{-1}$, showing that $a^{-1} \in \phi\left(G\right)$.
+        \end{itemize}
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        In general, the image is not a normal subgroup.
+    \end{subparag}
+\end{parag}
+
+\subsection{Elliptic curves}
+
+\begin{parag}{Remark}
+    The following introduction will be very brief. However, elliptic curves represent a very broad area of maths, which is very useful.
+\end{parag}
+
+
+\begin{parag}{Definition: Elliptic curve}
+    An \important{elliptic curve} is a curve for which there exists some $a, b \in \mathbb{R}$ such that it satisfies the following equation: 
+    \[y^2 = x^3 + ax + b\]
+
+    \begin{subparag}{Property}
+        We notice that it is always symmetric along the $x$ axis, since $y$ is squared.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Elliptic curve group}
+    Let us consider some elliptic curve. Both the real points and the rational points on this elliptic curve has a group structure.
+
+    Given two elements $P, Q$ on the curve, we introduce an operation $+$, which is such that $P + Q = -R$ if and only if $P, Q, R$ are collinear. This has the following properties:
+    \begin{itemize}[left=0pt]
+        \item The zero is at $x \to \infty$. It is such that $P + 0 = 0 + P = P$.
+        \item $-P$ is the point symmetric with respect to the horizontal axis.
+    \end{itemize}
+    
+    This is (somehow) an associative law.
+\end{parag}
+
+\begin{parag}{Lenstra's algorithm}
+    Let $n \in \mathbb{N}$, we want to factorise it using elliptic curves.
+
+    \begin{enumerate}[left=0pt]
+        \item We pick an elliptic curve $y^2 = x^3 + ax + b$ over $\mathbb{Z}/n\mathbb{Z}$, and a point $P\left(x_0, y_0\right)$ on it.
+        \item We compute $2P, 3! P, \ldots, k! P$ for some integer $k > 0$. This only involves computing operations $2Q$ which are easy to do on a computer. For instance: 
+        \[3! P = 3 \cdot  2P = 2\cdot 2P + 2P\]
+        
+        This operation involves computing slopes of lines modulo $n$. This only makes sense if $v$ is invertible modulo $n$, meaning $\gcd\left(n, v\right) = 1$. Thus, if the operation fails, it means that $\gcd\left(n, v\right) > 1$ and thus that we have found a non-trivial factor of $n$. Otherwise, we change slightly the elliptic curve.
+    \end{enumerate}
+    
+    This method is very efficient, and its asymptotic time is sub-exponential in $\log\left(n\right)$.
+\end{parag}
+
+\subsection{Dihedral groups}
+
+\begin{parag}{Definition: Group of rigid symmetries}
+    The \important{group of rigid symmetries of a flat regular $n$-gon} is written $D_n$. The group law is composition: a rotation of angle $\pi$ followed by a rotation of angle $\frac{\pi}{2}$ is a rotation of angle $\frac{3\pi}{2}$.
+
+    In other words, it is the group of operations (rotations and axial symmetries) we can do, which will yield the same shape.
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider $D_4$. We thus want to find the symmetries of a square.
+
+    We can rotate the square by angles $0$, $\frac{\pi}{2}$, $\pi$ and $\frac{3\pi}{2}$, which we write $1, r, r^2, r^3$. We can also take axial reflections, along the $x$-axis, the $y$-axis and the two diagonals, which we write $s_1, s_2, s_3, s_4$.
+    \imagehere[0.3]{SymmetriesSquare.png}
+
+    Thus, we have $\left|D_4\right| = 8$.
+\end{parag}
+
+\begin{parag}{Remark}
+    $D_n$ is not an Abelian group.
+
+    Let us consider $D_4$. We label the vertices of our square to be able to know if two transformations are equal. We notice that the following transformations are not commutative, showing $rs \neq sr$:
+    \imagehere[0.6]{DihedralIsNotAbelian.png}
+\end{parag}
+
+\begin{parag}{Proposition}
+    The number of elements in $D_n$ is $2n$.
+
+    \begin{subparag}{Proof}
+        We label all the vertices of our polygon from $1$ to $n$. We can pick a transformation that sends vertex $1$ to any of the $n$ other places. Then, the vertex 2 needs to stay next to the first one, giving 2 possibilities. This yields that $\left|D_n\right| \leq 2$.
+
+        However, we are able to construct $2n$ different operations with the $n$ rotations (including the one of angle 0), and the $n$ symmetries. This shows that $\left|D_n\right| \geq 2n$.
+
+        We can therefore indeed conclude that $\left|D_n\right|= 2$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Relation}
+    Let $s$ be a reflection through a vertex, and $r_{\frac{2\pi}{n}}$ be a counterclockwise rotation of angle $\frac{2\pi}{n}$. We can see that $srs = r^{-1}$:
+    \imagehere[0.8]{Dihedral_SRS_Rinv.png}
+
+    We thus deduce the first relation, $srs = r \iff \left(sr\right)^2 = 1$.
+\end{parag}
+
+\begin{parag}{Proposition: Presentation in generators and relations}
+    $D_n$ admits the following presentation in generators and relations: 
+    \[D_n = \braket{r,s}{r^n = 1, s^2 = 1, srs = r^{-1}}\]
+
+    Moreover, the elements of $D_n$ can be written as: 
+    \[D_n = \left\{1, r, \ldots, r^{n-1}, s, sr, \ldots, sr^{n-1}\right\}\]
+
+    \begin{subparag}{Proof idea}
+        We noticed that $sr = r^{-1} s$. Thus, any product $s ^{i_1} r^{i_2} s ^{i_3} \cdots$ can be written in the form $s^a r^b$. Now, we know that $s^2 = 1$, telling us that: 
+        \[D_n = \left\{r^i, s r^j | \left(i, j\right) \in \left\{0, 1, \ldots, n-1\right\} \times \left\{0, 1, \ldots, n-1\right\}\right\}\]
+        
+        It is possible to show that any additional relation will reduce the number of elements. However, we already have $2n$ elements and we showed that $\left|D_n\right| = 2n$. Therefore, it is impossible that there is another relation.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Subgroup of rotations}
+    Let $R = \left\langle r \right\rangle = \left\{1, \ldots, r^{n-1}\right\} \subset D_n$. It is a normal subgroup, the \important{subgroup of rotations}.
+
+    \begin{subparag}{Normal subgroup}
+        We want to show that $g r^k g^{-1} = r^j$ for any $g \in D_n$. If $g = r^i$, this is easy: 
+        \[r^{i} r^k r^{-i} = r^{i + k + -i} = r^k \in R\]
+        
+        If $g = s$, we use the fact that $s^2 = 1$ (which notably implies that $s ^{-1} = s$) and $s r s = r^{-1}$: 
+        \[s  r^k s ^{-1} = s \underbrace{r r \cdots r}_{k \text{ times}} s = s \underbrace{r s^2 r s^2 \cdots s^2 r}_{k \text{ times}} s = \left(srs\right)^k = r^{-k} = r^{n -k}\in R\]
+
+        We can make a similar proof if $g = s r^i$.
+    \end{subparag}
+    
+    \begin{subparag}{Cosets}
+        We notice that it has two cosets: 
+        \[1R = \left\{1, r, \ldots, r^{n-1}\right\}\]
+        \[sR = \left\{s, sr, \ldots, sr^{n-1}\right\}\]
+        
+        They are indeed all since $\left|1R\right| = \left|sR\right|= n$, so there must only be 2 of them.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Subgroup of symmetry}
+    Let $K = \left\langle s \right\rangle = \left\{1, s\right\} \subset D_n$.
+
+    This is a subgroup, but not a normal one. Indeed, since $sr^{-1} = rs$, we know that $r s r ^{-1} = rr s = r^2 s \not \in K$.
+\end{parag}
+
+\subsection{Quotient groups}
+
+\begin{parag}{Quotient group}
+    If $H \normalsubgroup G$ is normal, then the set of left $H$-cosets in $G$ naturally form a group, named the \important{quotient group} and written $G / H$. We define $\left(xH\right)\left(yH\right) = xyH$ where $1H$ is the neutral element and $x^{-1}H$ is the inverse.
+
+    However, the choice of the representative $z$ of $zH$ is ambiguous, so we need to show this makes sense.
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $H \normalsubgroup G$ be normal.
+
+    The product on cosets is well defined and defines a group structure of the set of cosets.
+
+    \begin{subparag}{Proof}
+        We need to check that the product does not depend on the choice of the representation.
+
+        Let $x' \in xH$ and $y' \in yH$. We know by definition that there exists some $h_1, h_2 \in H$ such that $x' = xh_1$ and $y' = yh_2$. We want to show that $x' y' \in xy H$: 
+        \[x' y' = x h_1 y h_2 = x y \underbrace{y^{-1} h y}_{= h_3} h_2 = xy h_3 h_2 \in xy H\]
+        where we used that $h_3 \in H$ since $H$ is normal.
+
+        Since $x' y' \in xy H$, this shows that we cannot get a different result for this operation by choosing different representatives of our cosets.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the cosets of $R = \left\{1, r, \ldots, r^{n-1}\right\}$ in $D_n$. We saw that they were: 
+    \[1R = \left\{1, r, \ldots, r^{n-1}\right\}, \mathspace sR = \left\{s, sr, \ldots, sr^{n-1}\right\}\]
+    
+    We consider the quotient group $D_n / R$. It has 2 elements, which are $1R$ and $sR$. As mentioned earlier, the operation is the product of their representations, and the neutral element is $1 R$.
+
+    For instance: 
+    \[\left(1R\right)\left(sR\right) = sR, \mathspace \left(sR\right)\left(sR\right) = s^2 R = 1R\]
+
+    We can verify that this works picking any representative of the cosets. For instance, for $\left(sR\right)\left(1R\right) = \left(sR\right)$, let $g_1 \in sR$ and $g_2 \in 1R$. Then: 
+    \[g_1 g_2 = \underbrace{s r^i}_{\in sR} \underbrace{r^j}_{\in 1R} = s r^{i + j} \in sR\]
+
+    This indeed shows that $\left(g_1 R\right)\left(g_2 R\right) = sR$, and is non-ambiguous.
+
+    \begin{subparag}{Remark}
+        It is possible to show that there exists only one group of 2 elements (this directly comes from the fact that we need an identity and an inverse for all elements). Our quotient group is thus isomorphic to $D_n / R \simeq C_2 = \braket{t}{t^2 = 1} = \left\{1, t\right\}$. In that case, $\phi\left(1\right) = 1R$ and $\phi\left(t\right) = sR$.
+    \end{subparag}
+\end{parag}
+
+\end{document}

@@ -1,0 +1,369 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-10-02 at 15:19:49.
+
+\usepackage{../../style}
+
+\title{Algebra}
+\author{Joachim Favre}
+\date{Lundi 02 octobre 2023}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2023-10-02}{AICC 2}{
+    \begin{itemize}[left=0pt]
+    \item Explanation of the RSA cryptosystem.
+    \item Definition of groups and order.
+    \item Definition of subgroups.
+    \item Definition of left cosets, and of index.
+    \item Proof of Lagrange's theorem, and some corollaries.
+\end{itemize}
+    
+}
+
+\section{Groups}
+
+\begin{parag}{RSA}
+    Groups are very useful for the RSA cryptosystem. The algorithm goes as follows:
+    \begin{enumerate}
+        \item We choose two large distinct primes $p, q$.
+        \item Let $m = pq$. We notice that we can easily compute $\phi\left(m\right) = \left(p-1\right)\left(q-1\right)$.
+        \item We choose some $e \leq m-1$ such that $\gcd\left(e, \phi\left(m\right)\right) = 1$.
+        \item We use the Euclidean algorithm to find a $d \leq m-1$ such that $ed - k \phi\left(m\right) = 1$ for some $k \in \mathbb{Z}$.
+        \item We finally publish the encoding key $\left(m, e\right)$ and keep secret the decoding key $\left(m, d\right)$.
+    \end{enumerate}
+    
+    Let's say that Bob wants to send a secret message to Alice. The message is a number $x$ such that $0 \leq x \leq m - 1$.
+
+    Alice previously published the encoding key $\left(m, e\right)$ and kept the decoding key $\left(m, d\right)$. Bob uses the public key to compute $y = x^e \Mod m$, and sends $y$ publicly to Alice. It is very hard to inverse this function (this problem is called the Discrete logarithm problem), so this is secure. Alice can finally recover $x = y^d \Mod m$. Other people cannot do that since it is very hard to compute $d$ from $m$, because it is hard to compute $\phi\left(m\right)$ (this comes from the difficulty to compute the prime factorisation of a number).
+    
+    To show that this algorithm works, we need to show that: 
+    \[x^{ed} \Mod m = x, \mathspace \forall x \in \left\{0, 1, \ldots, m-1\right\}\]
+    
+    This is done by group theory.
+\end{parag}
+
+\subsection{Definitions}
+
+\begin{parag}{Definition: Group}
+    A \important{group} is a non-empty set $G$ together with a binary operation $\cdot: G \times G \mapsto G$, satisfying the following axioms:
+    \begin{itemize}
+        \item (Associativity) For any $a, b, c \in G$:
+        \[\left(a\cdot b\right)\cdot c = a\cdot \left(b\cdot c\right)\]
+        \item (Existence of a neutral element) There exists some $1 \in G$, such that, for any $a \in G$:
+        \[1\cdot a = a\cdot 1 = a\]
+        \item (Existence of the inverse) For any $a \in G$, there exists some $a^{-1} \in G$ such that:
+        \[a^{-1} \cdot a = a\cdot a^{-1} = 1\]
+    \end{itemize}
+
+    We write groups $G$, $\left(G, \cdot \right)$ or $\left(G, \cdot , 1\right)$.
+\end{parag}
+
+\begin{parag}{Definition: Order}
+    Let $\left(G, \cdot \right)$ be a group. 
+
+    It is said to be \important{finite} if $\left|G\right| < \infty$. In this case, we name $\left|G\right|$ to be the order of the group.
+\end{parag}
+
+\begin{parag}{Definition: Abelian group}
+    Let $\left(G, \cdot \right)$ be a group.
+
+    It is said to be \important{Abelian} (or commutative) if it also follows the following property, for any $a, b \in G$: 
+    \[a\cdot b = b\cdot a\]
+\end{parag}
+
+\begin{parag}{Examples}
+    We have the following examples:
+    \begin{enumerate}
+        \item $\left(\mathbb{R}, +, 0\right)$ is an infinite Abelian group. For any $x \in \mathbb{R}$, the inverse in this group is $-x$.
+        \item $\left(\mathbb{Z}, +, 0\right)$ is another infinite Abelian group.
+    \end{enumerate}
+\end{parag}
+
+\begin{parag}{Definition: Integers modulo $n$}
+    The set of integers modulo $n$ is written $\mathbb{Z} / n\mathbb{Z}$. Its elements are equivalence classes of the equivalence relation of numbers modulo $n$: 
+    \[\mathbb{Z} / n \mathbb{Z} = \left\{\left[0\right], \ldots, \left[n-1\right]\right\}\]
+\end{parag}
+
+\begin{parag}{Definition: Cyclic group of order $n$}
+    We notice that $\left(\mathbb{Z} / n\mathbb{Z}, +_m\right)$ where $+_m$ is the addition modulo $m$, is an Abelian group of order $n$. The inverse of an element $\left[k\right]$ is $\left[n-k\right]$.
+
+    This is named the \important{cyclic group of order $n$}, written $C_n$
+
+    \begin{subparag}{Example}
+        For instance, in $\mathbb{Z} / 12 \mathbb{Z} = \left\{\left[0\right], \ldots, \left[11\right]\right\}$, we have: 
+        \[\left[7\right] + \left[5\right] = \left[12\right], \mathspace \left[10\right] + \left[3\right] = \left[1\right]\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    All sets are not Abelian. Indeed, let us consider the group $GL_{n}\left(\mathbb{R}\right)$, which is the set of real $n \times n$ matrices with non-zero determinant with respect to matrix multiplication.
+
+    There is indeed a neutral element---the identity matrix---the operation is indeed associative, and they all have inverses. However, this group is non-abelian since matrix multiplication is not commutative in general. 
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $n \in \mathbb{Z}^*$ and $a \in \mathbb{Z}$. 
+
+    $a$ has an inverse with respect to the multiplication modulo $n$ if and only if: 
+    \[\gcd\left(a, n\right) = 1\]
+    
+    \begin{subparag}{Proof}
+        The existence of some $x \in \mathbb{Z}$ such that $ax \Mod n = 1$ is equivalent to the existence of $x, y \in \mathbb{Z}$ such that $ax + ny = 1$. However, by Bézout's theorem, this is equivalent to: 
+        \[\gcd\left(a, n\right) = 1\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Observation}
+    Let $G = \left(\mathbb{Z}/{n}\mathbb{Z}, \cdot, 1\right)^*$ be the group of invertible numbers with respect to the multiplication mod $n$. By our proposition, this is of the form:
+    \[G = \left\{1 \leq x \leq n | \gcd\left(x, n\right) = 1\right\}\]
+
+    Thus, by definition of $\phi\left(n\right)$, this yields that the order of $G$ is: 
+    \[\left|G\right| = \phi\left(n\right)\]
+    
+    We thus see that this is a finite Abelian group of order $\phi\left(n\right)$, and with identity $\left[1\right]$.
+\end{parag}
+
+\subsection{Subgroups and cosets}
+
+\begin{parag}{Definition: Subgroup}
+    Let $\left(G, \cdot, 1 \right)$ be a group, and $H \subset G$ be a subset of $G$.
+
+    $H$ is a \important{subgroup} of $G$ if $H$ is such that:
+    \begin{enumerate}
+        \item $1 \in H$
+        \item For any $a, b \in H$, then $a\cdot b \in H$.
+        \item For any $a \in H$, then $a^{-1} \in H$.
+    \end{enumerate}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $G$ be a group and $H \subset G$ be a subgroup. 
+
+    Then, $H$ is a group.
+\end{parag}
+
+\begin{parag}{Example 1}
+    We noticed that $\left(GL_{n}\left(\mathbb{R}\right), \cdot \right)$ is a group. 
+
+    Now, we can take $H \subset GL_{n}\left(\mathbb{R}\right)$ to be the set of invertible diagonal matrices: 
+    \[D = \left\{\begin{pmatrix} a & 0 \\ 0 & b \end{pmatrix} | a, b \in \mathbb{R}^*\right\}\]
+    
+    The identity matrix is indeed in $D$. Moreover, multiplications and inverses are closed under $D$: 
+    \[\begin{pmatrix} a_1 & 0 \\ 0 & b_1 \end{pmatrix} \begin{pmatrix} a_2 & 0 \\ 0 & b_2 \end{pmatrix} = \begin{pmatrix} a_1 a_2 & 0 \\ 0 & b_1 b_2 \end{pmatrix} \in D\] 
+    \[\begin{pmatrix} a & 0 \\ 0 & b \end{pmatrix}^{-1} = \begin{pmatrix} \frac{1}{a} & 0 \\ 0 & \frac{1}{a} \end{pmatrix} \in D\]
+
+    Thus, $H$ is a subgroup of $GL_n\left(\mathbb{R}\right)$.
+\end{parag}
+
+\begin{parag}{Example 2}
+    We notice that $\left(3 \mathbb{Z}, +, 0\right) \subset \left(\mathbb{Z}, +, 0\right)$ is a subgroup.
+\end{parag}
+
+\begin{parag}{Definition: Subgroup generated by one element}
+    Let $G$ be a group, and $g \in G$.
+
+    The \important{subgroup generated by $g$} is defined as: 
+    \[\left\langle g \right\rangle = \left\{1, g, g^2, \ldots\right\} \cup \left\{g^{-1}, g^{-2}, \ldots\right\}\]
+    where $g^{i+k} = g^i \cdot g^k$ is the operation $\cdot $ repeated on $i+k$ $g$'s.
+    
+    \begin{subparag}{Property}
+        $\left\langle g \right\rangle \subset G$ is a subgroup by construction.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        If $g$ has a finite order $k$, then we just have: 
+        \[\left\langle g \right\rangle = \left\{1, g, g^2, \ldots, g^{k-1}\right\}\]
+        
+        Indeed, we for instance have that $g^{k-1} = g^{-1}$ since: 
+        \[g^{k-1} g = g^{k} = 1\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the group $G = \left(\mathbb{Z}, +, 0\right)$, and $g = 3 \in \mathbb{Z}$. Then, this generates: 
+    \[\left\langle g \right\rangle = \left\{0, \pm 3, \pm 6, \ldots\right\} = 3 \mathbb{Z}\]
+\end{parag}
+
+\begin{parag}{Definition: Order of an element}
+    Let $\left(G, \cdot \right)$ be a group. If there exists some minimal $n \in \mathbb{N}^*$ such that $g^n = 1$, then $n$ is called the \important{order} of $g$.
+
+    \begin{subparag}{Remark}
+        This must not be mistaken with the order of the group.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        In a finite group, each element has a finite order by the pigeon-hole principle. If however the group is infinite, some elements might be such that $g^n \neq 1$ for all $n$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Left coset}
+    Let $G$ be a group, $H \subset G$ be a subgroup and $g \in G$. 
+
+    The \important{left coset $gH$} (the left coset of $g$ with respect to $H$) is the set of group elements of the form: 
+    \[gH = \left\{gh | h \in H\right\}\]
+    
+    \begin{subparag}{Remark}
+        This is not necessarily a subgroup, since there might not be the identity element for instance.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Properties}
+    Let $G$ be a finite group, and $H \subset G$ be a subgroup of $G$.
+
+    We have the following properties:
+    \begin{enumerate}
+        \item Two left cosets $xH$ and $yH$ are either equal or disjoint: 
+        \[x H = y H \mathspace \text{ or } \mathspace xH \cap y H = \o\]
+        \item Any $g \in G$ belongs to a left $H$-coset.
+        \item For any $x \in G$, then $\left|x H\right| = \left|H\right|$.
+    \end{enumerate}
+    
+    \begin{subparag}{Proof 1}
+        Let's suppose that we have $x H \cap y H \neq \o$.
+
+        Then, there exist $h_1, h_2 \in H$ such that $x h_1 = y h_2$. Since elements of a group are invertible, we get: 
+        \[x = y \underbrace{h_2 h_1^{-1}}_{\in H} = y h_3\]
+        
+        This means that any element of $xH$ can be written as: 
+        \[xh = y \underbrace{h_3 h}_{\in H} = y h_4 \in y H\]
+
+        Since any element $xh \in xH$ is such that $xh \in yH$, this yields that $x H \subset y H$. By starting the proof again but using a symmetrical argument, we can get that $yH \subset x H$. Combining both together, we indeed find $x H = yH$.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 2}
+        Let $g \in G$. We consider the following coset: 
+        \[gH = \left\{g\cdot 1, g\cdot h_1, g\cdot h_2, \ldots\right\}\]
+        
+        However, $g = g\cdot 1$; so $g \in gH$.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 3}
+        To show that two sets have the same cardinality, a good way is to find a bijection $f: H \mapsto xH$. Thus, let: 
+        \[f\left(h\right) = xh\]
+        
+        We first notice that $f$ is surjective since we reach any element of $xH$ by definition of cosets. It is moreover injective since: 
+        \[x h_1 = x h_2 \iff x^{-1} x h_1 = x^{-1} x h_2 \iff h_1 = h_2\]
+        
+        This yields that $f$ is bijective, and thus that $\left|H\right| = \left|xH\right|$ for any $x \in G$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the group $\left(\mathbb{Z}, +, 0\right)$ and the subgroup $3 \mathbb{Z} \subset \mathbb{Z}$.
+
+    The coset of 0 with respect to $3\mathbb{Z}$ in $\mathbb{Z}$ is: 
+    \[\left\{0 + 3k\right\}_{k \in \mathbb{Z}} = 3 \mathbb{Z}\]
+    
+    The coset of 1 with respect to $3\mathbb{Z}$ in $\mathbb{Z}$ is: 
+    \[\left\{1 + 3k\right\}_{k \in \mathbb{Z}} = \left\{1, -2, 4, -5, 7, \ldots\right\}\]
+    which the set of all numbers which rest after a division by 3 is 1.
+    
+    We notice that the coset of 10 with respect to $3\mathbb{Z}$ in $\mathbb{Z}$ is exactly the same coset:
+    \[\left\{10 + 3k\right\}_{k \in \mathbb{Z}} = \left\{1, -2, 4, -5, 7, \ldots\right\}\]
+\end{parag}
+
+\begin{parag}{Definition: Index}
+    The number of left $H$-cosets in $G$ is called the \important{index} of $H$ in $G$, written $\left[G:H\right]$. 
+\end{parag}
+
+
+\begin{parag}{Lagrange's theorem}
+    Let $G$ be a finite group, and $H \subset G$ be a subgroup.
+
+    Then, $\left|H\right|$ divides $\left|G\right|$; and:
+    \[\frac{\left|G\right|}{\left|H\right|} = \left[G:H\right]\]
+
+    \begin{subparag}{Proof}
+        We know that each $g \in G$ belongs to a left $H$-coset and that either $x H = yH$ or $xH \cap yH = \o$. We can thus write $G = \bigcup_{i=1}^{r} x_i H$ as a disjoint union of finitely many left $H$-cosets.
+
+        This allows us to compute its cardinality: 
+        \[\left|G\right| = \sum_{i=1}^{r} \left|x_i H\right|\]
+        
+        Now, we now that $\left|x_i H\right| = \left|H\right|$, so: 
+        \[\left|G\right| = \sum_{i=1}^{r} \left|H\right| = r\left|H\right|\]
+
+        We indeed get that $\left|H\right|$ divides $\left|G\right|$. However, $r$ is the number of cosets, so this is the index of $H$ in $G$, yielding: 
+        \[\left[G:H\right] = r = \frac{\left|G\right|}{\left|H\right|}\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary 1}
+    Let $G$ be a finite group and $g \in G$.
+
+    Then, the order of $g$ divides $\left|G\right|$.
+
+    \begin{subparag}{Proof}
+        Let us consider the subgroup generated by $g$: 
+        \[H = \left\langle g \right\rangle = \left\{1, g, \ldots, g^{k-1}\right\}\]
+        where $k$ is the order of $g$.
+
+        We know that $H \subset G$ is a subgroup. Thus, by Lagrange's theorem, $\left|H\right|$ divides $\left|G\right|$. However, $\left|\left\langle g \right\rangle\right| = k$, so we indeed got that the order of $g$ divides $\left|G\right|$.
+
+        \qed
+    \end{subparag}
+    
+\end{parag}
+
+\begin{parag}{Corollary 2}
+    Let $G$ be a finite group, and $g \in G$.
+
+    Then, $g^{\left|G\right|} = 1$.
+
+    \begin{subparag}{Proof}
+        Let $k$ be the order of $g$. We know that $k$ divides $\left|G\right|$, so there exists some integer $t$ such that: 
+        \[\left|G\right| = kt\]
+
+        This yields that: 
+        \[g^{\left|G\right|} = \left(g^k\right)^t = 1^t = 1\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Euler's theorem}
+    Let $a, n \in \mathbb{Z}_+$ such that $\gcd\left(a, n\right) = 1$.
+
+    Then: 
+    \[\congruent{a^{\phi\left(n\right)}}{1}{n}\]
+    
+    \begin{subparag}{Proof}
+        Let $G = \left(\mathbb{Z}/n\mathbb{Z}, \cdot, 1\right)^*$. We saw that $\left|G\right| = \phi\left(n\right)$.
+
+        We know that if $\gcd\left(a, n\right) = 1$, then $\left[a\right] \in G$. This tells us by our second corollary that: 
+        \[\left[a\right]^{\phi\left(n\right)} = \left[1\right]\]
+        
+        In other words:
+        \[\congruent{a^{\phi\left(n\right)}}{1}{n}\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Fermat's little theorem}
+    Let $a \in \mathbb{Z}_+$ and $p$ be a prime such that $p$ does not divide $a$.
+
+    Then: 
+    \[\congruent{a^{p-1}}{1}{p}\]
+    
+    \begin{subparag}{Proof}
+        We notice that, by hypothesis, $\gcd\left(a, p\right) = 1$. So, by Euler's theorem: 
+        \[\congruent{a^{\phi\left(p\right)}}{1}{p} \iff \congruent{a^{p-1}}{1}{p}\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

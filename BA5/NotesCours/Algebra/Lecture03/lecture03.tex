@@ -1,0 +1,272 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2023-10-12 at 22:59:59.
+
+\usepackage{../../style}
+
+\title{Algebra}
+\author{Joachim Favre}
+\date{Lundi 9 octobre}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2023-10-09}{Homeomorphisms are better though}{
+\begin{itemize}[left=0pt]
+    \item Definition of homomorphisms, and proof of some of their properties.
+    \item Definition of automorphism.
+    \item Definition of generators and cyclic groups.
+    \item Definition of relation.
+    \item Definition of the presentation in generators and relations of a group.
+    \item Proof of the characterisation of a homomorphism by the presentation in generators and relations of a group.
+\end{itemize}
+
+}
+
+\begin{parag}{Proposition: RSA}
+    Let $p, q$ be distinct primes, and $m = pq$. Also, let $e \in \mathbb{Z}$ be such that $\gcd\left(e, \phi\left(m\right)\right) = 1$ and $d,k \in \mathbb{Z}$ be such that $ed - k \phi\left(m\right) = 1$.
+
+    Then, for any $x \in \left\{1, \ldots, m\right\}$: 
+    \[\congruent{x^{ed}}{x}{m}\]
+
+    \begin{subparag}{Proof}
+        We first want to show that $\congruent{x^{ed}}{x}{p}$. To do so, we consider two cases. If $x$ is divisible by $p$, then $\congruent{x^{ed}}{0}{p}$ and $\congruent{x}{0}{p}$. If $x$ is not divisible by $p$ then, by Fermat's theorem: 
+        \autoeq{x^{k \phi\left(m\right)} = x^{k\left(p-1\right)\left(q-1\right)} = \left(x^{\left(p-1\right)}\right)^{k\left(q-1\right)} \equiv 1^{k\left(q-1\right)} \equiv 1 \ \left(\Mod p\right)\implies \congruent{x^{k \phi\left(m\right) + 1}}{x}{p}}
+        
+        Thus, in both cases: 
+        \[\congruent{x^{ed}}{x}{p}\]
+        
+        We can use a completely symmetrical argument to get that:
+        \[\congruent{x^{ed}}{x}{q}\]
+
+        This means that $x^{ed}- x$ is divisible by both $p$ and $q$. However, a number is divisible by two different prime numbers if and only if it is divisible by the product of those prime numbers. This means that $x^{ed} - x$ is divisible by $pq = m$, and thus:
+        \[\congruent{x^{ed}}{x}{m}\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+ 
+\begin{parag}{Example}
+    Let $p = 3$ and $q = 11$. Then, we have $m = pq = 33$ and $\phi\left(m\right) = \left(p-1\right)\left(q-1\right) = 20$. Finally, we pick $e = 7$, since $\gcd\left(7, 20\right) = 1$.
+
+    We compute $d$ by using the extended Euclidean algorithm to notice that: 
+    \[1 = \gcd\left(7, 20\right) = 7\cdot 3 - 20\]
+    
+    This yields that $d = 3$. Thus, our encoding key is $\left(m, e\right) = \left(33, 7\right)$ and our decoding key is $\left(m, d\right) = \left(33, 3\right)$.
+
+    Now, let's suppose that we want to send $x = 20$. To encode it, we compute: 
+    \[x^e \Mod m = 20^7 \Mod 33 = 26 \]
+    which we can get through fast exponentiation.
+    
+    Then, to decode we do: 
+    \[y^d \Mod m = 26^3 \Mod 33 = 20 = x\]
+    as expected.
+\end{parag}
+
+\subsection{Homomorphisms}
+
+\begin{parag}{Definition: Group of roots of unity}
+    The \important{group of $n$\Th complex roots of unity}, written $C_n$, is: 
+    \[\sqrt[n]{1} = \left\{e^{\frac{2\pi k i}{n}}, k = 0, 1, \ldots, n-1\right\} = C_n\]
+    with the regular complex multiplication.
+    
+    \begin{subparag}{Remark}
+        This is named the cyclic group of order $n$. This is what we named $\left(\mathbb{Z}/n\mathbb{Z}, +, 0\right)$ too, but this makes sense since, in $C_5$, multiplying the third root ($q_2$) and the fifth one ($q_4$) yields the second one one ($q_2 \cdot  q_4 = q_{\left(2 + 4\right) \Mod 5} = q_{1}$); meaning that this is like adding numbers modulo $n$. The two groups are thus, in some sense, structurally the same.
+
+        This introduces the following notion.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Homomorphism}
+    Let $G, H$ be groups.
+
+    A map $\phi: G \mapsto H$ is a \important{group homomorphism} if, for any $x, y \in G$: 
+    \[\phi\left(x\cdot y\right) = \phi\left(x\right)\cdot \phi\left(y\right)\]
+    where the first group operation $\cdot $ is done in $G$, and the second one in $H$.
+\end{parag}
+
+\begin{parag}{Trivial homomorphism}
+    Let $G, H$ be groups, of identity $1_G$ and $1_H$, respectively.
+
+    We notice that the following is a trivial homomorphism: 
+    \[\phi\left(x\right) = 1_H, \mathspace \forall x \in G\]
+    
+    This shows that there always exists a homomorphism from a group to another one.
+\end{parag}
+
+
+\begin{parag}{Proposition}
+    Let $G, H$ be groups of identity $1_G$ and $1_H$, respectively. Moreover, let $\phi: G \mapsto H$ be a homomorphism.
+
+    Then, $\phi\left(1_G\right) = 1_H$ and $\phi\left(x^{-1}\right) = \phi\left(x\right)^{-1}$ for any $x \in G$.
+
+    \begin{subparag}{Proof}
+        Let $x, y \in G$. Then, we notice the following important property: 
+        \[\phi\left(x\right) = \phi\left(x y y^{-1}\right) = \phi\left(x y^{-1}\right)  \phi\left(y\right) \implies \phi\left(xy^{-1}\right) = \phi\left(x\right)\phi\left(y\right)^{-1}\]
+        
+        Thus, if $y = x$: 
+        \[\phi\left(1_G\right) = \phi\left(x x^{-1}\right) = \phi\left(x\right)\phi\left(x\right)^{-1} = 1_H\]
+        
+        And, if $x = 1_G$: 
+        \[\phi\left(y^{-1}\right) = \phi\left(1_G y^{-1}\right) = \phi\left(1_G\right)\phi\left(y\right)^{-1} = 1_H\phi\left(y\right)^{-1} = \phi\left(y\right)^{-1}\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Isomorphism}
+    Let $G, H$ be groups, and $\phi: G \mapsto H$ be a homomorphism.
+
+    If $\phi$ is invertible, then it is named a \important{isomorphism}. $G$ and $H$ are then said to be \important{isomorphic} groups, written $G \simeq H$.
+    
+    \begin{subparag}{Remark}
+        This means that we can find a group homomorphism $\psi: H \mapsto G$ such that $\phi \circ \psi = \text{Id}_H$ and $\psi \circ \phi = \text{Id}_G$ where $\text{Id}_X$ maps an element of $X$ to itself.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Automorphism}
+    Let $G$ be a group, and $\phi : G \mapsto G$ be a homomorphism mapping elements from $G$ to $G$. 
+
+    Then, $\phi$ is named a group \important{automorphism}.
+\end{parag}
+
+\begin{parag}{Example}
+    Following our intuition from the beginning of this section, we want to show that: 
+    \[C_n \simeq \left(\mathbb{Z}/n\mathbb{Z}, 0, +\right)\]
+    where $C_n = \left\{1, q, \ldots, q^{n-1}\right\} $ is the group of $n$\Th root of unity, as usual.
+
+    We will pick the following isomorphism: 
+    \[\phi: q^k \mapsto \left[k\right]\]
+
+    This is indeed a bijection, which respects the group operations: 
+    \[\phi\left(p^i q^j\right) = \phi\left(q^{i+j}\right) = \left[i+j\right]\]
+    \[\phi\left(p^i\right)\phi\left(q^j\right) = \left[i\right] + \left[j\right] = \left[i + j\right]\]
+    
+    Thus, from the viewpoint of group theory, those two groups are indistinguishable one from another.
+\end{parag}
+
+\begin{parag}{Definition: Generator}
+    Let $G$ be a group.
+
+    The \important{generators} of $G$ are the elements of a minimal subset of $G$ such that any element of $G$ can be written as a product of those generators and their inverses. 
+\end{parag}
+
+\begin{parag}{Definition: Cyclic group}
+    Let $G$ be a group. 
+
+    If it is generated by a single element, we say that it is \important{cyclic}.
+\end{parag}
+
+\begin{parag}{Example 1}
+    Let us consider the group of $n$\Th root of unity: 
+    \[C_n = \left\{1, q, \ldots, q^{n-1}\right\}\]
+    
+    We can pick the generator $\left\{q\right\}$, showing it is indeed cyclic. We could also take $\left\{q^{n-1}\right\}$ since $q^{n-1} = q^{-1}$. In fact, we can pick $\left\{q^k\right\}$ for any $k$ such that $\gcd\left(k, n\right) = 1$.
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let us consider $\left(\mathbb{Q}_{> 0}, \cdot, 1\right)$.
+
+    We see that the set of primes is a generator, since we can use the prime factorisation of the numerator and of the denominator. However, if we throw away one prime, then we will not be able to represent some number; indeed showing they are generators.
+\end{parag}
+
+\begin{parag}{Definition: Relation}
+    Any equation satisfied by some group elements is called a \important{relation}.
+
+    \begin{subparag}{Remark}
+        Since we only have manipulate group elements thanks to the group operation $\cdot $, a relation can always be written in the form: 
+        \[x_1 \cdot x_2 \cdots x_n = y_1 \cdot y_2 \cdots y_m, \mathspace  x_1, \ldots, y_m \in G\]
+    
+        Multiplying both sides of this equation by $\left(y_1 \cdots y_m\right)^{-1}$, it means that we can write any relation as: 
+        \[z_1 \cdot \cdots z_k = 1, \mathspace z_1, \ldots, z_k \in G \]
+
+        We can then name the relation $R = z_1 \cdots z_k$. 
+    \end{subparag}
+    
+    \begin{subparag}{Example}
+        For instance, in $C_n$, $q^n = 1$ and $q^{n+3} = q^3$ are relations.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Presentation in generators and relations}
+    Let $G$ be a group.
+
+    A \important{presentation in generators and relations} of $G$ is an expression $\braket{S}{R}$, where $S$ is a set of generators, and $R$ is a minimal set of relations that only use the generators in $S$ and that are such that any other relation in $G$ follows from these.
+
+    \begin{subparag}{Example}
+        For instance, $C_n = \braket{q}{q^n = 1}$ is such a presentation of $C_n$. We for instance indeed get that $q^{n+3} = q^3$ by multiplying both sides of $q^n  =1$ by $q^3$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $G = \braket{S}{R_1 = 1, \ldots, R_k = 1}$, $H$ be a group and $a_1, \ldots, a_{\left|S\right|} \in H$. 
+    
+    \begin{enumerate}
+        \item There is at most one homomorphism $\phi: G \mapsto H$ such that $\phi\left(S_i\right) = a_i$ for all generators $S_i \in S$.
+        \item There exists such a homomorphism if and only if we have $a_{i_1}\cdots a_{i_n} = 1_H$ for all relations $R_{j} = S_{i_1} \cdots S_{i_n} = 1_G$ (all relations are satisfied by the images of the generators $a_i = \phi\left(S_i\right)$).
+    \end{enumerate}
+    
+    \begin{subparag}{Proof 1}
+        This is a constructive proof. If there exists a homomorphism $\phi: G \mapsto H$ such that $\phi\left(S_i\right) = a_i$ for all $S_i \in S$, we can force its other values:
+        \begin{enumerate}
+            \item We need $\phi\left(S_i^{-1}\right) = \phi\left(S_i\right)^{-1}$ for each generator $S_i \in S$. 
+            \item Any element $x \in G$ can be expressed as a product of generators or their inverses $S_1 \cdots S_n$. So, this requires: 
+            \[\phi\left(x\right) = \phi\left(S_1 \cdots S_n\right) = \phi\left(S_1\right)\cdots\phi\left(S_n\right)\]
+        \end{enumerate}
+
+        There is no choice in this construction, showing the unicity.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 2 $\implies$}
+        We suppose by hypothesis that there exists a homomorphism $\phi: G \mapsto H$ such that $\phi\left(S_i\right) = a_i$ for all generators $S_i$.
+
+        Let's suppose for contradiction that there exists some relation $R_j = S_1 \cdots S_k = 1$, which is not satisfied by the images of the generators. In other words:
+        \[\phi\left(S_{i_1}\right) \cdots \phi\left(S_{i_\ell }\right) \neq 1_H\]
+
+        However, by definition of a relation and since $\phi$ is a homomorphism:
+        \[\phi\left(S_{i_1} \cdots S_{i_\ell }\right) = \phi\left(1_G\right) = 1_H\]
+
+        This is a contradiction to the fact that $\phi$ is a homomorphism.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2 idea $\impliedby$}
+        We want to show that the construction from part $1$ does not have a contradiction.
+
+        First, we notice the following fact. By definition of the presentation in generators and relations, any relation $S_{i_1} \cdots S_{i_k} = 1$ on $G$ follows from $R_1, \ldots, R_k$. However, this means that any relation $\phi\left(S_{i_1}\right) \cdots \phi\left(S_{i_k}\right) = 1$ also follows from the fact that the $\phi\left(S_i\right)$ satisfy the relations $R_1, \ldots, R_k$.
+
+        \textit{The rest of this proof is taken from an explantation from Zichen Gao on EdStem.} Now, the only possible contradiction in the construction of $\phi$ in the first part of the proof is that we could have two different definitions for some $\phi\left(x\right)$ for a $x \in G$. Indeed, an element $x$ can be written in at least two different ways as a product of generators: 
+        \[x = s_1 \cdots s_n = t_1 \cdots t_m\]
+        
+        However, this is equivalent to the following relation on $G$: 
+        \[s_1 \cdots s_n t_1^{-1} \cdots t_m^{-1} = 1\]
+        
+        Using the fact we noticed at the beginning of this proof, we know that, since this is a relation on $G$, the images of the generators also respect it: 
+        \[\phi\left(s_1\right) \cdots \phi\left(s_n\right) \phi\left(t_1\right)^{-1} \cdots \phi\left(t_n\right)^{-1} = 1\]
+        
+        However, this is equivalent to: 
+        \[\phi\left(s_1\right) \cdots \phi\left(s_n\right) = \phi\left(t_1\right) \cdots \phi\left(t_n\right)\]
+        
+        We thus indeed have no problem in the definition of $\phi\left(x\right)$, it has a unique value.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We want to make a homomorphism $f: C_8 \mapsto C_4$, where: 
+    \[C_8 = \braket{q}{q^8 = 1}, \mathspace C_4 = \braket{t}{t^4 = 1}\]
+    
+    We only need to consider how the generator $q$ is mapped. We thus consider the mapping $\phi_k: q \mapsto t^k$ for an arbitrary $k \in \left\{0, 1, 2, 3\right\}$. There is a homomorphism if and only if $\phi_k\left(q\right)^8 = 1$, i.e.:
+    \[1 = \phi_k\left(q\right)^8 = \left(t^k\right)^8 = t ^{8k} = \left(t^4\right)^{2k} = 1^{2k} = 1\]
+    
+    Thus, there is no condition on $k$ for $\phi_k\left(q\right) = t^k$ to be a homomorphism. This yields 4 different homomorphisms.
+    \imagehere[0.7]{ListAllHomomorphismsExample.png}
+
+    We finally notice that no $\phi_k$ is an isomorphism since the $C_8$ and $C_4$ have a different size and, thus, no $f: C_8 \mapsto C_4$ can be bijective.
+\end{parag}
+
+\end{document}
+
