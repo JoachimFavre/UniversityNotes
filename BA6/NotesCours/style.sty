@@ -1,0 +1,828 @@
+% #########################################################################################################
+% ######################################### Joachim Favre's style #########################################
+% #########################################################################################################
+% ##### You need to compile a latex document using this style with LuaLaTeX, since it uses the        #####
+% ##### luacode package and the luaexec command.                                                      #####
+% #########################################################################################################
+% ##### You may require to install Mozilla Twemoji, see https://github.com/mozilla/twemoji-colr       #####
+% ##### You only need to download and execute the TTF file from their release section on GitHub.      #####
+% #########################################################################################################
+
+% ##### Table of contents (you can search for the items using " [number]. ") #####
+% 01. Includes
+% 02. General parameters
+% 03. Miscellaneous new commands and symbols
+% 04. parag and subparag environments
+% 05. lecture command
+% 06. slidecomment environment
+% 07. autoeq command
+
+% ##### 01. Includes #####
+\usepackage{luacode}
+
+% ===== Packages for general functionalities =====
+\usepackage[british]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{fontspec}
+% \usepackage[utf8]{inputenc}  % useless for LuaLaTex
+\usepackage[bottom=2.5cm, top=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\setlength{\columnsep}{1cm}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[nobottomtitles, raggedright]{titlesec} % https://tex.stackexchange.com/a/360454
+\usepackage[all]{nowidow}  % remove widow and orhpan lines
+\usepackage[hyphens]{url} % need to be included before hyperref
+\usepackage[breaklinks, hidelinks]{hyperref}
+
+% ===== Packages for mathematical symbols =====
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{esint}
+\usepackage[nointegrals]{wasysym}
+\usepackage{empheq}
+\usepackage{dsfont} % for \mathds{1}
+
+% ===== Packages for pictures =====
+\usepackage{svg}  % For \includesvg command (needs -shell-escape when compiling and inkscape)
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+%\pgfplotsset{width=10cm, height=10cm, compat=1.8}
+%\usepgfplotslibrary{external}
+%\tikzexternalize
+
+% ===== Packages for useful commands ======
+\usepackage{siunitx}
+\sisetup{parse-numbers = false}
+\sisetup{per-mode = symbol}
+\usepackage{xcolor}
+\usepackage[super]{nth}  % for the \nth command
+\usepackage{centernot}  % for \centernot command
+\usepackage{emoji}  % absolutely mandatory
+\setemojifont{Twemoji Mozilla}  % This must be installed, see: https://github.com/mozilla/twemoji-colr (you only need to install and execute the TTF file from the release section)
+
+% ===== Packages for useful environments =====
+\usepackage{tabularx}  % tabular environments which allow line breaking
+\usepackage{hhline}  % For tables; Source : https://tex.stackexchange.com/a/373342/252510
+\usepackage{diagbox}  % For tables; to have the \diagbox command
+\usepackage{multirow}  % For tables
+\usepackage{listings}  % environment to display code
+
+% ===== Dependencies for my style =====
+\usepackage[skins,breakable]{tcolorbox}  % for the parag and subparag environments
+\usepackage{enumitem}
+\usepackage{ifthen}
+\usepackage{xifthen}
+\usepackage{calc}  % To do computations for lengthes
+\usepackage[useregional, showdow]{datetime2}  % to handle dates
+\usepackage{changepage}  % for adjustwidth environment
+\usepackage{environ}  % To create new environments more easily
+\usepackage{bm}  % To have bold in maths
+\usepackage{tocloft} % To handle the table of content more easily, specifically to add paragraphs and subparagraphs to them
+\usepackage{ragged2e}  % For \RaggedLeft and \RaggedRight commands
+\usepackage[relative]{textpos}  % For the textblock environment
+\usepackage{needspace}  % To allow to ask for some space before an environment.
+
+% ##### 02. General parameters #####
+
+% This is a very bad idea since it removes page equalising.
+% However, I want to have a very hard control over where
+% my pictures are, so I don't really have any other way
+\raggedbottom  % source: https://tex.stackexchange.com/a/65356
+
+% Colours
+\definecolor{maincolour}{HTML}{004A7F}
+\definecolor{MyGreen}{HTML}{34A308}
+\definecolor{MyPurple}{HTML}{9500DB}
+
+% set to 4 to show parags in table of content
+\setcounter{tocdepth}{3}
+
+% Paragraph lengths
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt}
+\edef\unchangedparskip{\the\parskip}
+
+% Header and footter lengths
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Lists, enumerations and description
+\setlist{left=15pt, noitemsep, topsep=\parskip, itemsep=\parskip}
+\renewcommand\descriptionlabel[1]{$\bullet\ $ \fullbf{#1}}
+\AtBeginDocument{\def\labelitemi{$\bullet$}} % Source: https://tex.stackexchange.com/a/123669
+
+% Tables
+% Source: https://tex.stackexchange.com/a/468319
+% \renewcommand\tabularxcolumn[1]{m{#1}}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+% Code
+\definecolor{backgroundColourDark}{rgb}{0.17, 0.17, 0.17}
+\definecolor{backgroundColourLight}{rgb}{0.95, 0.95, 0.95}
+\definecolor{commentColour}{rgb}{0.32, 0.50, 0}
+\definecolor{keywordColour}{rgb}{0.84, 0.62, 0.46}
+\definecolor{numberColour}{rgb}{0, 0, 0}
+\definecolor{stringColourLight}{rgb}{1, 0.47, 0.78}
+\definecolor{stringColourDark}{rgb}{0.69, 0.90, 0.53}
+\definecolor{basicColourLight}{rgb}{0, 0, 0}
+\definecolor{basicColourDark}{rgb}{1, 1, 1}
+
+\lstdefinestyle{light}{
+    backgroundcolor=\color{backgroundColourLight},
+    commentstyle=\color{commentColour},
+    keywordstyle=\bf\color{maincolour},
+    numberstyle=\tiny\color{numberColour},
+    stringstyle=\color{stringColourLight},
+    basicstyle=\ttfamily\footnotesize\color{basicColourLight},
+    % numbers=left,
+    breakatwhitespace=false,
+    breaklines=true,
+    showstringspaces=false,
+    framextopmargin=0mm,
+    frame=tlrb,
+}
+
+\lstdefinestyle{dark}{
+    backgroundcolor=\color{backgroundColourDark},
+    commentstyle=\color{commentColour},
+    keywordstyle=\bf\color{maincolour},
+    numberstyle=\tiny\color{numberColour},
+    stringstyle=\color{stringColourDark},
+    basicstyle=\ttfamily\footnotesize\color{basicColourDark},
+    % numbers=left,
+    breakatwhitespace=false,
+    breaklines=true,
+    showstringspaces=false,
+    framextopmargin=0mm,
+    frame=tlrb,
+}
+
+\lstdefinelanguage{pseudo}{
+    morekeywords = {procedure, return, define, function,
+                    array, integer, integers, real, number, numbers,
+                    and, or,
+                    select, let,
+                    while, for, in, to, is,
+                    if, then, else},
+    morecomment=[l]{//}
+}
+
+\lstset{style=light}
+
+% Dark theme
+%\pagecolor[rgb]{0,0,0}
+%\color[rgb]{1, 1, 1}
+
+% ##### 03. Miscellaneous new commands and symbols #####
+% This provdes many commands, browse through them.
+
+% Imports
+\newcommand{\importcode}[2]{
+
+    \needspace{2em}
+    \lstinputlisting[language=#2]{#1}
+}
+\newcommand{\imagehere}[2][1]{\begin{center}\includegraphics[width=#1\textwidth]{#2}\end{center}}
+\newcommand{\svghere}[2][1]{\begin{center}\includesvg[width=#1\textwidth]{#2}\end{center}}
+\newcommand{\svgherenolatex}[2][1]{\begin{center}\includesvg[inkscapelatex=false, width=#1\textwidth]{#2}\end{center}}
+\newcommand{\pdfhere}[1]{{\centering\includegraphics{#1}}}
+
+% Style constructions
+\newcommand{\fullbf}[1]{{\boldmath\textbf{#1}}}
+% To have $f\left(x\right)$ and $f(x)$ look the same (without an extra space around the parentheses).
+% Source: https://tex.stackexchange.com/a/2610
+\let\originalleft\left
+\let\originalright\right
+\renewcommand{\left}{\mathopen{}\mathclose\bgroup\originalleft}
+\renewcommand{\right}{\aftergroup\egroup\originalright}
+
+\newcommand{\clearemptydoublepage}{
+  \clearpage\
+  {\pagestyle{empty}\cleardoublepage}
+} % Source: https://latexref.xyz/_005cclearpage-_0026-_005ccleardoublepage.html
+
+% Text modifiers
+% Source: https://latex.org/forum/viewtopic.php?t=10866
+\newcommand{\important}[1]{\textcolor{maincolour}{\fullbf{#1}}}
+\newcommand{\question}[1]{
+  \textcolor{red}{\fullbf{#1}}
+  \phantomsection
+  \addcontentsline{questions}{chapter}{p.\thepage : #1}
+}
+\newcommand{\later}[1]{\textcolor{orange}{\fullbf{[#1]}}}
+
+% Symbol modifications
+\let\originalbar\bar
+\renewcommand{\bar}{\overline}
+\let\originalover\over
+\renewcommand{\over}[2]{\overset{\text{#2}}{#1}}  % write over an operator
+\renewcommand{\textrightarrow}{$\rightarrow\ $}
+\renewcommand{\textleftarrow}{$\leftarrow\ $}
+\renewcommand{\textleftrightarrow}{$\leftrightarrow\ $}
+\let\originaltilde\tilde
+\renewcommand{\tilde}{$\sim\ $}
+\let\originalo\o
+\renewcommand{\o}{\text{\originalo}}
+
+% ouint and odint define the direction (up or down) of the right part of the arrow (I think that it is simpler when taking notes than thinking whether it is clockwise)
+\let\originaloiint\oiint
+\renewcommand{\oiint}{\varoiint}
+\newcommand{\odint}{\varointclockwise}
+\newcommand{\ouint}{\ointctrclockwise}
+
+\let\originalepsilon\epsilon
+\renewcommand{\epsilon}{\varepsilon}
+\let\originalphi\phi
+\renewcommand{\phi}{\varphi}
+
+% General symbols
+\newcommand{\Th}{\textsuperscript{th}\ }  % th and TH already defined
+\newcommand{\mathspace}{\quad}
+\newcommand{\eval}{\Big|}
+\newcommand{\degree}{^\circ}
+\newcommand{\telque}{\text{ tel que }}
+\newcommand{\suchthat}{\ \middle|\ }
+\newcommand{\contradiction}{\text{\lightning}}
+\newcommand{\qed}{
+    \begin{flushright} $\square$ \end{flushright}
+
+}
+\newcommand{\wink}{;)}
+\newcommand{\hex}[1]{\text{0x#1}}
+
+% Analysis
+\DeclareMathOperator{\cre}{\mathbb{R}e}
+\DeclareMathOperator{\cim}{\mathbb{I}m}
+
+\DeclareMathOperator{\Hess}{Hess}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\rot}{rot}
+
+\DeclareMathOperator{\Res}{Res}
+
+\DeclareMathOperator{\supp}{supp}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+
+\DeclareMathOperator*{\dcup}{\dot{\cup}}  % disjoint union
+
+% Source: https://tex.stackexchange.com/a/97246
+\DeclareMathOperator{\sech}{sech}
+\DeclareMathOperator{\csch}{csch}
+\DeclareMathOperator{\arcsec}{arcsec}
+\DeclareMathOperator{\arccot}{arccot}
+\DeclareMathOperator{\arccsc}{arccsc}
+\DeclareMathOperator{\arccosh}{arccosh}
+\DeclareMathOperator{\arcsinh}{arcsinh}
+\DeclareMathOperator{\arctanh}{arctanh}
+\DeclareMathOperator{\arcsech}{arcsech}
+\DeclareMathOperator{\arccsch}{arccsch}
+\DeclareMathOperator{\arccoth}{arccoth}
+
+\DeclareMathOperator{\sinc}{sinc}
+
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\sign}{sign}
+
+% Linear algebra
+\newcommand{\bvec}[1]{\bm{\protect\vec{#1}}}
+\newcommand{\bhat}[1]{\bm{\hat{#1}}}  % could use widehat, but is strange
+\newcommand{\bcheck}[1]{\bm{\check{#1}}}
+\newcommand{\dotprod}{\bullet}
+
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\vect}{vect}
+\DeclareMathOperator{\im}{Im}
+\DeclareMathOperator{\rang}{rang}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator{\proj}{proj}
+\DeclareMathOperator{\Tr}{Tr}
+
+% Algebra
+\newcommand{\normalsubgroup}{\lhd}
+\newcommand{\congclasses}[1]{#1/\text{$\sim$}}  % to have no space around the \sim.
+
+% Number theory
+\newcommand{\divides}{\mid}
+\newcommand{\ndivides}{\centernot\divides}
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\ppmc}{ppmc}
+\DeclareMathOperator{\pgdc}{pgdc}
+\DeclareMathOperator{\Div}{div}
+\DeclareMathOperator{\Mod}{mod}
+\newcommand{\congruent}[3]{#1 \equiv #2\ (\Mod #3)}
+\newcommand{\notcongruent}[3]{#1 \not\equiv #2\ (\Mod #3)}
+
+% Probabilities
+\newcommand{\exval}{\mathbb{E}}
+\newcommand{\prob}{\mathbb{P}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\corr}{corr}
+\newcommand{\independent}{\mathrel{\perp\!\!\!\perp}}
+\newcommand{\followsdistr}{\sim}
+\newcommand{\iid}{\over{\sim}{iid}}
+
+% Signal processing
+% taken from https://www.ctan.org/pkg/trfsigns
+\newcommand{\fourierpair}{%
+    \ %
+    \mbox{\setlength{\unitlength}{0.1em}%
+    \begin{picture}(20,10)%
+        \put(2,3){\circle{4}}%
+        \put(4,3){\line(1,0){13}}%
+        \put(18,3){\circle*{4}}%
+    \end{picture}%
+    }% 
+    \ %
+}
+
+\newcommand{\dtfourierpair}{\longleftrightarrow}
+\newcommand{\laplacepair}{\fourierpair} % Signals and Systems convention, I guess it is because Laplace transforms are generalisations of Fourier ones
+\newcommand{\ztransformpair}{\fourierpair} % Signals and Systems convention, I guess it is because Laplace transforms are generalisations of Fourier ones
+
+% Quantum mechanics
+\newcommand{\bra}[1]{\left\langle #1 \right|}
+\newcommand{\ket}[1]{\left| #1 \right\rangle}
+\newcommand{\braket}[2]{\left\langle #1 \middle| #2 \right\rangle}
+
+% Personal environments
+% Source: https://tex.stackexchange.com/a/5652
+\NewEnviron{multiequality}{\begin{equation*}\begin{split} \BODY \end{split}\end{equation*}}
+\NewEnviron{multiequation}{\begin{equation*}\begin{split} \BODY \end{split}\end{equation*}}
+
+\NewEnviron{systemofequations}{\begin{cases} \BODY \end{cases}}
+\NewEnviron{functionbypart}[1]{\begin{equation*}#1 = \begin{dcases} \BODY \end{dcases}\end{equation*}}
+\newcommand{\piecewisefunc}[4]{\unexpanded{\begin{systemofequations} #1, & #2 \\ #3, & #4 \end{systemofequations}}}
+
+% Other commands
+\newcommand{\multicolumnX}[2]{\multicolumn{#1}{>{\hsize=\dimexpr#1\hsize+#1\tabcolsep+\arrayrulewidth\relax}X}{#2}}
+
+% ##### 04. parag and subparag environments #####
+% This provides:
+%   \FatalPackageError: A command making a pacakage error, and then terminates the compilation immediately.
+%   parag environment: An environment representing a paragraph. It can span over multiple pages and, when there is an error
+%                      in the code, it shows it at the right line (which would not be the case with the Environ package).
+%                      You cannot nest parag environments.
+%   subparag environment: An environment representing a subparagraph. It has similar behaviour as the parag environment
+%                         except that it must be placed inside a parag environment.
+
+% Just a way to have global variables, since LaTeX is a pain with its local variables
+\directlua{inparag = false}
+\directlua{insubparag = false}
+
+% Source: https://tex.stackexchange.com/a/666539
+% I prefer some of my error to be fatal, so that we can exactly see what the problem is,
+% instead of having a lot of errors and not knowing which one we can fix.
+\newcommand{\FatalPackageError}[3]{
+    \PackageError{#1}{#2}{#3}
+    \batchmode \read-1to\foo
+}
+
+\newlength{\paragtitlewidth}
+\setlength{\paragtitlewidth}{3cm}
+\newlength{\paragtitlespace}
+\setlength{\paragtitlespace}{0.3cm}
+\newlength{\subparaglinewidth}
+\setlength{\subparaglinewidth}{0.1mm}
+\newlength{\subparagtitlelinespace}
+\setlength{\subparagtitlelinespace}{0.2cm}
+\newlength{\subparagtitlewidth}
+\setlength{\subparagtitlewidth}{2cm}
+\newlength{\subparagtitlespace}
+\setlength{\subparagtitlespace}{0.3cm}
+
+% inspired from https://tex.stackexchange.com/a/271436/252510 and https://tex.stackexchange.com/a/242086
+\newtcolorbox{paragbox}[2]{
+    blanker,
+    breakable,
+    boxsep=0pt,        % Space between the content and the box border
+    left=0pt,          % Space on the left side of the box
+    right=0pt,         % Space on the right side of the box
+    top=0pt,           % Space above the box
+    bottom=0pt,        % Space below the box
+    before skip=6pt,   % Space before the box; seems to work better that way
+    after skip=0pt,    % Space after the box
+    enlarge left by=\paragtitlewidth + \paragtitlespace,
+    width=\linewidth - \paragtitlewidth - \paragtitlespace,
+    parbox=true,
+    overlay unbroken and first={%
+        \node[inner sep=0pt,outer sep=0pt,text width=\paragtitlewidth,
+          align=left,
+          below right]
+          at ([xshift=-\paragtitlewidth - \paragtitlespace]frame.north west)
+          {%
+             \fullbf{#1}
+          };},
+    height=#2,
+    height plus=100cm, % enough for a page break to happen, since then those options are ignored
+}
+
+\newtcolorbox{subparagbox}[2]{
+    blanker,
+    breakable,
+    boxsep=0pt,        % Space between the content and the box border
+    left=0pt,          % Space on the left side of the box
+    right=0pt,         % Space on the right side of the box
+    top=0pt,           % Space above the box
+    bottom=0pt,        % Space below the box
+    before skip=6pt,   % Space before the box; seems to work better that way
+    after skip=0pt,    % Space after the box
+    enlarge left by=\paragtitlewidth + \paragtitlespace + \subparagtitlelinespace + \subparagtitlewidth + \subparagtitlespace,
+    width=\linewidth - \paragtitlewidth - \paragtitlespace - \subparagtitlelinespace - \subparagtitlewidth - \subparagtitlespace,
+    borderline west={\subparaglinewidth}{-\subparagtitlelinespace - \subparagtitlewidth - \subparagtitlespace - 0.5\subparaglinewidth}{black},
+    parbox=true,
+    overlay unbroken and first={%
+        \node[inner sep=0pt,outer sep=0pt,text width=\subparagtitlewidth,
+          align=left,
+          below right]
+          at ([xshift=-\subparagtitlewidth - \subparagtitlespace]frame.north west)
+          {%
+            \textit{\footnotesize #1}
+          };},
+    height=#2,
+    height plus=100cm, % enough for a page break to happen, since then those options are ignored
+}
+
+\newbox\paragtitlebox
+\newlength{\paragtitleheight}
+
+\newenvironment{parag}[1]{%
+    \vspace{\parskip} % We want the parskip to be here, not after (it is then cancelled).
+    % Check that not inside a paragraph.
+    \directlua{
+        if inparag then
+            tex.print([[\string\FatalPackageError{Joachim Favre's style}{You cannot put a paragraph inside another paragraph}{Remove some level of nesting.}]])
+        end
+        inparag = true
+    }
+    % Add to toc
+    \addcontentsline{toc}{paragraph}{#1}
+    % Measure title, while not displaying it.
+    \sbox\paragtitlebox{
+        \begin{minipage}[c]{\paragtitlewidth}
+            \RaggedRight \fullbf{#1}
+        \end{minipage}
+    }
+    \setlength\paragtitleheight{2\ht\paragtitlebox}  % parag title height; why a factor 2? Very good question, I won't act as if I knew what I was doing, but it seems to work
+    % Ask for correct space on the page, for the title.
+    \needspace{\paragtitleheight}
+    % Display the paragraph
+    \begin{paragbox}{#1}{\the\paragtitleheight}
+        % Re-set parskip size.
+        \setlength{\parskip}{\unchangedparskip}
+        \vspace{-\parskip}% Else, double counts the paragraph skip (there is probably a better way, but I'm not sure what I am doing).
+}{ 
+    \end{paragbox}
+    
+    \vspace{\parskip} % Seems to work better
+    
+    \directlua{inparag = false}
+}
+
+\newbox\subparagtitlebox
+\newlength{\subparagtitleheight}
+
+\newenvironment{subparag}[1]{%
+    \vspace{2\parskip}
+    % Measure title, while not displaying it.
+    \sbox\subparagtitlebox{
+        \begin{minipage}[c]{\subparagtitlewidth}
+            \RaggedRight \textit{\footnotesize #1}
+        \end{minipage}
+    }
+    \setlength\subparagtitleheight{2\ht\subparagtitlebox}  % subparag title height; why a factor 2? Very good question, I won't act as if I knew what I was doing, but it seems to work
+    % Ask for correct space on the page, for the title.
+    \needspace{\subparagtitleheight}
+    % Display the subparagraph
+    \begin{subparagbox}{#1}{\the\subparagtitleheight}
+        % Re-set parskip size.
+        \setlength{\parskip}{\unchangedparskip}
+        \vspace{-\parskip}% Else, double counts the subparagraph skip (there is probably a better way, but I'm not sure what I am doing).
+}{ 
+    \end{subparagbox}
+    
+    \vspace{\parskip} % Seems to work better
+    
+    \directlua{insubparag = false}
+}
+
+% The subparag environment is designed to go inside a parag environment. However, tcolorbox does not allow to put a
+% breakable box inside another breakable box, so we close the paragbox before opening the subparagbox and, at the end,
+% we re-open the paragbox.
+\BeforeBeginEnvironment{subparag}{
+    \directlua{%
+        if not inparag then
+            tex.print([[\string\FatalPackageError{Joachim Favre's style}{You must put a sub-paragraph inside a paragraph}{Put the 'parag' environment around this block of code, possibly with an empty title.}]])
+        end
+        if insubparag then
+            tex.print([[\string\FatalPackageError{Joachim Favre's style}{You cannot put a sub-paragraph inside another sub-paragraph}{Remove some level of nesting.}]])
+        end
+        insubparag = true
+    }%
+    \directlua{%
+        --[[ For the LaTeX compiler: \string\begin{paragbox} --]]
+        tex.print([[\string\end{paragbox}]])
+    }%
+}
+
+\AfterEndEnvironment{subparag}{
+    \directlua{
+        tex.print([[\string\begin{paragbox}{}{0pt}]])
+        --[[ For the LaTeX compiler: \string\end{paragbox} --]]
+    }
+    \setlength{\parskip}{\unchangedparskip}
+    \directlua{insubparag = false}
+}
+
+% ##### 05. Lecture headers #####
+% This provides:
+%   \lecture: Draws a line to show the start of a new lecture.
+%   \lecturetitelsummary: Displays the title and summary of some lecture, used at the start of the document.
+%   \listoflectures: Makes a \tableofcontents-styled list of lectures
+%   \invinsiblelistofquestions: Makes LaTeX believe we want a list of all the \questions in the document, for it to generate a file.questions. 
+%                               This file is then used by my external compilation program.
+
+% For the capital letter (it's a bad way to do it, but it's the only way I found)
+% DTMWeekdayname should work, but it does not in French
+\def\DTMfrenchweekdayname#1{%
+  \ifcase#1
+  Lundi%
+  \or
+  Mardi%
+  \or
+  Mercredi%
+  \or
+  Jeudi%
+  \or
+  Vendredi%
+  \or
+  Samedi
+  \or
+  Dimanche%
+  \fi
+}
+
+\def\hrulefill{\leavevmode\leaders\hrule height 1pt\hfill\kern\z@} % Source: https://latex.org/forum/viewtopic.php?t=8117
+
+\DTMlangsetup[en-GB]{ord=raise}
+\newcommand{\lecture}[4]{  % #1: lecture no, #2: date, #3: title, #4 summary (used in my external compilation program)
+    \needspace{5em}
+    \vspace{1em}
+    \DTMsavedate{lectureDate}{#2}
+    \def\emptyvariable{}
+    % Ifthenelse does not work in addcontentsline
+    \def\lecturename{\fullbf{\ifx\bbl@loaded\french Cours \else Lecture \fi #1 \ifx\emptyvariable#3\else: #3\fi}}
+    \def\datename{\DTMusedate{lectureDate}}
+    \phantomsection
+    \addcontentsline{lectures}{chapter}{\lecturename\ ---\ \datename}
+    \hyperref[lecturesummary#1]{\textcolor{maincolour}{\hrulefill \hspace{5pt} \datename\ ---\ \lecturename}}
+    \label{lecture#1}
+    \vspace{1em}
+    \nopagebreak
+}
+
+\newcommand{\lecturetitlesummary}[3]{  % #1: lecture no, #2: date, #3: title
+    \needspace{5em}
+    \DTMsavedate{lectureDate}{#2}
+    \def\lecturename{\fullbf{\ifx\bbl@loaded\french Cours \else Lecture \fi #1 \ifx\emptyvariable#3\else: #3\fi}}
+    \def\datename{\DTMusedate{lectureDate}}
+    
+    \hyperref[lecture#1]{\textcolor{maincolour}{\lecturename\ ---\ \datename\ \hrulefill\ \textit{p. \pageref{lecture#1}}}}
+    
+    \phantomsection
+    \label{lecturesummary#1}
+}
+
+\newcommand\listoflectures{%
+  \def\french{french}
+  \def\listoflecturestitle{\ifx\bbl@loaded\french Liste des cours \else List of lectures \fi}
+  \let\oldleftmark\leftmark
+  \def\leftmark{\expandafter\MakeUppercase\expandafter{\listoflecturestitle}}
+  \chapter*{\listoflecturestitle}\@starttoc{lectures}
+  \cleardoublepage
+  \def\leftmark{\oldleftmark}
+}
+
+\newcommand{\invinsiblelistofquestions}{  % Want to get the file.questions file for the program, but not the list in the document
+\begin{textblock}{10}(-20, -20)\vspace{0pt}
+  \@starttoc{questions}
+\end{textblock}
+}
+
+% ##### 06. slidecomment environment #####
+% This provides:
+%   \importslides: Defines the file of the slides we want to comment.
+%   \defslide: Define the number of the slide we want to use.
+%   slidecomment environment: Puts a slide and a comment side by side. The next slidecommment will consider the next slide.
+%   \doubleslide: Put two slides side by side, without any comment.
+%   \skipslide: Skip one slide.
+
+\def\currentpdf{None}
+\newcounter{CurrentSlide}
+\newcommand{\importslides}[1]{\def\currentpdf{#1} \setcounter{CurrentSlide}{1}}
+\newcommand{\defslide}[1]{\setcounter{CurrentSlide}{#1}}
+
+\newlength\slideheight
+\newdimen\height
+
+\NewEnviron{slidecomment}{
+
+    \def\CurrentSlidePDF{\includegraphics[width=0.5\textwidth, page=\theCurrentSlide]{\currentpdf}}
+    \setlength\slideheight{\heightof{\CurrentSlidePDF}}
+    %
+    \setbox0=\hbox{\begin{minipage}[c]{0.48\textwidth}\BODY\end{minipage}}
+    \height=\ht0 \advance\height by \dp0
+    %
+    \ifthenelse{\height < \slideheight}{
+        \centering
+        \begin{minipage}[c]{0.48\textwidth}
+            \frame{\includegraphics[width=\textwidth, page=\theCurrentSlide]{\currentpdf}}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[c][\slideheight]{0.48\textwidth}
+            \BODY \hphantom{a}
+        \end{minipage}
+    }{
+    \centering
+    \begin{minipage}[t]{\textwidth}
+        \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}
+            \frame{\includegraphics[width=\textwidth, page=\theCurrentSlide]{\currentpdf}}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[t]{0.48\textwidth}\vspace{0pt}
+            \BODY \hphantom{a}
+        \end{minipage}
+    \end{minipage}
+    }
+    \stepcounter{CurrentSlide}
+    %\vspace{-1em}
+
+}
+
+\newcommand{\doubleslide}{
+    % I don't know why those four lines are needed, but it fixes a problem of inconsitant spacing.
+    \def\CurrentSlidePDF{\includegraphics[width=0.5\textwidth, page=\theCurrentSlide]{\currentpdf}}
+    \setlength\slideheight{\heightof{\CurrentSlidePDF}}
+    %
+    \setbox0=\hbox{\begin{minipage}[c]{0.48\textwidth}I need text here, let's call that an easter egg.\end{minipage}}
+    \height=\ht0 \advance\height by \dp0
+    %
+  \centering
+  \begin{minipage}[c]{0.48\textwidth}
+      \frame{\includegraphics[width=\textwidth, page=\theCurrentSlide]{\currentpdf}}
+  \end{minipage}
+  \stepcounter{CurrentSlide}
+  \hfill
+  \begin{minipage}[c][\slideheight]{0.48\textwidth}
+      \frame{\includegraphics[width=\textwidth, page=\theCurrentSlide]{\currentpdf}}
+  \end{minipage}
+  \stepcounter{CurrentSlide}
+}
+
+\newcommand{\skipslide}{
+
+  \stepcounter{CurrentSlide}
+
+}
+
+% ##### 07. Autoeq command. #####
+% This provides:
+%   \autoeq: Displays the equation or equality on multiple lines if needed by automatically cutting it.
+%            See its inner comment for more information.
+%   \fakeequal: Considered as an equal sign by the \auteq command, though it does not dislay anything.
+%               This allows to show a point we want to split the equation.
+
+\newcommand{\fakeequal}{}
+
+\newlength{\eqwidth}
+\newcommand{\autoeq}[2][]{%
+    % This command allows to automatically format equations and equalities, by splitting them when they are too long. Note that the result might be too long for the line too. You should then decrease the equation or font size.
+    % This command needs to be used together with the \unexpanded command. For instance, we could write \autoeq{\unexpanded{1 + 1 = 2}}. There is also an optional parameter, when it is the character s, makes equality sloppy (you can try a very big equality with and without this optional parameter).
+    \settowidth{\eqwidth}{$\displaystyle #2$}%
+    %
+    \luaexec{%
+    % ------------------------------------------------------- Functions -------------------------------------------------------
+    function replaceSymbols(txt, symbols, before, after)
+        for i, symbol in pairs(symbols) do
+            % Case we have \over{symbol}{...}. Note that because of internal mechanisms, \over{...}{...} is turned to \over {...}{...} before receiving it
+            void, currentIndex = txt:find("\\over {" .. symbol .. [[}{]])       --[[} (we need to close the bracket for LaTeX)]]
+            while currentIndex ~= nil do
+                % We first look for the content between the brackets by matching those brackts
+                insideText = ""
+                bracketLevel = 1
+                while bracketLevel > 0 do
+                    currentIndex = currentIndex + 1
+                    currentChar = txt:sub(currentIndex, currentIndex)
+                    if (currentChar == "{" or currentChar == "(" or currentChar == "[") then bracketLevel = bracketLevel + 1
+                    elseif (currentChar == "}" or currentChar == ")" or currentChar == "]") then bracketLevel = bracketLevel - 1
+                    end
+                    %
+                    if bracketLevel ~= 0 then
+                       insideText = insideText .. currentChar
+                    end
+                end
+                % We found the content. Now we replace it, using a placeholder for latter replacement. It would have been nice to use regex, but it is a pain to mach brackets using regular expressions.
+                toReplace = "\\over {" .. symbol .. "}{" .. insideText .. "}"
+                txt = txt:gsub(literalise(toReplace), before .. "\\over {" .. symbol .. "}{" .. insideText .. "}" .. after)
+                % Consider next \over{symbol}{...}
+                void, currentIndex = txt:find("\\over {" .. symbol .. [[}{]], currentIndex)       --[[} (we need to close the bracket for LaTeX)]]
+            end
+            % After having considered all \over{symbol}{...}, we replace all symbols which are not in brackets. This is important, because we don't want to replace the = in "\sum_{i=1}^{n}", nor the ones that were already replaced in the "\over{symbol}"
+            bracketLevel = 0
+            i = 1
+            while i <= \#txt do
+                currentChar = txt:sub(i,i)
+                % texio.write("symbol=" .. symbol .. " i=" .. i .. " currentChar=" .. currentChar .. " bracketLevel=" .. bracketLevel .. "\noexpand\n")
+                if (currentChar == "{" or currentChar == "(" or currentChar == "[") then bracketLevel = bracketLevel + 1
+                elseif (currentChar == "}" or currentChar == ")" or currentChar == "]") then bracketLevel = bracketLevel - 1
+                end
+                startSymb, endSymb = txt:find(symbol, i)
+                if bracketLevel == 0 and startSymb == i then
+                    txt = txt:sub(1, startSymb-1) .. before .. symbol .. after .. txt:sub(endSymb+1, \#txt)
+                    i = endSymb + \#before + \#after
+                end
+                i = i + 1
+            end
+        end
+        return txt
+    end
+    % ------------------------------------------------------- Body -------------------------------------------------------
+    function literalise(str)  % from https://stackoverflow.com/a/1746473. We need to escape characters which we don't want to be considered as patterns for regular expressions when using gsub.
+        return str:gsub("[\%(\%)\%.\%\%\%+\%-\%*\%?\%[\%]\%^\%$]", function(c) return "\%" .. c end)  --[[$ close dollar sign for LaTeX]]
+    end
+    function countSub(text, sub)
+        void, count = text:gsub(sub, "")
+        return count
+    end
+    %
+    %
+    equationSymbols = {[[\noexpand\iff]], [[\noexpand\implies]], [[\noexpand\impliedby]]}
+    equalitySymbols = {"=", "<", ">", [[\noexpand\geq]], [[\noexpand\leq]], [[\noexpand\approx]], [[\noexpand\fakeequal]]}
+    %
+    optional = [[#1]]
+    sloppyEquality = optional == "s"
+    text = [[ \expandonce{ #2 } ]]  % the space at the end is very very very important if #2 ends with a ] (else lua does not understand); and it seems like the spaces inside the expand once are also important so I put some everywhere.
+    if \ifdim \eqwidth > \textwidth true \else false \fi then  % line is too long
+        % Check if in equation (contains given symbols)
+        inEquation = false
+        for i, value in pairs(equationSymbols) do
+            if text:find(value) then
+                inEquation = true
+                break
+            end
+        end
+        %
+        if inEquation then
+            text = "&" .. replaceSymbols(text, equationSymbols, [[\string\\ ]], [[ &]])
+        else
+            % When the equality is not sloppy, we want a carriage return at every equality symbol except for the first one
+            % So, we split until the end first symbol (the head) and the rest (the tail)
+            if sloppyEquality then
+                head = "& "
+                tail = text
+            else
+                smallestIndex = \#text + 1
+                for i, symbol in pairs(equalitySymbols) do
+                    %
+                    j = 1
+                    repeat  % need to verify that the character we skip is not in between brackets
+                        void, endIndex = text:find(symbol, j)
+                        if endIndex then
+                            head = text:sub(1, endIndex)
+                            openCount = countSub(head, "{") + countSub(head, "\%(") + countSub(head, "\%[")
+                            closeCount = countSub(head, "}") + countSub(head, "\%)") + countSub(head, "\%]")
+                        end
+                        j = j + 1
+                    until(not endIndex or openCount == closeCount or j > \#text)
+                    %
+                    if endIndex and openCount == closeCount and endIndex < smallestIndex then
+                        smallestIndex = endIndex
+                    end
+                end
+                  head = text:sub(1, smallestIndex)
+                tail = text:sub(smallestIndex + 1, \#text)
+            end
+            %
+            head = replaceSymbols(head, equalitySymbols, "", [[\string\ &]])
+            tail = replaceSymbols(tail, equalitySymbols, [[\string\\ ]], [[\string\ &]])
+            %
+            text = head .. tail
+        %
+        end
+        % Print everything
+        tex.print("\string\\[\string\\begin{split}")
+        tex.print(text)
+        tex.print("\string\\end{split}\string\\]")
+        % and log it also
+        texio.write("\string\\[\string\\begin{split}")
+        texio.write(text)
+        texio.write("\string\\end{split}\string\\]")
+    else
+        tex.print("\string\\[" .. text .. "\string\\]")
+    end
+    }%
+}
