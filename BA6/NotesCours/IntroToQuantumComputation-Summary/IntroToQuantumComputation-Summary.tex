@@ -1,0 +1,1306 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2022-12-08 at 23:55:56.
+
+\usepackage{texdate}
+\usepackage{../style}
+
+%\usepackage{titling}
+%\setlength{\droptitle}{-8em}
+
+\title{Introduction to quantum computation \\ Detailed summary}
+\author{Joachim Favre \\ Course by Prof. Olivier Lévêque and Prof. Rüdiger Urbanke}
+\date{Spring semestre 2024}
+
+\begin{document}
+\maketitle
+
+\cftsetindents{paragraph}{1.5em}{1em}
+\setcounter{tocdepth}{5}
+
+\tableofcontents
+
+\initcurrdate
+\def\setdateformat{Y--m--d}
+\vspace*{\fill}
+\begin{center}
+    \textit{Version \printdate}
+\end{center}
+\vspace*{\fill}
+\vspace*{\fill}
+\newpage
+
+\section{Generalities}
+
+\begin{parag}{Introduction}
+    I will not repeat definitions and axioms of quantum physics in this summary. For a more formal approach, and missing definitions (of the tensor product, for instance), I invite the reader to refer to my summary of Introduction to quantum information processing, available at
+    \begin{center}
+        \url{https://github.com/JoachimFavre/EPFLNotesIN/releases/tag/BA5}.
+    \end{center}
+\end{parag}
+
+\begin{parag}{Definition: Finite field}
+    The unique \important{finite field} of characteristic $k$ is written as $\mathbb{F}_{k}$.
+
+    We can construct a \important{vector space} over it, of dimension $n$, denoted by $\mathbb{F}_k^n$.
+
+    \begin{subparag}{Remark}
+        We will mostly consider $\mathbb{F}_{2}^n = \left\{0, 1\right\}^n$. Addition over this vector space is denoted by $\oplus$, and are simply component-wise xor.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Dot product}
+    Over a vector space $\mathbb{F}_k^n$, we can consider the \important{dot product} defined by
+    \[a \dotprod b = \left(a_{n-1}, \ldots, a_{0}\right) \dotprod \left(b_{n-1}, \ldots, b_0\right) = a_{n-1} b_{n-1} + \ldots + a_0 b_0,\]
+    for any $a, b \in \mathbb{F}_{k}^n$.
+
+    \begin{subparag}{Remark}
+        Note that this has many of the properties a regular dot product has, except for $a \dotprod b = 0 \iff x = y = 0$. For instance $11 \dotprod 11 = 0$ over $\mathbb{F}_2^2$. 
+
+        Therefore, even with this dot product, $\mathbb{F}_k^n$ is not an inner product space. This dot product does not respect the axioms of inner products.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Quantum circuit}
+    A \important{quantum circuit} is a unitary transformation $\hat{U} \in \mathbb{C}^{n \times n}$ followed by some measurement.
+
+    We typically use \important{quantum gates}, unitary transformations $\hat{V} \in \mathbb{C}^{n \times n}$, the product of which gives us our circuit.
+
+    The important quantum gates are the following, for $x, y, z \in \mathbb{F}_2$:
+    \begin{itemize}
+        \item $\displaystyle \hat{H} = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} $, called the \important{Hadamard gate}. 
+        \item $\displaystyle \hat{X} \ket{x} = \widehat{NOT} \ket{x} = \ket{\bar{x}}$.
+        \item $\displaystyle \widehat{CNOT} \ket{x, y} = \ket{x, y \oplus x}$.
+        \item $\displaystyle \widehat{CCNOT} \ket{x, y, z} = \ket{x, y, z \oplus \left(x \land y\right)}$, called the \important{Toffoli gate}.
+        \item $\displaystyle \hat{Z} = \begin{pmatrix} 1 & 0 \\ 0 & e^{i \pi} \end{pmatrix} $
+        \item $\displaystyle \hat{S} = \begin{pmatrix} 1 & 0 \\ 0 & e^{i \frac{\pi}{2}} \end{pmatrix} $
+        \item $\displaystyle \hat{T} = \begin{pmatrix} 1 & 0 \\ 0 & e^{i \frac{\pi}{4}} \end{pmatrix} $
+    \end{itemize}
+
+    The three last gates are called \important{phase gates}.
+
+    Moreover, given a gate $\hat{U}$, we can construct a controlled version of it such that
+    \[\widehat{CU} \ket{x_1, \ldots, x_n, y} = \ket{x} \otimes \hat{U}^{x_1 \land \ldots \land x_n} \ket{y}.\]
+
+    \begin{subparag}{Remark}
+        Since all quantum gates are unitary transformations, i.e. $\hat{V}^{\dagger} \hat{V} = \hat{I}$, they are invertible. This for instance yields that we cannot construct a gate that takes $x, y \in \mathbb{F}_2$ and outputs $x \land y$. We can over construct a gate that takes $x, y, c \in \mathbb{F}_2$ and outputs $x, y, c \oplus \left(x \land y\right)$.
+
+        This $c$ is called an \important{Ancilla bit}.
+    \end{subparag}
+
+    \begin{subparag}{Assumptions}
+        For simplifications, we suppose that the initial state is always 
+        \[\ket{0} \otimes \ket{0} \otimes \ldots \otimes \ket{0}.\]
+        
+        Moreover, we suppose that measurement is always done in the computational basis, 
+        \[\left\{\ket{x} \suchthat x \in \mathbb{F}_2^n\right\}.\]
+        
+        Those two assumptions are without loss of generality: we can simply do a change of basis at the very start and very end of the circuit. However, they have a potential impact on complexity.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Oracle gate}
+    Let $f: \mathbb{F}_2^n \mapsto \mathbb{F}_{2}^m$ be some binary function. 
+
+    We can construct an \important{oracle gate}$\hat{U}_f$, defined by 
+    \[\hat{U}_f \left(\ket{x} \otimes \ket{y}\right) = \ket{x} \otimes \ket{y \oplus f\left(x\right)},\]
+    for any $x \in \mathbb{F}_2^n, y \in \mathbb{F}_2^n$.
+
+    \begin{subparag}{Remark}
+        This is indeed unitary. We directly get that 
+        \autoeq{\left(\bra{x'} \otimes \bra{y'}\right) \hat{U}_f^{\dagger} \hat{U}_f \left(\ket{x} \otimes \ket{y}\right) = \left(\bra{x'} \otimes \bra{y \oplus f\left(x'\right)}\right) \left(\ket{x} \otimes \ket{y \oplus f\left(x\right)}\right) = \braket{x'}{x} \braket{y' \oplus f\left(x'\right)}{y \oplus f\left(x\right)}.}
+        
+        For the first term to be non-zero, we need $x' = x$. This then yields for the second term that we need $y' = y$. This means that the only non-zero terms of $\hat{U}_f^{\dagger} \hat{U}_f$ are the ones on the diagonal, which are zero, indeed showing $\hat{U}_f^{\dagger} \hat{U}_f = \hat{I}$ is the identity.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Circuit complexity}
+    Different gates can be run at the same time in a circuit, which we call a \important{layer}. The \important{depth} of a circuit is its number of different layers. Its \important{width} is the number of q-bits it uses.
+
+    The \important{complexity} of some circuit is then defined to be the product between its width and its depth.
+
+    \begin{subparag}{Example}
+        For instance, the following has 3 layers, and uses 4 q-bits. Therefore, its width is 4, its depth is 3 and thus its complexity is 12.
+        \begin{center}
+        \begin{quantikz}[slice all, slice titles=\relax]
+            \slice{} & \gate{} & \gate[wires=2]{} & \gate[wires=1]{} & \\
+                     &         &                  & \gate[wires=3]{} & \\
+                     & \gate{} &                  &                  & \\
+                     &         &                  &                  &
+        \end{quantikz}
+        \end{center}
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Post's theorem}
+    Let $f: \mathbb{F}_2^n \mapsto \mathbb{F}_2^m$ be a boolean function.
+
+    Then, it can be computed by a classical circuit made only with NOT, AND, OR and COPY gates. Those gates are said to be \important{universal}.
+
+    \begin{subparag}{Remark}
+        We can construct all such quantum gates (using Ancilla bits) for classical bits $\left\{\ket{0}, \ket{1}\right\}$. Thus, a quantum computer can run any classical algorithm.
+
+        However, as soon as we move to general q-bits $\alpha \ket{0} + \beta \ket{1}$, we cannot make the COPY gate (see the non-cloning theorem of my Introduction to quantum information theory summary for a proof) and thus quantum circuits are different from classical circuits.
+    \end{subparag}
+
+    \begin{subparag}{Proof idea}
+        Any boolean function can be put in CNF form, which can be expressed using those classical gates.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Barenco's theorem}
+    Let $\hat{U} \in \mathbb{C}^{2^n \times 2^n}$ be a $2^n \times 2^n$ unitary transformation.
+
+    Then, it can be approximated with an arbitrary precision by a quantum circuit made only of $\hat{T}, \hat{S}, \hat{H}$ and $\widehat{CNOT}$ gates.
+
+    \begin{subparag}{Remark 1}
+        The number of gates needed depends on $\hat{U}$. Some $\hat{U}$s need a number of gates which is exponential in $n$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The Gottesman–Knill theorem states that, without the gate $T$, no quantum advantage can be obtained. In other words, we can efficiently simulate on a classical computer any quantum circuit that only uses the three other gates.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{IQC lemma}
+    Let $x \in \mathbb{F}_2^n$. Then,
+    \[\hat{H}^{\otimes n} \ket{x} = \frac{1}{\sqrt{2^n}} \sum_{y \in \mathbb{F}_2^n} \left(-1\right)^{x \dotprod y} \ket{y}.\]
+    
+    \begin{subparag}{Personal remark}
+        I later refer to this lemma as the IQC (Introduction to quantum computation) lemma, but this is simply because it appears in every circuits shown in this course. This is not a name that was used during the course, and it does not appear in literature.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We start by considering the projection of $\hat{H}^{\otimes n} \ket{x}$ on some state $\ket{y}$,
+        \autoeq{\bra{y} \hat{H}^{\otimes n} \ket{x} = \bra{y} \bigotimes_{i=1}^n  \hat{H}\ket{x_i} = \bra{y} \bigotimes_{i=1}^n \frac{\ket{0} + \left(-1\right)^{x_i} \ket{1}}{\sqrt{2}} = \bigotimes_{i=1}^n \frac{\braket{y_i}{0} + \left(-1\right)^{x_i}\braket{y_i}{1}}{\sqrt{2}},}
+        since $\bra{y} = \bra{y_1} \otimes \ldots \otimes \bra{y_n}$.
+
+        We can simplify this, by exploiting the fact that the numerator is $\left(-1\right)^{x_i y_i}$: if $y_i = 0$, then the numerator is $1$ if $y_i = 1$, the numerator is $\left(-1\right)^{x_i}$. In other words,
+        \autoeq{\bra{y} \hat{H}^{\otimes n}\ket{x} = \bigotimes_{i=1}^n \frac{\left(-1\right)^{x_i y_i}}{\sqrt{2}} = \frac{1}{\sqrt{2^n}} \left(-1\right)^{x_1 y_1 + \ldots + x_n y_n} = \frac{1}{\sqrt{2^n}} \left(-1\right)^{x \dotprod y}.}
+        
+        This directly gives the result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: Arbitrary success probability}
+    Let $p \in \left[0, 1\right[$ be a lower bound on the probability of success of an algorithm, 
+    \[\prob\left(\text{success}\right) \geq p.\]
+
+    We can have an arbitrary success probability $1 - \epsilon$ for any $0 < \epsilon < 1$ by running the circuit $T$ times, where
+    \[T \geq \log_{1-p}\left(\epsilon\right).\]
+
+    \begin{subparag}{Proof}
+        Running the algorithm $T$ times, the probability of success is given by 
+        \[\prob\left(\text{$T$ successes}\right) = 1 - \prob\left(\text{$T$ fails}\right) = 1 - \left(1 - \prob\left(\text{$1$ success}\right)\right)^T  \geq 1 - \left(1-p\right)^T.\]
+
+        Therefore, we can take the inequality, 
+        \[1 - \left(1-p\right)^T \geq 1 - \epsilon \iff \epsilon \geq \left(1-p\right)^T \iff \log_{1-p}\left(\epsilon\right) \leq T,\]
+        since $\log_{1-p}\left(x\right)$ is a decreasing function for $p \in \left[0, 1\right[ $.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\section{Deutsch-Josza's algorithm}
+
+\begin{parag}{Definition: Balanced function}
+    Let $f: \mathbb{F}_2^n \mapsto \mathbb{F}_2$ be a function.
+
+    It is said to be \important{balanced} if half of the inputs yield $0$ and half of the inputs yield $1$; i.e. if, 
+    \[\left|\left\{x \in \mathbb{F}_2^n \suchthat f\left(x\right) = 0\right\}\right| = \left|\left\{x \in \mathbb{F}_2^n \suchthat f\left(x\right) = 1\right\}\right|\]
+
+    \begin{subparag}{Examples}
+        For instance, the following $f$ are balanced:
+        \[f\left(x_1, \ldots, x_n\right) = x_1, \mathspace f\left(x_1, \ldots, x_n\right) = x_1 \oplus \ldots \oplus x_n.\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Deutsch's problem}
+    Let $f: \mathbb{F}_2^n \mapsto \mathbb{F}_2$ be a boolean function that is either constant or balanced. 
+
+    We want to know if $f$ is constant or balanced, with a minimum number of call to the oracle $\hat{U}_f$.
+
+    \begin{subparag}{Remark}
+        We will need to be able to implement $\hat{U}_f$ efficiently for our quantum algorithm to work and be better than the classical case. However, this requires a very good understanding of $f$, and thus more or less to already know if it is balanced or constant. This is therefore mostly a toy problem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Classical algorithm}
+    Classically and deterministically, we need to consider $m = 2^{n-1} + 1$ points $x_1, \ldots, x_m \in \mathbb{F}_2^n$. Since we try more than half of the points, we know if it is balanced or constant. We cannot moreover not get rid of any point in the worst case.
+
+    We can however allow us some probability of error, checking only $k < m$ random points $x_1, \ldots, x_k$. If all $f\left(x_1\right), \ldots, f\left(x_k\right)$ are equal, we output that $f$ is constant. Otherwise, we output that it is balanced.
+
+    This will always be correct if $f$ is constant. If it is balanced, all $k-1$ last points need to be equal to the first one to have an error, which arrives with a probability
+    \[\prob\left(\text{error}\right) = \frac{1}{2^{k-1}}.\]
+    
+    This only depends on $k$, not on $n$ or $m$, so we can always make a classical algorithm that is correct with an arbitrary small error and makes $O\left(1\right)$ calls to $f$.
+
+    \begin{subparag}{Remark}
+        We will make a quantum algorithm that always works, and makes a single call to $\hat{U}_f$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Deutsch-Josza's algorithm}
+    \important{Deutsch-Josza's algorithm} is constructed using the following circuit:
+    \begin{center}
+    \begin{quantikz}[slice all]
+        \lstick[wires=3]{$n$ times} &[-0.75cm] \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} & \gate[wires=4]{\hat{U}_f} & \gate{\hat{H}} & \meter[3]{}\\
+        \setwiretype{n} & \midstick{\vdots} & \midstick{\vdots} & & \midstick{\vdots} & \\
+                        & \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} &  & \gate{\hat{H}} & \\
+                        & \wireoverride{n} \midstick{\ket{1}} & \gate{\hat{H}} & & & 
+    \end{quantikz}
+    \end{center}
+
+    If we measure $\ket{0\ldots0}$ at the end, we output that $f$ is constant. If we measure something else, we output that $f$ is balanced.
+
+    This algorithm always works, it has a zero probability of error.
+
+    \begin{subparag}{Proof}
+        We start with 
+        \[\ket{\psi_1} = \ket{0}^{\otimes n} \otimes \ket{1}.\]
+
+        Then, by the IQC lemma, we get 
+        \[\ket{\psi_2} = \left(\hat{H} \ket{0}\right)^{\otimes n} \otimes \left(\hat{H} \ket{1}\right) = \frac{1}{\sqrt{2^n}} \sum_{x \in \mathbb{F}_2^n} \ket{x} \otimes \frac{\ket{0} - \ket{1}}{\sqrt{2}}.\]
+
+        We then apply the oracle gate, yielding 
+        \[\ket{\psi_3} = \frac{1}{\sqrt{2^n}} \sum_{x \in \mathbb{F}_2^n} \ket{x} \otimes \frac{\ket{f\left(x\right)} - \ket{\bar{f\left(x\right)}}}{\sqrt{2}} = \frac{1}{\sqrt{2^n}} \sum_{x \in \mathbb{F}_2^n} \ket{x} \otimes \left(-1\right)^{f\left(x\right)} \ket{-}.\] 
+
+        Applying the final Hadamard gates, we can again use the IQC lemma to get that 
+        \autoeq{\ket{\psi_4} = \frac{1}{\sqrt{2^n}} \sum_{x \in \mathbb{F}_2^n} \left(-1\right)^{f\left(x\right)} \hat{H}^{\otimes n}\ket{x} \otimes  \ket{-} = \frac{1}{2^n} \sum_{x \in \mathbb{F}_2^n} \left(-1\right)^{f\left(x\right)} \sum_{y \in \mathbb{F}_2^n} \left(-1\right)^{x \dotprod y} \ket{y} \otimes \ket{-} = \sum_{y \in \mathbb{F}_2^n} \underbrace{\sum_{x \in \mathbb{F}_2^n} \frac{1}{2^n} \left(-1\right)^{f\left(x\right) + x \dotprod y}}_{= \alpha_y}\ket{y} \otimes \ket{-}.}
+
+        When measuring $\ket{\psi_4}$ in the canonical basis, we have a probability $\left|\alpha_y\right|^2$ to get $\ket{y}$. Thus, the probability to get $\ket{0}$ is given by 
+        \[\prob\left(\ket{0}\right) = \left|\alpha_0\right|^2 = \left|\frac{1}{2^n} \sum_{x \in \mathbb{F}_2^n} \left(-1\right)^{f\left(x\right)}\right|^2.\]
+        
+        If $f\left(x\right)$ is balanced, the sum will simply give 0 and thus $\prob\left(\ket{0}\right) = 0$. If $f\left(x\right) = c \in \mathbb{F}_2$ is constant, we have 
+        \[\prob\left(\ket{0}\right) = \left|\frac{1}{2^n} \left(-1\right)^c \sum_{x \in \mathbb{F}_2^n} \right| = \left|\left(-1\right)^c\right| = 1.\]
+
+        This indeed ends the proof: if we measure $\ket{0}$ at the end, we are sure that $f$ is constant; and otherwise we are sure it is balanced.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Distributed Deutsch-Josza's algorithm}
+
+\begin{parag}{Yao's communication complexity}
+    Alice knows some vector $x \in \mathbb{F}_2^n$ and Bob knows some vector $y \in \mathbb{F}_2^n$. They want to compute some function $f\left(x, y\right)$.
+
+    In \important{Yao's model}, the communication complexity of this problem is the number of q-bits they need to exchange in order to compute $f\left(x, y\right)$.
+\end{parag}
+
+\begin{parag}{Cleve-Buhrman's complexity}
+    Alice knows some vector $x \in \mathbb{F}_2^n$ and Bob knows some vector $y \in \mathbb{F}_2^n$. They want to compute some function $f\left(x, y\right)$.
+
+    In \important{Cleve-Buhrman's model}, Alice and Bob have access to entangled q-bits, and the communication complexity of this problem is the number of classical bits they need to exchange in order to compute $f\left(x, y\right)$.
+
+    \begin{subparag}{Remark}
+        It is possible to show that this is equivalent to Yao's communication complexity.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Hamming distance}
+    Let $x, y \in \mathbb{F}_2^n$.
+
+    Their \important{Hamming distance}, denoted $d_H\left(x, y\right)$, is the number of bits where they differ. 
+\end{parag}
+
+\begin{parag}{Distributed Deutsch-Josza's problem}
+    Let $k \in \mathbb{N}$ be some integer, and $n = 2^k$. Moreover, let $x, y \in \mathbb{F}_2^n$ be such that $x = y$ or $d_H\left(x, y\right) = \frac{k}{2}$. In other words, they are either always equal or equal for exactly half of the bits.
+
+    Alice only knows $x$ and Bob only knows $y$. They want to know if $x = y$.
+
+    \begin{subparag}{Quantum oracles}
+        We can consider $x$ and $y$ to be functions $x\left(j\right) = x_j$: given an index $j$, they output their $j$\Th bit. This allows us to construct quantum oracles $\hat{U}_x$ and $\hat{U}_y$ on those functions.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Distributed Deutsch-Josza's algorithm using communication}
+    The \important{distributed Deutsch-Josaza's algorithm} that uses communication uses the following circuit, based upon a quantum channel so that Alice can run the first part, and Bob can run the second part:
+    \begin{center}
+    \begin{quantikz}[slice all]
+        \lstick[wires=3]{$k$ times} &[-0.75cm] \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} & \gate[wires=4]{\hat{U}_x} & \\
+        \setwiretype{n} & \midstick{\vdots} & \midstick{\vdots} & & \\
+                        & \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} & & \\
+                        & \wireoverride{n} \midstick{\ket{1}} & \gate{\hat{H}} & & 
+    \end{quantikz}
+    $\xrightarrow[\text{channel}]{\text{Quantum}}$
+    \begin{quantikz}[slice all, slice titles=\the\numexpr\col+3\relax]
+        \slice{3} & \gate[wires=4]{\hat{U}_y} & \gate{\hat{H}} & \meter[3]{} \\
+        \setwiretype{n} & & \midstick{\vdots} &  \\
+                        & & \gate{\hat{H}} & \\
+                        & & & 
+    \end{quantikz}
+    \end{center}
+
+    If Bob measures $\ket{0}^{\otimes k}$, then $x = y$. Otherwise, $d_H\left(x, y\right) = \frac{n}{2}$. This always work, with probability $1$.
+
+    \begin{subparag}{Remark}
+        This implies that the Yao communication complexity of this problem is only $k + 1 = \log_2\left(n\right) + 1$, which is a great improvement over the classical case where we need to send $\frac{n}{2} + 1$ bits.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This circuit is completely equivalent to to Deutsch-Josza's circuit, where $\hat{U}_f = \hat{U}_y \hat{U}_x$. However, 
+        \[\hat{U}_f \ket{j} \otimes \ket{c} = \hat{U}_y \ket{j} \otimes \ket{c \oplus x_j} = \ket{j} \otimes \ket{c \oplus x_j \oplus y_j}.\]
+
+        So, this is like having the oracle for $f\left(j\right) = x_j \oplus y_j$. If $x = y$, then $f\left(j\right) = 0$ constant. If $d_H\left(x, y\right) = \frac{n}{2}$, then all $\frac{n}{2}$ inputs where $x_j = y_j$ will be 0 and all $\frac{n}{2}$ others will be 1; in which case $f$ is balanced. 
+
+        If Bob measures $\ket{0}^{\otimes k}$, this yields that $f\left(j\right)$ is constant and thus $x = y$. Otherwise, $f\left(j\right)$ is balanced, and thus $d_H\left(x, y\right) = \frac{n}{2}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Distributed Deutsch-Josza's algorithm using entanglement}
+    The \important{distributed Deutsch-Josaza's algorithm} that uses entanglement uses the following starting state, a tensor product of $k$ Bell states,
+    \[\ket{\phi} = \ket{B_{00}}^{\otimes k} = \left(\frac{\ket{00} + \ket{11}}{\sqrt{2}}\right)^{\otimes k} = \frac{1}{\sqrt{2^{k}}} \sum_{b \in \mathbb{F}_2^k} \ket{b}_A \otimes \ket{b}_B.\]
+
+    Alice and Bob run the same circuit by using their part of the entangled state and their own oracle gate $\hat{U} \in \left\{\hat{U}_x, \hat{U}_y\right\}$: 
+    \begin{center}
+    \begin{quantikz}[slice all, slice titles=\the\numexpr\col+1\relax]
+        \lstick[wires=3]{$\ket{\phi}_A$} \gategroup[wires=4,steps=4,style={inner ysep=15pt, inner xsep=15pt, color=gray}]{{\color{gray}Alice}} \slice{1} & \gate[wires=4]{\hat{U}_x} & \gate{\hat{H}} & \meter[3]{}\\
+        \setwiretype{n} & & \midstick{\vdots} & \\
+                        &  & \gate{\hat{H}} & \\
+        \midstick{\ket{-}}  & & & 
+    \end{quantikz}
+    \hfill
+    \begin{quantikz}[slice all, slice titles=\the\numexpr\col+1\relax]
+        \lstick[wires=3]{$\ket{\phi}_B$} \gategroup[wires=4,steps=4,style={inner ysep=15pt, inner xsep=15pt, color=gray}]{{\color{gray}Bob}} \slice{1} & \gate[wires=4]{\hat{U}_y} & \gate{\hat{H}} & \meter[3]{}\\
+        \setwiretype{n} & & \midstick{\vdots} & \\
+                        &  & \gate{\hat{H}} & \\
+        \midstick{\ket{-}} & & & 
+    \end{quantikz}
+    \end{center}
+
+    If Alice and Bob measure the same value, then $x = y$. If they measure different values, then $d_H\left(x, y\right) = \frac{n}{2}$. This has a zero probability of failing.
+
+    \begin{subparag}{Remark}
+        This implies that the Cleve-Buhrman complexity of this problem is $k = \log_2\left(n\right)$: Alice and Bob only need to share $k$ bits to know whether $x = y$.  Since it is equivalent with Yao's model, this is reasonable to get the same asymptotic complexity.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The starting state is 
+        \autoeq{\ket{\psi_1} = \left(\ket{\phi}_A \otimes \ket{-}\right) \otimes \left(\ket{\phi}_B \otimes \ket{-}\right) = \frac{1}{\sqrt{2^k}} \sum_{b = 0}^{n-1} \left(\ket{b}_A \otimes \ket{-}\right) \otimes \left(\ket{b}_B \otimes \ket{-}\right).}
+
+        When Alice and Bob apply their oracle gate, we get, just like for Deutsch-Josza's algorithm, 
+        \autoeq{\ket{\psi_2} = \frac{1}{\sqrt{2^k}} \sum_{b = 0}^{n - 1} \hat{U}_x\left(\ket{b}_A \otimes \ket{-}\right) \otimes \hat{U}_y\left(\ket{b}_B \otimes \ket{-}\right) = \frac{1}{\sqrt{2^k}} \sum_{b = 0}^{n - 1} \left(-1\right)^{x_b + y_b} \left(\ket{b}_A \otimes \ket{-}\right) \otimes \left(\ket{b}_B \otimes \ket{-}\right).}
+
+        After this, when Alice and Bob apply the Hadamard gates, by the IQC lemma,
+        \autoeq[s]{\ket{\psi_3} = \frac{1}{\sqrt{2^k}^3} \sum_{b=0}^{n-1} \left(-1\right)^{x_b + y_b} \left(\sum_{c=0}^{n-1} \left(-1\right)^{b \dotprod c} \ket{c}_A \otimes \ket{-}\right) \otimes \sum_{d=0}^{n-1} \left(\left(-1\right)^{b \dotprod d} \ket{d}_B \otimes \ket{-}\right) = \sum_{c=0}^{n-1} \sum_{d=0}^{n-1} \underbrace{\left(\frac{1}{\sqrt{2^k}^3} \sum_{b=0}^{n-1} \left(-1\right)^{x_b + y_b + b \dotprod c + b \dotprod d}\right)}_{= \alpha_{c, d}} \left(\ket{c}_A \otimes \ket{-}\right) \otimes \left(\ket{d}_B \otimes \ket{-}\right).}
+        
+        Since $n = 2^k$, the probability that Alice measures $c$ and Bob measure $d$ is given by,
+        \[\prob\left(c, d\right) = \left|\alpha_{c, d}\right|^2 = \frac{1}{n^3} \left|\sum_{b = 0}^{n-1} \left(-1\right)^{x_b + y_b + b \dotprod c + b \dotprod d}\right|^2.\]
+        
+        The probability that they both observe the same value $v$ is therefore given by, 
+        \autoeq{\prob\left(c = d = v\right) = \left|\alpha_{v, v}\right|^2 = \frac{1}{n^3} \left|\sum_{b = 0}^{n-1} \left(-1\right)^{x_b + y_b} \left(\left(-1\right)^2\right)^{b \dotprod v}\right|^2 = \frac{1}{n^3} \left|\sum_{b=0}^{n-1} \left(-1\right)^{x_b + y_b}\right|^2.}
+
+        If $d_H\left(x, y\right) = \frac{n}{2}$, then half of the terms of the sum will be negative, the other half will be positive, yielding that $\prob\left(c = d\right) = 0$. If however $x = y$, then all terms of the sum will be positive and thus, 
+        \[\prob\left(c = d = v\right) = \frac{1}{n^3} \left|\sum_{b=0}^{n-1}\right|^2 = \frac{n^2}{n^3}= \frac{1}{n}.\]
+        
+        Since there are $n$ different values for $v$, this necessarily means that of them is chosen uniformly at random and that it is impossible to have $c \neq d$ (still when $x = y$).
+
+        In other words, when $x = y$, we necessarily have $c = d$; and when $d_H\left(x, y\right)$, there is probability $0$ that $c = d$. This indeed ends the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Simon's algorithm}
+
+
+\begin{parag}{Hidden subgroup problem}
+    Let $H \subset \mathbb{F}_2^n$ be an unknown subgroup, and let $X$ be a set of cardinality $\left|X\right| = 2^{n-k}$.
+
+    Moreover, let $f: \mathbb{F}_2^n \mapsto X$ be a boolean function such that $f\left(x\right) = f\left(y\right)$ if and only if $x \sim y$ are in the equivalence relation defined by
+    \[x \sim y \iff x \ominus y \in H,\]
+    where $x \ominus y = x \oplus y$ over $\mathbb{F}_2^n$.
+
+    The goal is to find a basis $\left\{h_1, \ldots h_k\right\}$ of $H$ in the least number of calls to $f$.
+
+    \begin{subparag}{Remark}
+        We can always choose $X = G / H$ since, by Lagrange's theorem,
+        \[\left|G / H\right| = \frac{\left|G\right|}{\left|H\right|} = \frac{2^n}{2^k} = 2^{n-k}.\]
+    \end{subparag}
+
+    \begin{subparag}{Simplification}
+        To understand well this problem, it is interesting to consider the particular case where,
+        \[H = \left\{0, a\right\},\]
+        where $a \in \mathbb{F}_2^n \setminus \left\{0\right\}$ is unknown. Our goal is to find this $a$.
+
+        Our function $f$ is such that $f\left(x\right) = f\left(y\right)$ if and only if $x \oplus y = 0$ or $x \oplus y = a$. This is equivalent to asking that $f$ is such that $f\left(x\right) = f\left(y\right)$ if and only if $x = y$ or $x = a \oplus y$. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Classical algorithm}
+    We consider a classical algorithm for the simple case $H = \left\{0, a\right\}$. We can pick random distinct samples $x_1, \ldots, x_k \in \mathbb{F}_2^n$ until we find a collision $f\left(x_i\right) = f\left(x_j\right)$. 
+
+    Since $x_i$ and $x_j$ are distinct, we necessarily have
+    \[x_i = x_j \oplus a \iff a = x_i \oplus x_j \neq 0.\]
+
+    \begin{subparag}{Complexity}
+        The probability to have a collision in some set increases quadratically in the size of the set by the birthday paradox. Therefore, in average, we need $O\left(\sqrt{2^n}\right)$ calls to the function, which is exponential and therefore very bad.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Orthogonal complement}
+   Let $H \subset \mathbb{F}_2^n$ be a vector space. Its \important{orthogonal complement}, written $H^\perp$, is given by
+   \[H^\perp = \left\{x \in \mathbb{F}_2^n \suchthat x \dotprod h = 0, \forall h \in H\right\}.\]
+
+   \begin{subparag}{Remark}
+       Recall $\mathbb{F}_k^n$ is not an inner product space: we do not have the property $a \dotprod b = 0 \iff a = b = 0.$ This breaks many usual properties of $H^\perp$, one of the most important ones being that we may have
+       \[H \cap H^\perp \neq \left\{0\right\}.\]
+
+       For instance, over $\mathbb{F}_2^2$, we have that $11 \in \left\{0, 11\right\}^{\perp}$.
+
+       We however still have the property
+       \[\dim H + \dim H^\perp = \dim \mathbb{F}_k^n,\]
+       by the rank theorem.
+   \end{subparag}
+\end{parag}
+
+\begin{parag}{Simon's circuit}
+    Simon's algorithm uses the following circuit:
+    \begin{center}
+    \begin{quantikz}[slice all]
+        \lstick[wires=3]{$n$ times} &[-0.75cm] \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} & \gate[wires=6]{\hat{U}_f} & \gate{\hat{H}} & \meter[3]{}\\
+        \setwiretype{n} & \midstick{\vdots} & \midstick{\vdots} & & \midstick{\vdots} & \\
+                        & \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} &  & \gate{\hat{H}} & \\
+        \lstick[wires=3]{$n-k$ times} & \wireoverride{n} \midstick{\ket{0}} & & & & \\
+        \setwiretype{n} & \midstick{\vdots} & \midstick{\vdots} & & \midstick{\vdots} & & \\
+                        & \wireoverride{n} \midstick{\ket{0}} & & & & 
+    \end{quantikz}
+    \end{center}
+    
+    This circuit outputs a vector from $H^{\perp}$ uniformly at random.
+
+    \begin{subparag}{Proof}
+        The starting state is 
+        \[\ket{\psi_1} = \ket{0}^{\otimes n} \otimes \ket{0}^{\otimes \left(n-k\right)}.\]
+        
+        After the Hadamard gates, we have, by the IQC lemma, 
+        \[\ket{\psi_2} = \left(\hat{H} \ket{0}\right)^{\otimes n} \otimes \ket{0}^{\otimes \left(n-k\right)} = \frac{1}{\sqrt{2^n}} \sum_{x \in \mathbb{F}_2^n } \ket{x} \otimes \ket{0}^{\otimes \left(n-k\right)}.\]
+
+        The oracle gate then directly yields
+        \[\ket{\psi_3} = \hat{U}_f \ket{\psi_1} = \frac{1}{\sqrt{2^n}} \sum_{x \in  \mathbb{F}_2^n} \ket{x} \otimes \ket{f\left(x\right)}.\]
+        
+        We can then again use the IQC lemma for the last Hadamard gates, 
+        \[\ket{\psi_4} = \frac{1}{\sqrt{2^n}} \sum_{x \in  \mathbb{F}_2^n} \hat{H}^{\otimes n}\ket{x} \otimes \ket{f\left(x\right)} = \frac{1}{2^n} \sum_{x \in \mathbb{F}_2^n} \sum_{y \in \mathbb{F}_2^n} \left(-1\right)^{x \dotprod y} \ket{y} \otimes \ket{f\left(x\right)}.\]
+        
+        We have not used $H$ so far, so let us make it appear by considering $G / H$, i.e. the equivalence classes under the equivalence relation $\sim$. Let $V = \left\{v^{\left(1\right)}, \ldots, v^{\left(n-k\right)}\right\}$ be a set of representatives for those equivalence classes. Since $\mathbb{F}_2^n$ is partitioned into equivalence classes by $H$, for any $x \in \mathbb{F}_2^n$, we can find unique $v \in V$, $h \in H$ such that $x = v \oplus h$.
+
+        To exploit the property of $f\left(x\right)$ that $f\left(v \oplus h\right) = f\left(v\right)$, let us split the sum over $x$ as two sums, giving 
+        \autoeq{\ket{\psi_4} = \frac{1}{2^n} \sum_{v \in V} \sum_{h \in H} \sum_{y \in \mathbb{F}_2^n} \left(-1\right)^{\left(v \oplus h\right) \dotprod y} \ket{y} \otimes \ket{f\left(v \oplus h\right)} =  \sum_{y \in \mathbb{F}_2^n} \frac{1}{2^n} \sum_{v \in V} \left(-1\right)^{v \dotprod y} \underbrace{\left(\sum_{h \in H} \left(-1\right)^{h \dotprod y}\right)}_{= S} \ket{y} \otimes \ket{f\left(v\right)}.}
+        
+        Let us consider the sum $S$. If $y \in H^{\perp}$, we have 
+        \[S = \sum_{h \in H} \left(-1\right)^{h \dotprod y} = \sum_{h \in H} \left(-1\right)^{0} = \left|H\right| = 2^k.\]
+
+        However, if $y \not \in H^{\perp}$, there is some $h_0 \in H$ such that $h_0 \dotprod y \neq 0$ by definition. Since we are working over $\mathbb{F}_2$, this necessarily means that $h_0 \dotprod y = 1$. We moreover notice that we can do a change of variable: for any $h \in H$, we can find a unique $\hat{h} \in H$ such that $h = h_0 \oplus \hat{h}$. This yields
+        \autoeq{S = \sum_{\hat{h} \in H} \left(-1\right)^{\left(h_0 \oplus \hat{h}\right) \dotprod y} = \left(-1\right)^{h_0 \dotprod y} \sum_{\hat{h} \in H} \left(-1\right)^{\hat{h} \dotprod y} = -\overbrace{\sum_{\hat{h} \in H} \left(-1\right)^{\hat{h} \dotprod y}}^{= S}.}
+
+        In other words, still when $y \not \in H^{\perp}$,
+        \[S = -S \iff S = 0.\]
+        
+        Therefore, we only need to sum over $y \in H^{\perp}$,
+        \autoeq{\ket{\psi_4} = \sum_{y \in H^{\perp}} \frac{1}{2^n} \sum_{v \in V} \left(-1\right)^{v \dotprod y} 2^{k} \ket{y} \otimes \ket{f\left(v\right)} = \sum_{y \in H^{\perp}} \frac{1}{2^{n - k}}\sum_{v \in V} \left(-1\right)^{v \dotprod y} \ket{y} \otimes \ket{f\left(v\right)}.}
+
+        In this case, measurement is less trivial than in Deutsch-Josza's algorithm since $\ket{y}$ and $\ket{f\left(v\right)}$ are entangled: we cannot express $\ket{\psi_4} = \left(\sum_{y} \alpha_y \ket{y}\right) \otimes \ket{\psi}$. We therefore have to use partial measurements (see my summary of Introduction to quantum information processing for a formal definition), to see that the probability to get $\ket{y'}$ after the measurement is
+        \[\prob\left(\ket{y'}\right) = \left\|\left(\ket{y'}\bra{y'} \otimes \hat{I}^{\otimes \left(n-k\right)}\right) \ket{\psi_4}\right\|^2.\]
+
+        If $y' \not \in H^{\perp}$, then we directly get that $\prob\left(\ket{y'}\right) = 0$ since it is not in the sum. Otherwise, when $y' \in H^{\perp}$,
+        \[\prob\left(\ket{y'}\right) = \left\|\frac{1}{2^{n-k}} \sum_{v \in V} \left(-1\right)^{v \dotprod y'} \ket{y'} \otimes \ket{f\left(v\right)}\right\|^2.\]
+
+        The squared norm of a vector is simply given by the square modulus of all of its components. But, by definition of $f$, we cannot find any $v_1 \neq v_2$ such that $f\left(v_1\right) = f\left(v_2\right)$. All terms of the sum are therefore different components, yielding 
+        \[\prob\left(\ket{y'}\right) = \frac{1}{4^{n-k}} \sum_{v \in V} \left(\left(-1\right)^{v \dotprod y'}\right)^2 = \frac{\left|V\right|}{4^{n-k}} = \frac{\left|X\right|}{4^{n-k}} = \frac{2^{n-k}}{4^{n-k}} = \frac{1}{2^{n-k}}.\]
+
+
+        This circuit therefore indeed outputs a vector of $H^{\perp}$ uniformly at random.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Simon's algorithm}
+    \important{Simon's algorithm} goes as follows:
+    \begin{enumerate}
+        \item We run $n-k$ times Simon's circuit, getting $y^{\left(1\right)}, \ldots, y^{\left(n-k\right)}$ as a result.
+        \item We try to create an orthonormal basis from those vectors. 
+        \item If the vectors are not linearly independent, declare failure. Otherwise, the result is a basis for $H^{\perp}$.
+        \item Use Gaussian elimination to get a basis for $H$.
+    \end{enumerate}
+
+    This algorithm succeeds with a probability 
+    \[\prob\left(\text{success}\right) \geq \frac{1}{4}.\]
+    
+    \begin{subparag}{Arbitrary success probability}
+        The failing probability of this algorithm is upper bounded by $\frac{3}{4}$, so, using the arbitrary success probability lemma, we can run the algorithm $T \geq \log_{\frac{3}{4}}\left(\epsilon\right)$ times to get an arbitrary success probability $1 - \epsilon$.
+
+        In other words, the algorithm requires $O\left(\left(n-k\right) \left|\ln\left(\epsilon\right)\right|\right)$ calls to the oracle for a success probability of $\epsilon$. Hence, the bottleneck is typically the computation of the basis of $H$ from the basis of $H^{\perp}$.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        We want to show that the probability of success is greater than or equal to $\frac{1}{4}$, i.e. that, when we pick $n - k$ vectors uniformly at random of $H^{\perp}$, we have a probability greater than or equal to $\frac{1}{4}$ that they are linearly independent.
+
+        Let $L_j$ be the event that vectors $y^{\left(1\right)}, \ldots, y^{\left(j\right)}$ are linearly independent, and $S_j$ be the event that $y^{\left(j\right)} \not\in \Span\left\{y^{\left(1\right)}, \ldots, y^{\left(j-1\right)}\right\}$ for $j \neq 1$ and the event that $y^{\left(1\right)} \neq 0$ for $j = 1$. By property of linear independence, we have that 
+        \[L_j = \bigcap_{i=1}^{j} S_j,\]
+        i.e. $j$ vectors are linearly independent if and only if each vector is not in the span of the vectors before.
+
+        Our goal is to show that 
+        \[\prob\left(L_{n-k}\right) \geq \frac{1}{4}.\]
+
+        We notice that, if we have $j-1$ vectors that are linearly independent, their span reaches $2^{j-1}$ of the elements of $H^{\perp}$. Therefore, picking a random element of $H^{\perp}$, the probability that it is not in their span is given by
+        \[\prob\left(S_{j} \suchthat L_{j-1}\right) = 1 - \frac{2^{j-1}}{\left|H^{\perp}\right|} = 1 - \frac{2^{j}}{2^{n-k}} = 1 - \frac{1}{2^{n-k-j+1}}.\]
+
+        Moreover, the probability that a single vector is linearly independent is the probability that this vector is not 0, giving 
+        \[\prob\left(S_1\right) = 1 - \frac{1}{\left|H^{\perp}\right|} = 1 - \frac{1}{2^{n-k}}.\]
+
+        We get that the probability to have $n-k$ linearly independent vectors is the product of the probability to have a $j$\Th linearly independent vector when we already have $j-1$ of them that are linearly independent, i.e.
+        \[\prob\left(L_{n-k}\right) = \prob\left(\bigcap_{j=1}^{n-k} S_j\right) = \prod_{j=1}^{n-k} \prob\left(S_j \suchthat \bigcap_{i=1}^{j-1} S_j\right) = \prod_{j=1}^{n-k} \prob\left(S_j \suchthat L_{j-1}\right).\]
+
+        Using what we found right before, and the change of variable $\ell = n - k - j + 1$, we get, 
+        \autoeq{\prob\left(L_{n-k}\right) = \prod_{j=1}^{n-k} \left(1 - \frac{1}{2^{n-k-j + 1}}\right) = \prod_{\ell = 1}^{n-k} \left(1 - \frac{1}{2^{\ell }}\right) = \exp\left(\sum_{\ell = 1}^{n-k} \ln\left(1 - \frac{1}{2^{\ell }}\right)\right).}
+
+        We can now use the fact that $\ln\left(1 - x\right) \geq - 2 \ln\left(2\right) x$ for any $x \in \left[0, \frac{1}{2}\right]$, yielding 
+        \[\prob\left(L_{n-k}\right) \geq \exp\left(- 2 \ln\left(2\right) \sum_{\ell = 1}^{n-k} \frac{1}{2^{\ell }}\right) \geq \exp\left(- 2 \ln\left(2\right)\cdot 1\right) = \frac{1}{4},\]
+        since the sum was a truncation of the series $\sum_{i=1}^{\infty} \frac{1}{2^i} = 1$, which only has positive terms.
+
+        This indeed finishes the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Shor's algorithm}
+
+\begin{parag}{Factorisation problem}
+    Let $N \in \mathbb{N}$ be a composite number (i.e. not a prime).
+
+    We want to find one of its non-trivial factor: $d \divides N$ such that $d \not \in \left\{1, N\right\}$.
+\end{parag}
+
+\begin{parag}{Order finding problem}
+    Let $N, a \in \mathbb{N}$ be some coprime integers, i.e. $\gcd\left(N, a\right) = 1$.
+
+    Then, we want to find the multiplicative order of $a$ modulo $N$: the smallest $r \in \mathbb{N}_{\geq 1}$ such that 
+    \[\congruent{a^r}{1}{N}.\]
+
+    \begin{subparag}{Remark}
+        This number always exists by group theory: $a$ is an element of the group $\left(\mathbb{Z}/N\mathbb{Z}^*, \cdot \right)$ since it is coprime with $N$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Period finding problem}
+    Let $f: \mathbb{Z} \mapsto \mathbb{Z}$ be a periodic function of period $r$. We moreover suppose that, for any $x, y \in \mathbb{Z}$,
+    \[f\left(x\right) = f\left(y\right) \iff x = y + kr,\]
+    for some $k \in \mathbb{Z}$. 
+
+    We want to find $r$.
+
+    \begin{subparag}{Alternative hypotheses}
+        Another formulation of the hypotheses is that the function is periodic and that it differs across $0 \leq x \leq r- 1$, i.e. that $f\left(x\right) \neq f\left(y\right)$ for $x, y \in \left\{0, \ldots, r-1\right\}$ and $x \neq y$.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        This is more or less the hidden subgroup problem for an infinite group.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        This problem is a generalisation of the order finding problem. We can always pick the function $f_{a, N}\left(x\right) = a^x \Mod N$. Its period is indeed the order $r$ of $a$ and it does differ across $0 \leq x \leq r-1$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        In practice, we can solve this problem by picking $f: \left\{0, \ldots, 2^n - 1\right\} \mapsto \left\{0, \ldots, 2^n - 1\right\}$ for some $2^n \gg r$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Factorisation reduces to order finding}
+    Let $N \in \mathbb{N}$ be a composite number. 
+
+    If we know how to efficiently solve the order finding problem, we can find non-trivial factors of $N$ using the following algorithm:
+    \begin{enumerate}
+        \item Pick a random $a \in \left\{2, \ldots, N-1\right\}$.
+        \item Compute $d = \gcd\left(a, N\right)$ using Euclid's algorithm.
+        \item If $d > 1$, return $d$. Otherwise, $d = 1$ and continue.
+        \item Find the multiplicative order $r$ of $a$ modulo $N$. By definition, $a^r = kN + 1$ for some $k \in \mathbb{Z}$.
+        \item If $r$ is odd, declare failure and restart.
+        \item If $r$ is even, then we can write, 
+        \[kN = a^r - 1 = \left(a^{\frac{r}{2}} - 1\right) \left(a^{\frac{r}{2}} + 1\right).\]
+        \item If $a^{\frac{r}{2}} + 1$ is a multiple of $N$, declare failure. Otherwise, $\gcd\left(a^{\frac{r}{2}} - 1, N\right)$ and $\gcd\left(a^{\frac{r}{2}} + 1, N\right)$ are non-trivial divisors of $N$.
+    \end{enumerate}
+
+    Note that, for the last step, we can never have $\congruent{a^{\frac{r}{2}} - 1}{0}{N}$, since it would contradict that $r$ was the smallest value such that $\congruent{r}{1}{N}$. So, it can never be a multiple of $N$. Only $a^{\frac{r}{2}} + 1$ can be a problem.
+
+    Except for the order finding, all other steps can be done very efficient classically. For instance, computing the gcd of two number thanks to Euclid's algorithm is linear in their number of digits in the worst case.
+
+    \begin{subparag}{Implication}
+        In other words, if we manage to efficiently solve the period finding problem, we can efficiently solve the factorisation problem.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        It is possible to show that this algorithm has a bounded probability of failure,
+        \[\prob\left(\text{failure}\right) \leq \frac{1}{4}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Continued fraction}
+    Let $x \in \mathbb{R}$ be some number. It can always be represented as a \important{continued fraction}, 
+    \[x = a_0 + \frac{1}{a_1 + \frac{1}{a_2 + \ldots}},\]
+    for $a_0, a_1, a_2, \ldots \in \mathbb{N}$.
+
+    We note this $x = \left[a_0, a_1, a_2, \ldots\right]$. Any truncation of this sequence $\left[a_0, \ldots, a_n\right]$ is called a \important{convergent} of $x$.
+
+    \begin{subparag}{Example 1}
+        For instance, we have
+        \[\frac{263}{189} = 1 + \frac{74}{189} = 1 + \frac{1}{\frac{189}{74}}.\]
+
+        We then only need to compute the continued fraction of $\frac{189}{74}$, which can be done recursively. Every step only is a single step of the Euclidean algorithm. Doing so, we find that 
+        \[\frac{263}{189} = \left[1,2,1,1,4,8\right].\]
+    \end{subparag}
+
+    \begin{subparag}{Example 2}
+        It is possible to show that the golden ratio's continued fraction is
+        \[\phi = \frac{1 + \sqrt{5}}{2} = \left[1,1,1,1,\ldots\right],\]
+        and that its convergents are ratios of consecutive terms in the Fibonacci sequence.
+
+        For instance, the following is a convergent of $\phi$,
+        \[\left[1, 1, 1, 1\right] = 1 + \frac{1}{1 + \frac{1}{1 + \frac{1}{1}}} = \frac{5}{3}.\]
+    \end{subparag}
+
+    \begin{subparag}{Complexity}
+        Computing all convergents of some rational number $\frac{p}{q}$ is simply done by running Euclid's algorithm to get $\gcd\left(p, q\right)$, which is linear in their number of digits. Each division is however quadratic in the number of digits.
+
+        Therefore, computing all convergents of $\frac{p}{q}$ is only cubic in their number of digits.
+    \end{subparag} 
+\end{parag}
+
+\begin{parag}{Legendre's theorem for convergents}
+    Let $x \in \mathbb{R}_{\geq 0}$ be a real number, and $p, q \in \mathbb{N}$ be integers.
+
+    If $\left|x - \frac{p}{q}\right| < \frac{1}{q^2}$, then $\frac{p}{q}$ is a convergent of $\alpha$.
+
+    \begin{subparag}{Intuition}
+        This means that any good (in the sense of the theorem) rational approximation of $x$ is one of its convergent.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: QFT gate}
+    The \important{QFT gate} (Quantum Fourier Transform gate) is defined such that, for any $x \in \left\{0, \ldots, 2^n - 1\right\}$, 
+    \[\widehat{QFT} \ket{x} = \frac{1}{\sqrt{2^n}} \sum_{y = 0}^{2^n - 1} \exp\left(\frac{2\pi i}{2^n} xy\right) \ket{y}.\]
+    where $x$ and $y$ are multiplied as numbers, this is not a dot product. 
+
+    \begin{subparag}{Remark 1}
+        It is indeed possible to show that this gate is unitary (which is necessary for it to be a gate).
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Using a method close to the one we use to prove the IQC lemma, it is possible to show that 
+        \[\widehat{QFT} \ket{x} = \bigotimes_{\ell = 1}^{n} \frac{\ket{0} + \exp\left(\dfrac{2\pi i}{2^\ell } x\right)\ket{1}}{\sqrt{2}}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{QFT circuit}
+    The QFT gate can be constructed using the following circuit:
+    \begin{center}
+    \resizebox{\columnwidth}{!}{
+        \hspace*{-1.2cm}
+        \begin{quantikz}
+                            & \wireoverride{n} \midstick{\ket{x_{n-1}}} & \gate[wires=5]{\widehat{SWAP}} & & & & \ctrl{4} & & & \ctrl{1} & \gate{i \pi} & \\
+                            & \wireoverride{n} \midstick{\ket{x_{n-2}}} & & & & & & & \gate{i \pi} & \gate{\dfrac{i \pi}{2}} & & \\
+            \setwiretype{n} & \midstick{\vdots} & & & & & \gate[style={draw=none, yshift=-0.1cm}]{\raisebox{0.2cm}{\vdots}} & & & & &\\
+                            & \wireoverride{n} \midstick{\ket{x_{1}}} & & & \ctrl{1} & & & \midstick{$\cdots$} & & & & \\
+                            & \wireoverride{n} \midstick{\ket{x_0}} & & \gate{i \pi} & \gate{\dfrac{i \pi}{2}} & \midstick{$\cdots$} & \gate{\dfrac{i \pi}{2^{n-1}}} & & & & &
+        \end{quantikz}
+    }
+    \end{center}
+    where the gates $\widehat{i\phi}$ are the controlled version of
+    \[\begin{pmatrix} 1 & 0 \\ 0 & e^{i \phi} \end{pmatrix}.\]
+
+    \begin{subparag}{Remark}
+        Swapping 2 q-bits can be implemented using the following circuit, which is based on the same idea to swap two variables without extra memory classically:
+        \begin{center}
+        \begin{quantikz}
+            \lstick{\ket{x_0}} & \ctrl{1} & \targ{} &  \ctrl{1} & \rstick{\ket{x_1}}\\
+            \lstick{\ket{x_1}} & \targ{} & \ctrl{-1} & \targ{} & \rstick{\ket{x_0}}
+        \end{quantikz}
+        \end{center}
+
+        Then, we can chain $\frac{n}{2}$ of those swaps by swapping $x_0$ and $x_{n-1}$, $x_1$ and $x_{n-2}$ and so on. This allows to construct the SWAP gate in a linear number of gates.
+    \end{subparag}
+
+    \begin{subparag}{Complexity}
+        Since we need a linear number of gates for implementing SWAP, and then a quadratic number of controlled phase gates, this circuit uses a quadratic number of gates.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let us start with the following form of the QFT gate,
+        \[\widehat{QFT} \ket{x} = \frac{1}{\sqrt{2^n}} \bigotimes_{\ell = 1}^{n} \left(\ket{0} + \exp\left(\frac{2\pi i}{2^\ell } x\right)\ket{1}\right).\]
+
+        Moreover, let us decompose $x = \left(x_{n-1}, \ldots, x_0\right)$ into its binary representation, 
+        \[x = x_{n-1} \cdot 2^{n-1} + \ldots + x_1 \cdot 2 + x_0.\]
+
+        Since we know that $\exp\left(2 \pi i k\right) = 1$, this for instance means that,
+        \autoeq{\exp\left(\frac{2\pi i}{4} x\right) = \exp\left( 2^{n-2} x_{n-1} \pi i + \ldots + 2 x_2 \pi i + x_1 \pi i + \frac{x_0}{2} \pi i\right) = \exp\left(x_1 \pi i + \frac{x_0}{2} \pi i\right).}
+        
+        Doing a similar reasoning for all terms of the tensor product, this yields, 
+        \autoeq{\widehat{QFT} \ket{x} = \frac{1}{\sqrt{2^n}} \left(\ket{0} + \exp\left(\pi i x_0\right) \ket{1}\right) \otimes \left(\ket{0} + \exp\left(\pi i x_1 + \frac{\pi i}{2} x_0\right)\right) \fakeequal \otimes \ldots \otimes \left(\ket{0} + \exp\left(\pi i x_{n-1} + \ldots + \frac{\pi i}{2^{n-1}} x_0\right) \ket{1}\right).}
+
+        However, the gate $\exp\left(\frac{\pi i}{2^k} x_j\right)$ is the phase gate $\exp\left(\frac{\pi i}{2^k}\right)$ controlled by some q-bit $x_j$. The circuit indeed implements this formula, ending the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Shor's circuit}
+    The circuit Shor's algorithm uses is:
+    \begin{center}
+    \begin{quantikz}[slice all]
+        \lstick[wires=3]{$n$ times} &[-0.75cm] \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} & \gate[wires=6]{\hat{U}_f} & \gate[wires=3]{\widehat{QFT}} & \meter[3]{}\\
+        \setwiretype{n} & \midstick{\vdots} & \midstick{\vdots} & & & \\
+                        & \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} &  & & \\
+        \lstick[wires=3]{$n$ times} & \wireoverride{n} \midstick{\ket{0}} & & & & \\
+        \setwiretype{n} & \midstick{\vdots} & \midstick{\vdots} & & \midstick{\vdots} & & \\
+                        & \wireoverride{n} \midstick{\ket{0}} & & & & 
+    \end{quantikz}
+    \end{center}
+
+    Let $f: \left\{0, \ldots, 2^n - 1\right\} \mapsto \left\{0, \ldots, 2^n - 1\right\}$ be a periodic function such that 
+    \[f\left(x\right) = f\left(y\right) \iff x - y = k\cdot r.\]
+
+    The output $y$ of this circuit is very likely to be the integer closest to a multiple of $\frac{2^n}{r}$ (which might not be an integer), i.e. 
+    \[\prob\left(y \in \bigcup_{k=0}^{r-1} \left[k \frac{2^n}{r} - \frac{1}{2}, k \frac{2^n}{r} + \frac{1}{2}\right]\right) \geq \frac{2}{5}.\]
+    
+    Note that this bound does not depend on $n$ or $r$.
+
+    \begin{subparag}{Remark}
+        Using this circuit for finding a non-trivial divisor of a number relies on our ability to implement $\hat{U}_f$ for $f\left(x\right) = a^{x} \Mod N$. Its implementation is not extremely important, so let us only see a quick intuition.
+
+        We can first notice the fact that we can make a gate that, controlled by some q-bit, multiplies its input by some hard-wired number $x$ (there exists reversible classical circuits, which can therefore be used as a quantum circuit). Then, we know that $a \Mod N, a^2 \Mod N, \ldots, a^{2^m - 1} \Mod N$ can be computed efficiently classically. We can therefore implement $\hat{U}_f$ using fast-exponentiation.
+    \end{subparag}
+
+    \begin{subparag}{Proof idea}
+        We want to prove that the output of the circuit is very likely to be close to a multiple of $\frac{2^n}{r}$. This is however pretty hard to show. We will prove a simpler version where we suppose that that $r$ divides $2^n$. In this case, we want to show that 
+        \begin{functionbypart}{\prob\left(y_0\right)}
+            \frac{1}{r}, & y_0 = k\frac{2^n}{r} \\
+            0, & \text{otherwise}
+        \end{functionbypart}
+
+        We start with 
+        \[\ket{\psi_1} = \ket{0}^{\otimes n} \otimes \ket{0}^{\otimes n}.\]
+        
+        Then, by the IQC lemma, we have that
+        \[\ket{\psi_2} = \frac{1}{\sqrt{2^n}} \sum_{x = 0}^{2^n - 1} \ket{x} \otimes \ket{0}^{\otimes n}.\]
+
+        After this, when we apply the oracle gate,
+        \[\ket{\psi_3} = \frac{1}{\sqrt{2^n}} \sum_{x=0}^{2^n - 1} \ket{x} \otimes \ket{f\left(x\right)}.\]
+
+        Now, we would like to do the change of variable $x = x_0 + jr$ for some $x_0, j \in \mathbb{N}$ in order to exploit the fact that $f$ has a period $r$. It is easy to find that $x_0 \in \left\{0, \ldots, r-1\right\}$, but the domain of $j$ is a bit harder in general. We therefore define the function $A\left(x_0\right)$, such that, 
+        \[A\left(x_0\right) = \min\left\{j \geq 1 \suchthat x_0 + jr > 2^n - 1\right\}.\]
+
+        In our case, $2^n$ is a multiple of $r$, and thus we always have $A\left(x_0\right) = \frac{2^n}{r}$. This is where this assumption greatly simplifies our reasoning. We can thus now write,
+        \autoeq{\ket{\psi_3} = \frac{1}{\sqrt{2^n}} \sum_{x_0 = 0}^{r-1} \sum_{j=0}^{A\left(x_0\right) -  1} \ket{x_0 + jr} \otimes \ket{f\left(x_0 + jr\right)} = \frac{1}{\sqrt{2^n}} \sum_{x_0 = 0}^{r-1} \sum_{j=0}^{A\left(x_0\right) -  1} \ket{x_0 + jr} \otimes \ket{f\left(x_0\right)}.}
+        
+        We now apply the QFT gate and, by definition, 
+        \autoeq[s]{\ket{\psi_4} = \frac{1}{\sqrt{2^n}} \sum_{x_0 = 0}^{r-1} \sum_{j=0}^{A\left(x_0\right) -  1} \widehat{QFT} \ket{x_0 + jr} \otimes \ket{f\left(x_0\right)} = \frac{1}{2^n} \sum_{x_0 = 0}^{r-1} \sum_{j=0}^{A\left(x_0\right) -  1} \sum_{y=0}^{2^n - 1}  \exp\left(\frac{2\pi i}{2^n} \left(x_0 + jr\right)y\right) \ket{y} \otimes \ket{f\left(x_0\right)} = \frac{1}{2^n} \sum_{x_0 = 0}^{r-1} \sum_{y=0}^{2^n - 1}  \exp\left(\frac{2\pi i}{2^n} x_0 y\right) \underbrace{\left(\sum_{j=0}^{A\left(x_0\right) -  1}\exp\left(\frac{2\pi i}{2^n} jr y\right)\right)}_{= S} \ket{y} \otimes \ket{f\left(x_0\right)}.}
+        
+        Now, the probability to measure some $y_0$ is given by,
+        \autoeq{\prob\left(\ket{y_0}\right) = \left\|\ket{y_0} \bra{y_0} \otimes I^{\otimes n} \ket{\psi_4}\right\|^2 = \left\|\frac{1}{2^n} \sum_{x_0 = 0}^{r-1} \exp\left(\frac{2\pi i}{2^n} x_0 y_0\right) S \ket{y_0} \otimes \ket{f\left(x_0\right)}\right\|^2.}
+
+        Let us consider more precisely the sum $S$. If we suppose that $y_0$ divises $\frac{2^n}{r}$, i.e. that there exists some $k$ such that $y_0 = k\frac{2^n}{r}$, we get,
+        \[S = \sum_{j=0}^{A\left(x_0\right) - 1} \exp\left(2 \pi i \left(kj\right)\right) = \sum_{j=0}^{A\left(x_0\right) - 1} = A\left(x_0\right) = \frac{2^n}{r},\]
+        since, as specified before, in our case, $A\left(x_0\right) = \frac{2^n}{r}$ for all $x_0$.
+
+        But then, still for $y_0 = k\frac{2^n}{r}$, 
+        \[\prob\left(\ket{y_0}\right) = \left\|\frac{1}{r} \sum_{x_0 = 0}^{r-1} \exp\left(\frac{2\pi i}{2^n} x_0 y_0\right) \ket{y_0} \otimes \ket{f\left(x_0\right)}\right\|^2 .\]
+
+        Since all $\ket{f\left(x_0\right)}$ are different by assumption, all terms of the sum are different components. Since the squared norm of a vector is the sum of the modulus square of the components, we get,
+        \[\prob\left(\ket{y_0}\right) = \frac{1}{r^2} \sum_{x_0 = 0}^{r-1} \left|\exp\left(\frac{2\pi i}{2^n} x_0 y_0\right)\right|^2 = \frac{1}{r^2} \sum_{x_0 = 0}^{r-1} = \frac{1}{r}.\]
+
+        Since we have $r$ of such $y_0$ (that divide $\frac{2^n}{r}$), this yields that we get one of them uniformly at random, and that any other $y_0$ have 0 probability to show up.
+
+        Now, in practice, $2^n$ may not be a multiple of $r$. In this case, it is possible to indeed show that the probability stays close to multiples of $\frac{2^n}{r}$,
+        \[\prob\left(y_0 \in \bigcup_{k=0}^{r-1} \left[k \frac{2^n}{r} - \frac{1}{2}, k\frac{2^n}{r} + \frac{1}{2}\right]\right) \geq \frac{2}{5}.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Shor's algorithm}
+    We suppose $2$ does not divide $N$ and $N$ is not the power of some prime (both cases are solvable classically easily). We moreover suppose that $n$ is such that $2^n \geq N^2$, and that it is big (a lot bigger than the period $r$).
+
+    Then, \important{Shor's algorithm} goes as follows: 
+    \begin{enumerate}
+        \item Run the circuit to get some integer $y$.
+        \item If any of the convergents of $\frac{y}{2^n}$ has a denominator which is a valid period of $f$, output the smallest. 
+        \item If no convergent has this property, start again.
+    \end{enumerate}
+
+    This algorithm has a bounded probability of success,
+    \[\prob\left(\text{success}\right) \geq \frac{2}{5} \cdot  \frac{1}{4 \ln\left(\ln\left(2^n\right)\right)}.\]
+    
+    \begin{subparag}{Arbitrary success probability}
+        To get a success probability $1 - \epsilon$, we can use the arbitrary success probability lemma to tell us that we only need to run the algorithm at least $T$ times, where 
+        \[T \geq \left|\frac{\ln\left(\epsilon\right)}{\ln\left(1 - \frac{1}{10 \ln\left(\ln\left(2^n\right)\right)}\right)}\right|.\]
+
+        However, for a small $x$, we can do the Taylor approximation $\ln\left(1 - x\right) \approx x$. This yields that, for a large $n$,
+        \[\left|\frac{\ln\left(\epsilon\right)}{\ln\left(1 - \frac{1}{10 \ln\left(\ln\left(2^n\right)\right)}\right)}\right| \approx \left|\frac{\ln\left(\epsilon\right)}{\frac{1}{-10 \ln\left(\ln\left(2^n\right)\right)}}\right| = 10 \left|\ln\left(\epsilon\right)\right| \ln\left(\ln\left(2^n\right)\right).\]
+        
+        In other words, to get a success probability $1 - \epsilon$, this algorithm needs to be run $O\left(\left|\ln\left(\epsilon\right)\right| \ln\left(n\right)\right)$ times, which is a huge improvement over the classical case.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        With a probability greater than $\frac{2}{5}$, the circuit gives us some $y \in \mathbb{N}$ such that there exists a $k \in \mathbb{N}$ where
+        \[\left|y - k\frac{2^n}{r}\right| \leq \frac{1}{2} \iff \left|\frac{y}{2^n} - \frac{k}{r}\right| \leq \frac{1}{2\cdot 2^n}.\]
+
+        We know $r \leq \phi\left(n\right) \leq N$, where $\phi\left(r\right)$ is Euler's totient function, by group theory. We furthermore took as assumption that $n$ was such that $2^n \geq N^2$. All this yields, 
+        \[2^n \geq N^2 \geq r^2.\]
+
+        Therefore, our inequality becomes, 
+        \[\left|\frac{y}{2^n} - \frac{k}{r}\right| \leq \frac{1}{2\cdot 2^n} \leq \frac{1}{2r^2} \leq \frac{1}{r^2}.\]
+
+        We can therefore use Legendre's convergent theorem to know that $\frac{k}{r}$ is one of the convergents of $\frac{y}{2^n}$. 
+
+        For the denominator of the reduced $\frac{k}{r}$ to be equal to $r$, we finally need that $\gcd\left(k, r\right) = 1$. It is possible to show that $k$ is chosen uniformly at random in $0, \ldots, r-1$, so this probability is given by, 
+        \[\prob\left(\gcd\left(k, r\right) = 1\right) = \frac{\phi\left(r\right)}{r},\]
+        since $\phi\left(r\right)$ counts the number of numbers $0 \leq x \leq r - 1$ such that $\gcd\left(r, x\right) = 1$.
+
+        Using the number theory fact that $\phi\left(r\right) \geq \frac{r}{4 \ln\left(\ln\left(r\right)\right)}$, and the fact that $r \leq 2^n$, we find that, 
+        \[\prob\left(\gcd\left(k, r\right)\right) = \frac{\phi\left(r\right)}{r} \geq \frac{r}{4 \ln\left(\ln\left(r\right)\right)} \cdot \frac{1}{r} = \frac{1}{4 \ln\left(\ln\left(r\right)\right)} \geq \frac{1}{4 \ln\left(\ln\left(2^n\right)\right)}.\]
+
+        Since the probability of success for the circuit and the probability of success of the algorithm are independent, this gives us our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\section{Grover's algorithm}
+
+\begin{parag}{Search problem}
+    Let $f: \mathbb{F}_2^n \mapsto \mathbb{F}_2$, and the set $A$ defined by,
+    \[A = \left\{x \in \mathbb{F}_2^n \suchthat f\left(x\right) = 1\right\}.\]
+
+    We want to identify an $x \in A$ in the fewest number of calls to the oracle $\hat{U}_f$.
+
+    \begin{subparag}{Notations}
+        For the rest of this section, we will note,
+        \[N = 2^n, \mathspace M = \left|A\right|.\]
+
+        Moreover, we let $\theta_0 \in \left[0, \frac{\pi}{2}\right]$ to be the angle such that 
+        \[\cos\left(\theta_0\right) = \sqrt{\frac{N - M}{N}}, \mathspace \sin\left(\theta_0\right) = \sqrt{\frac{M}{N}}.\]
+
+        This will greatly simplify notations.
+    \end{subparag}
+
+    \begin{subparag}{Application}
+        Let us consider boolean functions $f$ that are in CNF form, such as,
+        \[f\left(x_1, x_2, x_3, x_4\right) = \left(x_1 \lor \bar{x}_2\right) \land \left(\bar{x}_1 \lor x_3 \lor x_4\right).\]
+        
+        Finding a solution $x$ to $f\left(x\right) = 1$ solves the SAT problem, known to be NP-complete (and therefore very hard classically). Quantum algorithms offer a quadratic speed-up. This is still exponential, but better.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: Geometric interpretation}
+    Let $\ket{P}$ and $\ket{Q}$ be two quantum states defined by
+    \[\ket{P} = \frac{1}{\sqrt{N-M}} \sum_{x \in A^C} \ket{x}, \mathspace \ket{Q} = \frac{1}{\sqrt{M}} \sum_{x \in A} \ket{x},\]
+
+    Moreover, let $\ket{\psi_1} = \ket{0}^{\otimes n}$ be the full zero state, and let $\hat{R}$, named the \important{reflection gate}, be the gate defined by 
+    \[\hat{R} = \hat{H}^{\otimes n} \left(2 \ket{\psi_1}\bra{\psi_1} - \hat{I}^{\otimes n}\right) \hat{H}^{\otimes n}.\]
+
+    Then, $\hat{U}_f$ can be considered as a reflection around the $\ket{P}$ vector, and $\hat{R}$ can be considered as a reflection around the $\ket{\psi_2} = \sqrt{\frac{N-M}{N}} \ket{P} + \sqrt{\frac{M}{N}} \ket{Q} = \cos\left(\theta_0\right) \ket{P} + \sin\left(\theta_0\right) \ket{Q}$ vector. In other words, considering $\ket{\phi} = \cos\left(\theta\right) \ket{P} + \sin\left(\theta\right) \ket{Q}$, then, 
+    \[\hat{U}_f \ket{\phi} \otimes \ket{-} = \left[\cos\left(-\theta\right) \ket{P} + \sin\left(-\theta\right) \ket{Q}\right] \otimes \ket{-},\]
+    \[\hat{R} \ket{\phi} = \cos\left(\theta_0 - \left(\theta - \theta_0\right)\right) \ket{P} + \sin\left(\theta_0 - \left(\theta - \theta_0\right)\right)\ket{Q}.\]
+
+    \svghere{GroverGeometricInterpretation.svg}
+
+    \begin{subparag}{Remark}
+        The reflection gate $\hat{R}$ is indeed unitary and can therefore be constructed. Its implementation is not considered important (and was not presented in class); therefore, it is not presented here.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\hat{U}_f$}
+        We start by showing that $\hat{U}_f$ is a reflection around $\ket{P}$.
+
+        By definition of the oracle gate, 
+        \autoeq{\hat{U}_f\left(\ket{P} \otimes \ket{-}\right) = \frac{1}{\sqrt{N-M}} \sum_{x \in A^C} \ket{x} \otimes \frac{\ket{f\left(x\right)} - \ket{\bar{f\left(x\right)}}}{\sqrt{2}} = \frac{1}{\sqrt{N-M}} \sum_{x \in A^C} \ket{x} \otimes \ket{-} = \ket{P} \otimes \ket{-}.}
+        
+        Similarly, we find that, 
+        \[\hat{U}_f \left(\ket{Q} \otimes \ket{-}\right) = -\ket{Q} \otimes \ket{-}.\]
+
+        Therefore, 
+        \autoeq{\hat{U}_f \left(\ket{\phi} \otimes \ket{-}\right) = \cos\left(\theta\right)\hat{U}_f \left(\ket{P} \otimes \ket{-}\right) + \sin\left(\theta\right) \hat{U}_f \left(\ket{Q} \otimes \ket{-}\right) = \cos\left(\theta\right)\ket{P} \otimes \ket{-} - \sin\left(\theta\right) \ket{Q} \otimes \ket{-} = \cos\left(-\theta\right) \ket{P} \otimes \ket{-} + \sin\left(-\theta\right) \ket{Q} \otimes \ket{-},}
+        finishing this part of the proof.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\hat{R}$}
+        We now want to show that $\hat{R}$ makes a reflection around the vector $\ket{\psi_2}$. To do so, we will construct the operator that does such a reflection, and will see that this is indeed the $\hat{R}$ from this lemma.
+
+        To do so, we use the fact that the reflection of the vector $\bvec{\phi}$ around the vector $\bvec{\psi}_2$ is given by 
+        \[\bvec{\phi}' = 2 \left(\bvec{\psi}_2 \dotprod \bvec{\phi}\right) \bvec{\psi}_2 - \bvec{\phi}.\]
+
+        Using Dirac notation, we get that the gate making such a reflection is defined by, 
+        \[\hat{R} \ket{\phi} = 2 \braket{\psi_2}{\phi} \ket{\psi_2} - \ket{\phi} = 2 \ket{\psi_2}\bra{\psi_2} \ket{\phi} - \ket{\phi} = \underbrace{\left(2 \ket{\psi_2}\bra{\psi_2} - \hat{I}^{\otimes n}\right)}_{= \hat{R}} \ket{\phi}.\]
+
+        Now, we notice that, for $\ket{\psi_1} = \ket{0}^{\otimes n}$, by the IQC lemma,
+        \autoeq{\hat{H}^{\otimes n} \ket{\psi_1} = \frac{1}{\sqrt{N}} \sum_{x \in \mathbb{F}_2^n} \ket{x} = \frac{1}{\sqrt{N}} \sum_{x \in A^C} \ket{x} + \frac{1}{\sqrt{N}} \sum_{x \in A} \ket{x} = \sqrt{\frac{N-M}{N}} \ket{P} + \sqrt{\frac{M}{N}} \ket{Q} = \ket{\psi_2}.}
+        
+        Using moreover the fact that $\hat{H}^2 = \hat{I}$, all this yields,
+        \autoeq{\hat{R} = 2 \ket{\psi_2}\bra{\psi_2} - \hat{I}^{\otimes n} = 2 \hat{H}^{\otimes n} \ket{\psi_1} \bra{\psi_1} \hat{H}^{\otimes n} - \hat{H}^{\otimes n} \hat{H}^{\otimes n} = \hat{H}^{ \otimes n} \left(2 \ket{\psi_1}\bra{\psi_1} - \hat{I}^{\otimes n}\right)\hat{H}^{\otimes n},}
+        which is indeed the $\hat{R}$ that was defined above.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Grover's circuit}
+    Let $k \in \mathbb{N}$. \important{Grover's circuit} is defined as follows:
+    \begin{center}
+    \begin{quantikz}[slice all, remove end slices=4]
+        \lstick[wires=3]{$n$ times} &[-0.75cm] \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} & & \gate[wires=4]{\hat{U}_f} \gategroup[wires=4,steps=2,style={inner ysep=6pt, inner xsep=2pt, color=gray}]{{\color{gray}Repeat $k$ times}} & \gate[wires=3]{\hat{R}} & \midstick{$\cdots$} & \meter[3]{}\\
+        \setwiretype{n} & \midstick{\vdots} & \midstick{\vdots} & & & & & \\
+                        & \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} & & & & \midstick{$\cdots$} & \\
+                        & \wireoverride{n} \midstick{\ket{1}} & \gate{\hat{H}} & & & & \midstick{$\cdots$} &
+    \end{quantikz}
+    \end{center}
+
+    With $k$ iterations, this circuit outputs $x \in A$ with probability 
+    \[\prob\left(\text{success}\right) = \sin\left(\left(2k+1\right) \theta_0\right)^2,\]
+    where, as defined earlier, $\theta_0$ is such that 
+    \[\cos\left(\theta_0\right) = \sqrt{\frac{N-M}{N}} = \sqrt{\frac{2^n - \left|A\right|}{2^n}}, \mathspace \sin\left(\theta_0\right) = \sqrt{\frac{M}{N}} = \sqrt{\frac{\left|A\right|}{2^n}}.\]
+    
+    \begin{subparag}{Circuit proof}
+        We start with
+        \[\ket{\psi_1} = \ket{0}^{\otimes n} \otimes \ket{1}.\]
+
+        Then, by a reasoning completely analogous to the proof of the geometric interpretation lemma, we get,
+        \autoeq{\ket{\psi_2} = \sqrt{\frac{N-M}{N}}\ket{P}\otimes \ket{-} + \sqrt{\frac{M}{N}} \ket{Q}\otimes \ket{-} = \cos\left(\theta_0\right)\ket{P} \otimes \ket{-} + \sin\left(\theta_0\right) \ket{Q} \otimes \ket{-}.}
+
+        Now, on a state $\ket{\phi} = \left[\cos\left(\theta\right) \ket{P} + \sin\left(\theta\right)\ket{Q}\right] \otimes \ket{-}$, one iteration of Grover's circuit only yields a change of angle, by the geometric interpretation lemma. In other words, 
+        \[\theta \over{\mapsto}{$\hat{U}_f$} -\theta \over{\mapsto}{$\hat{R}$} \theta_0 - \left(-\theta - \theta_0\right) = \theta + 2 \theta_0.\]
+        
+        In other words, each iteration rotates $\ket{\phi}$ by an angle of $2 \theta_0$. Since we start with $\ket{\psi_2}$ that has an angle of $\theta_0$, we have an angle of $\left(2k + 1\right)\theta_0$ after $k$ iterations. Let's call $\ket{\psi}$ this state, i.e. 
+        \[\ket{\psi} = \cos\left(\left(2k + 1\right) \theta_0\right) \ket{P} \otimes \ket{-} + \sin\left(\left(2k+1\right) \theta_0\right)\ket{Q} \otimes \ket{-}.\]
+
+        When we do our measurement of this state, we want to know the probability it collapses on some $\ket{x}$ where $x \in A$. Those are any vectors composing $\ket{Q}$, so we simply get that this is the squared modulus of its coefficient,
+        \[\prob\left(x \in A\right) = \sin\left(\left(2k + 1\right) \theta_0\right)^2.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Grover's algorithm with known $\left|A\right|$}
+    \important{Grover's algorithm} with known $\left|A\right|$ goes as follows:
+    \begin{enumerate}
+        \item If $\left|A\right| \geq \frac{3}{4}\cdot  2^n$, then pick an element of $\left|A\right|$ uniformly at random.
+        \item If $\left|A\right| < \frac{3}{4}\cdot 2^n$, then run Grover's circuit with $k$ such that 
+        \[k = \left\lfloor \frac{\pi}{4 \theta_0} \right\rfloor.\]
+    \end{enumerate}
+
+    This algorithm has a probability of success given by
+    \[\prob\left(\text{success}\right) \geq \frac{1}{4}.\]
+
+    \begin{subparag}{Remark}
+        Note that, when $\left|A\right| < \frac{3}{4}\cdot  2^n$, $k = \left\lfloor \frac{\pi}{4 \theta_0} \right\rfloor$ forces the probability of success to be greater than or equal to $\frac{1}{4}$. It may however not be optimal.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        When $\left|A\right| \geq \frac{3}{4}\cdot 2^n$, we have a probability $\frac{3}{4}$ of choosing the correct element, which is indeed greater than or equal to $\frac{1}{4}$.
+
+        When $\left|A\right| < \frac{3}{4} \cdot 2^n$, we know by definition of $\theta_0$ that 
+        \[\sin\left(\theta_0\right) = \sqrt{\frac{\left|A\right|}{2^n}} < \sqrt{\frac{\frac{3}{4}\cdot  2^n}{2^n}} = \frac{\sqrt{3}}{2}.\]
+
+        Since $\theta_0 \in \left[0, \frac{\pi}{2}\right]$, this necessarily means that $\theta_0 < \frac{\pi}{3}$. This yields that, since $\left\lfloor x \right\rfloor \leq x$,
+        \[\left(2k + 1\right) \theta_0 \leq \left(2 \frac{\pi}{4 \theta_0}  + 1\right) \theta_0 = \frac{\pi}{2} + \theta_0 < \frac{\pi}{2} + \frac{\pi}{3} = \frac{5\pi}{6}.\]
+
+        Moreover, since $\left\lfloor x \right\rfloor > x - 1$, we get
+        \[\left(2k + 1\right) \theta_0 > \left(2 \frac{\pi}{4 \theta_0} - 2 + 1\right) \theta_0 = \frac{\pi}{2} - \theta_0 > \frac{\pi}{2} - \frac{\pi}{3} = \frac{\pi}{6}.\]
+
+        However, for $\alpha \in \left[\frac{\pi}{6}, \frac{5\pi}{6}\right]$, we always have $\sin\left(\alpha\right) \geq \frac{1}{2}$. This yields that 
+        \[\sin\left(\left(2k + 1\right) \theta_0\right)^2 \geq \frac{1}{2^2} = \frac{1}{4},\]
+        as expected.
+
+        \qed
+   \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Grover's algorithm with unknown $\left|A\right|$}
+    \important{Grover's algorithm} with unknown $\left|A\right|$ goes as follows:
+    \begin{enumerate}
+        \item Choose some $x \in \mathbb{F}_2^n$ uniformly at random. If $x \in A$, then we are done.
+        \item Choose $k \in \left\{0, \ldots, \sqrt{2^n} - 1\right\}$ uniformly at random and use Grover's circuit with $k$ iterations. Output the state measured.
+    \end{enumerate}
+
+    This algorithm has a probability of success given by
+    \[\prob\left(\text{success}\right) \geq \frac{1}{4}.\]
+
+    \begin{subparag}{Remark}
+        This algorithm, just like the one with known $\left|A\right|$, has a worst case complexity $O\left(\sqrt{2^n}\right)$, since the complexity of Grover's circuit increases linearly as a function of $k$; and we can pick $k$ to be as big as $\sqrt{2^n}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We split our proof in two cases. If $\left|A\right| \geq \frac{3}{4}\cdot  2^n$, then the first step is successful with a probability greater than or equal to $\frac{1}{4}$, just like for the case with known $\left|A\right|$.
+
+        If however $\left|A\right| < \frac{3}{4}\cdot  2^n$, let us consider the probability that the second step is successful. By the law of total probability, 
+        \autoeq{\prob\left(\text{success}\right) = \sum_{k=0}^{\sqrt{2^n} - 1} \prob\left(\text{success} \suchthat K = k\right) \prob\left(K = k\right) = \sum_{k=0}^{\sqrt{2^n} - 1} \sin\left(\left(2k + 1\right) \theta_0\right)^2 \cdot \frac{1}{\sqrt{2^n}}.}
+
+        Now, it is possible to show using trigonometric identities that, 
+        \[\prob\left(\text{success}\right) = \frac{1}{2} - \frac{\sin\left(4 \theta_0 \sqrt{2^n}\right)}{4 \sqrt{2^n} \sin\left(2\theta_0\right)}.\]
+
+        Let us bound those two sine functions. The first one is easy since, by definition of $\sin\left(x\right)$, 
+        \[\sin\left(4 \theta_0 \sqrt{2^n}\right) \leq 1.\]
+
+        For the second one, we first need to notice that,
+        \[\sqrt{\frac{N-M}{N}} = \sqrt{\frac{2^n - \left|A\right|}{2^n}} > \sqrt{\frac{2^n - \frac{3}{4}2^n}{2^n}} = \sqrt{\frac{1}{4}} = \frac{1}{2}.\]
+
+        But then, using the definition of $\theta_0$, 
+        \[\sin\left(2 \theta_0\right) = 2 \sin\left(\theta_0\right) \cos\left(\theta_0\right) = 2 \sqrt{\frac{M}{N}} \cdot  \sqrt{\frac{N-M}{M}} > \frac{2}{2} \sqrt{\frac{M}{N}} \geq \frac{1}{\sqrt{N}},\]
+        since $M = \left|A\right| \geq 1$ (it has at least one element).
+
+        Putting everything together, 
+        \[\prob\left(\text{success}\right) = \frac{1}{2} - \frac{\sin\left(4 \theta_0 \sqrt{2^n}\right)}{4 \sqrt{2^n} \sin\left(2\theta_0\right)} \geq \frac{1}{2} - \frac{1}{4 \sqrt{2^n} \frac{1}{\sqrt{2^n}}} = \frac{1}{4},\]
+        as expected.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\section{Error correction}
+
+\begin{parag}{Definition: Classical linear code}
+    A classical linear code $\left(n, k\right)$ maps words of $k$ bits into codewords of $n$ bits to add repetition and correct some bit-flip errors. They are defined by some \important{generator matrix} $\hat{G} \in \mathbb{F}_2^{k \times n}$ such that a word $x \in \mathbb{F}_2^k$ is mapped to 
+    \[c = x \hat{G} \in \mathbb{F}_2^{n}.\]
+
+    Equivalently, they are defined by some \important{parity-check matrix} $\hat{H} \in \mathbb{F}_2^{\left(n-k\right) \times n}$ such that, for any $c$ in the code,
+    \[c \hat{H}^T = 0.\]
+
+    Those two representations are equivalent since we always have $\hat{G}\hat{H}^T = 0$, which gives us an equation to find one matrix from the other.
+\end{parag}
+
+\begin{parag}{Definition: Classical Hamming code}
+    Let $m \in \mathbb{N}$, $n = 2^m - 1$ and $k = n - m$.
+
+    The classical $\left(n, k\right)$ \important{Hamming code} is defined by its parity matrix $\hat{H}$, where its columns are all the $m$-digit binary numbers. 
+
+    Using this code, we can correct any single bit flip error.
+
+    \begin{subparag}{Syndrome decoding}
+        It is easy to correct a single bit error of this code thanks to syndrome decoding. Indeed, let us suppose that we receive $y = c + e$ where $e$ is a vector with a single bit equal to 1, and $c$ is a valid codeword.
+
+        Then, the syndrome of $y$, defined to be $y\hat{H}^T$ is, 
+        \[y\hat{H}^T = c\hat{H}^T + e\hat{H}^T = e\hat{H}^T.\]
+
+        Since $e$ has a single bit equal to 1, it is an element of the canonical basis and therefore $e \hat{H}^T = \left(\hat{H} e^T\right)^T$ is the transpose of one of the columns of $\hat{H}$. Looking at which column of $\hat{H}$ it is, we can find which bit it modified.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For $m = 3$, we can construct the $\left(7, 4\right)$ Hamming code using the parity-check matrix given by, 
+        \[\hat{H} = \begin{pmatrix} 0 & 0 & 0 & 1 & 1 & 1 & 1 \\ 0 & 1 & 1 & 0 & 0 & 1 & 1 \\ 1 & 0 & 1 & 0 & 1 & 0 & 1 \end{pmatrix}.\]
+
+        Then, it is possible to check that the following is a codeword, 
+        \[c = \begin{pmatrix} 1 & 0 & 1 & 0 & 1 & 0 & 1 \end{pmatrix} = 1010101.\]
+
+        Supposing that we have a bit-flip in the second component, we receive
+        \[y = 1110101.\]
+
+        But then, its syndrome is 
+        \[y \hat{H}^T = 010.\]
+
+        We recognise it to be the transpose of the second column of $\hat{H}$, so we can indeed know that the bit-flip was on the second bit.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Simplified notation}
+    Let $\hat{G}$ be some operator acting on one q-bit. 
+
+    In an $n$ q-bit system, we note $\hat{G}_i$ to be the operator that acts on the $i$\Th q-bit.
+
+    \begin{subparag}{Examples}
+        For instance, if we have a 3 q-bit system, then, 
+        \[\hat{X}_3 = \hat{I} \otimes \hat{I} \otimes \hat{X},\]
+        \[\hat{X}_1 \hat{Z}_3 = \left(\hat{X} \otimes \hat{I} \otimes \hat{I}\right) \left(\hat{I} \otimes \hat{I} \otimes \hat{Z}\right) = \hat{X} \otimes \hat{I} \otimes \hat{Z} = \hat{Z}_3 \hat{X}_1.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Two operators acting on different q-bits will always commute. In other words, for any operators $\hat{A}$, $\hat{B}$, and $i \neq j$, then, 
+        \[\hat{A}_i \hat{B}_j = \hat{B}_j \hat{A}_i.\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Definition: Types of error}
+    We consider three types of error that can appear on a q-bit $\ket{\phi} = \alpha \ket{0} + \beta \ket{1}$:
+    \begin{enumerate}
+        \item \important{Bit flips}: $\ket{\phi'} = \alpha \ket{1} + \beta \ket{0} = \hat{X} \ket{\phi}$.
+        \item \important{Phase flips}: $\ket{\phi'} = \alpha \ket{0} - \beta \ket{1} = \hat{Z} \ket{\phi}$.
+        \item \important{Bit-phase flips}: $\ket{\phi'} = -\alpha \ket{1} + \beta \ket{0} = \hat{Z} \hat{X} \ket{\phi} = i \hat{Y} \ket{\phi}$, where $\hat{Y} = i \hat{X}\hat{Z}$.
+    \end{enumerate}
+
+    \begin{subparag}{Remark}
+        Note that a bit flip on q-bit 1 and a phase flip on q-bit 2 is not equivalent to a bit-phase flip on any q-bit. 
+    \end{subparag}
+
+    \begin{subparag}{Correction}
+        Once we know which q-bits have what type of flip, we can simply apply a gate $\hat{X}$, $-i\hat{Y}$ or $\hat{Z}$ on them, since $\hat{P}^2 = \hat{I}$ for all of those gates.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Pauli string}
+    A \important{Pauli string} is a tensor product of elements of $\left\{\hat{I}, \hat{X}, \hat{Y}, \hat{Z}\right\}$.
+
+    \begin{subparag}{Property}
+        It is possible to show that two Pauli strings either commute or anti-commute. For instance, $\hat{X}_1\hat{X}_2$ and $\hat{Z}_1\hat{Z}_2$ commute but $\hat{X}_1 \hat{X}_2$ and $\hat{Z}_1\hat{Z}_3$ anti-commute,
+        \[\left(\hat{X}_1 \hat{X}_2\right)\left(\hat{Z}_1 \hat{Z}_2\right) = \left(\hat{Z}_1 \hat{Z}_2\right)\left(\hat{X}_1 \hat{X}_2\right),\]
+    \[\left(\hat{X}_1 \hat{X}_2\right)\left(\hat{Z}_1 \hat{Z}_3\right) = -\left(\hat{Z}_1 \hat{Z}_3\right) \left(\hat{X}_1 \hat{X}_2\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Stabiliser code}
+    Any \important{stabiliser code} is composed of:
+    \begin{enumerate}
+        \item A linear map that converts single q-bits into an $n$ q-bit codeword that has repetition, i.e. $\ket{0} \mapsto \ket{0}_C \in \mathbb{C}^{2^n}$ and $\ket{1} \mapsto \ket{1}_C \in \mathbb{C}^{2^n}$.
+        \item A set of $\ell $ \important{stabilisers} $\hat{O}^{\left(j\right)}$.
+    \end{enumerate}
+
+    Stabilisers must follow the following properties:
+    \begin{enumerate}
+        \item They are all Pauli strings acting on $n$ q-bit (and cannot be $\hat{I}^{\otimes n}$). 
+        \item They are independent, i.e. we cannot find $j, \ell , p$ such that 
+        \[\hat{O}^{\left(j\right)} \hat{O}^{\left(\ell \right)} = \hat{O}^{\left(p\right)}.\]
+        \item They all commute, i.e. 
+        \[\hat{O}^{\left(j\right)} \hat{O}^{\left(\ell \right)} = \hat{O}^{\left(\ell \right)} \hat{O}^{\left(j\right)}, \mathspace \forall j, \ell.\]
+        \item $\ket{0}_C$ and $\ket{1}_C$ are eigenvectors of all stabilisers, with eigenvalue $1$, i.e. for all $j$,
+        \[\hat{O}^{\left(j\right)} \ket{0}_C = \ket{0}_C, \mathspace \hat{O}^{\left(j\right)} \ket{1}_C = \ket{1}_C.\]
+    \end{enumerate}
+
+    This last property gives them their name: they stabilise $\ket{0}_C$ and $\ket{1}_C$.
+
+    Finally, the \important{syndrome} of some codeword $\ket{c} \in \mathbb{C}^{2^n}$ is the vector $\bvec{s} \in \mathbb{R}^\ell$ where $s_j$ is the value obtained when measuring $\ket{c}$ under the observable $\hat{O}^{\left(j\right)}$. 
+
+    \begin{subparag}{Intuition}
+        Let $\ket{\psi} = \alpha \ket{0}_C + \beta \ket{1}_C$ be some arbitrary codeword. We notice that $\ket{\psi}$ is always an eigenvector of eigenvalue $1$ for any stabiliser $\hat{O}^{\left(j\right)}$, 
+        \[\hat{O}^{\left(j\right)} \ket{\psi} = \alpha \hat{O}^{\left(j\right)} \ket{0}_C + \beta \hat{O}^{\left(j\right)} \ket{1}_C = \alpha \ket{0}_C + \beta \ket{1}_C = \ket{\psi}.\]
+
+        A combination of bit flips, phase flips and bit-phase flips is always a Pauli string $\hat{E}$, yielding we receive $\ket{\psi'} = \hat{E} \ket{\psi}$. Since two Pauli strings either commute or anti-commute, we always have $\hat{E} \hat{O}^{\left(j\right)} = t_j \hat{O}^{\left(j\right)} \hat{E}$ for some $t_j \in \left\{-1, 1\right\}$. But then, we can notice that, 
+        \[\hat{O}^{\left(j\right)} \ket{\psi'} = \hat{O}^{\left(j\right)} \hat{E} \ket{\psi} = t_j \hat{E} \hat{O}^{\left(j\right)} \ket{\psi} = t_j \hat{E} \ket{\psi} = t_j \ket{\psi'}.\]
+
+        Therefore, any codeword that suffered an error is still an eigenket of all stabiliser $\hat{O}^{\left(j\right)}$, but with eigenvalue $t_j \in \left\{-1, 1\right\}$. This means that, when doing our measurement, we do not modify the state; this notably allows us to measure all stabilisers in an arbitrary order, without destroying $\ket{\psi'}$. We take exactly those $t_j$ as our syndrome, $s_j = t_j$, so $\bvec{s} \in \left\{-1, 1\right\}^{\ell }$ in fact.
+
+        We moreover notice that the syndrome $\bvec{s}$ only depends on the error pattern $\hat{E}$, not at all on $\ket{\psi}$ (like for the classical case). We can therefore differentiate two error patterns if and only if they have different syndromes. When $s_j = 1$ for all $j$, we always consider that there there is no error $\hat{E} = \hat{I}^{\otimes n}$. We can then map all other syndromes to its most likely corresponding error pattern. This yields that we can fix at most $2^{\ell } - 1$ different non-trivial error patterns.
+    \end{subparag}
+    
+    \begin{subparag}{Classical analogy}
+        The map is the quantum analogous to the generator matrix, and the stabilisers are the quantum analogous to the parity-check matrix.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This definition is not exactly the one found in literature, because the added formalism has no interest in this course. Notably, in literature, we allow to encode $k$ q-bits at once into a $n$ q-bit codeword, we ask $\ell = n - k$, and the codewords are deduced from the stabilisers.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Bit flip repetition code}  
+    We can make a bit flip repetition code by mapping
+    \[\ket{0} \mapsto \ket{0}_C = \ket{000}, \mathspace \ket{1} \mapsto \ket{1}_C = \ket{111}.\]
+    
+    We can moreover take the following stabilisers
+    \[\hat{Z}_1 \hat{Z}_2, \mathspace \hat{Z}_2 \hat{Z}_3.\]
+
+    This code can correct any single bit flip error. The gate $\hat{G}$ to apply on some syndrome $\bvec{s}$ is 
+    \begin{functionbypart}{\hat{G}}
+        \hat{I}^{\otimes 3}, & \text{if } \bvec{s} = \left(1, 1\right)^T  \\
+        \hat{X}_1, & \text{if } \bvec{s} = \left(-1, 1\right)^T \\
+        \hat{X}_2, & \text{if } \bvec{s} = \left(-1, -1\right)^T \\
+        \hat{X}_3, & \text{if } \bvec{s} = \left(1, -1\right)^T \\
+    \end{functionbypart}
+
+    \begin{subparag}{Intuition}
+        Let $\ket{\psi} = \alpha \ket{000} + \beta \ket{111}$ be a general codeword. 
+
+        If it has no error, then its syndrome is $\bvec{s} = \left(1, 1\right)^T$ since $\hat{Z}\ket{0} = \ket{0}$ and $\hat{Z}\ket{1} = -\ket{1}$ and thus,
+        \[\hat{Z}_1 \hat{Z}_2 \ket{\psi} = \ket{\psi}, \mathspace \hat{Z}_2 \hat{Z}_3 \ket{\psi} = \ket{\psi}.\]
+
+        Let's say it has a single bit flip, on the first q-bit. Then, 
+        \[\ket{\psi'} = \alpha \ket{100} + \beta \ket{011}.\]
+
+        In this case, we notice that $\bvec{s} = \left(-1, 1\right)^T$, since
+        \[\hat{Z}_1 \hat{Z}_2 \ket{\psi'} = -\ket{\psi'}, \mathspace \hat{Z}_2 \hat{Z}_3 \ket{\psi'} = \ket{\psi'}.\]
+
+        We therefore indeed detect the bit flip on the first q-bit, and apply the $\hat{X}_1$ gate to get back $\ket{\psi}$,
+        \[\hat{X}_1 \ket{\psi'} = \ket{\psi}.\]
+
+        A similar idea can be done for any other bit flip.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Phase flip repetition code}
+    We can make a phase flip repetition code by mapping 
+    \[\ket{0} \mapsto \ket{+++}, \mathspace \ket{1} \mapsto \ket{---}.\]
+
+    The stabilisers are then 
+    \[\hat{X}_1 \hat{X}_2, \mathspace \hat{X}_2 \hat{X}_3.\]
+
+    This code can correct any single phase flip error.
+\end{parag}
+
+\begin{parag}{Shor's code}
+    \important{Shor's code} is made by mapping 
+    \[\ket{0} \mapsto \frac{\ket{000} + \ket{111}}{\sqrt{2}} \otimes \frac{\ket{000} + \ket{111}}{\sqrt{2}} \otimes \frac{\ket{000} + \ket{111}}{\sqrt{2}},\]
+    \[\ket{1} \mapsto \frac{\ket{000} - \ket{111}}{\sqrt{2}} \otimes \frac{\ket{000} - \ket{111}}{\sqrt{2}} \otimes \frac{\ket{000} - \ket{111}}{\sqrt{2}}.\]
+
+    The stabilisers are then 
+    \[\hat{Z}_1 \hat{Z}_2, \mathspace \hat{Z}_2 \hat{Z}_3, \mathspace \hat{Z}_4 \hat{Z}_5, \mathspace \hat{Z}_5 \hat{Z}_6, \mathspace \hat{Z}_7 \hat{Z}_8, \mathspace \hat{Z}_8 \hat{Z}_9,\] 
+    \[\hat{X}_1 \hat{X}_2 \hat{X}_3 \hat{X}_4 \hat{X}_5 \hat{X}_6, \mathspace \hat{X}_4 \hat{X}_5 \hat{X}_6 \hat{X}_7 \hat{X}_8 \hat{X}_9.\]
+
+    This code can correct any single bit flip, phase flip or bit-phase flip error.
+    
+    \begin{subparag}{Intuition}
+        The idea is to do both the phase flip repetition code by mapping $\ket{0} \mapsto \ket{+++}$ and then the bit flip repetition code by tripling each q-bit; and similarly for $\ket{1}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Steane's code}
+    \important{Steane's code} is made by mapping 
+    \[\ket{0} \mapsto \frac{1}{\sqrt{8}} \sum_{c \in \mathcal{C}_H^\perp} \ket{c}, \mathspace \ket{1} \mapsto \frac{1}{\sqrt{8}} \sum_{c \in \mathcal{C}_H^\perp} \ket{c \oplus 11111111},\]
+    where $\mathcal{C}_H$ is the $\left(7, 4\right)$ Hamming code.
+
+    The stabilisers are then 
+    \[\hat{X}_4 \hat{X}_5 \hat{X}_6 \hat{X}_7, \mathspace \hat{X}_2 \hat{X}_3 \hat{X}_6 \hat{X}_7, \mathspace \hat{X}_1 \hat{X}_3 \hat{X}_5 \hat{X}_7,\] 
+    \[\hat{Z}_4 \hat{Z}_5 \hat{Z}_6 \hat{Z}_7, \mathspace \hat{Z}_2 \hat{Z}_3 \hat{Z}_6 \hat{Z}_7, \mathspace \hat{Z}_1 \hat{Z}_3 \hat{Z}_5 \hat{Z}_7.\]
+    
+    This code can correct any single bit flip, phase flip, or bit-phase flip.
+    
+    \begin{subparag}{Remark}
+        We are interested in $\mathcal{C}_H^\perp$ for the $\left(7, 4\right)$ Hamming code. 
+
+        It is possible to show that: 
+        \[\mathcal{C}_H^\perp = \left\{u\hat{H} \suchthat u \in \mathbb{F}_2^{n-k}\right\}.\]
+
+        Therefore, $\mathcal{C}_H^\perp$ is generated by the rows of $\hat{H}$, 
+        \[\hat{H} = \begin{pmatrix} 0 & 0 & 0 & 1 & 1 & 1 & 1 \\ 0 & 1 & 1 & 0 & 0 & 1 & 1 \\ 1 & 0 & 1 & 0 & 1 & 0 & 1 \end{pmatrix}  .\]
+        
+        For instance, $0000000, 0001111, 0111100 \in \mathcal{C}_H^\perp$.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        This code is as powerful as Shor's code for single q-bit errors, but has a smaller codeword length.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Error correction for building reliable gates}
+    Error correction is extremely important for building reliable quantum circuits: currently quantum computers have a lot of noise. An important thing in order to do that is the ability to create gates that act on the space of codewords $\ket{0}_C$ and $\ket{1}_C$.
+
+    This can indeed be done. For instance, for Steane's code, we can build a gate acting on the codewords $\hat{G}_C$ from any gate $\hat{G}\in \left\{\hat{I}, \hat{X}, \hat{Y}, \hat{Z}\right\}$ by simply taking $\hat{G}_C = \hat{G}^{\otimes 7}$. The CCNOT gate can be constructed similarly. It is then possible to show that $\hat{S}_C = \left(\hat{Z} \hat{S}\right)^{\otimes 7}$ works too. A construction---which is more complicated---can also be done for $\hat{T}$.
+
+    Once we have those gates acting on codewords, we can do error correction after every gate, increasing greatly their reliability.
+\end{parag}
+ 
+
+\end{document}
+
