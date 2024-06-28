@@ -30,7 +30,8 @@
 \usepackage{fancyhdr}
 \usepackage{lmodern}
 \usepackage{microtype}
-\usepackage[nobottomtitles, raggedright]{titlesec} % https://tex.stackexchange.com/a/360454
+% This has to be reconsidered. I had issues with it with RGL AE report.
+\usepackage[nobottomtitles]{titlesec} % https://tex.stackexchange.com/a/360454
 \usepackage[all]{nowidow}  % remove widow and orhpan lines
 \usepackage[hyphens]{url} % need to be included before hyperref
 \usepackage[breaklinks, hidelinks]{hyperref}
@@ -50,6 +51,8 @@
 %\pgfplotsset{width=10cm, height=10cm, compat=1.8}
 %\usepgfplotslibrary{external}
 %\tikzexternalize
+\usepackage{tikz}
+\usepackage{quantikz} % quantum circuits
 
 % ===== Packages for useful commands ======
 \usepackage{siunitx}
@@ -88,7 +91,7 @@
 % This is a very bad idea since it removes page equalising.
 % However, I want to have a very hard control over where
 % my pictures are, so I don't really have any other way
-\raggedbottom  % source: https://tex.stackexchange.com/a/65356
+% \raggedbottom  % source: https://tex.stackexchange.com/a/65356
 
 % Colours
 \definecolor{maincolour}{HTML}{004A7F}
@@ -298,7 +301,6 @@
 \DeclareMathOperator{\rang}{rang}
 \DeclareMathOperator{\rank}{rank}
 \DeclareMathOperator{\dist}{dist}
-\DeclareMathOperator{\proj}{proj}
 \DeclareMathOperator{\Tr}{Tr}
 
 % Algebra
@@ -345,9 +347,10 @@
 \newcommand{\ztransformpair}{\fourierpair} % Signals and Systems convention, I guess it is because Laplace transforms are generalisations of Fourier ones
 
 % Quantum mechanics
-\newcommand{\bra}[1]{\left\langle #1 \right|}
-\newcommand{\ket}[1]{\left| #1 \right\rangle}
-\newcommand{\braket}[2]{\left\langle #1 \middle| #2 \right\rangle}
+% defined by quantikz
+%\newcommand{\bra}[1]{\left\langle #1 \right|}
+%\newcommand{\ket}[1]{\left| #1 \right\rangle}
+%\newcommand{\braket}[2]{\left\langle #1 \middle| #2 \right\rangle}
 
 % Personal environments
 % Source: https://tex.stackexchange.com/a/5652
@@ -460,6 +463,7 @@
         inparag = true
     }
     % Add to toc
+    \phantomsection
     \addcontentsline{toc}{paragraph}{#1}
     % Measure title, while not displaying it.
     \sbox\paragtitlebox{
