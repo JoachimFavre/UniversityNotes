@@ -324,7 +324,7 @@
 \end{parag}
 
 \begin{parag}{Distributed Deutsch-Josza's algorithm using communication}
-    The \important{distributed Deutsch-Josaza's algorithm} that uses communication uses the following circuit, based upon a quantum channel so that Alice can run the first part, and Bob can run the second part:
+    The \important{distributed Deutsch-Josza's algorithm} that uses communication uses the following circuit, based upon a quantum channel so that Alice can run the first part, and Bob can run the second part:
     \begin{center}
     \begin{quantikz}[slice all]
         \lstick[wires=3]{$k$ times} &[-0.75cm] \wireoverride{n} \midstick{\ket{0}} & \gate{\hat{H}} & \gate[wires=4]{\hat{U}_x} & \\
@@ -360,7 +360,7 @@
 \end{parag}
 
 \begin{parag}{Distributed Deutsch-Josza's algorithm using entanglement}
-    The \important{distributed Deutsch-Josaza's algorithm} that uses entanglement uses the following starting state, a tensor product of $k$ Bell states,
+    The \important{distributed Deutsch-Josza's algorithm} that uses entanglement uses the following starting state, a tensor product of $k$ Bell states,
     \[\ket{\phi} = \ket{B_{00}}^{\otimes k} = \left(\frac{\ket{00} + \ket{11}}{\sqrt{2}}\right)^{\otimes k} = \frac{1}{\sqrt{2^{k}}} \sum_{b \in \mathbb{F}_2^k} \ket{b}_A \otimes \ket{b}_B.\]
 
     Alice and Bob run the same circuit by using their part of the entangled state and their own oracle gate $\hat{U} \in \left\{\hat{U}_x, \hat{U}_y\right\}$: 
@@ -494,7 +494,10 @@
         We can then again use the IQC lemma for the last Hadamard gates, 
         \[\ket{\psi_4} = \frac{1}{\sqrt{2^n}} \sum_{x \in  \mathbb{F}_2^n} \hat{H}^{\otimes n}\ket{x} \otimes \ket{f\left(x\right)} = \frac{1}{2^n} \sum_{x \in \mathbb{F}_2^n} \sum_{y \in \mathbb{F}_2^n} \left(-1\right)^{x \dotprod y} \ket{y} \otimes \ket{f\left(x\right)}.\]
         
-        We have not used $H$ so far, so let us make it appear by considering $G / H$, i.e. the equivalence classes under the equivalence relation $\sim$. Let $V = \left\{v^{\left(1\right)}, \ldots, v^{\left(n-k\right)}\right\}$ be a set of representatives for those equivalence classes. Since $\mathbb{F}_2^n$ is partitioned into equivalence classes by $H$, for any $x \in \mathbb{F}_2^n$, we can find unique $v \in V$, $h \in H$ such that $x = v \oplus h$.
+        We have not used $H$ so far, so let us make it appear by considering $G / H$, i.e. the equivalence classes under the equivalence relation $\sim$. Let $V$ be a set of representatives for those equivalence classes,
+        \[V = \left\{v^{\left(1\right)}, \ldots, v^{\left(2^{n-k}\right)}\right\}.\]
+
+        Since $\mathbb{F}_2^n$ is partitioned into equivalence classes by $H$, for any $x \in \mathbb{F}_2^n$, we can find unique $v \in V$, $h \in H$ such that $x = v \oplus h$.
 
         To exploit the property of $f\left(x\right)$ that $f\left(v \oplus h\right) = f\left(v\right)$, let us split the sum over $x$ as two sums, giving 
         \autoeq{\ket{\psi_4} = \frac{1}{2^n} \sum_{v \in V} \sum_{h \in H} \sum_{y \in \mathbb{F}_2^n} \left(-1\right)^{\left(v \oplus h\right) \dotprod y} \ket{y} \otimes \ket{f\left(v \oplus h\right)} =  \sum_{y \in \mathbb{F}_2^n} \frac{1}{2^n} \sum_{v \in V} \left(-1\right)^{v \dotprod y} \underbrace{\left(\sum_{h \in H} \left(-1\right)^{h \dotprod y}\right)}_{= S} \ket{y} \otimes \ket{f\left(v\right)}.}
@@ -821,7 +824,7 @@
         \[\prob\left(\ket{y_0}\right) = \left\|\frac{1}{r} \sum_{x_0 = 0}^{r-1} \exp\left(\frac{2\pi i}{2^n} x_0 y_0\right) \ket{y_0} \otimes \ket{f\left(x_0\right)}\right\|^2 .\]
 
         Since all $\ket{f\left(x_0\right)}$ are different by assumption, all terms of the sum are different components. Since the squared norm of a vector is the sum of the modulus square of the components, we get,
-        \[\prob\left(\ket{y_0}\right) = \frac{1}{r^2} \sum_{x_0 = 0}^{r-1} \left|\exp\left(\frac{2\pi i}{2^n} x_0 y_0\right)\right|^2 = \frac{1}{r^2} \sum_{x_0 = 0}^{r-1} = \frac{1}{r}.\]
+        \[\prob\left(\ket{y_0}\right) = \frac{1}{r^2} \sum_{x_0 = 0}^{r-1} \left|\exp\left(\frac{2\pi i}{2^n} x_0 y_0\right)\right|^2 = \frac{1}{r^2} \sum_{x_0 = 0}^{r-1} 1 = \frac{1}{r}.\]
 
         Since we have $r$ of such $y_0$ (that are multiples of $\frac{2^n}{r}$), this yields that we get one of them uniformly at random, and that any other $y_0$ have 0 probability to show up.
 
