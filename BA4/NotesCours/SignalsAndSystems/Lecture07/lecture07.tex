@@ -26,33 +26,33 @@
 
 \section{Sampling}
 
-\parag{Definition: Sampling}{
+\begin{parag}{Definition: Sampling}
     Sampling is the process of turning a continuous signal to a discrete one.
     
-    \subparag{Example}{
+    \begin{subparag}{Example}
         This is for instance very important when we turn an analogue picture to a digital one, or when we are recording sound. In general, this leads to loss of information, but our goal is to minimise.
-    }
+    \end{subparag}
 
-    \subparag{Problem}{
+    \begin{subparag}{Problem}
         The problem can be represented as the following system, where we have an analog-digital and a digital-analog converter:
         \imagehere[1]{SamplingSystem.png}
 
         At first, we will simply consider that the system $\mathcal{H}$ is an identity one.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Main idea}{
+\begin{parag}{Main idea}
     Let $T \in \mathbb{R}^*_+$ and some continuous signal $x\left(t\right)$. The main idea is to pick samples at distance $T$ one from another: 
     \[x\left[n\right] = x\left(nT\right)\]
     
     $T$ is named the \important{sampling interval}.
 
-    \subparag{Problem}{
+    \begin{subparag}{Problem}
         The main problem we have now is that it seems very hard to reconstruct $x\left(t\right)$ from $x\left[n\right]$: there is an infinite amount of functions which could have been mapped to $x\left[n\right]$. We will thus instead try to pick the simplest function which is coherent.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider the following continuous signal, which we want to sample with a sampling interval $T = 10$: 
     \[x\left(t\right) = \cos\left(\frac{\pi}{5}t\right)\]
     
@@ -63,15 +63,15 @@
     \[x_r\left(t\right) = 1\]
     
     This is not correct because we did not pick a sampling interval too small. This problem is known as \important{aliasing}.
-}
+\end{parag}
 
-\parag{Definition: Sampling frequency}{
+\begin{parag}{Definition: Sampling frequency}
     Let $T$ be some sampling interval. Then, the \important{sampling frequency} is: 
     \[\omega_s = \frac{2\pi}{T}\]
-}
+\end{parag}
 
 
-\parag{Complex exponential}{
+\begin{parag}{Complex exponential}
     For simplicity, let us try to sample the following continuous signal, with sampling interval $T$: 
     \[x\left(t\right) = \exp\left(j \omega_0 t\right)\]
     
@@ -91,9 +91,9 @@
     Indeed, in order to have $\hat{\omega}_0 = \omega_0 T$, we need $-\pi < \omega_0 T \leq \pi$ (the $\ell $ in the definition of $\hat{\omega}_0$ must be 0), which indeed implies that $\left|\omega_0 T\right| \leq \pi$.
 
     Requiring $2 \left|\omega_0\right| \leq \omega_s$ is a condition on the sampling frequency we want to be able to reconstruct without loss which we will want to generalise.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider the following continuous signal:
     \[x\left(t\right) = e^{j \frac{\pi}{5}t}\]
     
@@ -105,9 +105,9 @@
     
     However, if $T_2 = 9$, then things no longer work: 
     \[x_2\left[n\right] = e^{j\frac{\pi}{5}T_2 n} = e^{j\frac{9}{5}\pi n} = e^{-j \frac{\pi}{5}n} \implies x_r\left(t\right) = e^{-j \frac{\pi}{5} \frac{t}{T_2}} = e^{-j \frac{\pi}{45}t} \neq x\left(t\right)\]
-}
+\end{parag}
 
-\parag{Linear combination}{
+\begin{parag}{Linear combination}
     Let us consider the following continuous signal: 
     \[x\left(t\right) = A_0 e^{j \omega_0 t} + A_1 e^{j\omega_1 t}\]
 
@@ -117,35 +117,35 @@
     Since we want to reconstruct both using a linear combination of exponentials with smallest frequency, we need both $\left|\frac{\omega_0}{\omega_s} 2\pi\right| < \pi$ and $\frac{\omega_1}{\omega_s} 2\pi < \pi$, which is equivalent to: 
     \[\omega_s > \max\left\{2\left|\omega_0\right|, 2\left|\omega_1\right|\right\}\]
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Now that we are able to sample linear combination of complex exponential, it seems like we should be able to generalise our result to signals which Fourier transform exists (since a Fourier transform is a continuous linear combination of complex exponentials).
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Definition: Band-limited signal}{
+\begin{parag}{Definition: Band-limited signal}
     A band-limited signal is a continuous signal which Fourier transform exists, and for which there exists an $\omega_M \in \mathbb{R}$ such that:
     \[x\left(t\right) = \frac{1}{2\pi} \int_{-\infty}^{\infty} X\left(\omega\right) e^{j \omega t} d\omega = \frac{1}{2\pi} \int_{-\omega_M}^{\omega_M} X\left(\omega\right) e^{j \omega t} d\omega\]
     
     In other words, $X\left(\omega\right) = 0$ for all $\left|\omega\right| > \omega_M$.
-}
+\end{parag}
 
-\parag{Definition: Impulse train}{
+\begin{parag}{Definition: Impulse train}
     An \important{impulse train} signal is a signal of the form: 
     \[p\left(t\right) = \sum_{n=-\infty}^{\infty} \delta\left(t - nT\right)\]
     for some $T \in \mathbb{R}$.
 
     We notice that, the bigger $T$, the farther the $\delta$ will be one-another.
 
-    \subparag{Fourier transform}{
+    \begin{subparag}{Fourier transform}
         The Fourier transform of the impulse train is: 
         \[P\left(\omega\right) = \frac{2\pi}{T} \sum_{k=-\infty}^{\infty} \delta\left(\omega - \frac{2\pi k}{T}\right)\]
 
         We notice that, the bigger $T$, the closer the $\delta$ will be one-another.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Bandlimited interpolation}{
+\begin{parag}{Bandlimited interpolation}
     Let $x\left(t\right)$ be some signal we want to sample, and $T$ be the sampling interval.
 
     We take our sampled signal as: 
@@ -183,30 +183,30 @@
     \autoeq{x_r\left(t\right) = \left(h* x_p\right)\left(t\right) = \left(h * \sum_{n=-\infty}^{\infty} x\left(nT\right)\delta\left(t - nT\right)\right) = \sum_{n=-\infty}^{\infty} x\left(nT\right)h\left(t - nT\right) = \sum_{n=-\infty}^{\infty} x\left(nT\right) \frac{\omega_c T}{\pi} \frac{\sin\left(\omega_c\left(t - nT\right)\right)}{\omega_c\left(t - nT\right)}}
     
     This is named bandlimited interpolation, and this is another instance of a problem which is definitely easier to think of in the frequency domain than in the time domain.
-}
+\end{parag}
 
-\parag{Sampling theorem}{
+\begin{parag}{Sampling theorem}
     Let $x\left(t\right)$ be a bandlimited signal, meaning $X\left(\omega\right) = 0$ for $\left|\omega\right| > \omega_M$.
 
     It is uniquely determined by its samples $x\left(nT\right)$ if: 
     \[\omega_s > 2 \omega_M\]
     where $\omega_s = \frac{2\pi}{T}$.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         $\omega_s = 2 \omega_M$ is named the \important{Nyquist rate}.
-    }
+    \end{subparag}
 
-    \subparag{Formulas}{
+    \begin{subparag}{Formulas}
         We found that that we can sample:
         \[x\left[n\right] = x\left(nT\right)\]
 
         If we indeed have $\omega_s > 2 \omega_M$, then we can recover our signal by using bandlimited interpolation: 
         \[x\left(t\right) = \sum_{n=-\infty}^{\infty} x\left[n\right] \frac{\omega_c T}{\pi} \frac{\sin\left(\omega_c\left(t - nT\right)\right)}{\omega_c\left(t - nT\right)}\]
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let us consider the following signal again: 
     \[x\left(t\right) = \cos\left(\frac{\pi}{5}t\right)\]
     
@@ -227,9 +227,9 @@
     We see that, indeed, we have some clutter, we don't have just $X\left(\omega\right)$ in $\left]-\omega_M, \omega_M\right[ $ (in fact, the black arrows from $X\left(\omega\right)$ are outside this interval, and all we have is an arrow from $X\left(\omega - \omega_s\right)$ in blue and one from $X\left(\omega + \omega_s\right)$ in green). In fact, applying a low-pass filter, we get: 
     \[X_r\left(\omega\right) = \frac{2\pi}{T} \delta\left(t\right) \implies x_r\left(t\right) = 1 \neq x\left(t\right)\]
     exactly as what we had got before.
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let us consider the exact same signal, but with a sampling interval $T =4$: 
     \[x\left(t\right) = \cos\left(\frac{\pi}{5}t\right)\]
     
@@ -240,6 +240,6 @@
     \imagehere[0.7]{SamplingNoAliasingExample.png}
 
     Applying a low-pass filter, we indeed get the Fourier transform $X\left(\omega\right)$, which yields that $x_r\left(t\right) = x\left(t\right)$.    
-}
+\end{parag}
 
 \end{document}

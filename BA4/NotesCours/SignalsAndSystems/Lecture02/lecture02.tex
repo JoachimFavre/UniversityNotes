@@ -27,11 +27,11 @@
 \section{LTI systems}
 \subsection{Fundamentals}
 
-\parag{Definition: LTI system}{
+\begin{parag}{Definition: LTI system}
     A \important{LTI system} (short for linear time-invariant system) is a system which is both linear and time invariant \textit{(I bet you did not see that coming!)}.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us say that we know that some system is LTI, $y_1\left[n\right] = \mathcal{H}\left\{x_1\left[n\right]\right\}$. 
 
     Now, if we get $x_2\left[n\right] = 0.5x_1\left[n\right] + 2x_1\left[n-1\right]$, we can compute $y_2\left[n\right] = \mathcal{H}\left\{x_2\left[n\right]\right\}$ using things we already computed for $y_1\left[n\right]$: 
@@ -41,48 +41,48 @@
     \[y_2\left[n\right] = 0.5 \mathcal{H}\left\{x_1\left[n\right]\right\} + 2 \mathcal{H}\left\{x_1\left[n-1\right]\right\} = 0.5 y_1\left[n\right] + 2 y_1 \left[n-1\right]\]
     
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This shows how powerful a LTI system is. In fact, because of this, we will mainly focus our analysis on them in this course. 
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Unit impulse}{
+\begin{parag}{Definition: Unit impulse}
     The \important{unit impulse} (or the Kronecker-delta function) is a signal defined as:
     \begin{functionbypart}{\delta \left[n\right]}
         1, & \text{if } n = 0 \\
         0, & \text{otherwise}
     \end{functionbypart} 
 
-    \subparag{Property}{
+    \begin{subparag}{Property}
         We can write any signal as a linear sum of this unit impulse: 
         \[x\left[n\right] = \sum_{k=-\infty}^{\infty} x\left[k\right] \delta \left[n-k\right]\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Unit step}{
+\begin{parag}{Definition: Unit step}
     The \important{unit step} is a signal defined as: 
     \[u\left[n\right] = \sum_{k=-\infty}^{n} \delta \left[k\right]\]
     
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         This is basically a function which is 0 for all $n < 0$, and 1 for all $n \geq 0$.
 
         \imagehere[0.5]{DicreteUnitStep.png}
-    }
+    \end{subparag}
 
-    \subparag{Property}{
+    \begin{subparag}{Property}
         We have the following property: 
         \[\delta \left[n\right] = u\left[n\right] - u\left[n-1\right]\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Definition: Impulse response}{
+\begin{parag}{Definition: Impulse response}
     Let $\mathcal{H}$ be any system.
 
     The \important{impulse response} of the system $\mathcal{H}$ is:
     \[h\left[n\right] = \mathcal{H}\left\{\delta \left[n\right]\right\}\]
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The impulse response completely characterises an LTI system.
 
         As we saw, we can write:
@@ -93,10 +93,10 @@
 
          This sum is very important, so we name it \important{convolution sum}, and we write it using a convolution:
          \[y\left[n\right] = \sum_{k=-\infty}^{\infty} x\left[k\right] h\left[n-k\right] = \left(x * h\right)\left[n\right]\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Dirac Delta}{
+\begin{parag}{Definition: Dirac Delta}
     We would like to define something similar to the unit impulse, but for the continuous case. 
 
     Informally, we define the \important{Dirac delta} (or unit impulse) as the following signal: 
@@ -111,7 +111,7 @@
     We write this using distribution theory notations:
     \imagehere[0.5]{DiracDelta.png}
 
-    \subparag{As a limit}{
+    \begin{subparag}{As a limit}
         A more formal way to define this Dirac delta is as a limit. Let us consider the following function:
         \begin{functionbypart}{\delta_{\Delta}\left(t\right)}
             \frac{1}{\Delta} & \text{if } 0 \leq t \leq \Delta \\
@@ -120,50 +120,50 @@
 
         Then, we can see $\delta\left(t\right)$ to be: 
         \[\delta\left(t\right) = \lim_{\Delta \to 0^+} \delta_{\Delta}\left(t\right)\]
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Just as for the discrete case, for any ``nicely behaved'' $x\left(t\right)$: 
         \[x\left(t\right) = \int_{-\infty}^{\infty} x\left(\tau\right) \delta\left(t - \tau\right) d\tau\]
-    }
+    \end{subparag}
 
     
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider $\delta\left(\frac{1}{2} t\right)$. This still has first property, so we only need to consider the second one. Doing the change of variable $\frac{1}{2}t = s$: 
     \[\int_{-\infty}^{\infty} \delta\left(\frac{1}{2}t\right)dt = \int_{-\infty}^{\infty} \delta\left(s\right) 2ds = 2 \int_{-\infty}^{\infty} \delta\left(t\right)dt = 2\]
     
     We thus see that: 
     \[\delta\left(\frac{1}{2} t\right) = 2\delta\left(t\right)\]
-}
+\end{parag}
 
-\parag{Definition: Unit step}{
+\begin{parag}{Definition: Unit step}
     We define the \important{unit step} signal to be:
     \begin{functionbypart}{u\left(t\right)}
         0, & t < 0 \\
         1, & t \geq 0
     \end{functionbypart} 
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         In general, we don't really care what value it has at $t = 0$.
-    }
+    \end{subparag}
 
-    \subparag{Property}{
+    \begin{subparag}{Property}
         We can link the unit impulse to the Dirac delta: 
         \[u\left(t\right) = \int_{-\infty}^{t} \delta\left(\tau\right) d\tau\]
         Also: 
         \[\delta\left(t\right) = \frac{du\left(t\right)}{dt}\]
         
         Note that we are using the generalised version of the derivative in distribution theory, for it to exist and make sense.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Impulse response}{
+\begin{parag}{Definition: Impulse response}
     Let $\mathcal{H}$ be any system. We define the \important{impulse response} of this system to be: 
     \[h\left(t\right) = \mathcal{H}\left\{\delta\left(t\right)\right\}\]
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Just as for the discrete case, the impulse response completely characterises an LTI system. 
 
         Indeed, we get that: 
@@ -172,10 +172,10 @@
 
         This integral is very fundamental, so we name it the \important{convolution integral}, and write it using a convolution: 
         \[y\left(t\right) = \int_{-\infty}^{\infty} x\left(\tau\right) h\left(t-\tau\right)d\tau = \left(x * h\right)\left(t\right)\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say we have the following LTI system: 
     \[y\left(t\right) = \int_{-\infty}^{t} x\left(\tau\right)d\tau\]
     
@@ -195,31 +195,31 @@
     \[y\left(t\right) = \frac{1}{a}\left(1 - e^{-at}\right)u\left(t\right)\]
 
     We could also have used a convolution. Both ways are equivalent.
-}
+\end{parag}
 
-\parag{Definition: Convolution}{
+\begin{parag}{Definition: Convolution}
     We defined a discrete-time convolution as: 
     \[\left(x*h\right)\left[n\right] = \sum_{k=-\infty}^{\infty} x\left[k\right] h\left[n-k\right]\]
     
     Also, we defined the continuous-time one as: 
     \[\left(x*h\right)\left(t\right) = \int_{-\infty}^{\infty} x\left(\tau\right)h\left(t - \tau\right) d\tau\]
-}
+\end{parag}
 
-\parag{Definition: Absolutely summable}{
+\begin{parag}{Definition: Absolutely summable}
     A DT signal is \important{absolutely summable} if: 
     \[\sum_{n=-\infty}^{\infty} \left|x\left[n\right]\right| < \infty\]
 
     In other words, this sum must converge to a real and finite number.
-}
+\end{parag}
 
-\parag{Definition: Absolutely integrable}{
+\begin{parag}{Definition: Absolutely integrable}
     A CT signal is \important{absolutely integrable} if: 
     \[\int_{-\infty}^{\infty} \left|x\left(t\right)\right|dt < \infty\]
 
     In other words, this integral must converge to a real and finite number.
-}
+\end{parag}
 
-\parag{Properties}{
+\begin{parag}{Properties}
     A discrete-time convolution has the following properties:
     \begin{itemize}
         \item Identity: $\displaystyle \left(x*\delta\right)\left[n\right] = x\left[n\right]$
@@ -238,20 +238,20 @@
         \item Associative: $\displaystyle \left(\left(x *h_1\right)*h_2\right)\left(t\right) = \left(x * \left(h_1 * h_2\right)\right)\left(t\right)$ if $x\left(t\right), h_1\left(t\right), h_2\left(t\right)$ are absolutely integrable.
     \end{itemize}
 
-    \subparag{Proof: DT commutativity}{
+    \begin{subparag}{Proof: DT commutativity}
         Let us prove that DT convolutions are commutative. Using the change of variables $i = n -k$:
         \[\left(x*h\right)\left[n\right] = \sum_{k=-\infty}^{\infty} x\left[k\right]h\left[n-k\right] =  \sum_{i=-\infty}^{\infty} x\left[n-i\right]h\left[i\right] = \left(h*x\right)\left[n\right]\]
 
         \qed
-    }
+    \end{subparag}
 
-    \subparag{Proof: DT associativity}{
+    \begin{subparag}{Proof: DT associativity}
         Let us prove that DT convolutions are associative. Using the change of variable $i = m-k$:
         \autoeq{\left(\left(x * h_1\right) * h_2\right)\left[n\right] = \sum_{m=-\infty}^{\infty} \left(x*h_1\right)\left[n\right] h_2\left[n-m\right] = \sum_{m=-\infty}^{\infty} \left(\sum_{k=-\infty}^{\infty} x\left[k\right]h_1\left[m-k\right]\right) h_2\left[n-m\right] = \sum_{k=-\infty}^{\infty} x\left[k\right]\left(\sum_{m=-\infty}^{\infty} h_1\left[m-k\right] h_2\left[n-m\right]\right) = \sum_{k=-\infty}^{\infty} x\left[k\right] \left(\sum_{i=-\infty}^{\infty} h_1\left[i\right]h_2\left[n - i - k\right]\right) = \sum_{k=-\infty}^{\infty} x\left[k\right] \left(h_1 * h_2\right)\left[n-k\right] = \left(x* \left(h_1 * h_2\right)\right)\left[n\right]}
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 \end{document}

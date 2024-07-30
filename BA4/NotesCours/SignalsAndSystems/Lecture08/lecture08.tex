@@ -27,7 +27,7 @@
 
 \subsection{Laplace transform}
 
-\parag{Transfer function derivation}{
+\begin{parag}{Transfer function derivation}
     Let $\mathcal{H}$ be some LTI system with impulse response $h$. We want to input a signal $x\left(t\right) = e^{st}$. We know this is just a convolution: 
     \[y\left(t\right) = \int_{-\infty}^{\infty} e^{s\left(t - \tau\right)} h\left(\tau\right) d\tau = e^{st} \int_{-\infty}^{\infty} e^{- s \tau}h\left(\tau\right)d \tau = H\left(s\right) e^{s t}\]
     assuming the integral converges. Indeed, the integral only depends on the parameter $s$, so we can just name it $H\left(s\right)$. This is the \important{transfer function}, and it is the Laplace transform of $h\left(t\right)$.
@@ -39,40 +39,40 @@
     We thus get that: 
     \[H\left(\omega\right) = H\left(s = j \omega\right)\]
     where the function on the left is the frequency response, and the one on the right is the transfer function.
-}
+\end{parag}
 
-\parag{Definition: Laplace transform}{
+\begin{parag}{Definition: Laplace transform}
     Let $x\left(t\right)$ be a CT signal. Then, its Laplace transform is: 
     \[X\left(s\right) = \int_{-\infty}^{\infty} x\left(t\right) e^{-s t}dt\]
     for all $s$ such that the integral converges.
 
-    \subparag{Comparison with Fourier}{
+    \begin{subparag}{Comparison with Fourier}
         This is very similar with the Fourier transform: 
         \autoeq{X\left(s\right) = \int_{-\infty}^{\infty} x\left(t\right) e^{-s t}dt = \int_{-\infty}^{\infty} x\left(t\right) e^{-\left(a + jb\right)t} dt = \int_{-\infty}^{\infty} x\left(t\right)e^{-xt} e^{-j b t} dt = \mathcal{F}\left\{x\left(t\right)e^{-at}\right\}\left(s\right)}
          
         We thus see that the Laplace transform of $x\left(t\right)$ at $s = a + bj$ is the Fourier transform of $x\left(t\right)e^{-at}$ at $b$. This is thus a generalisation of Fourier transforms.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider the following signal: 
     \[x\left(t\right) = u\left(t\right)\]
     
     We thus have: 
     \[X\left(s\right) = \int_{0}^{\infty} e^{-s t} dt = -\frac{1}{s} e^{-s t} \eval_{t=0}^{t=\infty} = -\frac{1}{s} e^{-\cre\left(s\right)t} \underbrace{e^{-j \cim\left(s\right)t}}_{\text{bounded}} \eval_{t=0}^{t=\infty} = \frac{1}{s}\]
     which converges if and only if $\cre\left(c\right) > 0$.
-}
+\end{parag}
 
-\parag{Theorem: Inverse Laplace transform}{
+\begin{parag}{Theorem: Inverse Laplace transform}
     Let $x\left(t\right)$ be a CT signal and $X\left(s\right)$ be its Laplace transform. Then: 
     \[x\left(t\right) = \frac{1}{2\pi j} \int_{\cre\left(s\right) - j\infty}^{\cre\left(s\right) + j\infty} X\left(s\right) e^{s t}ds\]
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This formula is not really used in practice, we instead more often use a table of Laplace pairs.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example: Region of convergence}{
+\begin{parag}{Example: Region of convergence}
     Let $a \in \mathbb{R}$. We consider the two following CT signals: 
     \begin{functionbypart}{h_c\left(t\right) = e^{-a t}u\left(t\right)}
         e^{-a t}, & t \geq 0 \\
@@ -95,45 +95,45 @@
     if $\cre\left(s\right) < -a$.
     
     We get something very strange: these are different signals, but their Laplace transforms are the same. This should not be possible since we have an inversion formula. However, the thing which changes for both of them is the region of convergence.
-}
+\end{parag}
 
-\parag{Definition: ROC}{
+\begin{parag}{Definition: ROC}
     The \important{region of convergence} (ROC) of some Laplace transform, is the set on which it converges.
-}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     Since the exponential of a purely imaginary number is bounded, a ROC only depends on the real part of $s$. This means that a ROC is always a vertical strip on the complex plane.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $x\left(t\right)$ be a function with Laplace transform $X\left(s\right)$.
 
     $x\left(t\right)$ is stable if and only if its region of convergence contains the imaginary axis.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We have seen that the Laplace transform of $x\left(t\right)$ at $s = a + bj$ is the Fourier transform of $x\left(t\right)e^{-at}$ at $b$. This means that the Fourier transform $x\left(t\right)$ exists if and only $s = bj$, the imaginary axis, belongs to the ROC. 
 
         Moreover, we know that the signal has a Fourier transform if and only if it is stable. This indeed means that a system is stable if and only if the ROC of its transfer function contains the imaginary axis.
 
         \qed
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Rational functions}{
+\begin{parag}{Rational functions}
     We will often have rational transfer functions: 
     \[H\left(s\right) = \frac{P\left(s\right)}{Q\left(s\right)}\]
     where $P$ and $Q$ are polynomials.
 
     We define the roots of $Q$ to be \important{poles}. In general, there is one more region of convergence than there are poles, since a region can never contain the poles of $H\left(s\right)$ and they are parallel vertical strips (though this is not always true, since poles could be aligned on the same vertical line). 
-}
+\end{parag}
 
-\parag{Definition: Zero-pole plot}{
+\begin{parag}{Definition: Zero-pole plot}
     A \important{zero-pole} plot for a rational function $H\left(s\right) = \frac{P\left(s\right)}{Q\left(s\right)}$ is the complex plane, on which we mark its poles (the roots of $Q\left(s\right)$) as crosses, and its roots (the roots of $P\left(s\right)$) as zeroes.
-}
+\end{parag}
 
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider the following transfer function: 
     \[H\left(s\right) = \frac{3}{\left(s+2\right)\left(s-1\right)} = \frac{1}{s-1} - \frac{1}{s+2}\]
     
@@ -155,9 +155,9 @@
     since we require $\cre\left(s\right) > 1$ for the first one and $\cre\left(s\right) > -2$ for the second one.
     
     Only the second impulse response is stable, since the ROC of the transfer function contains the imaginary axis.
-}
+\end{parag}
 
-\parag{Laplace pairs}{
+\begin{parag}{Laplace pairs}
     Just as for Fourier transform, we can make the following table of Laplace pairs:
     \begin{center}
     \begin{tabular}{|rcll|}
@@ -173,9 +173,9 @@
         \hline
     \end{tabular}
     \end{center}
-}
+\end{parag}
 
-\parag{Laplace properties}{
+\begin{parag}{Laplace properties}
     We also have the following properties:
     \begin{center}
     \begin{tabular}{|rcll|}
@@ -195,9 +195,9 @@
         \hline
     \end{tabular}
     \end{center}
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider three signals $x\left(t\right), x_1\left(t\right), x_2\left(t\right)$ such that:
     \[x\left(t\right) = x_1\left(t\right) - x_2\left(t\right)\]
     \[X_1\left(s\right) = \frac{1}{s+1}, \mathspace \cre\left(s\right) >-1\]
@@ -207,48 +207,48 @@
     \[X\left(s\right) = \frac{1}{s+1} - \frac{1}{\left(s+1\right)\left(s+2\right)} = \frac{s+1}{\left(s+1\right)\left(s+2\right)} = \frac{1}{s+2}, \mathspace \cre\left(s\right) > -2\]
     
     We notice that $R \supsetneq R_1 \cap R_2$. Thus, when using the linearity property, $R$ is not just given by $R_1 \cap R_2$.
-}
+\end{parag}
 
-\parag{Definition: Right-sided signal}{
+\begin{parag}{Definition: Right-sided signal}
     Let $x\left(t\right)$ be a CT signal.
 
     $x\left(t\right)$ is \important{right-sided} if there exists some $T$ such that, for all $t < T$: 
     \[x\left(t\right) = 0\]
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Note that any causal signal is right-sided, but the reciprocal is not true.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Left-sided signal}{
+\begin{parag}{Definition: Left-sided signal}
     Let $x\left(t\right)$ be a CT signal.
 
     $x\left(t\right)$ is \important{left-sided} if there exists some $T$ such that, for all $t > T$: 
     \[x\left(t\right) = 0\]
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Note that any anti-causal signal is left-sided, but the reciprocal is not true.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     Any finite duration signal is both left-sided and right-sided.
-}
+\end{parag}
     
-\parag{Definition: Two-sided signal}{
+\begin{parag}{Definition: Two-sided signal}
     Let $x\left(t\right)$ be a CT signal.
     
     $x\left(t\right)$ is \important{both-sided} if it is neither right-sided nor left-sided.
-}
+\end{parag}
 
 
-\parag{Lemma}{
+\begin{parag}{Lemma}
     Let $\sigma_1 > \sigma_2$, and let $x\left(t\right)$ be a right-sided signal. 
 
     Then, we have: 
     \[\sigma_2 \in \text{ROC}\left\{X\left(s\right)\right\} \implies \sigma_1 \in \text{ROC}\left\{X\left(s\right)\right\}\]
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We know by hypothesis that $x\left(t\right)$ is right-sided, thus there exists some $T$ such that: 
         \[x\left(t\right) = 0, \mathspace \forall t > T\]
         
@@ -259,38 +259,38 @@
         We indeed get that, if $X\left(\sigma_2\right)$ exists, $X\left(\sigma_1\right)$ must also exist (it cannot diverge to infinity).
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $x\left(t\right)$ be some signal which transfer function $H\left(s\right)$ exists.
 
     If $x\left(t\right)$ is right-sided, then $H\left(s\right)$ is right-sided. 
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         This comes directly from the previous lemma.
-    }
+    \end{subparag}
     
-    \subparag{Reciprocal}{
+    \begin{subparag}{Reciprocal}
         The reciprocal is not true.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $x\left(t\right)$ be some signal which transfer function $H\left(s\right)$ exists.
 
     If $x\left(t\right)$ is left-sided, then $H\left(s\right)$ is left-sided. 
-}
+\end{parag}
 
 \subsection{Application to continuous time LTI systems}
-\parag{LTI systems}{
+\begin{parag}{LTI systems}
     Using the convolution property, we see that: 
     \[\left(h* x\right)\left(t\right) \laplacepair H\left(s\right)X\left(s\right)\]
 
     Therefore, we have that: 
     \[Y\left(s\right) = H\left(s\right) X\left(s\right)\]
     where $\text{ROC}\left(Y\left(s\right)\right) \supseteq \text{ROC}\left(X\left(s\right)\right) \cap \text{ROC}\left(H\left(s\right)\right)$.
-}
+\end{parag}
 
 
 \end{document}

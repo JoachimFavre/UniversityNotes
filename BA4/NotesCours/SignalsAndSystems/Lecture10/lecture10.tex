@@ -26,7 +26,7 @@
 
 \subsection{$Z$-transform}
 
-\parag{Derivation of the transfer function}{
+\begin{parag}{Derivation of the transfer function}
     Let's say that we have an LTI system $\mathcal{H}$ with impulse response $h$. We also let $z_0 = A e^{j \omega_0}$ to be an arbitrary complex number. If we input $x\left[n\right] = z_0^n$ to our system, we get: 
     \[y\left[n\right] = \left(h * x\right)\left[n\right]= \sum_{k=-\infty}^{\infty} z_0^{n-k} h\left[k\right] = z_0^n \sum_{k=-\infty}^{\infty} z_0^{-k} h\left[k\right]\]
     
@@ -36,7 +36,7 @@
 
     We had already done a very similar argument for Fourier transforms and Laplace transforms.
 
-    \subparag{Fourier}{
+    \begin{subparag}{Fourier}
         For Fourier transforms, we noticed that: 
         \[\mathcal{H}\left\{e^{j \omega_0 n}\right\} = H\left(e^{j \omega_0}\right)e^{j \omega_0 n}\]
         where $H\left(e^{j \omega}\right)$ is the frequency response.
@@ -45,34 +45,34 @@
         \[H\left(e^{j\omega_0}\right) = H\left(z = e^{j \omega_0}\right)\]
         
         However, this time, we are allowed to have a constant $A$ in front of the complex exponential; we don't need the circle to be a unit one. 
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: $Z$-transform}{
+\begin{parag}{Definition: $Z$-transform}
     Let $x\left[n\right]$ be a DT signal. Its $Z$-transform is: 
     \[X\left(z\right) = \sum_{n=-\infty}^{\infty} x\left[n\right] z^{-n}\]
     for every $z$ such that the sum converges.
 
-    \subparag{Pairs}{
+    \begin{subparag}{Pairs}
         We often write the $\left(x\left[n\right], X\left(z\right)\right)$ pair as: 
         \[x\left[n\right] \ztransformpair X\left(z\right) \text{ and } R\]
         where $R$ is the region of convergence, the set of values where the sum converges.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Link with DTFT}{
+\begin{parag}{Link with DTFT}
     Let us consider the $Z$-transform, writing $z$ in its polar form: 
     \[X\left(z\right) = \sum_{n=-\infty}^{\infty} x\left[n\right] z^{-n} = \sum_{n=-\infty}^{\infty} x\left[n\right] \left(\left|z\right| e^{j \arg\left(z\right)}\right)^{-n} = \sum_{n=-\infty}^{\infty} \left(x\left[n\right] \left|z\right|^{-n}\right) e^{-j \arg\left(z\right) n}\]
     
     We notice that the $Z$-transform of $x\left[n\right]$ at $z$ is the Fourier transform of $x\left[n\right] \left|z\right|^{-n}$ at $\omega = \arg\left(z\right)$. In other words, the $Z$-transform generalises the discrete-time Fourier transform.
-}
+\end{parag}
 
-\parag{Inverse $Z$-transform}{
+\begin{parag}{Inverse $Z$-transform}
     It is possible to inverse the $Z$-transform using a formula. However, it is rather complicated and we will, as usual, instead mostly use tables.
-}
+\end{parag}
 
 
-\parag{Example: Region of convergence}{
+\begin{parag}{Example: Region of convergence}
     Let us consider the two following signals: 
     \begin{functionbypart}{h_c\left[n\right] = a^n u\left[n\right]}
         a^n, & n \geq 0 \\
@@ -95,51 +95,51 @@
     which converges if and only if $\left|za^{-1}\right| < 1 \iff \left|z\right| < \left|a\right|$.
 
     We notice that $H_c = H_a$, which is really strange since we have an inversion formula. However, the difference is made on the regions of convergence.
-}
+\end{parag}
 
-\parag{Definition: ROC}{
+\begin{parag}{Definition: ROC}
     The \important{region of convergence} (ROC) of some $Z$-transform is the set of inputs where its sum converges.
-}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     We notice that we can write the $Z$-transform as: 
     \[X\left(z\right) = \sum_{n=-\infty}^{\infty} x\left[n\right] \left|z\right|^{-n} e^{-n\arg\left(z\right)j}\]
     
     Since a complex exponential is bounded, the convergence of the $Z$-transform only depends on $\left|z\right|$. This implies that the ROCs are disks or annulus (possibly with infinite radius) centred at 0.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $x\left[n\right]$ be a DT signal and $X\left(z\right)$ its $Z$-transform. 
 
     $x\left[n\right]$ is stable if and only if its region of convergence contains the unit circle.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We have seen that the $Z$-transform of $x\left[n\right]$ at $z = A e^{j \omega_0}$ is the DT Fourier transform of $x\left[n\right]\left|z\right|^{-n}$ at $\omega = \arg\left(z\right)$. This means that the Fourier transform of $x\left[n\right]$ exists if and only if $\left|z\right| = 1$, the unit circle, belongs to the ROC.
 
         Moreover, we know that a signal has a Fourier transform if and only if it is stable. This indeed means that a system is stable if and only if the ROC of its transfer function contains the unit circle.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Rational function}{
+\begin{parag}{Rational function}
     In many cases, $H\left(z\right)$ will be a rational function: 
     \[H\left(z\right) = \frac{P\left(z\right)}{Q\left(z\right)}\]
     where $P$ and $Q$ are polynomials in $z$.
 
     We define the roots of $Q$ to be \important{poles}, and the roots of $P$ to be \important{zeroes}.
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         A circle containing a pole can never belong to the ROC. The ROC of rational function must thus either be bounded by poles or extend to infinity.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Zero-pole plot}{
+\begin{parag}{Definition: Zero-pole plot}
     Just as for the CT case, we can draw the \important{zero-pole plot} of a rational transfer function $H\left(z\right)$ on the complex plane. Its zeroes are represented by circles and its poles by crosses.
-}
+\end{parag}
 
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider the following expression: 
     \[H\left(z\right) = \frac{2}{\left(1 - \frac{1}{2}z^{-1}\right)\left(1 - \frac{3}{2}z^{-1}\right)}\]
 
@@ -162,9 +162,9 @@
     In the third ROC, if $\frac{3}{2} < \left|z\right|$, we get: 
     \[\left[3\left(\frac{3}{2}\right)^n - \left(\frac{1}{2}\right)^n\right]u\left[n\right]\]
     since we require $\left|z\right| > \frac{1}{2}$ for the first term and $\left|z\right| > \frac{3}{2}$ for the second one.
-}
+\end{parag}
 
-\parag{$Z$-transform pairs}{
+\begin{parag}{$Z$-transform pairs}
     As usual, we can make the following table of $Z$-transform pairs:
     \begin{center}
     \begin{tabular}{|rcll|}
@@ -182,9 +182,9 @@
         \hline
     \end{tabular}
     \end{center}
-}
+\end{parag}
 
-\parag{$Z$-transform properties}{
+\begin{parag}{$Z$-transform properties}
     We also have the following properties:
     \begin{center}
     \begin{tabular}{|rcll|}
@@ -205,55 +205,55 @@
     \end{tabular}
     \end{center}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We notice that the properties are very close to the ones of the DT Fourier transform. This makes sense since the $Z$-transform generalises the DT Fourier transform.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Right-sided signal}{
+\begin{parag}{Definition: Right-sided signal}
     Let $x\left[n\right]$ be a DT signal.
 
     $x\left[n\right]$ is \important{right-sided} if there exists some $N \in \mathbb{N}$ such that, for all $n < N$: 
     \[x\left[n\right] = 0\]
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Just as for CT right-sideness, any causal signal is right-sided, but the reciprocal is not true.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Definition: Left-sided signal}{
+\begin{parag}{Definition: Left-sided signal}
     Let $x\left[n\right]$ be a DT signal.
 
     $x\left[n\right]$ is \important{left-sided} if there exists some $N \in \mathbb{N}$ such that, for all $n > N$: 
     \[x\left[n\right] = 0\]
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Any anti-causal signal is left-sided, but the reciprocal is not true.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     Any finite duration signal is both left-sided and right-sided.
-}
+\end{parag}
     
-\parag{Definition: Two-sided signal}{
+\begin{parag}{Definition: Two-sided signal}
     Let $x\left[n\right]$ be a DT signal.
     
     $x\left[n\right]$ is \important{both-sided} if it is neither right-sided nor left-sided.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $x\left[n\right]$ be some DT signal, which transfer function $X\left(z\right)$ exists.
 
     If $x\left[n\right]$ is right-sided, then the ROC of $X\left(z\right)$ contains a neighbourhood of every $\left|z\right| = \infty$ (the ROC is of the form $\left|z\right| > r$ for some $r \in \mathbb{R}_+$). If moreover $x\left[n\right]$ is causal, then the ROC of $X\left(z\right)$ contains all $\left|z\right| = \infty$ (meaning that all the limits exist).
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The reciprocals are false in general. However, they are true for rational functions $X\left(z\right)$.
-    }
+    \end{subparag}
 
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         By hypothesis, there exists some $N \in \mathbb{N}$ such that, for all $n < N$: 
         \[x\left[n\right] = 0\]
         
@@ -266,33 +266,33 @@
         The first sum is finite, so it converges for all $z \in \mathbb{C}$, where $\left|z\right| \neq \infty$. The second sum gets smaller as $\left|z\right|$ grows bigger; meaning that, if a circle belongs to the ROC, all circles with greater radius are also in the ROC. Putting both together, the ROC must contain a negihbourhood of all $\left|z\right| = \infty$, but not necessarily $\left|z\right| = \infty$.
 
         However, if $N \geq 0$, then we only have the second sum. This yields that $X\left(z\right)$ exists for any $\left|z\right| = \infty$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $x\left[n\right]$ be some DT signal, which transfer function $X\left(z\right)$ exists.
 
     If $x\left[n\right]$ is left-sided, then the ROC of $X\left(z\right)$ contains a neighbourhood of 0. If moreover $x\left[n\right]$ is anti-causal, then the ROC of $X\left(z\right)$ contains 0.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The reciprocals are false in general. However, they are true for rational functions $X\left(z\right)$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example: Finite duration}{
+\begin{parag}{Example: Finite duration}
     Using the properties, we notice that a signal is finite duration if and only if its region of convergence is the whole complex plane, except possibly for $\left|z\right| = 0$ and $\left|z\right| = \infty$.
 
     For instance, if $x\left[n\right] = \delta \left[n -m \right]$ for some $m \in \mathbb{Z}$: 
     \[X\left(z\right) = z^{-m}\]
     
     It converges for all $z \in \mathbb{C}$ except for $z = 0$ if $m > 0$ and except for $z = \infty$ if $m < 0$. 
-}
+\end{parag}
 
 
 \subsection{Application to discrete time LTI systems}
 
-\parag{LTI systems}{
+\begin{parag}{LTI systems}
     Let $\mathcal{H}$ be an LTI system with impulse response $h\left[n\right]$. We know that we can write: 
     \[y\left[n\right] = \mathcal{H}\left\{x\right\}\left[n\right] = \left(x * h\right)\left[n\right]\]
     
@@ -303,43 +303,43 @@
     Thus, we have, as usual: 
     \[Y\left(z\right) = H\left(z\right) X\left(z\right)\]
     where $R_Y \supseteq R_X \cap R_H$.
-}
+\end{parag}
 
-\parag{Property: Stability}{
+\begin{parag}{Property: Stability}
     Let $\mathcal{H}$ be a LTI system with transfer function $H\left(z\right)$.
 
     $\mathcal{H}$ is stable if and only if the ROC of $H\left(z\right)$ includes the unit circle.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         This directly comes from our earlier observations.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Property: Causality}{
+\begin{parag}{Property: Causality}
     Let $\mathcal{H}$ be a LTI system with transfer function $H\left(z\right)$.
 
     If $\mathcal{H}$ is causal, then the ROC of $H\left(z\right)$ contains all $\left|z\right| = \infty$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         If $\mathcal{H}$ is causal, then its impulse response $h\left[n\right]$ is right-sided and $H\left(z\right)$ must exist for all $\left|z\right| = \infty$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Property: Rational function causality}{
+\begin{parag}{Property: Rational function causality}
     Let $\mathcal{H}$ be a LTI system with a \textit{rational} transfer function $H\left(z\right) = \frac{P\left(z\right)}{Q\left(z\right)}$.
 
     $\mathcal{H}$ is causal if and only if the ROC of $H\left(z\right)$ contains all $\left|z\right| = \infty$.
-}
+\end{parag}
 
-\parag{Difference equation}{
+\begin{parag}{Difference equation}
     We know the following property of $Z$-transforms: 
     \[x\left[n - n_0\right] \ztransformpair z^{-n_0}X\left(z\right)\]
     
     We can use it to solve difference equations for LTI systems. DTFT required that the system was stable, but $Z$-transforms do not need this hypothesis.
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let's suppose that a LTI system satisfies the following difference equation: 
     \[y\left[n\right] - \frac{1}{2}y\left[n-1\right] = x\left[n\right] + \frac{2}{3}x\left[n-1\right] - \frac{3}{5}x\left[n-2\right]\]
     
@@ -360,6 +360,6 @@
     If however $\frac{1}{2} < \left|z\right|$, we have:
     \[h\left[n\right] = \left(\frac{1}{2}\right)^n u\left[n\right] + \frac{2}{3} \left(\frac{1}{2}\right)^{n-1} u\left[n-1\right] - \frac{3}{5}\left(\frac{1}{2}\right)^{n-2} u\left[n-2\right]\]
     which we can deduce to be a causal and stable signal from the ROC.
-}
+\end{parag}
 
 \end{document}

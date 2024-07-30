@@ -25,26 +25,26 @@
 
 }
 
-\parag{Flip-and-drag method}{
+\begin{parag}{Flip-and-drag method}
     To compute a convolution, we can use a graphical method name the flip-and-drag method. Let us consider again the definition of DT convolutions: 
     \[\left(x * h\right)\left[n\right] = \sum_{k=-\infty}^{\infty} x\left[k\right] h\left[n-k\right]\]
     
     So, we can plot the input as a function of $k$. Then, we flip $h\left[k\right]$ and shift it $n$ units to the right. We just compute the product of the two functions, and add everything up to get the value for the current $n$. Then we drag the function and do it for another $n$.
 
     The case for continuous time is completely similar, excepted that we drag over continuous steps instead of discrete ones, and then just compute the of the product of functions.
-}
+\end{parag}
 
 \subsection{LTI system properties}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     We have defined a lot of properties systems can have. However, we know that LTI systems are completely expressed by their impulse response, so we can deduce the property from their impulse response.
-}
+\end{parag}
 
-\parag{Memorylessness}{
+\begin{parag}{Memorylessness}
     An LTI system $\mathcal{H}$ with impulse response $h\left(t\right)$ or $h\left[n\right]$ is memoryless if and only if there exists $a \in \mathbb{R}$ such that:
     \[h\left(t\right) = a \delta\left(t\right), \mathspace h\left[n\right] = a \delta \left[n\right]\]
     
-    \subparag{Proof $\implies$}{
+    \begin{subparag}{Proof $\implies$}
         Since $\mathcal{H}$ is memoryless and time invariant by hypothesis, this necessarily means that $y\left(t\right) = \mathcal{H}\left\{x\right\}\left(t\right)$ only depends on $x\left(t\right)$, and thus that there exists a $f$ such that: 
         \[y\left(t\right) = \mathcal{H}\left\{x\right\}\left(t\right) = f\left(x\left(t\right)\right)\]
 
@@ -61,43 +61,43 @@
         \[h\left(t\right) = a \delta\left(t\right)\]
 
         The case for DT is similar.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Causality}{
+\begin{parag}{Causality}
     An LTI system with impulse response $h\left(t\right)$ is causal if and only if:
     \[h\left(t\right) = 0, \mathspace \text{ for } t <0\]
 
     Similarly, for DT systems:
     \[h\left[n\right] = 0, \mathspace \text{ for } n <0\]
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         The argument is very similar to memorylessness. Also, the case for DT is very similar.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Invertibility}{
+\begin{parag}{Invertibility}
     Any LTI system with an impulse response $h\left(t\right)$ is invertible if and only if there exists a $g\left(t\right)$ such that: 
     \[\left(g * h\right)\left(t\right) = \delta\left(t\right)\]
 
     Similarly, for the DT case: 
     \[\left(g * h\right)\left[n\right] = \delta \left[n\right]\]
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         There must exist an inverse $g\left(t\right)$: if distinct inputs lead to distinct outputs, then we can find an inverse.
 
         The case for DT systems in completely analogous.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Stability}{
+\begin{parag}{Stability}
     Any LTI system with impulse response $h\left(t\right)$ is stable if and only if: 
     \[\int_{-\infty}^{\infty} \left|h\left(t\right)\right|dt < \infty\]
     
     Similarly for the DT case: 
     \[\sum_{k=-\infty}^{\infty} \left|h\left[k\right]\right| < \infty\]
     
-    \subparag{Proof $\implies$}{
+    \begin{subparag}{Proof $\implies$}
         We will only consider the DT case; the case for CT is completely similar.
 
         We do the proof by the contrapositive: we suppose that $\sum_{k=-\infty}^{\infty} \left|h\left[k\right]\right| = \infty$, and we want to show that $h\left[k\right]$ is not stable. Thus, we consider the following signal: 
@@ -110,9 +110,9 @@
         We notice that $\left|x\left[n\right]\right| \leq 1$ for all $n$, showing it is bounded. However: 
         \[y\left[0\right] = \sum_{k=-\infty}^{\infty} h\left[k\right]x\left[-k\right] = \sum_{k=-\infty}^{\infty} \left|h\left[k\right]\right| = \infty\]
         by our assumption. We found a bounded input which led to an unbounded input, showing that the system is not stable; as required.
-    }
+    \end{subparag}
     
-    \subparag{Proof $\impliedby$}{
+    \begin{subparag}{Proof $\impliedby$}
 
         Let's suppose that we have some signal such that $\left|x\left[n\right]\right| < B$ for all $n$ and that our system follows our property: 
         \[\sum_{k=-\infty}^{\infty} \left|h\left[k\right]\right| = C \in\mathbb{R}\]
@@ -122,34 +122,34 @@
         which is finite, as required.
 
         \qed
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
 
 \subsection{System composition} 
 
-\parag{Goal}{
+\begin{parag}{Goal}
     In real life, it is typical for different systems to be built by composing other systems together.
 
     In this course, we will focus on three kind of compositions: parallel, series and feedback. This last one will only be considered later.
-}
+\end{parag}
 
-\parag{Definition: Series composition}{
+\begin{parag}{Definition: Series composition}
     Two systems $\mathcal{H}_1$ and $\mathcal{H}_2$ are composed in \important{series} (or in cascade) if they are taken one after the other: 
     \[y\left(t\right) = \mathcal{H}_2\left\{\mathcal{H}_1\left\{x\left(t\right)\right\}\right\}, \mathspace y\left[n\right] = \mathcal{H}_2\left\{\mathcal{H}_1\left\{x\left[n\right]\right\}\right\}\]
 
     \imagehere[0.5]{SystemsInSeries.png}
-}
+\end{parag}
 
-\parag{Definition: Parallel composition}{
+\begin{parag}{Definition: Parallel composition}
     Two systems $\mathcal{H}_1$ and $\mathcal{H}_2$ are composed in \important{parallel} if they are computed in parallel, and then summed up: 
     \[y\left(t\right) = \mathcal{H}_1\left\{x\left(t\right)\right\} + \mathcal{H}_2\left\{x\left(t\right)\right\}, \mathspace y\left[n\right] = \mathcal{H}_1\left\{x\left[n\right]\right\} + \mathcal{H}_2\left\{x\left[n\right]\right\}\]
     
     \imagehere[0.5]{SystemsInParallel.png}
-}
+\end{parag}
 
-\parag{LTI systems in series}{
+\begin{parag}{LTI systems in series}
     Let $\mathcal{H}_1$ and $\mathcal{H}_2$ be two LTI systems with impulse response $h_1\left(t\right)$ and $h_2\left(t\right)$.
 
     If they composed in series, then the result is also LTI, and it has an impulse response of:
@@ -157,7 +157,7 @@
 
     The case for DT systems is completely analogous.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         It is possible rather easily to show that the composition is LTI. To derive the impulse response, we just use the associative property of convolutions: 
         \[y\left(t\right) = \mathcal{H}_2\left\{\mathcal{H}_1\left\{x\left(t\right)\right\}\right\} = \left(h_2 *\left(h_1 * x\right)\right)\left(t\right) = \left(\left(h_2 * h_1\right)* x\right)\left(t\right)\]
         
@@ -165,10 +165,10 @@
         \[h\left(t\right) = \left(h_2 * h_1\right)\left(t\right) = \left(h_1 * h_2\right)\left(t\right)\]
         
         We also note that the composition order does not matter for LTI systems (though this is not the case for non-LTI systems). 
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{LTI systems in parallel}{
+\begin{parag}{LTI systems in parallel}
     Let $\mathcal{H}_1$ and $\mathcal{H}_2$ be two LTI systems with impulse response $h_1\left(t\right)$ and $h_2\left(t\right)$.
 
     If they composed in parallel, then the result is also LTI, and it has an impulse response of:
@@ -176,63 +176,63 @@
 
     The case for DT systems is completely analogous.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         It is pretty easy to show that the two systems in parallel is also LTI. To find its impulse response, we can use the distributive property of convolutions: 
         \autoeq{y\left(t\right) = \mathcal{H}\left\{x\left(t\right)\right\} = \mathcal{H}_1\left\{x\left(t\right)\right\} + \mathcal{H}_2\left\{x\left(t\right)\right\} = \left(h_1 * x\right)\left(t\right) + \left(h_2 * x\right)\left(t\right) = \left(\left(h_1 + h_2\right) * x\right)\left(t\right)}
 
         This thus gives us that $\mathcal{H}$ has the following impulse response: 
         \[h\left(t\right) = h_1\left(t\right) + h_2\left(t\right)\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 \subsection{Differential and difference equations}
-\parag{Remark}{
+\begin{parag}{Remark}
     Many physical systems can be represented using differential equations (for continous-time systems) and discrete-time systems (for difference equations).
 
     We will focus on causal LTI systems in this section.
-}
+\end{parag}
 
-\parag{Definition: Linear constant-coefficient differential equation}{
+\begin{parag}{Definition: Linear constant-coefficient differential equation}
     A \important{linear constant-coefficient differential equation} as the following form: 
     \[\sum_{k=0}^{N} a_k \frac{d^{k}y\left(t\right)}{dt^{k}} = \sum_{k=0}^{M} b_k \frac{d^{k}x\left(t\right)}{dt^{k}} \]
     
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         If $N=0$, we have an explicit expression for $y\left(t\right)$. However, when $N \geq 1$, we need some more information to completely describe our system.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Linear constant-coefficient difference equation}{
+\begin{parag}{Definition: Linear constant-coefficient difference equation}
     A linear constant-coefficient difference equation has the form: 
     \[\sum_{k=0}^{N} a_k y\left[n-k\right] = \sum_{k=0}^{M} b_k x\left[n-k\right]\]
     
     This is also known as a recursive equation.
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         Just as for differential equations, if $N \geq 1$ we need auxiliary conditions.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Condition of initial rest}{
+\begin{parag}{Definition: Condition of initial rest}
     A system follows the \important{condition of initial rest} if, for any $t_0 \in \mathbb{R}$ and any signal $x$ such that $x\left(t\right) = 0$ for all $t < t_0$, then: 
     \[y\left(t\right) = 0, \mathspace \forall t < t_0\]
 
     The case for DT systems is very similar.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     An LTI system $\mathcal{H}$ is causal if and only if it satisfies the condition of initial rest.
 
-    \subparag{Proof $\implies$}{
+    \begin{subparag}{Proof $\implies$}
         Let's suppose that $\mathcal{H}$ is causal and $x\left[n\right] = 0$ for $n < n_0$.
 
         This implies that, for any $n < n_0$:
         \autoeq{y\left[n\right] = \sum_{k=-\infty}^{\infty} x\left[k\right] h\left[n-k\right] = \sum_{k=n_0}^{\infty} x\left[k\right]h\left[n-k\right] = \sum_{k=n_0}^{n} x\left[k\right]h\left[n-k\right] = 0}
         using first that $x\left[k\right] = 0$ for $k < n_0$, then that $h\left[k\right] = 0$ for $k < 0$ and finally that $n < n_0$.
         
-    }
+    \end{subparag}
 
-    \subparag{Proof $\impliedby$}{
+    \begin{subparag}{Proof $\impliedby$}
         Let's suppose that $\mathcal{H}$ satisfies the condition of initial rest.
 
         We can consider $n_0 = 0$ and $x\left[n\right] = \delta \left[n\right]$, which are indeed such that: 
@@ -244,10 +244,10 @@
         However, as we have seen, this implies that the system is causal.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider the following linear constant-coefficient differential equation: 
     \[\frac{dy\left(t\right)}{dt} + 2y\left(t\right) = x\left(t\right)\]
     where $x\left(t\right) = Ke^{3t}u\left(t\right)$.
@@ -270,11 +270,11 @@
     Still using the initial rest condition, we get: 
     \[y\left(t\right) = \frac{K}{5}\left[e^{3t} - e^{-2t}\right]u\left(t\right)\]
     
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         Solving differential equations that way is very tedious, so we will develop tools to help us.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 
 
