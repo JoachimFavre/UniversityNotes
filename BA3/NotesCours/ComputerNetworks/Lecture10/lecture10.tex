@@ -26,20 +26,20 @@
 }
 
 \section{Link layer}
-\parag{Goal}{
+\begin{parag}{Goal}
     The goal of the link layer is to take a packet from then end of one link (or subnet) to the end of the other
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Note that this seems very close to the network layer, which goal is to take a packet from one end of a network to the other end.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Terminology}{
+\begin{parag}{Terminology}
     We make the distinction between switches (link-layer switches) and router (network-layer switch).
-}
+\end{parag}
 
 
-\parag{Point of views}{
+\begin{parag}{Point of views}
     There are two point of views for the link layer: from an IP subnet or from the internet (which is composed of many subnets).
 
     From the point of view of an IP subnet, the link layer takes packet  from one end of one physical link to the other end, whereas the network layer takes packet from one end of the IP subnet to the other end.
@@ -47,21 +47,21 @@
     From the point of view of the internet, a ``link'' goes across a subnet. This means that, for its point of view, the link layer take packets from one end of one IP subnet to the other end, and the network layer takes packet from one end of the internet to the other end.
 
     When people say ``link layer'', they typically mean both together, since they are packed together in the same technology. 
-}
+\end{parag}
 
-\parag{Services}{
+\begin{parag}{Services}
     The link-layer has three main services.
 
     First, it may do error detection: the receiver (at the end of a physical link) may rely on checksum in order to detect and drop corrupted packets. Second, it may do reliable data delivery: detect corruption and loss and try to recover. This only appears for link which may have a lot of loss, such as wireless ones. Third, they may do medium access control (MAC): some medium (such as wireless) are shared, they may listen for ongoing transmission and  try again later.
 
     Note that we this is a good idea to do reliable data delivery also at the link layer (on top of what TCP does). Indeed, in the end, it is less expensive (for instance, the timeouts can be must shorter and it can avoid TCP to timeout and start with a small congestion window again). Naturally, it comes with a cost: they need buffers, \texttt{ACK}s, and so on.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Very generally, when implementing reliable data delivery in a system, we at least need end-to-end reliable data delivery (such as what TCP provides) since this is ultimately end systems which knows if there was corruption or loss. However, we may do it at some other places too.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Addressing}{
+\begin{parag}{Addressing}
     Each router has a MAC address. \important{MAC addresses} are 48-bit number, where each byte is represented as hexadecimal. For instance, it may look like:
     \begin{center}
         \texttt{1A-28-DD-78-CF-CC}
@@ -71,39 +71,39 @@
 
     The link layer header of a packet stores the source MAC address (the \textit{last} router it went through) and the destination MAC address (the \textit{next} router it will go through; not its final destination).
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         In theory, a MAC address should be unique inside a subnet. In practice, we do more than that, and all MAC addresses are unique around the world.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Forwarding}{
+\begin{parag}{Forwarding}
     Each switch names it network interfaces (also called links), and keeps a forwarding table that maps MAC addresses to those links. This is named L2 (layer 2) forwarding. 
      
     This looks a lot like L3 forwarding (IP forwarding), except that MAC addresses are flat, so we cannot use prefixes. The thing is, it does not scale in general, but it scales enough for the systems we work on. Indeed, L2 forwarding only neeeds to store the MAC address of all active destination MAC addresses in the IP subnet, whereas L3 forwarding requires to know all IP prefixes in the world.
-}
+\end{parag}
 
-\parag{Learning}{
+\begin{parag}{Learning}
     If we reboot a link layer switch, it is very probable that its forwarding table will be empty. The thing is, there is no routing algorithm that populates forwarding tables. Instead, they learn it by analysing the traffic.
     
     When a packet arrives to a switch, the latter looks the source MAC address and the link this packet comes from, and learns that the packets going to this MAC address need to be sent to this link (this is not of immediate use, but will very probably come after). If it does not know to whom it needs to send the packet, it will broadcast the packet to all its links.
     
     This idea of L2 learning is similar to IP routing, but it relies on actual traffic instead of a routing protocol.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Naturally, this system raises security questions, which must be kept in mind in real life.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Forwarding loops}{
+\begin{parag}{Forwarding loops}
     An important thing to consider with the idea of broadcasting the packet, is loops: we may broadcast to switches which don't know where to send it, and it may come back to us after some iterations. 
 
     The idea is that every switches in an IP subnet all store a spanning tree: a subgraph of the IP subnet which includes all end-systems, router and switches, but only a subset of the links (just enough edges to reach all the nodes without loops). They all need to agree on the same spanning tree.
 
     We can use this spanning tree to broadcast safely: when we receive a packet, we broadcast to every children in the tree (except to the switch which sent us the packet). This means that the links which are not in the spanning tree are not used. However, since this tree is not always static, such links may become used after some time.
-}
+\end{parag}
 
-\parag{Address resolution}{
+\begin{parag}{Address resolution}
     Let's say Alice knows Bob's IP address and wants to send him a packet, while they are in the same IP subnet. She needs to know what destination MAC address to put on her packet. 
 
     To get Bob's MAC address, she needs to make an ARP (Address Resolution Protocol) request. Since she does not know any MAC address, she puts the broadcasting MAC address (typically \texttt{FF-FF-FF-FF-FF-FF}) on her ARP request: she asks switches to send it to every end system of the subnet. When Bob receives this packet, he recognises his IP address, and sends a response (named ARP response) which contains his MAC address. That way, Bob has learnt Alice's MAC address, and Alice has learnt Bob's. 
@@ -116,26 +116,26 @@
 
     Note that routers (not to be mistaken with switches) are the same as any other end system in the link layer. Thus, if they don't know a MAC address, they will also make an ARP request. Switches don't know anything about IP address, so they could not have a cache for those requests.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         ARP serves a similar role as DNS. However, the former relies on broadcasting (which would not scale over the internet), and the latter relies on centralised maps.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Ethernet}{
+\begin{parag}{Ethernet}
     We have seen the three basic elements of the Ethernet protocol: L2 forwarding (related to IP forwarding), L2 learning (related to IP routing) and ARP (related to DNS).
-}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     Note that we cannot get rid of IP addresses and IP forwarding, replacing them with MAC addresses and L2 forwarding. Indeed, this would not scale a network device located in the middle of the internet may see traffic from millions of end-systems rendering L2 learning not doable. Also, the forwarding table would need to be large enough to fit individual entries for each active end system, and the broadcastring would be a too big flooding.
 
     On the other hand, we could get rid of MAC address and L2 forwarding, replacing them with IP addresses and IP forwarding. It would work, but it would not be great because it would decrease flexibility. We only saw one type of IP subnet (ethernet), but there are many others. Only using IP addresses and forwarding would require all subnets to have the same link layer protocol, decreasing flexibility.
-}
+\end{parag}
 
-\parag{Levels of hierarchy}{
+\begin{parag}{Levels of hierarchy}
     We have seen three levels of hierarchy: IP subnets (which use L2 forwarding and L2 learning; recall that it is a contiguous area with routers only at its boundaries (but may have switches inside)), on top of which we have autonomous systems (which use IP forwarding and intra-domain routing) and on top of which we have the internet (which uses IP forwarding and inter-domain routing (BGP)).
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's consider the following architecture:
     \imagehere[0.7]{LinkLayerExampleArchitecture.png}
 
@@ -153,15 +153,15 @@
 
     Now, $R1$ can change the source MAC address to be its MAC address, and the destination MAC address to be the DNS local server, and send it again. This packet will, in the end, arrive correctly to Alice's local DNS server.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This may look like it takes a lot of time. However, thanks to ARP caching, this is in fact really fine.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     From what we have seen, routers do not need IP addresses, and switches do not need MAC addressees nor IP addresses. However, in reality, both switches and router have MAC and IP addresses.
 
     This is done for multiple practical reasons. For instance, they may need to be reachable by an administrator or for configuration and inspection, or they might need to be tested alongside the rest of the network. Also, a router needs an IP address to respond to ARP requests, and it needs one if it acts as a NAT gateway.
-}
+\end{parag}
 
 \end{document}

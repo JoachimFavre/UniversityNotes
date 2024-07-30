@@ -24,25 +24,25 @@
 }
 
 \subsection{Example 2: DNS}
-\parag{DNS name}{
+\begin{parag}{DNS name}
     When we type a URL into our web client, such as \texttt{http://www.epfl.ch/index.html}, it extracts the DNS name (\texttt{www.epfl.ch}), converts it into an IP address (we will see how), forms the web-server process name (the port number is specified by the \texttt{http}, there is very specific port numbers for this protocol: 80 or 8080 for \texttt{http} and 443 or 8443 for \texttt{https}).
 
     To translate the DNS name to an IP address, we use DNS (Domain Name System).
 
-    \subparag{Remark: Interface}{
+    \begin{subparag}{Remark: Interface}
         An interface is a complicated notion since it appears in many forms, but it is basically a point where two systems (or subjects or organisations) meet and interact.
 
         We have for instance seen the API (Application Programming Interface), which is an interface between an application and the Internet by giving a set of functions to communicate over the internet. There are also network interfaces: interface between an end-system and the network, a piece of hardware or software that sends and receives packets.
 
         The DNS name identifies a network interface, meaning that it identifies an end-system (or host).
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Architecture}{
+\begin{parag}{Architecture}
     Our web-client also runs a DNS client process, it can ask this process the IP address for a given DNS name. The DNS process (a process that generates DNS requests) then asks a DNS server (a process that answers DNS requests) for the IP address. Note that DNS resolution must be done before any web connection, giving some intuition on how important this is.
 
 
-    \subparag{Scalability}{
+    \begin{subparag}{Scalability}
         We notice that it is not possible to have a single DNS server in the entire Internet: this would be a single point of failure (if it crashes, nobody can access the web anymore), the propagation delay would be a problem for some people, it would be very costly to handle and to have it big enough, and so on. Using only one DNS server could not scale. This makes us introduce the concept of scalability.
 
         \important{Scalability} is the ability of a system to grow, it is its ability to maintain its properties at a reasonable cost as it grows. 
@@ -61,59 +61,59 @@
 
 
         To sum up, this is a hierarchy of three levels, where each node knows how to reach its children. This is definitely scalable, and there is no single point of failure or single institution which needs to manage for everything. For instance, EPFL has its own authoritative server.
-    }
+    \end{subparag}
     
     
-    \subparag{Caching}{
+    \begin{subparag}{Caching}
         With all the queries, we need to optimise performance, which we can do through caching. When we have many users who want to access the same information, and that information takes time to get, then, as a very general paradigm, it makes sens to cache. By doing caching, any DNS server in the hierarchy (even the client) can make everything quicker. However, as usual with caching, we have the problem of stale data.
 
         The solution against stale data for web pages is not really interesting here since IP addresses do not represent a lot of data. However, we notice that IP addresses do not change often. So, instead, when sending the IP address corresponding to a given DNS name, the DNS server adds a \important{TTL} (Time to Live; its length can vary a lot depending on the authoritative server), which the DNS server (or client) above also caches. The authoritative server assures that the IP address will not change during this period of time. Then, if the engineer wants to modify the IP address, he or she can allow the old IP address for the TTL of the most recent request.
 
         We could also imagine another system, where, if data changes, then the DNS server notifies all servers who asked for this data. However, this is not a good idea since we are making a stateful architecture (it would need to know who asked). This would complicate the DNS protocol, and, very generally, we must think twice before turning a stateless architecture into a stateful one.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     We have seen two important concepts: hierarchy and caching.
 
     To sum up, \important{hierarchy} is a universal technique for scaling large systems and \important{caching} is a universal technique for improving performance (where its main challenge is stale data, and to which we have seen two solutions).
-}
+\end{parag}
 
 
-\parag{Communication protocol}{
+\begin{parag}{Communication protocol}
     The communication protocol of DNS relies on \important{Resource Record} (RR). This a piece of information (such as a DNS to IP mapping). In this protocol, we then have queries (a request for an RR), answers (a response to a question) and messages (a set of queries and answers, plus some other elements). 
 
     Any DNS client and server, or any two DNS servers, can exchange any sequence of message.
-}
+\end{parag}
 
-\parag{Transport layer technology}{
+\begin{parag}{Transport layer technology}
     DNS's transport layer typically relies on UDP since we do not really need the confirmation that the message was received, it is not worth for the TCP connection setup time. 
 
     Thus, typically, for short exchanges, we use UDP. However, when DNS servers begin to exchange a lot between them, then they can start using TCP. Note that, in an exam, without further information, we can suppose DNS works over UDP.
-}
+\end{parag}
 
-\parag{Attacks}{
+\begin{parag}{Attacks}
     Let's consider the possible attacks this system can undergo.
 
-    \subparag{Impersonating}{
+    \begin{subparag}{Impersonating}
         A malicious entity, Persa, can impersonate a DNS server and, if she sends her IP address more quickly than the DNS server (she could do this by guessing: sending the IP address to many people), then our DNS client will just ignore the true answer. This means that we could connect to Persa's machine, thinking we are looking at our bank's website. If she makes a website that looks like our bank, then we could give her our username and password. 
 
         This shows the power someone has by taking a DNS server.
-    }
+    \end{subparag}
  
-    \subparag{Denial of service}{
+    \begin{subparag}{Denial of service}
         Another malicious entity, Denis, could make denial of service attack to Root and TLD DNS servers by spamming them of demands. Since there are relatively few root and TLD servers, this attack can really have a big impact over the web. This is a very common attack, and there are a lot of protections against it.
-    }
+    \end{subparag}
     
 
-    \subparag{Trashing the cache}{
+    \begin{subparag}{Trashing the cache}
         Another attack can be done by Trish, by asking to get the IP address of many random websites of which nobody cares. If the DNS server is not careful, its cache will be filled with trash. This attack is called \important{trashing the cache}, and it is a potential vulnerability to any architecture using caching.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \subsection{Example 3: BitTorrent}
-\parag{Scaling}{
+\begin{parag}{Scaling}
     All architectures we have seen so far were client-servers, and BitTorrent's architecutre is the first peer-to-peer one. Let's see why people say that peer-to-peer architectures scale better than client-servers architecture.
 
     We are doing this very approximately, considering many delays to be insignificant, because it depends on many things.
@@ -135,40 +135,40 @@
 
     Peer-to-peer has a sublinear behaviour, whereas client-server is linear. This is why we say peer-to-peer scales better than client-server.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Naturally, we do not need to know those formulas by heart.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Content}{
+\begin{parag}{Content}
     Let's now see how we retrieve content with this system.
 
     We have a set of files stored in different peers. Also, there are metadata files, storing information about the data files (the file identities and, optionally, location information). For instance, in BitTorrent, the metadata file is a \texttt{.torrent} file.
 
     To retrieve content, we first need to learn the metadata file ID. Second, we need to find the metadata file location. Third, we need to get the metadata file (either from a web server or a peer), and read the data file IDs. Fourth, we need to find the data file locations. Finally, we get the data files from our peers.
-}
+\end{parag}
 
-\parag{File location}{
+\begin{parag}{File location}
     To find the file location, we can use one of two concepts: a tracker (which is centralised), xor a DHT (decentralised).
-}
+\end{parag}
 
-\parag{Metadata file}{
+\begin{parag}{Metadata file}
     To get the metadata file, there are multiple ways.
 
     The first way is to get it on a web server. To do so, we download it from the web server, and we don't need to learn any ID.
 
     The second way is to get it from a peer: we learn its ID from a web server, and we learn its location from a tracker or DHT. In Bittorent, a metadata file ID is named a magnet link.
 
-    \subparag{Legality}{
+    \begin{subparag}{Legality}
          Storing a magnet link on a server is legal, whereas storing metadata is not (for pirated files). The magnet link is not content, so it is legal to store it on a webserver. Also, then, since with magnet links nothing is centralised, it makes it much harder for authorities to shut it down.
-    }
+    \end{subparag}
     
-    \subparag{Personal remark}{
+    \begin{subparag}{Personal remark}
         I love how we speak about BitTorrent by only considering the case where we download pirated content. This is probably one of its last uses, but it is really funny to speak about that kind of stuff in class.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{DHT}{
+\begin{parag}{DHT}
     Now that we have a magnet link, we need to find the address of the files. Let's say we want to do it thanks to a \important{DHT} (Distributed Hash Table).
 
     Let's suppose that we have 16 files, and 4 peers. We don't know who stores what since there is no centralised unit. So, when someone joins the network, he or she gets responsibility of some files, meaning that they get to know someone who has these files. Also, people know at least two of their neighbours. 
@@ -176,7 +176,7 @@
     \imagehere[0.6]{DHT.png}
 
     Thus, when someone gets a request for a file, they look if they are responsible for that ID, and, if not, transmit to their neighbour who has the range id which is closet to the range. Real networks implement optimisations, by knowing more people and doing a $\log\left(n\right)$-search.
-}
+\end{parag}
 
 
 

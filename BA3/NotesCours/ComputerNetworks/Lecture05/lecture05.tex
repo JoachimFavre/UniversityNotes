@@ -28,14 +28,14 @@
 \section{Transport layer}
 \subsection{Interaction with the application layer}
 
-\parag{Internet packet}{
+\begin{parag}{Internet packet}
     In a typical internet packet, there is the application layer message, followed by a transport-layer header and a network-layer header. Typically, the first two together are called a \important{segment} and all of them together are named a \important{datagram}. Thus, a packet typically includes a datagram, which includes a segment.
 
     This looks like:
     \imagehere[0.5]{PacketSegmentDatagram.png}
 
     We will see how the transport layer knows what data to add (what are the source and destination port fields for instance) right after.
-}
+\end{parag}
 
 \subsubsection{UDP}
 \begin{filecontents*}[overwrite]{UDPSendMessage.code}
@@ -45,7 +45,7 @@ socket.sendTo(message, destIPAdress="5.5.5.5", destPort=5000)
 socket.close()
 \end{filecontents*}
 
-\parag{Sending a message}{
+\begin{parag}{Sending a message}
     Let's say a process wants to use UDP as its transport-layer protocol to send a message to a remote process. 
 
     First, the process asks the transport layer to open a UDP socket. The transport layer does so and associates it with this process. Second, the process asks the transport layer to bind the socket to a particular (local) IP address and port number; which it does by adding those two informations to the socket. 
@@ -56,13 +56,13 @@ socket.close()
 
     Note that we can use a socket to send multiple messages.
 
-    \subparag{Pseudocode}{
+    \begin{subparag}{Pseudocode}
         We can sum up this idea with the following pseudocode:
         \importcode{UDPSendMessage.code}{pseudo}
 
         Note that this code would not compile, it is more for the general idea.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{UDPReceiveMessage.code}
 socket = new socket("UDP")
@@ -71,24 +71,24 @@ message = socket.receiveFrom(100)  // 100 bytes
 socket.close()
 \end{filecontents*}
 
-\parag{Receiving a message}{
+\begin{parag}{Receiving a message}
     Now, to receive a message, this is rather similar. 
 
     We first create a socket, and then bind it using our IP address and port number. Then, we can tell the socket to receive a message through a blocking (wait until you get it) or non-blocking way, specifying how many bytes we want. 
 
     When a packet arrives from the network layer, the transport layer reads the header and searches for a socket corresponding for the IP address and port number. When it finds it, it sees to what process this socket is bound, and transmits the message down to it.
     
-    \subparag{Pseudocode}{
+    \begin{subparag}{Pseudocode}
         Algorithmically, this looks like:
         \importcode{UDPReceiveMessage.code}{pseudo}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Socket}{
+\begin{parag}{Socket}
     To sum up, each UDP socket has a unique IP address and port number tuple. This needs to be unique in order to make demultiplexing (know to which socket corresponds a message coming from the network layer).
 
     A process can use the same UDP socket to communicate with many remote processes.
-}
+\end{parag}
 
 \subsubsection{TCP}
 \begin{filecontents*}[overwrite]{TCPSendMessage.code}
@@ -99,16 +99,16 @@ socket.send(message)
 socket.close()
 \end{filecontents*}
 
-\parag{Sending a message}{
+\begin{parag}{Sending a message}
     When sending a message through TCP, the two first steps are similar to the ones of UDP (creating and binding the socket). The third step is then not to send the message directly, but to ask the transport layer to connect to the socket to a particular remote IP address and port number. The TCP socket is augmented with the remote IP address and remote port number. 
 
     Then, the transport layer is ready to send messages.
 
-    \subparag{Pseudocode}{
+    \begin{subparag}{Pseudocode}
         The pseudocode would look like:
         \importcode{TCPSendMessage.code}{pseudo}
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{TCPReceiveMessage.code}
 socket = new socket("TCP")
@@ -120,7 +120,7 @@ connectionSocket.close()
 \end{filecontents*}
 
 
-\parag{Receiving a message}{
+\begin{parag}{Receiving a message}
     Again, the two first steps are the same. 
 
     Then, the third step is to tell the transport layer that we want to use this socket to listen for TCP-connection-setup requests from remote processes. This TCP listening socket is always active on a server, in a client-server architecture.
@@ -129,38 +129,38 @@ connectionSocket.close()
 
     When receiving a message from the network layer, the transport layer will verify that it has a socket matching the local and remote ip address and port, and pass this message to the corresponding socket.
 
-    \subparag{Pseudocode}{
+    \begin{subparag}{Pseudocode}
         We could implement it the following way:
         \importcode{TCPReceiveMessage.code}{pseudo}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Socket}{
+\begin{parag}{Socket}
     To sum up, there are two types of TCP sockets: listening and connection sockets. Listening sockets look a lot like UDP sockets (except it also knows for how many connections it is listening), and connection sockets have a unique local IP, local port, remote IP and remote port tuple. A process must use a different TCP connection socket per remote processes.
-}
+\end{parag}
 
-\parag{Multiplexing}{
+\begin{parag}{Multiplexing}
     For both UDP and TCP, upon receiving a new message from a process, we create new packets, by identifying the correct IP addresses and ports. This is named \important{multiplexing}.
 
     Upon receiving a new packet from the network, we identify the correct destination process form all that are running the application layer. This is named \important{demultiplexing}.
-}
+\end{parag}
 
 \subsection{Reliable data delivery}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     The network layer of the internet is unreliable: it may corrupt or drop packets. We want to provide a transport layer which gives the illusion that the network layer is reliable to the application layer.
 
     Right now, we will consider an imaginary, more abstract, protocol. We will consider TCP in the next lecture.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         In this section, we will use the terms ``segment'' and ``packet'' interchangeably: both terms mean the same thing in this context.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Naive implementation}{
+\begin{parag}{Naive implementation}
     The naivest implementation we could do is just send the packet as is: doing multiplexing and demultiplexing but that's all. Clearly, this provides no reliability. 
-}
+\end{parag}
 
-\parag{Corruption}{
+\begin{parag}{Corruption}
     Let's first consider how to detect and recover from corruption.
 
     To do so, we can use error detection and error correction codes, such as checksum (through Hamming codes for instance). This is redundant information which is concatenated to each segment as a transport-layer header field. When the receiver gets the message, then it can compute the checksum and compare it to the one given by the sender. If they are the same, then it is very probable that there was no corruption.
@@ -171,16 +171,16 @@ connectionSocket.close()
 
     Note that we can replace the use of \texttt{Ack} and \texttt{Nack} by those sequence numbers: the receiver can say \texttt{Ack N}, where $N$ is the last sequence number it received correctly. Thus, if the sender sends the packet with sequence number 1 and receives from the receiver \texttt{Ack 0}, then it knows the packet was corrupted.
 
-    \subparag{Summary}{
+    \begin{subparag}{Summary}
         An \important{acknowledgement} is a feedback from the receiver to sender. The receiver adds \texttt{Ack} to each segment, as a transport-layer header field. The sender uses it to detect and overcome data corruption (if the sender gets negative \texttt{Ack}, then it retransmits the data).
 
         A \important{sequence number} is an identifier for data. The sender adds a \texttt{Seq} to each segment, in the transport-layer header field. The receiver uses it to disambiguate data. 
 
         All this is completely transparent to the application layer: it does not see anything of this happening. Of course, nothing prevents the application layer from doing its own checksums.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Lost segment}{
+\begin{parag}{Lost segment}
     Now, we want to be able to recover from lost segments (which can occur because of packet drop for instance).
 
     To do so, the sender's transport layer can use timeouts: every time it transmits a segment, it starts a timer. If this timer expires before it has received an \texttt{Ack} for the segment, it assumes that the segment was lost and retransmits it.
@@ -189,20 +189,20 @@ connectionSocket.close()
 
     It is also possible that the \texttt{Ack} was delayed. Thus, the sender timed-out, sent again a segment, but receives an \texttt{Ack} as it is waiting for the next \texttt{Ack} for the packet it is re-sending, it knows it did not need to re-send it. It can thus send the next segment immediately.
 
-    \subparag{Summary}{
+    \begin{subparag}{Summary}
         A \important{timeout} is when there is no arrival of an expected \texttt{Ack}, and it can happened when a segment was lost or delayed, or if the \texttt{Ack} for a segment was lost or delayed. The sender uses it to overcome data loss; if it times out, it retransmits.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Basic elements}{
+\begin{parag}{Basic elements}
     We have seen multiple basic elements: checksums (to detect data corruption), \texttt{Ack}s, retransmissions, \texttt{Seq}s (the three together to overcome data corruption) and timeouts (with the last three to detect and overcome data loss). 
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         It is typical in an exam to have a special network, such as one without corruption but with packet drop, and to be asked what elements we need for our transport layer.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Inefficiency}{
+\begin{parag}{Inefficiency}
     For now, implementing everything we have seen so far, we have made the transport-layer protocol named as \important{Stop and Wait}. In this protocol the sender does nothing while waiting for the receiver's \texttt{Ack} or the timeout, leading the transmission to be very inefficient (through the same definition of inefficiency as usual: the sender computer has the resources to serve, but does not use them).
     \imagehere[0.5]{WhyWeNeedPipelining.png}
 
@@ -211,7 +211,7 @@ connectionSocket.close()
 
     This is indeed very inefficient; we thus need to do something about it.
 
-    \subparag{Pipelining}{
+    \begin{subparag}{Pipelining}
         A way to fix this problem, is to introduce the notion of a \important{sender window}. This is an interval of size $N$ representing which packets we can currently send without waiting for other acknowledgements. This interval can ``slide'' when we have received an acknowledgement for its lowest value. This means that we always have at most $N$ un-acknowledged packets, and that all the packets below the starting point of our interval where acknowledge. Also, none of the packet after the ending point of our interval were sent.
 
         For instance, for a window size of $N = 4$:
@@ -220,23 +220,23 @@ connectionSocket.close()
         Naturally, we cannot increase $N$ arbitrarily since, then, we may overcharge the sender or the receiver. Also, note that this forces to increase the sequence numbers: we can no longer only use 2.
 
         This new version we have seen, using this sender window, is named \important{pipelining}: the sender sends up to $N$ segments without having received \texttt{Ack}, which yields a better utilisation. 
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Stop and wait is the special case of pipelining where $N = 1$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Pipelining with packet drops}{
+\begin{parag}{Pipelining with packet drops}
     Let's now consider pipelining with packet drops. We have two ways of implementing our protocol: \important{Go-Back-N} (GBN) and \important{Selective Repeat} (SR).
 
-    \subparag{Go-back-N}{
+    \begin{subparag}{Go-back-N}
         The idea for this protocol is that the receiver accepts no out-of-order segments (as if it had a receiver window of $N=1$). Thus, it means that \texttt{Ack}s are cumulative: an \texttt{Ack} for segment 10 indicates that all segments until and including 10 have been received. When the receiver receives an out-of-order packet, it still makes an \texttt{Ack}, but again for its last received in-order segment.
 
         This means that, when the sender timeouts, it needs to retransmit \textit{all} the un-\texttt{Ack}ed segments.
-    }
+    \end{subparag}
     
-    \subparag{Selective Repeat}{
+    \begin{subparag}{Selective Repeat}
         Selective repeat is a protocol closer to what is applied nowadays.
 
         The idea is that the sender and the receiver have the same window. If the sender times out, then it only sends back the segment which made this time out. 
@@ -248,14 +248,14 @@ connectionSocket.close()
         \imagehere[0.75]{SelectiveRepeatPart2.png}
 
         We would then finally be able to slide the window down by 4, and send segment 6, 7, 8 and 9.
-    }
+    \end{subparag}
 
-    \subparag{Comparison}{
+    \begin{subparag}{Comparison}
         Selective repeat is more complicated than Go-back-N. However, there are scenarios where the former is important, since we want cumulative \texttt{Ack}s.
 
         For instance, if the channel from the receiver to the sender drops \texttt{Ack}s often, then, a cumulative \texttt{Ack} is really useful. Indeed, if the \texttt{Ack}s for packets 0 to 5 are dropped but not the one for packet 6, then Go-back-N allows the sender to start sending packets after the number 6, whereas Selective-Repeat would need to send all packets 0 to 5 again.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 

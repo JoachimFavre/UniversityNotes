@@ -26,28 +26,28 @@
 \section{Introduction}
 \subsection{Infrastructure}
 
-\parag{End-system}{
+\begin{parag}{End-system}
     An internet \important{end-system} is any device that uses the internet for their communication. For instance, we could quote laptop, smartphone, servers, Tesla Model 3 controller, and so on.
 
     The goal of the internet is to let all these end-systems communicate.
-}
+\end{parag}
 
-\parag{Communication}{
+\begin{parag}{Communication}
     To communicate, we need functions \texttt{send} and \texttt{receive}, which can be very complicated to implement (for instance what to do if we receive more messages than what we can process), and they are provided by our OS API (application programming interface).
 
     Also, we need a protocol, a specification of all the possible sequences of messages that the communicating entities can exchange. If one of the parties does not follow the protocol, then the other will stop to communicate with it.
 
-}
+\end{parag}
 
-\parag{Infrastructure}{
+\begin{parag}{Infrastructure}
     Between end-systems, there are switches and link (cables). Such things are managed by Internet Service Providers (ISP), which are often in competition. Note that this means they do not talk together to fix problems, for instance. 
     \imagehere[0.5]{Infrastructure.png}
-}
+\end{parag}
 
-\parag{Link}{
+\begin{parag}{Link}
     As mentioned above, to communicate, we need a link between the two end systems. 
 
-    \subparag{DSL}{
+    \begin{subparag}{DSL}
         Today, DSL (digital subscriber line) is very prevalent in many countries: we use the phone line to connect to the internet. This can be efficient (more than $\SI{100}{\mega\byte \per \second }$), but this is not the most efficient. However, there already is a big phone line system, and using it is cheaper than setting up something new.
 
         The infrastructure could look like:
@@ -56,61 +56,61 @@
         Our computer is connected to a modem (modulator-demodulator), which converts the data to something that can be sent over a phone line. Then, the data follows our phone line directly to the central office, where voice and digital data are splitted; the former is sent to the telephone network and the latter to the internet. 
 
         In fact, DSL modem creates three separate channels: one for downstream (downloading data from the internet), one for upstream (uploading data to the internet) and one for voice signal from and to the telephone.
-    }
+    \end{subparag}
 
-    \subparag{Fiber}{
+    \begin{subparag}{Fiber}
         The fiber to the house technology is very similar to DSL (we basically replace the copper cable by some path letting the light bounce; thus, we also have a modem), but it can be very efficient (it gives more than $\SI{1}{\giga\byte \per \second }$ currently and it is expected to increase).
-    }
+    \end{subparag}
 
-    \subparag{Cable}{
+    \begin{subparag}{Cable}
         There are also systems using the cable TV lines. They are --- again --- very similar to the previous technologies, but we have multiple users involved (because of this, it is named a shared broadcast medium). This was imagined so because the TV is a constant data stream, which people can watch or not. Thus, if we download data, everyone can see it (only us can decode it, but everyone could see it). Also, this means the connection is shared between everyone: if everyone else is downloading movies, you will have a very bad connection.
 
         \imagehere[0.7]{CableInfrastructure.png}
-    }
+    \end{subparag}
     
-    \subparag{More}{
+    \begin{subparag}{More}
         There are many more medium to send data: ethernet, wifi (usually attached to some other technology), cellular (for smartphones), satellite (for remote areas), electricity (inside homes for instance), and so on.
-    }
+    \end{subparag}
 
     We can see that already existing physical infrastructure is important because it is cheaper and customers already have trust relationship with the provider.
-}
+\end{parag}
 
 \subsection{Ownership}
-\parag{ISP business connection}{
+\begin{parag}{ISP business connection}
     We want every device on the internet to be interconnected, thus we need ISP to be linked. An ISP cannot be connected to every ISP in the world, since it would make too many connections, so the way in real life is to have access ISP to be connected to regional ISP, which are connected to tier-1 ISP which are all interconnected.
     \imagehere[0.5]{ISPTree.png}
 
     To do so, access ISP are paying the regional ISP so that we get access to the internet (there is a customer-provider relationship between them). There is the same kind of relationship between regional ISP and tier-1 ISP. Between tier-1 ISPs, it is more complicated; they usually do peering (where it can be very simple, simply saying that both send the packets they need to the other, and it can be very complicated). Also, regional ISP can sometimes do peering.
 
     Of course, in real life, this hierarchy is not as clean as explained here.
-}
+\end{parag}
 
-\parag{IXP}{
+\begin{parag}{IXP}
     Internet exchange points (IXP) are points to which ISPs can connect physically and which will do the interconnection for them. This means that two ISP can have some customer-provider or peering relationship, but not be connected directly to the other physically.
 
     The reason this IXP emerged was that it is a business opportunity. If there are 100 ISPs which want to connect, this becomes complicated for them. The IXP takes care of this problem.
-}
+\end{parag}
 
-\parag{Content providers}{
+\begin{parag}{Content providers}
     Some content providers, such as Google, become their own ISP for their own infrastructure. Nowadays, Google, Amazon, Facebook and other big content provider have so much internet infrastructure so much spread over the world that they have become some kind of tier-1 ISP. Swisscom is in fact peering with Google and Microsoft.
-}
+\end{parag}
 
-\parag{Future}{
+\begin{parag}{Future}
     Some people think that in the future, content provider will act as regional and tier-1 ISP, which will be connected to access ISPs through IXPs.
 
     \imagehere[0.5]{Future.png}
 
     However, the business of an ISP is to provide internet connection; the more they connect the people the more they get paid. For content providers, their business model is to offer service, they have no interest in having people getting connected to something other than them. Thus the future of global end-to-end connection could be in danger.
-}
+\end{parag}
 
 \subsection{How it works}
-\parag{Layers}{
+\begin{parag}{Layers}
     The internet architecture is based off layers. Two layers only interact through an interface, and to the layer above or below. 
 
     For instance in regular mail, at the top we have humans, who bring the mail to the mail box, which is brought to local post office, which is sent to a central post office, which is communicated to another central post office and the system goes in the other way.
-}
+\end{parag}
 
-\parag{Layers in the internet}{
+\begin{parag}{Layers in the internet}
     In reality, in the internet, we have 5 layers: application, transport, network, link and physical. All these layers will become much clearer on what they do later in the semester, but we can summarise them in the following table, with the technologies to which they are linked:
     \begin{center}
     \begin{tabular}{|l|l|}
@@ -130,19 +130,19 @@
 
     Note that we will not see all the technologies presented in the table during the semester.
     
-    \subparag{Why layers}{
+    \begin{subparag}{Why layers}
         Layout can harm performance. For instance, in the postal service, putting the letter in a postal box is a waste of time, driving the car to hand it to the receiver is easier. However, this is much more complex. She does not need to know the postal office, the position of Bob, the people working at the postal office, and so on.
 
         This is more or less the same thing for the internet. Having such layers eases modularity: we can let someone specialised in a given layer to write the interface for this layer. Of course, only having one layer would increase speed, but it would be really hard to set up. 
 
         To know what layers to define, we try to add as many layers as possible to reduce complexity but not too much in order not to harm too much performance.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Header}{
+\begin{parag}{Header}
     Each layer works over a header to the packet we are sending. When sending a packets, a layer adds a header (encapsulation) and, when receiving, the layer removes the header which was added by the same layer at the other side of of the communication (decapsulation). When being on the physical layer, the data we are considering is data and metadata (what we actually want to send), with a transport (the destination port number, meaning for which application the packet is), a network (the destination IP address) and a link (the destination MAC address) header.
 
     Note that we have different identifiers for the same things. For network interfaces, we have DNS names (such as \url{www.epfl.ch}), IP addresses, MAC addresses and local names. For processes, we have have network-interface name together with a port number. We don't have to understand all these yet, but it is interesting to see that they are in fact synonyms.
-}
+\end{parag}
 
 \end{document}
