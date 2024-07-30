@@ -25,20 +25,20 @@
 }
 
 \subsection{Interpolation}
-\parag{Goal}{
+\begin{parag}{Goal}
     The idea is that we have data at some points, and we want to access it at other points. 
-}
+\end{parag}
 
-\parag{Runge's phenomenon}{
+\begin{parag}{Runge's phenomenon}
     We already saw how to do polynomial regressions using Legendre polynomials. As we observed, using them instead of regular monomials, we get a much better conditioning number for our regression matrix. However, if we try to make our polynomial go through all points, then we can still get some problems. 
 
     For instance, fitting a polynomial (in blue) on the Runge function $\frac{1}{1 + 25x^2}$ (in orange), by evaluating the function at evenly spaced points and looking for a polynomial going through all these, we can see some clear problems at the sides:
     \imagehere[0.5]{RungePhenomenon.png}
 
     This is called \important{Runge's phenomenon}.
-}
+\end{parag}
 
-\parag{Chebyshev nodes}{
+\begin{parag}{Chebyshev nodes}
     To understand what is happening, we can look at the error given by the Taylor formula for a polynomial passing through the points $x_1, \ldots, x_n$: 
     \[E\left(x\right) = \frac{f^{\left(n\right)}\left(\xi\right)}{n!} \prod_{i=1}^{n} \left(x - x_i\right)\]
 
@@ -50,11 +50,11 @@
 
     Such points are called \important{Chebyshev nodes}.
     
-    \subparag{Geometric interpretation}{
+    \begin{subparag}{Geometric interpretation}
         This is basically like if we pick a circle of radius 1, sampled uniformly points on it, and then projected them onto the $x$-axis.
-    }
+    \end{subparag}
 
-    \subparag{Implication}{
+    \begin{subparag}{Implication}
         This is a very small modification, and it works really well. For instance, with 20 sample points (without Chebyshev nodes on the left, and with on the right):
         \begin{center}
         \begin{minipage}{0.48\textwidth}
@@ -67,10 +67,10 @@
         \end{center}
 
         We are basically forcing more points onto the side, more or less preventing sides to explode.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Splines}{
+\begin{parag}{Splines}
     We have another problem now: if we move slightly one of the points, then it can have a big effect on the complete function. This makes no much sense, and thus it leads to the interpolation technique named \important{Splines}.
 
     The goal is to split our function into sub-functions:
@@ -82,32 +82,32 @@
 
     Depending on how we choose our sub-functions, we will necessarily have some discontinuities (either in the function, or in some of the $n$\Th derivatives). 
 
-    \subparag{Derivatives}{
+    \begin{subparag}{Derivatives}
         If we also know the derivative at points, then we could use this data to allow something smoother than pure piecewise straight lines. However, we are usually not given this derivative. To estimate it at a point, we can do a finite difference by computing the slope of the straight line going from the point before to the point after:
         \[f'\left(x\right) \approx \frac{f\left(x + h\right) - f\left(x - h\right)}{2h}\]
 
         This gives some kind of splines, the Catmull-Rom splines:
         \imagehere[0.5]{CatmullRomSpline.png}
-    }
+    \end{subparag}
     
 
-    \subparag{Cubic spline}{
+    \begin{subparag}{Cubic spline}
         Now, we need to find how to get those functions. If we know $f\left(x_0\right), f\left(x_1\right), f'\left(x_0\right), f'\left(x_1\right)$ (where the derivatives are computed thanks to the method presented above, meaning that we are seeing an element of the Catmull-Rom splines set) and we want to do a cubic spline. Then we want to solve: 
         \[f\left(x\right) = ax^3 + bx^2 + cx + d \implies f'\left(x\right) = 3ax^2 + 2bx + c\]
 
         This is a linear system, and it can be solved through the usual methods.
-    }
+    \end{subparag}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         There are many ways to choose those functions, and we can typically choose the degree we want.
 
         \imagehere[0.6]{SplineFunctions.png}
-    }
+    \end{subparag}
     
 
-}
+\end{parag}
 
-\parag{RBF interpolation}{
+\begin{parag}{RBF interpolation}
     What we have done so far works very well if we have well structured data (samples which we can evaluate ourselves for instance). However, if we are given very random samples in many dimensions, then they work much less well. Typically, let's say we have:
     \imagehere[0.5]{RBF.png}
 
@@ -119,39 +119,39 @@
     
     Finally, we need to find the $w_i$ such that $g\left(\bvec{x}_i\right) = f\left(\bvec{x}_i\right)$ for all $i$ (those parameters are only here because, when doing interpolation, this property is quite important). This is just a linear system.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Since the radial basis function decays quickly, we can optimise our algorithm by not visiting points which are far apart from the point we are sampling.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \subsection{Remez algorithm}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     We want to understand what happens when we compute special functions such as \texttt{np.sin}. They are not implemented in hardware, because they are transcendantal and thus we need an infinite number of additions and multiplications to get a correct result.
 
     So, they need to be implemented in software, and we want to see how to come up with those algorithms.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This will not be at the exam.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Goal}{
+\begin{parag}{Goal}
     The idea is that, given a function $f$, we want to design an approximation $\hat{f}$ so that $\left\|\hat{f} - f\right\|$ is \textit{extremely} small. We want to get as close as to the IEE754 guarantee that additions and mulitplications are done in infinite precision. In fact, this is impossible in practice, but we will try to reach a maximum error of less that 1 ULP.
 
     We will only need the following prerequisite: the ability to evaluate $f$ with a higher precision than the targeted approximation.
 
     We will only consider the 1D case here, studying the sine function.
-}
+\end{parag}
 
-\parag{Taylor series}{
+\begin{parag}{Taylor series}
     We know some functions equal their Taylor series, getting for instance: 
     \[\sin\left(x\right) = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \ldots\]
     
     We get many problems if we just implement this function as is, such as needing a really big number of terms to converge to the value of $\sin\left(1000\right)$ (which can be a typical application). 
-}
+\end{parag}
 
-\parag{Restricting to relevant interval}{
+\begin{parag}{Restricting to relevant interval}
     A good idea is to see how to restrict to smaller intervals, by studying the symmetries of our function.
 
     For instance, for the sine function, we can only consider $\left[0, \frac{\pi}{2}\right]$, since $\sin\left(-x\right) = \sin\left(x\right)$, $\sin\left(\pi - x\right) = \sin\left(x\right)$, and $\sin\left(x + 2\pi\right) = \sin\left(x\right)$.
@@ -160,16 +160,16 @@
     \[\hat{f}\left(x\right) = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \frac{x^7}{7!}\]
     
     However, we get a maximum absolute error around $0.00015$, which is one billion times worse that what we could do.
-}
+\end{parag}
 
-\parag{Use polynomial fit}{
+\begin{parag}{Use polynomial fit}
     A much better idea than using Taylor series is, given points computed really precisely, we fit a polynomial on them. This could give the following relative error:
     \imagehere[0.75]{SineRelativeErrorUsingPolynomialFit.png}
 
     We notice that the constant term of $\hat{f}$ is non-zero, meaning that the relative error tends towards infinity at zero (since we $\frac{\hat{f}\left(x\right) - \sin\left(x\right)}{\sin\left(x\right)}$ tends towards ``$\frac{1}{0}$'' as x tends towards zero). This is quite a big problem.
-}
+\end{parag}
 
-\parag{Smarter fit}{
+\begin{parag}{Smarter fit}
     Now, maybe we are not fitting the right function. Let's consider again the Taylor series of $\sin\left(x\right)$:
     \[\sin\left(x\right) = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \frac{x^7}{7!} + \ldots\]
 
@@ -180,23 +180,23 @@
 
     For instance, with only four terms (we had seven before), we get even a better relative error:
     \imagehere[0.75]{SineRelativeErrorUsingSmarterFit.png}
-}
+\end{parag}
 
-\parag{Chebyshev nodes}{
+\begin{parag}{Chebyshev nodes}
     Again, we have some problems with Runge phenomenon at the sides of the function, so we can use Chebyshev nodes to evaluate the fitting points.
 
     However, we can do even better than that.
-}
+\end{parag}
 
-\parag{Equioscillation theorem}{
+\begin{parag}{Equioscillation theorem}
     Amongst all degree-$n$ polynomials fits, there exists one where all local extrema $x_i$ satisfy $f\left(x_i\right) = \left(-1\right)^i E$ for some given $E$.
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         Intuitively, it means that we can spread out the error over the entire function.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Remez Algorithm}{
+\begin{parag}{Remez Algorithm}
     We want to find uniform maximum error in ``problematic areas''. The idea is to find a new polynomial using equioscillation theorem:
     \imagehere[0.5]{RemezAlgorithm.png}
 
@@ -208,9 +208,9 @@
     \imagehere[0.9]{RemezAlgorithmConverged.png}
 
     The axis are not shown here but polynomials of this form have a much smaller error (and this is has a huge impact for challenging functions).
-}
+\end{parag}
 
-\parag{Summary}{
+\begin{parag}{Summary}
     So, to sum up, to approximate a function, we use the following principles:
     \begin{enumerate}
         \item Choose a good interval of approximation: the smaller the better. 
@@ -218,6 +218,6 @@
         \item Use Chebychev nodes as a first approximation, followed by Remez algorithm to uniformise errors.
     \end{enumerate}
     
-}
+\end{parag}
 
 \end{document}

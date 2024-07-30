@@ -22,44 +22,44 @@
 
 \section{Computer Graphics}
 \subsection{Graphics}
-\parag{Goal}{
+\begin{parag}{Goal}
     The goal of computer graphics is to render pictures from 3D scenes.
 
     Light is very complicated to simulate, since there are many phenomena happening. This is a preview of CS440, the Advanced Computer Graphics course at EPFL.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Note that nothing in this lecture is at the exam.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Elements}{
+\begin{parag}{Elements}
     In a scene, we have multiple components: a camera (taking the picture), shapes (approximated thanks to triangles), materials (specifying how the light bounces on the object), and emitters.
-}
+\end{parag}
 
-\parag{Materials}{
+\begin{parag}{Materials}
     To make materials, we can measure them using some machines.
-}
+\end{parag}
 
-\parag{Uncanny valley}{
+\begin{parag}{Uncanny valley}
     There is phenomenon called uncanny valley. If we spend a lot of time modelling our human, there is a point at which it looks a lot like a human but we feel that there is something wrong. We need to spend more time working on it to overcome this uncanny valley.
     \imagehere[0.5]{UncannyValleyGraph.png}
 
     This took a long time, but now we do it really well in movies.
 
-    \subparag{Hair}{
+    \begin{subparag}{Hair}
         A typical thing which make a rendering fall in this valley in hair.
 
         A way to see hair is as glass cylindres, with tilted scales on top. Blond hairs are particularly hard to simulate, since there is a lot of light interaction happening.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Rendering equation}{
+\begin{parag}{Rendering equation}
     To simulate our light, we use the rendering equation, an integral equation: 
     \[L_o\left(\bvec{x}, \bvec{w}\right) = L_e\left(\bvec{x}, \bvec{\omega}\right) + \int_{\mathcal{S}^2} L_o\left(\bvec{r}\left(\bvec{x}, \bvec{\omega}'\right), -\bvec{\omega}'\right) M\left(x, \bvec{\omega}, \bvec{\omega}'\right) d \bvec{\omega}'\]
     where $L_o\left(\bvec{x}, \bvec{\omega}\right)$ is the light emitted at point $\bvec{x}$ in direction $\bvec{\omega}$, $L_e\left(\bvec{x}, \bvec{\omega}\right)$ is the light emitted at this point for this direction, and the integral is the amount of light coming from every direction of a hemisphere centred at $\bvec{x}$.
 
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{PathTracing.code}
 def L_o(x, w):
@@ -68,29 +68,29 @@ def L_o(x, w):
     return a*L_o(y, -wprime)
 \end{filecontents*}
 
-\parag{Path Tracing}{
+\begin{parag}{Path Tracing}
     We need to compute an integral, so we can typically use a Monte Carlo method. This leads to path tracing: we send rays and let them bounce arround the scene.
 
     Ignoring the stop condition, we could have:
     \importcode{PathTracing.code}{pseudo}
-}
+\end{parag}
 
 
 \subsection{Inverse graphics}
-\parag{Goal}{
+\begin{parag}{Goal}
     Let us consider our input scene as a vector $\bvec{x}$. Rendering basically consists in computing the picture $\bvec{y} = f\left(\bvec{x}\right)$.
 
     The goal of inverse graphics is to compute $\bvec{x}$ from $\bvec{y}$, i.e. compute $\bvec{x} = f^{-1}\left(\bvec{y}\right)$. This would be really nice since it would mean that we could just take some pictures of objects, and then import their shape and material easily to 3D scenes.
 
     However, this is really tricky since light is really complicated: light can bounce, refract, and so on.
-}
+\end{parag}
 
-\parag{Caustic design}{
+\begin{parag}{Caustic design}
     Another application is caustic design. If we have some directional area light leading light going through some geometry and lead to some caustic, we may want to optimise the geometry to get the caustic we want.
     \imagehere[0.35]{CausticDesign.png}
-}
+\end{parag}
 
-\parag{Simple example}{
+\begin{parag}{Simple example}
     Let's say we have a transparent tea cup which contains tea. We have a 3D model which represents exactly our scene, but without the correct colour for the tea. We want to find this correct colour.
 
     However, this is just an optimisation problem.
@@ -98,18 +98,18 @@ def L_o(x, w):
 
     We could do it by evaluating the function at different points and then going to the minimum.
 
-    \subparag{Problem}{
+    \begin{subparag}{Problem}
         In real life, there are too many parameters to evaluate the function at enough points to get an idea of its shape. This, we do gradient descent.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Automatic differentiation}{
+\begin{parag}{Automatic differentiation}
     We need to compute the derivative, so let's consider our most power tool for computing gradients: automatic differentiation.
 
     We have so many inputs that we need to do reverse mode AD. The thing is, we need to store the whole program in memory. This is fine for machine learning, but it does not work for rendering algorithms. Rendering algorithms are really expensive, meaning that they produce terabytes of information per second, and run for really long.
-}
+\end{parag}
 
-\parag{In practice}{
+\begin{parag}{In practice}
     Let us consider a better method, by coming back to the rendering equation: 
     \[L_o\left(\bvec{x}, \bvec{\omega}\right) = L_e\left(\bvec{x}, \bvec{\omega}\right) + \int_{\mathcal{S}^2} L_i\left(\bvec{x}, \bvec{\omega}'\right) M\left(\bvec{x}, \bvec{\omega}, \bvec{\omega}'\right) d\omega'\]
     
@@ -119,17 +119,17 @@ def L_o(x, w):
 
     Now this is nice because we can just run our rendering algorithm twice: we first transport radiance, then we transport differential radiance: we compute the picture, get the loss function, and then we propagate this through rays (every time a ray touches something, we update the point). This is known as radiative backpropagation.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         It is something interesting to keep in mind: automatic differentiation is really neat, but sometimes we know more about our problem, and it allows us to simplify our problem.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Discontinuities}{
+\begin{parag}{Discontinuities}
     We now have a big problem: discontinuities. Indeed, the following only works if the function is continuous:
     \[\frac{\partial }{\partial x} \int f\left(x, y\right) dy = \int \frac{\partial }{\partial x} f\left(x, y\right)dy\]
 
     However, this can be fixed by reparametrising integrals through a change of variables.
-}
+\end{parag}
 
 
 \end{document}

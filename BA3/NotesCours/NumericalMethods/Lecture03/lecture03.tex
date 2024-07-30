@@ -24,7 +24,7 @@
 }
 
 \subsection{Conditioning of linear systems}
- \parag{Vector norm}{
+\begin{parag}{Vector norm}
      To measure conditioning of linear systems, e need a way of comparing the sizes of error: \important{a norm}. A norm must respect some axioms (always positive, null only for the zero-vector, $\left\|\alpha \bvec{x}\right\| = \left|\alpha\right| \left\|\bvec{x}\right\|$ and the triangle inequality). We can define the $L_p$ norm to be: 
     \[\left\|\bvec{x}\right\|_p = \left(\sum_{i=1}^{n} \left|x_i\right|^p\right)^{\frac{1}{p}}\]
 
@@ -35,9 +35,9 @@
     \imagehere{CirclesPVectorNorms.png}
 
     In this course, we will pretty much always use a 2-norm.
-}
+\end{parag}
 
-\parag{Induced matrix norm}{
+\begin{parag}{Induced matrix norm}
     Every (vector) norm induces a \important{matrix norm}: 
     \[\left\|A\right\| = \max\left\{\left\|A \bvec{x}\right\|, \text{where } \left\|\bvec{x}\right\| = 1\right\}\]
     
@@ -47,12 +47,12 @@
         \item $\left\|A \bvec{x}\right\| \leq \left\|A\right\| \left\|\bvec{x}\right\|$
     \end{enumerate}
 
-    \subparag{Geometric interpretation}{
+    \begin{subparag}{Geometric interpretation}
         Geometrically, the norm of a matrix is the maximum warping ratio due to this matrix. This can be represented thanks to an ellipse:
         \imagehere[0.7]{NormMatrixEllipse.png}
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 
 \begin{filecontents*}[overwrite]{conditioningPython.code}
@@ -60,7 +60,7 @@ A = np.array(...)
 cond = np.linalg.cond(A, p=2)
 \end{filecontents*}
 
-\parag{Conditioning}{
+\begin{parag}{Conditioning}
     When solving linear systems, there can be rounding errors, cancellation, badly conditioned problems, or maybe even the problem itself can be inaccurate. 
 
     For instance, if we consider a picture as a vector, then we can blur it through a matrix (which will add up some pixels around each pixel, with some weight). Thus, getting a blurred picture, if we know the matrix $A$ which blurred it, then we can get it's un-blured version (since we are very good at solving linear systems). This process is named deconvolution. In fact, in reality, it does not work as expected, because of the errors mentioned above.
@@ -74,9 +74,9 @@ cond = np.linalg.cond(A, p=2)
 
     This gives us the following picture:
     \imagehere[0.5]{BackwarForwardErrorLinearSystem.png}
-}
+\end{parag}
 
-\parag{Conditioning number}{
+\begin{parag}{Conditioning number}
     To sum up, we currently have a perturbed system $A\left(\bvec{x} + \Delta \bvec{x}\right) = \bvec{b} + \Delta \bvec{b}$, and we want to measure its error $\frac{\left\|\Delta \bvec{x}\right\|}{\left\|\bvec{x}\right\|}$. To do so, we can see that: 
     \[\left\|\bvec{b}\right\| = \left\|A \bvec{x}\right\| \leq \left\|A\right\| \left\|\bvec{x}\right\| \iff \left\|\bvec{x}\right\| \geq \frac{\left\|\bvec{b}\right\|}{\left\|A\right\|}\]
     
@@ -91,16 +91,16 @@ cond = np.linalg.cond(A, p=2)
     \[\frac{\left\|\Delta\bvec{x}\right\|}{\left\| \bvec{x}\right\|} \lesssim \cond\left(A\right) \ulp\left(1\right)\]
     where $\ulp\left(1\right) \approx 2^{-23}$ for single precision and $\ulp\left(1\right) \approx 2^{-53}$ for double precision.
 
-    \subparag{Geometric interpretation}{
+    \begin{subparag}{Geometric interpretation}
         We can interpret geometrically the conditioning number:
         \imagehere{ConditioningNumberMatrix.png}
-    }
+    \end{subparag}
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         If we want to better understand the conditioning number of a matrix, we can compute its logarithm in base 10. This will tell us how many digits of precision we lost (in base 10).
-    }
+    \end{subparag}
 
-    \subparag{Properties}{
+    \begin{subparag}{Properties}
          The condition number has the following properties:
         \begin{enumerate}
             \item $\cond\left(A\right) = \infty$ if and only if $A$ is singular.
@@ -108,25 +108,25 @@ cond = np.linalg.cond(A, p=2)
             \item $\cond\left(\gamma A\right) = \cond\left(A\right)$ for all $\gamma \in \mathbb{R}$.
             \item $\cond\left(QA\right) = \cond\left(A\right)$ for all rotation matrix $Q$.
         \end{enumerate}
-    }
+    \end{subparag}
     
-   \subparag{Problem}{
+    \begin{subparag}{Problem}
         To compute the conditioning number of a matrix, we need to invert it, and thus solve a linear system. And then, we need to compute a matrix norm, which we don't know yet how to do. Thus, this may seem like a big problem.
 
         However, there exists efficient estimation algorithms. For instance, in python:
         \importcode{conditioningPython.code}{python}
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Remark: Determinant}{
+\begin{parag}{Remark: Determinant}
     Note that the determinant is not a good way of determining if a linear system is solvable: this is absolutely not aware of numerical instabilities.
 
     For instance, letting $A = \frac{1}{10} I \in \mathbb{R}^{1000 \times 1000}$. Its determinant is $\det\left(A\right) = 10^{-1000}$, which cannot be stored in a double-precision floating point number. However, it is trivial to solve. On the other hand, $\cond\left(A\right) = 1$.
-}
+\end{parag}
 
 \subsection{Polynomial regression}
-\parag{Finding a parabola}{
+\begin{parag}{Finding a parabola}
     Let's say have some points at which a thrown ball was, and we want to find the parabola $y = a + bx + c x^2$ through which it went. To do so, we can do a quadratic regression to find the best $a, b, c$.
 
     We need (at least) three observations. Then, we can set the following linear system (in $a, b, c$):
@@ -136,16 +136,16 @@ cond = np.linalg.cond(A, p=2)
 
     However, we realise there are multiple problems. If the data is too closely spaced, then we may be extrapolating for too long. Also, we don't really know what to do if we have more than 3 observations, which ones we should use. Finally, there might be noise on our observations, and thus having more that 3 observations would lead to a system with no solution.
 
-    \subparag{Conditioning of the Vandermonde matrix}{
+    \begin{subparag}{Conditioning of the Vandermonde matrix}
         Note that for $n = 100$, and using uniformly spaced positions on $\left[0, 1\right]$ we get that the Vandermonde matrix $V$ has a conditioning number of: 
         \[\cond\left(A\right) = 7.31 \cdot 10^{19}\]
         which is huge.
 
         We will treat this problem later in the course.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Regression}{
+\begin{parag}{Regression}
     The problem currently is that we have many data points, leading to a lot of information, and it is impossible to exactly reach all of those points with our polynomial (because the points suffered some noise for instance). Thus, we want: 
     \[\left\|\bvec{r}\left(\bvec{x}\right)\right\| = \left\|A \bvec{x} - \bvec{b}\right\| \approx 0\]
     
@@ -164,16 +164,16 @@ cond = np.linalg.cond(A, p=2)
 
     As a fun fact, it is interesting to know that normal equations have been very useful a lot of times (and for many matrices): Gauss used it for astronomy.
 
-    \subparag{Why normal}{
+    \begin{subparag}{Why normal}
         We can see that: 
         \[A^T A \bvec{x} = A^T \bvec{b} \iff A^T\left(A \bvec{x} - \bvec{b}\right) = \bvec{0} \iff A^T \bvec{r}\left(\bvec{x}\right) = \bvec{0}\]
 
         This means that $\bvec{r}\left(\bvec{x}\right) \in \ker\left(A^T\right) = \im\left(A^T\right)^\perp$, and thus that $\bvec{r}$ is orthogonal to the image of $A$. In other words, we have done an orthogonal projection of $\bvec{b}$ over the image of $A$.
 
         \imagehere[0.5]{NormalEquationsOrthogonalImageA.png}
-    }
+    \end{subparag}
 
-    \subparag{Personal remark}{
+    \begin{subparag}{Personal remark}
         Note that if we were looking for an orthogonal projection at first, we could have come to the solution more easily. Here is the way we used in my Linear Algebra class, which, in my opinion, helps to grasp the intuition:
         \begin{multiequation}
         & \bvec{\hat{b}} = \proj_{\im A}\left(\bvec{b}\right) = A \bvec{x}  \\
@@ -186,16 +186,16 @@ cond = np.linalg.cond(A, p=2)
         \end{multiequation}
 
         Thus, when solving a system, if we want to find the ``best solution'' (in terms of the 2-norm), then we basically only need to multiply both sides on the left by $A^T$. This naturally works for any matrix.
-    }
+    \end{subparag}
 
-    \subparag{Problem}{
+    \begin{subparag}{Problem}
         There is a problem with normal equations (especially if we recall the conditioning number of the Vandermonde matrix): 
         \[\cond\left(A^T A\right) = \cond\left(A\right)^2\]
         
         ``Yikes.'' (Prof. Jakob)
 
         In fact, the QR decomposition will allow us to solve this problem.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \end{document}

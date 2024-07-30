@@ -25,7 +25,7 @@
 }
 
 \subsection{Integration}
-\parag{Usefulness}{
+\begin{parag}{Usefulness}
     Definite integrals are really important since they allow to compute areas and volume, but also because they allow to sum a lot of very small things.
 
     For instance, they show up everywhere in physics when we want to use a local formula to get a result over a distance or a time.
@@ -33,22 +33,22 @@
     Also, if we want to compute a realistic image, then we need to compute integrals. To compute light getting out of a dot, we need to sum all the light coming from the rest of the scene multiplied by a function saying what material is represented.
 
     Finally, integrals are really useful in statistics.
-}
+\end{parag}
 
-\parag{Integration}{
+\begin{parag}{Integration}
     It is always possible to compute a derivative analytically, but this is not the case for antiderivatives (which we need to compute definite integrals). There are really few rules, and they usually do not work for real life scenario.
 
     We are thus forced to use numerical approaches.
-}
+\end{parag}
 
-\parag{Quadrature problem}{
+\begin{parag}{Quadrature problem}
     Formally, we are given functions evaluations $f\left(x_1\right), \ldots, f\left(x_n\right)$ at nodes $x_1, \ldots, x_n \in \left[a, b\right]$, and we want to compute an approximation of: 
     \[\int_{a}^{b} f\left(x\right)dx\]
     
     Just as for interpolation, the nodes may be arbitrary or fixed, and they may be regularly spaced or irregular.
-}
+\end{parag}
 
-\parag{Midpoint rule}{
+\begin{parag}{Midpoint rule}
     We want to compute the area of a function over an interval. To do so, we can simply approximate it by a constant. Any interval can then later be split into subintervals, where we locally consider the function constant. We can choose the evaluations how we want, so let them be taken at the midpoint of our interval:
     \[\int_{a}^{b} f\left(x\right)dx \approx \left(b-a\right)f\left(\frac{a+b}{2}\right)\]
     
@@ -56,9 +56,9 @@
     \[\int_{a}^{b} f\left(x\right)dx \approx \sum_{i=1}^{k} f\left(\frac{x_i + x_{i+1}}{2}\right)\Delta x\]
     
     \imagehere[0.6]{MidpointRule.png}
-}
+\end{parag}
 
-\parag{Trapezoid rule}{
+\begin{parag}{Trapezoid rule}
     Instead of approximating our function by a constant, we can approximate it with linear functions (which draw trapezoids):
     \[\int_{a}^{b} f\left(x\right)dx \approx \left(b-a\right)\frac{f\left(a\right)+ f\left(b\right)}{2}\]
 
@@ -66,9 +66,9 @@
     \autoeq{\unexpanded{\int_{a}^{b} f\left(x\right)dx \approx \sum_{i=1}^{k} \left(\frac{f\left(x_i\right) + f\left(x_{i+1}\right)}{2}\right) \Delta x = \Delta x \left(\frac{1}{2}f\left(a\right) + f\left(x_1\right) + \ldots + f\left(x_{k-1}\right) + \frac{1}{2} f\left(b\right)\right)}}
 
     \imagehere[0.6]{TrapezoidRule.png}
-}
+\end{parag}
 
-\parag{Simpson's rule}{
+\begin{parag}{Simpson's rule}
     Since we can make a linear fit, we can make a quadratic aproximation (leading to a method named Simpson's rule): 
     \[\int_{a}^{b} f\left(x\right)dx \approx \frac{b-a}{6}\left(f\left(a\right) + 4f\left(\frac{a+b}{2}\right) + f\left(b\right)\right)\]
     
@@ -78,11 +78,11 @@
 
     \imagehere[0.6]{SimpsonRule.png}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The idea is the same as splines: we approximate our function by a polynomial, and integrate it.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{AdaptiveQuadrature.code}
 def integrate(f, a, b):
@@ -96,24 +96,24 @@ def integrate(f, a, b):
 \end{filecontents*}
 
 
-\parag{Adaptive quadrature}{
+\begin{parag}{Adaptive quadrature}
     A good idea is to use two different quadrature rules (such as trapezoid and Simpson). If the two values are very different, then we split the interval in two halves and call the function recursively. If they are very close, we suppose that the value is correct and we return it. This allows to split more intervals where the function is badly behaved, and diminish the number of computations where it acts like a straight line.
 
     \imagehere[0.6]{AdaptiveQuadrature.png}
 
-    \subparag{Implementation}{
+    \begin{subparag}{Implementation}
         This could for instance be implemented as:
         \importcode{AdaptiveQuadrature.code}{python}
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Definition: Exact quadratures}{
+\begin{parag}{Definition: Exact quadratures}
     We define a quadrature to be \important{exact} for polynomial of degree $n$ if the integration error of every degree-$n$ polynomial is zero and it is nonzero for some polynomials of degree $n+1$. 
-}
+\end{parag}
 
 
-\parag{Newton-Cotes}{
+\begin{parag}{Newton-Cotes}
     We saw that a quadrature is always written as: 
     \[Q\left[f\right] = \sum_{i}^{} w_i f\left(x_i\right)\]
     
@@ -121,19 +121,19 @@ def integrate(f, a, b):
     \[Q\left[1\right] = \int_{a}^{b} 1dx, \mathspace Q\left[x\right] = \int_{a}^{b} xdx, \mathspace Q\left[x^2\right] = \int_{a}^{b} x^2 dx, \mathspace \ldots\]
 
     Given $n$ equally spaced points, we can find an exact quadrature for polynomials of degree $n$ using our linear system (we approximate our $n$ points by a polynomial and integrate). This gives us \important{Newton-Cotes} quadrature.
-}
+\end{parag}
 
-\parag{Gaussian quadrature}{
+\begin{parag}{Gaussian quadrature}
     Note that there exists another technique named \important{Gaussian quadrature} which uses $n$ nonuniformly spaced points, and it is exact for polynomials of degree $2n - 1$.
-}
+\end{parag}
 
 
-\parag{Multidimensional integrals}{
+\begin{parag}{Multidimensional integrals}
     To intergrate over a volume, Fubini's theorem say that we can do nested integrals: 
     \[\int_{I_1 \times I_2 \times I_3} f\left(x, y, z\right)dxdydz = \int_{I_1} \left(\int_{I_2} \left(\int_{I_3} f\left(x, y, z\right) dx\right) dy\right) dz\]
     
     The thing is, if we want to use a quadrature rule with $4$ points and have $D$ dimensions, then we need $4^D$ points. This is named the curse of dimensionality: if we have 100 dimensions, then the problem is really intractable. Many integration problems do happen in so many dimensions, so we need to develop other ideas.
-}
+\end{parag}
 
 
 \end{document}

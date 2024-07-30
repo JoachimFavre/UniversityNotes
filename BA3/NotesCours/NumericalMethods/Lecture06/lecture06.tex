@@ -25,44 +25,44 @@
 }
 
 \subsection{Eigendecomposition}
-\parag{Eigenthings}{
+\begin{parag}{Eigenthings}
     For any square matrix $A \in \mathbb{R}^{n \times n}$, there sometimes exist some vectors $\bvec{v} \in \mathbb{R}^{n}$ and some constant $\lambda \in \mathbb{R}$ such that: 
     \[A \bvec{v} = \lambda \bvec{v}\]
     
     $\lambda$ is named the \important{eigenvalue} and $\bvec{v}$ is named the eigenvector. Since we have infinitely many $\bvec{v}$ for a given $\lambda$, we usually take $\bvec{v}$ such that $\left\|\bvec{v}\right\| = 1$.
 
-    \subparag{Ellipse}{
+    \begin{subparag}{Ellipse}
        As before, we can summarise what a matrix does by applying it to every point of a unit circle, and getting an ellipse:
        \imagehere[0.5]{EigenvectorsEllipse.png}
         
        Then, if a vector is an eigenvector, then it must be at an intersection of the circle and the ellipse.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     If a matrix $A$ is non-singular, then there are exactly $n$ distinct eigenvalue-eigenvectors pairs, and the eigenvectors $\bvec{v}_i$ form a basis for $\mathbb{R}^n$ (which is not necessarly orthogonal).
-}
+\end{parag}
 
-\parag{Eigendecomposition}{
+\begin{parag}{Eigendecomposition}
     Let's put our eigenvectors and eigenvalues in a matrix:
     \[V = \begin{pmatrix}  &  &  \\ \bvec{v}_1 & \cdots & \bvec{v}_n \\  &  &  \end{pmatrix}, \mathspace \Lambda = \begin{pmatrix} \lambda_1 & \cdots & 0 \\ \hdots & \ddots & \hdots \\ 0 & \cdots & \lambda_n \end{pmatrix} \]
 
     Then, we can see that: 
     \[A V = V \Lambda \iff A = V \Lambda V^{-1}\]
 
-    \subparag{Geometric intuition}{
+    \begin{subparag}{Geometric intuition}
         The eigendecomposition expresses a linear transformation $A$ as three step: we change the basis to a system $\mathcal{V}$ with $V^{-1}$, apply a non-uniform scaling $\Lambda$, and then get back to our original coordinate system by applying $V$.
-    }
+    \end{subparag}
 
-    \subparag{Properties}{
+    \begin{subparag}{Properties}
         We see that this is very useful for applying powers: 
         \[A^k = V \Lambda^k V^{-1}\]
         
         Also, in principle, we can compute the inverse of the matrix cheaply (ignoring the fact that we need $V^{-1}$): 
         \[A^{-1} = V\Lambda^{-1} V^{-1}\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 \begin{filecontents*}[overwrite]{PowerIterationDominantEigenvector.code}
@@ -72,13 +72,13 @@ for i in range(num_iterations):
     x /= np.linalg.norm(x)  # we only want its direction
 \end{filecontents*}
 
-\parag{Compute an eigendecommposition}{
+\begin{parag}{Compute an eigendecommposition}
     In maths, when we compute eigenvalues, we solve for the root of the following plynomial: 
     \[p\left(\lambda\right) = \det\left(A - \lambda I\right) = 0\]
     
     However, it is not always possible to find a closed form for polynomials of degree of 5 or more. Solving this is a nonlinear operation, meaning that we will get an approximate result and that we have no guarantees on the computation time.
 
-    \subparag{Power iteration}{
+    \begin{subparag}{Power iteration}
         Instead of searching root for a polynomial, let us make a better algorithm. Saying that $\lambda_1 > \ldots > \lambda_n$, we get that, as $k \to \infty$: 
         \[\Lambda^k \approx \begin{pmatrix} \lambda_1^k &  &  &  \\  & 0 &  &  \\  &  & \ddots &  \\  &  &  & 0 \end{pmatrix} \]
         where the eigenvalues are ordered by convention, meaning that $\lambda_1$ is the biggest eigenvalue.
@@ -87,23 +87,23 @@ for i in range(num_iterations):
         \importcode{PowerIterationDominantEigenvector.code}{pseudo}
         
         This algorithm is named \important{power iteration}, and allows to compute the dominant eigenvector. Also, it may not always converge (for instance if the first two eigenvalues are very close to each other)
-    }
+    \end{subparag}
     
-    \subparag{Inverse iteration}{
+    \begin{subparag}{Inverse iteration}
         To find the smallest eigenvalue, we can use our algorithm above on $A^{-1}$, since, now, as $k \to \infty$, the biggest eigenvalue $\frac{1}{\lambda_n}$ dominates, which is the smallest eigenvalue of $A$. This is named \important{inverse iteration}.
-    }
+    \end{subparag}
 
-    \subparag{In practice}{
+    \begin{subparag}{In practice}
         In practice, those algorithms are much more complex. We run many versions of power iteration at the same time, and we ``push vectors apart'' to keep them from converging to the same eigenvector-eigenvalue pair.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Application: Dimensionality reduction}{
+\begin{parag}{Application: Dimensionality reduction}
     Let's say we have a lot of data in which we try to find a correlation. However, we have data on things that relate a lot (growth of plant and the amount of ferilizer), and other that don't at all (the two previous with the average temperature on the back side of the moon and the EPFL electricity bill).
 
     We thus want to through useless dimensions to only keep the ones that are useful. 
 
-    \subparag{2D}{
+    \begin{subparag}{2D}
         Let's begin to 2D. We want to find a line to which we could project all our point. Note that this may look similar to linear regression, but this is not (since we are computing the distance with the projection, not only in the $y$-value).
 
         Our goal is to minimise: 
@@ -115,16 +115,16 @@ for i in range(num_iterations):
         where $X$ is a matrix which rows are the vectors $\bvec{x}_1, \ldots, \bvec{x}_n$.
 
         We want to maximise the opposite $\bvec{v}^T X X^T \bvec{v}$, and we can show that the $\bvec{v}$ which maximises this expression is the eigenvector associated with the largest eigenvalue of the matrix $X X^T$.
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Note that, in real life, dimensionality reduction through eigenvalues is not used since we have better algorithms.
 
         Indeed, the big problem is that we have $\cond\left(X X^T\right) \approx \cond\left(X\right)^2$. So, using our algorithm would lead to many numerical instabilities.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Application: Solve ordinary differential equations}{
+\begin{parag}{Application: Solve ordinary differential equations}
     We know that the equation $x'\left(t\right) = ax\left(t\right)$ has the solution $x\left(t\right) = e^{at} x\left(0\right)$.
 
     Thus, it would make sense to have the same idea for systems of differential equations. If we have $\bvec{x}'\left(t\right) = A \bvec{x}\left(t\right)$, then the solution could be of the form: 
@@ -138,80 +138,80 @@ for i in range(num_iterations):
     where we can compute $e^{\Lambda}$ easily: 
     \[e^{\Lambda} = \begin{pmatrix} e^{\lambda_1} &  &  \\  & \ddots &  \\  &  & e^{\lambda_n} \end{pmatrix} \]
 
-    \subparag{Summary}{
+    \begin{subparag}{Summary}
         To sum up, we have: 
         \[\bvec{x}'\left(t\right) = A \bvec{x}\left(t\right) \iff \bvec{x}\left(t\right) = e^{A t} \bvec{c} = V e^{\Lambda} V^{-1} \bvec{c}\]
         where $At = V e^{\Lambda} V^{-1}$ is its eigendecomposition.
-    }
+    \end{subparag}
     
-    \subparag{Personal remark}{
+    \begin{subparag}{Personal remark}
         There is a great 3Blue1Brown video on this subject:
         \begin{center}
             \url{https://youtu.be/O85OWBJ2ayo}
         \end{center}
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Remarks}{
+\begin{parag}{Remarks}
     We can notice that in fact eigenvalue-eigenvector pairs are actually a triple $\left(\bvec{x}, \bvec{y}, \lambda\right)$ where we have a left eigenvector and a righteignevector, respectively: 
     \[\bvec{y}^T A = \lambda \bvec{y}^T, \mathspace A \bvec{x} = \lambda \bvec{x}\]
     
     Also, in fact complex arithmetic is generally required, meaning that we need to work with complex arithmetic. Another problem is that methods can be very unstable if eigenvalues are not well separated. Finally, none of this makes sense for non-square matrices.
 
     We show that this decomposition yields to a lot of difficulties, which leads us to the following decomposition.
-}
+\end{parag}
 
 \subsection{Singular Value Decomposition}
-\parag{Remark}{
+\begin{parag}{Remark}
     In general, if we are stuck with a linear algebra problem, we can replace a matrix by its SVD, and it will often helps us.
-}
+\end{parag}
 
-\parag{Goal}{
+\begin{parag}{Goal}
     The goal is to have two orthogonal matrices $U, V$ and a diagonal matrix $\Sigma$ such that: 
     \[A = U\Sigma V^T\]
     
     Note that this costs around 5 to 10 times more than LU factorisation, which means that we should not compute it if we don't need it.
 
-    \subparag{Remarks}{
+    \begin{subparag}{Remarks}
         This decomposition is really great: it works for any matrix (non-square, non-symmetric, singular, and so on), the computations are stable (we don't need pivoting), it involves only orthogonal and diagonal matrices (which are very easy to invert), it has impeccable numerical properties and it does not require any complex arithmetic.
-    }
+    \end{subparag}
     
-    \subparag{Ellipses}{
+    \begin{subparag}{Ellipses}
         For a $2\times2$ matrix, for which the vectors $\bvec{v}_1, \bvec{v}_2$ are the columns of the matrix $V$ and the vectors $\bvec{u}_1, \bvec{u}_2$, we can draw the following ellipses:
         \imagehere[0.5]{SVDEllipse.png}
 
         Thus, when applying the decomposition, we transform our vector onto the blue ellipse, apply it a non-uniform magnification, and finally put it onto the red ellipse.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Non-square systems}{
+\begin{parag}{Non-square systems}
     When working with non-square matrices, we get the following forms:
     \imagehere[0.5]{SVDMatricesShape.png}
 
     As for the QR decomposition, we can get an economic SVD, by removing all zeroes and all elements that would have been multiplied by 0 anyway.
-}
+\end{parag}
 
-\parag{Matrix norm}{
+\begin{parag}{Matrix norm}
     We can compute the matrix norm very easily from an SVD: 
     \[\left\|A\right\|_2 = \sigma_1\]
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The singular values are ordered by convention, meaning that $\sigma_1$ is the biggest one.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Condition value}{
+\begin{parag}{Condition value}
     Also, we can compute the conditioning value easily from an SVD: 
     \[\cond\left(A\right) = \left\|A\right\| \cdot  \left\|A^{-1}\right\| = \frac{\sigma_1}{\sigma_n}\]
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Note that this is not really the best way to compute the condition value since the SVD is expensive, but it works (yeah you start to get the idea, this course is not really understanding algorithms but more concepts).
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Outer product}{
+\begin{parag}{Outer product}
     We can find the following way to express the SVD: 
     \[A = U \Sigma V^T = \sum_{i=1}^{n} \sigma \bvec{u}_i \bvec{v}_i^T\]
     
@@ -219,9 +219,9 @@ for i in range(num_iterations):
     \[\bvec{u} \bvec{v}^T = \begin{pmatrix} u_1 v_1 & u_1 v_2 & \cdots & u_1 v_n \\ u_2 v_1 & u_2 v_2 & \cdots & u_2 v_n \\ \vdots & \vdots & \ddots & \vdots \\ u_m v_1 & u_m v_2 & \cdots & u_m v_n \end{pmatrix} \]
     
     It has only a rank equal to 1, since all its columns are linearly dependent.
-}
+\end{parag}
 
-\parag{Inverse}{
+\begin{parag}{Inverse}
     If $A$ is a square matrix, knowing that $A = U \Sigma V^T$, we can compute its inverse: 
     \[A^{-1} = V \Sigma^{-1} U^T = \sum_{i=1}^{n} \frac{1}{\sigma_i} \bvec{v}_i \bvec{u}_i^T\]
 
@@ -230,20 +230,20 @@ for i in range(num_iterations):
     where $k_i = \frac{1}{\sigma_i}$ if $\sigma_i \neq 0$, and 0 otherwise.
     
     When we have a full-rank matrix, this is identical to the inverse. For over constrained problems (tall matrices), the pseudoinverse gives the least squares solution. For underconstrainded problems (wide matrices), it gives a minimum-norm solution.
-}
+\end{parag}
 
-\parag{Eckart-Young theorem}{
+\begin{parag}{Eckart-Young theorem}
     If we compute the SVD of a matrix $A$, but truncating the largest $k$ singular values using the SVD, then this is a pretty good approximation.
 
     Indeed, the matrix $\hat{A}$ got with this approximation minimises both $\left\|A - \hat{A}\right\|_2$ and $\left\|A - \hat{A}\right\|_F$, where the second norm is the Frobenius norm (computed by stacking all the values of our matrix into a column vector, and computing its 2-norm).
 
-    \subparag{Low-rank approximation}{
+    \begin{subparag}{Low-rank approximation}
         In other words, by computing the following matrix, we get a \important{low-rank approximation}, which provides the best possible approximation using outer products: 
         \[\hat{A} = \sum_{i=1}^{k_{max}} \sigma_i \bvec{u}_i \bvec{v}_i^T\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Regularisation strategy}{
+\begin{parag}{Regularisation strategy}
     The distribution of singular values typically looks like:
     \imagehere[0.65]{DistributionSingularValues.png}
 
@@ -254,10 +254,10 @@ for i in range(num_iterations):
 
     This conditioning works much better than Tikhonov regularisation.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We will be able to experiment with this idea in the homework on the shadows.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \end{document}
 

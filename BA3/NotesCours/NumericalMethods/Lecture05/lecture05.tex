@@ -24,7 +24,7 @@
 }
 
 \section{Writing efficient numerical code}
-\parag{Moore's law}{
+\begin{parag}{Moore's law}
     Moore's law is an empiric observation, which say that the number of transistors in a CPU doubles every two years.
 
     Actually, nowadays, we have a power wall because of heat. The faster a CPU runs, the more it needs power and thus the more heat it produces. We have reached a point where if we increase its speed, the CPU melts. We continue to increase the density (since we can put more and more transistors), but not really the clock speed.
@@ -32,13 +32,13 @@
     Nowadays, we use two concepts to increase performances: parallelism (compute multiple things at the same time) and specialisation (make hardware units which are specifically wired to do some things, such as matrix multiplications).
 
     This is important because, nowadays, if we write single threaded scalar code, we use only 0.39\% of a 16-core processor with 16-wide SIMD.
-}
+\end{parag}
 
-\parag{Misconceptions}{
+\begin{parag}{Misconceptions}
     When we follow a course of Computer Architecture, it feels like a program is executed in linear order, with only 1 thread, using an array of memory with fixed access time, and a few simple instructions that all require the same (short) amount of time. Also, it would seem like there is an ``obvious'' mapping from high level languages to easy-to-understand assembly code.
 
     However, nowadays, threading and vectors are needed to use hardware effectively, we have a hierarchy of memory with different levels and access speeds, a CPU has around 2000 instructions with different caracteritics (where the processor often tries to guess what we want to do, which, if it fails, there is a speed decrease), and thus it is complicated to translate from a high-level language.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{DotProduct.code}
 float dot(int n, const float *x, const float *y) {
@@ -69,7 +69,7 @@ loop_end:
 \end{filecontents*}
 
 
-\parag{Languages of different levels}{
+\begin{parag}{Languages of different levels}
     In python, making a for loop to compute a dot product between two vectors with 10M entries may take 10 seconds, but computing it through numpy with \texttt{a @ b} it only takes 0.1 second. The difference is that numpy uses a highly optimised routine written in C. The advantage is that Python is a interpreted language, meaning that we have to pay the ``Python tax'', for instance because it has to find the type of every number on runtime. C is much faster.
 
     Thus, let's consider the following code in C:
@@ -79,9 +79,9 @@ loop_end:
     \importcode{DotProductAssembly.code}{}
     
     We notice that the variable names are gone, but were replaced by registers (which the compiler chose). This is assembly, and is much more complicated than C for humans.
-}
+\end{parag}
 
-\parag{Parallelisation}{
+\begin{parag}{Parallelisation}
     Nowadays, processors are \important{superscalar}, meaning that they can execute more than one instruction per clock cycle.
 
     Every instruction has a certain throughput (number of times we can start in a clock cycle) and a latency (the time we must wait until we get the result). For instance, floating point addition could have a latency of 4 and a throughput of 2, whereas loading from main memory may have a latency of 5 to 300 cycles, and a throughput of 2.
@@ -92,25 +92,25 @@ loop_end:
 
     Superscalar processors are not just magic tricks, we have some kind of limit:
     \imagehere[0.7]{SuperScalarProcessorsLimit.png}
-}
+\end{parag}
 
-\parag{Branch prediction}{
+\begin{parag}{Branch prediction}
     Since the CPU is going so quickly and has so much inertia (because of what it scheduled), it needs to predict what will happen after. However, sometimes, if we want to load an information from memory and check its value for branching (for instance), the CPU will guess the direction. The problem is that, if it realises it was wrong, then it will need to backtrack and ``undo'' what was done after the mistaken track.
 
     We can note that, if the branch was not well predicted, this leads to bad efficiency, usually 15-20 cycles. This means that programs that are ``predictable'' run faster. Montecarlo algorithms are typically not very predictable, since predicting pseudorandom is not a trivial task.
 
-    \subparag{Speculation attack}{
+    \begin{subparag}{Speculation attack}
         Note that the CPU guessing a branch can be a problem for security if not done well. Manipulating the CPU into going in the wrong direction at an if statement and not backtracking correctly is known as a speculation attack.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Memory hierarchy}{
+\begin{parag}{Memory hierarchy}
     We have a lot of memory levels, some close and fast but costlier per byte and small, and some larger and cheaper per byte but slower.
 
     We notice that programs tends to use data and instructions with addresses near those they have used recently. There is a temporally locality (recently referenced items are likely to be referenced again in the near future) and spatial locality (items with nearby addresses tend to be referenced close together in time). This allows to do memory prefetching: get elements from the memory before they are asked.
-}
+\end{parag}
 
-\parag{Latency}{
+\begin{parag}{Latency}
     Every instruction has latency. Let's consider a computer running with a clock frequency going at the same frequency as a human heartbeat. Then, we would have:
     \begin{itemize}
         \item $\SI{5}{\second }$: Branch misprediction, divisions and squareroots.
@@ -118,27 +118,27 @@ loop_end:
         \item 1 year: Read $\SI{1}{\mega\byte }$ sequentially from the disk.
         \item 4.8 years: Make a network roundtrip between Europe and the United States.
     \end{itemize}
-}
+\end{parag}
 
-\parag{Vectorisation}{
+\begin{parag}{Vectorisation}
     Another thing computers do is vectorisation, also known as SIMD (single instruction multiple data). The idea is that if we know that we will need to compute many additions, then we can put all the elements we want to add in two big arrays, and the two arrays at the same time with a single instruction.
 
     Auto-vectorisation has many pitfalls. It cannot be used when there is insufficient information (if we are making function calls for instance) or interloop dependency (have the current value depend on the one before).
-}
+\end{parag}
 
-\parag{Intrinsics}{
+\begin{parag}{Intrinsics}
     We can use intrinsics (for instance Intel's) in C to give it Assembly-looking lines which, when compiled to assembly, will stay here the exact same. This is typically why we should not implement libraries ourselves. We must not reinvent the wheel when such things are implemented much faster (for instance using intrinsics).
-}
+\end{parag}
 
-\parag{Libraries}{
+\begin{parag}{Libraries}
     There exists very efficient libraries, such as BLAS and LAPACK, are standardised set of low-level routines for common linear algebra routines (such as dot products and matrix multiplications). 
 
     In python, to use them, we typically have to use the numpy library.
-}
+\end{parag}
 
-\parag{Conclusion}{
+\begin{parag}{Conclusion}
     When optimising a program, we have to be careful not to sacrifice correctness for speed (ensure correctness), reinvent the wheel (use libraries!) or valuing computer time over our own time (maybe our optimisation is not really needed).
-}
+\end{parag}
 
 
 

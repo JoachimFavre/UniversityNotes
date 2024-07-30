@@ -27,7 +27,7 @@
 \section{Nonlinear systems}
 \subsection{Introduction}
 
-\parag{Goal}{
+\begin{parag}{Goal}
     We want algorithms to understand non-linear functions $f\left(\bvec{x}\right)$.
 
     We have two goals. The first one is \important{root finding}, finding $\bvec{x}$ such that:
@@ -40,17 +40,17 @@
 
     Note that, then, maximising $f\left(\bvec{x}\right)$ is equivalent to minimising $-f\left(\bvec{x}\right)$.
     
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         We already have really good tools for solving those problems for linear systems (root finding is solving $A \bvec{x} - \bvec{b} = \bvec{0}$ and minimisation is minimising $\left\|A \bvec{x} - \bvec{b}\right\|$). Now, we notice that everything is very different.
         
         For instance, linear systems could only have $0, 1$ or infinitely many solutions. Now, for non-linear functions, anything is possible. For instance, we have 0, 1, 2, 3 and infinitely many solutions, respectively:
         \[\exp\left(x\right) + 1 = 0, \mathspace \exp\left(-x\right) - x = 0, \mathspace x^2 - 4\sin\left(x\right) = 0\]
         \[x^3 - 6x^2 + 11x - 6 = 0, \mathspace \sin\left(x\right) = 0\]
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     We can see that we can have very ``evil'' functions: 
     \begin{functionbypart}{f_1\left(x\right)}
     1, \mathspace x \in \mathbb{Q} \\
@@ -64,12 +64,12 @@
     \end{functionbypart}
 
     If we ask a computer to minimise this function while only being able to evaluate it at some points (meaning it does not have its definition, it can only access it as a blackbox), it will be almost impossible. For that reason, we will not consider the whole function space, but only restrict to some kind of functions (such as continuous, Lipschitz continuous, differentiable or of class $C^k$, in order of restriction).
-}
+\end{parag}
 
 \subsection{Root finding}
-\parag{Intermediate Value Theorem}{
+\begin{parag}{Intermediate Value Theorem}
     If $f$ is continuous and $f\left(x_0\right) = y_0$ and $f\left(x_1\right) = y_1$, then $f\left(x\right)$ takes \textit{every} value between $y_0$ and $y_1$.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{BisectionSearch.code}
 def bisect(f, l, r, eps1, eps2):
@@ -83,37 +83,37 @@ def bisect(f, l, r, eps1, eps2):
             l = m
 \end{filecontents*}
 
-\parag{Bisection search}{
+\begin{parag}{Bisection search}
     If we know that $f\left(x_0\right)\cdot f\left(x_1\right) < 0$, it means that one is positive and the other is negative, and thus, necessarily, there is a root in between. We can use this idea to make some kind of binary search.
 
     Note that if we have $f\left(x_0\right) f\left(x_1\right) > 0$, we don't know anything: there could be a root and there could be none.
 
-    \subparag{Terminology}{
+    \begin{subparag}{Terminology}
         If $f\left(x_0\right)f\left(x_1\right) < 0$, then $\left[x_0, x_1\right]$ is named a \important{bracket}.
-    }
+    \end{subparag}
 
-    \subparag{Code}{
+    \begin{subparag}{Code}
         we could implement this as:
         \importcode{BisectionSearch.code}{python}
         
         Where $\left[l, r\right]$ is a bracket, and \texttt{eps1}, \texttt{eps2} are thresholds for stopping. 
 
         In practice, there is a simple optimisation we can do: caching the answer of our function allows to divide by three the number of evaluations of $f$.
-   }
+    \end{subparag}
 
-   \subparag{Stopping criteria}{
+    \begin{subparag}{Stopping criteria}
        The stopping criteria can be summed up as wanting a small backward error (if  the function evaluates to a small value, we found a value close enough to the zero) or a small forward error (if we found a small enough bracket, then our solution is good enough).
        
        \imagehere[0.6]{BissectionSearchForwardBackwardError.png}
-   }
+    \end{subparag}
 
-   \subparag{Observation}{
+    \begin{subparag}{Observation}
        We can see that we are only using the sign of $f$, not its value. This seems a bit inefficient, but we can't really find any way to optimise this. We will need to use derivatives to improve this idea.
-   }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Order of convergence}{
+\begin{parag}{Order of convergence}
    Let $E_k$ be the error after iteration $k$. Formally, if we can find numbers $o$ and $r$ such that: 
    \[\lim_{k \to \infty} \frac{E_{k+1}}{E_k^o} = r\]
    
@@ -121,17 +121,17 @@ def bisect(f, l, r, eps1, eps2):
 
    Also, $r$ is called the \important{rate of convergence}. It distinguishes the convergence speed of algorithms with the same order.
 
-   \subparag{Bisection}{
+    \begin{subparag}{Bisection}
        For bisection, we notice that we have an error bound of $r - \ell $ before the \nth{1} iteration and $\frac{r - \ell }{2}$. Thus, we get that: 
        \[E_{k+1} = \frac{1}{2} E_k \iff \frac{E_{k+1}}{E_k} = \frac{1}{2}\]
        
        We have thus found that the order of convergence is 1 (it is linear) and its rate of convergence is $\frac{1}{2}$.
 
        Note that a method with a linear order of convergence gains a fixed number of accurate digits iterations (depending on the rate). Here, we have 1 base-2 digit every iteration, meaning 1 base-10 digit every $\frac{\log\left(10\right)}{\log\left(2\right)} \approx 3$ iterations.
-   }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Newton's method}{
+\begin{parag}{Newton's method}
     \important{Newton's method} is based on the \nth{1}-order Taylor expansion (approximating a function at a point by its tangent at this point): 
     \[f\left(x + h\right) \approx f\left(x\right) + f'\left(x\right)h\]
 
@@ -143,33 +143,33 @@ def bisect(f, l, r, eps1, eps2):
     
     \imagehere[0.5]{NewtonMethodExample.png}
 
-    \subparag{Downsides}{
+    \begin{subparag}{Downsides}
         The problem with this method is that we need to be able to compute the derivative.
 
         Another problem is that, if we have a very wiggly function, then our derivative does not really represent our function's behaviour, and Newton's method will diverge far away from the solution.
         \imagehere[0.6]{NewtonMethodWigglyDiverged.png}
 
         We also get a problem when we have multiple roots at some point, such as the polynomial $f\left(x\right) = \left(x - 1\right)^2$, we need to (in theory) divide by zero at $x = 1$. In practice, this is a problem but not so big, since we have linear convergence near multiple roots.
-    }
+    \end{subparag}
 
-    \subparag{Remark 1}{
+    \begin{subparag}{Remark 1}
         Note that there are some ways to compute the derivative automatically, as we will see in the next course.
-    }
+    \end{subparag}
 
-    \subparag{Remark 2}{
+    \begin{subparag}{Remark 2}
         Note that Newton's method is not hard to implement: we can do some optimisations in real life, but it is not so different form what we explained here.
-    }
+    \end{subparag}
 
-    \subparag{Order of convergence}{
+    \begin{subparag}{Order of convergence}
         We can show that, typically, this method has a quadratic order of convergence. In other words, the number of valid digits approximately doubles every  iteration.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Newton-bisection}{
+\begin{parag}{Newton-bisection}
     We have seen that bisection is slow, but it is guaranteed to work and it need continuity and a bracket. On the other hand, Newton's method is extremely fast, but it can diverge and has problems if there are multiple roots, and we need to get the derivative.
 
     We can combine both methods into the \important{Newton-Bisection}, giving us a fast convergence which is guaranteed to work, but it requires continuity, bracket and derivatives. The idea is to run bisection and Newton's method: if Newton's method's point is inside the bracket, we use it as the middle; if it wants to jump out of the bracket, we cut the interval in half.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{Quake3FastInverseSqrt.code}
 float Q_rsqrt(float y) {
@@ -185,7 +185,7 @@ float Q_rsqrt(float y) {
 }
 \end{filecontents*}
 
-\parag{Application: Quake 3's fast inverse square root}{
+\begin{parag}{Application: Quake 3's fast inverse square root}
     In 2005, ID software published the source code of Quake 3. In it, we can find the following algorithm (I kept the comments from the slides because I find them very funny):
     \importcode{Quake3FastInverseSqrt.code}{C}
 
@@ -198,38 +198,38 @@ float Q_rsqrt(float y) {
     \[f'\left(x\right) = -\frac{2}{x^3} \implies x_{k+1} = x_k - \frac{f\left(x_k\right)}{f'\left(x_k\right)} = x_k\left(\frac{3}{2} - \frac{y}{2} x_k^2\right)\]
     
     The more mysterious part, the one with the \texttt{0x5f3759df}, is for getting a good initial value.
-}
+\end{parag}
 
 \subsection{$N$-dimensional root finding}
-\parag{Derivative}{
+\begin{parag}{Derivative}
     In $n$-dimensions, we have a function $\bvec{f}: \mathbb{R}^n \mapsto \mathbb{R}^n$, and the equivalent of the derivative is the Jacobian: 
     \[J_{\bvec{f}} = \nabla \bvec{f} = \begin{pmatrix} \frac{\partial f_1}{\partial x_1} & \cdots & \frac{\partial f_1}{\partial x_n} \\ \vdots & \ddots & \vdots \\ \frac{\partial f_m}{\partial x_1} & \cdots & \frac{\partial f_m}{\partial x_n} \end{pmatrix} \]
-}
+\end{parag}
 
-\parag{Bisection}{
-}
+\begin{parag}{Bisection}
+\end{parag}
 
-\parag{Newton's method for multivariate root finding}{
+\begin{parag}{Newton's method for multivariate root finding}
     When we want to generalise our algorithms to more dimensions, we can basically replace everything by vectors and see if it still works. There is no generalisation of the bisection, but we can make a Newton's method in $n$-dimensions this way.
 
     Thus, replacing our derivative by a Jacobian, we approximate $\bvec{f}\left(\bvec{x} + \bvec{h}\right) \approx \bvec{f}\left(\bvec{x}_{k-1}\right) + \nabla \bvec{f}\left(\bvec{x}_{k-1}\right)\bvec{h}$, yielding: 
     \[\bvec{x}_k = \bvec{x}_{k-1} - \left(\nabla \bvec{f}\left(\bvec{x}_{k-1}\right)\right)^{-1} \bvec{f}\left(\bvec{x}_{k-1}\right)\]
     
-    \subparag{Pros and cons}{
+    \begin{subparag}{Pros and cons}
         At first sight, we can see that this is a rapid quadratic convergence algorithm, but it may diverge. Also, there is no safe hybrid (such as the Newton-Bisection) in $N$-dimensions.
 
         However, spending more time, we can see that the biggest problem is that we actually need to compute Jacobians and solve linear system: which require both $O\left(n^3\right)$ operations per iteration. More than that, linear systems could still fail (if they are ill-conditioned), and we are assuming that the input and output spaces have matching dimensions.
 
         Though, this algorithm is a ``gold standard'', so we make quasi-Netwon methods to closely emulate it, while being faster.
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         To illustrate the ``gold standard'', there is the following picture on the slides, which I particularly love:
         \imagehere[0.3]{NetwonLightSaber.png}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Broyden's method for computing a Jacobian}{
+\begin{parag}{Broyden's method for computing a Jacobian}
     We know that the Jacobian is expensive to compute, so instead of computing it we can guess it. We could start with a very bad approximation of the Jacobian (such as the identity matrix), and then iteratively make it better.
 
     The idea is that, given a change in the function $\Delta \bvec{f} = \bvec{f}\left(\bvec{x}_k\right) - \bvec{f}\left(\bvec{x}_{k-1}\right)$, then we set the Jacobian to be $J_k = J_{k-1} + \Delta J$, in order to explain the change in the function value going from $\bvec{x}_{k-1}$ to $\bvec{x}_k$ (supposing the Jacobian did not change between $\bvec{x}_k$ and $\bvec{x}_{k-1}$, this should indeed get finer and finer): 
@@ -239,15 +239,15 @@ float Q_rsqrt(float y) {
     \[\Delta J = \frac{\Delta \bvec{f} - J_{k-1} \Delta \bvec{x}}{\left\|\Delta \bvec{x}\right\|} \Delta \bvec{x}^T\]
     
     We can note that $\Delta J$ is a rank-1 matrix, meaning that it equals $\bvec{u} \bvec{v}^T$ for some vectors $\bvec{u}, \bvec{v}$.
-}
+\end{parag}
 
-\parag{Sherman-Morrison formula}{
+\begin{parag}{Sherman-Morrison formula}
     The Sherman-Morrison is a really powerful formula which allows us to know how $A^{-1}$ changes when we make a standard modification to $A$: 
     \[\left(A + \bvec{u} \bvec{v}^T\right)^{-1} = A^{-1} - \frac{A^{-1} \bvec{u} \bvec{v}^T A^{-1}}{1 + \bvec{v}^T A^{-1} \bvec{u}}\]
     where $A, A^{-1} \in \mathbb{R}^{n \times n}$ is a matrix and its inverse, and $\bvec{u}, \bvec{v} \in \mathbb{R}^n$ are the vectors of a rank-1 update.
-}
+\end{parag}
 
-\parag{Broyden's method}{
+\begin{parag}{Broyden's method}
     We have all the high-levels tools to make a quasi-Newton method: \important{Broyden's method}. Its high level idea is:
     \begin{enumerate}
         \item Evaluate $\bvec{f}\left(\bvec{x}_k\right)$
@@ -257,7 +257,7 @@ float Q_rsqrt(float y) {
     \end{enumerate}
     
     This algorithm is really fast since we threw away everything which took a lot of time to compute. However, in practice, there are many more optimisations we can do.
-}
+\end{parag}
 
 
 

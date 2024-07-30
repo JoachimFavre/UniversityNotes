@@ -35,20 +35,20 @@ b = np.float32(0.1234567123456789)
 print(b-a)  # 7.450581e-09, so not at all what was expected (would be correct for np.float64)
 \end{filecontents*}
 
-\parag{Floating point error}{
+\begin{parag}{Floating point error}
     As mentioned in the last course, we have to be careful about floating point errors. We can see two in the following code snippet:
     \importcode{FloatingPointError.code}{python}
-}
+\end{parag}
 
-\parag{Error measuring}{
+\begin{parag}{Error measuring}
     We can measuring in two ways: 
     \[\text{absolute error} = \text{approximate value} - \text{true value}\] 
     \[\text{relative error} = \frac{\text{absolute error}}{\text{true value}}\]
 
     In general, when measuring the error for floating points, it is better to consider relative error. If we have a sequence making $a$ and $b$ getting closer and closer, and we want to loop until $\left|a - b\right| < c$, then we might have problems if $a$ and $b$ are very large: the ULP might be bigger than $c$, meaning that this cannot be reached unless $a = b$. 
-}
+\end{parag}
 
-\parag{Forward and backward error}{
+\begin{parag}{Forward and backward error}
     Due to numerical errors because of approximation and errors, the actual algorithm does not always lead to the exacte result we want. 
 
     Let's say that we have an algorithm taking input $x$ that would work with infinite precision, giving $y = f\left(x\right)$. Let's say that our real algorithm, introducing approximation, is $\hat{y} = g\left(x\right)$. The \important{forward error} is defined to be the error between the expected and the actual value, $\Delta y = y - \hat{y}$. The \important{backward error} is defined to be the smallest $\Delta x$ such that $f\left(x + \Delta x\right) = \hat{y}$, meaning the distance between the problem we wanted to solve and the one we actually solved. This can be represented as:
@@ -58,25 +58,25 @@ print(b-a)  # 7.450581e-09, so not at all what was expected (would be correct fo
     \[\text{condition number} = \frac{\text{forward error}}{\text{backward error}}\]
 
     A large condition number means that the algorithm is very sensitive to small errors in the input (it is said to be poorly conditioned), whereas a small condition number means having a high quality input does not produce garbage at the end (such algorithm is said to be well-conditioned). This is for instance important for data we took from experiments in physics: such data cannot be perfect.
-}
+\end{parag}
 
 
 
 \section{Linear systems}
-\parag{Remark}{
+\begin{parag}{Remark}
     We have very good tools to solve linear systems, so if we can explain our algorithm as a linear system, then we have solved our problem.
-}
+\end{parag}
 
 \subsection{LU decomposition}
-\parag{Restriction}{
+\begin{parag}{Restriction}
     For now, we will only restrict ourselves to square invertible matrice.
-}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     Note that there are two ways to compute $A^{-1} \bvec{b}$. The first one is to compute the inverse matrix, and then multiply. However, this is very inefficient, because computing $A^{-1}$ is very slow and can be poorly conditioned.
 
     The best way is often, in fact, to solve $A \bvec{x} \bvec{b}$ by using a decomposition such as the LU. This does give us $\bvec{x} = A^{-1} \bvec{b}$. Note that, in this course, when we see an inverse matrix, this often means that we need to compute values through this second method (and thus not compute the inverse matrix).
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{gaussianElimination.code}
 // Elimination, O(n^3)
@@ -90,7 +90,7 @@ for row i in [n, ..., 1]:
 \end{filecontents*}
 
 
-\parag{Gaussian elimination}{
+\begin{parag}{Gaussian elimination}
     We consider a nonsingular matrix (meaning it has an non-zero determinant).
 
     The goal of Gaussian elimination is that, using three laws, we want to reach an echeloned matrix. The three laws are permuting two rows, adding the multiple of a row to another and multiplying a row by a constant non-zero value.
@@ -100,27 +100,27 @@ for row i in [n, ..., 1]:
     
     We can see in complexities that solving a triangular system is very easy: we have already done the hard work. 
 
-    \subparag{Complexities}{
+    \begin{subparag}{Complexities}
         Let's take a bit more look at the runtime complexities, and compare them to computing $\bvec{x}$ through $\bvec{x} = A^{-1} \bvec{b}$.
 
         Computing $\bvec{x}$ through the inverse takes $n^3$ operations to compute the inverse (which can be numerically unstable), followed by $2n^2$ operations for the matrix-vector multiplication. However, the algorithm we just saw takes $\frac{2}{3} n^3$ computations to do the Gaussian elimination, followed by $n^2$ computations for the triangular solve. Computing $x \bvec{x} = A^{-1} $
 
         In other words, as mentioned earlier, Gaussian elimination is faster than inverting $A$.
-    }
+    \end{subparag}
     
 
-    \subparag{Issues}{
+    \begin{subparag}{Issues}
         There can be instabilities which can occur when pivot elements are tiny (this is a problem since we would need to divide by this value). Thus, we choose the pivot element which is the largest to avoid those problems. There are two algorithms doing this idea.
 
         When we do \important{partial pivoting}, at every iteration, we select the number with the highest absolute value in the column (in red in the picture hereinbelow) by swapping lines. When we do \important{full pivoting}, we select the highest absolute value in the sub-matrix (in green in the picture hereinbelow) by swapping lines and column (when we swap columns, we have to remember which we swapped, since it is equivalent to swapping two variable names).
         \imagehere{PartialFullPivoting.png}
 
         Note that, often, partial pivoting is enough.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Common use case}{
+\begin{parag}{Common use case}
     We sometimes have to compute systems which have the same matrix $A$ but a different $\bvec{b}$. Doing Gaussian elimination over and over again seems very suboptimal, and so as for computing the inverse (for the same reasons as before).
 
     We can realise that none of the decisions taken by the Gaussian algorithm depends on the $\bvec{b}$ vector. Thus, we can record the involved row operations. However, since the operations are linear, they can always be represented by matrix multiplications. We can convince ourselves that the used matrix is the identity matrix, but with the operation we want to apply applied on it. For instance, adding twice the first row to the second row would be represented by the matrix:
@@ -136,9 +136,9 @@ for row i in [n, ..., 1]:
     To solve our system, we can compute: 
     \[x = U^{-1} \left(L^{-1} \bvec{b}\right) \iff L U \bvec{x} = \bvec{b}\]
     which can be solved very easily since triangular systems only take $O\left(n^2\right)$ to be computed, and we only need to compute $L \bvec{y} = \bvec{b}$, followed by $U \bvec{x} = \bvec{y}$.
-}
+\end{parag}
 
-\parag{Pivoting}{
+\begin{parag}{Pivoting}
     As mentioned before, when doing partial and full pivoting, we need to remember which permutations we did. To do so, we can use permutation matrices, matrices $P$ such that $P ^{-1} = P^T$. For instance, we could have:
     \[P = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix} \]
     
@@ -149,13 +149,13 @@ for row i in [n, ..., 1]:
     
     Also, when doing full pivoting, we need to keep in mind which columns we switched, which is done by post-multiplying by a permutation matrix.
     \[A = P_1 LU P_2\]
-}
+\end{parag}
 
-\parag{Memory}{
+\begin{parag}{Memory}
     When implementing LU matrix decomposition, we can do some memory optimisations. First, storing the permutations in a matrix is very inefficient, we can instead store them in a vector.
 
     Also, we can notice that the $L$ matrix is a lower unitriangular matrix, thus we only care about its elements strictly under the diagonal, and $U$ is an upper triangular matrix, thus we only care about its elements which are on the diagonal or above. This means that we can store both the $L$ and $U$ matrix in a common $LU$ $\left(n \times n\right)$-matrix (its elements strictly under the diagonal give the ones of $L$, and the others the ones of $U$). Note that this matrix does not represent anything, it is just used to decrease memory use. 
-}
+\end{parag}
 
 
 \begin{filecontents*}[overwrite]{SolveLinearSystem.code}
@@ -170,17 +170,17 @@ lu, piv = scipy.linalg.lu_factor(A)
 x = scipy.linalg.lu_solve((lu, piv), b)
 \end{filecontents*}
 
-\parag{Python}{
+\begin{parag}{Python}
     In python, to compute solve a system through LU decomposition, we can write:
     \importcode{SolveLinearSystem.code}{python}
-} 
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     The goal is not to understand completely the algorithm and to be able to write one (since it would probably be less efficient than the one provided in python libraries anyway), but more to understand how and when to apply it.
-}
+\end{parag}
 
 
-\parag{Special}{
+\begin{parag}{Special}
     Both work and storage can be saved if we know a bit more about the linear system:
     \begin{itemize}
         \item Symmetric matrix: $A = A^T$
@@ -189,12 +189,12 @@ x = scipy.linalg.lu_solve((lu, piv), b)
         \item Sparse matrix: contains almost only zeroes. Those are a very big and important topic.
     \end{itemize}
 
-    \subparag{Example: Cholesky factorisation}{
+    \begin{subparag}{Example: Cholesky factorisation}
         If we have a symmetric positive definite matrix, then we can compute 2 times quicker the Cholesky factorisation: 
         \[A = L L^T\]
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 
 \end{document}

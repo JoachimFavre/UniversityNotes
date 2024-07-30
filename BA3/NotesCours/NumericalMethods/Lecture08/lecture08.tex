@@ -24,44 +24,44 @@
 }
 
 \subsection{Minimisation}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     The algorithms presented in this course do not allow to find the global minimum, only a local minimum. We can thus run them multiple times, and looking for the smallest minimum around them.
 
-    \subparag{Least squares}{
+    \begin{subparag}{Least squares}
         In the least square problem, we reduced the optimisation problem to root finding: 
         \[\min_{\bvec{x}} \left\|A \bvec{x} - \bvec{b}\right\|^2 \iff A^T A \bvec{x} - A^T \bvec{b} = \bvec{0}\]
 
         In fact, for non-linear functions, we will often be able to turn optimisation problems to root finding problems too, or reciprocally (but this is very rare since it basically makes our life harder).
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Minimisation is a very broad subject. We could want to minimise $f\left(x\right)$ subject to the conditions $g\left(x\right) = 0$ and $h\left(x\right) \leq 0$. Also, we could require $x$ to be an integer. More than that, we could know that $f$, $g$ and $h$ are linear, or that $f$ is convex.
 
         This shows that we will definitely not be able to see everything throughout this lecture. There are many courses at EPFL speaking about optimisation, such as MATH-504 (integer programming), MATH-261 (linear programming) and CS-454 (convex optimisation and applications).
 
         Making good optimisation programs can make a lot of money, since companies use them to optimise complex market models they make.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Derivative}{
+\begin{parag}{Derivative}
     We know that: 
     \[x^* = \argmin_{x} f\left(x\right) \implies f'\left(x^*\right) = 0\]
 
     Thus, we can just run a root finding algorithm on the derivative $f'\left(x\right)$. However, we will have to be careful since it may yield a maximum, an inflection point or a local minimum.
-}
+\end{parag}
 
-\parag{Definition: Unimodal}{
+\begin{parag}{Definition: Unimodal}
     A function $f$ is said to be \important{unimodal} if there exists a value $m$ such that $f$ is monotonically decreasing for $x \geq m$ and $f$ is monotonically increasing for $x \leq m$.
 
-    \subparag{Examples}{
+    \begin{subparag}{Examples}
         For instance, the three following functions are unimodal:
         \imagehere{UnimodalFunctionExamples.png}
-    }
+    \end{subparag}
     
-    \subparag{Interest}{
+    \begin{subparag}{Interest}
         This is really interesting since we know that unimodal functions have a unique minimum.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{GoldenSectionSearch.code}
 phi_inv = 2 / (math.sqrt(5) + 1)
@@ -76,10 +76,10 @@ def gss(f, l, r, epsilon=1e-5):
     return (l + r) / 2
 \end{filecontents*}
 
-\parag{Golden section search}{
+\begin{parag}{Golden section search}
     The idea of the golden section search algorithm is that, given an interval where we know there is a minimum, we make it smaller while preserving the certainty that the minimum is in, just as for bisection search.
 
-    \subparag{Idea}{
+    \begin{subparag}{Idea}
         We notice that an interval with point does not allow us to know if the minimum is in it or not: we need three points (so that the first slope is negative and the second slope is positive). In other words, we start with an interval $\left[l, r\right]$, where we are sure that there is a minimum in it. We sample tow points in it, and we can reduce the interval with certainty to one smaller that still contains the minimum.
 
         For instance, in the following graph, we would be able to reduce $\left[l, r\right]$ to $\left[x_1, r\right]$:
@@ -92,25 +92,25 @@ def gss(f, l, r, epsilon=1e-5):
         \imagehere[0.5]{GoldenSectionSearchNonUniform.png}
 
         This allows to avoid computing the same thing again and again, and to preserve our interval ratio.
-    }
+    \end{subparag}
     
-    \subparag{Algorithm}{
+    \begin{subparag}{Algorithm}
         The algorithm can be formulated in Python as:
         \importcode{GoldenSectionSearch.code}{python}
-    }
+    \end{subparag}
     
 
-    \subparag{Analysis}{
+    \begin{subparag}{Analysis}
         Just as for the bisection search, we have a convergence order 1 (meaning it is linear). However, the convergence rate is $\frac{1}{\phi}$, which is a bit slower than bisection search.
 
         However, this is a great algorithm because we are sure it will converge for a unimodal function.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 \subsection{Multidimensional minimisation}
 
-\parag{Multivariate derivative definition}{
+\begin{parag}{Multivariate derivative definition}
     In multivariate calculus, we can define the gradient as a generalisation of the derivative: 
     \[\nabla f = \begin{pmatrix} \frac{\partial f}{\partial x_1}  & \cdots & \frac{\partial f}{\partial x_n} \end{pmatrix} \]
 
@@ -118,35 +118,35 @@ def gss(f, l, r, epsilon=1e-5):
     
     Also, we can define the Hessian matrix, which generalises the second derivative:
     \[H_f = \begin{pmatrix} \frac{\partial^2 f}{\partial^2 x_1} & \cdots & \frac{\partial^2}{\partial x_1 \partial x_n} \\ \vdots & \ddots & \vdots \\ \frac{\partial^2 f}{\partial x_n \partial x_1} & \cdots & \frac{\partial^2 f}{\partial^2 x_n} \end{pmatrix} \]
-}
+\end{parag}
 
-\parag{Gradient descent}{
+\begin{parag}{Gradient descent}
     The idea is to always follow the direction of greatest decrease, by constructing the sequence: 
     \[\bvec{x}_{k+1} = \bvec{x}_k - \alpha \nabla f\left(\bvec{x}_k\right)\]
     where $\alpha$ is the step size.
 
     This is basically the movement a small marble rolling down a hill would do.
 
-    \subparag{Remark 1}{
+    \begin{subparag}{Remark 1}
         We can slightly improve gradient descent by adding some kind of ``momentum'': the more we go in a direction, the greater we take $\alpha$.
-    }
+    \end{subparag}
     
-    \subparag{Remark 2}{
+    \begin{subparag}{Remark 2}
         This algorithm is very nice because it is very easy to write. However, this also means that it is also easy to break it.
 
         For instance, the Rosenbrock function, $f\left(x, y\right) = \left(1 - x\right)^2 + 100\left(y - x^2\right)^2$ really makes Gradient descent struggle, since the function is very flat where the minimum is:
         \imagehere[0.5]{RosenbrockFunction.png}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Taylor series}{
+\begin{parag}{Taylor series}
     The Taylor second order approximation of a multivariate function is: 
     \[f\left(\bvec{x} + \bvec{h}\right) \approx f\left(\bvec{x}\right) + \nabla f\left(\bvec{x}\right) \bvec{h} + \frac{1}{2} \bvec{h}^T H_f\left(\bvec{x}\right) \bvec{h}\]
     
     Such approximation allows to also consider the curvature of the function. 
-}
+\end{parag}
 
-\parag{Newton's method for optimisation}{
+\begin{parag}{Newton's method for optimisation}
     For Newton's method for optimisation, we consider the same idea as for Newton's method for root finding: we approximate the function by its Taylor series, and we look what we get.
 
     We know that we want $\nabla f\left(\bvec{x}\right) = 0$. So, letting $g\left(\bvec{x}\right) = \nabla f\left(\bvec{x}\right)$, newton's method gives us: 
@@ -155,45 +155,45 @@ def gss(f, l, r, epsilon=1e-5):
     And, since the gradient of a gradient of a scalar field is a Hessian matrix, and since $g\left(\bvec{x}\right) = \nabla f\left(\bvec{x}\right)$, it yields:
     \[\bvec{x}_k = \bvec{x}_{k-1} - H^{-1}_f\left(\bvec{x}_{k-1}\right) \nabla f\left(\bvec{x}_{k-1}\right)\]
     
-    \subparag{Analysis}{
+    \begin{subparag}{Analysis}
         Just as for Newton's method for root finding, if we are sufficiently close to a solution, it converges really fast, in quadratic speed. However, it is really unreliable unless we started sufficiently close to our solution.
-    }
+    \end{subparag}
 
-    \subparag{Convergence}{
+    \begin{subparag}{Convergence}
         As mentioned earlier, there is still a problem since finding critical points is not enough: they might not be minimum, they could be maximum or saddle points.
         \imagehere[0.7]{OptimisationRootFindingDerivative.png}
             
         In other words, when our algorithm outputs a value, we should verify that it is indeed a minimum.
-    }
+    \end{subparag}
     
 
-    \subparag{Remarks}{
+    \begin{subparag}{Remarks}
         On the Rosenbrock function, this converges really fast.
 
         When working on the Rastririgin function, however, this algorithm struggles a lot:
         \imagehere[0.5]{RastriginFunction.png}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     To use minimisation in python, we can use the \texttt{scipy.minimize()} or \texttt{scipy.minimize\_scalar()}.
-}
+\end{parag}
 
 
 \subsection{Automatic differentiation}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     We will see three methods to compute derivatives. Finite differences, symbolic, and finally automatic differentiation. We will see why this third method is really the one ruling them all.
 
     There are many frameworks for automatic differentiation in Python: Pytorch, Jax, TensorFlow, and so on. They are really nice because they made the training of neural networks really easy.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         To train neural networks, we need to solve optimisation problems. Neural networks can be really big (twenty million parameters is typical, but it can go up to hundreds of billions), meaning that it is impossible to compute the Hessian matrix (which size is the square of the dimension) and thus Newton's method is not usable.
 
         This means that we need to use gradient descent, and thus compute gradients. This is where automatic differentiation softwares come up: they compute such gradients really fast.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Finite differences}{
+\begin{parag}{Finite differences}
     The idea is to evaluate the function at nearby points to estimate derivative.
 
     We can use two ways. The most naive way is the forward difference: 
@@ -204,22 +204,22 @@ def gss(f, l, r, epsilon=1e-5):
 
     This is really simple to implement, and it is thus often used to verify that a method is correct.
     
-    \subparag{Problem 1}{
+    \begin{subparag}{Problem 1}
         A big problem with this method is how to choose $h$. We need to take it small enough in order to grasp the problem but large enough that we don't have cancellation error (we are taking the difference between two values that are almost the same).
 
         We can look at different accuracies given by finite differences of $f\left(x\right) = x^3$ at different points:
         \imagehere[0.8]{FiniteDifferencesPrecision.png}
         
         We can even see that $h$ might need to be chosen differently depending on where we want to evaluate the derivative.
-    }
+    \end{subparag}
 
-    \subparag{Problem 2}{
+    \begin{subparag}{Problem 2}
         If we have one million dimensions, then we need to evaluate $f$ at least $1\,000\,001$ times. This is, in the end, the biggest problem for this method since, this is really impracticable for neural networks.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Symbolic}{
+\begin{parag}{Symbolic}
     The idea is to use the rules we learnt in maths to differentiate.
 
     However, there might be a problem if we are computing the integral of $f_8\left(x\right)$ where $f_8\left(x\right)$ is just 8 exponential nested: 
@@ -228,22 +228,22 @@ def gss(f, l, r, epsilon=1e-5):
     $\frac{df_8\left(x\right)}{dx}$ results in 37 exponentials.
 
     However, we are doing computer science, not mathematics. The rules of a program can have much more structure than the rules of a formula. This is the idea behind automatic differentiation.
-}
+\end{parag}
 
-\parag{Automatic differentiation (finally)}{
+\begin{parag}{Automatic differentiation (finally)}
     The goal is to improve symbolic differentiation.
 
     We know that any program boils down to a sequence of many tiny steps (addition, multiplication, and so on). If we know how to handle each step, then we can differentiate the entire program. As stated before, the whole idea is that, with a program, we can have much more structure. So, we use the two following key ideas behind automatic differentiation: chain rules and reusing common expressions.
 
-    \subparag{Power of chain rule}{
+    \begin{subparag}{Power of chain rule}
         The chain rule tells us that, if $b = f\left(a\right)$ and $c = g\left(b\right)$, then: 
         \[\frac{dc}{da} = \frac{dc}{db} \frac{db}{da}\]
         
         We can represent this a graph, where there is an arrow going from $x$ to $y$ if we use $x$ to compute $y$ 
         \imagehere[0.6]{AutomaticDifferentiationChainRuleGraph.png}
-    }
+    \end{subparag}
 
-    \subparag{Reuse common expressions}{
+    \begin{subparag}{Reuse common expressions}
         Let's say we have: 
         \[b = f\left(a\right), \mathspace c = g\left(a\right), \mathspace d = h\left(b, c\right), \mathspace e = k\left(d\right)\]
 
@@ -251,8 +251,8 @@ def gss(f, l, r, epsilon=1e-5):
         \imagehere[0.8]{AutomaticDifferentiationReusingCommonExpressions.png}
         
         We can thus output a program to compute our derivative, which is able to store values and compute them only once.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{ADOperatorOverloading.code}
 class ADVar:
@@ -275,7 +275,7 @@ class ADVar:
 \end{filecontents*}
 
 
-\parag{AD via operator overloading}{
+\begin{parag}{AD via operator overloading}
     A typical way to implement automatic differentiation by stacking a function with its derivative $\left[f\left(x\right), f'\left(x\right)\right]$. Then, when we want to evaluate $f'\left(a\right)$ where $a$ is a given input, we can just go as if we were evaluating the function, but evaluating the derivative at the same time. We compute the derivative of all the outputs with respect to a given input in a single pass.
 
     For instance, we can use operator overloading in python. We can then define the addition and the multiplication of two functions using the mathematics rule:
@@ -284,7 +284,7 @@ class ADVar:
     which are indeed really easy to compute if $\left[v_1, \frac{\partial }{\partial x} v_1\right]$ and $\left[v_2, \frac{\partial }{\partial x} v_2\right]$ where already computed at the input we are considering. This could be implemented as:
     \importcode{ADOperatorOverloading.code}{python}
     
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let's say that we have $f\left(x\right) = x^2 + 1$, and we want to compute $f\left(2\right)$, $f'\left(2\right)$. Then, we would let \texttt{x = 2}, and: 
         \begin{center}
             \texttt{f = ADvar(x, 1) * Advar(x, 1) + 1} 
@@ -292,29 +292,29 @@ class ADVar:
         where it would in fact be translated to: 
         \[\texttt{f} = \left[2, 1\right] \cdot \left[2, 1\right] + \left[1, 0\right] = \left[4, 4\right] + \left[1, 0\right] = \left[5, 4\right]\]
         through the laws defined above. This is exactly the result expected, $\left[f\left(2\right), f'\left(2\right)\right]$, and we can see that we indeed just computed the derivative at the same time as the function.
-    }
+    \end{subparag}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This is definitely not how we would implement this in real life, but this is a good example.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Cheap Gradient Principle}{
+\begin{parag}{Cheap Gradient Principle}
     The Cheap Gradient Principle states that the cost of computing the gradient (of a scalar function) is nearly the same (typically less than $5$ times) as that of simply computing the function itself.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This means that we can compute quickly high-dimensional gradients, and this is crucial for machine-learning (and many other applications).
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Backward mode}{
+\begin{parag}{Backward mode}
     What we have done so far works very well if we have one input and potentially many outputs. Indeed, we compute the derivative with respect to one input, and see how it propagates, allowing us to compute one column of a jacobian matrix at a time. However, if we have much more inputs that outputs, we may want to go in the other direction, seeing how parameters variate when the function variates. This would allows us to compute the complete row of a jacobian matrix at a time. We can indeed do that by going in the reverse direction, using the reverse rules of our laws.
 
     To do so, we need to run a program (a function but with higher structure) in reverse order. However, the only way is to run forward, keep everything in memory, and then use this data to go in the other direction. This is a real practical limitation, which explains why some models are really cheap to evaluate but really expensive to run.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say we want to differentiate the following function with respect to $\alpha$: 
     \[\alpha \exp\left(-\alpha x\right)\]
     
@@ -329,7 +329,7 @@ class ADVar:
 
     We could show that we get the same results at the end, $\delta a$ of the forward mode is the same as $\delta e$ of the reverse mode. However, reverse mode is much more interesting when we have many more inputs than outputs.
     
-    \subparag{Personal note}{
+    \begin{subparag}{Personal note}
         I write this after the end of the semester, because during the exam I felt this was lacking. $\delta x$ does not mean the same thing in forward mode and in reverse mode.
 
         In forward mode, this means $\delta x = \frac{\partial x}{\partial a}$. We thus indeed know that $\delta a = \frac{\partial a}{\partial a} = 1$ and we are looking for $\delta e = \frac{\partial e}{\partial a}$. Note that, in this case, we indeed have the following property (using first the inverse rule, then the chain rule): 
@@ -339,8 +339,8 @@ class ADVar:
         \[\frac{\delta x}{\delta y} = \frac{\frac{\partial e}{\partial x} }{\frac{\partial e}{\partial y} } = \frac{\partial e}{\partial x} \frac{\partial y}{\partial e} = \frac{\partial y}{\partial x} = \frac{1}{\frac{\partial x}{\partial y} }\]
         
         In my opinion, we should write $\delta x$ in forward mode but $\delta^{-1} x$ in reverse mode (for instance). The fact that we name them the same when they represent different things is very misleading, especially since $\frac{\delta x}{\delta y} = \frac{\partial y}{\partial x} \neq \frac{\partial x}{\partial y} $ in reverse mode.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 \end{document}
