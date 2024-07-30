@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2021-12-06 at 13:14:43.
@@ -20,7 +22,7 @@
 }
 
 \subsection{Orthonormalisation}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     Soit $W = \vect\left\{\bvec{x}_1, \bvec{x}_2\right\}$, où: 
     \[\bvec{x}_1 = \begin{bmatrix} 3 \\ 6 \\ 0 \end{bmatrix}, \mathspace \bvec{x} = \begin{bmatrix} 1 \\ 2 \\ 2 \end{bmatrix} \]
     
@@ -42,7 +44,7 @@
     
     Ainsi, par construction, $\mathcal{U} = \left(\bvec{u}_1, \bvec{u}_2\right)$ est une base orthonormée, et $\vect\left\{\bvec{u}_1, \bvec{u}_2\right\} = \vect\left\{\bvec{x}_1, \bvec{x}_2\right\}$
 
-    \subparag{Observation 1}{
+    \begin{subparag}{Observation 1}
         On remarque que: 
         \[\bvec{x}_1 = \left\|\bvec{x}_1\right\|\bvec{u}_1\]
 
@@ -52,18 +54,18 @@
         Ainsi, on peut écrire ceci sous la forme d'un produit matriciel: 
         \[\begin{bmatrix}  &  \\ \bvec{x}_1 & \bvec{x}_2 \\  &  \end{bmatrix} = \begin{bmatrix}  &  \\ \bvec{u}_1 & \bvec{u}_2 \\  &  \end{bmatrix} \begin{bmatrix} \left\|\bvec{x}_1\right\| & \bvec{x}_2 \dotprod \bvec{u}_1 \\ 0 & \left\|\bvec{v}_2\right\| \end{bmatrix} \implies A = QR\]
         où $A$ est la matrice dont les colonnes forment une base quelconque de $W$, $Q$ est une matrice dont les colonnes forment une base orthonormée de $W$, et $R$ est une matrice triangulaire supérieure. On se rendra compte qu'on pourra toujours factoriser $A$ sous cette forme, si les colonnes de $A$ sont linéairement indépendants.
-    }
+    \end{subparag}
 
-    \subparag{Observation 2}{
+    \begin{subparag}{Observation 2}
         Non seulement $\left(\bvec{u}_1, \bvec{u}_2\right)$ est une base orthonormée de $\vect\left\{\bvec{x}_1, \bvec{x}_2\right\}$, mais aussi $\left(\bvec{u}_1\right)$ est une base orthonormée de $\vect\left\{\bvec{x}_1\right\}$.
-    }
+    \end{subparag}
 
-    \subparag{Remarque}{
+    \begin{subparag}{Remarque}
         Cet algorithme s'appelle formellement l'algorithme de Gram-Schmidt. Cependant, il est beaucoup plus intéressant de lui donner des noms amicaux. Un très bon ami, un \textit{Génie en la Physique}, l'appelle ``l'algorithme du Grand Schmit'', ou ``l'algorithme du Grand Schtroumpf''.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Avec 3 vecteurs}{
+\begin{parag}{Avec 3 vecteurs}
     Soient les trois vecteurs suivants: 
     \[\bvec{x}_1 = \begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix}, \mathspace \bvec{x}_2 = \begin{bmatrix} 0 \\ 1 \\ 1 \\ 1 \end{bmatrix}, \mathspace \bvec{x}_3 = \begin{bmatrix} 0 \\ 0 \\ 1 \\ 1 \end{bmatrix} \]
     
@@ -75,16 +77,16 @@
     Maintenant, pour calculer $\bvec{v}_2$, on retranche la projection de $\bvec{x}_2$ sur $W_1 = \vect\left\{\bvec{u}_1\right\}$ à $\bvec{x}_2$: 
     \[\bvec{v}_2 = \bvec{x}_2 - \proj_{W_1}\left(\bvec{x}_2\right) = \bvec{x}_2 - \left(\bvec{x}_2 \dotprod \bvec{u}_1\right)\bvec{u}_1 = \begin{bmatrix} 0 \\ 1 \\ 1 \\ 1 \end{bmatrix} - \frac{3}{2} \cdot \frac{1}{2}\begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix} = \begin{bmatrix} -3 / 4 \\ 1 / 4 \\ 1 / 4 \\ 1 / 4 \end{bmatrix} = \frac{1}{4} \begin{bmatrix} -3 \\ 1 \\ 1 \\ 1 \end{bmatrix} \]
     
-    Ainsi, en normalisant $\bvec{v_2}$, on obtient $\bvec{u}_1$: 
+    Ainsi, en normalisant $\bvec{v}_2$, on obtient $\bvec{u}_1$: 
     \[\bvec{u}_2 = \frac{1}{\bvec{v}_2} \bvec{v}_2 = \frac{2}{\sqrt{3}} \frac{1}{4} \begin{bmatrix} -3 \\ 1 \\ 1 \\ 1 \end{bmatrix} = \frac{1}{2\sqrt{3}} \begin{bmatrix} -3 \\ 1 \\ 1 \\ 1 \end{bmatrix} \]
 
     On remarque que, jusque là, le fait qu'on ait 3 vecteurs ne change rien : on n'a jamais utilisé le troisième vecteur.
 
     \imagehere[0.5]{MethodeOrthonormalisation3Vecteurs.png}
 
-    On va faire le même raisonnement que pour les dernières fois : on va projeter $\bvec{x}_3$ sur $W_2 = \vect\left\{\bvec{u}_1, \bvec{u}_2\right\}$, puis retrancher ce résultat à $\bvec{x}_3$ pour obtenir $\bvec{v_3}$. La projection est calculable facilement, puisque $\left(\bvec{u}_1, \bvec{u}_2\right)$ est une base orthogonale.
+    On va faire le même raisonnement que pour les dernières fois : on va projeter $\bvec{x}_3$ sur $W_2 = \vect\left\{\bvec{u}_1, \bvec{u}_2\right\}$, puis retrancher ce résultat à $\bvec{x}_3$ pour obtenir $\bvec{v}_3$. La projection est calculable facilement, puisque $\left(\bvec{u}_1, \bvec{u}_2\right)$ est une base orthogonale.
     
-    \[\bvec{v}_3 = \bvec{x}_3 - \proj_{W_2}\left(\bvec{x}_3\right) = \bvec{x}_3 - \left(\bvec{x_3} \dotprod \bvec{u}_1\right)\bvec{u}_1 - \left(\bvec{x}_3 \dotprod \bvec{u}_2\right)\bvec{u}_2\]
+    \[\bvec{v}_3 = \bvec{x}_3 - \proj_{W_2}\left(\bvec{x}_3\right) = \bvec{x}_3 - \left(\bvec{x}_3 \dotprod \bvec{u}_1\right)\bvec{u}_1 - \left(\bvec{x}_3 \dotprod \bvec{u}_2\right)\bvec{u}_2\]
 
     Ainsi, on obtient 
     \[\bvec{v}_3 = \begin{bmatrix} 0 \\ 0 \\ 1 \\ 1 \end{bmatrix} - 1\cdot \frac{1}{2} \begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix} - \frac{1}{\sqrt{3}} \frac{1}{2\sqrt{3}} \begin{bmatrix} -3 \\ 1 \\ 1 \\ 1 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 1 \\ 1 \end{bmatrix} - \begin{bmatrix} 1 / 2 \\ 1 / 2 \\ 1 / 2 \\ 1 / 2 \end{bmatrix}  - \begin{bmatrix} -1 / 6 \\ 1 / 6 \\ 1 / 6 \\ 1 / 6 \end{bmatrix} = \begin{bmatrix} 0 \\ -2 / 3 \\ 1 / 3 \\ 1 / 3 \end{bmatrix} = \frac{1}{3} \begin{bmatrix} 0 \\ -2 \\ 1 \\ 1 \end{bmatrix} \]
@@ -95,7 +97,7 @@
     On a donc construit la base orthonormée $U = \left(\bvec{u}_1, \bvec{u}_2, \bvec{u}_3\right)$ pour $W = \vect\left\{\bvec{x}_1, \bvec{x}_2, \bvec{x}_3\right\}$, où: 
     \[\bvec{u}_1 = \frac{1}{2} \begin{bmatrix} 1 \\ 1 \\ 1 \\ 1 \end{bmatrix}, \mathspace \bvec{u}_2 = \frac{1}{2\sqrt{3}} \begin{bmatrix} -3 \\ 1 \\ 1 \\ 1 \end{bmatrix}, \mathspace \bvec{u}_3 = \frac{1}{\sqrt{6}} \begin{bmatrix} 0 \\ -2 \\ 1 \\ 1 \end{bmatrix}  \]
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         On remarque que:
         \begin{itemize}
             \item $\left\{\bvec{u}_1\right\}$ est une base orthonormée pour $W = \vect\left\{\bvec{x}_1\right\}$.
@@ -120,19 +122,19 @@
         \[\proj_{\im A}\left(\bvec{y}\right) = QQ^T \bvec{y}\]
 
         Le plus simple pour trouver la matrice qui projette sur l'espace image de $A$ est donc d'appliquer le Grand Schtroumpf (Gram-Schmidt), de factoriser $A$ sous la forme $QR$, puis de calculer $QQ^T$
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Dépendance linéaire}{
+\begin{parag}{Dépendance linéaire}
     Nous pouvons nous rendre compte que, si nous appliquons le Grand Schtroumpf sur des vecteurs qui sont linéairement dépendants, alors on aurait obtenu le vecteur $\bvec{0}$ à un endroit. Cependant, puisqu'en suite nous devons diviser ce vecteur par sa norme, ce qui est une division par 0, l'algorithme casse bel et bien.
 
     En effet, la projection d'un vecteur dans un espace auquel il appartient est égal à ce vecteur. Ainsi, quand on va retrancher ce résultat à ce vecteur, alors cela va nous donner $\bvec{0}$.
 
     Ceci est cohérent puisque notre but est d'orthonormaliser une \textit{base}, ainsi si les vecteurs n'étaient pas linéairement indépendants, alors ce n'était pas une base au départ.
 
-}
+\end{parag}
 
-\parag{Gram-Schmidt et factorisation QR}{
+\begin{parag}{Gram-Schmidt et factorisation QR}
     Soit $A$ une matrice de taille $m \times n$ dont les colonnes sont linéairement indépendants. En d'autres mots, $\left(\bvec{x}_1, \ldots, \bvec{x}_n\right)$ est une base de $W = \vect\left\{\bvec{x}_1, \ldots, \bvec{x}_n\right\} = \im A$.
 
     \important{L'algorithme de Gram-Schmidt} (Grand Schtroumpf) revient à calculer: 
@@ -142,9 +144,9 @@
 
     Ces calculs nous donnent $\left(\bvec{u}_1, \ldots, \bvec{u}_n\right)$, une \important{base orthonormée} de $W = \im A$. De plus, ils révèlent la factorisation $QR$ de $A$: 
     \[A = QR, \mathspace Q = \begin{bmatrix}  &  &  \\ \bvec{u}_1 & \ldots & \bvec{u}_n \\  &  &  \end{bmatrix}, \mathspace R = \begin{bmatrix} \left\|\bvec{x}_1\right\| & \bvec{x}_2 \dotprod \bvec{u}_1 & \ldots & \bvec{x}_n \dotprod \bvec{u}_1 \\ 0 & \left\|\bvec{v}_2\right\| & \ldots & \bvec{x}_n \dotprod \bvec{u}_2 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \ldots & \left\|\bvec{v}_n\right\| \end{bmatrix} \]
-}
+\end{parag}
 
-\parag{Matrice carrée}{
+\begin{parag}{Matrice carrée}
     Étudions la factorisation $QR$ d'une matrice $A \in \mathbb{R}^{n \times n}$ carrée. 
 
     Appliquons le Grand Schtroumpf à ses colonnes. Il y a deux cas possibles. Si cet algorithme échoue (il y a une division par zéro), alors $A$ n'est pas inversible. S'il aboutit, alors on trouve $Q \in \mathbb{R}^{n \times n}$ et $R \in \mathbb{R}^{n \times n}$ telles que: 
@@ -171,7 +173,7 @@
 
     Ceci est vrai pour tout $n$, donc $\left|\det\left(A\right)\right|$ est l'hyper-volume de l'hyper-parallélépipède de dimension $n$
 
-}
+\end{parag}
 
 
 
