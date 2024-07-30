@@ -23,13 +23,13 @@
 }
 
 \subsection{Reductions}
-\parag{Goal}{
+\begin{parag}{Goal}
     The goal of this section is to make a more abstract-type of proofs, more systematic way, to show that a language is not recognisable or not decidable.
 
     The idea is to compare the difficulty of languages.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider the language where, given the encoding of some DFA, we output whether it accepts a non-empty language: 
     \[NE_{DFA} = \left\{\left\langle D \right\rangle \suchthat L\left(D\right) \neq \o\right\}\]
     
@@ -38,23 +38,23 @@
     
     We notice that solving this second problem allows to solve the first too. If there is a path from the initial state to an accepting state, then the language of the DFA is non-empty. We have done a reduction: we transformed our problem into another one using some function $f\left(\left\langle D \right\rangle\right) = \left\langle G, v, w \right\rangle$, which is easier to solve.
     \imagehere[0.7]{ReductionNonEmptyDFA.png}
-}
+\end{parag}
 
-\parag{Definition: Computable function}{
+\begin{parag}{Definition: Computable function}
     A function $f: \Sigma^* \mapsto \Sigma^*$ is a \important{computable function} if there exists some TM $M$ such that, on every input $w$, halts with just $f\left(w\right)$ on its tape.
-}
+\end{parag}
 
-\parag{Definition: Mapping reducible}{
+\begin{parag}{Definition: Mapping reducible}
     Language $A$ is \important{mapping reducible} to language $B$, written $A \leq_m B$, if there exists some computable function $f: \Sigma^* \mapsto \Sigma^*$ named \important{reduction} such that, for every $w \in \Sigma^*$: 
     \[w \in A \iff f\left(w\right) \in B\]
 
     In other word, $f$ does not need to be bijective, but any element in $A$ must land in $B$, and any element in $\bar{A}$ must end in $\bar{B}$.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     If $A \leq_m B$ and $B$ is decidable, then $A$ is decidable.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We know that $B$ is decidable, thus let $R_B$ be a decider for it. Also, let $f$ be a reduction from $A$ to $B$.
 
         We can then define a Turing Machine $M$ such that, it takes any input $w$, feed $f\left(w\right)$ to $R_B$, and output whatever $R_B$ outputs.
@@ -69,20 +69,20 @@
         Thus, we indeed have that $M$ is a decider for $A$: it accepts all words inside $A$ and rejects all inside $\bar{A}$.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Corollary}{
+\begin{parag}{Corollary}
     If $A \leq_m B$ and $A$ is undecidable, then $B$ is undecidable.
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     The following reduction is possible: 
     \[A_{TM} \leq_m HALT\]
     
     And thus, $HALT$ is undecidable.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Our goal is to find some reduction $f$ from $A_{TM}$ to $HALT$.
 
         Given some input $x = \left\langle M, w \right\rangle$, our reduction outputs (without running the machine we construct) $f\left(x\right) = \left\langle M', w \right\rangle$, where $M'$ receives some input $y$, and runs it on $M$. If $M$ rejects $y$, $M'$ enter an infinite loop; and if $M$ accepts $y$, then $M'$ accepts $y$. We can indeed show that this $f$ is computable.
@@ -93,10 +93,10 @@
         We have found a reduction, which ends our proof.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     We consider the following language
     \[REG_{TM} = \left\{\left\langle N \right\rangle \suchthat L\left(N\right) \text{ is regular}\right\}\]
 
@@ -105,7 +105,7 @@
     
     And thus, $REG_{TM}$ is undecidable.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Our goal is to map any $\left(M, w\right)$ pair to a regular language if $M$ accepts $w$ and to a non-regular language is $M$ rejects or does not halt on $w$.
 
         The idea is to create a Turing Machine $M'$ (without simulating it) using some kind of switch. First, if $y \in \left\{0^n 1^n \suchthat n \in \mathbb{N}\right\}$, the machine will directly accept it. If not, this is where the switch appears: the machine $M'$ runs $M$ on $w$ and, depending on the result, accepts $y$ or not. If $M$ accepts $w$, then $M'$ accepts $y$; meaning that, overall, it accepts any $y$. If $M$ rejects $w$, then $M'$ rejects $y$; meaning that overall it only accepts $\left\{0^n 1^n \suchthat n \in \mathbb{N}\right\}$. If $M$ loops on $w$ then, well, $M'$ loops on $w$ and thus does not accept it; meaning that, overall, it also only accepts $\left\{0^n 1^n \suchthat n \in \mathbb{N}\right\}$.
@@ -119,17 +119,17 @@
         This is our reduction, finishing our proof.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     If $A \leq_m B$ and $B$ is recognisable, then $A$ is recognisable.
 
-    \subparag{Contrapositive}{
+    \begin{subparag}{Contrapositive}
         If $A \leq_m B$ and $A$ is unrecognisable, then $B$ is unrecognisable.
-    }
+    \end{subparag}
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We can, as usual, consider the following machine:
         \imagehere[0.8]{TheoremReduction.png}
 
@@ -138,11 +138,11 @@
 
         This thus shows that $M$ is a recogniser for $A$.
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider the following language, which states whether two Turing Machine decide the same language.: 
     \[EQ_{TM} = \left\{\left\langle M_1, M_2 \right\rangle \suchthat M_1, M_2 \text{ are Turing Machines such that } L\left(M_1\right) = L\left(M_2\right)\right\}\]
     
@@ -151,7 +151,7 @@
     
     Thus, $EQ_{TM}$ is unrecognisable.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We define a reduction $f$ such that, given an input $x = \left\langle M, w \right\rangle$, it outputs $f\left(x\right) = \left\langle M_1, M_2 \right\rangle$. The goal is that both machines have the same language if and only if $\left\langle M, w \right\rangle \in \bar{A_{TM}}$. Thus, we construct $M_1$ to ignore its input and just runs $M$ on $w$, and accepts if $M$ accepts or enter an infinite loop otherwise. $M_2$ rejects any input $y$.
 
         We notice that if $\left\langle M, w \right\rangle \in \bar{A_{TM}}$, then $M_1$ loops on all inputs and thus: 
@@ -163,7 +163,7 @@
         We have indeed show that $f$ is a reduction, and thus that $\bar{A_{TM}} \leq_m EQ_{TM}$.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \end{document}

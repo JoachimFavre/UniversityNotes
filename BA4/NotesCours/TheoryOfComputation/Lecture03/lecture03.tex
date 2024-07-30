@@ -23,7 +23,7 @@
 
 \subsection{Non-regular languages}
 
-\parag{Existence of non-regular languages}{
+\begin{parag}{Existence of non-regular languages}
     We have seen that many languages are regular: using a finite automaton, we can verify a number has a given substring, check if it is divisible modulo a given number, skip some prefix and suffix, do complements, unions, intersections, and so on.
     
     We now wonder if all languages are regular. In fact, sadly, no. Let us consider the following language: 
@@ -31,7 +31,7 @@
     
     The problem is that we need some kind of memory depending on the size of the input: we need to recall how many zeroes we had when we are counting the ones. 
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let us prove that $B$ is indeed not regular.
 
         Let's suppose for contradiction that $B$ is recognised by a DFA with $p$ states. Note that $p$ has to be finite.
@@ -42,10 +42,10 @@
         However, this means that if $0^i 1^i$ is accepted, then $0^j 1^i$ is also accepted. However, $0^j 1^i$ should not be accepted, which is our contradiction.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     Note that, to show a language is not regular, we cannot just say ``it needs memory depending on the size of the input'' blindly. Let us consider the following language: 
     \[D = \left\{w \suchthat w \text{ has an equal number of occurrences of 01 and 10 as substrings}\right\}\]
     
@@ -53,9 +53,9 @@
     \[D = \left\{w \suchthat w \text{ begins and ends with the same character, or } \text{length}\left(w\right) \leq 1\right\}\]
 
     Thus, $D$ is regular.
-}
+\end{parag}
 
-\parag{Pumping lemma}{
+\begin{parag}{Pumping lemma}
     If $A$ is a regular language, then there is a number $p$ (named the pumping length) such that, for every string $s$ in $A$ of length at least $p$, there exists a division of $s$ into three pieces, $s = xyz$, such that:
     \begin{enumerate}
         \item For any $i \geq 0$, $x y^i z \in A$.
@@ -63,7 +63,7 @@
         \item $\left|xy\right| \leq p$.
     \end{enumerate}
     
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         It is much better to remember the proof of this lemma, instead of the lemma itself.
 
         In fact, it just generalises the argument we had before. Let $p = \left|Q\right|$. By the pigeon hole principle, if we have a string of length at least $p$, we need to have a loop: let $y$ be a string which loops from a state $q_i$ to the same state $q_i$. Then, we also need $x$ to be a string bringing from the initial state to $q_i$, and $z$ to be a string bringing from $q_i$ to an accepting state. We can then go from the initial step to $q_i$, loop any number of times we want (even 0 times) and go to an accepting state.
@@ -71,9 +71,9 @@
         \imagehere[0.5]{PumpingLemmaIntuition.png}
 
         $\left|xy\right| \leq p$ just means that the state collision (which leads to the loop) has to take place before $p$.
-    }
+    \end{subparag}
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let M be an arbitrary DFA accepting $A$, and let $p = \left|Q\right|$ be the number of states in $M$. Also, let $s$ be any arbitrary string of length $\left|s\right| \geq p$.
 
         By the pigeonhole principle, since we have $p$ states and we visit $p+1$ states when reading a string of length $p$, this means that we must always have some collision for any string which length is less than or equal to $p$. Thus, when reading the $p$ first characters of $s$, there must be a loop: there must be some $x, y, z$ such that $\left|xy\right| \leq p$ (the loop must happen in the first $p$ characters of $s$), $\left|y\right| \geq 1$ (because of the loop) and:
@@ -85,10 +85,10 @@
         \[\delta\left(q_0, xy^i z\right) = r, \mathspace \forall i \geq 0\]
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let us consider the following language: 
     \[F = \left\{ww \suchthat w \in \left\{0, 1\right\}^*\right\}\]
     
@@ -106,9 +106,9 @@
     since the left part of this new string does not match the right one.
     
     This is our contradiction.
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let us consider the following language: 
     \[E = \left\{0^m 1^n \suchthat m > n\right\}\]
  
@@ -120,9 +120,9 @@
     Since we know that $\left|xy\right| \leq p$ and $\left|y\right| \geq 1$, we necessarily have that $y = 0^k$ for some $k \geq 1$. However, we see that: 
     \[x y^0 z = xz = 0^{p+1-k} 1^p \not \in E\]
     since $p + 1 - k \leq p$. By the pumping lemma, we should have $xz \in E$, this is our contradiction.
-}
+\end{parag}
 
-\parag{Example 3}{
+\begin{parag}{Example 3}
     Let us consider the following language: 
     \[C = \left\{w \suchthat w \text{ has an equal number of 0s and 1s}\right\}\]
     
@@ -136,7 +136,7 @@
     
     However, since the pumping lemma tells us that $x y^2 z \in C$, we got our contradiction.
 
-    \subparag{Other proof}{
+    \begin{subparag}{Other proof}
         We can use an easier approach than the pumping lemma. 
 
         Let us consider again a language we have proven not to be regular at the start of this lecture: 
@@ -148,8 +148,8 @@
         Let us now suppose for contradiction that $C$ is regular. However, we know that $\left\{0^m 1^n \suchthat m, n \geq 0\right\}$ is a regular language, and the intersection of two regular language is also regular. This thus means that $B$ is regular, which is a contradiction.
 
         This shows that the pumping lemma, though very powerful, is not the always the only way to go.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 

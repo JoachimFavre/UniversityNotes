@@ -24,97 +24,97 @@
 \end{itemize}
 }
 
-\parag{Definition: Regular language}{
+\begin{parag}{Definition: Regular language}
     $A \subseteq \Sigma^*$ is named a \important{regular language} if there exists at least a DFA $M$ such that $A = L\left(M\right)$ (meaning that it is the language of some DFA).
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, the following language is a regular language, as we have already seen a DFA for it: 
         \[L = \left\{w \in \left\{0, 1\right\}^* \suchthat w \text{ contains an even number of 1's}\right\}\]
 
         Formally, we would need to prove the correctness of the DFA.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Complement}{
+\begin{parag}{Definition: Complement}
     The \important{complement} of some language $L$ is defined as: 
     \[\bar{L} = \left\{w \in \Sigma^* \suchthat w \not\in L\right\}\]
-}
+\end{parag}
 
-\parag{Theorem: Complement}{
+\begin{parag}{Theorem: Complement}
     Let $L$ be some regular language and $M = \left(Q, \Sigma, \delta, q_0, F\right)$ be a machine recognising it.
 
     Then, the complement of $L$, $\bar{L}$, is regular and is the language of the following machine: 
     \[M' = \left(Q, \Sigma, \delta, q_0, \bar{F} = Q \setminus F\right)\]
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We just swap the accepting state and the non-accepting state. This naturally means that strings that were accepted are no longer, and inversely.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Union}{
+\begin{parag}{Definition: Union}
     The \important{union} of two languages $L_1$ and $L_2$ is: 
     \[L_1 \cup L_2 = \left\{w \in \Sigma^* \suchthat w \in L_1 \text{ or } w \in L_2\right\}\]
-}
+\end{parag}
 
-\parag{Theorem: Union}{
+\begin{parag}{Theorem: Union}
     Let $L_1$ and $L_2$ be the languages of machines $M_1 = \left(Q_1, \Sigma, \delta_1, q_1, F_1\right)$ and $M_2 = \left(Q_2, \Sigma, \delta_2, q_2, F_2\right)$, respectively.
 
     Then, the union of $L_1$ and $L_2$, $L_1 \cup L_2$ is regular, and it is accepted by the machine $M = \left(Q, \Sigma, \delta, q_0, F\right)$, where: 
     \[Q = Q_1 \times Q_2, \mathspace \delta\left(\left(r_1, r_2\right), a\right) = \left(\delta_1\left(r_1, a\right), \delta_2\left(r_2, a\right)\right)\]
     \[q_0 = \left(q_1, q_2\right), \mathspace F = \left\{\left(r_1, r_2\right) \suchthat r_1 \in F_1 \text{ or } r_2 \in F_2\right\}\]
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         We are basically simulating the two machines at the same time, keeping track of the two states as a tuple. We then consider that we end up in an accepting state if either machine ended up in one.
-    }
+    \end{subparag}
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let us consider the following two machines:
         \imagehere[0.8]{DFAExample-UnionNotYetUnionised.png}
 
         Then, their union is:
         \imagehere[0.6]{DFAExample-Union.png}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Intersection}{
+\begin{parag}{Definition: Intersection}
     The \important{intersection} of two languages $L_1$ and $L_2$ is: 
     \[L_1 \cap L_2 = \left\{w \in \Sigma^* \suchthat w \in L_1 \text{ and } w \in L_2\right\}\]
-}
+\end{parag}
 
-\parag{Theorem: Intersection}{
+\begin{parag}{Theorem: Intersection}
     Let $L_1$ and $L_2$ be the languages of machines $M_1 = \left(Q_1, \Sigma, \delta_1, q_1, F_1\right)$ and $M_2 = \left(Q_2, \Sigma, \delta_2, q_2, F_2\right)$, respectively.
 
     Then, the intersection of $L_1$ and $L_2$, $L_1 \cap L_2$ is regular, and it is accepted by the machine $M = \left(Q, \Sigma, \delta, q_0, F\right)$, where: 
     \[Q = Q_1 \times Q_2, \mathspace \delta\left(\left(r_1, r_2\right), a\right) = \left(\delta_1\left(r_1, a\right), \delta_2\left(r_2, a\right)\right) \]
     \[q_0 = \left(q_1, q_2\right), \mathspace F = \left\{\left(r_1, r_2\right) \suchthat r_1 \in F_1 \text{ \textcolor{red}{and} } r_2 \in F_2\right\}\]
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         This is the \textit{exact} same construction as for intersection, except that we consider the accepting states to be the ones where both DFA ended up in one.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Concatenation}{
+\begin{parag}{Definition: Concatenation}
     The \important{concatenation} of two languages $L_1$ and $L_2$ is: 
     \[L_1 \circ L_2 = \left\{w \in\Sigma^* \suchthat w = w_1 . w_2, w_1 \in L_1 \text{ and } w_2 \in L_2\right\}\]
-}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     It is very hard to know if concatenating two regular languages always yield a regular language. The main problem is that we do not know when to switch from the first machine to the second one: a string can be obtained through concatenation in many ways ($101 = 1 \circ 01 = 10 \circ 1 = 101 \circ \epsilon$).
 
     We will see that the concatenation of two languages is indeed regular but, for this, we need to do some non-determinisim.
-}
+\end{parag}
 
 \subsection{Non-deterministic finite automaton}
-\parag{Definition: Power set}{
+\begin{parag}{Definition: Power set}
     Let $Q$ be some set. We note $2^Q$ the power set of $Q$, meaning the set of all the subsets of $Q$.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, let us consider $Q = \left\{q_1, q_2\right\}$. Then: 
         \[2^Q = \left\{\o, \left\{q_1\right\}, \left\{q_2\right\}, \left\{q_1, q_2\right\}\right\}\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: NFA}{
+\begin{parag}{Definition: NFA}
     A \important{non-deterministic finite automaton} (NFA) $M$ is a 5-tuple $\left(Q, \Sigma, \delta, q_0, F\right)$, where:
     \begin{itemize}
         \item $Q$ is a finite set called the states.
@@ -126,16 +126,16 @@
 
     A NFA has multiple ways to compute the final state for some string. It accepts the word if there exists a set of choices, that make the word to be accepted. In other words, if we run a parallel computer that follows all possibilities in parallel, we consider the word to be accepted if any of them are in an accepting state at the end.
     
-    \subparag{Comparison with DFA}{
+    \begin{subparag}{Comparison with DFA}
         A NFA has two main difference to DFA. 
 
         First, it has the ability to transition to more than one state on a given symbol, or no symbol at all: the codomain of $\delta$ allows any subset of $Q$, meaning that it could map to $\o$ or $\left\{q_1, q_2\right\}$. Note that if at any point we reach a state where we cannot transition out (because $\delta\left(\sigma, q_i\right) = \o$), then the path ends and does not continue further. This path is not considered accepted even though it died on an accepting state.
 
         Second, it has the possibility to take a step in-between reading symbols, thanks to $\epsilon$ transition. In other words, if $\delta\left(\epsilon, q_i\right) = \left\{q_j\right\}$, then the machine can decide to transition form $q_i$ to $q_j$ even without reading any character.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let's consider the state diagram of the following NFA:
     \imagehere[0.6]{NFA-BasicExample.png}
 
@@ -150,16 +150,16 @@
 
     Since, in this example, we have some threads which end up in an accepting state at the end of the string, then it is accepted.
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         Note that, to show an input is accepted, we don't need to draw the whole tree, only the branch going to an accepting state. This is named guess and verify.
-    }
+    \end{subparag}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         In fact, we can convince ourselves that this NFA recognises the following language: 
         \[L = \left\{w \in \left\{0, 1\right\}^* \suchthat w \text{ contains 11 or 101 as a substring}\right\}\]
-    }
+    \end{subparag}
 
-    \subparag{Formal definition}{
+    \begin{subparag}{Formal definition}
         The formal definition of our machine is $M = \left(Q, \Sigma, \delta, q_1, F\right)$, where: 
         \[Q = \left\{q_1, q_2, q_3, q_4\right\}, \mathspace \Sigma = \left\{0, 1\right\}, \mathspace F = \left\{q_4\right\}\]
         
@@ -176,11 +176,11 @@
         \end{center}
 
         Just as for DFA, this formal definition and the state diagram above are completely equivalent.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let's consider the following NFA:
     \imagehere[0.6]{NFA-Example2.png}
 
@@ -188,9 +188,9 @@
 
     We can convince ourselves that it recognises the following language: 
     \[L = \left\{w \in \left\{0, 1\right\}^* \suchthat w \text{ contains a 1 in the third position from the end}\right\}\]
-}
+\end{parag}
 
-\parag{Example 3}{
+\begin{parag}{Example 3}
     Let us now consider an NFA over a unary language:
     \imagehere[0.5]{NFA-example3.png}
 
@@ -198,16 +198,16 @@
 
     This machine is the union of two regular languages: $w \in \left\{0\right\}^*$ has a length which is a multiple of 2, and $w \in \left\{0\right\}^*$ has a length which is a multiple of 3. This construction is more efficient in size, and it gives: 
     \[L = \left\{w \in \left\{0\right\}^* \suchthat w \text{ has a length which is multiple of 2 or 3}\right\}\]
-}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     An NFA may be much smaller than its deterministic counterpart, or its functioning may be easier to understand. In fact, they seem really more powerful than DFA, but this is a wrong intuition as we will see with the following theorem, for which we will need some lemma beforehand.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Every non-deterministic finite automaton has an equivalent deterministic finite automaton.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We will only prove the case without $\epsilon$-transitions since it slightly complicates the initial states. However, the proof with them is very similar, and we will show in the second series of exercises that any NFA with $\epsilon$-transitions can be translated to any NFA without such transitions.
 
         Let $N = \left(Q_N, \Sigma, \delta_N, q_0, F_n\right)$ be an arbitrary NFA. We want to construct a DFA $M$ such that: 
@@ -231,9 +231,9 @@
         In other words, since we indeed had all the possible states of $N$ for $x$, then we still have all the possible states of $N$ after $x.a$, as required.
 
         \qed
-    }
+    \end{subparag}
   
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let's consider this construction for the following NFA:
         \imagehere[0.7]{NFAToDFA-OriginalNFA.png}
 
@@ -243,28 +243,28 @@
         For instance, if we are in any of the state $p$ or $q$ and we read a 1, we can go to any of $p$, $q$ and $r$. This indeed means that $\delta\left(\left\{p, q\right\}, 1\right) = \left\{p, q, r\right\}$.
 
         We can see that the this DFA can never reach some of its states, such as $\o$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Corollary}{
+\begin{parag}{Corollary}
     A language is regular if and only if some NFA recognises it.
-}
+\end{parag}
 
 
-\parag{Theorem: Concatenation}{
+\begin{parag}{Theorem: Concatenation}
     Let $L_1$ and $L_2$ be regular languages.
 
     Then, the concatenation of $L_1$ and $L_2$, $L_1 \circ L_2 = L$, is regular.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Concatenation is very easy with non-determinism. Indeed, we just need to link the accepting states of the first machine to the initial state of the second machine using $\epsilon$-transition. In other words, we allow to switch to the second machine as soon as we recognise a word, but also to stay on the first one.
         \imagehere{NFAConcatenation.png}
 
         However, by the corollary above, since we have a NFA which language is the concatenation of $L_1$ and $L_2$ is indeed regular.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 \end{document}

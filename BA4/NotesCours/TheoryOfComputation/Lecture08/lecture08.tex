@@ -25,106 +25,106 @@
 
 }
 
-\parag{Proposition: SAT}{
+\begin{parag}{Proposition: SAT}
     SAT is in NP.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We construct a verifier for SAT: given some input $\left\langle \phi, C \right\rangle$, we interpret $C$ as a truth assignment to the variables of $\phi$, and check if our sentence indeed reduces to true. We can thus indeed write our language as: 
         \[\text{SAT} = \left\{\left\langle \phi \right\rangle \suchthat \exists C \text{ such that the above verifier accepts $\left\langle \phi, C \right\rangle$}\right\}\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Proposition: GI}{
+\begin{parag}{Proposition: GI}
     GI is in NP.
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We construct a verifier for GI: given some input $\left\langle G_1, G_2, C \right\rangle$, we interpret $C$ as function $V\left(G_1\right) \mapsto V\left(G_2\right)$ and check that it is both a bijection and preserves adjacency. This is a poly-time verifier, indeed showing this is in NP.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Proposition: INDSET}{
+\begin{parag}{Proposition: INDSET}
     INDSET is in NP.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We construct a verifier for the language INDSET: on input $\left\langle G, k, C \right\rangle$, we interpret $C$ as a subset $C \subseteq V\left(G\right)$, check that $\left|C\right| = k$ and check that, for all $u, v \in C$, we have $\left\{u, v\right\} \not \in E\left(G\right)$.
 
         Since this verifier runs in polynomial time, we have indeed shown INDSET is in NP.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Non-deterministic Turing Machines}{
+\begin{parag}{Definition: Non-deterministic Turing Machines}
     In a regular Turing machine, the transition function is $\delta : Q \times \Gamma \mapsto Q \times \Gamma \times \left\{L, R\right\}$. In a Nondeterministic Turing Machine (NTM), we instead let it to be: 
     \[\delta: Q \times \Gamma \mapsto \mathcal{P}\left(Q \times \Gamma \times \left\{L, R\right\}\right)\]
     
     We thus allow several transitions for any given state and tape symbol, just as for NFAs.
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         Those are not really computable efficiently, we would require an exponential amount of parallel threads.
-    }
+    \end{subparag}
 
-    \subparag{Multithreading}{
+    \begin{subparag}{Multithreading}
         Note that NTMs are weaker than multithreaded computers: threads cannot communicate between each other. This is more some kind of ``quantum parallel worlds''.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Nondeterministic decider}{
+\begin{parag}{Definition: Nondeterministic decider}
     A \important{nondeterministic decider} for language $L$ is an NTM $N$ such that for each $x \in \Sigma^*$, every computation of $N$ on $x$ halts. Moreover, if $x \in L$, then some threads of $N$ on $x$ accepts and, if $x \not \in L$, then every computation of $N$ on $x$ rejects.
-}
+\end{parag}
 
-\parag{Definition: Polynomial time NTM}{
+\begin{parag}{Definition: Polynomial time NTM}
     An NTM is a \important{polynomial time NTM} if the running time of its longest computation on $x$.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $L \subseteq \Sigma^*$ be an arbitrary language.
 
     $L$ has a nondeterministic poly-time decider if and only if $L$ has a poly-time verifier.
 
-    \subparag{Proof $\implies$}{
+    \begin{subparag}{Proof $\implies$}
         We know by hypothesis that there exists some nondeterministic polynomial-time decider $N$ for $L$
 
         We construct a verifier $V$ for $L$. It interprets the certificate as a set of choices for which thread to choose. In other words, on input $\left\langle x, C \right\rangle$, it simulates $N\left(x\right)$ with nondeterministic choices given by $C$. We know that there exists a path in our decision tree which has a polynomial length by definition of polynomial time NTM. Thus, we know this path can be encoded by a certificate with polynomial length.
-    }
+    \end{subparag}
     
-    \subparag{Proof $\impliedby$}{
+    \begin{subparag}{Proof $\impliedby$}
         We know by hypothesis that there exists a verifier $V$ for $L$.
 
         We construct a nondeterministic poly-timer decider. Using non-determinism, we can try all certificates in parallel. In other words, at each step, we split into three threads: one which appends a 0 to the current certificate, one that appends a 1, and one that uses the current certificate (which runs $V$ on $\left\langle x, C \right\rangle$). If there exists a certificate which works, we will find it in polynomial time. This gives us an algorithm which runs in polynomial time for each thread, which is thus a polynomial-time NTM.
         
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: NTIME complexity class}{
+\begin{parag}{Definition: NTIME complexity class}
     We define the NTIME complexity class as: 
     \[\text{NTIME}\left(t\left(n\right)\right) = \left\{L \suchthat L \text{ has a nondeterministic $O\left(t\left(n\right)\right)$ time decider}\right\}\]
-}
+\end{parag}
 
 
-\parag{Equivalent definition: NP Class}{
+\begin{parag}{Equivalent definition: NP Class}
     \important{NP} can be equivalently defined as: 
     \[\text{NP} = \bigcup_{k=1}^{\infty} \text{NTIME}\left(n^k\right)\]
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This explains why NP is called nondeterministic P: a language in NP has a nondeterministic polynomial-time decider.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 \subsection{Polynomial-time reductions}
-\parag{Definition: Poly-time computable function}{
+\begin{parag}{Definition: Poly-time computable function}
     A function $f: \Sigma^* \mapsto \Sigma^*$ is a \important{poly-time computable function} if there exists some poly-time TM $M$ such that, on every input $w$, it halts with just $f\left(w\right)$ on its tape.
-}
+\end{parag}
 
-\parag{Definition: Poly-time reduction}{
+\begin{parag}{Definition: Poly-time reduction}
     A language $A$ is \important{poly-time mapping reducible} to language $B$, written $A \leq_P B$, if there exists a poly-time computable function $f: \Sigma^* \mapsto \Sigma^*$ such that, for every $w \in \Sigma^*$: 
     \[w \in A \iff f\left(w\right) \in B\]
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     If $A \leq_P B$ and $B$ is in P, then $A$ is in P.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We assume by hypothesis that $M$ is an $O\left(n^p\right)$-time decider for $B$, and $f$ is an $O\left(n^q\right)$-time reduction from $A$ to $B$.
 
         We can then construct a TM $N$ as:
@@ -135,57 +135,57 @@
         We have indeed construct a poly-time TM for our problem $A$, showing it is in P.
 
         \qed
-    }
+    \end{subparag}
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         This is another instance of the intuition behind reductions: if $A$ reduces to $B$ and $B$ is easy, then $A$ is easy.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Corollary}{
+\begin{parag}{Corollary}
     If $A \leq_P B$ and $A$ is not in P, then $B$ is not in P.
-}
+\end{parag}
 
-\parag{Theorem: Tranistivity}{
+\begin{parag}{Theorem: Tranistivity}
     If $A \leq_P B$ and $B \leq_P C$, then $A \leq_P C$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         The proof is completely analogous to the one we have just done: we can show that running $f_{AB}$ and then $f_{BC}$ runs in $O\left(\left|w\right|^{pq}\right)$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: NP-hardness}{
+\begin{parag}{Definition: NP-hardness}
     A language $L$ is said to be \important{NP-hard} if every language $L'$ in NP is such that: 
     \[L' \leq_P L\]
-}
+\end{parag}
 
 
-\parag{Definition: NP-completeness}{
+\begin{parag}{Definition: NP-completeness}
     A language $L$ is said to be \important{NP-complete} if $L$ is in NP and $L$ is NP-hard.
     
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         If any of the NP-complete language has a polynomial time decider, then every language in NP have a polynomial time decider and thus $P = NP$. Thus, NP-complete problems are the hardest NP problems. In other words, if we show that a problem is NP-complete, we showed that, even if we are not able to find an efficient algorithm, neither 40 years of research could.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Cook-Levin Theorem}{
+\begin{parag}{Cook-Levin Theorem}
     SAT is NP-complete.
-}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     In practice, from now on, to show that a language is NP-complete we will always follow the same recipe. 
 
     We first need to show that $L$ belongs to NP, and thus we need to give a poly-time verifier for $L$. Then, for NP-hardness, we only need to show $H \leq_P L$ for some NP-complete language $H$. Indeed, since we know that $\forall L' \in NP$ we have $L' \leq _P H$ and we show $H \leq_P L$, we indeed get that $L' \leq_P L$.
-}
+\end{parag}
 
-\parag{Proposition: INDSET}{
+\begin{parag}{Proposition: INDSET}
     We can make the following reduction: 
     \[\text{SAT} \leq_P \text{INDSET}\]
     
     Since INDSET is in NP, this implies that INDSET is NP-complete.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We are given as input a CNF formula $\phi$, and we want to turn it into a graph for INDSET in polynomial time.
 
         The idea is to construct a vertex per literal per clause, grouping the literals within a clause. We then link with an edge every vertex within a group (in brown) and every conflicting literals (so $x$ and $\bar{x}$; in blue). For instance, we could have:
@@ -199,11 +199,11 @@
         Let's suppose that $f\left(\phi\right) \in \text{INDSET}$, meaning that there exists an independent set $C$ in $G$ of size $\left|C\right| = m$. Again, by construction, $C$ contains a vertex from each group. We can thus set the corresponding literal to true, obtaining a satisfiable assignment for $\phi$. Indeed, this allows to have one literal set to true by group, and no contradiction (it is impossible to need $x_i = \bar{x}_i = T$, since there would be a blue edge between our elements and thus it would not be an independent set to start with). We have also shown that $f\left(\phi\right) \in \text{INDSET} \implies \phi \in \text{SAT}$, finishing our proof.
 
         \qed
-    }
+    \end{subparag}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This proof is really beautiful: we managed to make a link between independent sets and satisfiable CNF formulas.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \end{document}

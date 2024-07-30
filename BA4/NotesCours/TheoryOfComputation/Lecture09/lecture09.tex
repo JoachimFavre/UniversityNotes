@@ -24,22 +24,22 @@
 
 }
 
-\parag{Definition: $k$SAT}{
+\begin{parag}{Definition: $k$SAT}
     We define $k$SAT as: 
     \[\text{$k$SAT} = \left\{\left\langle \phi \right\rangle \suchthat \phi \text{ is satisfiable and each clause of $\phi$ contains at most $k$ literals}\right\}\]
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We notice that $k$SAT is in NP for any $k$, since we can use the exact same verifier as for SAT.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem: $k$SAT}{
+\begin{parag}{Theorem: $k$SAT}
     Let $k \geq 3$. We can make the following reduction: 
     \[\text{SAT} \leq_P \text{$k$SAT}\]
 
     Since $k$SAT is in NP for all $k$, it is NP-complete for $k \geq 3$.
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We do the proof for $k = 3$, a general $k \geq 3$ is completely analogous. We have some input $\phi$, and we want to turn it into some input for 3SAT. 
 
         Thus, let us say that $\phi$ has a clause with too many variables, for instance: 
@@ -53,9 +53,9 @@
         We can do this iteratively, until all our clauses have at most 3 literals. Each clause needs to be iterated over at most a linear number of times, meaning that our reduction can indeed be done in polynomial time. Satisfiability is preserved throughout the transformation, finishing our reduction.
 
         \qed
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This proof cannot be done for $k = 2$. Indeed, let's say that we have: 
         \[K = \left(x_1 \lor x_2 \lor x_3\right)\]
         
@@ -63,45 +63,45 @@
         \[K_1 = \left(x_1 \lor z_1\right), \mathspace K_2 = \left(\bar{z}_1 \lor x_2 \lor x_3\right)\] 
         
         We have not reduced the number of literals in $K_2$, so our proof cannot be applied. In fact, 2SAT is in P (this proof is non-trivial), and we don't expect an NP-complete problem to reduce to a P problem (since it would imply $\text{P} = \text{NP}$).
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: $k$-clique}{
+\begin{parag}{Definition: $k$-clique}
     Let $G$ be a graph. A $k$-clique is a subset of $k$ vertices which are all pairwise connected.
-}
+\end{parag}
 
-\parag{Definition: CLIQUE}{
+\begin{parag}{Definition: CLIQUE}
     We define the language CLIQUE as: 
     \[\text{CLIQUE} = \left\{\left\langle G, k \right\rangle \suchthat \text{$G$ has a clique of size $k$}\right\}\]
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, let us consider the following graph: 
         \svghere[0.5]{CliqueExample.svg}
         
         Then, $\left\langle G, 3 \right\rangle \in \text{CLIQUE}$ (a $3$-clique is highlighted in red) but $\left\langle G, 4 \right\rangle \not \in \text{CLIQUE}$.
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We can easily show that CLIQUE is in NP: we consider the certificate as a subset of vertices, and we verify that it is indeed a clique (which only requires $\Theta\left(k^2\right)$ operations).
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Definition: Complement of graph}{
+\begin{parag}{Definition: Complement of graph}
     Let $G$ be a graph. The complement of $G$ is:
     \[\bar{G} = \left(V, \bar{E}\right)\]
     where $\bar{E}$ is the complement of $E$, meaning:
     \[\left(u, v\right) \in E \iff \left(u, v\right) \not \in \bar{E}\]
-}
+\end{parag}
 
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     We can make the following reduction: 
     \[\text{INDSET} \leq_P \text{CLIQUE}\]
     
     Since CLIQUE is in NP, it means that CLIQUE is NP-complete.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We notice that a clique is the some kind of opposite to an independent set: all vertices are pairwise adjacent, instead of pairwise non-adjacent. Thus, let us consider the complement of $G$. We notice that, if we have some graph $G = \left(V, E\right)$, then a subset $S \subseteq V$ is an independent set of $G$ if and only if $S$ is a clique of $\bar{G}$.
 
         Thus, we can take the following reduction: 
@@ -110,90 +110,90 @@
         By our observation, this indeed has the reduction property, finishing our proof.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Recall: Vertex incidence}{
+\begin{parag}{Recall: Vertex incidence}
     Let $G = \left(V, E\right)$ be a graph. An edge $\left(u_1, u_2\right) \in E$ is incident to a vertex $v \in V$ if the vertex is an endpoint of the edge, meaning that:
     \[v = u_1 \mathspace \text{or} \mathspace v = u_2\]
-}
+\end{parag}
 
 
-\parag{Definition: Vertex cover}{
+\begin{parag}{Definition: Vertex cover}
     Let $G = \left(V, E\right)$ be a graph. A \important{vertex cover} is a subset $S \subseteq V$ such that every edge of $G$ is incident to at least one vertex in $S$.
-}
+\end{parag}
 
-\parag{Definition: VERTEX COVER language}{
+\begin{parag}{Definition: VERTEX COVER language}
     We define the following language: 
     \[\text{VERTEX COVER} = \left\{\left\langle G, k \right\rangle \suchthat \text{$G$ is a graph that has a vertex cover of size $k$}\right\}\]
     
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let us consider the following graph:
         \svghere[0.5]{VertexCoverExample.svg}
 
         We notice that we have $\left\langle G, 4 \right\rangle \in \text{VERTEX COVER}$, the highlighted vertices are an example. However, $\left\langle G, 3 \right\rangle \not \in \text{VERTEX COVER}$. Indeed, we notice that a vertex has at most 3 incident edges in this graph. Thus, taking only 3 vertices gives at most 9 covered edges, but the graph has a total of 11 edges, so this is a contradiction.
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We can notice rather trivially that this language is in NP: we can just consider the certificate as $S$, and see if this is indeed a vertex cover.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Lemma}{
+\begin{parag}{Lemma}
     Let $G$ be a graph.
 
     $S \subseteq V$ is a vertex cover if and only if $\bar{S} = V \setminus S$ is an independent set.
 
     \imagehere[0.5]{IndependentSetVertexCoverTheorem.png}
 
-    \subparag{Proof $\implies$}{
+    \begin{subparag}{Proof $\implies$}
         We do this proof by the contrapositive.
 
         If $\bar{S}$ is not an independent set, it means that there is an edge linking two of its vertices. However, this edge is not covered by a vertex of $S$ and thus $S$ is not a vertex cover.
-    }
+    \end{subparag}
     
-    \subparag{Proof $\impliedby$}{
+    \begin{subparag}{Proof $\impliedby$}
         If $S$ is an independent set, it means that none of its vertices are linked by an edge, and thus $\bar{S}$ is sufficient to cover all the edges.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Corollary}{
+\begin{parag}{Corollary}
     Let $G$ be a graph, and $k \in \mathbb{N}$.
 
     $G$ has an independent set of size $k$ if and only if $G$ has a vertex cover of size $n-k$.
-}
+\end{parag}
 
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     We have the following reduction: 
     \[\text{INDSET} \leq_p \text{VERTEX COVER}\]
     
     Since VERTEX COVER is in NP, it implies that it is NP-complete.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We can pick the following reduction: 
         \[f\left(\left\langle G, k \right\rangle\right) = \left\langle G, n-k \right\rangle\]
         
         This reduction is indeed computable in polynomial time, and works thanks to our corollary.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Set cover}{
+\begin{parag}{Definition: Set cover}
     Let $U = \left\{1, \ldots, n\right\}$ and $\mathcal{F} = \left\{T_1, \ldots, T_m\right\}$ be a family of subsets (meaning that $T_i \subseteq U$ for all $i$). 
 
     A subset $\left\langle T_{i_1}, \ldots, T_{i_k} \right\rangle \subseteq \mathcal{F}$ is called a \important{set cover} of size $k$ if: 
     \[\bigcup_{j=1}^{k} T_{i_j} = U\]
-}
+\end{parag}
 
-\parag{Definition: SET COVER language}{
+\begin{parag}{Definition: SET COVER language}
     We define the following language:
     \[\text{SET COVER} = \left\{\left\langle U, \mathcal{F}, k \right\rangle \suchthat \text{$\mathcal{F}$ contains a set cover of $U$ of size $k$}\right\}\]
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let us consider the following $U$ and $\mathcal{F}$:
         \imagehere[0.6]{SetCoverExample.png}
 
@@ -201,20 +201,20 @@
         \[\left\{\left\{1,2,4\right\}, \left\{3,6,5\right\}, \left\{4,7,8,9\right\}\right\}\]
 
         However, $\left\langle U, \mathcal{F}, 2 \right\rangle \not \in \text{SET COVER}$.  Indeed, we need a $T_i$ containing 2, one containing 6 and one containing 9 (since they are each in an different set). We thus need at least 3 sets.
-    }
+    \end{subparag}
 
-    \subparag{NP}{
+    \begin{subparag}{NP}
         We notice that this language is in NP: it is easy to verify that a given partition indeed works.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     We can make the following reduction: 
     \[\text{VERTEX COVER} \leq_P \text{SET COVER}\]
     
     Since SET COVER is in NP, it implies that SET COVER is NP-complete.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We notice that VERTEX COVER is a special case of SET COVER.
 
         The idea is to take $U = E$: we consider the edges as the element of our set, since we want to cover them. Then, to construct $\mathcal{F}$, we construct sets $S_v$, which contain the set of edges which are incident to the vertex $v \in V$. Then, we can just take: 
@@ -226,7 +226,7 @@
         We notice that making a set cover is equivalent to making a vertex cover: each element of $\mathcal{F}$ represents a vertex, and thus making a set cover means that we found a set of vertices which covers the graph, and inversely. This reduction is also clearly computable in polynomial time.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \end{document}

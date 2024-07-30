@@ -25,28 +25,28 @@
 \section{Turing machines}
 \subsection{Formal definition}
 
-\parag{Introduction}{
+\begin{parag}{Introduction}
     So far, it feels like we miss memory: we would need some kind of memory depending on the size of the input (while keeping a fixed-size program). This is where Turing machines come in.
 
     The idea is that we have a tape on which we can write and read things. Thus, we have like a finite automaton where we can also take into account what is written on the tape. We still have a finite number of states (the program is finite), but the tape is infinite (allowing for different inputs to use different size of memory).
-}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     We only need a single tape since we can reserve some part of the memory for the input and the output.
     \imagehere[0.5]{TuringMachineTape.png}
 
     It is possible to show that having multiple tapes or a single one is completely equivalent.
-}
+\end{parag}
 
-\parag{Capabilities}{
+\begin{parag}{Capabilities}
     Even though the tape is infinite, the Turing Machine can only see a specific symbol, where its current head is.
 
     At any given step, it acts depending on what is written on the tape under the head and the current state. Just as for DFA, it goes to some state. However, moreover, it can move the tape right or left, and write any symbol on it (including a new symbol, $\sqcup$, representing an empty cell).
 
     As soon as it reaches the accept or reject state, the machine stops immediately, unlike DFA. Because of that we can have a single accept and reject states (one of each), since it would not be useful to have more. Moreover, this means that it may never halt: it may never reach an accept or reject state.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider the following diagram:
     \imagehere[0.7]{Palindromes.png}
 
@@ -54,12 +54,12 @@
 
     We can in fact convince ourselves that this Turing machine accepts even length binary palindromes.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This is a very inefficient algorithm to find palindromes. However, in this part of the course, we do not care about running time.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Turing Machine}{
+\begin{parag}{Definition: Turing Machine}
     A \important{Turing Machine} is a 7-tuple $\left(Q, \Sigma, \Gamma, \delta, q_o, q_{accept}, q_{reject}\right)$ (with $\Gamma$ and $q_{reject}$ being the new elements with respect to DFA), where:
     \begin{enumerate}
         \item $Q$ is the set of states.
@@ -70,9 +70,9 @@
         \item $q_{accept} \in Q$ is the accept state.
         \item $q_{reject} \in Q$ is the reject state, where $q_{reject} \neq q_{accept}$.
     \end{enumerate}
-}
+\end{parag}
 
-\parag{Definition: TM configuration}{
+\begin{parag}{Definition: TM configuration}
     Let's consider the Turing Machine $\left(Q, \Sigma, \Gamma, \delta, q_0, q_{accept}, q_{reject}\right)$. We still need to define how it computes.
 
     We write $uqv$ where $u,v \in \Gamma^*$ and $q \in Q$ for the configuration where:
@@ -90,13 +90,13 @@
 
     Naturally, the program may not terminate. We can even show that some loops may happen even though no configurations are repeated (for instance if the machine writes a 1 to the current cell and moves to the right).
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, a Turing Machine with configuration $1011q_7 01111$ would look like: 
         \imagehere[0.8]{TuringMachineConfigurationRepresentation.png}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     We want to make a Turing Machine which recognises the following language: 
     \[L = \left\{w \suchthat w \text{ has an equal number of 0s and 1s}\right\}\]
 
@@ -108,31 +108,31 @@
     \imagehere[0.7]{EqualNumberOf0sAnd1s.png}
 
     Note that we are doing something slightly more intelligent here: when we are at the left of the string and scan for the first non-$X$ character, we also replace all $X$ characters by $\sqcup$, in order to simplify the detection when we finished considering the whole word.
-}
+\end{parag}
 
 \subsection{Decidable and undecidable languages}
 
-\parag{Definition: Turing-Recognisable}{
+\begin{parag}{Definition: Turing-Recognisable}
     A language $L$ is \important{Turing-Recognisable} (or Recognisable) if there exists a Turing Machine $M$ which recognises $L$.
 
     In other words, all $w \in L$ must be accepted by $M$ and all $w \not \in L$ do not make $M$ stop or $M$ rejects $w$.
-}
+\end{parag}
 
-\parag{Definition: Turing-Decidable}{
+\begin{parag}{Definition: Turing-Decidable}
     A language $L$ is \important{Turing-Decidable} (or Decidable) if there exists a Turing Machine $M$ which decides $L$.
 
     In other words, all $w \in L$ must be accepted by $M$ and all $w \not \in L$ must be rejected by $M$.
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         This second definition is stronger: if a machine decides a language, then it recognises it. However, the converse may not be true. The machine may not stop on some words $w \not\in L$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Church-Turing thesis}{
+\begin{parag}{Church-Turing thesis}
     In 1936, two scientists gave different definitions for the concept of algorithms. Church defined it using $\lambda$-calculus, in an intuitive way. Turing defined it using his machines.
 
     However, we can show that the two definitions are equivalent. This means that anything we can write in programming languages (such as C, Java, and so on) or with quantum computers can also be executed on Turing Machines; and conversely. Thus, when we want to show that a language is decidable or recognisable, we do not necessarily need to make a formal Turing Machine, a program is sufficient.
-}
+\end{parag}
 
 
 \end{document}
