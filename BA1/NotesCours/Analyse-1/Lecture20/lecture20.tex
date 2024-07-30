@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2021-12-01 at 10:17:21.
@@ -22,13 +24,13 @@
 }
 
 \subsection{Développements limités}
-\parag{Théorème (formule de Taylor)}{
+\begin{parag}{Théorème (formule de Taylor)}
     Soit $f : I \mapsto F$ une fonction $\left(n + 1\right)$ fois dérivables sur $I$, avec $a \in I$. Alors, $\forall x \in I$, il existe $u$ entre $a$ et $x$ (on n'utilise pas de notation avec des intervalles puisqu'on sait pas si $a$ est à gauche ou à droite) tel que:
     \[f\left(x\right) = \underbrace{f\left(a\right) + f'\left(a\right)\left(x-a\right) + \frac{f''\left(a\right)}{2} \left(x-a\right)^2 + \ldots + \frac{f^{\left(n\right)}\left(a\right)}{n!} \left(x - a\right)^{n}}_{P_n\left(f\right) \text{: Polynôme de Taylor}} + \underbrace{\frac{f^{\left(n+1\right)}\left(u\right)}{\left(n + 1\right)!} \left(x - a\right)^{n+1}}_{R_n\left(f\right) \text{: Reste}}\]
 
     Le tout est la formule de Taylor.
 
-    \subparag{Idée de preuve}{
+    \begin{subparag}{Idée de preuve}
         Soit $f$ dérivable sur $I$. Par le TAF, $\forall x, a \in A$, il existe $u$ entre $x$ et $a$ tel que:
         \begin{multiequation}
         & f'\left(u\right) = \frac{f\left(x\right) - f\left(a\right)}{x - a} \\
@@ -37,23 +39,23 @@
         \end{multiequation}
 
         Qui est la formule de Taylor d'ordre 0.
-    }
+    \end{subparag}
 
-    \subparag{Terminologie}{
+    \begin{subparag}{Terminologie}
         La formule de Taylor s'appelle la formule de Maclaurin si $a = 0$.
-    }
+    \end{subparag}
 
-    \subparag{Note personnelle}{
+    \begin{subparag}{Note personnelle}
         Comme d'habitude, il y a une très bonne vidéo de 3Blue1Brown sur le sujet:
         \begin{center}
             \url{https://www.youtube.com/watch?v=3d6DsjIBzJ4}
         \end{center}
 
         L'idée principale est que, si nous connaissons très bien une fonction à un point (c'est-à-dire qu'on connait sa valeur, la valeur de sa dérivée, etc.), alors on peut approximer l'alentour de ce point avec un polynôme. On étudiera les rayons de convergence plus tard, mais certaines fonctions, comme $e^x$, $\sin\left(x\right)$, $\cos\left(x\right)$ et les polynômes sont égaux à leur série de Taylor (qu'on définiera aussi plus tard, mais qui est similaire aux polynômes de Taylor) pour tout $x$ sur leur domaine.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Exemple 1}{
+\begin{parag}{Exemple 1}
     Prenons la fonction $f\left(x\right) = \sin\left(x\right)$, qui est indéfiniment dérivable sur $\mathbb{R}$. Calculons sa formule de Taylor en $a = 0$:
     \[f'\left(x\right) = \cos\left(x\right), \mathspace f''\left(x\right) = -\sin\left(x\right), \mathspace f^{\left(3\right)}\left(x\right) = -\cos\left(x\right), \mathspace f^{\left(4\right)}\left(x\right) = \sin\left(x\right), \mathspace \ldots\]
     \[f'\left(0\right) = 1, \mathspace f''\left(0\right) = 0, \mathspace f^{\left(3\right)}\left(0\right) = -1, \mathspace f^{\left(4\right)}\left(0\right) = 0, \mathspace \ldots\]
@@ -63,14 +65,14 @@
 
     On peut l'écrire sous la forme de la série suivante:
     \[\sum_{k=0}^{n} \frac{\left(-1\right)^{k} x^{2k+1}}{\left(2k + 1\right)!} + R_{2n + 1}\left(x\right)\]
-}
+\end{parag}
 
-\parag{Exemple 2}{
+\begin{parag}{Exemple 2}
     Calculons la formule de Taylor de $f\left(x\right) = \cos\left(x\right)$ autour de $a = 0$:
     \[\cos\left(x\right) = 1 - \frac{x^2}{2!} + \frac{x^{4}}{4!} - + \ldots \frac{\left(-1\right)^{n} x^{2n}}{\left(2n\right)!} + R_{2n}\left(x\right) = \sum_{k=0}^{n} \frac{\left(-1\right)^{k} x^{2k}}{\left(2k\right)!} + R_{2n}\left(x\right)\]
-}
+\end{parag}
 
-\parag{Définition (développement limité)}{
+\begin{parag}{Définition (développement limité)}
     Soit $f : E\mapsto F$ une fonction définie au voisinage de $x = a$.
 
     S'il existe des nombres $a_0, \ldots, a_n$ et une fonction $\epsilon\left(x\right)$, tels que $\forall x \in E, x \neq a$, on a:
@@ -78,12 +80,12 @@
     on dit que $f$ admet un \important{développement limité (DL)} d'ordre $n$ autour de $x = a$.
 
     On appelle les $n$ premiers termes (donc la partie sous forme de polynôme) \important{la partie principale du développement limité}, $P_n\left(x\right)$. On appelle le $n+1$-ème terme \important{le reste du DL}, $R_n\left(x\right) = \left(x-a\right)^{n} \epsilon\left(x\right)$.
-}
+\end{parag}
 
-\parag{Proposition (unicité)}{
+\begin{parag}{Proposition (unicité)}
     Si $f : E \mapsto F$ admet un développement limité d'ordre $n$ autour de $x = a$, alors celui-ci est unique.
 
-    \subparag{Preuve}{
+    \begin{subparag}{Preuve}
         Supposons par l'absurde que ce développement n'est pas unique:
         \[f\left(x\right) = a_0 + a_1\left(x - a\right)^2 + a_2\left(x - a\right)^2 + \ldots + a_n\left(x - a\right)^n + \left(x - a\right)^{n} \epsilon_1\left(x\right)\]
         \[f\left(x\right) = b_0 + b_1\left(x - a\right)^2 + b_2\left(x - a\right)^2 + \ldots + b_n\left(x - a\right)^n + \left(x - a\right)^{n} \epsilon_2\left(x\right)\]
@@ -101,13 +103,13 @@
         Or, on remarque que tous les termes de l'expression sur les deux dernières lignes tendent vers 0 quand $x \to a$. Ainsi, pour que les deux résultats soient égaux, il faut nécessairement que $a_k - b_k = 0$, et donc que $a_k = b_k$, ce qui est une contradiction.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Corollaire}{
+\begin{parag}{Corollaire}
     Soit $a \in I$, $f : I \mapsto \mathbb{R}$ une fonction $\left(n+1\right)$ continûment dérivable sur $I$. Alors, la formule de Taylor nous fournit le DL d'ordre $n$ de la fonction $f$ autour de $x = a$.
 
-    \subparag{Preuve}{
+    \begin{subparag}{Preuve}
         On doit démontrer que le reste de Taylor, $R_n\left(x\right) = f^{\left(n+1\right)}\left(u\right) \frac{\left(x-a\right)^{n+1}}{\left(n+1\right)!}$ fonctionne comme reste du développement limité. En d'autres mots, il faut vérifier que:
         \[\lim_{x \to a} \epsilon\left(x\right) = \lim_{x \to a} \frac{R_n\left(x\right)}{\left(x - a\right)^n}= \lim_{x \to a} f^{\left(n+1\right)}\left(u\right) \frac{x - a}{\left(n+1\right)!} \over{=}{?} 0\]
 
@@ -115,23 +117,23 @@
         \[\lim_{x \to a} \left|f^{\left(n+1\right)}\left(u\right) \frac{x-a}{\left(n+1\right)!}\right| \leq \lim_{x \to a} M \frac{x-a}{\left(n+1\right)!} = 0 \implies \lim_{x \to a} \epsilon\left(x\right) = 0\]
 
         En effet, par hypothèse on sait que $f^{\left(n+1\right)}\left(x\right)$ est continue sur $\left[a, x\right]$ ou $\left[x, a\right]$, donc elle est bornée. Il existe donc bien un $M$ tel que $\left|f^{\left(n+1\right)}\left(u\right)\right| \leq M$ pour tout $u$ sur cet intervalle.
-    }
+    \end{subparag}
 
-    \subparag{Remarque 1}{
+    \begin{subparag}{Remarque 1}
         Il suffit d'avoir $f$ $n$ fois continûment dérivable sur $I$ pour avoir
         \[f\left(x\right) = P_n\left(x\right) + \left(x - a\right)^{n} \epsilon\left(x\right), \mathspace \lim_{x \to a} \epsilon\left(x\right) = 0\]
 
         Dans ce cas on ne peut pas définir $\epsilon\left(x\right)$ comme la $n+1$ dérivée, mais on peut aussi trouver une expression (plus compliquée).
-    }
+    \end{subparag}
 
-    \subparag{Remarque 2}{
+    \begin{subparag}{Remarque 2}
         $f : E \mapsto F$ peut avoir un DL sans que la formule de Taylor lui soit applicable.
 
         Cependant, dans notre cours ce genre de cas sont rares.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Résumé}{
+\begin{parag}{Résumé}
     Soit $f : I \mapsto F$ $n$ fois continûment dérivable sur $I$, $a, x \in I$, $x \neq a$. Alors:
     \[f\left(x\right) = f\left(a\right) + f'\left(a\right)\left(x-a\right) + \ldots + \frac{f^{\left(n\right)} \left(a\right)}{n!} \left(x - a\right)^n + \left(x-a\right)^n \epsilon\left(x\right), \mathspace \lim_{x \to a} \epsilon\left(x\right) = 0\]
 
@@ -139,9 +141,9 @@
     \[f\left(x\right) = f\left(a\right) + f'\left(a\right)\left(x-a\right) + \ldots + \frac{f^{\left(n\right)} \left(a\right)}{n!} \left(x - a\right)^n + \frac{f^{\left(n+1\right)} \left(u\right)}{\left(n+1\right)!} \left(x - a\right)^{n+1}\]
 
     Ainsi, si $f : E \mapsto F$ est $n$ fois continûment dérivable sur un intervalle ouvert contenant $x = a$, alors la formule de Taylor nous fournit le DL d'ordre $n$ de $f$ autour de $x = a$.
-}
+\end{parag}
 
-\parag{Exemple}{
+\begin{parag}{Exemple}
     Trouvons le développement limité d'ordre $n$ de la fonction suivante autour de $x = 0$:
     \[f\left(x\right) = \frac{1}{1 - x}\]
 
@@ -160,9 +162,9 @@
     \[\frac{1}{1 - x} = 1 + x + x^2 + \ldots + x^{n} + x^{n} \frac{x}{1 - x}\]
 
     Exercice au lecteur: trouver ce résultat avec la formule de Taylor.
-}
+\end{parag}
 
-\parag{Note personnelle}{
+\begin{parag}{Note personnelle}
     Comme précisé ci-dessus, nous pouvons utiliser ces polynômes de manière à approximer notre fonction autour d'un point très bien connu. Voici un exemple tiré du cours de Méthode Mathématique pour Physicien I donné par Professeure Camille Bonvin au semestre d'automne 2019 à l'Université de Genève.
 
     Approximons $\cos\left(0.1\right)$ à l'aide d'une expansion de Taylor d'ordre $3$ autour de $x = 0$:
@@ -175,14 +177,14 @@
     \[\left|R_3\left(x\right)\right| < \frac{\cos\left(0\right)}{4!} x^4 = \frac{x^4}{4!} \implies \left|R_3\left(0.1\right)\right| < \frac{0.1^4}{4!} = 4.1\bar{6} \cdot 10^{-6}\]
 
     Notre estimation, $\cos\left(0.1\right) \approx 0.995$, est donc déjà très bonne!
-}
+\end{parag}
 
 \subsection{Étude de fonctions}
-\parag{Rappel}{
+\begin{parag}{Rappel}
     Si $f : I \mapsto F$ est dérivable sur $I$ et admet un extremum local en $x = c$, alors $f'\left(c\right) = 0$.
-}
+\end{parag}
 
-\parag{Proposition (condition suffisante pour un extremum local)}{
+\begin{parag}{Proposition (condition suffisante pour un extremum local)}
     Soit $f : I \mapsto F$ une fonction $n$ fois continûment dérivable sur $I$, où \important{$n \in \mathbb{N}^*$ est pair}.
 
     Si cette fonction est telle que
@@ -190,12 +192,12 @@
 
     Alors, si $f^{\left(n\right)}\left(c\right) > 0$, $f$ admet un minimum local en $x = c$, et si $f^{\left(n\right)}\left(c\right) < 0$, alors $f$ admet un maximum local en $x = c$.
 
-    \subparag{Mnémotechnie}{
+    \begin{subparag}{Mnémotechnie}
         On peut utiliser la fonction $x^2$ pour se souvenir de ce théorème. On voit que $f\left(x\right) = x^2$ a un minimum en $x = 0$, et $f''\left(x\right) = 2 > 0$, alors que $g\left(x\right) = -x^2$ a un maximum et $g''\left(x\right) = -2 < 0$.
 
-    }
+    \end{subparag}
 
-    \subparag{Preuve}{
+    \begin{subparag}{Preuve}
         La formule de Taylor d'ordre $\left(n-1\right)$ autour de $x = c$ nous donne:
         \[f\left(x\right) = f\left(c\right) + \frac{f^{\left(n\right)}\left(u\right)\left(x - c\right)^{n}}{n!}\]
 
@@ -213,25 +215,25 @@
         La preuve pour le maximum local est similaire.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Définition (tangente)}{
+\begin{parag}{Définition (tangente)}
     Soit $f : E \mapsto F$ une fonction dérivable en $a \in E$.
 
     $\ell\left(x\right) = f\left(a\right) + f'\left(a\right)\left(x - a\right)$ est la \important{tangente} à la courbe $y = f\left(x\right)$ en $\left<a, f\left(a\right)\right>$.
-}
+\end{parag}
 
-\parag{Définition (point d'inflexion)}{
+\begin{parag}{Définition (point d'inflexion)}
     Prenons la fonction suivante:
     \[\psi\left(x\right) \over{=}{déf} f\left(x\right) - \ell\left(x\right) = f\left(x\right) - f\left(a\right) - f'\left(a\right)\left(x - a\right)\]
 
     Si $\psi\left(x\right)$ change de signe en $x=a$, alors $\left<a, f\left(a\right)\right>$ est un \important{point d'inflexion de $f$}.
 
     \imagehere{SchemaPointDInflexion.png}
-}
+\end{parag}
 
-\parag{Proposition}{
+\begin{parag}{Proposition}
     Soit $f : I \mapsto F$ une fonction $n$ fois continûment dérivable sur $I$, où \important{$n \in \mathbb{N}$ est impair et $n > 1$}.
 
     Si la fonction est telle que:
@@ -239,7 +241,7 @@
 
     Alors, le point $\left<a, f\left(a\right)\right>$ est un point d'inflexion de $f$.
 
-    \subparag{Preuve}{
+    \begin{subparag}{Preuve}
         Prenons la fonction de Taylor d'ordre $\left(n-1\right)$ autour de $x = a$:
         \[f\left(x\right) = f\left(a\right) + f'\left(a\right)\left(x-a\right) + f^{\left(n\right)}\left(u\right) \frac{\left(x - a\right)^{n}}{n!}\]
 
@@ -258,33 +260,33 @@
         Ainsi, $\psi\left(x\right)$ change de signe en $x = a$, ce qui implique que $\left<a, f\left(a\right)\right>$ est un point d'inflexion.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Définition (convexité et concavité)}{
+\begin{parag}{Définition (convexité et concavité)}
     $f : I \mapsto F$ est \important{convexe} sur $I$ si pour tout couple $a < b \in I$, le graphique de $f\left(x\right)$ se trouve au dessous de la droite passant par $\left<a, f\left(a\right)\right>$ et $\left<b, f\left(b\right)\right>$.
 
     De manière similaire, $f : I \mapsto F$ est \important{concave} sur $I$ si pour tout couple $a < b \in I$, le graphique de $f\left(x\right)$ se trouve \textcolor{red}{au dessus} de la droite passant par $\left<a, f\left(a\right)\right>$ et $\left<b, f\left(b\right)\right>$.
 
     \imagehere{DefinitionConvexeConcave.png}
 
-    \subparag{Mnémotechnie}{
+    \begin{subparag}{Mnémotechnie}
         $f\left(x\right) = -x^2$ est concave et elle ``descend à la cave''.
-    }
+    \end{subparag}
 
-    \subparag{Note personnelle}{
+    \begin{subparag}{Note personnelle}
         Je trouve personnellement infiniment plus clair de dire que la fonction ``sourit'' quand elle est convexe, et qu'``elle est triste'' quand elle est concave.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Proposition}{
+\begin{parag}{Proposition}
     Soit $f : I \mapsto F$ deux fois dérivable sur $I$.
 
     $f$ est convexe sur $I$ si et seulement si $f''\left(x\right) \geq 0$ sur $I$ (ce qui est équivalent à dire que $f'\left(x\right)$ est croissante sur $I$).
 
     $f$ est \textcolor{red}{concave} sur $I$ si et seulement si $f''\left(x\right)\ {\color{red}\leq}\ 0$ sur $I$ (ce qui est équivalent à dire que $f'\left(x\right)$ est \textcolor{red}{décroissante} sur $I$).
 
-    \subparag{Idée de preuve}{
+    \begin{subparag}{Idée de preuve}
         La dérivée seconde est donnée par:
         \[f''\left(x\right) = \lim_{h \to 0} \frac{f'\left(x\right) - f'\left(x - h\right)}{h}\ \text{``$\approx$''}\ \lim_{h \to 0} \frac{\frac{f\left(x + h\right) - f\left(x\right)}{h} - \frac{f\left(x\right) - f\left(x - h\right)}{h}}{h}\]
 
@@ -299,8 +301,8 @@
         \[f''\left(x\right) \geq 0 \iff f\left(x\right) \text{ est convexe sur } I\]
 
         L'idée est similaire pour une fonction concave.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 
