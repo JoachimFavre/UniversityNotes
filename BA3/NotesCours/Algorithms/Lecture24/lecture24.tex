@@ -25,15 +25,15 @@
 }
 
 \subsection{All-pairs shortest paths}
-\parag{Goal}{
+\begin{parag}{Goal}
     We want to find efficient ways to compute all-pairs shortest paths.
 
     For now, we have seen algorithms allowing to compute the shortest path from a source to any point. Running these algorithms $\left|V\right|$ times allows to get all-pair shortest paths. Using BFS if the graph is unweighted, it is $VO\left(V + E\right) = O\left(EV\right)$; using Dijkstra if the graph has non-negative edge weights yields $VO\left(E + V\log\left(V\right)\right) = O\left(EV + V^2 \log\left(V\right)\right)$; and using Bellman-Ford, it gives $VO\left(VE\right) = O\left(V^2 E\right)$.
 
     Since for any graph $E = O\left(V^2\right)$, we have an algorithm that works for any graph in $O\left(V^4\right)$. However, we would want to have a better algorithm for all-pair shortest path, one that has the same as for $\left|V\right|$ times Dijkstra: $O\left(EV + V^2 \log\left(V\right)\right) = O\left(V^3\right)$.
-}
+\end{parag}
 
-\parag{Dynamic programming}{
+\begin{parag}{Dynamic programming}
     Our first guess is to use dynamic programming.
 
     Let $d_m\left(u, v\right)$ be the weight of the shortest path from $u$ to $v$ that uses at most $m$ edges. For our recursive function, we guess that the last edge of our path is a given edge $\left(x, v\right) \in E$, giving us: 
@@ -45,9 +45,9 @@
     where we consider $w\left(v, v\right) = 0$.
     
     When proving Bellman-Ford, we have proven that any path has at most $\left|V\right|-1$ edges. Thus, we only need to find $d_{\left|V\right|-1}\left(u, v\right)$ for all $\left(u, v\right) \in V \times V$. This means that we have $V^3$ subproblems, and we need $O\left(V\right)$ to compute the maximum amongst all those subproblems, leading to a complexity of $O\left(V^4\right)$. This is too much.
-}
+\end{parag}
 
-\parag{Matrix multiplication}{
+\begin{parag}{Matrix multiplication}
     Let's reinterpret our algorithm by doing a matrix multiplication. We know very efficient algorithm running in $O\left(n^{2.807}\right)$ (for Strassen's algorithm) or even $O\left(n^{2.376}\right)$ (For Coppersmith-Winograd algorithm) allowing to compute efficiently the following: 
     \[c_{uv} = \sum_{k=1}^{n} a_{uk} b_{kv}\]
     
@@ -67,7 +67,7 @@
     We may want to try doing more. We designed all this in the idea of using Strassen's algorithm, but sadly we cannot use it since the minimum operation does not have an inverse.
 
 
-    \subparag{Application}{
+    \begin{subparag}{Application}
         This idea of applying matrix multiplications with modified operations is a really nice one, which can be applied to many problems.
 
         For instance, let's say we want to solve an easier version of our problem: transitive closure. We want to output an array $t\left[i, j\right]$ such that:
@@ -80,10 +80,10 @@
         \[t\left[u, v\right] = \left(t\left[u, x_1\right] \land w\left[x_1, v\right]\right) \lor \ldots \lor \left(t\left[u, x_n\right] \land w\left[x_n, v\right]\right)\]
         
         $\left(\left\{0, 1\right\}, \lor, \land\right)$ is not a ring, but we can still use fast matrix multiplication in our case. This gives us a $O\left(V^{2.376} \log\left(V\right)\right)$ time (which is really good).
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Floyd-Warshall algorithm}{
+\begin{parag}{Floyd-Warshall algorithm}
     The idea of this algorithm is to make another dynamic program, but in a more clever way.
 
     Let's consider a slightly different subproblem: let $c_k\left(u, v\right)$ be the weight of the shortest path from $u$ to $v$ with intermediate vertices in $\left\{1, 2, \ldots, k\right\}$. Our guess is that our shortest path uses vertex $k$ or not, leading to:
@@ -95,15 +95,15 @@
     Again, we only need to consider up to $k = \left|V\right|$. This means that we have $O\left(V^3\right)$ subproblems, and only 2 choices, giving us a complexity of $O\left(V^3\right)$. This is already really good.
 
     We'd not want to try even improve this result when the graph is sparse, meaning that $\left|E\right| \ll \left|V\right|^2$ (typically having $\left|E\right| = o\left(\left|V\right|^2\right)$).
-}
+\end{parag}
 
-\parag{Johnson's algorithm: Intuition}{
+\begin{parag}{Johnson's algorithm: Intuition}
     Our new idea takes is source on the hope to apply Dijkstra $\left|V\right|$ times. However, our graph may have negative edge weights, so we need to find a clever way to transform our graph in order to only have non-negative weights and keeping the propriety that the shortest path over those weights is the shortest path over the original weights.
 
     To do so, we first need the following lemmas.
-}
+\end{parag}
 
-\parag{Theorem: Weight transformation}{
+\begin{parag}{Theorem: Weight transformation}
     Let $h: V \mapsto \mathbb{R}$ be any function. Let's also suppose that for all $u, v \in V$ we have the following property:
 
     \[w_h\left(u, v\right) = w\left(u, v\right) + h\left(u\right) - h\left(v\right)\]
@@ -111,31 +111,31 @@
     \[w\left(p\right) = w_h\left(p\right) - h\left(u\right) + h\left(v\right)\]
     where $w_h\left(p\right)$ is the weight of our path $p$ on the modified version of our graph.
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         In other words, if we are able to construct a new graph with weights $w_h\left(u, v\right)$ which are all positive, then, computing a distance on this graph, we can easily transform it to a distance on the non-transformed graph.
 
         In particular, if we find a path which has the shortest distance on the modified graph, then it will also be the path with shortest distance on our original graph.
-    }
+    \end{subparag}
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         This is just a telescopic series. Supposing that we have any path $p = \left(x_0, x_1, \ldots, x_k\right)$ where $x_0 = u$ and $x_k = v$, it yields thatè:
         \autoeq{\unexpanded{w_h\left(p\right) = \sum_{i=1}^{k} w_h\left(x_{i-1}, x_i\right) = \sum_{i=1}^{k} \left(w\left(x_{i-1}, x_i\right) + h\left(x_{i-1}\right) - h\left(x_i\right)\right) = \left(\sum_{i=1}^{k} w\left(x_{i-1}, x_i\right)\right) + h\left(x_0\right) - h\left(x_k\right) = w\left(p\right) + h\left(u\right) - h\left(v\right)}}
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: System of difference constraints}{
+\begin{parag}{Definition: System of difference constraints}
     Our goal is to have a modified graph with positive edges. This means that, for all $u, v \in V$ we want: 
     \[w_h\left(u,v\right) = w\left(u, v\right) + h\left(u\right) - h\left(v\right) \geq 0 \iff h\left(v\right) - h\left(u\right) \leq w\left(u, v\right)\]
     
     This last expression is what we are trying to solve, it is a \important{system of difference constraints}.
-}
+\end{parag}
 
-\parag{Theorem: Inexistence}{
+\begin{parag}{Theorem: Inexistence}
     If a weighted graph has a negative cycle, then there is no solution to the difference constraints for it.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let's suppose that we have a negative weight cycle $c = \left(v_0, v_1, \ldots, v_k\right)$ with $v_0 = v_k$. Supposing for contradiction that there exists a $h$ such that we have $h\left(v_i\right) - h\left(v_{i-1}\right) \leq w\left(v_{i-1}, v_{i}\right)$ for all $i$, we get: 
         \[w\left(c\right) = \sum_{i=1}^{k} w\left(v_{i-1}, v_i\right) \geq \sum_{i=1}^{k} \left(h\left(v_i\right) - h\left(v_{i-1}\right)\right) = 0\]
         since this is another telescopic series and since $v_0 = v_k$.
@@ -143,13 +143,13 @@
         However, $w\left(c\right) \geq 0$ implies that $c$ was not a negative weight cycle, which is our contradiction.
 
         \qed
-    } 
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem: Existence}{
+\begin{parag}{Theorem: Existence}
     If a weighted graph has no negative cycle, then we can solve the system of difference constraints.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let us first add a new vertex $s$ to our graph, which we link to every other vertex with an edge of weight 0: 
         \[w\left(s, x\right) = 0, \mathspace \forall x \in V\]
         
@@ -164,10 +164,10 @@
         as required.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Johnson's algorithm}{
+\begin{parag}{Johnson's algorithm}
     We now have all the keys to make Johnson's algorithm, in order to find the all-pair shortest path on a given graph.
 
     First, we consider a new graph with a new vertex $s$ connected to all other vertices with edges of weight 0. We run Bellman-Ford on this modified graph from $s$, i.e. to get the shortest paths from $s$ to all vertices. We let $h\left(v\right) = d\left(s, v\right)$ for all vertex $v \in V$ (note that this is useful if there are paths of negative weight going to $v$).
@@ -176,7 +176,7 @@
 
     The first Bellman-Ford takes $O\left(VE\right)$. Then, the $\left|V\right|$ Dijkstra take $O\left(VE + V^2 \log\left(V\right)\right)$. This indeed yields an algorithm running in
     \[O\left(VE + V^2 \log\left(V\right)\right).\]
-}
+\end{parag}
 
 
 \end{document}

@@ -23,32 +23,32 @@
 
 }
 
-\parag{Property}{
+\begin{parag}{Property}
     For any flow $f$ and any cut $\left(S, T\right)$, then: 
     \[\left|f\right| \leq c\left(S, T\right)\]
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Starting from the left hand side:
         \[\left|f\right| = f\left(S, T\right) = \sum_{\substack{u \in S \\ v \in T}}^{} f\left(u, v\right) - \underbrace{\sum_{\substack{u \in S\\ v \in T}}^{} f\left(v, u\right)}_{\geq 0}\]
 
         And thus: 
         \[\left|f\right| \leq \sum_{\substack{u \in S \\ v \in T}}^{} f\left(u, v\right) \leq \sum_{\substack{u \in S \\ v \in T}}^{} c\left(u, v\right) = c\left(S, T\right)\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Min-cut}{
+\begin{parag}{Definition: Min-cut}
     Let $f$ be a flow. A \important{min-cut} is a cut with minimum capacity. In other words, it is a cut $\left(S_{min}, T_{min}\right)$, such that for any cut $\left(S, T\right)$: 
     \[c\left(S_{min}, T_{min}\right) \leq c\left(S, T\right)\]
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         By the property above, the value of the flow is less than or equal to the min-cut: 
         \[\left|f\right| \leq c\left(S_{min}, T_{min}\right)\]
 
         We will prove right after that, in fact, $\left|f_{max}\right| = c\left(S_{min}, T_{min}\right)$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Max-flow min-cut theorem}{
+\begin{parag}{Max-flow min-cut theorem}
     Let $G = \left(V, E\right)$ be a flow network, with source $s$, sink $t$, capacities $c$ and flow $f$. Then, the following propositions are equivalent:
     \begin{enumerate}
         \item $f$ is a maximum flow.
@@ -56,29 +56,29 @@
         \item $\left|f\right| = c\left(S, T\right)$ for some cut $\left(S, T\right)$.
     \end{enumerate}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This theorem shows that the Ford-Fulkerson method gives the optimal value. Indeed, it terminates when $G_f$ has no augmenting path, which is, as this theorem says, equivalent to having found a maximum flow.
-    }
+    \end{subparag}
 
-    \subparag{Proof $\left(1\right) \implies \left(2\right)$}{
+    \begin{subparag}{Proof $\left(1\right) \implies \left(2\right)$}
         Let's suppose for contradiction that $G_f$ has an augmenting path $p$. However, then, Ford-Fulkerson method would augment $f$ by $p$ to obtain a flow with increased value. This contradicts the fact that $f$ was a maximum flow.
-    }
+    \end{subparag}
     
-    \subparag{Proof $\left(2\right) \implies \left(3\right)$}{
+    \begin{subparag}{Proof $\left(2\right) \implies \left(3\right)$}
         Let $S$ be the set of nodes reachable from $s$ in the residual network, and $T = V \setminus S$. 
 
         Every edge going out of $S$ in $G$ must be at capacity. Indeed, otherwise, we could reach a node outside $S$ in the residual network, contradicting the construction of $S$.
 
         Since every edge is at capacity, we get that $f\left(S, T\right) = c\left(S, T\right)$. However, since $\left|f\right| = f\left(S, T\right)$ for any cut, we indeed find that: 
         \[\left|f\right| = c\left(S, T\right)\]
-    }
+    \end{subparag}
 
-    \subparag{Proof $\left(3\right) \implies \left(1\right)$}{
+    \begin{subparag}{Proof $\left(3\right) \implies \left(1\right)$}
         We know that $\left|f\right| \leq c\left(S, T\right)$ for all cuts $S, T$. Therefore, if the value of the flow is equal to the capacity of some cut, it cannot be improved. This shows its maximality.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{FordFulkerson-MaxFlow.code}
 start with 0-flow
@@ -97,40 +97,40 @@ if no augmenting path exists in the residual network:
 \end{filecontents*}
 
 
-\parag{Summary}{
+\begin{parag}{Summary}
     All this shows that our Ford-Fulkerson method for finding a max-flow works:
     \importcode{FordFulkerson-MaxFlow.code}{pseudo}
 
     Also, when we have found a max-flow, we can use our flow to find a min-cut:
     \importcode{FordFulkerson-MinCut.code}{pseudo}
-}
+\end{parag}
 
 
-\parag{High complexity analysis}{
+\begin{parag}{High complexity analysis}
     It takes $O\left(E\right)$ to find a path in the residual network (using breadth-first search for instance). Each time, the flow value is increased by at least 1. Thus, the running time has a worst case of $O\left(E \left|f_{max}\right|\right)$.
 
     We can note that, indeed, there are some cases where we reach such a complexity if we always choose the bad path (the one taking the link in the middle here, which will always exist on the residual network):
     \imagehere[0.4]{WorstCaseFordFulkerson.png}
     
     This graph would never terminate before the heat death of the universe.
-}
+\end{parag}
 
-\parag{Lower complexity analysis}{
+\begin{parag}{Lower complexity analysis}
     In fact, if we don't choose our paths randomly and if the capacities are integers (or rational numbers, this does not really matter since we could then just multiply everything by the lowest common divisor an get an equivalent problem), then we can get a much better complexity. 
 
     If we take the shortest path given by BFS, then the complexity is bounded by $\frac{1}{2} E V$. If we take the fattest path (the path which bottleneck has the largest capacity), then the complexity is bounded by $E \log\left(E \left|f_{max}\right|\right)$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We will not show those two affirmations in this course.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Observation}{
+\begin{parag}{Observation}
     If the capacities of our network are irrational, then the Ford-Fulkerson method might not really terminate.
-}
+\end{parag}
 
-\parag{Application: Bipartite matching problem}{
+\begin{parag}{Application: Bipartite matching problem}
     Let's consider the Bipartite matching problem. It is easier to explain it with an example. We have $N$ students applying for $M \geq N$ jobs, where each student get several offers. Every job can be taken at most once, and every student can have at most one job.
     
     \imagehere[0.4]{BipartiteMatchingExample.png}
@@ -141,13 +141,13 @@ if no augmenting path exists in the residual network:
     \imagehere[0.8]{BipartiteMatchingExampleFlow.png}
 
     If the Ford-Fulkerson method gives us that $\left|f_{max}\right| = N$, then every student was able to find a job. Indeed, flows obtained by Ford-Fulkerson are integer valued if capacities are integers, so the value on every edge is 0 or 1. Since every student has the in-flow for at most one job, and each job has the out-flow for at most one student, there cannot be any student matched to two jobs or any job matched to two students, by conservation of the flow.
-}
+\end{parag}
 
-\parag{Application: Edge-disjoint paths problem}{
+\begin{parag}{Application: Edge-disjoint paths problem}
     In an undirected graph, we may want to know the minimum number of routes that we can take that do not share a common road. To do so, we set an edge of capacity 1 for both directions for every roads (in a non-anti-parallel fashion, as seen earlier).
 
     Then, the max-flow is the number of edge-disjoint paths, and the min-cut shows the minimum number of roads that need to be closed so that there is no more route going from the start to the end.
-}
+\end{parag}
 
 \end{document}
 

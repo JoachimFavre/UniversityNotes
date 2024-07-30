@@ -52,12 +52,12 @@ procedure BellmanFord(G, w, s):
     return true
 \end{filecontents*}
 
-\parag{Bellman-Ford algorithm}{
+\begin{parag}{Bellman-Ford algorithm}
     We receive in input a directed graph with edge weights, a source $s$ and no negative cycle, and, for each vertex $v$, we want to output $\ell \left(v\right)$, the distance of the shortest path, and $\pi\left(v\right) = pred\left(v\right)$, the predecessor of $v$ in the shortest path (this is enough to reconstruct the path at the end).
 
     Note that, as the algorithm iterates, $\ell \left(v\right)$ will always be the current upper estimate of the length of the shortest path to $v$, and $pred\left(v\right)$ be the predecessor of $v$ in this shortest path.
 
-    \subparag{Algorithm}{
+    \begin{subparag}{Algorithm}
         The idea is to iteratively relax all paths, meaning to replace the current path by a new path if it is better: 
         \importcode{BellmanFordRelax.code}{pseudo}
         
@@ -65,23 +65,23 @@ procedure BellmanFord(G, w, s):
         \importcode{BellmanFord.code}{pseudo}
 
         Note that the negative cycle detection will be explained through its proof after.
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This algorithm is only guaranteed to work if there is no negative cycle, but it can also detect them. 
-    }
+    \end{subparag}
     
-    \subparag{Analysis}{
+    \begin{subparag}{Analysis}
         \texttt{InitSingleSource} updates $\ell $ and pred for each vertex in time $\Theta\left(V\right)$. Then, the nested for loops run \texttt{Relax} $V-1$ times for each edge, giving $\Theta\left(EV\right)$. Finally, the last for loop runs once for each edge, giving a time of $\Theta\left(E\right)$.
 
         This gives us a total runtime of $\Theta\left(EV\right)$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Lemma: Optimal substructure}{
+\begin{parag}{Lemma: Optimal substructure}
     If $\left(s, v_1, \ldots, v_{k+1}\right)$ is a shortest path from $s$ to $v_{k+1}$, then $\left(s, v_1, \ldots, v_k\right)$ is a shortest path from $s$ to $v_k$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let $q = \left(s, v_1, \ldots, v_{k+1}\right)$ be a shortest path from $s$ to $v_{k+1}$, and $p = \left(s, v_1, \ldots, v_k\right)$ be the path of which we want to prove the optimality. Let's suppose for contradiction that there exists a path $p' = \left(s, w_1, \ldots, w_{j}, v_k\right)$ from $s$ to $v_k$ which sum of weight is smaller than the one of $p$. 
 
         Let's append $v_{k+1}$ to both our paths, giving $q$ and $q' = \left(s, w_1, \ldots, w_j, v_k, v_{k+1}\right)$. This increases both of their sum of weights by the same amount, $w\left(v_k, v_{k+1}\right)$, meaning that $q'$ also has a smaller weight than $q$:
@@ -90,13 +90,13 @@ procedure BellmanFord(G, w, s):
         This contradicts the optimality of $q$, showing the optimal substructure of our problem.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Lemma: Number of iterations}{
+\begin{parag}{Lemma: Number of iterations}
     After the $i$\Th iteration, $\ell \left(v\right)$ is at most the length of the shortest path from $s$ to $v$ using at most $i$ edges.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We want to do this proof by induction.
 
         The base case is trivial since, when there is 0 iteration, $\ell \left(s\right) = 0$ and all other equal infinity. Those are indeed the shortest paths using at most 0 edges.
@@ -109,34 +109,34 @@ procedure BellmanFord(G, w, s):
         Since $\ell\left(v\right)$ never increases, we know that this property will hold until the end of the procedure, which concludes our proof.
         
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Lemma: Number of edges in shortest path}{
+\begin{parag}{Lemma: Number of edges in shortest path}
    If there are no negative cycles reachable from $s$, then for any $v$ there is a shortest path from $s$ to $v$ using at most $\left|V\right|-1$ edges.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let's suppose for contradiction that a shortest path with the smallest number of edges has $\left|V\right|$ or more edges. However, this means that there exists at least a vertex the path uses at least twice by the pigeon-hole principle, meaning that there is a cycle. Since the weight of this cycle is non-negative, it can be removed without increasing the length of the path, contradicting that it had the smallest number of edges.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem: Optimality of Bellamn-Ford}{
+\begin{parag}{Theorem: Optimality of Bellamn-Ford}
     If there is no negative cycle, Bellman-Ford will return the correct answer after $\left|V\right| - 1$ iterations.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         The proof directly comes from the two previous lemmas: there always exists a shortest path with at most $\left|V\right| - 1$ edges when there is no negative cycle, and after $\left|V\right| - 1$ iterations we are sure that we have found all paths with at most $\left|V\right| - 1$ edges.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Theorem: Detection of negative cycles}{
+\begin{parag}{Theorem: Detection of negative cycles}
     There is no negative cycle reachable from $s$ if and only if the $\ell $-value of no node change when we run a $\left|V\right|$\Th iteration of Bellman-Ford.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We already know from the lemma telling the maximum minimum number of edges in the shortest path, that if there are no negative cycles reachable from the source, then the $\ell $-values don't change in the $n$\Th iteration. We would now want to show that this is actually equivalent, by showing that if the $\ell $-values of the vertices do not change in the $n$\Th iteration, then there is no negative cycle that is reachable from the source. 
 
         If there is no cycle, then definitely there is no negative cycle and everything works perfectly. Let's thus consider the case where there are cycles. We consider any cycle, $\left(v_0, v_1, \ldots, v_{t-1}, v_t\right)$ with $v_0 = v_t$. Since no $\ell $-value changed by hypothesis, we know that, by construction of the \texttt{Relax} procedure, $\ell \left(v_i\right) \leq \ell \left(v_{i-1}\right) + w\left(v_{i- 1}, v_i\right)$ (since it is true for all edges, then it is definitely true for the ones in our cycle). We can sum those values: 
@@ -146,17 +146,17 @@ procedure BellmanFord(G, w, s):
         \[0 \leq \sum_{i=1}^{t} w\left(v_{i-1}, v_i\right)\]
 
         \qed
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We have shown that Bellman-Ford returns \texttt{true} if and only if there is no (strictly) negative cycle.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     If we have a DAG (directed acyclic graph), we can first use a topological sort, followed by one pass of Bellman-Ford using this ordering. This allows to find a solution in $O\left(V + E\right)$.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{Dijkstra.code}
 procedure Dijkstra(G, w, s):
@@ -172,26 +172,26 @@ procedure Dijkstra(G, w, s):
 \end{filecontents*}
 
 
-\parag{Dijkstra's algorithm}{
+\begin{parag}{Dijkstra's algorithm}
     Let's consider a much faster algorithm, which only works with non-negative weights. 
 
     The idea is to make a version of BFS working with weighted graphs. We start with a set containing the source $S = \left\{s\right\}$. Then, we greedily grow the source $S$ by iteratively adding to $S$ the vertex that is closest to $S$ ($v \not\in S$ such that it minimises $\min_{u \in S} u.d + w\left(u, v\right)$). To find those, we use a priority queue. At any time, we have found the shortest path of every element in $S$.
 
-    \subparag{Implementation}{
+    \begin{subparag}{Implementation}
         The program looks like Prim's algorithm, but we are minimising $u.d + w\left(u, v\right)$ instead of $w\left(u, v\right)$:
         \importcode{Dijkstra.code}{pseudo}
-    }
+    \end{subparag}
 
-    \subparag{Analysis}{
+    \begin{subparag}{Analysis}
         Just like Prim's algorithm, the running time is dominated by operations on the queue. If we implement it using a binary heap, each operation takes $O\left(\log\left(V\right)\right)$ time, meaning that we have a runtime of $O\left(E \log \left(V\right)\right)$.
 
         Note that we can use a more careful implementation of the priority queue, leading to a runtime of $O\left(V \log\left(V\right) + E\right)$. This is almost as efficient as BFS.
-    }
+    \end{subparag}
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         The proof of optimality of this algorithm is considered trivial and left as an exercise to the reader. The idea is to show the loop invariant stating that, at the start of each iteration, we have for all $v \in S$ that the distance $v.d$ from $s$ to $v$ is equal to the shortest path from $s$ to $v$. This naturally uses the assumption that all weights are non-negative (positive or zero).
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 \end{document}

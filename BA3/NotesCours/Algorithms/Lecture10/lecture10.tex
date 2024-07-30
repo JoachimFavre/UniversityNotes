@@ -23,20 +23,20 @@
 
 \subsection{Application: Rod cutting}
 
-\parag{Problem}{
+\begin{parag}{Problem}
     Let's say we have a rod of length $n$, and we would want to sell it on the market. We can sell it as is, but also we could cut it in different lengths. The goal is that, given the prices $p_i$ for lengths $i=1, \ldots, n$, we must find the way to cut our rod which gives us the most money.
-}
+\end{parag}
 
-\parag{Brute force}{
+\begin{parag}{Brute force}
     Let's first consider the brute force case: why work smart when we can work fast. We have $n-1$ places where we can cut the rod, at each place we can either cut or not, so we have $2^{n-1}$ possibilities to cut the rod (which is not great).
 
     Also, as we will show in the \nth{5} exercise series, a greedy algorithm does not work.
-}
+\end{parag}
 
-\parag{Theorem: Optimal substructure}{
+\begin{parag}{Theorem: Optimal substructure}
     We can notice that, if the leftmost cut in an optimal solution is after $i$ units, and an optimal way to cut a solution of size $n-i$ is into rods of sizes $s_1$, \ldots, $s_k$, then an optimal way to cut our rod is into rods of sizes $i, s_1, \ldots, s_k$. 
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let's prove the optimality of our solution. Let $i, o_1, \ldots, o_\ell$ be an optimal solution (which exits by assumption). Also, let $s_1, \ldots, s_k$ be an optimal solution to the subproblem of cutting a rod of size $n-1$. Since this second solution is an optimal solution to the subproblem, we get that:
         \[\sum_{j=1}^{k} p_{s_j} \geq \sum_{j=1}^{\ell }  p_{o_j}\]
         
@@ -46,8 +46,8 @@
         This yields that, since the optimal solution is worse or equal to the solution we made (using the solution of the subproblem), this new solution is indeed optimal. 
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{CutRodBad.code}
 procedure CutRodBad(p, n):
@@ -86,7 +86,7 @@ procedure PrintCutRodSolution(p, n):
         n = n - s[n]
 \end{filecontents*}
 
-\parag{Dynamic programming}{
+\begin{parag}{Dynamic programming}
     The theorem above shows the optimal substructure of our problem, meaning that we can apply dynamic programming. Letting $r\left(n\right)$ to be the optimal revenue from a rod of length $n$ we get by the structural theorem that we can express $r\left(n\right)$ recursively as: 
     \begin{functionbypart}{r\left(n\right)}
     0, \mathspace \text{if } n = 0, \\
@@ -103,41 +103,41 @@ procedure PrintCutRodSolution(p, n):
     \importcode{BottomUpCutRodPrintSolution.code}{pseudo}
 
     Note that this is a typical Dynamic Programming approach: fill in the array of subproblems (\texttt{r} here) and another array containing more information (\texttt{s} here), and then use them to reconstruct the solution.
-}
+\end{parag}
 
 \subsection{Application: Change-making problem}
 
-\parag{Problem}{
+\begin{parag}{Problem}
     We need to give the change for some amount of money $W$ (a positive integer), knowing that we have $n$ distinct coins denominations (positive integers, positive integers too) $0 < w_1 < \ldots < w_n$. We want to know the minimum number of coins needed in order to make the change: 
     \[\min\left\{\sum_{j=1}^{n} x_j\ \left|\ x_j \in \mathbb{N}_0 \text{ and }\sum_{j=1}^{n} x_j w_j = W\right.\right\}\]
     
     For instance, if we have $w_1 = 1$, $w_2 = 2$, $w_3 = 5$ and $W = 8$, then the output must be $3$ since the best way of giving 8 is $x_1 = x_2 = x_3 = 1$ (give one coin of each).
-}
+\end{parag}
 
-\parag{Solution}{
+\begin{parag}{Solution}
     We first want to see our optimal substructure. To do so, we need to define our subproblems. Thus, let $r\left[w\right]$ be the smallest number of coins needed to make change for $w$. We can note that if we choose which coin $i$ to use first and know the optimal solution to make $W - w_i$, we can make the optimal solution by adding 1 to the solution we just found (since we just use one more coin $w_i$):
     \[r\left[w\right] = \min_{1 \leq i \leq n} \left\{1 + r\left[w - w_i\right]\right\}\]
     
     We can add the boundary conditions $r\left[w\right] = +\infty$ for all $w < 0$ and $r\left[0\right] = 0$. 
 
     We can see that the runtime is $O\left(nw\right)$ since we have $w$ subproblems, and the recomputation problem (checking all the value to get the minimum) takes order $n$.
-}
+\end{parag}
 
 
 \subsection{Application: Matrix-chain mulitplication}
 
-\parag{Problem}{
+\begin{parag}{Problem}
     We have $n$ matrices $A_1, \ldots, A_n$, where each matrix $A_i$ can have a different size $p_{i-1} \times p_i$. We have seen that scalar multiplications is what takes the most time, so we want to minimise the number of computations we do. To do so, we want to output a full parenthesisation of the product $\left(A_1 \cdots A_n\right)$ in a way that minimises the number of scalar multiplications (we can do this since matrix multiplication is associative). 
 
     For this algorithm, we need to make the following observation. Let $A \in \mathbb{R}^{p \times q}$, $B \in \mathbb{R}^{q \times r}$ and $C \in \mathbb{R}^{p \times r}$ be matrices such that $C = AB$. Using regular $\Theta\left(n^3\right)$ matrix-multiplication algorithms, we can see that each element of $C$ takes $q$ multiplications to compute. However, since it has $pr$ elements, we get that, to compute $C = AB$, we need $pqr$ scalar multiplications.
 
     For instance, let's say we have a product $A_1 A_2 A_3$ with matrices of dimensions $50 \times 5$, $5 \times 100$ and $100 \times 10$, respectively. Then, calculating $\left(A_1 A_2\right) A_3$ requires $50 \cdot  5 \cdot  100 + 50 \cdot  100 \cdot  10 = 75000$ scalar multiplications. However, calculating $A_1 \left(A_2 A_3\right)$ requires $5 \cdot  100 \cdot  10 + 50 \cdot  5 \cdot 10 = 7500$ scalar multiplications. We can see that, indeed, a good parenthesisation can tremendously decrease the number of operations, without changing the result.
-}
+\end{parag}
 
-\parag{Theorem: Optimal substructure}{
+\begin{parag}{Theorem: Optimal substructure}
     We can notice that, if the outermost parenthesisation in an optimal solution is $\left(A_1 \cdots A_i\right)\left(A_{i+1} \cdots A_n\right)$, and if $P_L$ and $P_R$ are optimal parenthesisation for $A_1 \cdots A_i$ and $A_{i+1} \cdots A_n$, respectively; then, $\left(\left(P_L\right) \cdot \left(P_R\right)\right)$ is an optimal parenthesisation for $A_1 \cdots A_n$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let $\left(\left(O_L\right) \cdot \left(O_R\right)\right)$ be an optimal parenthesisation (we know it has this form by hypothesis), where $O_L$ and $O_R$ are parenthesisation for $A_1 \cdots A_i$ and $A_{i+1} \cdots A_n$, respectively. Also, let $M\left(P\right)$, be the number of scalar multiplications required by a parenthesisation $P$.
 
         Since $P_L$ and $P_R$ are optimal by hypothesis, we know that $M\left(P_L\right) \leq M\left(O_L\right)$ and $M\left(P_R\right) \leq M\left(O_R\right)$. This allows us to get that:
@@ -146,9 +146,9 @@ procedure PrintCutRodSolution(p, n):
         However, since $\left(\left(P_L\right) \cdot \left(P_R\right)\right)$ needs less than or the same number of scalar multiplications of the optimal parenthesisation, it necessarily means that it is itself optimal.
 
         \qed
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{MatrixChainOrder.code}
 procedure MatrixChainOrder(p)
@@ -186,7 +186,7 @@ procedure PrintOPtimalParens(s, i, j):
         print ")"
 \end{filecontents*}
 
-\parag{Dynamic programming}{
+\begin{parag}{Dynamic programming}
     We can note that our theorem gives us the following recursive formula, where $m\left[i, j\right]$ is the optimal number of scalar multiplications for calculating $A_i \cdots A_j$: 
     \begin{functionbypart}{m\left[i, j\right]}
     0, \mathspace \text{if } i = j  \\
@@ -200,14 +200,14 @@ procedure PrintOPtimalParens(s, i, j):
     \importcode{MatrixChainOrderGetOptimal.code}{pseudo}
 
     We can note that this is $\Theta\left(n^3\right)$. A good way to see this is that we have $n^2$ subproblems, which all take around $\Theta\left(n\right)$ to find the maximum.
-}
+\end{parag}
 
-\parag{Summary}{
+\begin{parag}{Summary}
     To summarise, we first choose where to make the outermost parenthesis:
     \[\left(A_1 \cdots A_k\right)\left(A_{k+1} \cdots A_n\right)\]
 
     Then, we noticed the optimal substructure: to obtain an optimal solution, we need to parenthesise the two remaining expressions in an optimal way. This gives us a recurrence relation, which we solve through dynamic programming.
-}
+\end{parag}
 
 
 \end{document}

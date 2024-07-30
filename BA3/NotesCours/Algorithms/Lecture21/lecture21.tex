@@ -24,58 +24,58 @@
 
 \section{Probabilistic analysis}
 \subsection{Introduction}
-\parag{Goal}{
+\begin{parag}{Goal}
     We see that the worst case usually does not happen, so doing average case and amortised analysis seems usually better. In fact, using randomness on the input may allow us to get out of the worst case and lend in the average case: randomising the elements in an array before sorting it allows avoid the reverse-sorted case.
 
     Also, randomness is really important in cryptography.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Getting randomness (or random-looking sequences) is a non-trivial task for computers. We will not consider this problem here.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Hiring problem}{
+\begin{parag}{Hiring problem}
     Let's say we have $n$ persons entering one after the other, and we want to hire tall people. Our strategy is that, when someone comes in, we see if he or she is taller than the tallest person we had hired before. We want to know how many people we will have hired at the end on average.
 
     For instance, if $n = 3$ people enter with sizes $2, 1, 3$, then we will hire $2$ and $3$, and thus have hired 2 people.
 
-    \subparag{Unsatisfactory answer}{
+    \begin{subparag}{Unsatisfactory answer}
         First, we notice that, in the worst case, we can hire $n$ person if they come from the shortest to the tallest. In the contrary, in the best case, we hire $1$ person if they come from the tallest to the shortest.
 
         However, we realise that we should expect them to enter in uniform random order. Listing all $n!$ possibilities for $n = 3$, we get an expected value of: 
         \[\frac{3 + 2 + 2 + 2 + 1 + 1}{3!} = \frac{11}{6}\]
         
         The thing is, listing $n!$ possibilities is really not tractable as $n$ grows. So, we will need to develop a more intelligent theory.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem: Linearity of expected values}{
+\begin{parag}{Theorem: Linearity of expected values}
     Expected values are linear. In other words, for $n$ random variables $X_1, \ldots, X_n$ and constants $\alpha_1, \ldots, \alpha_n$:
     \[\exval\left(\alpha_1 X_1 + \ldots + \alpha_n X_n\right) = \alpha_1 \exval\left(X_1\right) + \ldots + \alpha_n\exval\left(X_n\right)\]
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This result is really incredible since it works for any $X_1, \ldots, X_n$ even if they are absolutely not independent.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Indicator Random Variables}{
+\begin{parag}{Definition: Indicator Random Variables}
     Given a sample space (the space of all possible outcomes) and an event $A$, we define the \important{indicator random variable} to be:
     \begin{functionbypart}{I\left(A\right)}
     1, \mathspace \text{if $A$ occurs}  \\
     0, \mathspace \text{if $A$ does not occurs}
     \end{functionbypart}
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $X_A = I\left(A\right)$ for some event $A$.
 
     Then, the expected value of $X_A$ is the probability of the event $A$ to occur, i.e:
     \[\exval\left(X_A\right) = \prob\left(A\right)\]
-}
+\end{parag}
 
 
-\parag{Example: Coin flip}{
+\begin{parag}{Example: Coin flip}
     Let's say we throw a coin $n$ times. We want to know the expected number of heads.
 
     We could compute it using the definition of expected values: 
@@ -88,9 +88,9 @@
     Now, let $X$ be a random variable for the number of heads in $n$ flips, and let $X_i = I\left(\text{$i$th flip result}\right)$. By the linearity of the expectations, we get: 
     \[\exval\left(X\right) = \exval\left(X_1 + \ldots + X_n\right) = \exval\left(X_1\right) + \ldots + \exval\left(X_n\right) = \frac{1}{2} + \ldots + \frac{1}{2} = \frac{n}{2}\]
     as expected (lolz).
-}
+\end{parag}
 
-\parag{Back to hiring problem}{
+\begin{parag}{Back to hiring problem}
     Let's consider again the hiring problem. We want to do a similar analysis as for the coin flip example.
 
     Let $H_i$ be the event that the candidate $i$ is hired, and let $X_i = I\left(H_i\right)$. We need to find this expected value and, to do so, we need $\prob\left(H_i\right)$. There are $i!$ ways for the first $i$ candidates to come, and only $\left(i-1\right)!$ where the $i$\Th is the tallest (we set the tallest to come last, and compute the permutations of the $\left(i-1\right)$ left).. Since people are hired if and only if they are the tallest, it gives us: 
@@ -100,7 +100,7 @@
     \[\exval\left(X\right) = \exval\left(X_1 + \ldots + X_n\right) = \exval\left(X_1\right) + \ldots + \exval\left(X_n\right) = \frac{1}{1} + \ldots + \frac{1}{n} = H_n\]
     
     We know that the harmonic partial series has a complexity of $\log\left(n\right) + O\left(1\right)$. However, the best case is $1$ with probability $\frac{1}{n}$ (if the tallest is the first), and the worst case is $n$ with probability $\frac{1}{n!}$ (if they come in sorted order, from shortest to tallest). By randomising our input before hiring people, it allows us to avoid malicious users to input the worst case and to (almost with certainty) land in the average-case scenario of $\log\left(n\right) + O\left(1\right)$.
-}
+\end{parag}
 
 
 \end{document}

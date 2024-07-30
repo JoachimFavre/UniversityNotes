@@ -24,25 +24,25 @@
 }
 
 \subsection{Flow networks}
-\parag{Basic problem}{
+\begin{parag}{Basic problem}
     The basic problem solved by flow networks is shipping as much of a resource from one node to another. Edge have a weight, which, if they were pipes, would represent their flow capacity. The question is then how to optimise the rate of flow from the source to the sink.
 
-    \subparag{Applications}{
+    \begin{subparag}{Applications}
         This has many applications. For instance: evacuating people out of a building. If we have given exits and corridors size, we can then know how many people we could evacuate in a given time.
 
         Another application is finding the best way to ship goods on roads, or disrupting it in another country.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Flow network}{
+\begin{parag}{Definition: Flow network}
     A \important{flow network} is a directed graph $G = \left(V, E\right)$, where each edge $\left(u, v\right)$ has a capacity $c\left(u, v\right) \geq 0$. This is function is such that, $c\left(u, v\right) = 0$ if and only if $\left(u, v\right) \not\in E$. Finally, we have a \important{source} node $s$ and a \important{sink} node $t$.
 
     We also assume that there are never antiparallel edges (both $\left(u, v\right) \in E$ and $\left(v, u\right) \in E$). This supposition is more or less without loss of generality since, then, we could just break one of the antiparallel edges into two edges linking a new node $v'$ (see the picture below). This will simplify notations in our algorithm.
 
     \imagehere[0.6]{AntiparallelEdgesWLOG.png}
-}
+\end{parag}
 
-\parag{Definition: Flow}{
+\begin{parag}{Definition: Flow}
     A \important{flow} is a function $f: V \times V \mapsto \mathbb{R}$ satisfying the two following constraints. First, the capacity constraint states that, for all $u, v \in V$, we have: 
     \[0 \leq f\left(u, v\right) \leq c\left(u, v\right)\]
     
@@ -51,29 +51,29 @@
     
     In other words, the flow coming into $u$ is the same as the flow coming out of $u$.
 
-    \subparag{Notation}{
+    \begin{subparag}{Notation}
         We will note flows on a flow network by noting $f\left(u, v\right) / c\left(u, v\right)$ for all edge. For instance, we could have:
         \imagehere[0.55]{FlowNetworkExample.png}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Value of a flow}{
+\begin{parag}{Definition: Value of a flow}
     The value of a flow $f$, denoted $\left|f\right|$, is: 
     \[\left|f\right| = \sum_{v \in V}^{} f\left(s, v\right) - \sum_{v \in V}^{} f\left(v, s\right)\]
     which is the flow out of the source minus the flow into the source.
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         By the flow conservation constraint, this is equivalent to the flow into the sink minus the flow out of the sink:
         \[\left|f\right| = \sum_{v \in V}^{} f\left(v, t\right) - \sum_{v \in V}^{} f\left(t, v\right)\]
-    }
+    \end{subparag}
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, for the flow graph and flow hereinabove:
         \[\left|f\right| = \left(1 + 2\right) - 0 = 3\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Goal}{
+\begin{parag}{Goal}
     The idea is now to develop an algorithm that, given a flow network, we find the maximum flow. The basic idea that could come to mind is to take a random path through our network, consider its bottleneck link, and send this value of flow onto this path. We then have a new graph, with capacities reduced and some links less (if the capacity happens to be 0). We can continue this iteratively until the source and the sink are 0.
 
     This idea we would for example on the following (very simple) flow network:
@@ -85,10 +85,10 @@
     \imagehere[0.4]{FlowNetworkExampleSubOptimal.png}
 
     This means that we need a way to ``undo'' bad choices of paths done by our algorithm. To do so, we will need the following definitions.
-}
+\end{parag}
 
 
-\parag{Definition: Residual capacity}{
+\begin{parag}{Definition: Residual capacity}
     Given a flow network $G$ and a flow $f$, the \important{residual capacity} is defined as:
     \begin{functionbypart}{c_f\left(u, v\right)}
     c\left(u, v\right) - f\left(u, v\right), \mathspace \text{if } \left(u, v\right) \in E  \\
@@ -98,27 +98,27 @@
 
     The main idea of this function is its second part: the first part is just the capacity left in the pipe, but the second part is a new, reversed, edge we add. This new edge holds a capacity representing the amount of flow that can be reversed.
 
-        \subparag{Example}{
+    \begin{subparag}{Example}
             For instance, if we have an edge $\left(u, v\right)$ with capacity $c\left(u, v\right) = 5$ and current flow $f\left(u, v\right) = 3$, then $c_f\left(u, v\right) = 5 - 3 = 2$ and $c_f\left(v, u\right) = f\left(u, v\right) = 3$.
-        }
+    \end{subparag}
         
-        \subparag{Remark}{
+    \begin{subparag}{Remark}
             This definition is the reason why we do not want antiparallel edges: the notation is much simpler without.
-        }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Residual network}{
+\begin{parag}{Definition: Residual network}
     Given a flow network $G$ and flow $f$, the \important{residual network} $G_f$ is defined as: 
     \[G_f = \left(V, E_f\right), \mathspace \text{where } E_f = \left\{\left(u, v\right) \in V \times V : c_{f}\left(u, v\right) > 0\right\}\]
 
     We basically use our residual capacity function, removing edges with 0 capacity left.
-}
+\end{parag}
 
-\parag{Definition: Augmenting path}{
+\begin{parag}{Definition: Augmenting path}
     Given a flow network $G$ and flow $f$, an \important{augmenting path} is a simple path (never going twice on the same vertex) from $s$ to $t$ in the residual network $G_f$. 
 
    \important{Augmenting the flow} $f$ by this path means applying the minimum capacity over the path: add it to edges which were here at the start, and remove it to edges we added after through the residual capacity. This can easily be seen by looking at the definition of residual capacity (if $\left(u, v\right) \in E$, then we use the opposite of the flow, if $\left(v, u\right) \in E$, then we use the positive version of the flow).
-}
+\end{parag}
 
 
 \begin{filecontents*}[overwrite]{FordFulkersonMethod.code}
@@ -130,10 +130,10 @@ procedure FordFulkersonMethod(G, s, t):
 \end{filecontents*}
 
 
-\parag{Ford-Fulkerson algorithm}{
+\begin{parag}{Ford-Fulkerson algorithm}
     The idea of the Ford-Fulkerson greedy algorithm for finding the maximum flow in a flow network is, as the one we had before, to improve our flow iteratively; but using residual networks in order to cancel wrong choices of paths.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let's consider again our non-trivial flow network, and the suboptimal flow our naive algorithm found:
         \imagehere[0.5]{FlowNetworkExampleSubOptimal.png}
 
@@ -142,44 +142,44 @@ procedure FordFulkersonMethod(G, s, t):
 
         Now, the new algorithm will indeed be able to take the new path. Taking the edge going from bottom to top basically cancels the choice it did before to choose it. Being careful to apply the new path correctly (meaning to add it to edges from $G$ and remove it to edges introduced by the residual network), we get the following flow and residual network:
         \imagehere{FlowNetworkSubOptimal-Optimal.png}
-    }
+    \end{subparag}
 
-    \subparag{Proof of optimality}{
+    \begin{subparag}{Proof of optimality}
         We will want to prove its optimality. However, to do so, we need the following definitions.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Cut of flow network}{
+\begin{parag}{Definition: Cut of flow network}
     A \important{cut of flow network} $G = \left(V, E\right)$ is a partition of $V$ into $S$ and $T = V \setminus S$ such that $s \in S$ and $t \in T$.
 
     In other words, we split our graph into nodes on the source side and on the sink side.
     
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, we could  have the following cut (where nodes from $S$ are  coloured in black, and ones from $T$ are coloured in white):
         \imagehere[0.6]{FlowNetworkCutExample.png}
 
         Note that the cut does not necessarily have to be a straight line (since, anyway, straight lines make no sense for a graph).
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Definition: Net flow across a cut}{
+\begin{parag}{Definition: Net flow across a cut}
     The \important{net flow across a cut} $\left(S, T\right)$ is: 
     \[f\left(S, T\right) = \sum_{\substack{u \in S \\ v \in T}}^{} f\left(u, v\right) - \sum_{\substack{u \in S \\ v \in T}}^{} f\left(v, u\right)\]
     
     This is basically the flow leaving $S$ minus the flow entering $S$.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, on the graph hereinabove, it is: 
         \[f\left(S, T\right) = 12 + 11 - 4 = 19\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Property}{
+\begin{parag}{Property}
     Let $f$ be a flow. For any cut $S, T$: 
     \[\left|f\right| = f\left(S, T\right)\]
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We make a proof by structural induction on $S$.
 
         \begin{itemize}[left=0pt]
@@ -191,25 +191,25 @@ procedure FordFulkersonMethod(G, s, t):
         \end{itemize}
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Definition: Capacity of a cut}{
+\begin{parag}{Definition: Capacity of a cut}
     The \important{capacity of a cut} $S, T$ is defined as: 
     \[c\left(S, T\right) = \sum_{\substack{u \in S \\ v \in T}}^{} c\left(u, v\right)\]
     
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, on the graph hereinabove, the capacity of the cut is: 
         \[12 + 14 = 26\]
         
         Note that we do not add the 9, since it goes in the wrong direction.
-    }
+    \end{subparag}
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         This value, however, \textit{depends} on the cut.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 \end{document}

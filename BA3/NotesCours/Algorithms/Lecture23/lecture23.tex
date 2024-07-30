@@ -24,10 +24,10 @@
 \end{itemize}
 }
 
-\parag{Successful search}{
+\begin{parag}{Successful search}
     A successful search also takes expected time $\Theta\left(1 + \alpha\right)$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let's say we search for a uniformly random element. However, a list with many elements has higher probability of being chosen. This means that we need to be careful.
 
         Let $x$ be the element we search, selected at random amongst all the $n$ elements from the table. The number of elements examined during a successful search for $x$ is one more than the number of elements that appear before $x$ in the list. By the implementation of our table, these elements are the elements inserted after $x$ was inserted, which have the same hash. Thus, we need to find the average of how many elements were inserted into $x$'s list after $x$ was inserted, over the $n$ possibilities to take $x$ in the table.
@@ -40,22 +40,22 @@
         which is indeed $\Theta\left(1 + \alpha\right)$
         
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Complexity of search}{
+\begin{parag}{Complexity of search}
     Both successful and unsuccessful searches have average complexity $\Theta\left(1 + \alpha\right)$, where $\alpha = \frac{n}{m}$. So, if we choose the size of our table to be proportional to the number of elements stored (meaning $m = \Theta\left(n\right)$), then search has $O\left(1\right)$ average complexity.
 
     This allowed us to construct a table which has insertion and deletion in $O\left(1\right)$, and search in expected $O\left(1\right)$ time.
-}
+\end{parag}
 
 \section{Back to sorting}
 \subsection{Quick sort}
-\parag{Idea}{
+\begin{parag}{Idea}
     The idea is to again use divide and conquer, but in a way that allows to sort the array in place. So, at any iteration, we choose a value (which yields an index $q$ such that the following properties can be satisfied) named pivot, and we partition $A\left[p\ldots r\right]$ into two (one of them possibly empty) subarrays $A\left[p\ldots \left(q+1\right)\right]$ and $A\left[\left(q+1\right) \ldots r\right]$, such that the elements in the first subarray are less than or equal to $A\left[q\right]$, and the ones in the right are greater than or equal to $A\left[q\right]$. We can then sort each subarray recusrively, and use the fact that we are working in place for not needing any combine step.
 
     \imagehere[0.6]{QuickSortExample.png}
-}
+\end{parag}
 
 
 \begin{filecontents*}[overwrite]{NaivePartitionQuickSort.code}
@@ -69,18 +69,18 @@ procedure Partition(A, p, r):
     return i+1  // pivot index
 \end{filecontents*}
 
-\parag{Naive partitioning}{
+\begin{parag}{Naive partitioning}
     Let's consider the last element to be the pivot. We thus want to reorder our array in place such that the pivot lands in index $q$, and that the two other subarrays have the property mentioned above. 
 
     To do so, we can use two counters: $i$ and $j$. $j$ goes through all elements one by one, and if it finds an element less than the pivot, it will move $i$ one forward and place this element at position $i$. That way, $i$ will always have elements less than or equal to the pivot before it.
     \importcode{NaivePartitionQuickSort.code}{pseudo}
     
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, it turns the first array to the second one:
         \imagehere[0.9]{QuickSortPartitionExample.png}
-    }
+    \end{subparag}
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let's show that our partition algorithm is correct by showing the loop invariant that all entries in $A\left[p \ldots i\right]$ are less than or equal to the pivot, that all entries in $A\left[\left(i+1\right) \ldots \left(j-1\right)\right]$ are strictly greater than the pivot, and that $A\left[r\right]$ is always equal to the pivot.
 
         The initial step is trivial since, before the loop starts, $A\left[r\right]$ is the pivot by construction, and $A\left[p \ldots i\right]$ and $A\left[\left(i+1\right)\ldots\left(j-1\right)\right]$ are empty.
@@ -92,14 +92,14 @@ procedure Partition(A, p, r):
         We can then move the pivot the right place by swapping $A\left[i+1\right]$ and $A\left[r\right]$.
 
         \qed
-    }
+    \end{subparag}
 
-    \subparag{Complexity}{
+    \begin{subparag}{Complexity}
         Let's consider the time complexity of our procedure. 
 
         The for loop runs around $n = r - p + 1$ times. Each iteration takes time $\Theta\left(1\right)$, meaning that the total running time is $\Theta\left(n\right)$ for an array of length $n$. We can also observe that the number of comparions made is around $n$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{quicksort.code}
 procedure Quicksort(A, p, r):
@@ -110,34 +110,34 @@ procedure Quicksort(A, p, r):
         // no need for a combine step :D
 \end{filecontents*}
 
-\parag{Naive quick sort}{
+\begin{parag}{Naive quick sort}
     We can now write our quick sort procedure:
     \importcode{quicksort.code}{pseudo}
     
-    \subparag{Worst case}{
+    \begin{subparag}{Worst case}
         Let's consider the worst case running time of this algorithm. If the list is already sorted, we will always have one of our subarray empty:
         \imagehere[0.5]{WorstCaseQuickSort.png}
 
         Since the \texttt{Partition} procedure takes time proportional to the list size, we get a worst case complexity of: 
         \[\Theta\left(n\right) + \Theta\left(n-1\right) + \ldots + \Theta\left(1\right) = \Theta\left(n^2\right)\]
         which is really not good.
-    }
+    \end{subparag}
     
-    \subparag{Best case}{
+    \begin{subparag}{Best case}
         Let's consider the best case of our algorithm now. This happens when every subarray are completely balance every time, meaning that the pivots always split the array into two subarrays of equal size. This gives us the following recurrence: 
         \[T\left(n\right) = 2T\left(\frac{n}{2}\right) + \Theta\left(n\right)\]
         
         We have already seen it, typically for merge sort, and it can be solved to $T\left(n\right) = \Theta\left(n\log\left(n\right)\right)$ by the master theorem.
-    }
+    \end{subparag}
 
-    \subparag{Average case}{
+    \begin{subparag}{Average case}
         Let's now consider the average case over all possible inputs. Doing it formally would take too much time, but let's consider some intuition to get why we have an average complexity of $\Theta\left(n \log\left(n\right)\right)$.
 
         First, we notice that even if \texttt{Partition} always produces a 9-to-1 split (9 times more elements in one subarray), then we get the recurrence $T\left(n\right) = T\left(\frac{9n}{10}\right) + T\left(\frac{n}{10}\right) + \Theta\left(1\right)$, which solves to $\Theta\left(n \log\left(n\right)\right)$.
 
         Also, we can notice that even if the recursion tree will not always be good, it will usually be a mix of good and bad splits. For instance, having a bad split (splitting $n$ into $0$ and $n-1$) followed by a perfect split takes $\Theta\left(n\right)$, and yields almost the same result as only having a good split (which also takes $\Theta\left(n\right)$).
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{RandomisedQuicksort.code}
 procedure RandomisedPartition(A, p, r):
@@ -152,22 +152,22 @@ procedure RandomisedQuicksort(A, p, r):  // the same
         RandomisedQuicksort(A, q+1, r)
 \end{filecontents*}
 
-\parag{Randomised quick sort}{
+\begin{parag}{Randomised quick sort}
     There is a huge difference between the expected running time over all inputs, and the expected running time for any input. We saw intuitively that the first is $\Theta\left(n\log\left(n\right)\right)$, and by computing a random permutation of our input array, we are able to transform the second into the first. 
 
     However, let's do a better strategy: instead of computing a permutation, let's pick randomly the pivot in the subarray we are considering.
 
-    \subparag{Implementation}{
+    \begin{subparag}{Implementation}
         This modification can be changed very easily by just changing the \texttt{Partition} procedure:
         \importcode{RandomisedQuicksort.code}{pseudo}
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Proposition: Randomised quick sort expected running time}{
+\begin{parag}{Proposition: Randomised quick sort expected running time}
     Randomised quick sort has expected running time $O\left(n \log\left(n\right)\right)$ for any input.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         The dominant cost of the algorithm is partitioning. Each call to \texttt{Partition} has cost $\Theta\left(1 + F_i\right)$ where $F_i$ is the number of comparisons in the for loop. Since an element can be a pivot at most once, \texttt{Partition} is called at most $n$ times. 
 
         This means that, letting $X$ to be the number of comparisons performed in all calls to \texttt{Partition}, the total work done over the entire execution is $O\left(n + X\right)$. We thus want to show that $\exval\left(X\right) = O\left(n\log\left(n\right)\right)$.
@@ -193,38 +193,38 @@ procedure RandomisedQuicksort(A, p, r):  // the same
         as required.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     We have thus seen that randomised quick sort has an expected running time $O\left(n\log\left(n\right)\right)$. Also, this algorithm is in-place and it is very efficient and easy to implement in practice.
-}
+\end{parag}
 
 \subsection{Sorting lower bound}
-\parag{Theorem: Sorting lower bound}{
+\begin{parag}{Theorem: Sorting lower bound}
     Any sorting algorithm takes $\Omega\left(n\right)$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         This is trivial since our algorithm definitely needs to consider every input at least once.
 
         \qed
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Definition: Comparison sorting}{
+\begin{parag}{Definition: Comparison sorting}
     A \important{comparison sorting} algorithm is a sorting algorithm which only uses comparisons of two elements to gain order information about a sequence. 
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         All sorts we have seen so far (insertion sort, merge sort, heapsort, and quicksort) are comparison sorts.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Theorem: Comparison sorting lower bound}{
+\begin{parag}{Theorem: Comparison sorting lower bound}
     Any comparison sorting takes (expected time) $\Omega\left(n\log\left(n\right)\right)$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Any comparison sorting algorithm can be summed up by a decision tree. 
         \imagehere[0.7]{SortingDecisionTree.png}
 
@@ -235,13 +235,13 @@ procedure RandomisedQuicksort(A, p, r):  // the same
 
         In fact, a similar argument implies that $\Omega\left(n\log\left(n\right)\right)$ comparisons are necessary for most inputs.
         \qed
-    }
+    \end{subparag}
     
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         In some sense, it means that merge-sort, heapsort and quicksort are optimal.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{CountingSort.code}
 procedure CountingSort(A, B, n, k):
@@ -264,30 +264,30 @@ procedure CountingSort(A, B, n, k):
         C[A[j]] -= 1  // if needs to be placed again, must not be at the same place
 \end{filecontents*}
 
-\parag{Counting sort}{
+\begin{parag}{Counting sort}
     Let's try to make a sorting algorithm in $O\left(n\right)$. By our theorem above, it requires not to be a comparison sort.
 
     Let's say that the array we receive $A\left[1\ldots n\right]$ has values $A\left[j\right] \in \left\{0, 1, \ldots, k\right\}$ for some $k$. Note that, as long as the array has integer values, we can always shift it like that by subtracting the minimum (found in $O\left(n\right)$). 
 
     Now, the idea, is to make an array $C\left[0\ldots k\right]$ such that $C\left[i\right]$ represents the number of times the value $i$ appears in $A$ (it can be 0, or more). It can be constructed from $A$ in one pass. From this array, we can then make a new, sorted, array $B\left[1 \ldots n\right]$ with the values of $A$, in another single pass.
 
-    \subparag{Algorithm}{
+    \begin{subparag}{Algorithm}
         We can realise that adding one more step can make the algorithm much simpler to implement. When we have computed our array $C$, we can then turn it to a cumulative sum, so that $C\left[i\right]$ represents the number of times the values $0, \ldots, i$ appear in $A$. However, we notice that, then, this values is exactly the place value $i$ would require to land in $B$ (if we need to add it to $B$), i.e. $B\left[C\left[i\right]\right] = i$.
 
         \importcode{CountingSort.code}{pseudo}
-    }
+    \end{subparag}
     
-    \subparag{Analysis}{
+    \begin{subparag}{Analysis}
         Our algorithm only consists of for loops with $\Theta\left(k\right)$ iterations and $\Theta\left(n\right)$ iterations. This gives us a runtime complexity of $\Theta\left(n + k\right)$.
 
         Note that, in fact, because $k$ typically has to be very big, this is not better than the comparisons sort we saw for arrays we have no information about. However, if this $k$ is small enough, then it can be very powerful.
-    }
+    \end{subparag}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This algorithm will not be at the exam since we did not have time to see in the lecture.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 
 

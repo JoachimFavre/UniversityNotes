@@ -25,7 +25,7 @@
 }
 
 \subsection{Priority queue}
-\parag{Definition: Priority queue}{
+\begin{parag}{Definition: Priority queue}
     A priority queue maintains a dynamic set $S$ of elements, where each element has a key (an associated value that regulates its importance). This is a more constraining datastructure than arrays, since we cannot access any element.
 
     We want to have the following operations:
@@ -36,11 +36,11 @@
        \item \texttt{Increase-Key(S, x, k)}: increases the value of element $x$'s key to $k$, assuming that $k$ is greater than its current key value.
    \end{itemize}
 
-   \subparag{Usage}{
+    \begin{subparag}{Usage}
        Priority queue have many usage, the biggest one will be in Dijkstra's algorithm, which we will see later in this course.
-   }
+    \end{subparag}
    
-}
+\end{parag}
 
 
 \begin{filecontents*}[overwrite]{PriorityQueueHeapIncreaseKey.code}
@@ -61,58 +61,58 @@ procedure HeapInsert(A, key, n)
 \end{filecontents*}
 
 
-\parag{Using a heap}{
+\begin{parag}{Using a heap}
     Let us try to implement a priority queue using a heap. 
 
-    \subparag{Maximum}{
+    \begin{subparag}{Maximum}
         Since we are using a heap, we have two procedures for free. \texttt{Maximum(S)} simply returns the root. This is $\Theta\left(1\right)$.
 
         For \texttt{Extract-Max(S)}, we can move the last element of the array to the root and run \texttt{Max-Heapify} on the root (like what we do with heap-sort, but without needing to put the root to the last element of the heap).
         \imagehere[0.5]{PriorityQueueExtractMaxHeap.png}
 
          \texttt{Extract-Max} runs in the same time as applying \texttt{Max-Heapify} on the root, and thus in $O\left(\log\left(n\right)\right)$.
-    }
+    \end{subparag}
 
-    \subparag{Increase key}{
+    \begin{subparag}{Increase key}
         To implement \texttt{Increase-Key}, after having changed the key of our element, we can make it go up until its parent has a bigger key that it.
         \importcode{PriorityQueueHeapIncreaseKey.code}{pseudo}
         
         This looks a lot like max-heapify, and it is thus $O\left(\log\left(n\right)\right)$.
 
         Note that if wanted to implement \texttt{Decrease-Key}, we could just run \texttt{Max-Heapify} on the element we modified. 
-    }
+    \end{subparag}
 
-    \subparag{Insert}{
+    \begin{subparag}{Insert}
         To insert a new key into heap, we can increment the heap size, insert a new node in the last position in the heap with the key $-\infty$, and increase the $-\infty$ value to \texttt{key} using \texttt{Heap-Increase-Key}.
         \importcode{PriorityQueueHeapInsert.code}{pseudo}
         
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     We can make min-priority queues with min-heaps similarly.
-}
+\end{parag}
 
 \subsection{Stack and queue}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     We realise that the heap was really great because it led to very efficient algorithms. So, we can try to make more great data structures.
-}
+\end{parag}
 
-\parag{Definition: Stack}{
+\begin{parag}{Definition: Stack}
     A stack is a data structure where we can insert (\texttt{Push(S, x)}) and delete elements (\texttt{Pop(S)}). This is known as a last-in, first-out (LIFO), meaning that the element we get by using the \texttt{Pop} procedure is the one that was inserted the most recently.
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         This is really like a stack: we put elements over one another, and then we can only take elements back from the top.
-    }
+    \end{subparag}
 
-    \subparag{Usage}{
+    \begin{subparag}{Usage}
         Stacks are everywhere in computing: a computer has a stack and that's how it operates.
 
         Another usage is to know if an expressions with parenthesis, brackets and curly brackets is a well-parenthesised expression. Indeed, we can go through all letters from our expression. When we get an opening character (\texttt{(}, \texttt{[} or \texttt{\{}), then we can push it in our stack. When we get a closing character (\texttt{)}, \texttt{]} or \texttt{\}}) we can pop an element from the stack and verify that both characters correspond.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{StackPush.code}
 procedure Push(S, x):
@@ -129,43 +129,43 @@ procedure Pop(S, x):
 \end{filecontents*}
 
 
-\parag{Stack implementation}{
+\begin{parag}{Stack implementation}
     A good way to implement a stack is using an array.
 
     We have an array of size $n$, and a pointer \texttt{S.top} to the last element (some space in the array can be unused).
 
-    \subparag{Empty}{
+    \begin{subparag}{Empty}
         To know if our stack is empty, we can basically only return \texttt{S.top == 0}. This definitely has a complexity of $O\left(1\right)$.
-    }
+    \end{subparag}
     
-    \subparag{Push}{
+    \begin{subparag}{Push}
         To push an element in our array, we can do:
         \importcode{StackPush.code}{pseudo}
 
         Note that, in reality, we would need to verify that we have the space to add one more element, not to get an \texttt{IndexOutOfBoundException}.
         
         We can notice that this is executed in constant time.
-    }
+    \end{subparag}
 
-    \subparag{Pop}{
+    \begin{subparag}{Pop}
         Popping element is very similar to pushing:
         \importcode{StackPop.code}{pseudo}
 
         We can notice that this is also done in constant time.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Queue}{
+\begin{parag}{Queue}
     A queue is a data structure where we can insert elements (\texttt{Enqueue(Q, x)}) and delete elements (\texttt{Dequeue(Q)}). This is known as a first-in, first-out (FIFO), meaning that the element we get by using the \texttt{Dequeue} procedure is the one that was inserted the least recently.
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         This is really like a queue in real life: people that get out of the queue are people who were there for the longest.
-    }
+    \end{subparag}
 
-    \subparag{Usage}{
+    \begin{subparag}{Usage}
         Queues are also used a lot, for instance in packet switches in the internet.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{Enqueue.code}
 procedure Enqueue(Q, x)
@@ -187,31 +187,31 @@ procedure Dequeue(Q)
 \end{filecontents*}
 
 
-\parag{Queue implementation}{
+\begin{parag}{Queue implementation}
     We have an array $Q$, a pointer \texttt{Q.head} to the first element of the queue, and \texttt{Q.tail} to the place after the last element.
     \imagehere[0.5]{QueuePointers.png}
 
-    \subparag{Enqueue}{
+    \begin{subparag}{Enqueue}
         To insert an element, we can simply use the \texttt{tail} pointer, making sure to have it wrap around the array if needed:
         \importcode{Enqueue.code}{pseudo}
 
         Note that, in real life, we must verify upon overflow. We can observe that this procedure is executed in constant time.
-    }
+    \end{subparag}
 
-    \subparag{Dequeue}{
+    \begin{subparag}{Dequeue}
         To get an element out of our queue, we can use the \texttt{head} pointer:
         \importcode{Dequeue.code}{pseudo}
 
         Note that, again, in real life, we must verify upon underflow. Also, this procedure is again executed in constant time.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Summary}{
+\begin{parag}{Summary}
     Both stacks and queues are very efficient and have natural operations. However, they have limited support (we cannot search). Also, implementations using arrays have a fixed-size capacity.
-}
+\end{parag}
 
 \subsection{Linked list}
-\parag{Linked list}{
+\begin{parag}{Linked list}
     The idea of a linked list is to, instead of having predefined memory slots like an array, each object is stored in a point in memory and has a pointer to the next element (meaning that we do not need to have all elements follow each other in memory). In an array we cannot increase the size after creation, whereas for linked lists we have space as long as we have memory left.
 
     We use a pointer \texttt{L.head} to the first element of our list.
@@ -225,7 +225,7 @@ procedure Dequeue(Q)
     It is also possible to have a sentinel, a node like all the others, except it does not wear a value. This can simplify a lot the algorithms, since the pointer to the head of the list always points to this sentinel. For instance, a circular doubly-linked list with a sentinel would look like:
     \imagehere{CircularDoublyLinkedListWithSentinel.png}
 
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{LinkedListSearch.code}
 procedure List-Search(L, k)
@@ -261,26 +261,26 @@ procedure Sentinel-List-Delete(L, x):
 \end{filecontents*}
 
 
-\parag{Operations}{
+\begin{parag}{Operations}
     Let's consider the operations we can do with a linked list.
 
-    \subparag{Search}{
+    \begin{subparag}{Search}
         We can search in a linked list just as we search in an unsorted array:
         \importcode{LinkedListSearch.code}{pseudo}
         
         We can note that, if $k$ cannot be found, then this procedure returns \texttt{nil}. Also, clearly, this procedure is $O\left(n\right)$.
-    }
+    \end{subparag}
 
-    \subparag{Insertion}{
+    \begin{subparag}{Insertion}
         We can insert an element to the first position of a double-linked list by doing:
         \importcode{LinkedListInsert.code}{pseudo}
         
         We are basically just rewiring the pointers of \texttt{L.head}, \texttt{x} and the first elements for everything to work.
 
         This runs in $O\left(1\right)$.
-    }
+    \end{subparag}
     
-    \subparag{Delete}{
+    \begin{subparag}{Delete}
         Given a pointer to an element $x$, we want to remove it from $L$:
         \importcode{LinkedListDelete.code}{pseudo}
         
@@ -290,11 +290,11 @@ procedure Sentinel-List-Delete(L, x):
         \importcode{LinkedListDeleteSentinel.code}{pseudo}
 
         Both those implementations run in $O\left(1\right)$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Summary}{
+\begin{parag}{Summary}
     A linked list is interesting because it does not have a fixed capacity, and we can insert and delete elements in $O\left(1\right)$ (as long as we have a pointer to the given element). However, searching is $O\left(n\right)$, which is not great (as we will see later).
-}
+\end{parag}
 
 \end{document}

@@ -23,22 +23,22 @@
 
 \subsection{Application: Longest common subsequence}
 
-\parag{Problem}{
+\begin{parag}{Problem}
     We have two sequences $X = \left\langle x_1, \ldots, x_m \right\rangle$ and $Y = \left\langle y_1, \ldots, y_n \right\rangle$, and we want to find the longest common subsequence (LCS; it does not necessarily to have to be consecutive, as long as it is in order) common to both.
 
     For instance, if we have h,e,r,o,i,c,a,l,l,y and s,c,h,o,l,a,r,l,y, then the longest common subsequence is h,o,l,l,y.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This problem can for instance be useful if we want a way to compute how far are two strings from each others: finding the length of the longest common subsequence would be one way to measure this distance.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Brute force}{
+\begin{parag}{Brute force}
     We can note that brute force does not work, since we have $2^m$ subsequences of $X$ and that each subsequence takes $\Theta\left(n\right)$ time to check (since we need to scan $Y$ for the first letter, then scan it for the second, and so on, until we know if this is also a subsequence of $Y$). This leads to a runtime complexity of $\Theta\left(n2^m\right)$.
-}
+\end{parag}
    
-\parag{Theorem: Optimal substructure}{
+\begin{parag}{Theorem: Optimal substructure}
     We can note the following idea. Let's say we start at the end of both words and move to the left step-by-step (the other direction would also work), considering one letter from both word at any time. If the two letters are the same, the we can let it to be in the susequence. If they are not the same, then the optimal subsequence can obtained by moving to the left in one of the words.
 
     Let's write this more formally. Let $X_i$ and $Y_j$ denote the subprefixes $\left\langle x_1, \ldots, x_n \right\rangle$ and $\left\langle y_1, \ldots, y_j \right\rangle$, respectively. Also, let $Z = \left\langle z_1, \ldots z_k \right\rangle$ be any longest common subsequence (LCS) of $X_i$ and $Y_j$. We then know that:
@@ -48,18 +48,18 @@
         \item If $x_i \neq y_j$ and $z_k \neq y_j$, then $Z$ is an LCS of $X_i$ and $Y_{j-1}$.
     \end{enumerate}
 
-    \subparag{Proof of the first part of the first point}{
+    \begin{subparag}{Proof of the first part of the first point}
         Let's prove the first point, supposing for contradiction that $z_k \neq x_i = y_j$.
 
         However, there is contradiction, since we can just create $Z' = \left\langle z_1, \ldots, z_k, x_i \right\rangle$. This is indeed a new subsequence of $X_i$ and $Y_j$ which is one longer, and thus contradicts the fact that $Z$ was the \textit{longest} common subsequence.
 
         We also note that, if $y_j$ would be already matched to something (meaning that we would not be able to match it now), it would mean that $z_k = y_j$: $y_j$ is the last letter of $Y$ and it must thus be the last letter of $Z$. Naturally, we can do a similar reasoning to show that $x_i$ was not already matched.
-    }
+    \end{subparag}
 
-    \subparag{Proof of the rest}{
+    \begin{subparag}{Proof of the rest}
         The proofs of the second part of the first point, and for the second and the third point (which are very similar) are considered trivial and left as exercises to the reader. \smiley
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{LongestCommonSubsequenceCompute.code}
 procedure LCSLength(X, Y, m, n):
@@ -100,7 +100,7 @@ procedure PrintLCS(b, X, i, j):
         print X[i]
 \end{filecontents*}
 
-\parag{Dynamic programming}{
+\begin{parag}{Dynamic programming}
     The theorem above gives us the following recurrence, where $c\left[i, j\right]$ is the length of an LCS of $X_i$ and $Y_j$:
     \begin{functionbypart}{c\left[i, j\right]}
     0, \mathspace \text{if } i = 0 \text{ or } j = 0 \\
@@ -118,12 +118,12 @@ procedure PrintLCS(b, X, i, j):
 
     We can note that each recursive call decreases $i + j$ by at least one. Hence, the time needed is at most $T\left(i+j\right) \leq T\left(i+j-1\right) + \Theta\left(1\right)$, which means it is $O\left(i+j\right)$. Also, each recursive call decreases $i+j$ by at most two. Hence, the time needed at least $T\left(i+j\right) \geq T\left(i+j-2\right) + \Theta\left(1\right)$, which means it is $\Omega\left(i+j\right)$. In other words, this means that we can print the result in $\Theta\left(m + n\right)$.
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         Conceptually, for $X = \left\langle B, A, B, D, B A \right\rangle$ and $Y = \left\langle D, A, C, B, C, B, A \right\rangle$, we are drawing the following table:
         \imagehere{LongestCommonSubsequenceTableArrowsExample.png}
         where the numbers are stored in the array \texttt{c} and the arrows in the array \texttt{b}. For this example, we would give us that the longest common subsequence is $Z = \left\langle A, B, B, A \right\rangle$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \end{document}
 

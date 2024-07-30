@@ -24,16 +24,16 @@
 }
 
 \subsection{Binary search trees}
-\parag{Intuition}{
+\begin{parag}{Intuition}
     Let's think about the following following game: Alice thinks about an integer $n$ between 1 and 15, and Bob must guess it. To do so, he can make guesses, and Alice tells him if the number is correct, smaller, or larger. 
 
     Intuitively, it seems like we can make a much more efficient algorithm than the basic linear one, one that would work in $O\left(\log\left(n\right)\right)$ instead.
-}
+\end{parag}
 
-\parag{Definition: Binary Search Trees}{
+\begin{parag}{Definition: Binary Search Trees}
     A binary search tree is a binary tree (which is \textit{not} necessarily nearly-complete), which follows the following core property: for any node $x$, if $y$ is in its left subtree then $y.key < x.key$, and if $y$ is in the right subtree of $x$, then $y.key \geq x.key$.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, here is a binary search tree of height $h = 3$:
         \imagehere{BinarySearchtreeExample.png}
 
@@ -41,13 +41,13 @@
         \imagehere{BinarySearchtreeExampleBad.png}
 
         We will see that good binary search trees are one with the smallest height, since complexity will depend on it.
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Even though binary search trees are not necessarily nearly-complete, we can notice that their property is much more restrictive than the one of heaps.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{BinarySearchTreeSearch.code}
 procedure TreeSearch(x, k)
@@ -59,11 +59,11 @@ procedure TreeSearch(x, k)
         return TreeSearch(x.right, k)
 \end{filecontents*}
 
-\parag{Searching}{
+\begin{parag}{Searching}
     We designed this data-structure for searching, so the implementation is not very complicated:
     \importcode{BinarySearchTreeSearch.code}{pseudo}
     
-}
+\end{parag}
 
 
 \begin{filecontents*}[overwrite]{BinarySearchTreeMinimum.code}
@@ -80,7 +80,7 @@ procedure TreeMaximum(x)
     return x
 \end{filecontents*}
 
-\parag{Extrema}{
+\begin{parag}{Extrema}
     We can notice that the minimum element is located in the leftmost node, and the maximum is located in the rightmost node.
     \imagehere[0.7]{BinarySearchTreeExtrma.png}
 
@@ -89,7 +89,7 @@ procedure TreeMaximum(x)
     
     We can make a very similar procedure to find the maximum element, which also runs in complexity $O\left(h\right)$: 
     \importcode{BinarySearchTreeMaximum.code}{pseudo}
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{BinarySearchTreeSuccessor.code}
 procdure TreeSuccessor(x)
@@ -102,7 +102,7 @@ procdure TreeSuccessor(x)
     return y
 \end{filecontents*}
 
-\parag{Successor}{
+\begin{parag}{Successor}
     The successor of a node $x$ is the node $y$ where $y.key$ is the smallest key such that $y.key > x.key$. For instance, if we have a tree containing the numbers $1, 2, 3, 5, 6$, the successor of 2 is 3 and the successor of 3 is 5.
 
     To find the successor of a given element, we can split two cases. If $x$ has a non-empty right subtree, then its sucessor is the minimum in this right subtre (it is the minimum number which is greater than $x$). However, if $x$ does not have a right subtree, we can consider the point of view of the successor $y$ of $x$: we know that $x$ is the predecessor of $y$, meaning that it is at the rightmost bottom of $y$'s left subtree. This means that we can go to the up-left (go up, as long as we are the right child), until we need to go to the up-right (go up, but we are the left child). When we went up-right, we found the successor of $x$.
@@ -113,7 +113,7 @@ procdure TreeSuccessor(x)
     \importcode{BinarySearchTreeSuccessor.code}{pseudo}
 
     We can note that looking at the successor of the greatest element yields $y = \text{\texttt{Nil}}$, as expected. Also, the procedure to find the predecessor is symmetrical.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{PreorderTreeWalk.code}
 procedure PreoderTreeWalk(x)
@@ -123,14 +123,14 @@ procedure PreoderTreeWalk(x)
         PreorderTreeWal(x.right)
 \end{filecontents*}
 
-\parag{Printing}{
+\begin{parag}{Printing}
     To print a binary tree, we have three methods: \important{preorder}, \important{inorder} and \important{postorder} tree walk. They all run in $\Theta\left(n\right)$.
 
     The preorder tree walk looks like:
     \importcode{PreorderTreeWalk.code}{pseudo}
     
     The inorder has the \texttt{print key[x]} statement one line lower, and the postorder tree walk has this instruction two lines lower.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{BinarySearchTreeInsert.code}
 procedure BinarySearchTreeInsert(T, z)
@@ -154,11 +154,11 @@ procedure BinarySearchTreeInsert(T, z)
         y.right = z
 \end{filecontents*}
 
-\parag{Insertion}{
+\begin{parag}{Insertion}
     To insert an element, we can basically search for this element and, when finding its supposed position, we can basically insert it at that position.
 
     \importcode{BinarySearchTreeInsert.code}{pseudo}
-}
+\end{parag}
 
 
 

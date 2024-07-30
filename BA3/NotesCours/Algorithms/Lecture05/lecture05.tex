@@ -23,7 +23,7 @@
 
 }
 
-\parag{Maximum subarray problem}{
+\begin{parag}{Maximum subarray problem}
     We have an array of values representing stock price, and we want to find when we should have bought and when we should have sold (retrospectively, so this is no investment advice). We want to buy when the cost is as low as possible and sell when it is as high as possible. Note that we cannot just take the all time minimum and all time maximum since the maximum could be before the minimum.
 
     Let's switch our perspective by instead considering the array of changes: the difference between $i$ and $i-1$. We then want to find the largest contiguous subarray that has the maximum sum; this is named the \important{maximum subarray problem}. In other words, we want to find $i < j$ such that $A\left[i\ldots j\right]$ has the biggest sum possible. For instance, for $A = \left[1, -4, 3, -4\right]$, we have $i = j = 3$, and the sum is 3.
@@ -34,20 +34,20 @@
 
     We get that the divide step is $\Theta\left(1\right)$, the conquer step solves two problems each of size $\frac{n}{2}$, and the merge time takes linear time. Thus, we have the exact same recurrence relation as for merge sort, giving us a time complexity of $\Theta\left(n\log\left(n\right)\right)$.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We will make a $\Theta\left(n\right)$ algorithm to solve this problem in the third exercise series.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 \subsection{Fast multiplication}
-\parag{Problem}{
+\begin{parag}{Problem}
     We want to multiply quickly two numbers. The regular algorithm seen in primary school is $O\left(n^2\right)$, but we think that we may be able to go faster.
 
     We are given two integers $a, b$ with $n$ bits each (they are given to us through arrays of bits), and we want to output $a\cdot b$. This can be important for cryptography for instance.
-}
+\end{parag}
 
-\parag{Fast multiplication}{
+\begin{parag}{Fast multiplication}
     We want to use a divide and conquer strategy.
 
     Let's say we have an array of values $a_0, \ldots, a_{n}$ giving us $a$, and an array of values $b_0, \ldots, b_n$ giving us $b$ (we will use base 10 here, but it works for any base): 
@@ -67,16 +67,16 @@
     
     This gives us a recursive algorithm. We compute $a_L b_L$, $a_H b_L$, $a_L b_H$ and $a_H b_H$ recursively. We can then do the corresponding shifts, and finally add everything up.
 
-    \subparag{Complexity algorithm}{
+    \begin{subparag}{Complexity algorithm}
         The recurrence of this algorithm is given by:
         \[T\left(n\right) = 4T\left(\frac{n}{2}\right) + n\]
         since addition takes a linear time.
 
         However, this solves to $T\left(n\right) = \Theta\left(n^2\right)$ by the master theorem \frownie.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Karatsouba algorithm}{
+\begin{parag}{Karatsouba algorithm}
     Karatsouba, a computer scientist, realised that we do not need 4 multiplications. Indeed, let's compute the following value: 
     \[\left(a_L + a_H\right)\left(b_L + b_H\right) = a_L b_L + b_H b_H + a_H b_L + b_H a_L\]
     
@@ -85,33 +85,33 @@
 
     Thus, considering what we did before, we this time only need three multiplications: $\left(a_L + a_H\right)\left(b_L + b_H\right)$, $a_L b_L$ and $a_H b_H$. 
 
-    \subparag{Complexity analysis}{
+    \begin{subparag}{Complexity analysis}
         The recurrence of this algorithm is given by:
         \[T\left(n\right) = 3T\left(\frac{n}{2}\right) + n\]
 
         This solves to $T\left(n\right) = \Theta\left(n^{\log_2\left(3\right)}\right)$, which is better than the primary school algorithm.
 
         Note that we are cheating a bit on the complexity, since $\left(a_L + a_H\right)\left(b_L + b_H\right)$ is $T\left(\frac{n}{2} + 1\right)$. However, as mentioned in the last lesson, we don't really care about floor and ceiling functions (nor this $+1$).
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     Note that, in most of the cases, we are working with 64-bit numbers which can be multiplied in constant time on a 64-bit CPU. The algorithm above is in fact really useful for huge numbers (in cryptography for instance).
-}
+\end{parag}
 
 
 \subsection{Matrix multiplication}
 
-\parag{Problem}{
+\begin{parag}{Problem}
     We are given two $n \times n$ matrices, $A = \left(a_{ij}\right)$ and $B = \left(b_{ij}\right)$, and we want to output a $n \times n$ matrix $C = \left(c_{ij}\right)$ such that $C = AB$.
 
     Basically, when computing the value of $c_{ij}$, we compute the dot-product of the $i$\Th row of $A$ and the $j$\Th column of $B$.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, for $n = 2$: 
         \autoeq{\unexpanded{\begin{pmatrix} c_{11} & c_{12} \\ c_{21} & c_{22} \end{pmatrix} = \begin{pmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{pmatrix} \begin{pmatrix} b_{11} & b_{12} \\ b_{21} & b_{22} \end{pmatrix} = \begin{pmatrix} a_{11} b_{11} + a_{12} b_{21} & a_{11} b_{12} + a_{12} b_{22} \\ a_{21} b_{11} + a_{22} b_{21} & a_{21} b_{12} + a_{22} b_{22}\end{pmatrix}}}
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{naiveMatrixMultiplication.code}
 let C be a new nxn matrix
@@ -122,16 +122,16 @@ for i = 1 to n
                 c[i]j] = c[i][j] + a[i][k]*b[j][j]
 \end{filecontents*}
 
-\parag{Naive algorithm}{
+\begin{parag}{Naive algorithm}
     The naive algorithm is:
     \importcode{naiveMatrixMultiplication.code}{pseudo}
     
-    \subparag{Complexity}{
+    \begin{subparag}{Complexity}
         There are three nested for-loops, so we get a runtime of $\Theta\left(n^3\right)$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Divide and conquer}{
+\begin{parag}{Divide and conquer}
     We can realise that, when multiplying matrices, this is like multiplying submatrices. If we have $A$ and $B$ being two $n \times n$ matrices, then we can split them into submatrices and get: 
     \[\begin{pmatrix} C_{11} & C_{12} \\ C_{21}  & C_{21} \end{pmatrix} = \begin{pmatrix} A_{11} & A_{12} \\ A_{21} & A_{22} \end{pmatrix} \begin{pmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{pmatrix} \]
     where those elements are matrices.
@@ -140,25 +140,25 @@ for i = 1 to n
     \[C_{11} = A_{11} B_{11} + A_{12} B_{21}\]
     and similarly for all others elements.
 
-    \subparag{Complexity}{
+    \begin{subparag}{Complexity}
         Since we are splitting our multiplication into 8 matrix multiplications that each need the multiplication of two $\frac{n}{2} \times \frac{n}{2}$ matrices, we get the following recurrence relation: 
         \[T\left(n\right) = 8T\left(\frac{n}{2}\right) + n^2\]
         since adding two matrices takes $O\left(n^2\right)$ time.
 
         The master theorem tells us that we have $T\left(n\right) = \Theta\left(n^3\right)$, which is no improvement.
-   }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Strassen's algorithm}{
+\begin{parag}{Strassen's algorithm}
     Strassen realised that we only need to perform 7 recursive multiplications of $\frac{n}{2} \times \frac{n}{2}$ rather than $8$. This gives us the recurrence: 
     \[T\left(n\right) = 7T\left(\frac{n}{2}\right) + \Theta\left(n^2\right)\]
     where the $\Theta\left(n^2\right)$ comes from additions, substractions and copying some matrices.
     
     This solves to $T\left(n\right) = \Theta\left(n^{\log_2\left(7\right)}\right)$ by the master theorem, which is better!
-}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     Strassen was the first to beat the $\Theta\left(n^3\right)$, but now we find algorithms with better and better complexity (Even though the best ones currently known are galactic algorithms).
-}
+\end{parag}
 
 \end{document}

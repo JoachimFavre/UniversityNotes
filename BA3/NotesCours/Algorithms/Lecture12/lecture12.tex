@@ -22,13 +22,13 @@
 }
 
 \subsection{Application: Optimal binary search tree}
-\parag{Optimal binary search trees}{
+\begin{parag}{Optimal binary search trees}
     The goal is that, given a \textit{sorted} sequence $K = \left\langle k_1, \ldots, k_n\right\rangle$ of $n$ distinct key, we want to build a binary search tree. There is a slight twist: we know that the probability to search for $k_i$ is $p_i$ (for instance, on social media, people are much more likely to search for stars than for regular people). We thus want to build the binary search tree with minimum expected search cost.
 
     The cost is the number of items examined. For a key $k_i$, the cost is given by $\text{depth}_T\left(k_i\right) + 1$, where the term $\text{depth}_T\left(k_i\right)$ tells us the depth of $k_i$ in the tree $T$. This gives us the following expected search cost: 
     \autoeq{\unexpanded{\exval \left[\text{search cost in $T$}\right] = \sum_{i=1}^{n} \left(\text{depth}_T\left(k_i\right) + 1\right)p_i = \sum_{i=1}^{n} p_i + \sum_{i=1}^{n} \text{depth}_T\left(k_i\right) = 1 + \sum_{i=1}^{n} \text{depth}_T\left(k_i\right)p_i}}
     
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For instance, let us consider the following tree and probability table:
         \imagehere[0.5]{BinarySearchTreeDPExample.png}
 
@@ -45,25 +45,25 @@
 
         Which is equal to:
         \[\exval\left[\text{search cost}\right] = 1 + 1.15 = 2.15\]
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Designing a good binary search tree is equivalent to designing a good binary search strategy.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     We notice that the optimal binary search tree might not have the smallest height, and that it might not have the highest-probability key at the root too.
-}
+\end{parag}
 
-\parag{Brute force}{
+\begin{parag}{Brute force}
     Before doing anything too fancy, let us start by considering the brute force algorithm: we construct each $n$-node BST, then for each put in keys, and compute their expected search cost. We can finally pick the tree with the smallest expected search cost.
 
     However, there are exponentially many trees, making our algorithm really bad.
-}
+\end{parag}
 
-\parag{Theorem: Optimal substructure}{
+\begin{parag}{Theorem: Optimal substructure}
     We know that:
     \[\exval \left[\text{search cost}\right] = \sum_{i=1}^{n} \left(\text{depth}_T\left(k_i\right) + 1\right)p_i\]
 
@@ -82,7 +82,7 @@
     0, \mathspace \text{if } i = j + 1 \\
     \min_{i \leq r \leq j} \left\{e\left[i, r-1\right] + e\left[r + 1, j\right] + \sum_{\ell = i}^{j} p_{\ell}\right\}, \mathspace \text{if } i \leq j
     \end{functionbypart}
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{OptimalBST.code}
 procedure OptimalBST(p, q, n):
@@ -111,14 +111,14 @@ procedure OptimalBST(p, q, n):
 \end{filecontents*}
 
 
-\parag{Bottom-up algorithm}{
+\begin{parag}{Bottom-up algorithm}
     We can write our algorithm as:
     \importcode{OptimalBST.code}{pseudo}
 
     We needed to be careful not to compute the sums again and again.
 
     We note that there are three nested loops, thus the total runtime is $\Theta\left(n^3\right)$. Another way to see this is that we have $\Theta\left(n^2\right)$ cells to fill in and that most cells take $\Theta\left(n\right)$ time to fill in.
-}
+\end{parag}
 
 
 \end{document}

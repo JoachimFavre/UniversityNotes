@@ -24,33 +24,33 @@
 
 }
 
-\parag{Randomness extraction}{
+\begin{parag}{Randomness extraction}
     Let's say that we have a random function that returns 1 with probability $p$ and $0$ with probability $1-p$. We want to generate $0$ or $1$ with probability $\frac{1}{2}$. 
 
     To do so, we can generate a pair of random numbers $\left(a, b\right)$. We notice that there is the same probability $p\left(1-p\right)$ to get $\left(a, b\right) = \left(0, 1\right)$ and $\left(a, b\right) = \left(1, 0\right)$. Thus, if we generate new pairs until we have $a \neq b$, we can then just output $a$, which will be 0 or 1 with both probability $\frac{1}{2}$.
 
     In the worst case, this method requires an infinite number of throws, but we can compute that the expected number of throws is $\frac{1}{2p\left(1-p\right)}$, meaning that we are fine on average (if $p$ is not too small and not too close to $1$).
-}
+\end{parag}
 
 \subsection{Hash functions and tables}
-\parag{Birthday paradox}{
+\begin{parag}{Birthday paradox}
     Let's say that people have a uniform $\frac{1}{365}$ probability to be be born a given day of a year. We wonder how many people we need so that at least two of them have their birthday the same day with probability $50\%$ or higher.
 
     Clearly, if we have 366 people, two people have the same date. However, we only need 23 people to get a probability of 50\% and 57 to reach a probability of 97\%.
-}
+\end{parag}
 
-\parag{Birthday lemma}{
+\begin{parag}{Birthday lemma}
     Let $M$ be a finite set, $q \in \mathbb{N}$ and $f: \left\{1, 2, \ldots, q\right\} \mapsto M$ a function chosen uniformly at random  (meaning that $f\left(1\right)$ is chosen uniformly random in $M$, and so on until $f\left(q\right)$; when those values are chosen they become fixed).
 
     If $q > 1.78\sqrt{\left|M\right|}$, then the probability that $f$ is injective (meaning that there is no collision) is at most $\frac{1}{2}$, i.e. the $\prob\left(\text{injective}\right) \leq \frac{1}{2}$.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Applying this to the birthday problem, we would have $M = \left\{1, 2, \ldots, 365\right\}$ and the function $f$ maps any person to a given day in the year, and it definitely seems chosen uniformly at random.
 
         Note that, in this case, the bound on $q$ is not very good (we get $q \geq 31$ but we only needed $q \geq 23$) but this lower bound will be very interesting hereinafter.
-    }
+    \end{subparag}
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let $m = \left|M\right|$. A function with only one element is injective $1$ with probability $100\%$. Then, when we add the second element, the probability that it is still injective is $1\cdot \frac{m-1}{m}$ (this second element can map to any element, except to the one already taken by $f\left(1\right)$). Similarly, when we add the third element, the probability that our function is still injective is $1 \cdot  \frac{m-1}{m} \cdot \frac{m-2}{m}$. So, with $q$ elements: 
         \autoeq{\unexpanded{\prob\left(\text{injective}\right) = \frac{m}{m} \cdot \frac{m-1}{m} \cdots \frac{m - \left(q - 1\right)}{m} = 1\left(1 - \frac{1}{m}\right)\cdots\left(1 - \frac{q-1}{m}\right)}}
             
@@ -63,17 +63,17 @@
         \autoeq{\unexpanded{\exp\left(-\frac{q\left(q-1\right)}{2m}\right) \leq \frac{1}{2} \iff q^2 - q \geq 2\ln\left(2\right)m \implies q \geq \frac{1 + \sqrt{1 + 8\ln\left(2\right)}}{2} \sqrt{m} \approx 1.78\sqrt{m}}}
         
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Hash function}{
+\begin{parag}{Definition: Hash function}
     A \important{hash function} $h: U \mapsto \left\{0, 1, \ldots, m-1\right\}$ is a ``many-to-one'' function: a function which has many more possible input than outputs.
 
     A good hash function must have three properties. First, it must be efficiently computable. Second, all the $u \in U$ should be uniformly distributed onto the $\left\{0, 1, \ldots, m-1\right\}$. Third, once the hashing function $h$ is set, $h\left(k\right)$ must always give the same value.
     
     This is \important{simple uniform hashing}.
 
-    \subparag{Examples}{
+    \begin{subparag}{Examples}
         A way to choose hash functions is to use a modulo: 
         \[h\left(k\right) = k \Mod m\]
         where $m$ is often selected to be a prime not too close to a power of 2.
@@ -83,29 +83,29 @@
         where $x - \left\lfloor x \right\rfloor $ is basically the fractional part of $x$. For the $A$, there are different valid choices, and Knut suggests to choose $A = \frac{\sqrt{5} - 1}{2}$.
 
         The important thing to remember is only that hash functions are a big area of research, and that they all depend on data distribution and other properties.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Naive table}{
+\begin{parag}{Naive table}
     We want to design a data structure which allows to insert, delete and search for elements in (expected) constant time.
 
     A first way to do it is to give a unique number to every element (such as ISBN if we are considering books), and we can make a table with an entry with each possible number. This indeed gives a running time of $O\left(1\right)$ for each operation, but a space of $O\left(\left|U\right|\right)$. The thing is we only have $\left|K\right| \ll \left|U\right|$ keys, so this is very space inefficient.
-}
+\end{parag}
 
-\parag{Bad hash table}{
+\begin{parag}{Bad hash table}
     In our table, instead of storing an element with key $k$ into index $k$, we store it in $h\left(k\right)$, where $h: U \mapsto \left\{0, 1, \ldots, m-1\right\}$ is a hash function (note that the array needs $m$ slots now). Two keys could collide, but we take $m$ to be big enough so that it is very unlikely. Search, insertion and deletion are also be in $O\left(1\right)$ in the average case as long as there is no collision.
 
      By the birthday lemma, for $h$ to be injective with good probability, we need $m > K^2$. This means that we would still have a lot of empty memory, which is really inefficient.
-}
+\end{parag}
 
-\parag{Hash table}{
+\begin{parag}{Hash table}
     Let's now (finally) see a correct hash table. The goal is to have a space proportional to the number $K$ of keys stored, i.e. $\Theta\left(K\right)$. Instead of avoiding every collision, we will try to deal with them.
 
     In every index we can instead store a double-linked list. Then, searching, inserting and deleting are also very simple to implement. To insert an element, we insert it at the head of the linked list in the good slot, which can be done in $\Theta\left(1\right)$. To delete an element we can remove it easily from the linked list in $\Theta\left(1\right)$, since we are given a pointer to it. Searching however requires to search in the list at the correct index, which takes a time proportional to the size of this list. The worst case for searching is thus $\Theta\left(n\right)$ (if the hash function conspires against us and puts all elements in the same slot), but we want to show that this is actually $\Theta\left(1\right)$ in average case, without requiring $m$ too large. This is done in the following paragraphs.
-}
+\end{parag}
 
-\parag{Expected list size}{
+\begin{parag}{Expected list size}
     Let $n_j$ denote the length of the list $T\left[j\right]$. By construction, we have: 
     \[n = n_0 + n_1 + \ldots + n_{m-1}\]
     
@@ -113,12 +113,12 @@
     \[\exval\left(n_j\right) = \prob\left(h\left(k_1\right) = j\right) + \ldots + \prob\left(h\left(k_n\right) = j\right) = \frac{1}{m} + \frac{1}{m} + \ldots + \frac{1}{m} = \frac{n}{m}\]
 
     Since this value will be important, we call $\exval\left(n_j\right) = \frac{n}{m} = \alpha$.
-}
+\end{parag}
 
-\parag{Unsuccessful search}{
+\begin{parag}{Unsuccessful search}
     An unsuccessful search takes an average time  of $\Theta\left(1 + \alpha\right)$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Since we use uniform hashing, any key which is not in the table is equally likely to hash to any of the $m$ slots.
 
         To search unsuccessfully for any key $k$, we need to search until the end of list $T\left[h\left(k\right)\right]$, which has expected length $\exval\left(n_{h\left(k\right)}\right) = \alpha$. Thus, the expected number of elements examined in an unsuccessful search is $\alpha$.
@@ -126,11 +126,11 @@
         Finally, we add the cost for computing the hash function, leading to $\Theta\left(1 + \alpha\right)$.
 
         \qed
-    }
+    \end{subparag}
  
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Since $\alpha = \frac{n}{m}$, depending on the way we choose $m$, we can have $\alpha = \Theta\left(\frac{1}{n}\right)$. This is why we need to add the 1 to the runtime (we cannot get below constant running time).
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \end{document}

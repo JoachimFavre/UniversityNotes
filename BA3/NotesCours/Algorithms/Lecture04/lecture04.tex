@@ -22,31 +22,31 @@
 
 }
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's look at the following recurrence: 
     \[T\left(n\right) = T\left(\frac{n}{4}\right) + T\left(\frac{3}{4}n\right) + 1\]
     
     We want to show it is $\Theta\left(n\right)$.
 
-    \subparag{Upper bound}{
+    \begin{subparag}{Upper bound}
         Let's prove that there exists a $b$ such that $T\left(n\right) \leq bn$. We consider the base case to be correct, by choosing $b$ to be large enough.
 
         Let's do the inductive step. We get:
         \autoeq{\unexpanded{T\left(n\right) = T\left(\frac{1}{4}n\right) + T\left(\frac{3}{4}n\right) + 1 \leq b \frac{1}{4} n + b \frac{3}{4} n + 1 = bn + 1}}
         
         But we wanted $bn$, so it proves nothing. We could consider that our guess is wrong, or do another proof.
-    }
+    \end{subparag}
 
-    \subparag{Upper bound (better)}{
+    \begin{subparag}{Upper bound (better)}
         Let's now instead the harder induction hypothesis, stating that $T\left(n\right) \leq bn - b'$. This gives us:
         \autoeq{\unexpanded{T\left(n\right) = T\left(\frac{1}{4}n\right) + T\left(\frac{3}{4}n\right) + 1 \leq b \frac{1}{4} n - b' + b \frac{3}{4} n - b' + 1 = bn - b' + \left(1 - b'\right) \leq bn - b'}}
         as long as $b' \geq 1$. 
 
         Thus, taking $b$ such that the base case works, we have proven that $T\left(n\right) \leq bn - b' \leq bn$, and thus $T\left(n\right) \in O\left(n\right)$. We needed to make our claim stronger for it to work, and this is something that is often needed to do.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Master theorem}{
+\begin{parag}{Master theorem}
     Let $a \leq 1$ and $b > 1$ be constants. Also, let $T\left(n\right)$ be a function defined on the nonnegative integers by the following recurrence: 
     \[T\left(n\right) = aT\left(\frac{n}{b}\right) + f\left(n\right)\]
     
@@ -57,15 +57,15 @@
         \item If $f\left(n\right) = \Omega\left(n^{\log_b\left(a\right) + \epsilon}\right)$ for some constant $\epsilon > 0$, and if $a f\left(\frac{n}{b}\right) \leq c f\left(n\right)$ for some constant $c < 1$ and all sufficiently large $n$, then $T\left(n\right)= \Theta\left(f\left(n\right)\right)$. Note that the second condition holds for most functions.
     \end{enumerate}
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let us consider the case for merge sort, thus $T\left(n\right) = 2T\left(\frac{n}{2}\right) + cn$. We get $a = b = 2$, so $\log_b\left(a\right) = 1$ and: 
         \[f\left(n\right) = \Theta\left(n^1\right) = \Theta\left(n^{\log_b\left(a\right)}\right)\]
         
         This means that we are in the second case, telling us: 
         \[T\left(n\right) = \Theta\left(n^{\log_b\left(a\right)} \log\left(n\right)\right) = \Theta\left(n \log\left(n\right)\right)\]
-    }
+    \end{subparag}
     
-    \subparag{Tree}{
+    \begin{subparag}{Tree}
         To learn this theorem, we only need to get the intuition of why it works, and to be able to reconstruct it. To do so, we can draw a tree. The depth of this tree is $\log_b\left(n\right)$, and there are $a^{\log_b\left(n\right)} = n^{\log_b\left(a\right)}$ leaves. If a node does $f\left(n\right)$ work, then each of its children does $af\left(\frac{n}{b}\right)$ work.
 
         \begin{enumerate}[left=0pt]
@@ -73,11 +73,11 @@
             \item If $f$ grows such that every child contributes exactly the same as their parents, then every level does the same work. Since we have $n^{\log_b\left(a\right)}$ leafs which each contribute a constant amount of work, the last level adds up to $c\cdot n^{\log_b\left(a\right)}$ work, and thus every level adds up to this value. We have $\log_b\left(n\right)$ levels, meaning that we have a total work of $c n^{\log_b\left(a\right)} \log_b\left(n\right)$.
             \item If $f$ grows fast, then a parent does more work than all its children combined. This means that all the work is done at the root and, thus, that all that matters is $f\left(n\right)$.
         \end{enumerate}
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
-\parag{Application}{
+\begin{parag}{Application}
     Let's use a modified version of merge sort in order to count the number of inversions in an array $A$ (an inversion is $i < j$ such that $A\left[j\right] < A\left[i\right]$, where $A$ never has twice the same value).
 
     The idea is that we can just add a return value to merge sort: the number of inversions. In the trivial case $n = 0$, there is no inversion. For the recursive part, we can just add the number of inversions of the two sub-cases and the number of inversions we get from the merge procedure (which is the complicated part). 
@@ -87,10 +87,10 @@
 
     This solution is $\Theta\left(n \log\left(n\right)\right)$ and thus much better than the trivial $\Theta\left(n^2\right)$ double for-loop solution.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We can notice that there are at most $\frac{n\left(n-1\right)}{2}$ inversions (in a reverse-sorted array). It seems great that our algorithm achieves to count this value in a smaller complexity. This comes from the fact that, sometimes, we add much more than 1 at the same time in the merge procedure.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 \end{document}
