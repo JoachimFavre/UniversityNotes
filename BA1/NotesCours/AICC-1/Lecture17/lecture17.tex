@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2021-11-16 at 08:39:14.
@@ -21,14 +23,14 @@
 }
 
 \subsection{Merge sort}
-\parag{Recursive Sorting}{
+\begin{parag}{Recursive Sorting}
     We saw sorting algorithms that had $\Theta\left(n^2\right)$ complexity.
 
     \important{Merge sort} is a sorting algorithm that performs significantly better. It works by iteratively splitting a list into two sublists of equal length, until each sublist has one element. At each step, a pair of sublists is successively merged into a list with the elements in increasing order. The process ends when all sublists have been merged.
 
     \imagehere[0.6]{mergeSortRepresentation.png}
 
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{mergefrommergesort.code}
 procedure merge(a1, a2: sorted array) 
@@ -41,7 +43,7 @@ procedure merge(a1, a2: sorted array)
 \end{filecontents*}
 
 
-\parag{Merge function}{
+\begin{parag}{Merge function}
     We use the following algorithm to merge two sorted lists into a sorted list:
     \importcode{mergefrommergesort.code}{pseudo}
 
@@ -50,7 +52,7 @@ procedure merge(a1, a2: sorted array)
     The cost of merging two lists is at most \texttt{len(a1) + len(a2) - 1}. Let's say we have $1, 3, 5$ and $2, 4, 6$. We will pick the first element of the first list, then from the second list, and so on until there are $5$ and $6$ left. We need to make in total a comparison for each item added to the new list, except for the last one.
 
         The best scenario is if we have something like $1$ and $2, 3, 4, 5$. If all the elements of a list are smaller than the second one, then it will make the same number of comparisons as there are elements in this list, meaning \texttt{len(a1)}.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{mergesort.code}
 procedure mergesort(a: array of n elements)
@@ -63,13 +65,13 @@ procedure mergesort(a: array of n elements)
         return a
 \end{filecontents*}
 
-\parag{Pseudo code}{
+\begin{parag}{Pseudo code}
     Here is an example on how to write merge sort:
     \importcode{mergesort.code}{pseudo}
-}
+\end{parag}
 
 
-\parag{Complexity}{
+\begin{parag}{Complexity}
     For simplicity, let's assume that $n$ is a power of 2, say $2^m$.
 
     At each invocation of merge sort, the number of lists doubles and the length of the lists half. After $m$ invocations there are $n = 2^m$ lists of length 1.
@@ -86,70 +88,70 @@ procedure mergesort(a: array of n elements)
     \[m2^m - 2^m + 1 = \log_2\left(n\right)n - n - 1\]
     
     So, this algorithm has complexity $\Theta\left(n\log\left(n\right)\right)$, i.e. linearithmic complexity. This is the best complexity that can yet be obtained for sorting, it is much better than $\Theta\left(n^2\right)$.
-}
+\end{parag}
 
 \section{Number theory}
 \subsection{Division}
-\parag{History}{
+\begin{parag}{History}
     Euclid wrote the most successful mathematics book ever ``the elements'' (it has over 1000 editions); Gauss said ``mathematics is the queen of sciences, number theory is the queen of mathematics''; Wiles proved Fermat's last theorem 358 years after it was conjectures (someone please give bigger margins to Fermat) in 1958; Tao proved a famous theorem on arbitrarily long arithmetic processions of primes in 1975.
 
     This is a very old and important subject.
-}
+\end{parag}
 
-\parag{Number theory and computer science}{
+\begin{parag}{Number theory and computer science}
     We use number theory in the representation and computation of integers, cryptography, coding, pseudo-random number generation, and so on. 
 
     Computing is also used to explore open problems in number theory, such as in the Collatz conjecture.
-}
+\end{parag}
 
-\parag{Definition of division}{
+\begin{parag}{Definition of division}
     If $a$ and $b$ are integers, with $a \neq 0$, then \important{$a$ divides $b$} if there exists an integer $c$ such that $b = ac$. When $a$ divides $b$, we say that $a$ is a \important{factor} or \important{divisor} of $b$, and that $b$ is a \important{multiple} of $a$.
 
-    \subparag{Notation}{
+    \begin{subparag}{Notation}
         The notation $a \divides b$ denotes $a$ divides $b$. If $a$ does not divide $b$, then we write $a \ndivides b$.
-    }
+    \end{subparag}
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         We see that, if $a \divides b$, then: 
         \[a \divides b \iff b = ak \iff \frac{b}{a} = k \in \mathbb{Z}\]
         
         So, $\frac{b}{a}$ is an integer if and only if $a \divides b$.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Properties of divisibility}{
+\begin{parag}{Properties of divisibility}
     \begin{enumerate}[left=0pt]
         \item If $a \divides b$ and $a \divides c$, then $a \divides \left(b + c\right)$
         \item If $a \divides b$, then $a \divides bc$ for all integers $c$
         \item If $a\divides b$ and $b\divides c$, then $a\divides c$
     \end{enumerate}
 
-    \subparag{Proof of property (1)}{
+    \begin{subparag}{Proof of property (1)}
         We can write $b = ak_1$ and $c = ak_2$, where $k_1$ and $k_2$ are integers. Therefore: 
         \[b + c = ak_1 + bk_2 = a\left(k_1 + k_2\right)\]
 
         Since $k_1 + k_2$ is an integer, then $a \divides b + c$.
         
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Corollary}{
+\begin{parag}{Corollary}
     If $a,b,c$ are integers, where $a \neq 0$ such that $a \divides b$ and $a \divides c$, then:
     \[a | mb + nc, \mathspace m,n \in \mathbb{Z}\]
-}
+\end{parag}
 
-\parag{Division algorithm}{
+\begin{parag}{Division algorithm}
     When an integer is divided by a positive integer, there is a quotient and a remainder. This is traditionally called the ``division algorithm'', but it is in fact a theorem.
 
-    \subparag{Theorem}{
+    \begin{subparag}{Theorem}
         If $a$ is an integer and $d$ is a positive integer, then there are unique integers $q$ and $r$, with $0 \leq r < d$, such that: 
         \[a = dq + r\]
 
         We can use the well-ordering of the natural numbers (and thus induction) to prove this theorem.
-    }
+    \end{subparag}
 
-    \subparag{Terminology}{
+    \begin{subparag}{Terminology}
         If we have $a = dq + r$, then:
         \begin{itemize}
             \item $d$ is called the \important{divisor}.
@@ -163,81 +165,81 @@ procedure mergesort(a: array of n elements)
         
         $\Div$ and $\Mod$ are functions:
         \[\Div : \mathbb{Z} \times \mathbb{Z}_+ \mapsto \mathbb{Z} \mathspace \text{ and } \mathspace \Mod : \mathbb{Z} \times \mathbb{Z}_+ \mapsto \mathbb{N}\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     We want to find the quotient and remainder when $101$ is divided by $11$. We see that $101$ can be written as:
     \[101 = 9\cdot 11 + 2\]
     
     Therefore, $q = 101 \Div 11 = 9$ and $r = 101 \Mod 11 = 2$.
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Now, we want to divide $-11$ by 3. We see that: 
     \[-11 = -4\cdot 3 + 1 \implies q = -11 \Div 3 = -4 \text{ and } r = -11 \Mod 3 = 1\]
     
     We have to be careful since dividing (positive) 11 by 3 is completely different: 
     \[11 \Div 3 = 3, \mathspace 11 \Mod 3 = 2\]
-}
+\end{parag}
 
 \subsection{Congruence}
-\parag{Definition of congruence}{
+\begin{parag}{Definition of congruence}
     Let $a$ and $b$ are integers and $m$ be a positive integer. We say that $a$ is \important{congruent} to $b$ modulo $m$ if:
     \[m \divides a - b\]
     
     We note $\congruent{a}{b}{m}$ to say that $a$ is congruent to $b$ modulo $m$. We say that $\congruent{a}{b}{m}$ is a congruence, and that $m$ is its modulus. If $a$ is not congruent to $b$ modulo $m$, we write $\notcongruent{a}{b}{m}$.
 
     We say that $\congruent{a}{b}{m}$
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     We wonder if $17$ is congruent to $5$ modulo 6:  
     \[17 -5 = 12, \mathspace 6 \divides 12 \implies \congruent{17}{5}{6}\]
     
     We can now see if $24$ and $14$ are congruent modulo 6: 
     \[24 - 14 = 10, \mathspace 6 \ndivides 10 \implies \notcongruent{24}{14}{6}\]
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     $\congruent{a}{b}{m}$ is an equivalence relation.
-}
+\end{parag}
 
 
-\parag{Notations}{
+\begin{parag}{Notations}
     We saw that the notations $\congruent{a}{b}{m}$ and $a \Mod m = b$ are different. The first one is a relation, the second one is a function. 
-}
+\end{parag}
 
-\parag{Theorem 1}{
+\begin{parag}{Theorem 1}
     Let $a$ and $b$ be integers, and let $m$ be a positive integer. We have:
     \[\congruent{a}{b}{m} \iff a \Mod m = b \Mod m\]
 
-    \subparag{Corollary}{
+    \begin{subparag}{Corollary}
         Two integers are congruent $\Mod m$ if and only if they have the same remainder when divided by $m$.
-    }
+    \end{subparag}
     
 
     \imagehere{CongruenceModuloLinkRepresentation.png}
-}
+\end{parag}
 
-\parag{Theorem 2}{
+\begin{parag}{Theorem 2}
     Let $m$ be a positive integer, and $a,b$ be integers. We have:
     \[\congruent{a}{b}{m} \iff \exists k \in \mathbb{Z} \text{ such that } a = b + km\]
-}
+\end{parag}
 
-\parag{Theorem 3}{
+\begin{parag}{Theorem 3}
     Let $m$ be a positive integer. If $\congruent{a}{b}{m}$ and $\congruent{c}{d}{m}$ then:
     \[\congruent{a+c}{b+d}{m} \mathspace \text{ and } \mathspace \congruent{ac}{bd}{m}\]
 
-    \subparag{Warning}{
+    \begin{subparag}{Warning}
         We have to beware of the fact that it does not work for powers. Indeed, we can have the following counter-example: 
         \[\congruent{2}{-1}{3} \text{ and } \congruent{3}{0}{3}\]
         
         However:
         \[3 \ndivides 7 \implies 3 \ndivides 2^3 - \left(-1\right)^{0} \implies \notcongruent{2^3}{\left(-1\right)^0}{3}\]
-    }
+    \end{subparag}
 
-    \subparag{Proof of multiplicativity}{
+    \begin{subparag}{Proof of multiplicativity}
         We have  
         \[a = b + k_1m \mathspace \text{and} \mathspace c = d + k_2 m\]
         
@@ -247,17 +249,17 @@ procedure mergesort(a: array of n elements)
         Which allows us to conclude:
         \[\congruent{ac}{bd}{m}\]
         
-    }
+    \end{subparag}
 
     So, this operation is very robust under elementary operations.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     If we know that $\congruent{7}{2}{5}$ and $\congruent{11}{1}{5}$, then we know that: 
     \[\congruent{77}{2}{5}\]
-}
+\end{parag}
 
-\parag{Corollary}{
+\begin{parag}{Corollary}
     Adding an integer to both sides of a valid congruence preserves validity: 
     \[\congruent{a}{b}{m} \implies \congruent{a+c}{b+c}{m}, \mathspace \forall c \in \mathbb{Z}\]
     
@@ -267,24 +269,24 @@ procedure mergesort(a: array of n elements)
     Putting both sides of a valid congruence to an integer power preserves validity: 
     \[\congruent{a}{b}{m} \implies \congruent{a^c}{b^c}{m}, \mathspace \forall c \in \mathbb{Z}\]
      
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We can use the last theorem for the two first points. Then, for the third one, we can see that: 
         \[\congruent{a}{b}{m} \implies \congruent{aa}{bb}{m} \implies \congruent{aaa}{bbb}{m}\]
 
         Repeating this idea $n$ times:
         \[\congruent{a^n}{b^n}{m}\]
-    }
+    \end{subparag}
 
-    \subparag{Warning}{
+    \begin{subparag}{Warning}
         We have to beware of the fact that we can neither divide by an integer, nor take a nth-root:
         \[\congruent{14}{8}{6} \mathspace \text{but} \mathspace \notcongruent{7}{4}{6}\]
         \[\congruent{16}{9}{7} \mathspace \text{but} \mathspace \notcongruent{4}{3}{7}\]
 
         Dividing by an integer is a bit more special, because in some specific cases it will work ($\congruent{ac}{bc}{m} \implies \congruent{a}{b}{m}$ if $c$ and $m$ are coprimes).
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Property of congruences}{
+\begin{parag}{Property of congruences}
     We wonder if: 
     \[\congruent{a}{b}{pq} \implies \congruent{a}{b}{p}\]
 
@@ -294,28 +296,28 @@ procedure mergesort(a: array of n elements)
     So yes. Now we may wonder if the reciprocal holds, but we can find a counterexample:
     \[\congruent{1}{5}{2}, \mathspace \congruent{1}{5}{4} \mathspace \text{ but } \mathspace \notcongruent{1}{5}{8}\]
 
-}
+\end{parag}
 
 
 \subsection{Modular arithmetic}
-\parag{Corollary}{
+\begin{parag}{Corollary}
     Let $m$ be a positive integer, and let $a and b$ be integers. Then: 
     \[\left(a + b\right) \Mod m = \left(\left(a \Mod m\right) + \left(b \Mod m\right)\right) \Mod m\]
     \[\left(a \cdot b\right) \Mod m = \left(\left(a \Mod m\right) \cdot \left(b \Mod m\right)\right) \Mod m\]
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We are using the fact that: 
         \[\congruent{a}{a \Mod m}{m}\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     This corollary allows us to simplify some computations:
     \[280 \Mod 6 = \left(28 \Mod 6 \cdot 10 \Mod 6\right) \Mod 6 = \left(4 \cdot 4\right) \Mod 6 = 16 \Mod 6 = 4\]
-}
+\end{parag}
 
 
-\parag{Definitions}{
+\begin{parag}{Definitions}
     Let \important{$\mathbb{Z}_m$} be the set of nonnegative integers less than $m$: 
     \[\mathbb{Z}_m = \left\{0, 1, \ldots, m - 1\right\}\]
     
@@ -324,14 +326,14 @@ procedure mergesort(a: array of n elements)
 
     The \important{multiplication modulo $m$} $\cdot_m$ is defined as: 
     \[a \cdot_m b = \left(a\cdot b\right) \Mod m\]
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     For example: 
     \[7 +_{11} 9 = 5, \mathspace 7 \cdot_{11} 9 = 8\]
-}
+\end{parag}
 
-\parag{Tables}{
+\begin{parag}{Tables}
     We can draw tables for our operations. For example, in $\mathbb{Z}_3$: 
     \begin{center}
     \begin{tabular}{c||c|c|c}
@@ -356,7 +358,7 @@ procedure mergesort(a: array of n elements)
     \end{center}
     
     We notice that we get $1\cdot_3 1 = 1$ and $2\cdot_3 2 = 1$. So, for $n \neq 0$, numbers have a multiplicative inverse on this set.
-}
+\end{parag}
 
 \end{document}
 

@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2021-11-10 at 15:10:29.
@@ -21,21 +23,21 @@
 
 }
 
-\parag{Explanation of the Fibonacci sequence}{
+\begin{parag}{Explanation of the Fibonacci sequence}
     Leonardo Pisano Fibonacci considered the following problem: a young pair of rabbits (one of each gender) is placed on an island. A pair of rabbits does not breed until they are two months old. After a pair is 2 months old, it produces another pair each month.
 
     The recursive relation that describes the population at month $n$ is:
     \[f_n = f_{n-1} + f_{n-2}\]
 
     Indeed, the population at month $n$ is the one of the month $n-1$ plus the pairs that are just born, which are equal to the number of reproductive pairs. The reproductive paire are those that are at least two months old and thus it is given by the number of rabbits at month $n-2$.
-}
+\end{parag}
 
-\parag{Property of the Fibonacci sequence}{
+\begin{parag}{Property of the Fibonacci sequence}
     Whenever $n \geq 3$, then: 
     \[f_n > \alpha^{n - 2}, \mathspace \text{where } \alpha = \frac{1 + \sqrt{5}}{2} = \phi\]
     We'll see later how to find this $\alpha$ without guessing.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let us use strong induction, but first, we can see that 
         \[\alpha^2 = \alpha + 1\]
 
@@ -52,38 +54,38 @@
         \[f_{k+1} = f_{k} + f_{k-1} \over{>}{IH} \alpha^{k-2} + \alpha^{k-3} = \alpha ^{k-1}\]
         
         \qed
-    }
-}   
+    \end{subparag}
+\end{parag}
 
 \subsection{Recursively defined sets and structure}
 
 
-\parag{Recursively defined sets and structure}{
+\begin{parag}{Recursively defined sets and structure}
     Recursion can be also used to define sets. \important{Recursive definitions of sets} have two parts. First, the basis step specifies an initial collection of elements. The recursive step gives the rules for forming new elements in the set from those already known to be in the set.
 
     The \important{exclusion rule} states that only elements generated using the basis and recursive steps belong to this set.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Previously, we either enumerated elements: 
         \[\left\{s_1, s_2, s_3\right\}\]
         either used its properties: 
         \[\left\{x | P\left(x\right)\right\}\]
         
         So, this gives us a third way.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     We can recursively define the set of natural numbers $\mathbb{N}$:
     \begin{itemize}
         \item Basis step: $0 \in \mathbb{N}$
         \item Recursive step: if $n$ is in $\mathbb{N}$, then $n+1$ is in $\mathbb{N}$.
     \end{itemize}
     
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let's recursively define a subset of integers $S3$:
     \begin{itemize}
         \item Basis step: $3 \in S3$
@@ -94,23 +96,23 @@
     \[S3_0 = \left\{3\right\}, \mathspace S3_1 = \left\{3, 6\right\}, \mathspace S3_2 = \left\{3, 6, 9, 12\right\}\]
      
     We understand that, in the end, we will get all the multiples of 3, even though this set is constructed in a weird way.
-}
+\end{parag}
 
-\parag{Strings}{
+\begin{parag}{Strings}
     Let's define the set $\Sigma^*$ of strings over the alphabet $\Sigma$: 
     \begin{itemize}
         \item Basis step: $\lambda \in \Sigma^*$ ($\lambda$ is the empty string)
         \item Recursive step: if $w$ is in $\Sigma^*$ and $x$ in $\Sigma$, then $wx \in \Sigma^*$ (where $w\cdot x = wx$ is the concatenation of the string $w$ with the character $x$; it is the primary operation for strings).
     \end{itemize}
     
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     If $\Sigma = \left\{0, 1\right\}$, the strings in $\Sigma^*$ are the set of all bit strings. We can construct the ``generations'' of this set:
     \[\Sigma_0^* = \left\{\lambda\right\}, \mathspace \Sigma_1^* = \left\{\lambda, 0, 1\right\}, \mathspace \Sigma_2^* = \left\{\lambda, 0, 1, 00, 01, 10, 11\right\}, \mathspace \ldots\]
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let $\Sigma = \left\{a, b\right\}$. We want to show that $aab$ is in $\Sigma^*$. 
 
     Since $\lambda \in \Sigma^*$ and $a \in \Sigma$, then $a \in \Sigma^*$.
@@ -118,9 +120,9 @@
     Now, since $a \in \Sigma^*$ and $a \in \Sigma$, then $aa \in \Sigma^*$.
 
     Finally, since $aa \in \Sigma^*$ and $b \in \Sigma$, then $aab \in \Sigma^*$.
-}
+\end{parag}
 
-\parag{Definition of well-formed formulae}{
+\begin{parag}{Definition of well-formed formulae}
     The set of \important{well-formed formulae} in propositional logic involving $T, F$, propositional variables, and operators from the set $\left\{\lnot, \land, \lor, \to, \leftrightarrow\right\}$ is recursively defined as:
     \begin{itemize}
         \item Basis step: $T, F$ and $s$, where $s$ is a propositional variable, are well-formed formulae.
@@ -129,33 +131,33 @@
         are well formed formulae. The parenthesis are important, so that there is no problem of precedence after multiple generations.
     \end{itemize}
     
-    \subparag{Example}{
+    \begin{subparag}{Example}
         We can show using this definition that the following proposition is in the set of well-formed formulae: 
     \[\left(\left(p \lor q\right) \to \left(q \land F\right)\right)\]
         
         However, we see that the following proposition is not well formed, since there are no parenthesis:
         \[p \land q\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \subsection{Recursively defied functions on recursively defined sets}
-\parag{Definition}{
+\begin{parag}{Definition}
     We can define functions by recursion on recursively defined sets. We follow the definition of the set.
 
     This is basically the same idea as recursive sequences, but instead we can have any basis step (which is a natural number for $\mathbb{N}$) and any recursive step (which is to explain how it goes from $n$ to $n+1$ for $\mathbb{N}$).
-}
+\end{parag}
 
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     We want to find a recursive definition, $l\left(w\right)$, which gives the length of the string $w$.
     \begin{itemize}
         \item Base step: $l\left(\lambda\right) = 0$ 
         \item Recursive step: If $w \in \Sigma^*$ and $x \in \Sigma$, then : 
             \[l\left(w x\right)= l\left(w\right) + 1\]
     \end{itemize}
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     The \important{concatenation} of two strings $w_1$ and $w_2$, denoted by $w_1 \cdot w_2$, or $w_1w_2$, is defined recursively as follows.
 
     Let $w \in \Sigma^*$ be any string, and $w_2$ be the string we apply recursion on.
@@ -164,27 +166,27 @@
         \item Recursive step: We take this definition as granted for some $w_2$, and we want to define it for $w_2\cdot x$, where $x \in \Sigma$: 
             \[w \cdot \left(w_2 \cdot x\right) = \left(w \cdot w_2\right)\cdot x\]
     \end{itemize}
-}
+\end{parag}
 
 \subsection{Structural induction}
-\parag{Structural induction}{
+\begin{parag}{Structural induction}
     To prove a property of the elements of a recursively defined set, we use \important{structural induction}:
     \begin{itemize}
         \item \important{Basis step:} Show that the result holds for all elements specified in the basis step of the recursive definition.
         \item \important{Recursive step:} Show that if the statement is true for each of the elements used to construct new elements in the recursive step of the definition, the result hold for these new elements.
     \end{itemize}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The validity of structural induction can be shown using the principle of mathematical induction.
-    }
+    \end{subparag}
 
-    \subparag{Personal note}{
+    \begin{subparag}{Personal note}
         This is generalising the idea of induction over the natural numbers. Indeed, using the recursive definition of the natural numbers, we are using a natural number as the basis step, and we show that if the property is true for $n$, then it is also true for $n+1$.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     We want to prove that, if $x, y \in \Sigma^*$, then: 
     \[l\left(xy\right) = l\left(x\right) + l\left(y\right)\]
     
@@ -199,26 +201,26 @@
             \[l\left(x\left(ya\right)\right) \over{=}{conc.} l\left(\left(xy\right)a\right) \over{=}{def $l$} l\left(xy\right) + 1 \over{=}{IH} l\left(x\right) + l\left(y\right) + 1 \over{=}{def $l$} l\left(x\right) + l\left(ya\right)\]
         
     \end{itemize}
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     We could show that every well-formed formula for compound propositions contains an equal number of left and right parenthesis.
-}
+\end{parag}
 
-\parag{Summary}{
+\begin{parag}{Summary}
     We generalised the idea of recursion and induction to any kind of recursively defined sets.
 
     \imagehere{DiagramSummaryInductionRecursion.png}
-}
+\end{parag}
 
 \subsection{Recursive algorithms}
 
-\parag{Recursive algorithms definition}{
+\begin{parag}{Recursive algorithms definition}
     An algorithm is called \important{recursive} if it solves a problem by reducing it to an instance of the same problem with smaller input.
 
     For the algorithm to terminate, the instance of the problem must eventually be reduced to some initial case for which the solution is known. (Don't forget the exit condition! \wink)
     \imagehere[0.5]{PushUpsMemeRecursion.jpg}
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{factorial.code}
 procedure factorial(n):
@@ -226,7 +228,7 @@ procedure factorial(n):
     else return n*factorial(n-1)
 \end{filecontents*}
 
-\parag{Recursive factorial algorithm}{
+\begin{parag}{Recursive factorial algorithm}
     Here is an example of a recursive algorithm for computing $n!$ where $n$ is a nonnegative integer:
 
     \importcode{factorial.code}{pseudo}
@@ -245,7 +247,7 @@ procedure factorial(n):
     \end{itemize}
 
     Many recursive calls get quickly inefficient in memory.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{power.code}
 procedure power(a, n):
@@ -260,7 +262,7 @@ procedure fast_power(a, n):
 \end{filecontents*}
 
 
-\parag{Recursive exponential algorithm}{
+\begin{parag}{Recursive exponential algorithm}
     The following algorithm is an example of a recursive algorithm for computing $a^n$, where $a$ is a nonzero real number and $n$ is a nonegative integer. 
 
     \importcode{power.code}{pseudo}
@@ -269,7 +271,7 @@ procedure fast_power(a, n):
     \importcode{fastpower.code}{pseudo}
 
     We use \texttt{n \& 1} to make a bitwise and between \texttt{n} and \texttt{1}, which is equivalent to take a modulo 2.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{recursivelinearsearch.code}
 procedure recursive_linear_search(a: array of n real numbers, x: real number, i <= n: integer):
@@ -279,12 +281,12 @@ procedure recursive_linear_search(a: array of n real numbers, x: real number, i 
 \end{filecontents*}
 
 
-\parag{Recursive linear search}{
+\begin{parag}{Recursive linear search}
     We can use the following recursive algorithm to do some linear search:
     \importcode{recursivelinearsearch.code}{pseudo}
     
     In the end, it does the same thing as linear search, but while executing it, we keep track of everything having happened before, so it is not very efficient.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{recursivebinarysearch.code}
 procedure recursive_binary_search(a: array of n integers, x, i, j):
@@ -295,18 +297,18 @@ procedure recursive_binary_search(a: array of n integers, x, i, j):
     else return -1
 \end{filecontents*}
 
-\parag{Recursive binary search}{
+\begin{parag}{Recursive binary search}
     Here is the recursive version of binary search:
     \importcode{recursivebinarysearch.code}{pseudo}
 
     The recursive version of this algorithm is not more efficient, however it is easier to ready.
-}
+\end{parag}
 
-\parag{Link between recursion and induction}{
+\begin{parag}{Link between recursion and induction}
     Induction and recursion are different approaches to proving result and solving problems. They both rely on the ability of achieving the desired result for the smallest possible version of the problem. However, induction extends this ability to problems of any size, whereas recursion reduces a problem of any size to the smallest possible ones.
-}
+\end{parag}
 
-\parag{Proving correctness of recursive algorithms}{
+\begin{parag}{Proving correctness of recursive algorithms}
     We want to prove that the \texttt{power(a, n)} defined above is correct.
 
     \begin{itemize}
@@ -315,15 +317,15 @@ procedure recursive_binary_search(a: array of n integers, x, i, j):
 
             \texttt{power(a, k+1) = $a\cdot$power(a,k) $= a\cdot a^k = a^{k+1}$}
     \end{itemize}
-}
+\end{parag}
 
-\parag{Recursion and iteration}{
+\begin{parag}{Recursion and iteration}
     A recursively defined function can be evaluated in two different ways:
     \begin{itemize}
         \item \important{Recursively:} For a value, apply directly the recursive definition, until a base case is reached. 
         \item \important{Iterative:} Start with a base case, and apply the recursive definition to compute the function for larger values.
     \end{itemize} 
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{recursivefibonacci.code}
 procedure recursive_fibonacci(n):
@@ -344,7 +346,7 @@ procedure iterative_fibonacci(n):
         return current
 \end{filecontents*}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say we want to compute the Fibonacci sequence using this algorithm:
     \importcode{recursivefibonacci.code}{pseudo}
     
@@ -354,7 +356,7 @@ procedure iterative_fibonacci(n):
     The iterative version is much more efficient, it has a complexity of $\Theta\left(n\right)$.
     \importcode{iterativefibonacci.code}{pseudo}
     
-}
+\end{parag}
 
 
 

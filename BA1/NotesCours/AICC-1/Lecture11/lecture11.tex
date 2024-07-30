@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2021-10-26 at 08:30:21.
@@ -20,10 +22,10 @@
 
 }
 
-\parag{Revision to countability}{
+\begin{parag}{Revision to countability}
     The set $\left[0,1\right] $ of real numbers is uncountable.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We will use binary representation for more fun (for example: $\left(0.1\right)_2 = 0.5$ and $\left(0.11\right)_2 = 0.75$).
 
         Let's suppose for contradiction that this set is countable. Thus, it can be written as a sequence (it does not matter how we write it, it must always be possible):
@@ -41,35 +43,35 @@
     Now we can construct $r = 0.011\ldots$ with every bit on the diagonal (in red), which we invert ($\bar{d_i} = 1 - d_{ii}$). Then it cannot be in the list, since the bit on the diagonal part would not be equal (we would have inverted it). Since it is not in the list, it is a contradiction to the fact that we can construct such a list.
 
     \qed
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We can use the same argument to show that the power set of the natural numbers is uncountable. We can use a number as each bit saying ``element $i$ is in the power set''.
-    }
+    \end{subparag}
 
 
-}
+\end{parag}
 
 \section{Algorithms}
 \subsection{Introduction}
-\parag{Definition}{
+\begin{parag}{Definition}
     An algorithm is a finite set of well-defined instructions to perform a specified task. Meaning, to perform a computation, to solve a problem, to reach a certain destination, and so on.
 
     Note that we can do algorithms without computers.
-}
+\end{parag}
 
-\parag{History}{
+\begin{parag}{History}
     There are algorithms ranging from 2500 BC in Babylon, that allowed to perform a division, Greece in 300 BC with finding prime number, from Muhammed ibn Musa al-Khwarizmi (the best, his name gave ``algorithm'') in 780 BC with solving quadratic equations. Then, in the twentieth century, many people such as Hilbert, Gödel, Church, and Kleene worked on predicate logic and, Turing came up with the Turing Machine, which is the basis for algorithms on computers.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's suppose we want to find the maximum value in a finite sequence of integers. Then we can use the following algorithm:
    \begin{enumerate}
        \item Set the temporary maximum equal to the first integer in the sequence.
        \item Compare the next integer in the sequence to the temporary maximum. If it is larger than the temporary maximum, then we set the latter to this integer.
        \item When we get at the end of the list, our temporary maximum is the global maximum.
    \end{enumerate}
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{max.code}
 procedure max(a: array of n integers):
@@ -80,15 +82,15 @@ procedure max(a: array of n integers):
 \end{filecontents*}
 
 
-\parag{Specifying algorithms}{
+\begin{parag}{Specifying algorithms}
     We have multiple ways to describe algorithms: natural language, pseudo-code and programming languages.
 
     Pseudo-code is an interemediate step, and it is used very often because it is more precise than natural language, but more general than a specfifc programming language. The idea is that if we know any typical programming language, then the syntax is clear enough to understand. For example:
     \importcode{max.code}{pseudo}
     
-}
+\end{parag}
 
-\parag{Typical problems}{
+\begin{parag}{Typical problems}
    \begin{description}[left=0pt]
        \item[Searching problems:] Find an element in a list.
        \item[Sorting problems:] Put elements in a list in order.
@@ -97,12 +99,12 @@ procedure max(a: array of n integers):
 
    The two first ones are really important for managing data.
 
-}
+\end{parag}
 
 \subsection{Searching algorithms}
-\parag{Searching problem}{
+\begin{parag}{Searching problem}
     Given a list $S = a_1, \ldots, a_n$ of distinct elements, and some $x$. If $x \in S$, then it must return $i$ such that $a_i = x$, else it must return 0.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{linearsearch.code}
 procedure linear_search(x: integer, a: array of n distinct integers):
@@ -113,12 +115,12 @@ procedure linear_search(x: integer, a: array of n distinct integers):
     return location
 \end{filecontents*}
 
-\parag{Linear search algorithm}{
+\begin{parag}{Linear search algorithm}
     The most simple one is to traverse the list, considering elements one by one, starting at the beginning. If we reach the element, then we have found it, else if we get out of the list without finding it, then it is not in it. Here is the pseudocode:
     \importcode{linearsearch.code}{pseudo}
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say we are looking for $x = 2$:
     \begin{center}
     \begin{tabular}{r|cccccc}
@@ -129,7 +131,7 @@ procedure linear_search(x: integer, a: array of n distinct integers):
     \end{tabular}
     \end{center}
 
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{binarysearch.code}
 procedure binary_search(x: integer, a: array of n increasing integers)
@@ -143,7 +145,7 @@ procedure binary_search(x: integer, a: array of n increasing integers)
 \end{filecontents*}
 
 
-\parag{Binary Search}{
+\begin{parag}{Binary Search}
     Let's assume that, this time, the input is a list of items in increasing order (they have been sorted previously).
 
     \begin{enumerate}
@@ -160,9 +162,9 @@ procedure binary_search(x: integer, a: array of n increasing integers)
     \end{enumerate}
 
     \importcode{binarysearch.code}{pseudo}
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say we are looking for 19 in the following list of 16 elements:
     \[1, 2, 3, 5, 6, 7, 8, 10{\color{red},} \underline{12, 13, 15, 16, 18, 19, 20, 22}\]
 
@@ -175,12 +177,12 @@ procedure binary_search(x: integer, a: array of n increasing integers)
     \[19\]
 
     We have a list of only one element, and it contains 19. So, we have found it.
-}
+\end{parag}
 
 \subsection{Sorting algorithms}
-\parag{Sorting problems}{
+\begin{parag}{Sorting problems}
     Given a list $S = a_1, \ldots, a_n$, we want to return a list where the elements are put in increasing order.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{bubblesort.code}
 procedure bubble_sort(a : array of n >= 2 real numbers):
@@ -190,7 +192,7 @@ procedure bubble_sort(a : array of n >= 2 real numbers):
 \end{filecontents*}
 
 
-\parag{Bubble sort}{
+\begin{parag}{Bubble sort}
     We will do different passes through the list:
     \begin{enumerate}
         \item In one pass, every pair of elements that are found to be out of order are interchanged.
@@ -200,9 +202,9 @@ procedure bubble_sort(a : array of n >= 2 real numbers):
 
     \importcode{bubblesort.code}{pseudo}
     
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say we have the list
     \[3, 2, 4, 1, 5\]
 
@@ -230,7 +232,7 @@ procedure bubble_sort(a : array of n >= 2 real numbers):
     \end{tabular}
     \end{center}
 
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{insertionsort.code}
 procedure insertion_sort(a: array of n >= 2 real numbers):
@@ -244,7 +246,7 @@ procedure insertion_sort(a: array of n >= 2 real numbers):
         a[i] := m
 \end{filecontents*}
 
-\parag{Insertion sort}{
+\begin{parag}{Insertion sort}
     \begin{enumerate}[left=0pt]
         \item Compare the second element with the first and puts it before the first if it is not larger.
         \item Then the third element is put in corret position among the three first using linear search.
@@ -253,9 +255,9 @@ procedure insertion_sort(a: array of n >= 2 real numbers):
 
     \importcode{insertionsort.code}{pseudo}
     
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     \begin{tabular}{ccccc}
         3 & 2 & 2 & 1 & \textcolor{maincolour}{1}\\
         \textcolor{red}{2} & 3 & 3 & 2 & \textcolor{maincolour}{2}\\
@@ -264,6 +266,6 @@ procedure insertion_sort(a: array of n >= 2 real numbers):
         5 & 5 & 5 & \textcolor{red}{5} & \textcolor{maincolour}{5}
     \end{tabular}
 
-}
+\end{parag}
 
 \end{document}

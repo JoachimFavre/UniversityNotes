@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2021-12-14 at 08:17:14.
@@ -20,7 +22,7 @@
 \end{itemize}
 }
 
-\parag{Probability trees}{
+\begin{parag}{Probability trees}
     We can use trees to analyse complex events which use conditional probabilities.
 
     For example, let's say we have a bag with 2 white marbles and 3 black ones. We wonder what is the probability to draw 3 black marbles in a row, if we take 3 marbles from the bag.
@@ -40,36 +42,36 @@
     
     Note that the following notation is often used: 
     \[p\left(B_3 | B_1 \cap B_2\right) = p\left(B_3 |B_1, B_2\right)\]
-}
+\end{parag}
 
 \subsection{Bernoulli trials}
-\parag{Example}{
+\begin{parag}{Example}
     Let's say we have a biased coin that gives head 2 times out of 3. We wonder what is the probability that exactly four heads occur when the coin is flipped seven times.
 
     There are $C\left(7, 4\right)$ possibilities to have 4 heads. Independently of the order, the probability to have 4 heads is given by $\left(\frac{2}{3}\right)^4\left(\frac{1}{3}\right)^3$. So, we get our probability: 
     \[C\left(7,4\right) \left(\frac{2}{3}\right)^4 \left(\frac{1}{3}\right)^3 = \frac{560}{2187} \approx \SI{25.61}{\percent}\]
-}
+\end{parag}
 
-\parag{Definition: Bernoulli trials}{
+\begin{parag}{Definition: Bernoulli trials}
     Let's say we have an experiment that can have only two possible outcomes, one is called a \important{success} and the other a \important{failure}. If $p$ is the probability of success and $q$ the probability of failure, then we have $p + q = 1$, since those are our two only possible outcomes. Each performance of the experiment is called a \important{Bernoulli trial}.
 
     A frequent question over Bernoulli trials is to determine the probability of $k$ successes when an experiment consists of $n$ mutually independent Bernoulli trials.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     The probability of exactly $k$ successes in $n$ independent Bernoulli trials, with probability of success $p$ and probability of failure $q = 1 - p$ is: 
     \[C\left(n, k\right) p^k q^{n-k}\]
-}
+\end{parag}
 
 
-\parag{Binomial Distribution}{
+\begin{parag}{Binomial Distribution}
     We denote $b\left(k:b, p\right)$ the probability of $k$ successes in $n$ independent Bernoulli trials with probability of success $p$. Viewed as a function of $k$, $b\left(k:n, p\right)$ is the \important{binomial distribution}.
 
     By the theorem above: 
     \[b\left(k: n, p\right) = C\left(n, k\right)p^k q^{n-k}\]
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     We want to analyse our exams. We wonder what is the probability of guessing at least 3 questions correctly out of 6, with 4 possible answers.
 
     This is a binomial distribution with $p = \frac{1}{4}$ and $n = 6$. The probability of guessing 0, 1 and 2 questions is given by: 
@@ -78,18 +80,18 @@
     \[p\left(E_2\right) = \binom{6}{2} \left(\frac{1}{4}\right)^2 \left(\frac{3}{4}\right)^4 = \frac{6\cdot 5 \cdot 3^4}{2\cdot 4^6}\]
     
     So, the probability not to answer at least 3 questions is given by their sum, $0.68$, since they are mutually exclusive. We thus know that the probability to pass by chance is approximately $1 - 0.68 = 0.32$ (so do not solve the exam by only guessing).
-}
+\end{parag}
 
 \subsection{Bayes' Theorem}
-\parag{Motivation}{
+\begin{parag}{Motivation}
     This theorem allows us to for example answer the following question: ``given that someone tests positive for having the Corona Virus, what is the probability that they actually do have this virus?''. Similarly, we may wonder what is the probability that someone actually has the virus if they tests negative.
-}
+\end{parag}
 
-\parag{Bayes' Theorem}{
+\begin{parag}{Bayes' Theorem}
     Let $E$ and $F$ be events from a sample space $S$ such that $p\left(E\right) \neq 0$ and $p\left(F\right) \neq 0$. Then: 
     \[p\left(F|E\right) = \frac{p\left(E|F\right)p\left(F\right)}{p\left(E\right)} = \frac{p\left(E|F\right)p\left(F\right)}{p\left(E|F\right)p\left(F\right) + p\left(E | \bar{F}\right)p\left(\bar{F}\right)}\]
     
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         Basically, this theorem allows us to switch what is given in the conditional probability. For example, it allows us to go from ``the probability to test positive knowing that we have the virus'' to ``the probability to have the virus knowing that we testes positive''.
 
         We have to be careful, since our intuition often wants to make us think that $p\left(E|F\right) = p\left(F|E\right)$, which is generally false. This fallacy even has a name: it is called \textit{the prosecutor's fallacy}. Note that such fallacy has already led to people getting convicted for a crime they had not done. Here is a video from \textit{Vsauce2} speaking about such a crime:
@@ -97,15 +99,15 @@
             \url{https://www.youtube.com/watch?v=mTNlVAz2fdA}
         \end{center}
         
-    }
+    \end{subparag}
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let $E$ be the event of testing positive on Corona, and $F$ be the event of having Corona. 
 
         The \important{prior probability}, $p\left(F\right)$, is the probability that someone has Covid (so, the percentage of the population that has the virus). The \important{evidence}, $p\left(E\right)$, is the probability of testing positive, this comes from statistical studies. The \important{likelihood}, $p\left(E|F\right)$ is the probability of testing positive when someone has Corona, this also comes from statistical studies. Finally, the \important{posterior probability}, $p\left(F|E\right)$ is what we are looking for.
-    }
+    \end{subparag}
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         By definition of conditional probability: 
         \[p\left(F|E\right) =\frac{p\left(E \cap F\right)}{p\left(E\right)} = \frac{p\left(E \cap F\right)}{p\left(F\right)} \cdot \frac{p\left(F\right)}{p\left(E\right)} = \frac{p\left(E | F\right) p\left(F\right)}{p\left(E\right)}\]
 
@@ -120,9 +122,9 @@
         \[p\left(F|E\right) = \frac{p\left(E | F\right)p\left(F\right)}{p\left(E|F\right)p\left(F\right) + p\left(E|\bar{F}\right) + p\left(E|\bar{F}\right)p\left(\bar{F}\right)}\]
 
         \qed
-    }
+    \end{subparag}
     
-    \subparag{Personal note}{
+    \begin{subparag}{Personal note}
         I personally draw a tree when I have to find this theorem back:
         \imagehere{TreeBayesTheorem.png}
 
@@ -136,10 +138,10 @@
         \[p\left(F|E\right) = \frac{p\left(F\right)p\left(E|F\right)}{p\left(E|F\right)p\left(F\right) + p\left(E|\bar{F}\right)p\left(\bar{F}\right)}\]
 
         Finally, note that this theorem is so important it led to a philosophical movement, Bayesianism.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let's suppose that 2\% of the population has Covid-19. There is a test for this disease that gives a positive result 95\% of the time when given to someone with the disease. When given to someone without the disease, the tests gives a negative result 98\% of the time. Note that the professor took this data some time ago, so they may not be very accurate nowadays.
 
     Let $D$ be the event that the person has the disease, and $P$ the event that the person tests positive. We know that: 
@@ -156,7 +158,7 @@
     
     So, if we test negative then the probability to have the virus is, in fact, really low. In other words, if we test positive, we don't really know whether we have the virus, but if we test negative, we can be quite sur that we do not have it.
 
-    \subparag{Personal note}{
+    \begin{subparag}{Personal note}
         Here is a relevant XKCD:
         \imagehere[0.5]{XKCDBayes.png}
 
@@ -164,11 +166,11 @@
             \url{https://xkcd.com/2545/}
         \end{center}
         
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let's say we have two boxes. The first box contains two green balls and seven red balls. The second contains four green balls and three red balls.
 
     Bob (who wants to add a letter in the middle of his name (that's a joke from Brandon Sanderson)) selects one of the boxes at random, then he selects a ball from that box at random. Knowing that he took a red ball, we want to know what is the probability that he chose the first box.
@@ -180,21 +182,21 @@
     \[p\left(F|E\right) = \frac{p\left(E | F\right)p\left(F\right)}{p\left(E | F\right)p\left(F\right) + p\left(E|\bar{F}\right)p\left(\bar{F}\right)} = \frac{\frac{7}{9} \cdot \frac{1}{2}}{\frac{7}{9} \frac{1}{2} + \frac{3}{7} \frac{1}{2}} = 0.645\]
 
     It makes sense that it is more likely to have chosen the first box, since there are more red balls in it.
-}
+\end{parag}
 
-\parag{Generalised Bayes' theorem}{
+\begin{parag}{Generalised Bayes' theorem}
     Suppose that $E$ is an event from a sample space $S$ such that $p\left(E\right) \neq 0$ and that $F_1, F_2, \ldots, F_n$ are mutually exclusive events such that: 
     \[\bigcup_{i=1}^n F_i = S\]
     
     Then:
     \[p\left(F_j|E\right) = \frac{p\left(E|F_j\right)p\left(F_j\right)}{p\left(E\right)} = \frac{p\left(E | F_j\right)p\left(F_j\right)}{\sum\limits_{i=1}^{n} p\left(E|F_i\right)p\left(F_i\right)}\]
     
-    \subparag{Personal note}{
+    \begin{subparag}{Personal note}
         We can do the exact same tree as above, with more branches. It would have more red branches, but sill one blue branch.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Monty Hall puzzle}{
+\begin{parag}{Monty Hall puzzle}
     In a TV-game, there are three doors. Behind one of them, there is a car, and goats behind the others. The player first selects a door. Then, the host opens one of the two other doors (they opens one that has a goat behind). Finally, the player can switch the door they chose. We wonder if they should switch.
 
     Let $pr$ be the probability that the initial choice has the car. The probability of winning without switching is given by: 
@@ -204,22 +206,22 @@
     \[p\left(win_2\right) = p\left(win_2 | pr\right)p\left(pr\right) + p\left(win_2 | \bar{pr}\right)p\left(\bar{pr}\right) = 0 \cdot \frac{1}{3} + 1 \cdot \frac{2}{3} = \frac{2}{3}\]
     
     So, we are twice as lucky to win the game if we decide to switch.
-}
+\end{parag}
 
 \subsection{Random variables}
-\parag{Motivation}{
+\begin{parag}{Motivation}
     Often, we are not interested in the outcomes of an experiment, but some function of those outcomes. For example, at a casino, we may want to know how much money we would win by rolling two dice and computing their sum.
-}
+\end{parag}
 
-\parag{Definition: random variables}{
+\begin{parag}{Definition: random variables}
     A \important{random variable} $X$ is a fonction $X : S \mapsto \mathbb{R}$ from the sample space $S$ of an experiment to the set of real numbers $\mathbb{R}$.
 
     Note that random variables have nothing to do with variables, and they are not random; they are functions.
 
     The name comes from the 1940s. W. Feller and J. L. Doob flipped a coin to know whether they would use ``random variable'' or ``chance variable''; Feller won and the term ``random variable'' has been used ever since.
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let's suppose that a coin is flipped three times. Let $X\left(t\right)$ be the random variable that equals the number of heads that appears when $t$ is the outcome. Our sample space is $S = \left\{H, T\right\}^3$.
 
     We have: 
@@ -227,9 +229,9 @@
     \[X\left(HTT\right) = X\left(THT\right) = X\left(TTH\right) = 1\]
     \[X\left(HHT\right) = X\left(HTH\right) = X\left(THH\right) = 2\]
     \[X\left(HHH\right) = 3\]
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     We want to describe the number of points obtained for answering a question in a MCQ from the exam. 
 
     Our sample space is $S = \left\{1, 2, 3, 4\right\}$, depending on the answer we check, and $\sum_{s \in S}^{} p\left(s\right) = 1$. For example, if we are guessing: 
@@ -249,7 +251,7 @@
     \frac{1}{2} \text{ if one of the answers is correct}  \\
     -\frac{1}{2} \text{ if they are all wrong}
     \end{functionbypart}
-}
+\end{parag}
 
 
 

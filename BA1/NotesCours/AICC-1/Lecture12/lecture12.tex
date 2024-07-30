@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2021-10-27 at 15:21:26.
@@ -22,23 +24,23 @@
 }
 
 \subsection{Optimisation algorithms}
-\parag{Goal}{
+\begin{parag}{Goal}
     The goal is to minimise or maximise some parameter over all possible inputs. For example, if we want to find a route between two cities, determine how to encode messages with the fewest bits, and so on.
-}
+\end{parag}
 
-\parag{Greedy algorithms}{
+\begin{parag}{Greedy algorithms}
     They are very short-sighted, and the only take the ``best'' choice at every step.
 
     This does not always gives us the optimal result. Sometimes, we have to go down a hill to get up a mountain. However, in many instances it does. Proving that the greedy algorithm is correct is required to use it.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     \imagehere{GreedyAlgorithmTreesExample.png}
 
     Firstly, the task is to find the longest path to get to the bottom of the left tree. A greedy algorithm would always go to the node with the greatest node, and it would work perfectly.
 
     Now, let's say that the task to find the leaf with the largest value in the right tree (for example if it is a minimax algorithm for chess, we give a value to each position, and we want to get to the best in the long run). We will not go to the right leaf. Maybe sacrificing a knight allows us to get a rook.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{cashieralgorithm.code}
 procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c[n])
@@ -50,24 +52,24 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
     return d
 \end{filecontents*}
 
-\parag{Cashier's algorithm}{
+\begin{parag}{Cashier's algorithm}
     Let's say we have coins of different values. Coins can be for example ``quarters'' (25 cents), ``dimes'' (10 cents), ``nickels'' (5 cents) and ``pennies'' (1 cent). We want to be able to give a certain value using the least possible number of coins.
 
     At each step, we choose the coin with the highest possible value that does not exceed the amount left.
 
     \importcode{cashieralgorithm.code}{pseudo}
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say we want to change for $n = 67$ cents. The highest coin available is $25$, so we have 42 left. We can give a second quarter, and we have $17$ cents left to give. Then we can give a dime, a nickel, a penny and another penny.
-}
+\end{parag}
 
-\parag{Proof of optimality}{
+\begin{parag}{Proof of optimality}
     We want to show that the change making algorithm for US coins is optimal.
 
-}
+\end{parag}
 
-\parag{Lemma}{
+\begin{parag}{Lemma}
      The change of $n > 0$ cents using the least possible number of coins amongst quarters, dimes, nickels, and pennies
     \begin{enumerate}
         \item has at most 2 dimes, 1 nickel and 4 pennies;
@@ -75,30 +77,30 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
         \item the total amount of change in dimes, nickels, and pennies cannot exceed 24 cents.
     \end{enumerate}
 
-    \subparag{Proof of part (1)}{
+    \begin{subparag}{Proof of part (1)}
         Let's suppose for contradiction that we have 3 dimes = 30 cents. Then we can replace them by $25 + 5$ cents, which represent two coins.
 
         2 nickels = 10 cents can be replaced by one coin of 10 cents, and 5 pennies = 5 cents can be replaced by one coin of 5.
-    }
+    \end{subparag}
 
-    \subparag{Proof of part (2)}{
+    \begin{subparag}{Proof of part (2)}
         We cannot have 2 dimes and 1 nickel, since we could replace them by one coin of 25.
-    }
+    \end{subparag}
 
-    \subparag{Proof of part (3)}{
+    \begin{subparag}{Proof of part (3)}
         Dimes nickels and pennies in total have less than 25, since else we could replace them by using a coin of 25.
 
         Another way of seeing this is to see that we have at most 2 dimes, 1 nickel and 4 pennies, but we cannot have 2 dimes and 1 nickel, so we thus need to get rid of the penny. In other words, we have 2 dimes and 4 nickels, which represent 24 cents.
-    }
+    \end{subparag}
 
 
 
-}
+\end{parag}
 
-\parag{Theorem (optimality)}{
+\begin{parag}{Theorem (optimality)}
     The greedy change-making algorithm for US coins produces change using the fewest coins possible.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let $c_{25}, c_{10}, c_5, c_1$ the number of coins of the ``optimal'' solution and $\bar{c}_{25}, \bar{c}_{10}, \bar{c}_5, \bar{c}_1$ be the number of coins the algorithm gives.
 
         Since the ``optimal'' solution is optimal, we know $\bar{c}_{25} \geq c_{25}$. Let's assume for contradiction that our program did not produce an optimal solution, meaning $\bar{c}_{25} > c_{25}$. It would then mean that the optimal solution would reach the same value, $n$, by using one less 25 cents coin. Thus, it needs to compensate this difference with the other coins:
@@ -111,50 +113,50 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
         which is also a contradiction.
 
         Again, assuming that $\bar{c}_5 \geq c_5$, then we would have $c_1 > 5$ which is another contradiction. We thus also conclude that $\bar{c}_1 = c_1$.
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
-\parag{Available coins}{
+\begin{parag}{Available coins}
     Optimality depends on the denominations available. If we have ``quarters'' (25 cents), ``dimes'' (10 cents) and ``pennies'' (1 cent), then the algorithm would not produce the minimum number of coins. For example, if we want to reach 31, it will use one quarter and 6 pennies, whereas we can reach it in 3 dimes and 1 penny.
-}
+\end{parag}
 
-\parag{Europe denominations}{
+\begin{parag}{Europe denominations}
     In Europe we have $1, 5, 10, 20, 50$.
 
-    \subparag{Lemma}{
+    \begin{subparag}{Lemma}
         The solution with the smallest coins
         \begin{enumerate}
             \item has at most $4\times1$, $1\times5$, $1\times10$, $2\times20$;
             \item cannot have $2\times20$ and $1\times10$ at the same time;
             \item the total amount using $1, 5, 10, 20, 50$ cannot exceed 49.
         \end{enumerate}
-    }
+    \end{subparag}
 
     We can then use this lemma to prove this denomination's optimality, using a proof similar to the one hereinabove.
-}
+\end{parag}
 
 
-\parag{Dropping coins}{
+\begin{parag}{Dropping coins}
     For denominations, $c_1, \ldots c_n$ where $c_i | c_{i+1}$. The greedy algorithm is optimal (it is a sufficient condition, but not necessary).
 
-    \subparag{Example for Europe}{
+    \begin{subparag}{Example for Europe}
         We see that it is not a necessary condition, since $20$ does not divide $50$. However, if we drop the $20$, then we know that it definitely works for $1, 5, 10, 50$. However, for $1, 20, 50$ the greedy algorithm would not work (for example, when doing the change for 69 (nice) coins).
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \subsection{Stable matching}
-\parag{Goal}{
+\begin{parag}{Goal}
     The task is to pair elements from equally sized two groups considering their preferences for members of the other group so that there are no ways to improve the preferences.
-}
+\end{parag}
 
-\parag{Definition of matching}{
+\begin{parag}{Definition of matching}
     Given a finite set $A$, a \important{matching} of $A$ is a set of (unordered) pairs of distinct elements of $A$ where any elements occurs in at most one pair (such pairs are called independent)
 
     A \important{maximum matching} is a matching that contains the largest possible number of independent pairs.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let $A = \left\{1, 2, 3, 4\right\}$
    \begin{itemize}
        \item $\left\{1,2\right\}$ and $\left\{\left(1,3\right),\left(2,4\right)\right\}$ are matchings.
@@ -167,23 +169,23 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
        \item $\left\{\left(1,3\right), \left(2,4\right)\right\}$ and $\left\{\left(5,3\right),\left(2,4\right)\right\}$ are two different maximum matchings.
    \end{itemize}
 
-}
+\end{parag}
 
-\parag{Definition of preferences}{
+\begin{parag}{Definition of preferences}
     A \important{preference list} $L_x$ defines for every element $x \in A$ the order in which the element prefers to be paired with. $x \in A$ prefers $y$ to $z$ if $y$ precedes $z$ on $L_x$.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For example, if we have $A = \left\{\text{Lou, Glenn, Bobbie, Tyler}\right\}$. Then, we could have $L_{\text{Tyler}} = \left\{\text{Bobbie, Lou, Glenn}\right\}$.
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
-\parag{Stability of matching}{
+\begin{parag}{Stability of matching}
     A matching is \important{unstable} if there are two pairs $\left(x, y\right),\left(v, w\right)$ in the matching such that $x$ prefers $v$ to $y$ and $v$ prefers $x$ to $w$. In other words, each want to leave their partner.
 
     A \important{stable} matching is a matching that is not unstable.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For example, if we have $A = \left\{\text{Lou, Glenn, Bobbie, Tyler}\right\}$, and:
         \begin{itemize}
             \item $L_{\text{Lou}} = \left\{\text{Glenn, Bobbie, Tyler}\right\}$
@@ -199,10 +201,10 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
         Then, our new matching is $\left\{\left(\text{\textcolor{red}{Lou}, Bobbie}\right), \left(\text{\textcolor{red}{Glenn}, Tyler}\right)\right\}$. Again, Lou prefers to be with Glenn, and Glenn prefers to be with Lou.
 
         If we reorder another time our matchings, we will have come back to the initial matching, which shows that this will go on forever. It is possible that there does not exist any stable matching. (No one wants to stay with Tyler, poor them.)
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Marriage problem}{
+\begin{parag}{Marriage problem}
     To guarantee the existence of a stable maximum matching, irrespective of the preference lists, it suffices to use a more stringent (harsher) pairing rule.
 
     Given a set with even cardinality, we partition $A$ into two disjoint subsets $A_1$ and $A_2$, where $A_1 \cup A_2 = A$ and $\left|A_1\right| = \left|A_2\right|$. A matching is a bijection from the elements of one set to the elements of the other set.
@@ -210,7 +212,7 @@ procedure change(c : array of n > 0 values of coins, where c[1] > c[2] > ... > c
     Put in simpler words, pairs can only consist of one element of $A_1$ and one of $A_2$ each. There is no way for an element from $A_1$ to be matched with another element of $A_1$.
 
     The professor gave the example of boys and girls getting married, but let's use families instead. If we have two families $A_1$ and $A_2$, then members from one family cannot get married with a member of they own family (unless they come from northern France).
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{stablematching.code}
 let M be the set of pairs under construction
@@ -226,13 +228,13 @@ while |M| < |A1|:
             replace (x', y) by (x, y) from M, and remove y from Lx'
 \end{filecontents*}
 
-\parag{Existence of stable maximum matching}{
+\begin{parag}{Existence of stable maximum matching}
     A greedy algorithm to construct a stable maximum matching for the marriage problem can be used to prove existence of stable matching. It is very efficient, and it gave a Nobel price to its creator. It is named the Gale-Shapley algorithm.
 
     \importcode{stablematching.code}{pseudo}
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say we have $A_1 = \left\{x_1, x_2, x_3, x_4\right\}$ and $A_2 = \left\{y_1, y_2, y_3, y_4\right\}$. Moreover, let
     \[L_{x_i} = \left\{y_1, y_2, y_3, y_4\right\}\]
    \[L_{y_1} = \left\{x_2, x_1, x_3, x_4\right\}\]
@@ -253,7 +255,7 @@ while |M| < |A1|:
    We can continue applying this reasoning over $x_4$.
 
    At the end, the algorithm will give us the optimal solution.
-}
+\end{parag}
 
 
 
