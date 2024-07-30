@@ -26,23 +26,23 @@
 
 }
 
-\parag{Definition: M-estimation}{
+\begin{parag}{Definition: M-estimation}
     In the \important{$M$-estimation} method, we maximise a function of the form: 
     \[\bar{\rho}\left(\theta ; Y\right) = \sum_{j=1}^{n} \rho\left(\theta; Y_j\right)\]
     where $\rho\left(\theta ; y\right)$ is a function of $\theta$, typically concave for all $y$.
 
     Note that there is an abuse of notation: $\bar{\rho}$ is not the same function as $\rho$, even though we often write them both the same way (without the bar).
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         This generalises maximum likelihood estimation: we can take $\rho\left(\theta; y\right) = \log\left(f\left(y; \theta\right)\right)$ to get it back.
-    }
+    \end{subparag}
 
-    \subparag{Least-squares estimator}{
+    \begin{subparag}{Least-squares estimator}
         This yields the \important{least-squares} estimator when we let $\rho\left(\theta; y\right) = -\left(y_j - \theta\right)^2$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let $Y_1, \ldots, Y_n \iid f$ such that $\exval\left(Y_j\right) = \theta$ for some $\theta$. We want to find the least-squares estimator of $\theta$.
 
     By definition, we want to maximise: 
@@ -53,34 +53,34 @@
     
     This yields that: 
     \[\frac{\bar{\rho}\left(\theta; y\right)}{d\theta} = 0 \iff \sum_{j=1}^{n} y_j = \sum_{j=1}^{n} \theta = n \theta \iff \hat{\theta} = \frac{1}{n}\sum_{j=1}^{n} y_j = \bar{y}\]
-}
+\end{parag}
 
-\parag{Definition: Bias}{
+\begin{parag}{Definition: Bias}
     The \important{bias} of the estimator $\hat{\theta}$ of $\theta$ is: 
     \[b\left(\theta\right) = \exval\left(\hat{\theta}\right) - \theta\]
     
-    \subparag{Interpretations}{
+    \begin{subparag}{Interpretations}
         \begin{itemize}[left=0pt]
             \item If $b\left(\theta\right) < 0$ for all $\theta$, we say that $\hat{\theta}$ \important{underestimates} $\theta$ on average. 
             \item If $b\left(\theta\right) > 0$ for all $\theta$, we say that $\hat{\theta}$ \important{overestimates} $\theta$ on average. 
             \item If $b\left(\theta\right) = 0$ for all $\theta$, we say that $\hat{\theta}$ is \important{unbiased}. 
             \item If $b\left(\theta\right) \approx 0$ for all $\theta$, we say that $\hat{\theta}$ is \important{in the right place} on average. 
         \end{itemize}
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This gives us a way to compare estimators: if the bias is much worse in absolute value, then the estimator is worse. 
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let us consider $Y_1, \ldots, Y_n \iid \mathcal{N}\left(\mu, \sigma^2\right)$. We want to find the bias of $\hat{\mu} = \bar{Y}$: 
     \[b\left(\mu\right) = \exval\left(\hat{\mu}\right) - \mu = \exval\left(\bar{Y}\right) - \mu = \frac{1}{n}\sum_{j=1}^{n} \exval\left(Y_j\right) - \mu = \mu - \mu = 0\]
     
     We thus see that $\hat{\mu}$ is unbiased.
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let us consider $Y_1, \ldots, Y_n \iid \mathcal{N}\left(\mu, \sigma^2\right)$. We want to find the bias of $\hat{\sigma}^2 = \frac{1}{n}\sum_{j=1}^{n} \left(Y_j - \bar{Y}\right)^2$: 
     \[b\left(\hat{\sigma}^2\right) = \exval\left(\hat{\sigma}^2\right) - \sigma^2 = \frac{1}{n}\sum_{j=1}^{n} \exval\left[\left(Y_j - \bar{Y}\right)^2\right] - \sigma^2\]
 
@@ -94,31 +94,31 @@
     \[b\left(\hat{\sigma}^2\right) = \frac{n-1}{n}\sigma^2 - \sigma^2 = -\frac{\sigma^2}{n}\]
     
     In other words, $\hat{\sigma}^2$ underestimates $\sigma^2$, by an amount which should be rather small when $n$ is large.
-}
+\end{parag}
 
-\parag{Remark}{
+\begin{parag}{Remark}
     The bias is important in order to choose the estimator, but it is not the only fact we have to take into account. The variance of the estimator is also really important (recall that the variance represents the mean squared distance to the expected value).
-}
+\end{parag}
 
-\parag{Interpretation}{
+\begin{parag}{Interpretation}
     We can imagine our point estimator as aiming to the bullseye of a target. If we have a high bias, we are not aiming at the right place, but if we have a lot of variance there our shots are very spread out.
     \imagehere[0.5]{BiasVarianceEstimatorBullseyeInterpretation.png}
-}
+\end{parag}
 
-\parag{Definition: Mean square error}{
+\begin{parag}{Definition: Mean square error}
     The \important{mean square error} (MSE) of the estimator $\hat{\theta}$ of $\theta$ is: 
     \[\text{MSE}\left(\hat{\theta}\right) = \exval\left[\left(\hat{\theta} - \theta\right)^2\right]\]
-}
+\end{parag}
 
-\parag{Proposition}{
+\begin{parag}{Proposition}
     Let $\hat{\theta}$ be an estimator of $\theta$. Then: 
     \[\text{MSE}\left(\hat{\theta}\right) = \exval\left[\left(\hat{\theta} - \theta\right)^2\right] = \Var\left(\hat{\theta}\right) + b\left(\theta\right)^2\]
     
-    \subparag{Interpretation}{
+    \begin{subparag}{Interpretation}
         The mean square error is thus a good way to compare estimators: we have a measure of both variance and bias.
-    }
+    \end{subparag}
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         This is a direct proof:
         \autoeq{\text{MSE}\left(\hat{\theta}\right) = \exval\left[\left(\hat{\theta}- \theta\right)^2\right] = \exval\left[\left(\hat{\theta} - \exval \left(\hat{\theta}\right) + \exval\left(\hat{\theta}\right) - \theta\right)^2\right] = \exval\left[\left(\hat{\theta} - \exval\left(\theta\right)\right)^2\right] + 2\exval\left[\left(\hat{\theta} - \exval\left(\hat{\theta}\right)\right)\left(\exval\left(\hat{\theta}\right) - \theta\right)\right] \fakeequal + \exval\left[\left(\exval\left(\hat{\theta}\right) - \theta\right)^2\right]
         = \Var\left(\hat{\theta}\right) + 2b\left(\hat{\theta}\right) \exval\left[\hat{\theta} - \exval\left(\hat{\theta}\right)\right] + b\left(\hat{\theta}\right)^2 = \Var\left(\hat{\theta}\right) + b\left(\hat{\theta}\right)^2}
@@ -127,27 +127,27 @@
         \[\exval\left[\hat{\theta} - \exval\left(\hat{\theta}\right)\right] = \exval\left(\hat{\theta}\right) - \exval\left[\exval\left(\hat{\theta}\right)\right] = \exval\left(\hat{\theta}\right) - \exval\left(\hat{\theta}\right) = 0\]
         
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     Let $\hat{\theta}$ be an unbiased estimator of some parameter $\theta$. We notice that we can compute its variance by using the MSE:
     \[\text{MSE}\left(\hat{\theta}\right) = \Var\left(\hat{\theta}\right) + b\left(\theta\right)^2 = \Var\left(\hat{\theta}\right)\]
-}
+\end{parag}
 
 
-\parag{Definition: Efficiency}{
+\begin{parag}{Definition: Efficiency}
     Let $\hat{\theta}_1$ and $\hat{\theta}_2$ be unbiased estimators of the same parameter $\theta$. 
     
     We say that $\hat{\theta}_1$ is \important{more efficient} than $\hat{\theta}_2$ if: 
     \[\Var\left(\hat{\theta}_1\right) \leq \Var\left(\hat{\theta}_2\right)\]
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We prefer estimators which are more efficient.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let $Y_1, \ldots, Y_n \iid \mathcal{N}\left(\mu, \sigma^2\right)$ for a large $n$. We want to compare the median $M$ (the value such that half of the samples are above and half are below) and the average $\bar{Y}$ as estimators of $\mu$.
 
     We have already computed that: 
@@ -163,25 +163,25 @@
     \[\exval\left(M\right) \approx \mu, \mathspace \Var\left(M\right) \approx \frac{\pi \sigma^2}{2 n}\]
     
     Thus, it is also unbiased asymptotically. However, the variance of $M$ is slightly worse than $\bar{Y}$, so the latter is slightly more efficient asymptotically. Now, in practice the former might be better if we have many outliers (many points which are far away) or that don't really belong to $\mathcal{N}\left(\mu, \sigma^2\right)$ (for instance because of measurement errors).
-}
+\end{parag}
 
-\parag{Proposition}{
+\begin{parag}{Proposition}
     Under certain conditions (for instance that the PDF is ``nice'' and that the samples are really from the supposed PDF), the maximum likelihood estimator is best for large $n$: it is unbiased and has a minimal variance.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         In practice, we often sacrifice some efficiency for some robustness to outliers.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \subsection{Interval estimation}
 
-\parag{Definition: Pivot}{
+\begin{parag}{Definition: Pivot}
     Let $Y = \left(Y_1, \ldots, Y_n\right)$ be sampled from a distribution $F$ with parameter $\theta$.
 
     A \important{pivot} is a function $Q = q\left(Y; \theta\right)$ which distribution is known and independent of $\theta$. We say that $Q$ is \important{pivotal}.
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let us consider $Y_1, \ldots, Y_n \iid U\left(0, \theta\right)$ for an unknown $\theta$ and:
     \[M = \max\left(Y_1, \ldots, Y_n\right)\]
     
@@ -189,9 +189,9 @@
     \[Q = \frac{1}{\theta} M = \frac{1}{\theta} \max\left(Y_1, \ldots, Y_n\right) = \max\left(\frac{Y_1}{\theta}, \ldots, \frac{Y_n}{\theta}\right)\]
 
     However, $\frac{Y_1}{\theta}, \ldots, \frac{Y_n}{\theta} \iid U\left(0, 1\right)$. This indeed means that $\theta$ does not matter for $Q$, and thus that $Q$ is a pivot.
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let us consider $Y_1, \ldots, Y_n \iid U\left(0, \theta\right)$ for an unknown $\theta$ and:
     \[\bar{Y} = \frac{1}{n} \sum_{i=1}^{n} Y_i\]
 
@@ -200,29 +200,29 @@
     
     Thus, we can take the following random variable, which is asymptotically a pivot (and thus it is an approximate pivot): 
     \[Q = \frac{\bar{Y} - \frac{\theta}{2}}{\sqrt{\frac{\theta^2}{12n}}}\]
-}
+\end{parag}
 
-\parag{Definition: Confidence interval}{
+\begin{parag}{Definition: Confidence interval}
     Let $Y = \left(Y_1, \ldots, Y_n\right)$ be data from a parametric statistical model with scalar parameter $\theta$. 
 
     A \important{confidence interval} (CI) for $\theta$, $\left(L, U\right) = \left(\ell \left(Y\right), u\left(Y\right)\right)$, is a random interval which contains $\theta$ with a specified probability, called the \important{confidence level} of the interval, specified by the following probabilities: 
     \[\prob\left(\theta < L\right) = \alpha_L, \mathspace \prob\left(U < \theta\right) = \alpha_U \]
     
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         The confidence level can be computed by seeing that: 
         \[\prob\left(L \leq \theta \leq U\right) = 1 - \prob\left(\theta < L\right) - \prob\left(U < \theta\right) = 1 - \alpha_L - \alpha_U\]
-    }
+    \end{subparag}
     
-    \subparag{Terminology}{
+    \begin{subparag}{Terminology}
         It is typical to take a $\alpha_L = \alpha_U = \frac{\alpha}{2}$ to have a symmetric probability of not containing $\theta$. This is named an \important{equi-tailed} $\left(1-\alpha\right)$ confidence interval.
-    }
+    \end{subparag}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The random variables $L$ and $U$ must not depend from $\theta$. Our goal is to find them for some data for which we don't know the distribution, and thus of which we don't know the actual $\theta$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Construction of a CI}{
+\begin{parag}{Construction of a CI}
     To construct a CI, we first need to find a pivot $Q = q\left(Y, \theta\right)$. We then need to choose $\alpha_L$ and $\alpha_U$, and obtain the quantiles $q_{\alpha_U}, q_{1 - \alpha_L}$ of $Q$. By definition of quantiles, this gives us: 
     \[\prob\left(q_{\alpha_U} \leq q\left(Y, \theta\right) \leq q_{1 - a_L}\right) = \left(1 - \alpha_L\right) - \alpha_U\]
     
@@ -230,12 +230,12 @@
     \[\prob\left(L \leq \theta \leq U\right) \leq 1 - \alpha_L - \alpha_U\]
     where the bounds $L$ and $U$ only depend on $Y$, $q_{1 - \alpha_L}$ and $q_{\alpha_U}$, but not on $\theta$.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We require that $Q$ is a pivot to be able to compute the quantiles $q_{\alpha_U}$ and $q_{1 - \alpha_L}$, so that they are independent of $\theta$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let us consider $Y_1, \ldots, Y_n \followsdistr U\left(0, \theta\right)$. We have already seen that the following random variable is a pivot: 
     \[Q = \frac{M}{\theta} = \frac{\max\left(Y_1, \ldots, Y_n\right)}{\theta} = \max\left(\frac{Y_1}{\theta}, \ldots, \frac{Y_n}{\theta}\right)\]
     
@@ -257,16 +257,16 @@
     
     We then indeed have: 
     \[\prob\left(L \leq \theta \leq U\right) = 1 - \alpha_L - \alpha_U\]
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     We have a sample of $n = 16$ plates with maximum $523308$ and average $320869$. We suppose that all plates from 0 to $\theta$ are given (where $\theta$ is the number of cars), uniformly at random. We want to find a confidence interval with $\alpha_U = \alpha_L = \SI{2.5}{\percent}$.
 
     We can apply the bound we have just computed, giving : 
     \[L = \frac{m}{\left(1 - \alpha_L\right)^{\frac{1}{n}}} = 524135, \mathspace U = \frac{m}{\alpha_U^{\frac{1}{n}}} = 659001\]
 
     It is interesting to see that $L$ is slightly above the maximum we have seen, which makes a lot of sense.
-}
+\end{parag}
 
 \end{document}
 

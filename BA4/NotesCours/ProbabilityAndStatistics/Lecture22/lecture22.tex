@@ -25,35 +25,35 @@
 
 \section{Statistical inference}
 \subsection{Introduction}
-\parag{Goal}{
+\begin{parag}{Goal}
     The goal is, given some observations, we want to make some inference on their probability space. We don't know their distribution, but we know that it is in some family and we want to infer the parameters. 
 
     In fact, in the past, we even used the term inverse probability to speak about inferential statistics.
 
     An \important{estimator} of the unknown parameters is a function of $y_1, \ldots, y_n$. We can also consider a random variable lead by the estimator, $T\left(Y_1, \ldots, Y_n\right)$.
-}
+\end{parag}
 
-\parag{Definition: Random sample}{
+\begin{parag}{Definition: Random sample}
     We will always take $Y_1, \ldots, Y_n$ to be IID from the distribution we don't know, named a \important{random sample}, and $y_1, \ldots, y_n$ to be a \important{realisation} of such random variables. Using those observations, we want to estimate the parameters of the distribution. 
-}
+\end{parag}
 
-\parag{Definition: Statistical model}{
+\begin{parag}{Definition: Statistical model}
     A \important{statistical model} is a probability distribution $f\left(y\right)$ chosen to learn from observed data $y$ or potential data $Y$.
 
     We note it $f\left(y\right) = f\left(y; \theta\right)$ to represent the fact that $\theta$ is a parameter of the model.
-}
+\end{parag}
 
-\parag{Definition: Statistic}{
+\begin{parag}{Definition: Statistic}
     A \important{statistic} is a function of the random variables, $T = t\left(Y_1, \ldots, Y_n\right)$.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let $y_1, \ldots, y_n$ be a random sample from a Bernoulli distribution with unknown parameter $p$. Then, the statistic $t = \sum_{j=1}^{n} y_j$ is considered to be a realisation of the random variable: 
     \[T = \sum_{j=1}^{n} Y_j \followsdistr B\left(n, p\right)\]
-}
+\end{parag}
 
 \subsection{Point estimation}
-\parag{Method of moments}{
+\begin{parag}{Method of moments}
     The idea of the \important{method of moments} is to use the law of large numbers: 
     \[\frac{1}{n} \sum_{i=1}^{n} y_i^r \over{\to}{P} \exval\left(Y_1^r\right)\]
     
@@ -61,9 +61,9 @@
     \[\exval\left(Y^r\right) = \frac{1}{n}\sum_{j=1}^{n} y_j^r\]
 
     We take $r = 1, \ldots, p$ to have the smallest number of equations which would give  a unique solution.
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let $Y_1, \ldots, Y_n \followsdistr U\left(0, \theta\right)$. We want to use the method of moments to estimate $\theta$.
 
     We let: 
@@ -71,33 +71,33 @@
     
     This thus gives us:
     \[\hat{\theta}_{MoM} = 2 \bar{y} \implies \hat{\Theta}_{MoM} = 2 \bar{Y}_n\]
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let $Y_1, \ldots, Y_n \followsdistr \mathcal{N}\left(\mu, \sigma^2\right)$, where $\mu$ and $\sigma^2$ are unknown. We can estimate them using the method of moments: 
     \[\begin{systemofequations} \frac{1}{n}\sum_{i=1}^{n} y_i = \mu \\ \frac{1}{n}\sum_{i=1}^{n} y_i^2 = \exval\left(Y_i^2\right) = \Var\left(Y_i\right) + \exval\left(Y_i\right)^2 = \sigma^2 + \mu^2 \end{systemofequations}\]
     
     We notice that this is solved by: 
     \[\begin{systemofequations} \hat{\mu}_{MoM} = \bar{y} \\ \hat{\sigma}_{MoM}^2 = \frac{1}{n} \sum_{i=1}^{n} y_i^2 - \bar{y}^2 \end{systemofequations}\]
-}
+\end{parag}
 
-\parag{Definition: Likelihood}{
+\begin{parag}{Definition: Likelihood}
     Let $y_1, \ldots, y_n$ be a random sample from a density $f\left(y; \theta\right)$. The \important{likelihood} for $\theta$ is defined as: 
     \[L\left(\theta\right) = f\left(y_1, \ldots, y_n; \theta\right)=  f\left(y_1;\theta\right) \cdots f\left(y_n; \theta\right)\]
     since all samples independent.
-}
+\end{parag}
 
 
-\parag{Maximum likelihood method}{
+\begin{parag}{Maximum likelihood method}
     The \important{maximum likelihood estimate} (MLE) $\hat{\theta}$ of a parameter $\theta$ is the value that maximises the likelihood: 
     \[\hat{\theta}_{MLE} = \argmax_{\theta} L\left(\theta\right)\]
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We often simplify the calculations by maximising $\ell \left(\theta\right) = \log\left(L\left(\theta\right)\right)$, which is equivalent to maximising $L\left(\theta\right)$ since the logarithm is an increasing function. This is often simpler since we will use derivatives (when the function is differentiable) and differentiating additions is easier than differentiating multiplications.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let us consider a random sample $y_1, \ldots, y_n$ from an exponential density with unknown $\lambda$.
 
     We want to maximise: 
@@ -114,9 +114,9 @@
     
     This critical point is thus indeed a maximum. This yields that: 
     \[\hat{\lambda}_{MLE} = \frac{1}{\bar{y}}\]
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let us consider a random sample $y_1, \ldots, y_n$ from a uniform density with unknown $\theta$.
 
     We want to maximise: 
@@ -126,6 +126,6 @@
     \[\hat{\theta}_{MLE} = \max\left(y_1, \ldots, y_n\right)\]
     
     We notice that this is different from $\hat{\theta}_{MoM} = 2 \bar{y}$, even though both make sense.
-}
+\end{parag}
 
 \end{document}

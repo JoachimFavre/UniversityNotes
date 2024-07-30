@@ -25,7 +25,7 @@
 
 }
 
-\parag{Example}{
+\begin{parag}{Example}
     We want to compute the expected value and variance of $X \followsdistr \text{Geom}\left(p\right)$.
 
     We know that $\prob\left(X \geq x\right) = \left(1-p\right)^{x-1}$. By our theorem, we get that: 
@@ -40,26 +40,26 @@
     \[\Var\left(X\right) = \exval\left[X\left(X-1\right)\right] + \exval\left(X\right) - \exval\left(X\right)^2 = \frac{2\left(1-p\right)}{p^2} + \frac{1}{p} - \frac{1}{p^2} = \frac{1-p}{p^2}\]
 
     As a quick sanity check, we can notice that it gets smaller as $p\to1$ (there is less variance when we have more probability to success) and larger as $p\to0$ (there is a lot of variance when we have a small probability of success). This is what intuition tells us, so this is a good thing.
-}
+\end{parag}
 
 \subsection{Conditional probability distributions}
-\parag{Definition: Conditional probability distribution}{
+\begin{parag}{Definition: Conditional probability distribution}
     Let $\left(\Omega, \mathcal{F}, \prob\right)$ be a probability space, on which we define a random variable $X$, and let $B \in \mathcal{F}$ such that $\prob\left(B\right) > 0$.
 
     Then, the \important{conditional probability mass function} of $X$ given $B$ is: 
     \[f_X\left(x |B\right) = \prob\left(X = x | B\right) = \frac{\prob\left(A_x \cap B\right)}{\prob\left(B\right)}\]
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     The function $f_X\left(x | B\right)$ is a well defined mass function. In other words: 
     \[f_X\left(x | B\right) \geq 0, \mathspace \sum_{x}^{} f_X\left(x | B\right) = 1\]
-}
+\end{parag}
 
-\parag{Proposition}{
+\begin{parag}{Proposition}
     Let $B$ be an event of the form $X \in \mathcal{B}$, for some $\mathcal{B} \subset \mathbb{R}$. Then:
     \[f_X\left(x | B\right) = \frac{I\left(x \in \mathcal{B}\right)}{\prob\left(X \in \mathcal{B}\right)} f_X\left(x\right)\]
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         This means that:
         \begin{functionbypart}{f_X\left(x | B\right)}
             0, & x \not \in \mathcal{B} \\
@@ -68,35 +68,35 @@
         where $c = \frac{1}{\prob\left(X \in \mathcal{B}\right)}$ is a normalisation factor.
 
         We thus zero-out every terms which cannot happen, and normalise the rest.
-    }
+    \end{subparag}
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         This is a direct proof: 
         \autoeq{f_X\left(x | B\right) = \frac{\prob\left(X = x \cap X \in \mathcal{B}\right)}{\prob\left(X \in \mathcal{B}\right)} = \frac{\prob\left(X \in \mathcal{B} | X = x\right)}{\prob\left(X \in \mathcal{B}\right)}\prob\left(X = x\right) = \frac{I\left(x \in \mathcal{B}\right)}{\prob\left(X \in \mathcal{B}\right)} f_X\left(x\right)}
         
         Indeed, $\prob\left(X \in \mathcal{B} | X = x\right)$ is one if $x \in \mathcal{B}$ and 0 otherwise. It is thus an indicator variable.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     We want to compute the conditional PMF of $X \followsdistr \text{Geom}\left(p\right)$ given that $X > n$.
 
     We know that the event $B = \left\{X > n\right\}$ has probability $\left(1-p\right)^n$ (the first success is after the $n$\Th trial is equivalent to saying that the first $n$ experiments failures). Thus:
     \[f_X\left(x | B\right) = \frac{\prob\left(X = x \cap X > n\right)}{\prob\left(X > n\right)} = \frac{I\left(x > n\right)}{\prob\left(X > n\right)} f_X\left(x\right) = p\left(1 - p\right)^{x-n-1}\]
     for $x = n+1, n+2, \ldots$. Note that the indicator variable hides in the fact that we only consider $x \geq n+1$.
-}
+\end{parag}
 
 
-\parag{Definition: Conditional expected value}{
+\begin{parag}{Definition: Conditional expected value}
     Let $\left(\Omega, \mathcal{F}, \prob\right)$ be a probability space, where we consider some random variable $X$ and event $B \in \mathcal{F}$. We also suppose that $\sum_{x}^{} \left|g\left(x\right)\right| f_X\left(x | B\right) < \infty$.
 
     The \important{conditional expected value} of $g\left(X\right)$ given $B$ is defined as: 
     \[\exval\left[g\left(X\right) | B\right] = \sum_{x}^{} g\left(x\right) f_X\left(x | B\right)\]
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $X$ be random variable with expected value $\exval\left(X\right)$, and $\left\{B_i\right\}_{i=1}^{\infty}$ be partition such that $\prob\left(B_i\right) > 0$ for all $i$ and such that the following sum is absolutely convergent.
 
     Then: 
@@ -104,14 +104,14 @@
 
     This is very similar to the theorem of total probability.
     
-    \subparag{Implication}{
+    \begin{subparag}{Implication}
         Let $B$ be an event with $\prob\left(B\right) > 0$ and $\prob\left(B^C\right) > 0$. Then, our theorem implies that: 
         \[\exval\left(X\right) = \exval\left(X|B\right)\prob\left(B\right) + \exval\left(X | B^c\right)\prob\left(B^c\right)\]
 
         This follows immediately from the theorem, by setting $B_1 = B$, $B_2 = B^C$ and $B_3 = B_4 = \ldots = \o$.
-    }
+    \end{subparag}
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Just as one can think, we will use the theorem of total probability: 
         \[f\left(x\right) = \prob\left(X = x\right) = \sum_{i=1}^{\infty} \prob\left(X = x | B_i\right) \prob\left(B_i\right) = \sum_{i = 1}^{\infty} f\left(x | B_i\right)\prob\left(B_i\right)\]
         
@@ -119,10 +119,10 @@
         \autoeq{\exval\left(X\right) = \sum_{x}^{} xf\left(x\right) = \sum_{x}^{} x \sum_{i=1}^{\infty} f\left(x | B_i\right)\prob\left(B_i\right) = \sum_{i=1}^{\infty} \left[\sum_{x}^{} xf\left(x | B_i\right)\right]\prob\left(B_i\right) = \sum_{i=1}^{\infty} \exval\left(X | B_i\right)\prob\left(B_i\right)}
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     We want to compute the expected value of $X \followsdistr \text{Geom}\left(p\right)$ given that $X > n$.
 
     We have seen in the previous example that: 
@@ -135,17 +135,17 @@
     \[\exval\left(X | B\right) = \sum_{y=1}^{\infty} \left(n+y\right)p\left(1-p\right)^{y-1} = n \sum_{y=1}^{\infty} p\left(1-p\right)^{y-1} + \sum_{y=1}^{\infty} yp\left(1-p\right)^{y-1} = n + \frac{1}{p}\]
     
     Indeed, the first sum is the probability distribution of the geometric distributions (and thus sums to 1), and the second one is their expected value. This result is rather intuitive.
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let's now say that we want to compute the conditional probability of $X \followsdistr \text{Geom}\left(p\right)$ given that $B^C = \left\{X \leq n\right\}$.
 
     However, we know $\exval\left(X\right)$ and $\exval\left(X | B\right)$: the second one was just computed in the previous example. Thus, we know that: 
     \autoeq{\exval\left(X\right) = \exval\left(X | B\right)\prob\left(B\right) + \exval\left(X | B^C\right)\prob\left(B^C\right) \iff \exval\left(X | B^C\right) = \frac{\exval\left(X\right) - \exval\left(X | B\right)\prob\left(B\right)}{\prob\left(B^C\right)} = \frac{\frac{1}{p} - \left(n + \frac{1}{p}\right)\left(1-p\right)^n}{1 - \left(1 - p\right)^n}}
-}
+\end{parag}
 
 \subsection{Law of small numbers}
-\parag{Definition: Convergence of distributions}{
+\begin{parag}{Definition: Convergence of distributions}
     Let $\left\{X_n\right\}$ and $X$ be random variables with cumulative distribution functions $\left\{F_n\right\}$ and $F$, respectively.
 
     We say that $\left\{X_n\right\}$ \important{converge in distribution} (or converge in laws) to $X$ if, for all $x \in \mathbb{R}$ where $F$ is continuous: 
@@ -153,24 +153,24 @@
     
     We write $X_n \over{\to}{$D$} X$ (or $X_n \over{\to}{$\left(d\right)$} X$) as $n \to \infty$.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         In the case of discrete random variables, meaning $D_X \subset \mathbb{Z}$, this is equivalent to: 
         \[\lim_{n \to \infty} f_n\left(x\right) = f\left(x\right)\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem: Law of small numbers}{
+\begin{parag}{Theorem: Law of small numbers}
     Let $\left(p_n\right)$ be a sequence of probabilities such that $\lim_{n \to \infty} n p_n = \lambda > 0$, and let $X_n \followsdistr B\left(n, p_n\right)$ be a sequence of random variables following binomial distributions. Finally, let $X \followsdistr \text{Pois}\left(\lambda\right)$.
 
     Then:
     \[X_n \over{\to}{D} X\]
 
-    \subparag{Implication}{
+    \begin{subparag}{Implication}
         We can use this theorem to approximate binomial probabilities for large $n$ and small $p$, by using Poisson probabilities.
-    }
+    \end{subparag}
     
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let $r$ be fixed. We want to show that the PMF of the binomial distribution tends towards the one of the Poisson distribution:
         \autoeq{\lim_{n \to \infty} \binom{n}{r} p_n^{r} \left(1-p_n\right)^{n-r} = \lim_{n \to \infty} \underbrace{n^{-r} \binom{n}{r}}_{\to \frac{1}{r!}} \underbrace{\left(n p_n\right)^{r}}_{\lambda^r} \underbrace{\left(1 - \frac{np_n}{n}\right)^{n-r}}_{\to e^{-\lambda}} = \frac{1}{r!} \lambda^r e^{-\lambda}}
         
@@ -178,10 +178,10 @@
         \[\lim_{n \to \infty} n^{-r} \binom{n}{r} = \frac{1}{r!}\]
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Proposition}{
+\begin{parag}{Proposition}
     Let $X_n$ be a hypergeometric variable: 
     \[\prob\left(X_n = x\right) = \frac{\binom{m}{x} \binom{N-m}{n-x}}{\binom{N}{x}}\]
     
@@ -190,7 +190,7 @@
     Then, the limiting distribution of $X_N$ is $B\left(n, p\right)$: 
     \[\prob\left(X_N = x\right) \to \binom{n}{x} p^x \left(1-p\right)^{n-x}, \mathspace i = 0, \ldots, n\]
      
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Multiplying by some terms which divide out to 1, it gives: 
         \[\frac{\binom{m}{x} \binom{N-m}{n-x}}{\binom{N}{n}} = \frac{m^x}{N^x}\cdot \frac{\left(N - m\right)^{n-x}}{N^{n-x}} \cdot  \frac{\overbrace{m^{-x} \binom{m}{x}}^{\to \frac{1}{x!}}\overbrace{\left(N - m\right)^{-\left(n-x\right)}\binom{N-m}{n-x}}^{\frac{1}{\left(n-x\right)!}}}{\underbrace{N^{-n} \binom{N}{n}}_{\to \frac{1}{n!}}}\]
         which, as $N \to +\infty$, tends towards:
@@ -198,53 +198,53 @@
         as required.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \section{Continuous random variables}
 \subsection{Fundamentals}
 
-\parag{Definition: Continuous random variable}{
+\begin{parag}{Definition: Continuous random variable}
     Let $X$ be a random variable, and $D_x$ be its support: 
     \[D_X = \left\{x \in \mathbb{R} \suchthat \exists \omega \in \Omega \text{ such that } X\left(\omega\right) = x\right\}\]
     
     This is a \important{continuous random variable} if $D_X$ is infinite non-countable.
-}
+\end{parag}
 
 
-\parag{Definition: CDF}{
+\begin{parag}{Definition: CDF}
     Let $\left(\Omega, \mathcal{F}, \prob\right)$ be a probability space.
 
     The \important{cumulative distribution function} of a continuous random variable $X$ on this probability space is defined just as for discrete random variables: 
     \[F\left(x\right) = \prob\left(X \leq x\right) = \prob\left(\mathcal{B}_x\right), \mathspace x \in \mathbb{R}\]
     where $\mathcal{B}_x = \left\{\omega \suchthat X\left(\omega\right) \leq x\right\} \subset \Omega$.
-}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     The probability that a continuous random variable is an exact value is 0. For instance, the probability that we get exactly 0.5 when picking a random number in $\left[0, 1\right]$ is 0.
 
     We need to switch our point of view: we will consider masses. We know that the mass of any particle of some continuous matter weigh 0, but that the whole object still weighs something. When we consider point-wise functions, we must not consider mass, but densities. This thus leads to the following definition.
-}
+\end{parag}
 
-\parag{Definition: PDF}{
+\begin{parag}{Definition: PDF}
     A random variable $X$ is continuous if there exists a function $f\left(x\right)$, called the \important{probability density function} (or density), named PDF, of $X$, such that: 
     \[\prob\left(X \leq x\right) = F\left(x\right) = \int_{-\infty}^{x} f\left(u\right)du, \mathspace x \in \mathbb{R}\]
     
     By using the properties of $F$, we know that this implies that $f\left(x\right) \geq 0$ and $\int_{-\infty}^{\infty} f\left(x\right)dx = 1$.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         By using the fundamental theorem of calculus, we get that: 
         \[f\left(x\right) = \frac{dF\left(x\right)}{dx}\]
 
         This means that $F\left(x\right)$ needs to be continuous. This function $F\left(x\right)$ can only have jumps for discrete random variables.
-    }
+    \end{subparag}
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         We notice that: 
         \[\prob\left(X = x\right) = \lim_{\delta \to 0} \int_{x}^{x + \delta} f\left(x\right)dx = 0\]
 
         As expected, a single point has zero probability.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \end{document}

@@ -22,34 +22,34 @@
 
 }
 
-\parag{Proposition}{
+\begin{parag}{Proposition}
     Let $X = \left(X_1, \ldots, X_p\right)^T$ and $X_i \followsdistr \mathcal{N}\left(0, \sigma_i^2\right)$ are all independent. In other words:
     \[X \followsdistr \mathcal{N}_p\left(0, \begin{pmatrix} \sigma_1^2 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & \sigma_p^2 \end{pmatrix}\right) = \mathcal{N}_p\left(0, \Omega\right)\]
 
     Then:
     \[f_X\left(x\right) = \frac{1}{\sqrt{2\pi}^p \sqrt{\det \Omega}} \exp\left(-\frac{1}{2} x^T \Omega^{-1} x\right)\]
     
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         This allows us to compute the PDF of $X$ when $\Omega$ is diagonal, but we are not yet able to compute it for the other cases.
-    }
+    \end{subparag}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This follows the observation we made earlier: any independent Gaussian variables are jointly Gaussian (which is not necessarily true if they are dependent).
-    }
+    \end{subparag}
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         The proof is rather straightforward:
         \autoeq{f_X\left(x\right) = \prod_{i=1}^{p} f_{X_i}\left(x_i\right) = \prod_{i=1}^{p} \frac{1}{\sqrt{2\pi \sigma_i}} \exp\left(-\frac{x_i^2}{2 \sigma_i}\right)= \frac{1}{\sqrt{2\pi}^p \sqrt{\prod_{i=1}^{p} \sigma_i}} \exp\left(- \frac{1}{2}x^T \begin{pmatrix} \frac{1}{\sigma_1^2} & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & \frac{1}{\sigma_p^2} \end{pmatrix} x\right) = \frac{1}{\sqrt{2\pi}^p \sqrt{\det \Omega}} \exp\left(-\frac{1}{2} x^T \Omega^{-1} x\right)}
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem: PDF of jointly Gaussian variables}{
+\begin{parag}{Theorem: PDF of jointly Gaussian variables}
     Let $X \followsdistr \mathcal{N}_p\left(0, \Omega\right)$ be non-degenerate (meaning that $\Omega$ is positive definite). Then: 
     \[f_X\left(x\right) = \frac{1}{\sqrt{2\pi}^p \sqrt{\det \Omega}} \exp\left(-\frac{1}{2} x^T \Omega^{-1} x\right)\]
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We want to use a random variables transformation. Transformation of random vectors comes right after \textit{(and I'm not sure why the structure was chosen to be that way in this course)}, but this is very similar to the 1D case.
 
         Let $X \followsdistr \mathcal{N}\left(0, I\right)$. We define $Y = AX$ such that $Y \followsdistr \mathcal{N}\left(0, \Omega\right)$. As we saw some lectures ago, this requires: 
@@ -71,10 +71,10 @@
         \[f_Y\left(y\right) = \frac{1}{\sqrt{2\pi}^p \sqrt{\det\left(\Omega\right)}} e^{-\frac{1}{2} y^T \Omega^{-1} y}\]
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us consider: 
     \[\begin{pmatrix} X_1 \\ X_2 \end{pmatrix} \followsdistr \mathcal{N}\left(0, \begin{pmatrix} 1 & \rho \\ \rho & 1 \end{pmatrix} \right)\]
     
@@ -83,7 +83,7 @@
 
     We want to verify this particular case using the PDF of jointly Gaussian random variables.
 
-    \subparag{Verifiation}{
+    \begin{subparag}{Verifiation}
         By definition, we know that: 
         \[f_{X_2|X_1}\left(x_2|x_1\right) = \frac{f_{X_1, X_2}\left(x_1, x_2\right)}{f_{X_1}\left(x_1\right)}\]
         
@@ -109,11 +109,11 @@
         We recognise the formula of the 1D Gaussian distribution, which indeed tells us that:
         \[X_1 | X_2 = x_2 \followsdistr \mathcal{N}\left(\rho x_2, 1- \rho^2\right)\]
         
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \subsection{Transformations}
-\parag{Definition: Jacobian}{
+\begin{parag}{Definition: Jacobian}
     Let $X = \left(X_1, \ldots, X_n\right)$ be a continuous random vector, and let $Y = g\left(X\right)$: 
     \[Y = \begin{pmatrix} Y_1 \\ \vdots \\ Y_n \end{pmatrix} = \begin{pmatrix} g_1\left(X_1, \ldots, X_n\right) \\ \vdots \\ g_n\left(X_1, \ldots, X_n\right) \end{pmatrix} \]
     
@@ -121,32 +121,32 @@
     \[J_g\left(x_1, \ldots, x_n\right) = \det\begin{pmatrix} \frac{\partial g_1}{\partial x_1}  & \cdots & \frac{\partial g_1}{\partial x_n}  \\ \vdots & \ddots & \vdots \\ \frac{\partial g_n}{\partial x_1}  & \cdots & \frac{\partial g_n}{\partial x_n}  \end{pmatrix} \in \mathbb{R}\]
 
     If this is unambiguous, we shorten $J_g\left(X\right) = J\left(X\right)$.
-}
+\end{parag}
 
 
-\parag{Theorem: Transformation}{
+\begin{parag}{Theorem: Transformation}
     Let $X = \left(X_1, \ldots, X_n\right)$ be a continuous random vector, and let $Y = g\left(X\right)$.
 
     If their Jacobian is non-zero (meaning that $g$ is invertible), then: 
     \autoeq{f_{Y_1, \ldots, Y_n}\left(y_1, \ldots, y_n\right) = f_{X_1, \ldots, X_n}\left(x_1, \ldots, x_n\right) \frac{1}{\left|J_g\left(x_1, \ldots, x_n\right)\right|} \eval_{x = g^{-1}\left(y\right)} = f_{X_1, \ldots, X_n}\left(g^{-1}\left(y_1, \ldots, y_n\right)\right) \left|J_{g^{-1}}\left(y_1, \ldots, y_n\right)\right|}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This is very similar to the 1D-case:
         \[f_Y\left(y\right) = f_X\left(g^{-1}\left(y\right)\right) \left|\frac{dg^{-1}\left(y\right)}{dy}\right|\]
-    }
+    \end{subparag}
 
-    \subparag{Personal remark: Intuition}{
+    \begin{subparag}{Personal remark: Intuition}
         First, we note that, when we map a square of area $dA$ centered at $x$ through $g$, its area will be stretched by a factor $\left|\det J_g\left(x\right)\right|$. This is an important property of the Jacobian.
 
         Let's now say that we have a probability $p$ to land in this square of area $dA$. When we map it through $g$, this probability must definitely not change. However, since the area increased by a factor $\left|\det J_g\left(x\right)\right|$, the probability density must decrease by a factor $\left|\det J_g\left(x\right)\right|^{-1}$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Corollary}{
+\begin{parag}{Corollary}
     Let's say that we are given $f_X\left(x\right)$ and $Y = AX$ for some full-rank matrix $A$.
 
     Then, we know that $\left|J\left(x\right)\right| = \left|\det\left(A\right)\right|$, and thus:
     \[f_Y\left(y\right) = f_X\left(x\right) \left|J\left(x\right)\right|^{-1} \eval_{x = A^{-1} y}^{} = \frac{f_X\left(A^{-1} y\right)}{\left|\det A\right|}\]
-}
+\end{parag}
 
 \end{document}

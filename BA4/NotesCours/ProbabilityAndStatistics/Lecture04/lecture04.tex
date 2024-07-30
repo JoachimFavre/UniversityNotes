@@ -23,14 +23,14 @@
 }
 
 \subsection{Conditional probabilities}
-\parag{Definition: Conditional probability}{
+\begin{parag}{Definition: Conditional probability}
     Let $A$ and $B$ be events of the probability space $\left(\Omega, \mathcal{F}, \prob\right)$, such that $\prob\left(B\right) > 0$. Then, the \important{conditional probability} of $A$ given $B$ (knowing that $B$ took place) is: 
     \[\prob\left(A | B\right) = \frac{\prob\left(A \cap B\right)}{\prob\left(B\right)}\]
     
     If $\prob\left(B\right) = 0$, we are still allowed to consider the following quantity (since both sides are equal to 0, ignoring that $\prob\left(A | B\right) $ is undefined):
     \[\prob\left(A \cap B\right) = \prob\left(A | B\right)\prob\left(B\right)\]
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         We note that any set $A$ can be split into: 
         \[A = \left(A \cap B\right) \cup \left(A \cap B^C\right)\]
         where $A \cap B$ and $A \cap B^C$ are disjoint.
@@ -39,17 +39,17 @@
         \[\prob\left(A\right) = \prob\left(A \cap B\right) + \prob\left(A \cap B^C\right) = \prob\left(A | B\right)\prob\left(B\right) + \prob\left(A | B^C\right)\prob\left(B^C\right)\]
 
         Note that this is correct even if $\prob\left(B\right) = 0$ or $\prob\left(B^C\right) = 0$. Reading this formula orally should make it very intuitive.
-    }
+    \end{subparag}
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         The idea is to draw the following diagram:
         \svghere[0.5]{ConditionalProbability.svg}
 
         Since we know that $B$ happened, this is like if our new sample space is $B$ and that we are looking for the event $A \cap B$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     We roll two fair dice, one red and one green. Let $A$ and $B$ be the events that the total exceeds 8, and that we get 6 on the red die, respectively. We want to compute the probability of $A$ knowing that $B$ has occurred.
 
     This can easily be computed thanks to our definition: 
@@ -58,9 +58,9 @@
     This is very intuitive: if we know that we rolled a 6 on the red die, then the green die must roll any number which is not 1 or 2.
 
     Note that we can show $\prob\left(A\right) = \frac{5}{18}$. We indeed see that conditioning the problem may have a big result on the probabilities.
-}
+\end{parag}
 
-\parag{Theorem: Conditional probability space}{
+\begin{parag}{Theorem: Conditional probability space}
     Let $\left(\Omega, \mathcal{F}, \prob\right)$ be a probability space, and let $B \in \mathcal{F}$ such that $\prob\left(B\right) > 0$. Also, let $\hat{\prob}\left(A\right) = \prob\left(A | B\right)$.
 
     Then $\left(\Omega, \mathcal{F}, \hat{\prob}\right)$ is a probability space. In particular:
@@ -70,46 +70,46 @@
         \item If $\left\{A_i\right\}_{i=1}^{\infty}$ are pairwise disjoint, then: 
         \[\hat{\prob}\left(\bigcup_{i=1}^{\infty} A_i\right) = \sum_{j=1}^{\infty} \hat{\prob}\left(A_i\right)\]
     \end{itemize}
-}
+\end{parag}
 
-\parag{Theorem: Law of total probability}{
+\begin{parag}{Theorem: Law of total probability}
     Let $\left\{B_i\right\}_{i=1}^{\infty}$ be pairwise disjoint events (meaning that $B_i \cap B_j = \o$ for $i \neq j$) of the probability space $\left(\Omega, \mathcal{F}, \prob\right)$. Also, let $A$ be an event satisfying $A \subset \bigcup_{i=1}^{\infty} B_i$. 
 
     Then: 
     \[\prob\left(A\right) = \sum_{i=1}^{\infty} \prob\left(A \cap B_i\right) = \sum_{i=1}^{\infty} \prob\left(A | B_i\right)\prob\left(B_i\right)\]
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         Basically, if the $B_i$ cover entirely $A$, then we can express $A$ as a union of $B_i \cap A$, which are pairwise disjoint (since the $B_i$ originally were pairwise disjoint). 
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We have seen a special case of this theorem above, in the definition of conditional probabilities, with $B$ and $B^C$: 
         \[\prob\left(A\right) = \prob\left(A|B\right)\prob\left(B\right) + \prob\left(A|B^C\right)\prob\left(B^C\right)\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Bayes' theorem}{
+\begin{parag}{Bayes' theorem}
     Let $\left\{B_i\right\}_{i=1}^{\infty}$ be pairwise disjoint events (meaning that $B_i \cap B_j = \o$ for $i \neq j$) of the probability space $\left(\Omega, \mathcal{F}, \prob\right)$. Also, let $A$ be an event satisfying $A \subset \bigcup_{i=1}^{\infty} B_i$ and $\prob\left(A\right) > 0$.
 
     Then, for any $j \in \mathbb{N}$:
     \[\prob\left(B_j | A\right) = \frac{\prob\left(A | B_j\right)\prob\left(B_j\right)}{\sum_{i=1}^{\infty} \prob\left(A | B_i\right)\prob\left(B_i\right)}\]
 
-    \subparag{Remark 1}{
+    \begin{subparag}{Remark 1}
         Note that this result is also true if the number of $B_i$ is finite, and if the $B_i$ partition $\Omega$ (which is a typical application of this theorem).
-    }
+    \end{subparag}
     
-    \subparag{Remark 2}{
+    \begin{subparag}{Remark 2}
         This theorem is very important. There always are questions on this theorem at exams.
-    }
+    \end{subparag}
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         This proof is very straighforward, using our definitions and our law of total probability: 
         \[\prob\left(B_j | A\right) = \frac{\prob\left(A \cap B_j\right)}{\prob\left(A\right)} = \frac{\prob\left(A | B_j\right)\prob\left(B_j\right)}{\prob\left(A\right)} = \frac{\prob\left(A | B_j\right)\prob\left(B_j\right)}{\sum_{i=1}^{\infty} \prob\left(A | B_i\right)\prob\left(B_i\right)}\]
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     We suspect that the man in front of us at the security check at the airport is a terrorist. We know that one person out of $10^6$ is a terrorist, and that a terrorist is detected by security check with a probability of 0.9999, but that the alarm may still be triggered when a normal person goes through with a probability $10^{-5}$. We wonder what is the probability that he is a terrorist, given that the alarm is triggered when he passes through security.
 
     Let $A$ be the event that the alarm is triggered and $T$ be the one that he is a terrorist. We can apply Bayes' rule: 
@@ -120,7 +120,7 @@
     
     
     This shows that $\prob\left(T | A\right) \neq \prob\left(A | T\right)$, rather unintuitively if we are not careful (it is a typical bias in statistics to assume they are equal).
-}
+\end{parag}
 
 
 \end{document}

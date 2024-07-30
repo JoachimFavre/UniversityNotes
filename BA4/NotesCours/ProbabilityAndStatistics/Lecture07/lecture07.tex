@@ -24,7 +24,7 @@
 
 }
 
-\parag{Definition: CDF}{
+\begin{parag}{Definition: CDF}
     Let $X$ be some random variable with probability distribution $\prob$. Its \important{Cumulative Distribution Function} (CDF) is defined as: 
     \[F_X\left(x\right) = \prob\left(X \leq x\right), \mathspace x \in \mathbb{R}\]
     
@@ -32,9 +32,9 @@
     \[F_X\left(x\right) = \sum_{\substack{x_i \in D_x \\ x_i \leq x}}^{} \prob\left(X = x_i\right)\]
     
     When there is no risk of confusion, we write $F = F_X$.
-}
+\end{parag}
 
-\parag{Theorem: Properties of CDF}{
+\begin{parag}{Theorem: Properties of CDF}
     Let $\left(\Omega, \mathcal{F}, \prob\right)$ be a probability space and $X: \Omega \mapsto \mathbb{R}$ be a random variable. Its cumulative distribution function $F_X$ satisfies:
     \begin{enumerate}
         \item $\lim_{x \to -\infty} F_X\left(x\right) = 0$.
@@ -44,65 +44,65 @@
         \item $\prob\left(X > x\right) = 1 - F_X\left(x\right)$
         \item If $x < y$, then $\prob\left(x < X \leq y\right) = F_X\left(y\right) - F_X\left(x\right)$
     \end{enumerate}
-}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     We can obtain the mass function of a discrete random variable from the CDF by using: 
     \[f\left(x\right) = \lim_{z \to x^+} F\left(z\right) - \lim_{y \to x^-} F\left(y\right) = F\left(x\right) - \lim_{y \to x^-} F\left(y\right)\]
 
     This means that describing a problem using a CDF or a PMF are completely equivalent in the discrete case.
-}
+\end{parag}
 
-\parag{Theorem: PMF Transformation}{
+\begin{parag}{Theorem: PMF Transformation}
     If $X$ is a random variable and $Y = g\left(X\right)$, then: 
     \[f_Y\left(y\right) = \sum_{x \suchthat g\left(x\right) = y}^{} f_X\left(x\right)\]
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         This is a direct proof: 
         \[f_Y\left(y\right) = \prob\left(Y = y\right) = \sum_{x \suchthat g\left(x\right) = y}^{} \prob\left(X = x\right) = \sum_{x \suchthat g\left(x\right) = y}^{} f_X\left(x\right)\]
         
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let $X \followsdistr \text{Pois}\left(\lambda\right)$ and $Y = I\left(X \geq 1\right)$. We have: 
     \[f_Y\left(0\right) = \prob\left(Y = 0\right) = \prob\left(X = 0\right) = e^{-\lambda}\]
     \[f_Y\left(1\right) = \prob\left(Y = 1\right) = \sum_{x=1}^{\infty} \prob\left(X = x\right) = \sum_{x=1}^{\infty} \frac{\lambda^x}{x!} e^{-\lambda} = 1 - e^{-\lambda}\]
-}
+\end{parag}
 
 
 \subsection{Expectation}
-\parag{Definition: Expectation}{
+\begin{parag}{Definition: Expectation}
     Let $X$ be a discrete random variable for which $\sum_{x \in D_X}^{} \left|x\right|f_X\left(x\right) < \infty$, where $D_X$ is the support of $f_X$. The \important{expectation} (or \important{expected value} or \important{mean}) of $X$ is: 
     \[\exval\left(X\right) = \sum_{x \in D_X}^{} x\prob\left(X = x\right) = \sum_{x \in D_x}^{} x f_X\left(x\right)\]
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let us compute the expected value of some Bernoulli random variable $I$: 
     \[\exval\left(I\right) = 0\left(1-p\right) + 1\left(p\right) = p\]
-}
+\end{parag}
 
 
-\parag{Theorem: Expected value of a function}{
+\begin{parag}{Theorem: Expected value of a function}
     Let $X$ be a random variable with mass function $f$, and let $g$ be a real-valued function of $X$. Then: 
     \[\exval\left[g\left(X\right)\right] = \sum_{x \in D_x}^{} g\left(x\right)f\left(x\right)\]
     when $\sum_{x \in D_X}^{} \left|g\left(x\right)\right|f\left(x\right) < \infty$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We let $Y = g\left(X\right)$. By a theorem we saw previously, we have: 
         \[f_Y\left(y\right) = \sum_{x \in D_x \suchthat g\left(x\right) = y}^{} f_X\left(x\right)\]
         
         Therefore: 
         \autoeq{\exval\left(Y\right) = \sum_{y \in D_y}^{} y f_Y\left(y\right) = \sum_{y \in D_y}^{} y \sum_{x \in D_x \suchthat g\left(x\right) = y}^{} f_X\left(x\right) = \sum_{y \in D_y}^{} \sum_{x \in D_x \suchthat g\left(x\right) = y}^{}  g\left(x\right) f_X\left(x\right) = \sum_{x \in D_x}^{} g\left(x\right) f_X\left(x\right)}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let $X \followsdistr \text{Pois}\left(\lambda\right)$. We want to calculate $\exval\left(X\left(X-1\right)\right)$. We can use our theorem: 
     \[\exval\left(X\left(X-1\right)\right) = \sum_{x=0}^{\infty} x\left(x-1\right) \frac{\lambda^x}{x!} e^{-\lambda} = \lambda^2 \sum_{x=2}^{\infty} \frac{\lambda^{x-2}}{\left(x-2\right)!} e^{-\lambda} = \lambda^2 \cdot  1 = \lambda ^2\]
     since we recognised the PMF of the Poisson distribution, which, as all PMF, sums to 1.
-}
+\end{parag}
 
 
 

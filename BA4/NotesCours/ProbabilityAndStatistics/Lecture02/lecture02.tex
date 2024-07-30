@@ -24,38 +24,38 @@
 }
 
 \section{Combinatorics}
-\parag{Proposition: Order with repetitions}{
+\begin{parag}{Proposition: Order with repetitions}
     The number of ways to choose $k$ elements amongst $n$ distinct elements, when order matters and we allow repetitions, is given by:
     \[n^k\]
 
-    \subparag{Justification}{
+    \begin{subparag}{Justification}
         We have $n$ possibilities for the first element, $n$ for the second one, and so on until the $k$\Th element. This gives us: 
         \[n \cdot n \cdots n = n^k\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Proposition: Order without repetitions}{
+\begin{parag}{Proposition: Order without repetitions}
     The number of ways to choose $k$ elements amongst $n$ distinct elements, when order matters but we don't want any repetition, is given by:
     \[\frac{n!}{\left(n-k\right)!}\]
 
-    \subparag{Justification}{
+    \begin{subparag}{Justification}
         The idea is that there are $n$ possibilities for the first element. Then, there are $n-1$ possibilities for the second one (since we want any element, except for the first one), and so on until $n-\left(k-1\right)$ (since we want $k$ elements in total). This gives us: 
         \[n\left(n-1\right)\cdots \left(n-\left(k-1\right)\right) = \frac{n!}{\left(n-k\right)!}\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Proposition: No order without repetitions}{
+\begin{parag}{Proposition: No order without repetitions}
     The number of ways to choose $k$ elements amongst $n$ distinct elements, when order does not matter and we don't want any repetition, is given by:
     \[\frac{n!}{\left(n-k\right)!k!} = \binom{n}{k}\]
     called the \important{binomial coefficient}.
 
-    \subparag{Justification}{
+    \begin{subparag}{Justification}
         The idea is that we consider the case where we allow order, and we just divide it by $k!$ (this is the number of different permutations since every element is unique). This gives us: 
         \[\frac{n!}{\left(n-k\right)!k!}\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Properties of binomial coefficients}{
+\begin{parag}{Properties of binomial coefficients}
     Let $n, m, r\in \mathbb{N}$ where $r \leq n$. Then, we have the following properties:
     \begin{enumerate}
         \item $\displaystyle \binom{n}{r} = \binom{n}{n-r}$.
@@ -73,16 +73,16 @@
         \item Let us consider that we have $n$ blue hats and $m$ red hats. The number of ways to choose $r$ hats from our total is the sum on all possible $j$ of taking $j$ blue hats and $r -j$ red hats.
     \end{enumerate}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The first property must be known, the others might be useful at some point.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Proposition: No order with repetitions}{
+\begin{parag}{Proposition: No order with repetitions}
     The number of ways to choose $k$ elements amongst $n$ distinct elements, when order does not matter but we allow repetitions, is given by:
     \[\binom{n-1+k}{k}\]
 
-    \subparag{Justification}{
+    \begin{subparag}{Justification}
         We need to switch our viewpoint in order to understand this well. The goal is basically to take a total of $k$ elements from $n$ buckets, which we can represent as a $n$-tuple: the $i$\Th element represents the number of objects we took from the $i$\Th box. Since we want to pick a total of $k$ objects, the sum of the elements of the tuple is equal to $k$. 
 
         We can encode this as a string: we use $n-1$ characters as splitters (for instance ``|''), and $k$ characters as objects we picked from a box (for instance ``$\bullet$''). For example, $\left(1, 2, 0, 1\right)$ could be represented by $\bullet | \bullet \bullet ||\bullet$ (there are one object in the first delimited box, 2 in the second one, then 0 and finally 1, indeed representing our vector). This is a bijective representation: any tuple can be represented as such a string, and any string represents exactly one tuple. This means that we only need to count the number of possible strings.
@@ -90,10 +90,10 @@
         Our string has length $n + k - 1$, with $k$ and $n-1$ repeated elements. This gives us: 
         \[\frac{\left(n+k-1\right)!}{n!\left(k-1\right)!} = \binom{n + k - 1}{k} = \binom{n+k-1}{n-1}\]
         using a property of the binomial coefficient.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Summary}{
+\begin{parag}{Summary}
     The number of ways to choose $k$ elements amongst $n$ distinct elements is given by:
     \begin{center}
     \begin{tabular}{|c|c|c|}
@@ -107,32 +107,32 @@
     \end{tabular}
     \end{center}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The purpose of this table is not to be learnt by heart and to just try and find the correct to use, but to be able to know their intuition, and to be able to find such formula back during an exercise.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Proposition: Generalised order without repetitions}{
+\begin{parag}{Proposition: Generalised order without repetitions}
     Let's say we have $n = n_1 + \ldots + n_r$ elements of $r$ different types, where $n_i$ is the number of objects of type $i$ that are indistinguishable from one another. Then, the number of permutations without repetitions is given by: 
     \[\frac{n!}{n_1! \cdots n_r!} = \binom{n}{n_1, \ldots, n_r}\]
     called the \important{multinomial coefficient}.
     
-    \subparag{Justification}{
+    \begin{subparag}{Justification}
         Let's think of it though an example: let's say we have a category $a$ with $a_1$ and $a_2$ (which are really undistinguishable, but we distinguish them here for understanding purposes), and another category $b$ with element $b_1$. If we just compute the basic order without repetitions, we get $3!$ possibilities. However, we count $a_1 a_2 b_1$ and $a_2 a_1 b_1$ separately. This should not be the case (again, $a_1$ and $a_2$ are indistinguishable). We can just fix this by dividing by the number of permutations of the elements within the category $a$ (it's like if we fix everything else, and we just permute elements of $a$ on their own).
 
         Generalising this idea is not very complicated, and it gives us: 
         \[\frac{n!}{n_1! \cdots n_r!}\]
         
         Indeed, we permute all those elements, and then we remove the duplicate within each category.
-    }
+    \end{subparag}
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
          Note that, if $n_i = 1$ for all $i$, then we get back our formula for order without repetitions where we pick $k = n$ elements.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let's say we have a class of 20 students, where we have to choose a committee of size 4. 
 
     If each person of the committee have a different role, then we need $20\cdot 19\cdot 18\cdot 17 = \frac{20!}{\left(20-4\right)!}$ possibilities.
@@ -140,22 +140,22 @@
     If there is one president, one treasurer, and two travel agents, then we have $\frac{20\cdot 19\cdot 18\cdot 17}{1!1!2!}$ since we must not count who is there is no agent 1 and agent 2, the two jobs are exactly the same.
 
     If there roles are indistinguishable, then we just need to pick 4 people out of our 20 students, giving $\binom{20}{4} = \frac{20!}{\left(20-4\right)!4!}$.
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let's say that we have an integer $n$, which we want to split into $n= n_1 + \ldots + n_r$ where $n_i \geq 0$ for all $i$. We want to know the number of ways we can find such numbers.
 
     We recognise the intermediate step in our justification for no order with repetition, meaning that we can use the same reasoning. We can represent our numbers as $|$, giving us strings such as $|||+||++| = 3 + 2 + 0 + 1 = 6$ for instance. We need a total of $n$ bars (since we want them to add to $n$), and we have $r-1$ plus symbols, giving us $\binom{n+r-1}{r-1}$ possibilities.
-}
+\end{parag}
 
-\parag{Example 3}{
+\begin{parag}{Example 3}
     Let's consider another example, which is very close. This time, we want $n_i > 0$ for all $i$. 
 
     A simple way to do so, is to consider the change of variable $m_i = n_i - 1$. Since $n_i > 0 \iff n_i \geq 1$, we get that we want $m_i \geq 0$ for all $i$, and:
     \[m_1 + \ldots + m_r = \left(n_1 - 1\right) + \ldots + \left(n_r - 1\right) = n_1 + \ldots + n_r - r = n - r\]
 
     Then, we can do the exact same reasoning as before, giving $\binom{n-1}{r-1}$.
-}
+\end{parag}
 
 
 \end{document}

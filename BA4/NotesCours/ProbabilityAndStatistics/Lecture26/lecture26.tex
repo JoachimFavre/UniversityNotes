@@ -24,19 +24,19 @@
 
 \subsection{Comparison of tests}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     We notice that we cannot optimise both the power and the size of a test. Now, if we freeze the size, we would like to have a way to maximise the power.
-}
+\end{parag}
 
-\parag{Definition: Rejection region}{
+\begin{parag}{Definition: Rejection region}
     A test allows to split our data $Y$ into two regions, the \important{rejection region}, written $\mathcal{Y}$, and its complement $\bar{\mathcal{Y}}$, such that: 
     \[Y \in \mathcal{Y} \iff \text{Reject $H_0$}\]
 
     Equivalently:
     \[Y \in \bar{\mathcal{Y}} \iff \text{Reject $H_1$}\]
-}
+\end{parag}
 
-\parag{Neyman-Pearson lemma}{
+\begin{parag}{Neyman-Pearson lemma}
     Let $H_0$ and $H_1$ be simple hypotheses, and let $f_0\left(y\right)$ and $f_1\left(y\right)$ be the densities of $Y$ under those hypotheses. Finally, let $\alpha \in \left[0, 1\right]$ be a size for our test.
 
     We construct the following set: 
@@ -45,7 +45,7 @@
 
     If such a $\mathcal{Y}_{\alpha}$ exists, then it is the most powerful test of size $\alpha$. In other words, it maximises $\prob_1\left(Y \in \mathcal{Y}_{\alpha}\right)$ amongst all the $\mathcal{Y}'$ for which $\prob_0\left(Y \in \mathcal{Y}'\right) \leq \alpha$.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         By hypothesis, $\mathcal{Y}_{\alpha}$ exists, meaning that there exists some $t_{\alpha} \geq 0$ for which $\prob_0\left(Y \in \mathcal{Y}_{\alpha}\right) \leq \alpha$.
 
         Let $\mathcal{Y}'$ be an arbitrary critical region of size $\alpha$ or less. Our goal is to show that: 
@@ -76,10 +76,10 @@
         This indeed completes our proof.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     We throw a coin $n$ times. We want to make an optimal test for the null hypothesis that the coin is fair, for a given size.
 
     Each throw is a Bernoulli variable $Y_i$ so, leaving $R = \sum_{i=1}^{n} Y_i$, we get:
@@ -99,9 +99,9 @@
     \[r_1 \approx 111.6\]
 
     In other words, if we have more than $111.6$ heads, we can reject the null hypothesis that the coin is fair.
-}
+\end{parag}
 
-\parag{Optimal hypothesis test under average error probability}{
+\begin{parag}{Optimal hypothesis test under average error probability}
     Let $H_0$ and $H_1$ be hypotheses with PMFs or PDFs $f_0$ and $f_1$, and let $H \in \left\{0, 1\right\}$ be a random variable stating which hypothesis is correct (meaning that, if $H = 0$, then $H_0$ should be accepted). Moreover, let $Y$ be some observations.
 
     We want to make a test minimising the average probability of error (the bar over the $\prob$ represents the fact that it is an average, not a complement): 
@@ -110,16 +110,16 @@
     We will moreover consider the prior that, if we don't make any observation, then $\prob\left(\text{truth} = H_1\right) = \prob\left(\text{truth} = H_0\right) = \frac{1}{2}$. In other words, we have maximal entropy since we have no information without any observation. This means that we are trying to minimise:
     \[\bar{\prob}_e = \frac{\prob_0\left(\text{accept $H_1$}\right) + \prob_1\left(\text{accept $H_0$}\right)}{2}\]
 
-    \subparag{Estimator}{
+    \begin{subparag}{Estimator}
         Now, the idea of our estimator $\hat{H}$ of $H$, which purpose is decide which hypothesis is correct while minimising the average error, is to always pick the one which has highest probability to take place:
         \autoeq{\hat{H}\left(y\right) = \argmax_{h \in \left\{0, 1\right\}} \prob\left(H = h | Y = y\right) = \argmax_{h \in \left\{0, 1\right\}} \frac{\prob\left(Y = y | H = h\right)\prob\left(H = h\right)}{\prob\left(Y = y\right)} = \argmax_{h \in \left\{0, 1\right\}} \frac{1}{2\prob\left(Y = y\right)} \prob\left(Y = y | H = h\right)}
         
         We notice that $\frac{1}{2\prob\left(Y = y\right)}$ is just a constant with respect to $h$, so it has no impact on the maximisation of this function. This means that we can just remove it: 
         \autoeq{\hat{H}\left(y\right) = \argmax_{h \in \left\{0, 1\right\}} \prob\left(Y = y | H = h\right) = \argmax_{h \in \left\{0, 1\right\}} f_h\left(y\right)}
         where we recognised the PMFs of our hypotheses. The case for continuous random variables is similar, and gives the PDFs.
-    }
+    \end{subparag}
     
-    \subparag{Analysis of error}{
+    \begin{subparag}{Analysis of error}
         Let us consider the following graph to understand what happens. We notice that the probability of accepting $H_1$ when the truth is $H_0$, $\prob_0\left(\text{accept $H_1$}\right)$, is the red area (places where the PMF of $H_0$ is lower than the one of $H_1$), and $\prob_1\left(\text{accept $H_0$}\right)$ is the blue area.
 
         \svghere{AverageErrorProbability_AnalysisOfError.svg}
@@ -147,9 +147,9 @@
         \[\bar{\prob}_e = \frac{1}{2} - \frac{0}{4} = \frac{1}{2}\]
         
         This also makes sense since we can only make a uniformly random guess in that case.
-    }
+    \end{subparag}
 
-    \subparag{Personal remark after a discussion with Marco Lourenço}{
+    \begin{subparag}{Personal remark after a discussion with Marco Lourenço}
         In practice, this kind of ideas is not really used. We usually first choose our size (depending on the context), and then try to minimise the false negative probability. Minimising the average of the two is something which is very rarely used.
 
         As an interesting side note, it seems like this is a special case of the maximum a posteriori probability estimate, where we only have two hypotheses, and do not give any prior advantage to any of them:
@@ -158,7 +158,7 @@
         \end{center}
 
         However, again, this over-specialisation of this test makes it not really used in practice.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \end{document}
