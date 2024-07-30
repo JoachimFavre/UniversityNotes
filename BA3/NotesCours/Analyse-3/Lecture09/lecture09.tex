@@ -28,92 +28,92 @@
 \section{Séries de Fourier}
 \subsection{Utilité de la théorie}
 
-\parag{But}{
+\begin{parag}{But}
     Le but est de faire de l'analyse de fréquence.
 
     Par exemple, quand on parle, on émet une onde sonore, qui fera vibrer le tympan à l'intérieur de l'oreille. Pour enregistrer un son dans un ordinateur, on va échantillonner l'amplitude en fonction du temps (on discrétise cette fonction continue). On peut ainsi se poser des questions sur, par exemple, le nombre d'échantillons qu'il faudrait prendre (de manière à ne pas utiliser trop de stockage). Cette question est répondue par le théorème de Nyquist-Shannon, qui utilise la théorie de Fourier. Ensuite, pour stocker efficacement ces données, on peut plutôt stocker les coefficients de la théorie de Fourier, ce qui nous fait gagner beaucoup de place (ce qui donne le format mp3).
 
     L'analyse de Fourier a aussi des applications en physique, comme pour déterminer la fréquence de résonance d'un matériau, ou en mathématiques, comme la résolution des équations différentielles, ou l'écriture de toute fonction périodique comme une somme infinie de sinus et cosinus (ou d'exponentielles complexes).
-}
+\end{parag}
 
-\parag{Théorème de Nyquist-Shannon}{
+\begin{parag}{Théorème de Nyquist-Shannon}
     Quand nous échantillons une fonction amplitude, il faut un échantillon toutes les  $\frac{1}{2B}$ secondes, où $B$ est la fréquence maximale que nous voulons pouvoir reproduire.
 
-    \subparag{Utilité}{
+    \begin{subparag}{Utilité}
         L'oreille humaine n'entend que jusqu'à $\SI{20}{\kilo\hertz }$, donc on prend typiquement $B = \SI{44}{\kilo\hertz }$.
-    }
+    \end{subparag}
     
-    \subparag{Preuve}{
+    \begin{subparag}{Preuve}
         Ce théorème utilise la théorie de Fourier.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \subsection{Séries de Fourier}
-\parag{Rappel: Exponentielle complexe}{
+\begin{parag}{Rappel: Exponentielle complexe}
     Il est important de se souvenir que, pour tout $x, y \in \mathbb{R}$: 
     \[e^{x + iy} = e^{x} e^{iy} = e^{x} \left(\cos\left(y\right) + i\sin\left(y\right)\right)\]
 
-    \subparag{Remarque personnelle}{
+    \begin{subparag}{Remarque personnelle}
         Je ressors cette vidéo très souvent, mais si vous n'avez pas l'intuition de pourquoi l'exponentielle complexe paramétrise un cercle, je vous conseille cette excellente (et très courte) vidéo de 3Blue1Brown:
         \begin{center}
             \url{https://www.youtube.com/watch?v=v0YEaeIClKY}
         \end{center}
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Définition: Fonction $T$-périodique}{
+\begin{parag}{Définition: Fonction $T$-périodique}
     $f: \mathbb{R} \mapsto \mathbb{R}$ est \important{$T$-périodique} si: 
     \[f\left(x + T\right) = f\left(x\right), \mathspace \forall x \in \mathbb{R}\]
     
     $T$ est appelée une \important{période} de $f$.
 
-    \subparag{Exemple}{
+    \begin{subparag}{Exemple}
         Par exemple, $\sin\left(x\right), \cos\left(x\right)$ et $\tan\left(x\right)$ sont $2\pi$-périodiques, mais $\tan\left(x\right)$ est aussi $\pi$-périodiques. De manière similaire, pour $n \in \mathbb{N}$, $\sin\left(\frac{2\pi}{T} nx\right)$ et $\cos\left(\frac{2\pi}{T} nx\right)$ sont $T$-périodiques. Cela nous donne donc aussi que $e^{i\frac{2\pi}{T}nx}$ est $T$-périodique.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Extension en $T$-périodicité}{
+\begin{parag}{Extension en $T$-périodicité}
     Si $f: \left[0, T\right[ \mapsto \mathbb{R}$, on peut l'étendre en $T$-périodicité $f_{ext} : \mathbb{R} \mapsto \mathbb{R}$ (sans que le résultat ne soit nécessairement continu).
 
-    \subparag{Exemple}{
+    \begin{subparag}{Exemple}
         \svghere{ExtensionTPeriodicite.svg}
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Remarque}{
+\begin{parag}{Remarque}
     Si $f$ est $T$-périodique, alors: 
     \[\int_{0}^{T} f\left(x\right)dx = \int_{h}^{T+h} f\left(x\right)dx\]
 
     En effet, l'intégrale sur une période est symétrique, peu importe l'endroit où on la commence.
-}
+\end{parag}
 
-\parag{Définition: Fonction continue par morceaux}{
+\begin{parag}{Définition: Fonction continue par morceaux}
     $f: \left[a, b\right] \mapsto \mathbb{R}$ est \important{continue par morceaux} s'il existe $a = a_0 < a_1 < \ldots < a_n = b$ tels que $f$ est continue sur chaque $\left]a_{i-1}, a_i\right[ $ pour tout $i$, mais aussi que les limites à gauche et à droite existent: 
     \[\lim_{x \to a_{i-1}^{+}} f\left(x\right) \over{=}{\text{déf}} f\left(a_{i-1}^+\right), \mathspace\lim_{x \to a_{i}^{-}} f\left(x\right) \over{=}{\text{déf}} f\left(a_{i}^-\right)\]
     
     Cependant, les limite aux points $a_i$ ne sont pas forcées d'exister.
 
-    \subparag{Terminologie}{
+    \begin{subparag}{Terminologie}
         On écrit $f \in C_{morc}^0\left(\left[a, b\right]\right)$.
-    }
+    \end{subparag}
     
-    \subparag{Exemple}{
+    \begin{subparag}{Exemple}
         Par exemple, la fonction de gauche est continue par morceau, mais pas celle de droite puisque toutes les limites à gauche n'existent pas (à cause de l'asymptote verticale):
         \svghere[0.666]{ExempleContinuParMorceau.svg}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Définition: Fonction différentiable par morceau}{
+\begin{parag}{Définition: Fonction différentiable par morceau}
     Soit $f$ une fonction continue par morceau. Si $f \in C^{1}\left(\left]a_{i-1}, a_i\right[ \right)$ et tous les $f'\left(a_{i}^{\pm}\right)$ existent (les dérivés à gauches et à droites, mais pas forcément au point), alors $f$ est \important{différentiable par morceau}.
 
-    \subparag{Terminologie}{
+    \begin{subparag}{Terminologie}
         On écrit alors $f \in C_{morc}^1\left(\left[a, b\right]\right)$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Rappel: Espace vectoriel $\mathbb{R}^n$}{
+\begin{parag}{Rappel: Espace vectoriel $\mathbb{R}^n$}
     Nous allons avoir besoin de construire un espace vectoriel pour les séries de Fourier, ainsi rappelons nous de leur application sur les nombres réels.
 
     Nous posons $V = \mathbb{R}^n$, muni d'un produit scalaire: 
@@ -130,9 +130,9 @@
     
     Nous pouvons ensuite écrire n'importe quel vecteur $v$ à l'aide de cette base: 
     \[v = \begin{pmatrix} v_1 \\ \vdots \\ v_n \end{pmatrix} = \sum_{j=1}^{n} v_j e_j = \sum_{j=1}^{n} \left\langle v, e_j \right\rangle e_j \]
-}
+\end{parag}
 
-\parag{Séries de Fourier}{
+\begin{parag}{Séries de Fourier}
     Nous pouvons utiliser la même idée que dans le paragraphe précédent, en remplaçant tout par des choses plus compliquées. 
 
     Nous prenons l'espace vectoriel suivant: 
@@ -156,36 +156,36 @@
     \[f\left(x\right) = \sum_{n \in \mathbb{Z}}^{} \left\langle f, e^{i\frac{2\pi}{T} nx}  \right\rangle e^{i\frac{2\pi}{T} nx}\]
 
     Ainsi, cela nous pousse à faire la prochaine définition.
-}
+\end{parag}
 
-\parag{Définition: Coefficients de Fourier complexe}{
+\begin{parag}{Définition: Coefficients de Fourier complexe}
     Soit $f : \mathbb{R} \mapsto \mathbb{R}$ une fonction $T$-périodique et $C^1_{morc}\left(\left[0, T\right]\right)$. Les coefficients de Fourier complexes sont défini comme: 
     \[c_n = \left\langle f, e^{i \frac{2\pi}{T}nx} \right\rangle = \frac{1}{T} \int_{0}^{T} f\left(x\right)e^{-i \frac{2\pi}{T}nx} dx, \mathspace\text{pour } n \in\mathbb{Z}\]
-}
+\end{parag}
 
-\parag{Définition: Somme partielle de Fourier complexe}{
+\begin{parag}{Définition: Somme partielle de Fourier complexe}
     La \important{somme partielle de Fourier complexe} d'ordre $N$ est: 
     \[F_N^{\mathbb{C}} f\left(x\right) = \sum_{n=-N}^{N} c_n e^{i \frac{2\pi}{T} nx}\]
-}
+\end{parag}
 
-\parag{Définition: Série de Fourier complexe}{
+\begin{parag}{Définition: Série de Fourier complexe}
     La \important{série de Fourier complexe} de $f$ est: 
     \[F^{\mathbb{C}} f\left(x\right) = \lim_{N \to \infty} F_n^{\mathbb{C}}f\left(x\right) = \sum_{n=-\infty}^{\infty} c_n e^{i \frac{2\pi}{T} nx}\]
-}
+\end{parag}
 
-\parag{Théorème de Dirichlet}{
+\begin{parag}{Théorème de Dirichlet}
     Soit $f: \mathbb{R} \mapsto \mathbb{R}$ une fonction $T$-périodique et $C^1_{morc}\left(\left[0, T\right]\right)$, alors: 
     \[F^{\mathbb{C}} f\left(x\right) = \lim_{h \to 0} \frac{f\left(x - h\right) + f\left(x + h\right)}{2}\]
     
-    \subparag{Remarque}{
+    \begin{subparag}{Remarque}
         Si $f$ est continue en $x$, alors cela nous donne exactement le résultat que nous espérions: 
         \[F^{\mathbb{C}}f\left(x\right) = f\left(x\right)\]
 
         Nous avons donc réussi à écrire nos fonctions comme une somme de sinus et cosinus.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Exemple}{
+\begin{parag}{Exemple}
     Soit la fonction suivante:
     \begin{functionbypart}{f\left(x\right)}
     -1, \mathspace \text{si } -1 \leq x \leq 0 \\
@@ -210,9 +210,9 @@
     
     Nous pouvons vérifier que $F^{\mathbb{C}} f\left(0\right) = \frac{1 + \left(-1\right)}{2} = 0$: 
     \[F^{\mathbb{C}} f\left(0\right) = \lim_{N \to \infty} \sum_{n=-N}^{N} c_n e^{i \pi n 0} = \lim_{N \to \infty} \left[\underbrace{\left(c_N + c_{-N}\right)}_{= 0} + \ldots + \underbrace{\left(c_1 + c_{-1}\right)}_{= 0} + \underbrace{c_0}_{= 0}\right] = 0\]
-}
+\end{parag}
 
-\parag{Version réelle des séries de Fourier}{
+\begin{parag}{Version réelle des séries de Fourier}
     Nous voyons que: 
     \[c_n + c_{-n} = \frac{1}{T} \int_{0}^{T} f\left(x\right) \left(e^{-i \frac{2\pi}{T} nx} + e^{i \frac{2\pi}{T} nx}\right) \frac{2}{2}dx = \frac{2}{T}\int_{0}^{T} f\left(x\right) \cos\left(\frac{2\pi}{T} nx\right) dx\]
     par la définition du cosinus complexe.
@@ -222,16 +222,16 @@
     par la définition du sinus complexe.
     
     Cela nous amène donc à la définition suivante.
-}
+\end{parag}
 
-\parag{Définition: Coefficients de Fourier réels}{
+\begin{parag}{Définition: Coefficients de Fourier réels}
     Les \important{coefficients de Fourier réels} de $f$ sont: 
     \[a_n = \frac{2}{T} \int_{0}^{T} f\left(x\right) \cos\left(\frac{2\pi}{T}nx\right)dx, \mathspace n \geq 0\]
     \[b_n = \frac{2}{T} \int_{0}^{T} f\left(x\right) \sin\left(\frac{2\pi}{T}nx\right)dx, \mathspace n \geq 1\]
     où $a_n = c_n + c_{-n}$ et $b_n = i\left(c_n - c_{-n}\right)$.
-}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     Nous remarquons que:
     \autoeq{\unexpanded{c_n e^{i \frac{2\pi}{T} nx} + c_{-n} e^{-i \frac{2\pi}{T}nx} = \left(c_n + c_{-n}\right)\cos\left(\frac{2\pi}{T} nx\right) + i\left(c_{n} - c_{-n}\right)\sin\left(\frac{2\pi}{T} nx\right) = a_n \cos\left(\frac{2\pi}{T} nx\right) + b_n \sin\left(\frac{2\pi}{T} nx\right)}}
     
@@ -240,28 +240,28 @@
 
     
     Cela justifie la définition suivante.
-}
+\end{parag}
 
 
-\parag{Définition: Somme partielle de Fourier réelle}{
+\begin{parag}{Définition: Somme partielle de Fourier réelle}
     La \important{somme partielle de Fourier réelle} d'ordre $N$ de $f$ est: 
     \[F_N^{\mathbb{R}} f\left(x\right) = \frac{a_0}{2} + \sum_{n=1}^{N} \left(a_n \cos\left(\frac{2\pi}{T} nx\right) + b_n \sin\left(\frac{2\pi}{T} nx\right)\right) \]
-}
+\end{parag}
 
-\parag{Définition: Série de Fourier réelle}{
+\begin{parag}{Définition: Série de Fourier réelle}
     La \important{série de Fourier} réelle de $f$ est: 
     \[F^{\mathbb{R}}f\left(x\right) = \lim_{N \to \infty} F_N^{\mathbb{R}} f\left(x\right) = \frac{a_0}{2} + \sum_{n=1}^{\infty} \left(a_n \cos\left(\frac{2\pi}{T} nx\right) + b_n \sin\left(\frac{2\pi}{T} nx\right)\right)\]
-}
+\end{parag}
 
-\parag{Remarque importante}{
+\begin{parag}{Remarque importante}
     Puisque nous n'avons fait que réordrer les termes, les deux objets sont les mêmes: 
     \[F_N^{\mathbb{R}} f\left(x\right) = F_N^{\mathbb{C}} f\left(x\right) \over{=}{déf} F_N f\left(x\right)\]
     
     Et ainsi: 
     \[F^{\mathbb{R}} f\left(x\right) = F^{\mathbb{C}} f\left(x\right) \over{=}{déf} F f\left(x\right)\]
-}
+\end{parag}
 
-\parag{Exemple}{
+\begin{parag}{Exemple}
     Reprenons la fonction suivante:
     \begin{functionbypart}{f\left(x\right)}
     -1, \mathspace \text{si } -1 \leq x \leq 0 \\
@@ -289,14 +289,14 @@
     Et nous trouvons donc une autre forme pour notre série de Fourier: 
     \[F f\left(x\right) = \sum_{k=-\infty}^{\infty} \frac{2}{i \pi \left(2k + 1\right)} e^{i \pi \left(2k + 1\right) x} = \sum_{n=1}^{\infty} b_n \sin\left(\pi n x\right) = \sum_{k=0}^{\infty} \frac{4}{\pi\left(2k + 1\right)} \sin\left(\pi\left(2k + 1\right)x\right)\]
     en posant à nouveau $n = 2k + 1$.
-}
+\end{parag}
 
-\parag{Passage réel vers complexe}{
+\begin{parag}{Passage réel vers complexe}
     Nous savons que:
     \[\begin{systemofequations} a_n = c_n + c_{-n} \\ b_n = i\left(c_n - c_{-n}\right) \end{systemofequations}\]
 
     Or, cela implique que:
     \[\begin{systemofequations} c_0 = \frac{a_0}{2} \\ c_n = \frac{a_n - i b_n}{2}, \mathspace \text{si } n \geq 1 \\ c_{-n} = \frac{a_n + i b_n}{2}, \mathspace \text{si } n \geq 1 \end{systemofequations}\]
-}
+\end{parag}
 
 \end{document} 
