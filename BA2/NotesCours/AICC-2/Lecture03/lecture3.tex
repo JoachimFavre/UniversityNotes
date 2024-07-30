@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-03-03 at 16:07:07.
@@ -21,15 +23,15 @@
 }
 
 \subsection{Source coding}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     Our goal is to efficiently describe the source output. For a fixed description alphabet (often binary), we want to minimise the average description length. 
-}
+\end{parag}
 
-\parag{Definition}{
+\begin{parag}{Definition}
     The \important{encoder} is specified by the input alphabet $\mathcal{A}$, the output alphabet $\mathcal{D}$ (typically $\mathcal{D} = \left\{0, 1\right\}$ since computers love binary), the codebook $\mathcal{C}$ which consists of finite sequences over $\mathcal{D}$, by the one-to-one encoding map $\Gamma : \mathcal{A}^k \mapsto C$, where $k$ is a positive integer (for now we will take $k = 1$).
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's define the following encoding maps:
     \begin{center}
     \begin{tabular}{c|cccc}
@@ -49,21 +51,21 @@
     Also, we can see that: 
     \[\Gamma_A\left(ba\right) = 010 = \Gamma_A\left(ac\right)\]
     which might be a problem.
-}
+\end{parag}
 
-\parag{Definition: uniquely decodable}{
+\begin{parag}{Definition: uniquely decodable}
     The code is \important{uniquely decodable} if every concatenation of codewords has a unique parsing into a sequence of codewords.
 
-    \subparag{Observation 1}{
+    \begin{subparag}{Observation 1}
         We note that the encoding function $\Gamma$ is one to one by assumption. If we can identify codewords boundaries, we can decode sequence of codewords.
-    }
+    \end{subparag}
     
-    \subparag{Observation 2}{
+    \begin{subparag}{Observation 2}
         A code is uniquely decodable if and only if its reverse (the reverse of 100 is 001) is uniquely decodable.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     $\Gamma_B$ from our previous example is uniquely decodable. Indeed, a 0 always marks the end of word.
 
     $\Gamma_C$ is also uniquely decodable, because 0 marks its beginning.
@@ -71,72 +73,72 @@
     $\Gamma_O$ is uniquely decodable as well, since we only read two characters every time. More generally, every fixed-length code is always uniquely decodable.
 
     However, $\Gamma_A$ is not uniquely decodable since, as we saw, $010 = \Gamma_A\left(ba\right) = \Gamma_A\left(ac\right)$.
-}
+\end{parag}
 
-\parag{Definition: Prefix-free codes}{
+\begin{parag}{Definition: Prefix-free codes}
     If no codeword is a prefix of another codeword, the code is said to be \important{prefix-free}.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         For example, 01 is a prefix of 011, but 10 is not a prefix of 110.
 
         $\Gamma_O$ and $\Gamma_B$ are prefix free, but $\Gamma_A$ and $\Gamma_C$ are not.
 
         We see that code $C$ is not prefix-free, yet it is uniquely decodable. 
-    }
+    \end{subparag}
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         We can see that a prefix-free code is uniquely decodable. Since no codeword is the prefix of another, we always know which codeword we are considering (we are not hesitating between 01 or 011 in $\Gamma_C$ for example).
-    }
+    \end{subparag}
 
-    \subparag{Terminology}{
+    \begin{subparag}{Terminology}
         A prefix-free code is also called \important{instantaneous code}. Indeed, we can treat data as it arrives. For example, in code $\Gamma_C$, we have to wait more when we receive a 0. This can be a problem in streaming services.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Complete trees}{
+\begin{parag}{Complete trees}
     Let's consider all binary sequences of length less than or equal to $\ell_{max}$. We can draw a tree representing it, and then our code in it:
     \imagehere[0.2]{CompleteTreeA.png}
 
     We can do that for any $D$-ary sequences of length less than or equal to $\ell_{max}$.
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         We can see that, for a prefix-free code, then there is no letter before another (there is no letter on the path between the root and any leaf). Recall that code $\Gamma_B$ is prefix free, whereas $\Gamma_C$ is not.
         \imagehere{CompleteTreeBC.png}
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
-\parag{Decoding trees}{
+\begin{parag}{Decoding trees}
     We can remove nodes that are not necessary to make a decoding tree. For example:
     \imagehere[0.35]{DecodingTreeB.png}
-}
+\end{parag}
 
-\parag{Definition: Codeword length}{
+\begin{parag}{Definition: Codeword length}
     We define the \important{codeword length} to be the size of the codeword (such a beautiful definition).
 
     We want the average codeword length to be as small as possible.
-}
+\end{parag}
 
-\parag{Theorem: Kraft-McMillan part 1}{
+\begin{parag}{Theorem: Kraft-McMillan part 1}
     If a $D$-ary code is uniquely decodable, then its codeword lengths $\ell_1, \ldots, \ell_M$ satisfy: 
     \[D^{-\ell_1} + \ldots + D^{-\ell_M} \leq 1\]
 
     This is called the Kraft inequality.
     
-    \subparag{Contrapositive}{
+    \begin{subparag}{Contrapositive}
         If a $D$-ary code's codeword lengths do no satisfy $D^{-\ell_1} + \ldots + D^{-\ell_M} \leq 1$, then this code is not uniquely decodable.
-    }
+    \end{subparag}
     
-    \subparag{Proof for prefix-free}{
+    \begin{subparag}{Proof for prefix-free}
         Let a code with codeword lengths $\left\{\ell_1, \ldots, \ell_M\right\}$, and let $L = \max_i \ell_i$. Let us also assume that the code is prefix-free.
 
         We notice something very important, in a prefix-free code, every terminal leaf belongs to at most one codeword. Thus, for a codeword of length $\ell_i$ consumes $D^{L - \ell_i}$ terminal leaves (all terminal leaves below cannot hold a codeword).
 
         We know that we have $D^L$ terminal leaves, so we have the following inequality: 
         \[D^{L - \ell_1} + \ldots + D^{L - \ell_M} \leq D^{L} \iff D^{-\ell_1} + \ldots + D^{-\ell_M} \leq 1\]
-    }
+    \end{subparag}
     
-    \subparag{Full proof}{
+    \begin{subparag}{Full proof}
         Let's take a source alphabet $\mathcal{A} = \left\{a, b, c, d\right\}$. It has 4 elements, but it is similar for any size of alphabets. We will also consider a code alphabet with two elements (binary).
 
         Let's define $\gamma\left(a\right)$ to be the codeword for $a$ and $\ell\left(a\right)$ to be the size of this codeword, and so on for every letters. Finally, let $\ell_{max} = \max\left\{\ell\left(a\right), \ell\left(b\right), \ell\left(c\right), \ell\left(d\right)\right\}$.
@@ -184,11 +186,11 @@
         \[\sum_{x \in A}^{} 2^{-\ell\left(x\right)} \leq 1\]
         
         \qed
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     For code $\Gamma_O$, we have: 
     \[2^{-2} + 2^{-2} + 2^{-2} + 2^{-2} = 1 \leq 1\]
 
@@ -196,30 +198,30 @@
     \[2^{-1} + 2^{-2} + 2^{-2} + 2^{-2} = 1.25 > 1\]
 
     So we know that $\Gamma_A$ could not be uniquely decodable. 
-}
+\end{parag}
 
-\parag{Theorem: Kraft-McMillan part 2}{
+\begin{parag}{Theorem: Kraft-McMillan part 2}
     If the positive integers $\ell_1, \ldots, \ell_M$ satisfy Kraft's inequality for some positive integer $D$, there exists a $D$-ary prefix-free code (hence uniquely decodable) that has codeword lengths $\ell_1, \ldots, \ell_M$.
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         Note that this theorem looks like the converse of the previous one, however it is weaker than it. The converse of the Kraft-McMillan theorem part 1 is wrong.
-    }
+    \end{subparag}
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         We will prove this theorem using an example. We can prove it formally, but it requires a lot of notations. 
 
         Let $\ell_1 = 1$, $\ell_2 = 2$, $\ell_3 = 3$, $\ell_4 = 4$. We notice that it respects the Kraft inequality, so we want to construct a prefix-free code with the given codeword lengths. Let us sort the lengths in increasing order, and draw our tree:
         \imagehere[0.75]{KraftInequalityPart2.png}
 
         The reason it works, is because every codeword can consume enough terminal leaves.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Summary}{
+\begin{parag}{Summary}
     We know that if a $D$-ary code is uniquely decodable, then its codeword lengths satisfy Kraft's inequality. We also know that if positive integers satisfy Kraft's inequality, then there exists a $D$-ary prefix-free code that has those codeword lengths.
 
     Those two imply that any uniquely decodable code can be substituted by a prefix-free code of the same codeword lengths.
-}
+\end{parag}
 
 
 

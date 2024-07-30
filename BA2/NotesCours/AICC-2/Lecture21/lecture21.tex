@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-05-10 at 15:12:04.
@@ -19,7 +21,7 @@
 \end{itemize}
 }
 
-\parag{Mainstream ways to choose information words}{
+\begin{parag}{Mainstream ways to choose information words}
     We notice that we have two equivalent ways to describe a code: the classical (which we have used so far) and the binary one.
     \begin{center}
     \begin{tabular}{ccc}
@@ -40,9 +42,9 @@
     The first way consists in using an element from $\mathcal{A}^k$ (thus $k = \log_{\left|\mathcal{A}\right|}\left(\left|\mathcal{C}\right|\right)$, and the unit of the rate is in information symbols). In our code above, the rate is $\frac{1}{2}$, meaning each channel symbol holds $\frac{1}{2}$ information symbol.
 
     The second way is to use elements from $\left\{0, 1\right\}^k$ (so $k = \log_2\left(\left|\mathcal{C}\right|\right)$ and the unit of the rate is bits). In our code above, we have $k = 2$ and $r = \frac{k}{n} = 1$ bit per code symbol. We are describing the same thing, but with different units.
-}
+\end{parag}
 
-\parag{Matrices}{
+\begin{parag}{Matrices}
     Let's consider again the following code:
     \begin{center}
     \begin{tabular}{cccc}
@@ -61,10 +63,10 @@
     \[\begin{pmatrix} b_0 & b_1 & b_2 \end{pmatrix} \begin{pmatrix} 0 & 0 & 1 & 1 & 1 & 0 & 0 \\ 0 & 1 & 1 & 1 & 0 & 1 & 1 \\ 1 & 1 & 1 & 0  & 1 & 0 & 0 \end{pmatrix} \]
     
     This idea is important, thus we will need to dig into vector spaces. But first, we need fields.
-}
+\end{parag}
 
 \subsection{Finite fields}
-\parag{Definition: Field}{
+\begin{parag}{Definition: Field}
     A \important{field} (in French, ``un corps'') $\left(K, +, \times\right)$ is such that:
     \begin{itemize}
         \item $\left(\mathcal{K}, +\right)$ is a commutative group with identity element $0$.
@@ -75,7 +77,7 @@
 
     We are using the symbols $+, \times, 0$, since this is generalising what we are used to, but this is all notations, we could use other symbols.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         \begin{itemize}[left=0pt]
             \item If $\mathcal{K}$ is finite, then $\left(\mathcal{K}, +, \times\right)$ is a \important{finite field}.
             \item Instead of $\left(+, \times\right)$, the binary operations of a field may be denoted by $\left(+, \cdot\right)$, $\left(\star, \circ\right)$, $\left(\oplus, \land\right)$, and so on.
@@ -83,15 +85,15 @@
             \item $a - b$ is a shorthand notation for $a + \left(-b\right)$, where $\left(-b\right)$ is the additive inverse of $b$.
             \item Let $n$ to be an integer, and $b \in \mathcal{K}$. We define $nb = b + b + \ldots + b$, where $b$ is added $n$ times.
         \end{itemize}
-    }
+    \end{subparag}
 
-    \subparag{Use}{
+    \begin{subparag}{Use}
         Any algebraic manipulation in a finite filed behaves similarly to $\mathbb{R}$. For instance, we can solve equations, and do linear algebra using vectors and matrices.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Examples}{
+\begin{parag}{Examples}
     The following are fields: 
     \[\left(\mathbb{R}, +, \cdot\right), \mathspace \left(\mathbb{C}, +, \cdot\right), \mathspace \left(\mathbb{Q}, +, \cdot\right)\]
 
@@ -100,9 +102,9 @@
     since they both do not have a multiplicative inverse (and the first one does not even have an additive inverse).
 
     Also, for finite fields, we can see that $\left(\mathbb{Z} / 17\mathbb{Z}, +, \cdot\right)$ is a finite field, but $\left(\mathbb{Z} / 16\mathbb{Z}, +, \cdot\right)$ is not one (since, for instance, $4 \neq 0$ does not have a multiplicative inverse).
-}
+\end{parag}
 
-\parag{Properties}{
+\begin{parag}{Properties}
     Let $\left(\mathcal{K}, +, \cdot\right)$ be a field with $0$ and $1$ being its additive and multiplicative identity, respectively. Then:
     \begin{enumerate}
         \item $0\cdot x = 0$ for all $x \in \mathcal{K}$.
@@ -113,7 +115,7 @@
     \end{enumerate}
 
     
-    \subparag{Proofs}{
+    \begin{subparag}{Proofs}
         \begin{enumerate}[left=0pt]
             \item We notice that: 
                 \begin{multiequation}
@@ -132,10 +134,10 @@
         The other properties can be proven using similar reasoning.
         
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say we want to find the solution of $3x + 6 = 4$ in $\left(\mathbb{Z} / 7 \mathbb{Z}, +, \cdot\right)$. We can do what we usually do when solving equations: 
     \begin{multiequation}
     & 3x+6 = 4 \\
@@ -144,30 +146,30 @@
         \iff & 3^{-1} \cdot 3x = 3^{-1} \cdot 5 \\
         \iff & x = 5\cdot 5 = 25 = 4
     \end{multiequation}
-}
+\end{parag}
 
-\parag{Order}{
+\begin{parag}{Order}
     In $\left(\mathbb{Z} / 7\mathbb{Z}, +, \cdot\right)$, we can see that: 
     \[\underbrace{1 + 1 + \ldots + 1}_{\text{7 times}} = 0\]
     
     Hence, the order of 1 with respect to $+$ is 7.
-}
+\end{parag}
 
-\parag{Definition: Characteristic}{
+\begin{parag}{Definition: Characteristic}
     We know that every finite field has a multiplicative identity, let's call it 1. 
 
     The order of 1 with respect to $+$, is called the \important{characteristic} of the finite field.
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         Let $p$ be the characteristic of a finite field. Then, we can see that for any element $a$: 
         \[\underbrace{a + a + \ldots + a}_{\text{$p$ times}} = a\left(1 + 1 + \ldots + 1\right) = a\cdot 0 = 0\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     The characteristic of a finite field $\left(F, +, \cdot\right)$ is a prime number.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let's suppose for contradiction that the smallest number $m$ such that $\underbrace{1 + 1 + \ldots+ 1}_{\text{$m$ times}} = 0$ is not prime, meaning that we can write $m = ab$.
 
         Thus, we can write: 
@@ -178,53 +180,53 @@
         However, this means that one of the term has to be 0 by the zero-product property, contradicting the fact that $m$ was the smallest number with this property.
         
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Definition: Isomorphism}{
+\begin{parag}{Definition: Isomorphism}
     An \important{isomorphism} between two finite fields $\mathbb{F} = \left(\mathcal{F}, +, \times\right)$ and $\mathbb{K} = \left(\mathcal{K}, \oplus, \otimes\right)$ is a bijection $\phi : \mathcal{F} \mapsto \mathcal{K}$ such that, for all $a, b \in \mathcal{F}$: 
     \[\phi\left(a + b\right) = \phi\left(a\right) \oplus \phi\left(b\right)\]
     \[\phi\left(a \times b\right) = \phi\left(a\right) \otimes \phi\left(b\right)\]
 
     We say that $\mathbb{F}$ and $\mathbb{K}$ are \important{isomorphic} if there exists an isomorphism between them.
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         Two finite fields are isomorphic if we can make them be the same by modifying the name of the elements.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     \begin{enumerate}[left=0pt]
         \item The cardinality of a finite field is an integer power of its characteristic (hence all finite fields have cardinality $p^m$ for some prime $p$ and some integer $m$).
         \item All finite fields of the same cardinality are isomorphic.
         \item For every prime number $p$ and positive integer $m$, there is a finite field of cardinality $p^m$.
     \end{enumerate}
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         This theorem was proven by Évariste Galois at the age of 20. He died at the age of 21 during a duel.
 
         We will not prove this theorem.
-    }
+    \end{subparag}
 
-    \subparag{Implication}{
+    \begin{subparag}{Implication}
         \begin{itemize}[left=0pt]
             \item There is exactly one finite field of cardinality $k$ if $k = p^m$, and none if the cardinality is not an integer power of a prime.
             \item $\left(\mathbb{Z} / k\mathbb{Z}, +, \cdot\right)$ is a finite field if and only if $k = p$ for some prime $p$.
             \item A field that has $p$ elements is isomorphic to $\left(\mathbb{Z} / p\mathbb{Z}, +, \cdot\right)$
             \item In $\left(\mathbb{Z} / p\mathbb{Z}, +, \cdot\right)$, we know how to add and multiply without tables, thus it is easier to use them for computations.
         \end{itemize}
-    }
+    \end{subparag}
     
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The field with $p^m$ elements is denoted by $\mathbb{F}_{p^m}$. Rather than developing the theory that allows us to add and multiply in $\mathbb{F}_{p^m}$, in most of our examples we will stick to $\left(\mathbb{Z}/p\mathbb{Z}, +, \cdot\right)$. We can keep in mind that all we do can be generalised to arbitrary finite fields.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Constructing finite fields}{
+\begin{parag}{Constructing finite fields}
     We want to construct all finite fields.
 
-    \subparag{$p = 2$}{
+    \begin{subparag}{$p = 2$}
         The first $\mathbb{F}_2$ is given by $p = 2$:
         \begin{center}
             \begin{tabular}{c|cc}
@@ -243,9 +245,9 @@
         \end{center}
 
         We can argue that it is the only possible answer, since it needs to respect all properties we have proven so far, and $1 + 1 = 0$ because $1$ needs an additive inverse.
-    }
+    \end{subparag}
     
-    \subparag{$p = 3$}{
+    \begin{subparag}{$p = 3$}
         Let's now do $\mathbb{F}_3 = \left(\mathbb{Z} / 3\mathbb{Z}, +, \cdot\right)$: 
         \begin{center}
             \begin{tabular}{c|ccc}
@@ -266,9 +268,9 @@
         \end{center}
 
         Again, we can indeed argue that it is the only possible one (up to names) by solving some kind of sudoku (we need every element exactly once in every row and column, the 0 can only be at some places because of the characteristic, $0x = 0$, $1x = x$, $x + 0 = x$, and so on).
-    }
+    \end{subparag}
 
-    \subparag{$p = 4$}{
+    \begin{subparag}{$p = 4$}
         Let's now do a harder one, $\mathbb{F}_4 = \mathbb{F}_{2^2}$, which is not isomorphic to any $\left(\mathbb{Z} / p\mathbb{Z}, +, \cdot\right)$ (since $\mathbb{Z} / 4\mathbb{Z}$ does not have a multiplicative inverse for all non-zero numbers). Let's construct our tables by using properties:
         \begin{center}
             \begin{tabular}{c|cccc}
@@ -333,10 +335,10 @@
         \end{center}
 
         We can see that it is definitely not isomorphic to $\left(\mathbb{Z} / 4\mathbb{Z}, + ,\cdot\right)$ since, first, the latter is not a group. Second, the characteristic of $\mathbb{F}_4$ is 2, thus $a + a = 0$ for all elements, and this is not the case in $\left(\mathbb{Z} / 4\mathbb{Z}, +, \cdot\right)$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     Let $\left(\mathbb{F}_4, +\right)$ be $\mathbb{F}_4$ without multiplication.
 
     We can actually see that it is isomorphic to $\left(\left(\mathbb{Z} / 2\mathbb{Z}\right)^2, +\right)$, since, in both cases, all non-zero element have order 2 and, since they have the same set of order, they are isomorphic. We can take the following mapping (or switch $a$ and $b$, we don't care): 
@@ -345,10 +347,10 @@
     However, we can prove that $\mathbb{F}_4$ is not isomorphic to $\left(\left(\mathbb{Z} / 2\mathbb{Z}\right)^2, +, \cdot\right)$. Indeed, for instance, $\left(0, 1\right)$ is a non-zero element that has no multiplicative inverse. However, we can redefine the multiplication of $\mathbb{Z} / 4\mathbb{Z}$ (using polynomials) so that it works (this is what computers do when we need big fields, since they want to work over binary, and thus fields of the form $2^m$).
 
     As stated earlier, we will focus on $\mathbb{F}_{p}$ where $p$ is prime.
-}
+\end{parag}
 
 \subsection{Vector spaces}
-\parag{Definition: Vector space}{
+\begin{parag}{Definition: Vector space}
     $\left(\mathcal{V}, +, \cdot\right)$, where $\mathcal{V}$ is a non-empty set $\mathcal{V}$, is a \important{vector space} over a field $\mathbb{F}$ if $\left(\mathcal{V}, +\right)$ is a commutative group, if the scalar multiplication operator $\cdot$ follows the following properties:
     \begin{enumerate}
         \item Closure: $\alpha \bvec{v} \in \mathcal{V}$ for all $\alpha \in \mathbb{F}$ and $\bvec{v} \in \mathcal{V}$.
@@ -362,7 +364,7 @@
     \end{enumerate}
     
     If we can prove that an object is a vector space, then ``we get a lot of juice from it''.
-}
+\end{parag}
 
 
 

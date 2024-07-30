@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-05-20 at 08:58:42.
@@ -19,7 +21,7 @@
     \end{itemize}
 }
 
-\parag{Example 3}{
+\begin{parag}{Example 3}
     Let us consider the following generator matrix in $\mathbb{F}_5^5$: 
     \[G = \begin{pmatrix} 0 & 1 & 2 & 3 & 4 \\ 4 & 3 & 2 & 1 & 0 \\ 1 & 1 & 0 & 1 & 1 \end{pmatrix} \]
     
@@ -37,13 +39,13 @@
     
     Finally, subtracting multiples of the last line from the first and the second line: 
     \[G_{sys} = \begin{pmatrix} 1 & 0 & 0 & 3 & 2 \\ 0 & 1 & 0 & 3 & 4 \\ 0 & 0 & 1 & 0 & 0 \end{pmatrix} \]
-}
+\end{parag}
 
-\parag{Recall}{
+\begin{parag}{Recall}
     Recall that, to describe a code, there are two ways. Either we can use the basis (and thus a generator matrix), which is convenient for encoding, or we can use $\left(n-k\right)$ linear homogeneous equations (like representing some kind of orthogonal space), which is convenient for decoding: we can just check if $\bvec{y}$ satisfies all $\left(n-k\right)$ equations to know if it is a codeword. 
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let $\mathcal{C} \subseteq \mathbb{F}_3^4$ be the solutions to: 
     \[\begin{systemofequations} y_1 + 2y_2 + 2y_3 + y_4 = 0 \\ 2y_i + 2y_2 + y_3 + y_4 = 0\end{systemofequations}\]
     
@@ -51,42 +53,42 @@
     \[\begin{pmatrix} y_1 & y_2 & y_3 & y_4 \end{pmatrix} \begin{pmatrix} 1 & 2 & 2 &  1 \\ 2 & 2 & 1 & 1 \end{pmatrix}^T = \bvec{0} \implies \bvec{y} H^T = \bvec{0}\]
 
     The subspace is 2 since the two rows of our matrix are linearly independent, and thus $n - k = 2 \implies k = 2$. We also see that $\bvec{y} \in \mathbb{F}_3^{4}$ is in $\mathcal{C}$ if and only if $\bvec{y} H^T = \bvec{0}$.
-}
+\end{parag}
 
-\parag{Definition: Parity-check matrix}{
+\begin{parag}{Definition: Parity-check matrix}
     A \important{parity-check matrix} $H$ for a linear $\left(n, k\right)$ block code $\mathcal{C}$ is an $\left(n-k\right)\times n$ matrix that contains the coefficients of the $n-k$ linear homogenous equations, the solutions to which construct $\mathcal{C}$.
 
     This tells us $H \in \mathbb{F}^{\left(n-k\right) \times n}$ is such that:
     \[\bvec{y} H^T = \bvec{0} \iff \bvec{y} \in \mathcal{C}\]
-}
+\end{parag}
 
-\parag{Lemma}{
+\begin{parag}{Lemma}
     Let $G$ and $H$ be full rank matrices (their rank is the highest it can be) and the right dimension.
 
     $\left(G, H\right)$ are generator/parity-check matrices if and only if: 
     \[GH^T = 0\]
-}
+\end{parag}
 
 
-\parag{Theorem: Systematic code}{
+\begin{parag}{Theorem: Systematic code}
     Let's say we have the following systematic generator matrix: 
     \[G = \begin{pmatrix}  &  &  &  &  &  \\  & I_k &  &  & P &  \\  &  &  &  &  &  \end{pmatrix} \]
     
     Then, the parity-check matrix is given by: 
     \[H = \begin{pmatrix}  &  &  &  &  &  \\  & -P^T &  &  & I_{n-k} &  \\  &  &  &  &  &  \end{pmatrix} \]
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let's first check the matrix dimensions. We know $P \in \mathbb{F}^{k \times \left(n-k\right)}$, and thus $P^T \in \mathbb{F}^{\left(n-k\right) \times k}$. This tells us that $H$ has $n-k$ rows and $n$ columns, as expected. Also, we can see that the $n-k$ rows of $H$ are linearly independent, thus both matrices are full rank.
 
         Finally, we need to check if $G H^T = 0$: 
         \[G H^T = \begin{pmatrix}  &  &  &  &  &  \\  & I_k &  &  & P &  \\  &  &  &  &  &  \end{pmatrix} \begin{pmatrix}  &  &  \\  & -P &  \\  &  &  \\  &  &  \\  & I_{n-k} &  \\  &  &  \end{pmatrix} = -P + P = 0\]
 
         \qed
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let us have a code $\mathcal{C} \subseteq \mathbb{F}_5^5$ where $k = 3$ and its generator matrix is given by: 
     \[G = \begin{pmatrix} 1 & 0 & 0 & 3 & 2 \\ 0 & 1 & 0 & 3 & 4 \\ 0 & 0 & 1 & 0 & 0 \end{pmatrix} \]
     
@@ -95,9 +97,9 @@
     
     We can see that the dimensions match. Let's do a quick check: 
     \[G H^T = \begin{pmatrix} 1 & 0 & 0 & 3 & 2 \\ 0 & 1 & 0 & 3 & 4 \\ 0 & 0 & 1 & 0 & 0 \end{pmatrix} \begin{pmatrix} 2 & 3 \\ 2 & 1 \\ 0 & 0 \\ 1 & 0 \\ 0 & 1 \end{pmatrix} = \begin{pmatrix} 0 & 0 \\ 0 & 0 \\ 0 & 0 \end{pmatrix} = 0\]
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let's consider the code $\mathcal{C} \subseteq \mathbb{F}_q^n$, where: 
     \[\mathcal{C} = \left\{\left(c_1, \ldots, c_n\right) \in \mathbb{F}_q^n : \sum_{i=1}^{n} c_i = 0\right\}\]
     
@@ -106,36 +108,36 @@
     
     We notice that $\rank\left(H\right) = 1$. Also, this is a systematic code since we have the identity matrix ($I_1 = 1$) in the last $n-k = 1$ columns. Thus, we can find the generator matrix: 
     \[G = \begin{pmatrix} 1 & 0 & \cdots & 0 & 1 \\ 0 & 1 & \cdots & 0 & 1 \\ \vdots & \vdots & \ddots & \vdots & \vdots \\ 0 & 0 & \cdots & 1 & 1 \end{pmatrix} \]
-}
+\end{parag}
 
-\parag{Definition: Syndrome}{
+\begin{parag}{Definition: Syndrome}
     Let $\mathcal{C} \subseteq \mathbb{F}^n$  be an $\left(n, k\right)$ linear block code with parity check matrix $H$.
 
     The vector $\bvec{s} = \bvec{y} H^T \in \mathbb{F}^{n-k}$ is the \important{syndrome} of $\bvec{y}$.
 
-    \subparag{Observation 1}{
+    \begin{subparag}{Observation 1}
         We notice that, by definition of the parity-check matrix: 
         \[\bvec{s} = \bvec{0} \iff \bvec{y} \in \mathcal{C}\]
-    }
+    \end{subparag}
 
-    \subparag{Observation 2}{
+    \begin{subparag}{Observation 2}
         Let's say we are sending a codeword $\bvec{x} \in \mathbb{F}^n$ through an error channel, and we get $\bvec{y} = \bvec{x} + \bvec{e}$, where $\bvec{e} = \bvec{y} - \bvec{x} \in \mathbb{F}^n$ is the error pattern. We get that the syndrome of $\bvec{y}$ is: 
         \[\bvec{s} = \bvec{y} H^T = \bvec{x} H^T + \bvec{e} H^T = \bvec{e} H^T\]
 
-        Thus, if there is only one error, meaning $\bvec{e} = \bvec{e_i} = \left(0, \ldots, 0, 1, 0, \ldots, 0\right)$ which has 0s everywhere except in the $i$\Th position, where it has 1, then $\bvec{s}$ is the $i$\Th column of $H^T$. This is a very interesting property.
-    }
+        Thus, if there is only one error, meaning $\bvec{e} = \bvec{e}_i = \left(0, \ldots, 0, 1, 0, \ldots, 0\right)$ which has 0s everywhere except in the $i$\Th position, where it has 1, then $\bvec{s}$ is the $i$\Th column of $H^T$. This is a very interesting property.
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Definition: Hamming code}{
+\begin{parag}{Definition: Hamming code}
     Let $n = 2^m - 1 \in \left\{1, 3, 7, 15, 31, \ldots\right\}$ and $k = n - m$ for some $m \in \mathbb{Z}_+$. A $\left(n, k\right)$ linear code $\mathcal{C} \subseteq \mathbb{F}_2^n$ is named a \important{Hamming code} if the binary representation of every number between $1$ and $2^m$ are represented in the columns exactly once (their order does not matter).
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This must not be mistaken with Huffman codes we saw earlier, which are completely different.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's consider the $\left(7, 4\right)$ Hamming code. We write all possible binary numbers in the columns, except for the all zero one (the order of the column does not matter): 
     \[H = \begin{pmatrix} 1 & 0 & 1 & 0 & 1 & 0 & 1 \\ 0 & 1 & 1 & 0 & 0 & 1 & 1 \\ 0 & 0 & 0 & 1 & 1 & 1 & 1 \end{pmatrix} \]
     
@@ -148,9 +150,9 @@
     \[\widetilde{G} = \begin{pmatrix} 1 & 0 & 0 & 0 & 1 & 1 & 0 \\ 0 & 1 & 0 & 0 & 1 & 0 & 1 \\ 0 & 0 & 1 & 0 & 0 & 1 & 1 \\ 0 & 0 & 0 & 1 & 1 & 1 & 1 \end{pmatrix} \]
     
     We could finally unswap the columns.
-}
+\end{parag}
 
-\parag{Minimum distance}{
+\begin{parag}{Minimum distance}
     Let $m = 4$, so $n = 2^4 - 1 = 15$. This gives us:
     \setcounter{MaxMatrixCols}{20}  % https://tex.stackexchange.com/a/95163
     \[H = \begin{pmatrix} 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 \\ 0 & 1 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\ 0 & 0 & 0 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \end{pmatrix} \]
@@ -164,8 +166,8 @@
     Now, let's determine $d_{min}\left(\mathcal{C}\right)$. Let $\bvec{c} \in \mathcal{C}$ be the input to an error channel. Then, the output of the error channel is $\bvec{y} = \bvec{c} + \bvec{e}$, where $\bvec{e}$ is an error pattern. As we discussed earlier the syndrome of $\bvec{y}$ is given by:
     \[\bvec{s} = \bvec{y} H^T = \bvec{e} H^T\]
 
-    Now, let's suppose that for some reason there was only one error, thus $\bvec{e} = \bvec{e_i}$: 
-    \[\bvec{s} = \bvec{y} H^T = \bvec{e_i} H^T = i^{\text{th}} \text{ column of $H$} = \text{binary expansion of $i$}\]
+    Now, let's suppose that for some reason there was only one error, thus $\bvec{e} = \bvec{e}_i$: 
+    \[\bvec{s} = \bvec{y} H^T = \bvec{e}_i H^T = i^{\text{th}} \text{ column of $H$} = \text{binary expansion of $i$}\]
     
     However, knowing the binary expansion of $i$ is equivalent to knowing where the error was made. Thus, we can correct every single error. This implies that $d_{min}\left(\mathcal{C}\right) \geq 3$. Let's prove that we cannot do better than 3. 
 
@@ -175,33 +177,33 @@
     However, we can pick $i = 1$, $j = 2$, $\ell = 3$, adding up the first three columns, we do get the zero vector.
 
     Using the exact same argument, we can show that any Hamming code has $d_{min} = 3$.
-}
+\end{parag}
 
-\parag{Singleton bound}{
+\begin{parag}{Singleton bound}
     For Hamming codes, we have: 
     \[3 = d_{min} \leq n -k + 1 = 2^m -1 - \left(2^m - 1 - m\right) + 1 = m + 1\]
     
     Thus, they are not MDS codes.
-}
+\end{parag}
 
-\parag{Theorem: Minimum distance via parity check matrix}{
+\begin{parag}{Theorem: Minimum distance via parity check matrix}
     Let $\mathcal{C} \subseteq \mathbb{F}_q^n$ be a linear $\left(n, k\right)$ code and $H$ be a parity check matrix for $\mathcal{C}$. 
 
     Then, $d_{min}\left(\mathcal{C}\right)$ is the smallest number of linearly dependent columns of $H$.
 
-    \subparag{Remarks}{
+    \begin{subparag}{Remarks}
         We could have used this theorem for showing that Hamming codes have $d_{min} = 3$; and the proof is similar.
 
         Also, this theorem still has a cost, since we have to look for every combination of linearly dependant vectors.
-    }
+    \end{subparag}
     
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We know that: 
         \begin{multiequality}
         \mathcal{C} =\ & \left\{\bvec{c} : \bvec{c} H^T = \bvec{0}\right\} \\
-        =\ & \left\{\bvec{c} : \left(c_1, \ldots, c_n\right) \begin{pmatrix}  & \bvec{h_1} &  \\  & \vdots &  \\  & \bvec{h_n} &  \end{pmatrix} = 0\right\} \\
-        =\ & \left\{\bvec{c} : c_1 \bvec{h_1} + \ldots + c_n \bvec{h_n} = 0\right\} 
+        =\ & \left\{\bvec{c} : \left(c_1, \ldots, c_n\right) \begin{pmatrix}  & \bvec{h}_1 &  \\  & \vdots &  \\  & \bvec{h}_n &  \end{pmatrix} = 0\right\} \\
+        =\ & \left\{\bvec{c} : c_1 \bvec{h}_1 + \ldots + c_n \bvec{h}_n = 0\right\} 
         \end{multiequality}
     
         We use the last form of this set to prove the theorem.
@@ -212,9 +214,9 @@
 
         \qed
 
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 
 

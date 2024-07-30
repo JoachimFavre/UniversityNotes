@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-03-08 at 15:30:32.
@@ -21,7 +23,7 @@
 
 }
 
-\parag{Ternary Huffman Code}{
+\begin{parag}{Ternary Huffman Code}
     Let's draw the following tree in ternary:
     \svghere[0.5]{HuffmanCodeTernaryFalse.svg}
 
@@ -31,10 +33,10 @@
     \svghere[0.5]{HuffmanCodeTernaryRight.svg}
 
     We can prove that this is also the optimal strategy.
-}
+\end{parag}
 
 \subsection{Conditional entropy}
-\parag{Compressing long string}{
+\begin{parag}{Compressing long string}
     Let's consider the following source:
     \begin{center}
     \begin{tabular}{c|c|c}
@@ -61,15 +63,15 @@
     \end{center}
 
     Doing so, we get average length of $\frac{92}{36}$ instead of $2\cdot \frac{4}{3}$, which is better.
-}
+\end{parag}
 
-\parag{Corollary}{
+\begin{parag}{Corollary}
     We proved that $H_D\left(S\right) \leq L\left(S, \Gamma_{SF}\right) < H_D\left(S\right) + 1$, where $L\left(S, \Gamma_{SF}\right)$ is the average length of a Shannon-Fano code.
 
     Since we know that Huffman is more optimal than the Shannon-Fano code (since it is the most optimal code) and that it is bounded below by entropy as all codes, we also have this inequality for Huffman codes.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     The per-letter average codeword length of a $D$-ary Shannon-Fano code for the random variables $\left(S_1, S_2\right)$ fulfills:
     \[\frac{H_D\left(S_1, S_2\right)}{2} \leq \frac{L\left(\left(S_1, S_2\right), \Gamma_{SF}\right)}{2} \leq \frac{H_D\left(S_1, S_2\right) + 1}{2}\]
 
@@ -82,24 +84,24 @@
     So, on average, the average length per letter goes to entropy as $\frac{1}{n}$. Thus, an optimal strategy to compress a string of independent and identical symbols (iid), is to do a Huffman code over infinitely many symbols (or a very large number on a real computer). There are some problems with that, because of the complexity of finding the Huffman tree, and the difficulty to store a huge tree. We will not consider such problem in this course.
 
     Instead, we will consider another problem.
-}
+\end{parag}
 
-\parag{Not iid strings}{
+\begin{parag}{Not iid strings}
     Let's consider strings that are not iid: if $a$ has probability $\frac{2}{3}$, then $aa$ has not necessary probability $\frac{4}{9}$. For example, in French and in English, after a $q$, it is very probable to have a $u$. Also, audio (songs or speeches are good examples), images, or video recording have a lot of repetitions; they are very predictable.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     The per-letter average codeword-length of a $D$-ary Shannon-Fano code for the random variable $\left(S_1, \ldots, S_n\right)$ fulfills:
     \[\frac{H_D\left(S_1, \ldots, S_n\right)}{n} \leq \frac{L\left(\left(S_1, \ldots, S_n\right), \Gamma_{SF}\right)}{n} < \frac{H_D\left(S_1, \ldots, S_n\right)}{n} + \frac{1}{n}\]
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         We want to understand the term $\frac{H_D\left(S_1, \ldots, S_n\right)}{n}$, since the per-letter average codeword length goes to that when $n \to \infty$.
 
         To do that, we will need to understand conditional property, and how to model infinitely many random variables (random processes).
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Probability recall}{
+\begin{parag}{Probability recall}
     Before beginning to develop our theory, let's recall what we had sen on probabilities.
 
     Let's say we know the following joint distribution:
@@ -140,10 +142,10 @@
     \end{tabular}
     \end{center}
 
-}
+\end{parag}
 
 
-\parag{Example: Bit-Flipper Channel}{
+\begin{parag}{Example: Bit-Flipper Channel}
     Let's say we have a channel $y$ that can take the value 0 or 1, as a uniform distribution. It has a probability $\epsilon$ when equal to 0 to go to 1, and a probability $\delta$ when equal to 1 to go to 0. We can make the following diagram:
     \imagehere[0.3]{BitFlipperDiagram.png}
 
@@ -166,24 +168,24 @@
         $x = 1$ & $\frac{1}{2}\epsilon$ & $\frac{1}{2}\left(1 - \delta\right)$
     \end{tabular}
     \end{center}
-}
+\end{parag}
 
-\parag{Definition}{
+\begin{parag}{Definition}
     The conditional expectation of $X$ given $Y = y$ is defined as:
     \[\exval\left[X |Y = y\right] \over{=}{def} \sum_{x \in X}^{} xp_{X|Y}\left(x | y\right)\]
-}
+\end{parag}
 
 
-\parag{Definition: Condition entropy}{
+\begin{parag}{Definition: Condition entropy}
     The conditional entropy of $X$ given $Y = y$ is defined as:
     \[H_D\left(X|Y=y\right) \over{=}{def} \sum_{x \in \mathcal{X}}^{} p_{X|Y}\left(x|y\right) \log_D\left(p_{X|Y}\left(x|y\right)\right)\]
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         $p_{X|Y}\left(\cdot|y\right)$ is a probability distribution on the alphabet of $X$, just like $p_X\left(\cdot\right)$. We know every probability distribution has an entropy associated to it.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's get back to the Bit-Flipper Channel. We can compute $H\left(X | Y = 0\right)$:
     \begin{multiequality}
     H\left(X|Y=0\right) =\ & -p_{X|Y}\left(0, 0\right) \log\left(p_{X|Y}\left(0, 0\right)\right) - p_{X|Y}\left(1, 0\right) \log\left(p_{X|Y}\left(1, 0\right)\right) \\
@@ -191,27 +193,27 @@
     =\ & h\left(\epsilon\right)
     \end{multiequality}
     where $h\left(\epsilon\right)$ is the binary entropy function. We can notice that it does not depend on the marginal distribution of $Y$.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     The conditional entropy of a discrete random variable $X \in \mathcal{X}$conditioned on $Y = y$ satisfies:
     \[0 \leq H_D\left(X | Y = y\right) \leq \log_D\left|\mathcal{X}\right|\]
     with equality on the left if and only if the probability distribution is degenerate (there is 100\% chance of an event happening and 0\% for the others) and equality on the right if and only if the probability distribution is uniform.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
        The proof is exactly the same as for the basic entropy bounds.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     In the Bit-flipper, we have $\mathcal{X} = \left\{0, 1\right\}$. Hence:
     \[\log_2 \left|\mathcal{X}\right| = \log_2\left(2\right) = 1\]
 
     And, we indeed know that:
     \[0 \leq h\left(\epsilon\right) \leq 1 = \log_{2}\left|\mathcal{X}\right|, \mathspace \forall \epsilon \in \left[0, 1\right]\]
-}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     We notice that the following inequality does not hold: $H_D\left(X|Y=y\right) \leq H_D\left(X\right)$. This is very weird, since entropy is a measure of uncertainty, and this inequality should thus hold (if we know more information, then the entropy should be less).
 
     For example, let's take $\delta = 0$. Then:
@@ -227,58 +229,58 @@
     Thus, if we have $\epsilon = \frac{1}{2}$, for example, then:
     \[\underbrace{H\left(X| Y = 0\right)}_{= 1} > \underbrace{H\left(X\right)}_{= h\left(\frac{1}{4}\right)} > \underbrace{H\left(X |Y=1\right)}_{= 0}\]
 
-    \subparag{Personal note: Intuition}{
+    \begin{subparag}{Personal note: Intuition}
         Let's keep the values of our example, i.e $\delta = 0$ and $\epsilon = \frac{1}{2}$.
 
         We notice that knowing that $Y = 0$ brings us to a uniform random distribution for $X$, and knowing that $Y = 1$ leads to a degenerate random distribution for $X$. However, knowing nothing on $Y$, makes $X$ follow a distribution between uniform and degenerate, which is thus in between our two bounds.
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
-\parag{Definition}{
+\begin{parag}{Definition}
     The \important{conditional entropy} of $X$ given $Y$ is defined as:
     \[H_D\left(X|Y\right) \over{=}{def} \sum_{y \in \mathcal{Y}}^{} p_Y\left(y\right) H\left(X|Y=y\right) = \sum_{y \in \mathcal{Y}}^{} p_Y\left(y\right) \left[-\sum_{x \in \mathcal{X}}^{} p_{X|Y}\left(x|y\right) \log_D\left(p_{X|Y}\left(x|y\right)\right)\right]\]
     This definition is really important.
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         We are computing the average conditional entropy of $X$ given $Y = y$, averaged over all values of $y$ under the marginal distribution $p_Y\left(y\right)$.
 
         In other words, we are basically doing a weighted average.
-    }
+    \end{subparag}
 
-    \subparag{Equivalent definition}{
+    \begin{subparag}{Equivalent definition}
         Note that, as usual, we can define this conditional entropy using expected values:
         \[H_D\left(X|Y\right) = \exval\left[\log_D\left(\frac{1}{p_{X|Y}\left(X|Y\right)}\right)\right]\]
 
         This can be useful to prove theorems.
-    }
+    \end{subparag}
 
 
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     In the bit-flipper, we have:
     \[H\left(X|Y\right) = p_Y\left(0\right) h\left(\epsilon\right) + p_Y\left(1\right)h\left(\delta\right) = \frac{h\left(\epsilon\right) + h\left(\delta\right)}{2}\]
 
     This time, we do use the marginal distribution of $Y$.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     The conditional entropy of a discrete random variable $X \in \mathcal{X}$ conditioned on $Y$ satisfies:
     \[0 \leq H_D\left(X|Y\right) \leq \log_D\left|\mathcal{X}\right|\]
     with equality on the left if and only if for every $y$ there exists an $x$ such that $p_{X|Y}\left(x|y\right) = 1$, and with equality if and only if $p_{X|Y}\left(x|y\right) = \frac{1}{\left|\mathcal{X}\right|}$ for all $x$ and $y$.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     For any two discrete random variables $X$ and $Y$, we have:
     \[H_D\left(X|Y\right) \leq H_D\left(X\right)\]
     with equality if and only if $X$ and $Y$ are independent random variables.
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         In other words, in average, the uncertainty about $X$ can only become smaller if we know $Y$. \textit{Note bene}, as we have seen, this is not true point-wise. We may have $H_D\left(X | Y=y\right) > H_D\left(X\right)$ for some values of $y$.
-    }
+    \end{subparag}
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         To simplify the notation, let us write:
         \[\sum_{x}^{} \sum_{y}^{} = \sum_{x,y}^{} \]
 
@@ -310,18 +312,18 @@
         Note that this theorem can also be proven using the expected value definition of conditional entropy, and the linearity of expected values.
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let $X \in \left\{0, 1\right\}$ be uniformly distributed, and let $Y = X$. Then:
     \[H\left(X|Y\right) = 0 \mathspace \text{and} \mathspace H\left(X\right) = 1\]
 
     Indeed:
     \[H\left(X|Y\right) = \sum_{y}^{} p\left(y\right)H\left(X|Y=y\right)= \sum_{y}^{} p\left(y\right)\cdot 0 = 0\]
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let's get back to our Lisa rolling dice example. She rolls two dice and announces the sum $L$ written as a two digit number. The alphabet of $L = L_1L_2$ is $\left\{02, 03, \ldots, 12\right\}$, the one of $L_1$ is $\left\{0,1\right\}$ and the one of $L_2$ is $\left\{0, 1, \ldots, 9\right\}$.
 
     We can to determine the probability that $L_2 = 2$, knowing that $L_1 = 1$:
@@ -335,15 +337,15 @@
 
     We computed that $H\left(L_2\right) = \SI{3.22}{\bit}$. We can indeed observe that, indeed:
     \[H\left(L_2|L_1\right) \leq H\left(L_2\right)\]
-}
+\end{parag}
 
-\parag{Theorem: Chain rule for entropy}{
+\begin{parag}{Theorem: Chain rule for entropy}
     Let $X$ and $Y$ be two random variables. Then:
     \[H_D\left(X, Y\right) = H_D\left(X\right) + H_D\left(Y|X\right)\]
 
     We already knew it if they were independent, but this result is completely general.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let's use the expected value definition of the conditional entropy, and the linearity of the expected value:
         \begin{multiequality}
         H\left(X, Y\right) =\ & \exval\left[-\log\left(p\left(X, Y\right)\right)\right]  \\
@@ -353,15 +355,15 @@
         \end{multiequality}
 
         \qed
-    }
+    \end{subparag}
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         We can see that:
         \[H\left(X | Y\right) = H\left(X, Y\right) - H\left(Y\right)\]
 
         This can be convenient for computations.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
 

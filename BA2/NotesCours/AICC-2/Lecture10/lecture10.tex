@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-03-24 at 17:37:31.
@@ -21,23 +23,23 @@
 
 }
 
-\parag{One-time pad}{
+\begin{parag}{One-time pad}
     One-time pad is being used in practice, but it's very expensive. The key is very long, and it has to be sent every time. Moreover, the key has to be sent (and we cannot do it over a public channel), this can be a complicated task.
 
     We reach the minimum length of a key for any binary crpytosystem if the plaintext cannot be compressed and is of length $n$, and we want perfect secrecy. Then, since $H\left(K\right) \geq H\left(T\right)$, we need at least $n$ bits. Thus, the one-time pad is optimal for perfect secrecy.
 
     This leads to the key distribution problem. If we have $N$ users, then each need $N - 1$ keys, which often need to be refreshed. This does not seem doable.
-}
+\end{parag}
 
 \subsection{Public channel}
-\parag{Public channel}{
+\begin{parag}{Public channel}
     We wonder if two people who have never met can agree on a secret key over a public channel. We cannot give a key, since other people would be able to see it.
-}
+\end{parag}
 
-\parag{Definition}{
+\begin{parag}{Definition}
     Let $p$ be a prime number. If $\left\{g^i : i = 0, 1, \ldots, p-2\right\}$ is a permutation of $\left\{1, 2, \ldots, p-1\right\}$, then $g$ is called a \important{generator}.
 
-    \subparag{Examples}{
+    \begin{subparag}{Examples}
         Let's pick $p = 7$. Then, our alphabet is:
         \[\mathcal{A} = \left\{0, 1, \ldots, p-1\right\} = \left\{0, 1, 2, 3, 4, 5, 6\right\}\]
 
@@ -72,11 +74,11 @@
         \end{center}
 
         We also see a pattern, but it is even more interesting. Indeed, for $g = 3$, we have a permutation of the non-zero elements of $\mathcal{A}$. Thus, $g = 3$ is a generator.
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
-\parag{Diffie-Hellman cryptosystem}{
+\begin{parag}{Diffie-Hellman cryptosystem}
    First, Alice and Bob agree publicly on a prime number $p$ and a generator $g$. Then, Alice picks a secret $a \in \left\{0, 1, \ldots, p-1\right\} = \mathcal{A}$, and calculates $A = g^a \Mod p$. Similarly, Bob picks a secret $b \in \mathcal{A}$, and calculates $B = g^b \Mod p$. Then, both write $A$ and $B$ in a public directory.
 
     Now, Alice gets $B$ from the directory, and she computes:
@@ -89,7 +91,7 @@
 
     \svghere{DiffieHellmanSystem.svg}
 
-    \subparag{Breaking the code}{
+    \begin{subparag}{Breaking the code}
         This cryptosystem is really easy to break if we observe that:
         \[b = \log_g\left(B\right), \mathspace a = \log_g\left(A\right)\]
 
@@ -98,45 +100,45 @@
         Let's take an example. If we pick $p = 2^{2048}$ to have a 2048-bit number (it is not prime, but it is not a problem). Then, Alice needs around 4095 multiplications to compute $A = g^a$. To compute $\log_g\left(A\right)$, one would need around $10^{35}$ multiplications (as a comparison point, the age of the universe is around $\SI{4.3 \cdot 10^{17}}{\second }$).
 
         This makes us come to the following definition
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
-\parag{Definition: One-way function}{
+\begin{parag}{Definition: One-way function}
     A \important{one-way function} is a function for which one way is easy to compute, but its reciprocal is really hard.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         $g^a$, where $g$ is known but $a$ is unknown, is conjectured to be one-way. This is not completely proven yet, but we think (and we hope) that it is true.
-    }
+    \end{subparag}
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         For a cryptographer, just having a one-way function is not enough to create a code. We need a trapdoor one-way function.
-    }
+    \end{subparag}
 
-}
+\end{parag}
 
-\parag{Definition: Trapdoor one-way function}{
+\begin{parag}{Definition: Trapdoor one-way function}
     A \important{trapdoor one-way function} is a one-way function, but for which the reciprocal is easy to compute when we have the key $k$ to a trapdoor.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         $g^a$, where $g$ is known but $a$ is unknown, is \textit{not} a trapdoor one-way function.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Observation}{
+\begin{parag}{Observation}
     A trapdoor one-way function is great to create a code. Indeed, Bob can create a private key $k_B$, which he keeps secret. Then, he publishes a trapdoor one-way function, with trapdoor $k_B$. Alice can use this function to send her message, which nobody else than Bob can decipher, since it is a one-way function. However, since Bob has his private key $k_B$ being a key to the trapdoor of the function, he can decipher the message Alice sent him.
 
     \svghere{TrapdoorOneWayFunction.svg}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         The RSA ciphering system works that way, but we will need two more weeks of theory to build it.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Multiplicative inverse}{
+\begin{parag}{Multiplicative inverse}
     If $a \cdot i = 1 \Mod m$, then we say that $a$ is the \important{multiplicative inverse} of $i$.
 
-    \subparag{Observation}{
+    \begin{subparag}{Observation}
         Let's consider the following alphabet:
         \[\mathcal{A} = \left\{0, 1, \ldots, p-1\right\}, \mathspace p \in \mathbb{N}\]
 
@@ -170,18 +172,18 @@
             5 & 5 \\
         \end{tabular}
         \end{center}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{El Gamal's cryptosystem}{
+\begin{parag}{El Gamal's cryptosystem}
     There is a ciphering system other than RSA that works with trapdoor one-way functions, named \important{El Gamal's crypto}.
 
     Alice and Bob choose a $g$ publicly. Then, Alice picks a random number $y$, and Bob a random number $x$. Alice publishes $g^y$ and Bob $g^x$. If Alice wants to send her message, she can compute $c = g^{xy}t\ \Mod\ \left|\mathcal{A}\right|$, where $g^{xy}$ can be easily computed as in the Diffie-Hellman cryptosystem. Then, Bob can decipher the message by using the multiplicative inverse of $g^{xy}$. Indeed, if $a$ is the multiplicative inverse of $g^{xy}$:
     \[ac = a\left(g^{xy} t\right) = a g^{xy} t = t\]
 
-    \subparag{Personal note: Difference with Diffie-Hellman}{
+    \begin{subparag}{Personal note: Difference with Diffie-Hellman}
         Note that the difference between El Gamal's cryptosystem and Diffie-Hellman's one, is that the later one allows to exchange keys, whereas the former allows to send a message privately.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \end{document}

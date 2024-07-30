@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-03-29 at 15:31:42.
@@ -21,31 +23,31 @@
 }
 
 \subsection{Modulo arithmetic}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     We notice that in the set of integers, $\mathbb{Z}$, we can add, subtract and multiply, but we cannot divide (in general). We will dig deeper in this question.
-}
+\end{parag}
 
-\parag{Euclid's Division Algorithm}{
+\begin{parag}{Euclid's Division Algorithm}
     For all integers $a$ and $m \neq 0$, there exist unique integers $q$ (the quotient) and $r$ (the remainder) such that: 
     \[a = mq + r\]
     where $0 \leq r < \left|m\right|$
     
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let's take $m = 4$, then:
         \[7 = 4\cdot 1 + 3\] 
         \[-2 = 4\left(-1\right) + 2\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
 
-\parag{Signs}{
+\begin{parag}{Signs}
     Let's do some Euclidean divisions. Let's divide 8 by 3, then $-8$ by 3, then $8$ by $-3$, and finally $-8$ by $-3$:
     \[{\color{red}8} = {\color{red}3} \cdot 2 + 2, \mathspace {\color{red}-8} = {\color{red}3} \cdot \left(-3\right) + 1\]
     \[{\color{red}8} = {\color{red}\left(-3\right)} \cdot \left(-2\right) + 2, \mathspace {\color{red}-8} = {\color{red}\left(-3\right)} \cdot 3 + 1\]
     
     To do those divisions, we know the red numbers, and we look for our quotient and remainder, such that $0 \leq r < \left|m\right|$.
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Note that, in many programming languages, the signs are not always implemented the same way. Thus, if $a$ and $m$ are positive, there is no problem, but if one of them is negative, then the result may be positive or negative depending on the language.
 
         Indeed, we could say: 
@@ -53,27 +55,27 @@
         \[8 = \left(-3\right)\left(-3\right) - 1, \mathspace -8 = \left(-3\right)\cdot 2 - 2\]
 
         This goes against our definition, since we want $0 \leq r < \left|m\right|$, but this could also be a definition that makes sense.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Mod operation}{
+\begin{parag}{Mod operation}
     By $r = a \Mod m$, we denote the remainder when dividing $a$ by $m$. Thus: 
     \[a = mq + r \implies a \Mod m = r\]
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     If we split a pie with 8 slices for 3 people, then $8 \Mod 3 = 2$ slices will be left over.
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     If someone leaves home at 7 a.m. for a 40-hour trip, they arrive at $\left(7 + 40\right) \Mod 24 = 23$ the day after.
-}
+\end{parag}
 
-\parag{Congruence}{
+\begin{parag}{Congruence}
     Two integers $a$ and $b$ are called \important{congruent} modulo $m$ if $m \divides a - b$, i.e. if $m$ divides $a - b$. This is denoted by: 
     \[\congruent{a}{b}{m}\]
     
-    \subparag{Equivalent definitions}{
+    \begin{subparag}{Equivalent definitions}
         In fact, we can see that all the following statements are equivalent:
         \begin{itemize}
             \item $\congruent{a}{b}{m}$
@@ -81,34 +83,34 @@
             \item $a \Mod m = b \Mod m$
             \item $r_a = r_b$
         \end{itemize}
-    }
+    \end{subparag}
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let us take $m = 4$. Then, we can draw the following number line, where numbers of the same colour belong to the same class:
         \svghere{CongruenceClassNumberLine.svg}
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     If we know that $\congruent{x}{3}{5}$, then clearly $x$ is not a multiple of $5$. Indeed, $x \Mod 5 = 3 \neq 0$.
 
     However, clearly, if $\congruent{x}{25}{5}$, then $x$ is a multiple of 5 since $\congruent{25}{0}{5}$.
-}
+\end{parag}
 
-\parag{Definition: Equivalence relation}{
+\begin{parag}{Definition: Equivalence relation}
     On a set, a \important{equivalence relation} is a relation (denoted by $\sim$) which satisfies:
     \begin{enumerate}
         \item Reflexivity: $a \sim a$
         \item Symmetry: $a \sim b \implies b \sim a$
         \item Transitivity: $a \sim b \land b \sim c \implies a \sim c$
     \end{enumerate}
-}
+\end{parag}
 
-\parag{Lemma: Equivalence relation}{
+\begin{parag}{Lemma: Equivalence relation}
     Congruence modulo $m$ is an equivalence relation on the set of integers.
-}
+\end{parag}
 
-\parag{Theorem: Properties}{
+\begin{parag}{Theorem: Properties}
     If $\congruent{a}{a'}{m}$ and $\congruent{b}{b'}{m}$, then:
     \begin{enumerate}
         \item $\congruent{a + b}{a' + b'}{m}$
@@ -127,7 +129,7 @@
 
     We have to be careful to see that the mod does not get distributed into the $n$ of the exponent.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         First, looking at the number line, we realise that $a \Mod m = \left(a + m k\right) \Mod m$.
 
         Then, we can write $a = m q_a + r_a$ and $b = m q_b + r_b$, which gives us: 
@@ -154,10 +156,10 @@
         \end{multiequality}
 
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     For example: 
     \[\left(123\cdot 97\right)\Mod 2 = \left(\left(123 \Mod 2\right) \left(97 \Mod 2\right)\right) \Mod 2 = \left(1 \cdot 1\right)\Mod2 = 1\]
     
@@ -179,9 +181,9 @@
     \[\left(9^{1000} + 9^{10^{6}}\right) \Mod5 = \left(\left(-1\right)^{1000} + \left(-1\right)^{10^{6}}\right) \Mod5 = \left(1 + 1 \right) \Mod 5 = 2\]
     
     Thus, $9^{1000} + 9^{10^6}$ is not divisible by 5.
-}
+\end{parag}
 
-\parag{Even numbers}{
+\begin{parag}{Even numbers}
     We know that: 
     \[1234 = 1\cdot 10^{3} + 2\cdot 10^{2} + 3\cdot 10^1 + 4\]
     
@@ -193,9 +195,9 @@
     \end{multiequality}
     
     Thus, only the last number matters to say if a number is even in base 10.
-}
+\end{parag}
 
-\parag{Division by 9}{
+\begin{parag}{Division by 9}
    We know that $\congruent{10}{1}{9}$, thus: 
    \[\congruent{10^n}{1^n = 1}{9}\]
    
@@ -208,16 +210,16 @@
    \end{multiequality}
    
    In other words, to know if a number is divisible by 9, we can only add up the digits.
-}
+\end{parag}
 
-\parag{Back to Diffie-Hellman}{
+\begin{parag}{Back to Diffie-Hellman}
     For Diffie-Hellman, we needed to compute quickly big exponents modulo a given number. Let's see an example of how to do that more quickly.
 
     To compute $28^{42} \Mod 67$, we can do it successively. Indeed: 
     \[28^{42} \Mod 67 = \left(\cdots \left(\left(\left(\left(28^2 \Mod 67\right) \cdot 28\right) \Mod 67\right) \cdot 28\right) \Mod 67 \cdots \right)\Mod 67\]
     
     This is $\Theta\left(n\right)$, but there is even an algorithm named fast-exponentiation which reaches $\Theta\left(\log\left(n\right)\right)$.
-}
+\end{parag}
 
 
 

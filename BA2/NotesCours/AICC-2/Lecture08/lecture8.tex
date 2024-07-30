@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-03-17 at 11:42:39.
@@ -19,14 +21,14 @@
 
 }
 
-\parag{Fundamental theorem of Source Coding}{
+\begin{parag}{Fundamental theorem of Source Coding}
     For the compression of a source $S_1, S_2, \ldots$ the fundamental limit is:
     \[\lim_{n \to \infty} \frac{H_D\left(S_1, \ldots, S_n\right)}{n} = H_D^*\left(\mathcal{S}\right)\]
     if this limit exists (if it does not, then we do not know anything).
 
     In other words, there exist uniquely decodable codes which average codeword-length per symbol gets arbitrarily close to $H^*_D\left(\mathcal{S}\right)$ (such as the Huffman code), and no uniquely decodable code can go below.
 
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We saw that, if $\Gamma_H$ is a Huffman $D$-ary code and $\Gamma_{SF}$ is a Shannon-Fano $D$-ary code for the random variable $S$, their average codeword-lengths satisfy:
         \[H_D\left(S\right) \leq L\left(S, \Gamma_H\right) \leq L\left(S, \Gamma_{SF}\right) < H_D\left(S\right) + 1\]
 
@@ -38,24 +40,24 @@
         using the sandwich theorem and the theorem we saw last lecture, since the limit exists by hypothesis.
 
         \qed
-    }
+    \end{subparag}
 
 
-    \subparag{Existence}{
+    \begin{subparag}{Existence}
         Note that we know that this limit exists for sure for Independent and Identically Distributed (IID) sources (such as the Coin-Flip source) and stationary sources.
 
         For IID sources, we can simply see that:
         \[H_D\left(S_1, \ldots, S_n\right) = nH_D\left(S_1\right) \implies \frac{H_D\left(S_1, \ldots, S_n\right)}{n} = H_D\left(S_1\right)\]
 
         We already know that stationary sources are regular, and thus that this limit exists.
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         This justifies that $H_D^*\left(\mathcal{S}\right)$ can be interpreted as a measure of information.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's take the following encoding:
     \begin{center}
     \begin{tabular}{c|c|cc}
@@ -84,16 +86,16 @@
     \[p_{Z_3|Z_1, Z_2}\left(z | 11\right) = \frac{1}{2}\]
 
     In fact, if we continue doing this, we notice that the probabilities all have  probability $\frac{1}{2}$. The bits in the Huffman-coded string are independent of each other, and uniformly distributed. That is, they have the maximum possible entropy.
-}
+\end{parag}
 
-\parag{Compressing data}{
+\begin{parag}{Compressing data}
     We want to know what happens to the entropy when we compress data.
 
    There is a one-to-one correspondance between $\widetilde{S}^n$, the $n$ characters string encoded using the direct encoding, and $Z^k$, the $k$ characters string (where $k \leq n$ since Huffman codes are optimal) encoded using the Huffman code; if we know one, we can get the others (they are both uniquely decodable code). Thus, necessarily $H\left(\widetilde{S}^n\right) = H\left(Z^k\right)$. However, since the Huffman code is shorter on expectation, then it must have higher entropy per symbol. This is why when we compress data, entropy per symbol goes up (see the \nth{2} series of \textit{Pratiques de la Programmation Orientée objet} course).
-}
+\end{parag}
 
 
-\parag{Additional questions}{
+\begin{parag}{Additional questions}
     We have some more questions. For example, what if the source-alphabet is not finite? Also, what if we do not know the source distribution $p_X\left(x\right)$ (doing universal source coding)?
 
     To have some intuition on this subject, let's try to make a uniquely decodable binary code to encode the integers, thus working on an infinite source-alphabet. Since it is infinite, we cannot use Huffman's algorithm. We note that converting the number into binary does not work, since there would be no way to tell if $11$ is 3 or a 1 followed by a 1 (thus it is not uniquely decodable). However, we can also notice that every number begins by a 1. Thus, we can add some 0s before our number, corresponding to the length of the number: we add $\ell - 1$ 0s if the numbers is $\ell$ digits long. This allows us to get a prefix free code:
@@ -111,15 +113,15 @@
     \end{center}
 
     This is called the Elias Gamma Coding, and it gives us a length $\ell\left(n\right) = \left\lfloor \log_{2}\left(n\right) \right\rfloor + 1$ for a number $n$. Note that we can do better by encoding the prefix 0s using Elias Code 1 and removing the 1 at the beginning of the number; this yields Elias Delta Coding. There also exists an Elias Omega Coding, working recursively.
-}
+\end{parag}
 
 \subsection{Entropy and algorithms}
-\parag{Twenty questions}{
+\begin{parag}{Twenty questions}
     Twenty questions is a game in which someone thinks to something, and someone else must guess what they are thinking by asking us 20 yes/no questions to identify it.
 
     Let $X$ be a random variable representing what the person thinks about. We wonder what is the minimum number of yes/no questions needed identify $X$, and which questions we should ask.
 
-    \subparag{Strategy}{
+    \begin{subparag}{Strategy}
         Let's consider a binary code $\Gamma$ for $X \in \mathcal{X}$. Once $\Gamma$ is fixed, we know $x \in \mathcal{X}$ if and only if we know the codeword $\Gamma\left(x\right)$. The strategy consists in asking the $i$\Th question so as to obtain the $i$\Th bit of this codeword. The average number of questions is $L\left(X, \Gamma\right)$, which is minimised if $\Gamma$ is the encoding map of a Huffman code. We will see that we cannot do better.
 
         For example, let $X$ be a random variable in $\mathcal{A} = \left\{a, b, c, d, e\right\}$ having the following distribution:
@@ -144,14 +146,14 @@
         \end{center}
 
         Let's suppose that the realisation is $X = b$ (but we do not know it). The first question is: is $x = e$? Since the answer is no, we know the first bit is 0. Then, we can ask ``is $x \in \left\{c, d\right\}$?'' And so on.
-    }
+    \end{subparag}
 
-    \subparag{Proof of optimality}{
+    \begin{subparag}{Proof of optimality}
         We have seen that a prefix-free code for $X \in \mathcal{X}$ leads to a querying strategy to find the realisation of $X$. Similarly, any deterministic querying strategy leads to a binary prefix free code for $X$. Indeed, before the first question we know that $x \in \mathcal{X}$. Then, the first question can be formulated as ``is $x \in A$?'', where $A \subset \mathcal{X}$ is given by our strategy. If the answer is yes, we know $x \in A \subset \mathcal{X}$, if it is no we know that $x \in A^C \subset \mathcal{X}$. In both cases, we have reduced the size of the set that contains $x$. We continue asking similar questions until the value of $x$ is fully determined, then we stop. The sequence of yes/no answers is a binary codeword associated to $x$. The code obtained when we consider all possible values of $x$ is a binary prefix-free code. Since the tree is prefix-free, its average codeword-length cannot be smaller than that of a Huffman code.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Sorting}{
+\begin{parag}{Sorting}
     We want to sort $n$ elements by doing pairwise comparisons with binary output. That is, for each comparison, we either get ``$<$'' or ``$\geq$''. We wonder how many binary comparisons are needed.
 
    For any strategy, we need to compare two positions, and swap them if they are smaller. Then, we compare other positions, depending on whether we found one is greater than another. Again after them, we will have two other possibilities, and so on. Thus, we necessarily have a tree.
@@ -173,9 +175,9 @@
    \[H\left(X\right) \approx \log\left(\frac{n^n}{e^{n-1}}\right) = n\log\left(n\right) - \left(n-1\right)\log\left(e\right)\]
 
    The dominant term is $n\log\left(n\right)$, which means that there cannot be any sorting algorithm being better than $\Omega\left(n\log\left(n\right)\right)$ if we do not have any other assumptions (and want to keep every element in the list, I see you Stalin sort and Nagasaki sort).
-}
+\end{parag}
 
-\parag{Billiard balls}{
+\begin{parag}{Billiard balls}
     There are 14 billiard balls numbered from 0 to 13. Amongst ball 1 to 13, at most one could be heavier or lighter than the others, and we know 0 is a regular ball. We wonder what is the minimum number of weightings (using a scale that only tells us if the left side is heavier, lighter or of equal weight to the right one) to determine if one ball is different, if so which one and whether it is heavier or lighter.
 
     Let $X$ be a random variable, stating the solution. We can encode it the following way. If all balls are equal, then $x = 0$. If ball $k$ is heavier, then $x = k$. If ball $k$ is lighter, then $x = -k$. Thus, for example, if ball 2 is lighter, then $x = -2$.  This gives us:
@@ -214,7 +216,7 @@
     \[S_1 = -1 \implies X \in \left\{-1, -2, -3, -4, 5, 6, 7, 8, 9\right\}\]
 
     In all three cases, we get 7 cases left after our first weight. Thus, it is indeed uniform. If $S_1 = 0$, then we can consider weighting 0, 10 and 11, 12. Again, we get uniform distributions. We can continue this way, and we find that 3 is indeed achievable.
-}
+\end{parag}
 
 
 \end{document}

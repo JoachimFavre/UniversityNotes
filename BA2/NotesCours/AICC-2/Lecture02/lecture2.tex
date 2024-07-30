@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-02-24 at 08:18:12.
@@ -19,7 +21,7 @@
 \end{itemize}
 }
 
-\parag{Example: Hat party}{
+\begin{parag}{Example: Hat party}
     We have $n$ men arriving at a party and leaving their hat. When they leave, they take a random hat. We wonder what is the expected value of men getting their own hat back.
 
     Let's define the following random variable: 
@@ -37,12 +39,12 @@
     Thus, we get that: 
     \[\exval\left[R\right] = n \cdot \frac{1}{n} = 1\]
 
-    \subparag{Independence}{
+    \begin{subparag}{Independence}
         We can clearly see that the $R_i$ are not independent. For example, if there are only two men, the second man has the same fate as the first one.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Independent random variables}{
+\begin{parag}{Definition: Independent random variables}
     Two random variables $X$ and $Y$ are \important{independent} if and only if, for all realisations $x$ and $y$: 
     \[p\left(\left\{X = x\right\} \cap \left\{Y = y\right\}\right) = p\left(\left\{X = x\right\}\right) p\left(\left\{Y = y\right\}\right)\]
     
@@ -52,31 +54,31 @@
     We can generalise this to $n$ random variables. The random variables $X_1, \ldots, X_n$ are independent if and only if: 
     \[p_{X_1, \ldots, X_n}\left(x_1, \ldots, x_n\right) = \prod_{i=1}^{n} p_{X_i}\left(x_i\right)\]
 
-    \subparag{Link with earlier definition}{
+    \begin{subparag}{Link with earlier definition}
         We defined that two event $E$ and $F$ are independent if and only if: 
         \[p\left(E \cap F\right) = p\left(E\right)p\left(F\right)\]
-    }
+    \end{subparag}
     
-    \subparag{Utility}{
+    \begin{subparag}{Utility}
         It is very useful to know that two random variables are independent in medical statistics, for example.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Definition: Conditional distribution}{
+\begin{parag}{Definition: Conditional distribution}
     The \important{conditional distribution} of $Y$ given $X$ is the function $p_{Y | X}$ defined by: 
     \[p_{Y|X}\left(y | x\right) = \frac{p_{X, Y}\left(x, y\right)}{p_{X\left(x\right)}}\]
 
-    \subparag{Personal note: Notations}{
+    \begin{subparag}{Personal note: Notations}
         As mentioned in the last course, sometimes we write: 
         \[p_{Y|X}\left(y|x\right) = p\left(Y = y | X = x\right)\]
         
         Also, sometimes we remove subscripts not to have redundancy: 
         \[p_{Y|X}\left(y|x\right) = p\left(y|x\right)\]
         
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Independence}{
+\begin{parag}{Independence}
     All the following sentences are equivalent:
     \begin{itemize}
         \item $X$ and $Y$ are independent.
@@ -84,39 +86,39 @@
         \item $\displaystyle p_{Y | X}\left(y | x\right) = p_Y\left(y\right)$ 
         \item $\displaystyle p_{X | Y}\left(x|y\right) = p_{X}\left(x\right)$
     \end{itemize}
-}
+\end{parag}
 
-\parag{Back to the example with the dice}{
+\begin{parag}{Back to the example with the dice}
     Let's go back to the example in which we throw two dice, and write its sum as a two digit number.
 
     We now wonder whether $L_1$ and $L_2$ are independent. We can find a counterexample: 
     \[p_{L}\left(13\right) = 0 \neq p_{L_1}\left(1\right) p_{L_2}\left(3\right) = \frac{1}{6}\cdot \frac{3}{36}\]
-}
+\end{parag}
 
-\parag{Product of expected values}{
+\begin{parag}{Product of expected values}
     If $X$ and $Y$ are independent, then: 
     \[\exval\left[XY\right] = \exval\left[X\right] \exval\left[Y\right]\]
     
-    \subparag{Hypothesis}{
+    \begin{subparag}{Hypothesis}
         The hypothesis is important. Indeed, let $X = Y \in \left\{-1, 1\right\}$ uniformly distributed. They are clearly not independent (since they are equal), and the formula does not hold: 
         \[\exval\left[XY\right] = 1 \neq 0 = \exval\left[X\right]\exval\left[Y\right]\]
-    }
+    \end{subparag}
 
-    \subparag{Advice}{
+    \begin{subparag}{Advice}
         When proving or disproving dependence, we must not hesitate to use random variables that are equal, or that give impossible results. Such edge cases can be easy to compute.
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \subsection{Entropy}
-\parag{Information}{
+\begin{parag}{Information}
     We communicate by revealing the value of a sequence of variables that we call (information) symbols.
 
     The $i$\Th symbol might represent the intensity of the $i$\Th pixel of black and white digital photo, a score at our $i$\Th exam, the $i$\Th letter of a text, and so on.
 
     In an article that appeared in 1928, Hartley wrote: ``A symbol provides information only if there had been other possibilities for its value, besides that which was revealed''. In modern language, Hartley was saying that the value of a symbol provides information only if the symbol is a (non-constant) random variable.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     We now want to quantify the quantity of information we get.
 
     Let's take the following sample space: 
@@ -125,23 +127,23 @@
     We could say that the information in $W$ is the number of possible values it could have taken. The more information there would have been, the more intuitive the random variable should be. In this case, it would be 5.
 
     We do not want to stop there. If we look through the window in the morning and the day after. Then there are 25 possibilities, so the information will be 25. It seems really weird to take the product, and we would like to instead have an addition. Let's thus take a logarithm. Thus, the entropy of $W$ would be $\log\left(5\right)$.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     The world population in 2022 is estimated to be 7.954 billion. Hence, we need $\log_2\left(7.954 \cdot 10^{9}\right) = 32.9$ bits of information to identify a person. 
 
     The world population in 1970 is estimated to have been 3.7 billion. We know that $\log_2\left(\frac{x}{2}\right) = \log_2\left(x\right) - 1$. So, around 32 bits of information were needed at this time.
-}
+\end{parag}
 
-\parag{Problem}{
+\begin{parag}{Problem}
     There is still a problem with this definition. 
 
     Let's suppose that $S_n \in \left\{\text{sunny}, \text{rainy}\right\}$ is the weather prognosis for day $n+1$, revealed on day $n$. Let's suppose that $S_n = \text{rainy}$ has probability $\frac{5}{365}$.
 
     It seems intuitively obvious that the amount of information provided by $S_n = \text{rainy}$ is much higher than that provided by $S_n = \text{sunny}$. However, our current definition assigns $\log_2\left(2\right) = 1$ bit of information to both.
-}
+\end{parag}
 
-\parag{Entropy}{
+\begin{parag}{Entropy}
     We finally come up with the definition of \important{entropy}, the one Shannon defined: 
     \[H_b\left(S\right) = - \sum_{s \in \supp\left(p_S\right)}^{} p_S\left(s\right) \log_b\left(p_S\left(s\right)\right), \mathspace \text{where } \supp\left(p_S\right) = \left\{s: p_S\left(s\right) > 0\right\}\]
 
@@ -151,24 +153,24 @@
     We can also see it the following way: 
     \[H\left(S\right) = \exval\left[-\log\left(p_S\left(S\right)\right)\right]\]
 
-    \subparag{Unit}{
+    \begin{subparag}{Unit}
         The choice of the base $b$ determines the unit. Typically, $b = 2$ leads to bits, and much less common, $b = e$ leads to nats.
-    }
+    \end{subparag}
     
-    \subparag{Graph}{
+    \begin{subparag}{Graph}
         We can plot $f\left(x\right) = x \log\left(x\right)$:
         \svghere[0.7]{EntropyGraph.svg}
-    }
+    \end{subparag}
 
-    \subparag{Intuition}{
+    \begin{subparag}{Intuition}
         The concept of entropy might be a bit unintuitive; what is really entropy? We will answer this question throughout this semester during this course, seeing that it comes up for many algorithms.
 
         For now, we can see it a value representing how random something is. We will see that the entropy of a random variable is bounded above by the one of the uniform distribution (clearly the distribution which gives the most random results) and bounded below by certainty (there is 100\% chance of something happening). 
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Uniform distribution}{
+\begin{parag}{Uniform distribution}
     Let $p_S\left(s\right)$ be a uniform distribution, i.e.: 
     \[p_S\left(s\right) = \frac{1}{\left|A\right|}\]
     
@@ -176,17 +178,17 @@
     \[H_b\left(S\right) = -\sum_{s \in A}^{} \frac{1}{\left|A\right|} \log_b\left(\frac{1}{\left|A\right|}\right) = \log_b\left|A\right| \underbrace{\sum_{s \in A}^{} \frac{1}{\left|A\right|}}_{= 1} = \log_b \left|A\right|\]
 
     Shanon's proposal and Harley's proposal are thus equivalent on uniform distribution.
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let's say that a monkey produces text by selecting letters at random from a French text. We can use French's letter distribution. 
     \[H \approx \SI{3.9425}{\bit}\]
     
     Note that the maximum entropy of a source with $\left|A\right| = 26$ is: 
     \[\log_2\left(26\right) \approx \SI{4.7004}{\bit}\]
-}
+\end{parag}
 
-\parag{Binary entropy function}{
+\begin{parag}{Binary entropy function}
     Let's consider the special case when $\left|A\right| = 2$. 
 
     In this case, $p_S$ has only two possible values, let's say $p$ and $\left(1 - p\right)$. This corresponds to the entropy: 
@@ -198,40 +200,40 @@
     It is extremely steep at 0 and 1, it is symmetric around $\frac{1}{2}$, and reaches its maximum at $x = \frac{1}{2}$.
 
     We call $h\left(p\right)$ the \important{binary entropy function}.
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say Anne has a random lock number. Let $S$ be the answer to the question ``Is 8950 Anne's lock number?'', i.e. $S \in A = \left\{YES, NO\right\}$. Its entropy is given by: 
     \[h\left(\frac{1}{10^4}\right) \approx \SI{0.001}{\bit}\]
-}
+\end{parag}
 
-\parag{Lemma: IT-inequality}{
+\begin{parag}{Lemma: IT-inequality}
     Let $r \in \mathbb{R}_+$. Then: 
     \[\log_b\left(r\right) \leq \left(r - 1\right) \log_b\left(e\right)\]
     with equality if and only if $r = 1$.
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         We can get some intuition using the following graph:
         \svghere[0.8]{ITInequalityGraph.svg}
 
         We can make a formal proof using calculus tools.
-    }
+    \end{subparag}
 
-    \subparag{Importance}{
+    \begin{subparag}{Importance}
         This inequality is really important in Computer Science; many results will result from it.
-    }
+    \end{subparag}
 
-    \subparag{Personal note}{
+    \begin{subparag}{Personal note}
         To remember this inequality, we only need to remember that we are looking for the tangent line at $r = 1$. We can compute the derivative quickly, which gives us the coefficient $\log_b\left(e\right)$.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Theorem: Entropy bound}{
+\begin{parag}{Theorem: Entropy bound}
     The entropy of a discrete random variable $S \in A$ satisfies: 
     \[0 \leq H_b\left(S\right) \leq \log_b\left|A\right|\]
     with equality on the left if and only if $p_S\left(s\right) = 1$ for some $s$ (certainty), and with equality on the right if and only if $p_S\left(s\right) = \frac{1}{\left|A\right|}$ for all $s$ (uniform distribution).
 
-    \subparag{Proof of left inequality}{
+    \begin{subparag}{Proof of left inequality}
         We can observe that:
         \begin{functionbypart}{-p_S\left(s\right) \log\left(p_S\left(s\right)\right)}
             0, \mathspace \text{if } p_S\left(s\right) \in \left\{0, 1\right\} \\
@@ -239,9 +241,9 @@
         \end{functionbypart}
 
         Since we are only adding non-negative values, we get that $H\left(S\right) \geq 0$. Also, the only way to get 0 is to stay in the first case, thus $p_S\left(s\right)$ must always either equal 0 or 1. Since it must add up to 1, then $p_S\left(s\right) = 1$ for some $s$.
-    }
+    \end{subparag}
 
-    \subparag{Proof of right inequality}{
+    \begin{subparag}{Proof of right inequality}
         We want to prove that: 
         \[H_2\left(s\right) - \log_2 \left|A\right| \leq 0\]
 
@@ -261,18 +263,18 @@
         
         We know that this is the IT-inequality, and thus that it is equal if and only if $r = 1$, i.e: 
         \[\frac{1}{p\left(s\right) \left|A\right|} = 1 \iff p\left(s\right) = \frac{1}{\left|A\right|}\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Two random variables}{
+\begin{parag}{Two random variables}
     We can also define entropy for two random variables: 
     \[H\left(X, Y\right) = -\sum_{\left(x, y\right) \in \mathcal{X} \times \mathcal{Y}}^{} p_{X,Y}\left(x, y\right) \log\left(p_{X,Y}\left(x,y\right)\right)\]
 
     We can also define it using expected values: 
     \[H\left(X, Y\right) = \exval\left[-\log\left(p_{X,Y}\left(X, Y\right)\right)\right]\]
-}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's say that $p_{X,Y}$ is given by the following table:
     \begin{center}
     \begin{tabular}{c|c|c}
@@ -287,18 +289,18 @@
 
     Then, we can compute the entropy:
     \[H\left(X, Y\right) = -\frac{1}{8} \log_2\left(\frac{1}{8}\right) - \frac{3}{8} \log_2\left(\frac{3}{8}\right) - \frac{1}{4}\log_2\left(\frac{1}{4}\right) - \frac{1}{4}\log_2\left(\frac{1}{4}\right)\]
-}
+\end{parag}
 
-\parag{Sequences of random variables}{
+\begin{parag}{Sequences of random variables}
     We want to compress large amounts of data, thus we can have long sequences of random variables. It can be finite, $\left(S_1, \ldots, S_n\right)$, infinite, $\left\{S_i\right\}_{i=1}^{\infty}$ (we can also consider $\ldots, S_{-1}, S_{0}, S_{1}, \ldots$ written $\left\{S_i\right\}$).
 
     A collection of random variables $\left(S_1, \ldots S_n\right)$ is specified by the joint probability distribution $p_{S_1, \ldots S_n}$. This is all we need to compute the entropy $H\left(S_1, \ldots, S_n\right)$.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $S_1, \ldots S_n$ be discrete random variables. Then: 
     \[H\left(S_1, \ldots, S_n\right)\leq H\left(S_1\right) + \ldots+ H\left(S_n\right)\]
     with equality if and only if $S_1, \ldots, S_n$ are independent.
-}
+\end{parag}
 
 \end{document}

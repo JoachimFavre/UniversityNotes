@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-03-13 at 10:25:07.
@@ -20,7 +22,7 @@
 \end{itemize}
 }
 
-\parag{Recall}{
+\begin{parag}{Recall}
     Let's do a quick recall of what we have seen in the last course, since this is important.
 
     Conditional probability is an important definition. For example, if $Y \in \left\{0, 1\right\}$:
@@ -37,13 +39,13 @@
 
     We also got an important theorem: 
     \[H\left(X, Y\right) = H\left(X\right) + H\left(Y | X\right)\]
-}
+\end{parag}
 
-\parag{Theorem: Chain rule for entropies}{
+\begin{parag}{Theorem: Chain rule for entropies}
     Let $S_1, \ldots, S_n$ be random variables. Then: 
     \[H_D\left(S_1, \ldots, S_n\right) = H_D\left(S_1\right) + H_D\left(S_2 | S_1\right) + \ldots + H_D\left(S_n|S_1, \ldots, S_{n-1}\right)\]
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let's use our expected value definition: 
         \begin{multiequality}
         & H\left(S_1, \ldots, S_n\right)  \\
@@ -59,18 +61,18 @@
          \end{multiequality}
 
          \qed
-    }
+    \end{subparag}
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         We observe that: 
         \[H\left(S_4 | S_3, S_2, S_1\right) = H\left(S_4 | S_1, S_2, S_3\right)\]
         
         Indeed, knowing that $\left(S_3 = s_3\right)  \land \left(S_2 = s_2\right) \land \left(S_1 = s_1\right)$ is equivalent to knowing that $\left(S_1 = s_1\right) \land \left(S_2 = s_2\right) \land \left(S_3 = s_3\right)$.
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Conditional entropy of a function}{
+\begin{parag}{Conditional entropy of a function}
     Let $X$ be an arbitrary random variable. Let $f\left(X\right)$ be a (deterministic) function of $X$. We want to analyse $H\left(f\left(X\right)|X\right)$.
 
     Let's take $X \in \left\{0, 1, 2, 3\right\}$ and: 
@@ -87,13 +89,13 @@
     \[H\left(f\left(X\right) | X\right) = 0\]
 
     In fact, this is completely general.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $X$ be an arbitrary random variable. Let $f\left(X\right)$ be a (deterministic) function of $X$. Then: 
     \[H\left(f\left(X\right) | X\right) = 0\]
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let $Y = f\left(X\right)$. Then, we see that:
         \begin{functionbypart}{p\left(y|x\right)}
             1, \mathspace \text{if } y = f \left(x\right) \\
@@ -107,10 +109,10 @@
         \[H\left(Y | X\right) = 0\]
         
         \qed
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example: Crypto Lemma}{
+\begin{parag}{Example: Crypto Lemma}
     Let $X, Y \in \left\{0, 1\right\}$ be a uniformly distributed random variable. Let $Z = X \oplus Y$. We want to compute $H\left(X, Y, Z\right)$.
 
     We can use our chain rule. We have many ways of computing it, some are easier than others: 
@@ -127,14 +129,14 @@
     \[H\left(Z|X\right) = \SI{1}{\bit} = H\left(Z\right)\]
     
     Which allows us to say that $X$ and $Z$ are independent.
-}
+\end{parag}
 
-\parag{Theorem}{
+\begin{parag}{Theorem}
     Let $S_1, \ldots, S_n$ be discrete  random variables. Then: 
     \[H\left(S_1, \ldots, S_n\right) \leq H\left(S_1\right) + \ldots + H\left(S_n\right)\]
     with equality if and only if $S_1, \ldots, S_n$ are independent.
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         By the chain rule, we know that: 
         \begin{multiequality}
         H\left(S_1, \ldots, S_n\right) =\ & H\left(S_1\right) + H\left(S_2|S_1\right) + \ldots H\left(S_n | S_1, \ldots, S_{n-1}\right)  \\
@@ -142,23 +144,23 @@
         \end{multiequality}
         
         \qed
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
-\parag{Corollary}{
+\begin{parag}{Corollary}
     We get the two following inequalities: 
     \[H\left(X, Y\right) \geq H\left(X\right)\] 
     \[H\left(X, Y\right) \geq H\left(Y\right)\]
     
-    \subparag{Proof}{
+    \begin{subparag}{Proof}
         Let's do a direct proof: 
         \[H\left(X, Y\right) = H\left(X\right) + H\left(Y |X\right) \geq H\left(X\right)\]
         since entropies can never be negative.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Example}{
+\begin{parag}{Example}
     Let's go back to the dice example, and their digits. Recall that we had two random variables $S_1, S_2 \in \left\{1, 2, \ldots 6\right\}$ which represent the result of two dice rolls, and two other random variables $L_1, L_2$ which represent the digits of the sum.
 
     We know that $H\left(L_1, L_2 | S_1, S_2\right) = 0$, since $L_1$ and $L_2$ are functions of $S_1$ and $S_2$.
@@ -174,10 +176,10 @@
     \[H\left(S_1, S_2 | L_1, L_2\right) = H\left(S_1, S_2\right) - H\left(L_1, L_2\right) = \SI{1.896}{\bit}\]
     
     In other words, when we have a function, we can easily get the entropy for its inverse.
-}
+\end{parag}
 
 \subsection{Random processes}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     Let's say we have a thousand random variables: $S_1, \ldots S_{1000}$. Then, conceptually, it works exactly as what we have done so far, we only need to get the joint distribution.
 
     However, it is much more interesting if we let the string evolve indefinitely (it goes to infinity). Let $I$ be a \textit{finite} subset of the integers, for instance: 
@@ -195,9 +197,9 @@
     \[\vdots\]
 
     We then do this for all finite subsets $I \subset \mathbb{Z}$. This is how we consider infinite strings.
-}
+\end{parag}
 
-\parag{Example 1 : Coin-Flip source}{
+\begin{parag}{Example 1 : Coin-Flip source}
     The source models a sequence $S_1, \ldots, S_n$ of $n$ coin flips. So, $S_i \in \mathcal{A} = \left\{H, T\right\}$ for $i = 1, 2, \ldots, n$.
 
     We know that $p_{S_i}\left(H\right) = p_{S_i}\left(T\right) = \frac{1}{2}$ for all $i$, and that coinflips are independent. Thus: 
@@ -209,7 +211,7 @@
     Also: 
     \[p_{S_i | S_{i-1}, \ldots}\left(s | s', s'', \ldots\right) = \frac{1}{2}, \mathspace \forall i, \forall s\]
     since they are independent.
-}
+\end{parag}
 
 
 
