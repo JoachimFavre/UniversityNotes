@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-04-11 at 19:00:31.
@@ -19,9 +21,9 @@
 
 }
 
-\parag{Architecture}{
+\begin{parag}{Architecture}
     Each entity needs to have at least one architecture (functional description), but it can have multiple. Indeed, we can implement the same functionality with different circuits.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{architectureVDHL.code}
 ARCHITECTURE <id_name> OF <entity_name> IS
@@ -32,21 +34,21 @@ END <id_name>;
 \end{filecontents*}
 
 
-\parag{Structure}{
+\begin{parag}{Structure}
     The architecture body looks like:
     \importcode{architectureVDHL.code}{VHDL}
 
     Each architecture has a unique name, and holds a reference to its corresponding entity. Also, they have a declaration section (which holds signals (wires), constants, components, and other stuff that are synthesisable) and a description section (implicite processes, explicite processes, or component instantiations). Every parts execute in parallel, not line by line.
 
     Most VHDL code written and used nowadays by designers is written following the RTL (Register Transfer Level) principle. This means that we separate sequential logic functions (flip-flops, for instance) from the combinatorial logic functions (the circuit logic of FSM, for example). This allows us to be more modular and to verify more easily that we did not make any mistake.
-}
+\end{parag}
 
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     If we want to make a triple or gate in VHDL, we can write \texttt{Y <= A OR B OR C}. Note that the input of a gate is on the left hand side of the \texttt{<=} operator, and the inputs of the gates are on the right hand side.
 
     Note that VHDL knows the gates \texttt{NOR, AND, NAND, OR, NOR, XOR, XNOR}.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{fullExampleVHDL.code}
 LIBRARY ieee;
@@ -66,12 +68,12 @@ END example;
 \end{filecontents*}
 
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let's consider the following code:
     \importcode{fullExampleVHDL.code}{VHDL}
 
     This realises a circuit mapping the LSB of \texttt{X} to \texttt{(A(0) AND NOT B(0)) NOR C(0)}, and the MSB of \texttt{X} to \texttt{(A(1) AND NOT B(1)) NOR C(1)}.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{architectureMoreComplex.code}
 ARCHITECTURE gate OF full_adder IS
@@ -93,7 +95,7 @@ BEGIN
 END gate1;
 \end{filecontents*}
 
-\parag{More complex example}{
+\begin{parag}{More complex example}
     Let's write code for the following circuit:
     \imagehere[0.7]{VHDLArchitectureExampleCircuit.png}
 
@@ -110,7 +112,7 @@ END gate1;
 
     Note that the order of the lines between the \texttt{BEGIN} and the \texttt{END} does not matter. In fact, we could also suppress wires:
     \importcode{architectureMoreComplexMoreConcise.code}{VHDL}
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{SRLatchVHDL.code}
 ARCHITECTURE srLatchArchitecture of srLatchEntity IS
@@ -123,13 +125,13 @@ BEGIN
 END srLatchArchitecture;
 \end{filecontents*}
 
-\parag{SR Latch}{
+\begin{parag}{SR Latch}
     Let us write the code for a SR-latch:
     \imagehere[0.5]{SRLatchCircuit.png}
 
     We need to introduce signals. Indeed, outputs are write-only and inputs are read-only (meaning that we cannot write on an output).
     \importcode{SRLatchVHDL.code}{VHDL}
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{faultyCode.code}
 ARHITECTURE common of doesItWork IS
@@ -140,7 +142,7 @@ BEGIN
     s_MySignal <= A(0) AND NOT A(1);
 \end{filecontents*}
 
-\parag{Short circuits}{
+\begin{parag}{Short circuits}
     Let's consider the following code:
     \importcode{faultyCode.code}{VHDL}
 
@@ -148,9 +150,9 @@ BEGIN
     \imagehere[0.7]{VHDLShortCircuitExample.png}
 
     This is a short circuit, and in real life it explodes \textit{(Professor screams ``boom'' and wakes up the whole class)}.
-}
+\end{parag}
 
-\parag{Constant}{
+\begin{parag}{Constant}
     To define a constant, we can use the following syntax:
     \begin{center}
         \texttt{CONSTANT <constant\_name> : <constant\_type> := <value>;}
@@ -158,7 +160,7 @@ BEGIN
 
     It is a good practice to prefix constants prefixed with \texttt{c\_}. If we are defining a constant of type \texttt{std\_logic}, we have to give the values in between single quote: \texttt{'1'}. Similarly, if we are defining a constant of type \texttt{std\_logic\_vector}, we have to give the value in between double quotes: \texttt{"001"}. We can also represent hexadecimal using a capital \texttt{X}: \texttt{X"FA00"}. However, note that every character represents four bits, thus we cannot use \texttt{s\_example <= X"18"} if \texttt{s\_example} is 5 bits (we would be giving it 8 bits when it is expecting 5). However, we can use the glue operator, taking \texttt{s\_example <= "1" \& X"8"}. Also, we can use the macro \texttt{OTHERS}: \texttt{s\_example <= (23 => '1', OTHERS => '0')} puts every bit to 0, except for the \nth{24}. Finally, we can modify part of the bits by doing \texttt{s\_example(23 DOWNTO 16) <= X''80''}.
 
-}
+\end{parag}
 
 
 

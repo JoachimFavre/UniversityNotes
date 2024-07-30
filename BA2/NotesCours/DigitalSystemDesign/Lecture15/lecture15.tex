@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-04-25 at 13:17:27.
@@ -20,11 +22,11 @@
 }
 
 \subsection{Explicit processes}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     For now, we have only seen implicit processes. To understand explicit processes, we first need to understand how HDL is simulated.
-}
+\end{parag}
 
-\parag{Simulation}{
+\begin{parag}{Simulation}
     We need to simulate a parallel system on a sequential machine, a computer. Thus, this is not a trivial task.
 
     We realise that we only have a change in our gates when there is an event. This means that we can use an \textit{event-driven} approach.
@@ -33,7 +35,7 @@
 
     When simulating, we can propagate events to processes that are sensitive to it, until all signals become stable. Note that there is no notion of time, since we are considering the zero-delay model. When we have an event, a sequential $\delta$-iterator is initialised for all signals in the process to the left of the \texttt{<=} operator (signals that may change). Also, these signals get now two values, namely the value seen before the even and the resulting $\delta$-value. We take as many $\delta$-iteration steps as we need to have the circuit reach stability (or stops if there are too many iterations (100k for instance) to block oscillations). Finally, the computer copies back the values of the $\delta$-variables back to signals, and the simulation continues until the next event.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let's consider the following circuit:
         \imagehere[0.5]{DeltaSimulationCircuitExample.png}
 
@@ -42,10 +44,10 @@
 
         So, at the event, the simulation fills in the following table (where ``Tr'' stands for ``Triggered by an event'', ``Fi'' stand for ``Fire an event'' and ``St'' stands for ``Stable''): 
         \imagehere{DeltaSimulationTableExample.png}
-    }
+    \end{subparag}
 
     Note that we can simulate this by adding the gate-delay to the fire action. However, they are not synthesizable since we cannot enforce a delay on a gate, they will be here but we cannot manipulate them.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{processSyntax.code}
 <process_identifier>: PROCESS(<sensitivity_list>) IS
@@ -54,7 +56,7 @@ BEGIN
 END PROCESS <process_identifier>;
 \end{filecontents*}
 
-\parag{Explicit processes}{
+\begin{parag}{Explicit processes}
     Simulating implicit processes can be very computationally intensive (or at least was at the time VHDL was invented). This is why explicit processes where invented.
 
     To make one, we write inside of the description section of an architecture:
@@ -64,7 +66,7 @@ END PROCESS <process_identifier>;
     \imagehere{ExpliciteProcessSensitivityList.png}
 
     Note that, however, the sensitivity list will be ignored when synthesizing the circuit. Thus, both will give the same result on a Gecko board.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{sequentialExplicitProcess.code}
 example: PROCESS (A, B) IS
@@ -76,14 +78,14 @@ BEGIN
 END PROCESS example;
 \end{filecontents*}
 
-\parag{Behaviour}{
+\begin{parag}{Behaviour}
     To understand the behaviour of an explicit process, we have to remember the $\delta$-iterator. Explicit processes are executed sequentially, and this is really important.
 
     For instance, let's look at the following code:
     \importcode{sequentialExplicitProcess.code}{vhdl}
 
     This is not a short-circuit, this process describes a nor gate since we are working sequentially. Note that the three first lines in the body are completely useless. Also, all values on the right hand side of the \texttt{<=} operator are always the values at $\delta$-iteration 0 (hence the values seen at the event).
-}
+\end{parag}
 
 
 

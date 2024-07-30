@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-03-07 at 13:18:17.
@@ -23,21 +25,21 @@
 
 \section{Number representation}
 
-\parag{Introduction}{
+\begin{parag}{Introduction}
     We have seen that a circuit can have multiple inputs and multiple outputs where each is represented using a logic function. We have also seen how to derive the smallest representation of those logic functions.
 
     Now, we wonder how to interprets those inputs and outputs. 
-}
+\end{parag}
 
-\parag{Definitions}{
+\begin{parag}{Definitions}
     Each of the $n$ inputs and $m$ outputs represent a quantity that can be either 1 or 0, we call this a \important{bit}. Multiple bits can be grouped together to form one dimensional arrays. A \important{nibble} is a group of 4 bits, and a \important{byte} is a group of 8 bits.
 
     Groups are nice, but we may wonder how to form a nibble from the inputs $A$, $B$, $C$, and $D$. We could take $ABCD$, $BCDA$, $CBDA$, \ldots We need to define an order to be able to uniquely identify the inputs and outputs. Let us define $I_i$ for $i = 0, \ldots, n-1$ as the set of ordered inputs of a circuit. For example, if $n = 8$, the inputs are $I_7 I_6 I_5 I_4 I_3 I_2 I_1 I_0$. Let us also define $O_j$ for $j = 0, \ldots, m-1$ to be the set of ordered outputs of a circuit. We usually use vectors $O$ and $I$ to represent such sets.
 
     The bits $I_0$ and $O_0$ are called the \important{Least Significant Bits} (LSB). The bits $I_{n-1}$ and $O_{n-1}$ are called the \important{Most Significant Bits} (MSB). We always write the MSB on the left and the LSB on the right.
-}
+\end{parag}
 
-\parag{Coding}{
+\begin{parag}{Coding}
     One way to represent numbers is the following:
     \begin{center}
     \begin{tabular}{c|c}
@@ -67,9 +69,9 @@
     This is called the \important{one-hot} encoding.
 
     Those two encoding are very inefficient. Instead, let's use \important{place-value notation}.
-}
+\end{parag}
 
-\parag{Basis}{
+\begin{parag}{Basis}
      We are used to decimal, where a 2 on the rightmost is 2 units, but if you move it a bit to the left (getting $20$), then it represents $2\cdot 10$. We can use a binary interpretation on a binary system (a binary system alone could represent people having headaches or not, for example). For instance: 
     \[1011_b = 1\cdot 2^3 + 0\cdot 2^2 + 1\cdot 2^1 + 1\cdot 2^0 = 11\]
     
@@ -79,9 +81,9 @@
     Indeed, $101_b = 5_o$, $001_b = 1_o$, $101_b = 5_o$ and $001_b = 1_o$. Note that those conversion tricks do not work with any basis, octal and hexadecimal are some kind of exceptions since they are powers of two. Speaking of which, we can also use the \important{hexadecimal number system}, base 16: 
     \[1010\,0110\,1001_b = A69_h = \hex{A69}\]
 
-}
+\end{parag}
 
-\parag{Basis conversion}{
+\begin{parag}{Basis conversion}
     We want to transform a number $k$ in base 10 to a place-value number with base $b$. To do that, we are looking for $a_n, \ldots, a_0 \in \left\{0, 1, \ldots, b - 1\right\}$ such that: 
     \[k = a_0 + a_1 \cdot b + \ldots a_n \cdot b^n\]
     
@@ -90,7 +92,7 @@
 
     Thus, doing an integer division between $k$ and $b$ gives $a_1 + a_2 b + \ldots + a_n \cdot b^{n-1}$ with rest $a_0$. We can do that again to get $a_2$, and so on until the result of the division gives 0.
 
-    \subparag{Example}{
+    \begin{subparag}{Example}
         Let's say we want to convert $768_{B=10}$ to base 7. Dividing it multiple times, we see that: 
         \[768 = 109\cdot 7 + {\color{red}5}\]
         \[109 = 15\cdot 7 + {\color{red}4}\]
@@ -98,12 +100,12 @@
         \[1 = 0\cdot 7 + {\color{red}2}\]
 
         So, we get $768_{B=10} = 2145_7$
-    }
+    \end{subparag}
     
-}
+\end{parag}
 
 
-\parag{Addition}{
+\begin{parag}{Addition}
     Let's see how we do additions. Doing column addition, we have:
     \begin{center}
     \begin{tabular}{r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}}
@@ -127,13 +129,13 @@
         & & 1 & 0 & 6 & $3_{B=7}$
     \end{tabular}
     \end{center}
-}
+\end{parag}
 
-\parag{Circuit}{
+\begin{parag}{Circuit}
     Let's say that we have a circuit that adds two three bit numbers and results in a three bit number. Then, the circuit yields $110 + 010 = 000$ since there are only three bits, which is obviously wrong. It can happen that a number cannot be represented in our situation, this is called an \important{overflow situation}. Any digital system has only a limited number of $k$-bits ($k=3$ in this example).
-}
+\end{parag}
 
-\parag{Substraction}{
+\begin{parag}{Substraction}
     Again, let's do a column substraction:
     \begin{center}
     \begin{tabular}{r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}r@{\,}}
@@ -148,13 +150,13 @@
     When we cannot do our subtraction, we borrow from our neighbour (writing a one over it) and add 10 to the digit we are currently on. When we get to our neighbour, it has one unit less since we borrowed it from it. In our example, $1 - 9$ cannot be done, so we borrow from the first column, giving us $11 - 9 = 2$. Then, when we compute the first column, it is like if we had 6 instead of the 7 since we borrowed from it.
 
     Similarly as before, when we build a circuit, we may have a borrow at a position that does not exist. This leads to situations such as $010 - 011 = 111$, which is obviously wrong. This is called an \important{underflow situation}. They can occur due to the fact that we have a limited number of bits.
-}
+\end{parag}
 
-\parag{Practical note}{
+\begin{parag}{Practical note}
     Note that if we want to make a circuit adding two 8-bit numbers. This makes a truthtable with $2^{16} > 65000$ entries. It is much better to slice the problem in subproblems using a katana (I use the Professor's words). This is called the divide and conquer method, or think first before doing.
 
     In our context, a truthtable can be used to add two 1-bit numbers. From that, we can build a 2-bit adder, from which we can build a 4-bit adder, from which we can make an 8-bit adder.
-}
+\end{parag}
 
 
 

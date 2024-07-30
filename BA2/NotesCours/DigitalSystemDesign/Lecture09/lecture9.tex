@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-03-21 at 14:11:44.
@@ -21,16 +23,16 @@
 }
 
 \section{Hazards}
-\parag{Technology}{
+\begin{parag}{Technology}
     Today, all gates are implemented in semiconductor material. There are two kinds of transitors used: Transistor to Transistor Logic (TTL) and Complementary Metal-Oxide-Semiconductor (CMOS). The gates come in the form of an Integrate Circuit (IC).
 
     For example, the IC 7402, which is a classical TTL, looks like:
     \imagehere[0.7]{IC7402Circuit.png}
 
     Let's look more deeply into the NOR-gate. It has two inputs and one output. In both TTL-technology and CMOS-technology, it is made using 4 transistors. Thus, in both cases there are capacitors, which create a delay in the gates. 
-}
+\end{parag}
 
-\parag{Hazards}{
+\begin{parag}{Hazards}
     For now, let's assume each gate has the same gate delay (this is not completely true, even for two NOR-gates).
 
     Let's look at the following circuit (the circuit of a XOR gate):
@@ -43,18 +45,18 @@
     \imagehere[0.8]{XorGateHazardTimingDiagramHazards.png}
 
     We can see multiple effects. First, $Y$ is shifted a bit to the right. Second, much worse, there are 0 levels that appear in between. We call those \important{hazards}.
-}
+\end{parag}
 
-\parag{Gated clocks}{
+\begin{parag}{Gated clocks}
     Because of the hazards, we must not do gated clocks. Indeed, let us consider the following circuit:
     \imagehere[0.5]{GatedClockExample.png}
 
     Since the clock of the D-flipflop is not directly connected to the clock of the circuit, we call this a gated clock. In the zero-delay model, we are expecting it to have 2 positive edges on the timing diagram above. However, in the real world it would have hazards, and thus we would have 4 positive edges. This is thus clearly a problem to do a gated clock.
 
     Such hazards are no problem if there is no gated clocks, if they arrive in between two positive edges.
-}
+\end{parag}
 
-\parag{Real memory}{
+\begin{parag}{Real memory}
     Let's now look at real D-FlipFlops. We can compare the zero-dely model, and what happens in the real world:
     \imagehere[0.7]{RealWorldDFlipFlop.png}
 
@@ -69,20 +71,20 @@
 
     The clock must not give a positive edge during the time of \important{the critical path}, the longest time of the different paths in the transition logic. Thus, the period of the clock must be at least $t_{hold} + t_{criticalPath} + t_{setup}$. Clocking the circuit slower is always good, but faster is not possible.
 
-    \subparag{Implications}{
+    \begin{subparag}{Implications}
         Because of such effect, a FSM can jump into a ghost state.
 
         This is also why we cannot overclock computers to infinity. If the positive edge happens during before the end of the critical path, the value entering the D-flipflop may be stable, but it may be a hazard. Also, the D may change when the clock triggers, because all possible ways in the transition logic did not have time to take place. In both cases, random things appear.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Synchroniser}{
+\begin{parag}{Synchroniser}
     Let's say we have two circuits linked on two clocks, which are both of the same frequency. We cannot make them communicate directly. Indeed, the clocks are not synchronised (they may not have the same phase), and clocks have some kind of jitter: their frequency does not remain exactly constant.
 
     To bypass the problem, we can put two D-flipflop in series. The higher our clock frequency is, the more D flip-flops we can put in series. The idea is that we are putting the value the first circuit yields in ``quarantine''. If there is no problem of metastability, then we will get its value. However, if there is a metastable state happening, then it will yield a random result, but which is at least stable (if we get a metastable as an input, then it breaks everything). Note that we are never 100\% sure that we will get a stable state at the end, but the probability to have a metastable state decreases exponentially as the quarantine time increases (the more D flip flops we put in series).
 
     \svghere[0.95]{synchroniser.svg}
-}
+\end{parag}
 
 
 \end{document}

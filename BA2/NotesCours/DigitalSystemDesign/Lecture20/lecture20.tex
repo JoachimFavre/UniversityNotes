@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-05-12 at 14:14:44.
@@ -38,19 +40,19 @@
     38:    15 00 00 00    l.nop 0x0
 \end{filecontents*}
 
-\parag{Assembly}{
+\begin{parag}{Assembly}
     When we compile a C program, it generates machine language. For instance, for an OpenRisc CPU, it could give:
     \importcode{assemblyExample.code}{}
 
     The number on the left represents the memory address: each instruction is in a sequential memory location. For an instruction we need 4 bytes (since this CPU is 32 bits), thus each number increases by 4. Each 32-bit number in the second column represents an instruction. The third part is human-readable assembly code (this is the same, but expressed for humans). In the assembly code, the r1 to r6 are the registers, which are basically D-flipflop. Those are our variables. Naturally, the only thing the CPU understands is the hexadecimal part.
-}
+\end{parag}
 
-\parag{Executable}{
+\begin{parag}{Executable}
     When the code is compiled, it is stored in an .elf or .exe file. The first part is an header, then the instruction in hexadecimal, some read-only data (all constants), and finally the read/write data (instructions or arrays we want to create in the RAM at the launch of the program). This gives the following diagram:
     \imagehere[0.4]{ExeStructure.png}
-}
+\end{parag}
 
-\parag{RISC-architecture}{
+\begin{parag}{RISC-architecture}
     The RISC-architecture is the easiest architecture of CPU. Its registers are D-flipflop.
 
     The first thing, only done once when starting the program, the executable is put to memory.
@@ -61,9 +63,9 @@
     \imagehere{RISCArchitectureExampleDiagram.png}
 
     This is not that complex, but there is a lot of combinational logic. This is just a big finite state machine, and the program determines which transitions we are going to take.
-}
+\end{parag}
 
-\parag{Add flipflops}{
+\begin{parag}{Add flipflops}
     This is very slow, because of all this combinational logic. We wanted to make them faster (going from Mhz to Ghz), thus we cut the critical path time by adding some flipflops. There is an initial delay before it starts executing, but there is still one instruction at each clock cycle.
     \imagehere{CpuAddedFlipFlops.png}
 
@@ -77,11 +79,11 @@
     \imagehere{CpuFlush.png}
 
     All branchings leads to flushing, meaning that they take multiple cycles. We can also do some things, such as branching detection units, and so on, but most processors do not have it.
-}
+\end{parag}
 
-\parag{Execution}{
+\begin{parag}{Execution}
     Note that there is a full execution example on the slides, if it interests you. I don't think it is important to put it here since all the important concepts are already presented.
-}
+\end{parag}
 
 
 \end{document}

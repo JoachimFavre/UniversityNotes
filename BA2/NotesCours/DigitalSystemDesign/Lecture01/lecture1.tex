@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-02-21 at 13:06:02.
@@ -23,52 +25,52 @@
 
 \section{Digital logic}
 \subsection{Logic}
-\parag{Digital logic versus Analog circuits}{
+\begin{parag}{Digital logic versus Analog circuits}
     The first transistor was invented in 1947 by Shockley, Bardeen and Brattain, who got a Nobel prize for it. This is the basis for almost all digital and analog circuits nowadays. We can make a graph between its input voltage and its output voltage:
     \svghere[0.5]{TransistorGraph.svg}
 
     There is the analog part, for which there is an infinite number of value, and the digital part (the very beginning and the very end), which is basically a switch. For now, using the digital part --- either its on, or off --- is much easier, so we will only consider this for this course.
-}
+\end{parag}
 
-\parag{Logic}{
+\begin{parag}{Logic}
     We can for example have the expression ``when I'm late and take a taxi or I'm not late and take the bus then I'm on time for the course''. 
 
     This expression has variables (I, take a taxi, \ldots), operators (and, or), it has one or more inputs, and one output.
 
     Digital logic is based on logic expressions of two valued variables.
-}
+\end{parag}
 
-\parag{Operators}{
-    \subparag{Not}{
+\begin{parag}{Operators}
+    \begin{subparag}{Not}
         The \important{not operator} is called the complement, written $\lnot A$ and read ``not $A$''.
 
         For example, let's consider the expression ``if you cannot see then your are blind'' (this is not correct since we can close our eyes, but it is not important). Then, we can translate this to: 
         \[\text{blind} = \lnot\text{see}\]
-    }
+    \end{subparag}
 
-    \subparag{And}{
+    \begin{subparag}{And}
         The \important{and operator} is called the conjunction, written $A \land B$. 
         For example, ``if you mix flour and milk and eggs then you have pancakes'' can be translated as: 
         \[\text{pancakes} = \text{flour} \land \text{milk} \land \text{eggs}\]
         
-    }
+    \end{subparag}
     
-    \subparag{Or}{
+    \begin{subparag}{Or}
         The \important{or operator} is called the disjunction, written $A \lor B$.
 
         For example, ``if John takes money or Marry takes money, then there is less money'', can be translated as: 
         \[\text{less money} = \text{John takes money} \lor \text{Marry takes money}\]
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{More on disjunction}{
+\begin{parag}{More on disjunction}
     Let's take the sentence ``if John is walking or John is biking then he is active''. This is definitely a disjunction, since we have a ``or''. However, it is not possible to walk and bike at the same time (we could argue that yes, but it is not important either). So, we say that this is an \important{exclusive disjunction}. We write it $A \oplus B$, and sometimes say ``xor'' or ``logic exclusion''.
 
     We can write this using conjunctions and regular disjunctions: 
     \[A \oplus B = \left(\lnot A \land B\right) \lor\left(A \land\lnot B\right)\]
-}
+\end{parag}
 
-\parag{Truth Table}{
+\begin{parag}{Truth Table}
     We know that each logical expression has $n$ inputs and one output. Since each input can only have two states --- T and F --- we have $2^n$ different input combinations for $n$ inputs. We can write the \important{truth table} of a logical expression.
 
     Let's consider the example ``if John takes money ($A$) or ($\lor$) Marry takes money ($B$), then there is less money ($Y$)''. We have $Y = A \lor B$. Let's draw its truth table.
@@ -98,9 +100,9 @@
     \end{center}
 
     Sometimes, the don't care symbol is ``x'' instead of ``-'', but we will not use it on purpose, since the ``x'' symbol will be use for the boom symbol.
-}
+\end{parag}
 
-\parag{Example 1}{
+\begin{parag}{Example 1}
     Let's consider the following truth table:
     \begin{center}
         \begin{tabular}{c|c|c}
@@ -113,9 +115,9 @@
     \end{center}
     
     This truth tables only has 4 unique possibilities, but lists 5 entries where two lines are double: 1, 1, 1 is described twice. 
-}
+\end{parag}
 
-\parag{Example 2}{
+\begin{parag}{Example 2}
     Let's take the truth table for the logic exclusion:
     \begin{center}
         \begin{tabular}{c|c|c}
@@ -129,20 +131,20 @@
     \end{center}
     
     We want to search for a don't care symbol in this truth table. If $A = F$, then $B$ has an influence. We can do the same reasoning when $A = T$, $B = F$, $B = T$. Thus, it is impossible to put a don't care symbol.
-}
+\end{parag}
 
-\parag{Digital logic and algebra}{
+\begin{parag}{Digital logic and algebra}
     We have seen a transistor giving in the two values \textit{On} (at $\SI{3.3}{\volt }$) and \textit{Off} (at $\SI{0}{\volt }$). We then also saw logic expressions with their two values \textit{True} and \textit{False}. We can thus define them to be equal, and even use numbers to simplify our life:
     \begin{enumerate}
         \item Off = False = 0
         \item On = True = 1
     \end{enumerate}
-}
+\end{parag}
 
-\parag{Operators}{
+\begin{parag}{Operators}
     We now want to take a look at what happens with the operators.
 
-    \subparag{Conjunction}{
+    \begin{subparag}{Conjunction}
         Let's consider the table of the sentence ``if you have a password and a login, then you can use the computer'' --- i.e. $C = P \land L$ --- using numbers:
         \begin{center}
             \begin{tabular}{c|c|c}
@@ -158,9 +160,9 @@
         We notice that this is exactly a multiplication, $C = P\cdot L$. The difference between $\land$ and $\cdot$ is that the first one is used in logic and philosophy whereas and the second one is more usual in electronic.
 
         We are allowed to use both, but we need to be consistent with the symbol set we use, if we use ancient Greek symbols, then we must always use them, but no electric symbols. We must not write expressions such as $A = B \land C \cdot D$.
-    }
+    \end{subparag}
 
-    \subparag{Disjunction}{
+    \begin{subparag}{Disjunction}
         Let's consider the sentence ``if you have an apple or an orange then you have a fruit''. Let's draw the truth table:
         \begin{center}
             \begin{tabular}{c|c|c}
@@ -177,25 +179,25 @@
         We really want to define $F = A \lor O$ to be $F = A + O$, even though there is a problem with the last line. 
 
         In fact, we see that we have a problem with the $1 + 1 = 2$, thus we can choose what it is equal. If we choose $1 + 1 = 1$, then we have a disjunction, but if we pick $1 \oplus 1 = 0$, then we have the exclusive disjunction, xor. So, this leads to ``two additions''.
-    }
+    \end{subparag}
 
-    \subparag{Precedence}{
+    \begin{subparag}{Precedence}
         We know that $5 + 2\cdot 3 = 5 + 6 = 11$ because of priority of operations. The usual hierarchy is parenthesis, then multiplication, and then addition.
 
         In digital logic, we have the complement, parenthesis, the and, the xor and finally the or: 
         \[\bar{A}, \mathspace \left(\right), \mathspace \cdot, \mathspace \oplus, \mathspace +\]
         
-    }
-}
+    \end{subparag}
+\end{parag}
 
 \subsection{Boolean algebra}
-\parag{Boolean Algebra}{
+\begin{parag}{Boolean Algebra}
     George Boole (1815-1864) formulated in 1847 the \textit{Mathematical Analysis of Logic}, which is based on mathematics restricted to two quantifiers: 0 and 1. This is now known as Boolean Algebra.
 
     Claude Elwood Shannon (1916-2001) published in 1937 \textit{A Symbolic Analysis of Relay and Switch Circuits}. He proved that Boolean Algebra could be used for digital circuit simplification, and it is still the basis for all circuit design, and simplification tools and practices.
-}
+\end{parag}
 
-\parag{Gates}{
+\begin{parag}{Gates}
     Every mathematical logic operator has two types of symbols: ANSI and IEC. The second ones are used in Europe and the first one are used in the rest of the world; we are expected to know both of them.
 
     \svghere[0.9]{LogicGates.svg}
@@ -205,7 +207,7 @@
     The IEC or operator is represented using a $\geq 1$ since the sum of the two inputs needs to be greater than or equal to 1. Similarly, for the xor operator, the sum of the inputs needs to be exactly equal to 1.
 
     We can draw most of the gates using more than two inputs, except for the xor gate for a reason which will be explained later.
-}
+\end{parag}
 
 \end{document}
 

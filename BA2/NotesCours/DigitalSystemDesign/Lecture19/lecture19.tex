@@ -1,3 +1,5 @@
+% !TeX program = lualatex
+
 \documentclass[a4paper]{article}
 
 % Expanded on 2022-05-09 at 13:26:06.
@@ -19,26 +21,26 @@
 }
 
 \subsection{Testbenching}
-\parag{Introduction}{
+\begin{parag}{Introduction}
     We may want the computer to automatically check our code, instead of us needing to look at the waves and making thousands of mistakes. This leads to testbenching. This is what is used for automatically grading the TPs.
 
     Note that this is not synthesisable. 
 
-    \subparag{Remark}{
+    \begin{subparag}{Remark}
         Note that everything is this subsection will not be at the final exam. However, this is very useful, so we should still be able to use it for next year.
-    }
-}
+    \end{subparag}
+\end{parag}
 
-\parag{Testbench}{
+\begin{parag}{Testbench}
     The idea is to have a circuit which checks our circuit. 
 
     Its \texttt{ENTITY} contains no external connection (thus no \texttt{PORT} declaration, since it is not mandatory), and the \texttt{ARCHITECURE} has the design to be tested as \texttt{COMPONENT}, a list with signals that are to be connected to the input(s) and the outputs of the DUT (Device Under Test), the instantiation of the DUT, the stimuli generator (gives the different testing vectors, written as an explicit process) and the output checker (as implicit or explicit process). 
 
     This makes the following harnas, which is non-synthesizable:
     \imagehere{WorkbenchNonSynthesisableHarnas.png}
-}
+\end{parag}
 
-\parag{Stimuli generator}{
+\begin{parag}{Stimuli generator}
     There are two ways of testing. One way is exhaustive testing: we check all possibilities. Another way is typical and corner case testing: we only take a subset of all the different possibilities. This leads to some danger, since we are not 100\% sure that everything is correct. 
     
     To generate the cases for typical and corner case testing, we can take some random entries out of the truth table (this is easy, but error prone). Another way, named the golden reference method, is to have a functional model (named the ``golden reference'', and generated in python for instance) that generates the cases. A third way is to use a software that generates set of cases from a functional description.
@@ -46,7 +48,7 @@
     Each of these cases forms one test vector, which consists of the input values and the expected output values. Using those methods, we generate a sequence of test vectors.
 
     Now, we can put a vector in our DUT, wait a bit (we do not want the checker to see hazards), and look at the reaction of our DUT.
-}
+\end{parag}
 
 \begin{filecontents*}[overwrite]{testbenching.code}
 ARCHITECTURE vector OF testbench IS
@@ -119,26 +121,26 @@ sim : PROCESS
     END PROCESS;
 \end{filecontents*}
 
-\parag{Example}{
+\begin{parag}{Example}
     We can make the testbench, for instance (note that a process without sensitivity list is executed only once, at the start of the simulation):
     \importcode{testbenching.code}{vhdl}
     
     Doing this is a lot of things to write, so we would like to make it nicer and remove repeting code.
-}
+\end{parag}
 
-\parag{Output reaction checker}{
+\begin{parag}{Output reaction checker}
     We now want to compare the value automatically. To do this, we can at the same time improve our stimuli generator (note that the \texttt{ASSERT} and the \texttt{PROCEDURE} clauses are non-synthesisable):
     \importcode{bettertestbench.code}{vhdl}
     
-}
+\end{parag}
 
-\parag{Assert clause}{
+\begin{parag}{Assert clause}
     The assert clause works as:
     \begin{center}
         \texttt{ASSERT <condition> REPORT <message> SEVERITY <level>;}
     \end{center}
     
     If the condition is true, then the assert does nothing, if it is false then it will print the message (which needs to be written in between quotation marks) and do something depending on the severity level.  For the serverities \texttt{note}, \texttt{warning} and \texttt{error}, the message is printed differently and the simulation continues, but for the \texttt{failure} it is printed the same way as an \texttt{error} and the simulator stops.
-}
+\end{parag}
 
 \end{document}
