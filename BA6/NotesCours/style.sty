@@ -78,6 +78,7 @@
 \usepackage{xifthen}
 \usepackage{calc}  % To do computations for lengthes
 \usepackage[useregional, showdow]{datetime2}  % to handle dates
+\usepackage{texdate}  % To display today's date (could probably be merged with datetime2 at some point)
 \usepackage{changepage}  % for adjustwidth environment
 \usepackage{environ}  % To create new environments more easily
 \usepackage{bm}  % To have bold in maths
@@ -91,7 +92,7 @@
 % This is a very bad idea since it removes page equalising.
 % However, I want to have a very hard control over where
 % my pictures are, so I don't really have any other way
-% \raggedbottom  % source: https://tex.stackexchange.com/a/65356
+\raggedbottom  % source: https://tex.stackexchange.com/a/65356
 
 % Colours
 \definecolor{maincolour}{HTML}{004A7F}
@@ -109,6 +110,7 @@
 % Header and footter lengths
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{12.66003pt}  % necessary sometimes
 
 % Lists, enumerations and description
 \setlist{left=15pt, noitemsep, topsep=\parskip, itemsep=\parskip}
@@ -301,6 +303,8 @@
 \DeclareMathOperator{\rang}{rang}
 \DeclareMathOperator{\rank}{rank}
 \DeclareMathOperator{\dist}{dist}
+\let\proj\relax  % undefine the definition from quantikz
+\DeclareMathOperator{\proj}{proj}
 \DeclareMathOperator{\Tr}{Tr}
 
 % Algebra
@@ -545,6 +549,7 @@
 % ##### 05. Lecture headers #####
 % This provides:
 %   \lecture: Draws a line to show the start of a new lecture.
+%   \chapterafterlecture: A chapter that does not have any page change, to appear after a \lecture.
 %   \lecturetitelsummary: Displays the title and summary of some lecture, used at the start of the document.
 %   \listoflectures: Makes a \tableofcontents-styled list of lectures
 %   \invinsiblelistofquestions: Makes LaTeX believe we want a list of all the \questions in the document, for it to generate a file.questions. 
@@ -587,6 +592,19 @@
     \label{lecture#1}
     \vspace{1em}
     \nopagebreak
+}
+
+\newcommand{\chapterafterlecture}[2][]{
+
+    \let\defaultclearpage\clearpage
+    \let\clearpage\relax
+    % Thanks ChatGPT
+    \ifx\\#1\\% Check if the optional argument is empty
+        \chapter{#2}% If empty, use only the mandatory argument
+    \else
+        \chapter[#1]{#2}% If not empty, use both optional and mandatory arguments
+    \fi
+    \let\clearpage\defaultclearpage
 }
 
 \newcommand{\lecturetitlesummary}[3]{  % #1: lecture no, #2: date, #3: title
