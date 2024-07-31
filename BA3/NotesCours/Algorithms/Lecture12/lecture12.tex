@@ -26,7 +26,7 @@
     The goal is that, given a \textit{sorted} sequence $K = \left\langle k_1, \ldots, k_n\right\rangle$ of $n$ distinct key, we want to build a binary search tree. There is a slight twist: we know that the probability to search for $k_i$ is $p_i$ (for instance, on social media, people are much more likely to search for stars than for regular people). We thus want to build the binary search tree with minimum expected search cost.
 
     The cost is the number of items examined. For a key $k_i$, the cost is given by $\text{depth}_T\left(k_i\right) + 1$, where the term $\text{depth}_T\left(k_i\right)$ tells us the depth of $k_i$ in the tree $T$. This gives us the following expected search cost: 
-    \autoeq{\unexpanded{\exval \left[\text{search cost in $T$}\right] = \sum_{i=1}^{n} \left(\text{depth}_T\left(k_i\right) + 1\right)p_i = \sum_{i=1}^{n} p_i + \sum_{i=1}^{n} \text{depth}_T\left(k_i\right) = 1 + \sum_{i=1}^{n} \text{depth}_T\left(k_i\right)p_i}}
+    \autoeq{\exval \left[\text{search cost in $T$}\right] = \sum_{i=1}^{n} \left(\text{depth}_T\left(k_i\right) + 1\right)p_i = \sum_{i=1}^{n} p_i + \sum_{i=1}^{n} \text{depth}_T\left(k_i\right) = 1 + \sum_{i=1}^{n} \text{depth}_T\left(k_i\right)p_i}
     
     \begin{subparag}{Example}
         For instance, let us consider the following tree and probability table:
@@ -71,7 +71,7 @@
     \[\exval \left[\text{search cost deeper}\right] = \sum_{i=1}^{n} \left(\text{depth}_T\left(k_i\right) + 2\right)p_i = \sum_{i=1}^{n} \left(\text{depth}_T\left(k_i\right) + 1\right)p_i + \sum_{i=1}^{n} p_i\]
 
     This means that we, if we know two trees which we want to merge using a root, we can easily compute the expected search cost through a recursive function:
-    \autoeq{\unexpanded{\exval \left[\text{search cost}\right] = p_r + {\color{red!50!black}\left(\sum_{\ell=i}^{r-1}  p_\ell + \exval \left[\text{search cost in left subtree}\right]\right)} \fakeequal + {\color{green!50!black}\left(\sum_{\ell=r+1}^{j} p_\ell + \exval \left[\text{search cost in right subtree}\right]\right)} = \exval\left[\text{search cost left subtree}\right] + \exval\left[\text{search cost right subtree}\right] + \sum_{\ell=i}^{j} p_\ell}}
+    \autoeq{\exval \left[\text{search cost}\right] = p_r + {\color{red!50!black}\left(\sum_{\ell=i}^{r-1}  p_\ell + \exval \left[\text{search cost in left subtree}\right]\right)} \fakeequal + {\color{green!50!black}\left(\sum_{\ell=r+1}^{j} p_\ell + \exval \left[\text{search cost in right subtree}\right]\right)} = \exval\left[\text{search cost left subtree}\right] + \exval\left[\text{search cost right subtree}\right] + \sum_{\ell=i}^{j} p_\ell}
 
     \imagehere[0.5]{BinarySearchTreeMergeDepth.png}
 
