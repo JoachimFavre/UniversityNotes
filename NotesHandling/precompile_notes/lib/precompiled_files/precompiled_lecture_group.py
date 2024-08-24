@@ -9,8 +9,11 @@ from lib.course import Course
 from lib.lecture_loader import LectureLoader
 from lib.style import Style
 
+
 class PrecompiledLectureGroup(AbstractPrecompiledFiles):
     def __init__(self, course: Course, lectures: List[PrecompiledLecture]):
+        _verify_not_summary(course)
+
         super().__init__(course)
         self.lectures = sorted(lectures)
 
@@ -24,6 +27,8 @@ class PrecompiledLectureGroup(AbstractPrecompiledFiles):
     
     @staticmethod
     def from_course(course: Course) -> "PrecompiledLectureGroup":
+        _verify_not_summary(course)
+
         result: List[PrecompiledLecture] = []
         is_english = course.loader.config().english
         for path in course.loader.lecture_paths():
@@ -96,3 +101,8 @@ class PrecompiledLectureGroup(AbstractPrecompiledFiles):
 
         for lecture in self.lectures:
             lecture.write(root_path)
+
+
+def _verify_not_summary(course: Course):
+    if course.is_summary:
+        raise ValueError("A PrecompiledLectureGroup cannot be a summary. Use a PrecompileSummary instead.")
