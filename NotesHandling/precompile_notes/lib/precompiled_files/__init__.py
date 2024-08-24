@@ -1,0 +1,3 @@
+from .abstract_precompiled_files import AbstractPrecompiledFiles
+from .precompiled_lecture_group import PrecompiledLectureGroup
+from .precompiled_lecture import PrecompiledLecture

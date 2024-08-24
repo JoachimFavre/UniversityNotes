@@ -27,7 +27,7 @@ from typing import List
 from lib.tags import Tags
 from lib.course import Course
 from lib.logger import Logger
-from lib.precompiled_lecture_group import PrecompiledLectureGroup
+from lib.precompiled_files import PrecompiledLectureGroup
 
 
 courses: List[Course] = [

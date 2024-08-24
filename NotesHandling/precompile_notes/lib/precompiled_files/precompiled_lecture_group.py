@@ -3,10 +3,10 @@ from pathlib import Path
 from typing import Dict, List
 from typing_extensions import override
 
-from lib.abstract_precompiled_files import AbstractPrecompiledFiles
+from .abstract_precompiled_files import AbstractPrecompiledFiles
+from .precompiled_lecture import PrecompiledLecture
 from lib.course import Course
 from lib.lecture_loader import LectureLoader
-from lib.precompiled_lecture import PrecompiledLecture
 from lib.style import Style
 
 class PrecompiledLectureGroup(AbstractPrecompiledFiles):
