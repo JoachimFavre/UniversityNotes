@@ -156,6 +156,9 @@ class Precompiler:
         
         if latex.count(r"\later") > 0:
             Logger.warn("A note for later was left.", file_path)
+        
+        if latex.count(r"\unexpanded") > 0:
+            Logger.warn("An unexpanded was kept.", file_path)
 
         if latex.count("bmatrix") > 0:
             Logger.warn("A bmatrix was left.", file_path)

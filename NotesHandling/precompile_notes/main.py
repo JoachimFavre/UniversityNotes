@@ -24,6 +24,7 @@ from pathlib import Path
 import time
 from typing import List
 
+from lib.tags import Tags
 from lib.course import Course
 from lib.logger import Logger
 from lib.precompiled_lecture_group import PrecompiledLectureGroup
@@ -31,44 +32,46 @@ from lib.precompiled_lecture_group import PrecompiledLectureGroup
 
 courses: List[Course] = [
     # BA1
-    Course(is_bachelor=True, semester=1, name="Analyse-1"),
-    Course(is_bachelor=True, semester=1, name="AlgebreLinaire"),
-    Course(is_bachelor=True, semester=1, name="AICC-1"),
+    #Course(is_bachelor=True, semester=1, name="Analyse-1"),
+    #Course(is_bachelor=True, semester=1, name="AlgebreLinaire"),
+    #Course(is_bachelor=True, semester=1, name="AICC-1"),
 
     # BA2
-    Course(is_bachelor=True, semester=2, name="AICC-2"),
-    Course(is_bachelor=True, semester=2, name="Analyse-2"),
+    #Course(is_bachelor=True, semester=2, name="AICC-2"),
+    #Course(is_bachelor=True, semester=2, name="Analyse-2"),
     Course(is_bachelor=True, semester=2, name="Analyse-2-MethodesDeDemonstration"),
-    Course(is_bachelor=True, semester=2, name="DigitalSystemDesign"),
+    #Course(is_bachelor=True, semester=2, name="DigitalSystemDesign"),
     
     # BA3
-    Course(is_bachelor=True, semester=3, name="Algorithms"),
-    Course(is_bachelor=True, semester=3, name="Analyse-3"),
-    Course(is_bachelor=True, semester=3, name="ComputerNetworks"),
-    #Course(is_bachelor=True, semester=3, name="IntroToMachineLearning-BA3-Summary"),
-    Course(is_bachelor=True, semester=3, name="NumericalMethods"),
+    #Course(is_bachelor=True, semester=3, name="Algorithms"),
+    #Course(is_bachelor=True, semester=3, name="Analyse-3"),
+    #Course(is_bachelor=True, semester=3, name="ComputerNetworks"),
+    #Course(is_bachelor=True, semester=3, name="IntroToMachineLearning-BA3-Summary", is_summary=True),
+    #Course(is_bachelor=True, semester=3, name="NumericalMethods"),
     
     # BA4
-    Course(is_bachelor=True, semester=4, name="Analyse-4"),
-    Course(is_bachelor=True, semester=4, name="ProbabilityAndStatistics"),
-    Course(is_bachelor=True, semester=4, name="SignalsAndSystems"),
-    Course(is_bachelor=True, semester=4, name="TheoryOfComputation"),
+    #Course(is_bachelor=True, semester=4, name="Analyse-4"),
+    #Course(is_bachelor=True, semester=4, name="ProbabilityAndStatistics"),
+    #Course(is_bachelor=True, semester=4, name="SignalsAndSystems"),
+    #Course(is_bachelor=True, semester=4, name="TheoryOfComputation"),
     
     # BA5
-    Course(is_bachelor=True, semester=5, name="Algebra"),
-    #Course(is_bachelor=True, semester=5, name="IntroToQuantumInformationProcessing-Summary"),
+    #Course(is_bachelor=True, semester=5, name="Algebra"),
+    #Course(is_bachelor=True, semester=5, name="IntroToQuantumInformationProcessing-Summary", is_summary=True),
     
     # BA6
-    #Course(is_bachelor=True, semester=6, name="IntroToQuantumComputation-Summary"),
+    #Course(is_bachelor=True, semester=6, name="IntroToQuantumComputation-Summary", is_summary=True),
 ]
+
+tag = Tags.NONE
 
 beginning_time = time.time()
 
 for course in courses:
     Logger.info("#"*10 + f" Handling {course.name}... " + "#"*10)
     lecture_group = PrecompiledLectureGroup.from_course(course)
-    lecture_group.make_code_zip_and_compile(None, Path("NotesHandling/precompile_notes/temp"))
-    #lecture_group.make_code_zip(None, Path("NotesHandling/precompile_notes/temp"))
+    lecture_group.make_code_zip_and_compile(tag.tag, Path("NotesHandling/precompile_notes")/tag.output_dir)
+    #lecture_group.make_code_zip(tag.tag, Path("NotesHandling/precompile_notes")/tag.output_dir)
 
     Logger.newline()
 
