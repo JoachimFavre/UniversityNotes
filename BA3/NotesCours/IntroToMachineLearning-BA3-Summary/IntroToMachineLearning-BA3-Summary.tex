@@ -30,27 +30,27 @@
 \newpage
 
 \section{Prerequisites}
-\parag{Supervised and unsupervised learning}{
+\begin{parag}{Supervised and unsupervised learning}
     In \important{supervised learning}, we are given data and its groundtruth labels. The goal is, given new data, we want to predict new labels, by doing regression or classification.
 
     In \important{unsupervised learning}, we are only given data (without any label), and we want to output some information about it, by doing dimensionality reduction or clustering.
-}
+\end{parag}
 
-\parag{Regression and classification}{
+\begin{parag}{Regression and classification}
     The goal of \important{regression} is to predict a continuous value for a given sample. The goal of \important{classification} is to output a discrete label (typically encoded in one-hot encoding with 0s and 1s or -1s and 1s).
 
     The main difference is that there is the notion of closeness in regression (when predicting a date, outputting 1970 when it should be 1980 is better than outputting 2100), which is not in classification (when predicting what is on a picture, outputting a car when it should be a cat is not better or worse than outputting an elephant).
-}
+\end{parag}
 
-\parag{Dimensionality reduction}{
+\begin{parag}{Dimensionality reduction}
     Dimensionality reduction has two main advantages. 
 
     The first one is that it allows to decrease the dimension of our data, which typically yield a tremendous speed-up while preserving a lot of the precision.
 
     The second one is that, depending on the model, we can also map data back from the lower dimensional space to the higher one. This can be very interesting since it allows to create new samples. For instance, applying dimensionality reduction on a set of human faces, we could create new points $\bvec{y}$ randomly thanks to the distribution of our data, and map it back to high dimension. That way, we created a new random face. Another use for this is to denoise the data: mapping a sample to a lower dimensional space and back to high dimensions may result to a lot less noise.
-}
+\end{parag}
 
-\parag{Notations}{
+\begin{parag}{Notations}
     We consider the following notation throughout this course, with some slight exceptions when specified otherwise. $N$ is the number of samples we have, $D$ is the dimensionality (the number of components) of any input, and $C$ is the dimensionality of any output. 
 
     Without specified otherwise, the input $\bvec{x}_i \in \mathbb{R}^{D+1}$ begins with a constant $1$ to account for a bias, followed by the input data. We let $\bvec{y}_i \in \mathbb{R}^C$ to be the $i$\Th output. $x_i^{\left(k\right)}$ is the $k$\Th component of the $i$\Th input, and similarly for $y_i^{\left(k\right)}$. To sum up, we have:
@@ -64,9 +64,9 @@
     \[X = \begin{pmatrix} \bvec{x}_1^T \\ \vdots \\ \bvec{x}_N^T \end{pmatrix} = \begin{pmatrix} 1 & \cdots & x_1^{\left(D\right)} \\ \vdots & \ddots & \vdots \\ 1 & \cdots & x_N^{\left(D\right)} \end{pmatrix} \in \mathbb{R}^{N \times \left(D+1\right)}\]
     \[Y = \begin{pmatrix} \bvec{y}_1^T \\ \vdots \\ \bvec{y}_N^T \end{pmatrix} = \begin{pmatrix} y_1^{\left(1\right)} & \cdots & y_1^{\left(C\right)} \\ \vdots & \ddots & \vdots \\ y_N^{\left(1\right)} & \cdots & y_n^{\left(C\right)} \end{pmatrix} \in \mathbb{R}^{N \times C}\]
     \[W = \begin{pmatrix} \bvec{w}_{\left(1\right)} & \hdots & \bvec{w}_{\left(C\right)} \end{pmatrix} \in \mathbb{R}^{\left(D+1\right)\times C}\]
-}
+\end{parag}
 
-\parag{Feature expansion}{
+\begin{parag}{Feature expansion}
     Increasing the amount of dimensions from $D$ to $F$ of our input data may help our models (using non-linear functions, since they would be of no help). Thus, we may let the following function: 
     \[\phi\left(\bvec{x}\right) = \begin{pmatrix} 1 & x^{\left(1\right)} & \cdots & x^{\left(D\right)} & \left(x^{\left(1\right)}\right)^2 & \cdots & \left(x^{\left(D\right)}\right)^2 & \cdots \end{pmatrix}^T \in \mathbb{R}^{F}\]
     
@@ -75,20 +75,17 @@
     
     We can replace $\bvec{x}$ by $\phi\left(\bvec{x}\right)$ and $X$ by $\Phi$ in mostly every model, especially the ones which will be kernalised. Note that, in this case, we need $\bvec{w} \in \mathbb{R}^F$, and thus $W = \mathbb{R}^{F \times C}$.
 
-}
-
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         The 1 we added to the input data to account for the bias is some kind of feature expansion.
-}
+    \end{subparag}
 
 
-\paragsubparag{}{Cover's Theorem}{
-
+    \begin{subparag}{Cover's Theorem}
         Cover's theorem states (more or less) that doing non-linear feature expansion, then it is more likely for our data to be linearly separable.
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Kernel}{
+\begin{parag}{Kernel}
     We can notice that defining our $\phi$ functions for feature expansion can be really tedious. However, since most of our methods depend on a dot product of $\phi\left(\bvec{x}_i\right)^T \phi\left(\bvec{x}_j\right)$, which gives some kind of measure of similarity between $\bvec{x}_i$ and $\bvec{x}_j$ (since it is proportional to the cosine of their angle), we can define a similarity function named a \important{kernel}, such that: 
     \[k\left(\bvec{x}_i, \bvec{x}_j\right) = \phi\left(\bvec{x}_i\right)^T \phi\left(\bvec{x}_j\right)\]
 
@@ -100,15 +97,11 @@
     
     Note that, since $k\left(\bvec{x}_i, \bvec{x}_j\right) = k\left(\bvec{x}_j, \bvec{x}_i\right)$ by the commutativity of the dot product, $K$ is symmetric ($K^T = K$).
 
-}
-
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         The main advantage of a kernel is that we don't need to know what function $\phi$ is linked to it.
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Examples}{
-    
+    \begin{subparag}{Examples}
         We can for instance use the \important{polynomial kernel}: 
         \[k\left(\bvec{x}_i, \bvec{x}_j\right) = \left(\bvec{x}_i^T \bvec{x}_j + c\right)^d\]
         
@@ -118,39 +111,33 @@
         \[k\left(\bvec{x}_i, \bvec{x}_j\right) = \exp\left(- \frac{\left\|\bvec{x}_i - \bvec{x}_j\right\|^2}{2 \sigma ^2}\right)\]
         
         $\sigma$ is typically chosen relatively to the data.
-}
+    \end{subparag}
+\end{parag}
 
-
-
-\parag{Representer theorem}{
+\begin{parag}{Representer theorem}
     The minimizer of a regularized empirical risk function can be represented as a linear combination of expanded features. In other words, we can write: 
     \[\bvec{w}^* = \sum_{i=1}^{N} \alpha_i^* \phi\left(\bvec{x}_i\right) = \Phi^T \bvec{\alpha}^*\]
     where $\bvec{\alpha} \in \mathbb{R}^N$.
 
-}
-
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         This theorem is really important to kernalise algorithms. When using it, the goal is to get rid of the $\Phi$ since we do not know the mapping $\phi$. Switching our view onto variables $\bvec{\alpha}$ instead of variables $\bvec{w}$ is typically a way to do so.
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Loss function}{
-    
+\begin{parag}{Loss function}
     The \important{loss function} $\ell \left(\hat{\bvec{y}}_i, \bvec{y}_i\right)$ computes an error value between the prediction and the true value.
 
     This is a measure of the error for any given prediction.
-}
+\end{parag}
 
-\parag{Empirical risk}{
+\begin{parag}{Empirical risk}
     Given $N$ training samples $\left\{\left(\hat{\bvec{x}}_i, \hat{\bvec{y}}_i\right)\right\}$, the \important{empirical risk} is defined as: 
     \[R\left(\left\{\hat{\bvec{x}}_i\right\}, \left\{\hat{\bvec{y}}_i\right\}, W\right) = \frac{1}{N} \sum_{i=1}^{N} \ell \left(\hat{\bvec{y}}_i, \bvec{y}_i\right)\]
 
     This represents the global error on the training samples, this is what we try to minimise: 
     \[W^* = \argmin_{W} R\left(\left\{\hat{\bvec{x}}_i\right\}, \left\{\hat{\bvec{y}}_i\right\}, W\right)\]
 
-}
-
-\paragsubparag{}{Regularised}{
+    \begin{subparag}{Regularised}
         Sometimes, we want to regularise our objective function, so that we prevent weights to become to large and make a lot of overfitting. We then instead seek to minimise. 
         \[E\left(W\right) = R\left(W\right) + \lambda E_W\left(W\right)\]
         where $\lambda$ is an hyperparameter and $E_W\left(W\right)$ is the regulariser.
@@ -158,33 +145,29 @@
         A regulariser that can be used is Tikhonov regularisation, and it will be used in ridge regressionb: 
         \[E_W\left(W\right) = \left\|W\right\|^2_F\]
         where $\left\|W\right\|_F^2$ is the squared Frobenius norm of $W$, meaning the sum of its values squared.
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Gradient descent}{
+\begin{parag}{Gradient descent}
     The goal of \important{gradient descent} is to minimise a function (an empirical risk $R\left(W\right)$ in this context). The idea is to begin with an estimate $W_0$ (typically completely random), and then to update it iteratively, by following the direction of greatest decrease (the opposite of the gradient):
     \[W_k = W_{k-1} - \eta \nabla_{W} R\left(W_{k-1}\right)\]
     where $\eta > 0$ is the learning rate. 
 
     This algorithm can then be stopped after the change in the function reaches a threshold $\left|R\left(W_{k}\right) - R\left(W_{k-1}\right)\right| < \delta_R$, the change in parameter value is less than a threshold $\left|W_{k} - W_{k-1}\right| < \delta_w$, or if a maximum number of iterations (also known as epochs) is reached (even though this gives no guarantee on a potential convergence).
 
-}
-
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         This algorithm does not always converge and, when it does, not necessarily to a minimum nor to the global minimum.
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Stochastic gradient descent}{
-
+    \begin{subparag}{Stochastic gradient descent}
         When we have a lot of input and a non-convex function (meaning that it probably does not have a single minimum, and thus that gradient descent can loose itself in some of them), we can use \important{stochastic gradient descent}. The idea is, instead of using all our samples, we only use a random subset (named \important{mini-batch}) of $B$ samples. The update rule becomes: 
         \[W_k = W_{k-1} - \eta \sum_{b=1}^{B} \nabla \ell _{i\left(b, k\right)}\left(W_{k-1}\right)\]
 
         This converges faster for the same number of computations, and it may get out of bad local minima.
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Evaluation metrics}{
+\begin{parag}{Evaluation metrics}
     Once a supervised machine learning model is trained, we want to be able to understand how well it performs on unseen test data (which must absolutely be separated from the train data). 
 
     We could use the loss function, but we may also use a different one.
@@ -201,76 +184,66 @@
     
     We can typically then use accuracy and the F1 score to see how well our classification model did.
 
-}
-
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         There are many more metrics for regression and classification. For the former, we could quote RMSE (root mean squared error), MAE (mean absolute error) or the MAPE (mean absolute percentage error). For the latter, making a confusion matrix or computing the AUC (area under the ROC curve) can give good insights too.
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Decision boundary}{
-    A classifiers lead a decision boundary. This is an object of dimension $D-1$ (a line if our data lies on a plane for instance), which splits the space into two regions: one where samples are considered positive (the predicted value is closer to the value of positive samples), and one where they are considered to be negative (the predicted value is closer to the value of negative samples).
+\begin{parag}{Decision boundary}
+    A classifier leads to a decision boundary. This is an object of dimension $D-1$ (a line if our data lies on a plane for instance), which splits the space into two regions: one where samples are considered positive (the predicted value is closer to the value of positive samples), and one where they are considered to be negative (the predicted value is closer to the value of negative samples).
 
     Since it is the set of points which are equivalently distant to both labels, the boundary is parametrised by the following equation: 
     \[\hat{\bvec{y}}\left(\bvec{x}\right) = \frac{y_{pos} + y_{neg}}{2}\]
-    where $y_{pos}$ is the value for positive samples, and $y_{neg}$ is the value for negative samples.1
-}
+    where $y_{pos}$ is the value for positive samples, and $y_{neg}$ is the value for negative samples.
 
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         A classifier is said to be linear if its decision boundary is an hyperplane (a straight line if the data lies on a plane for instance).
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Margin}{
+\begin{parag}{Margin}
    If $C = 1$, the orthogonal distance between the decision boundary and the nearest sample is called the margin.
    \imagehere[0.5]{margin.png}
-}
+\end{parag}
 
-
-\parag{Overfitting}{
+\begin{parag}{Overfitting}
     When we increase the complexity of the model (by changing the hyperparameters) we get better and better result for both training and test data. However, there is a point at which increasing the complexity keeps decreasing error on training data but increases the error on test data. This is a very general phenomenon, named \important{overfitting}.
-}
+\end{parag}
 
-\parag{Cross-validation}{
+\begin{parag}{Cross-validation}
     Cross-validation is a way to find good hyperparameters that prevent overfitting. We test different models (in a predefined set), assign to each of them an error value, and pick the one yielding the smallest error.
 
     The idea of \important{$k$-fold cross-validation} is, to evaluate the error of a model, to first randomly split the dataset into $k$ partitions (where $k$ is predefined). Then, we do $k$ iterations: at iteration $i$ we drop the $i$\Th partition, train the model on the $\left(k-1\right)$ other folds merged, and use the $i$\Th partition to compute the error. At the end of all the iterations, we average all the errors.
 
     Note that we never test the model on data we used to train it, allowing to avoid overfitting. Also, we use all of our training data to get a complete insight over it (doing only one iteration, would give less information about the model). It is important to notice that the larger the $k$, the less data we waste but the more expensive this method becomes.
 
-}
-
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         Note that leaving $k = N$ (where $N$ is the number of training samples) is also sometimes named \important{leave-one-out cross-validation}. This is really expensive but wastes (almost) no data.
 
         Another way to do cross-validation, which is much cheaper, is to split our training data into training and validation data, using \important{validation-set cross-validation}. This is like like doing only one iteration of $k$-fold cross-validation, meaning that it is very cheap but wastes a lot of data.
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Data representation}{
+\begin{parag}{Data representation}
     All the models we will see only work for fixed size data. If we want to handle data of varying size (such as text or pictures), a good way is to consider \important{bag of words}: consider the number of times each word from a dictionary appears in the text and put this as a big vector.
 
     Note that we don't need to consider the whole English dictionary, only picking the set of words appearing in the training data is enough. Also, it is often interesting to make a histogram out of our vector: divide it by the number of words in the sample, so that we instead have a repartition and give less importance to the length of the text.
 
     Also, we can apply this to images. To do so, we need to extract ``words'', meaning fixed-size picture elements.
-}
+\end{parag}
 
-\parag{Pre-processing}{
+\begin{parag}{Pre-processing}
     The training data might have problems: it might have noise (because of measurement errors), incorrect values, and so on. To fix those, a good idea is to do pre-processing.
 
-}
-
-\paragsubparag{}{Normalisation}{
+    \begin{subparag}{Normalisation}
         To begin with, a good idea is to scale each individual feature dimension to fall within a specified range (so that we don't give more impact to a dimension ranging from 1000 to 10000 than to another dimension ranging from 0 to 1). This can typically be done by using \important{normalisation}, such as $z$-score normalisation: 
         \[\widetilde{x}_i^{\left(d\right)} = \frac{x_i^{\left(d\right)} - \mu^{\left(d\right)}}{\sigma^{\left(d\right)}}\]
         where $\mu^{\left(d\right)}$ is the mean of the $d$\Th dimension, and $\sigma^{\left(d\right)}$ is its standard deviation.
 
         Note that there are many other ways to do normalisation, such as min-max normalisation (computing $\widetilde{x}_i = \frac{x_i - x_{min}}{x_{max} - x_{min}}$), max-normalisation (computing $\widetilde{x}_i = \frac{x_i}{x_{max}}$ where $x_{max}$ is the maximum in absolute value) or decimal-scaling (compute $\widetilde{x}_i = \frac{x_i}{10^k}$ where $k$ is the smallest integer $k$ such that $\left|\widetilde{x}_i\right| \leq 1$ for the largest $\widetilde{x}_i$).
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Imbalanced data}{
-    
+    \begin{subparag}{Imbalanced data}
         Another important thing to consider is \important{imbalanced data}. There might be 10 times as much data in one class as in another (between-class imbalance), or data inside a class might have a lot of representative at some point in space and much less at other points (within-class imbalance).
 
         To fix those problems, we can either work on the data, or on the cost function.
@@ -281,11 +254,12 @@
         \[R\left(\left\{\bvec{x}_i\right\}, \left\{\bvec{y}_i\right\}, W\right) = \frac{1}{N} \sum_{i=1}^{N} \beta_i \ell \left(\hat{\bvec{y}}_i, \bvec{y}_i\right)\]
 
         We can for instance use weights inversely proportional to the class frequency, such as $\beta_i = 1 - \frac{N_k}{N}$.
-}
+    \end{subparag}
+\end{parag}
 
 
 \section{Regression and classification}
-\parag{Ridge regression}{
+\begin{parag}{Ridge regression}
     The output of \important{ridge regression} is computed by a simple dot product: 
     \[\hat{\bvec{y}}_i = W^T \phi\left(\bvec{x}_i\right)\]
 
@@ -296,18 +270,14 @@
     This can be solved explicitly: 
     \[W^* = \left(\Phi^T \Phi + \lambda I_F\right)^{-1} \Phi^T Y\]
     where $I_F$ is the $F \times F$ identity matrix.
-    
-}
 
-\paragsubparag{}{Linear regression}{
+    \begin{subparag}{Linear regression}
         Leaving $\lambda = 0$, we get the special case of \important{linear regression}. Then, the closed-form formula can be rephrased as: 
         \[W^* = \left(\Phi^T \Phi\right)^{-1} \Phi^T \bvec{y} = \Phi^{\dagger} Y\]
         where $\Phi^{\dagger}$ is the Moore-Penrose pseudo-inverse.
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Kernelisation}{
-
+    \begin{subparag}{Kernelisation}
         Using the representer theorem, we can find that: 
         \[A^* = \left(K + \lambda I_N\right)^{-1} Y\]
         
@@ -315,19 +285,16 @@
         \[\hat{\bvec{y}} = Y^T \left(K + \lambda I_N\right)^{-1} k\left(X, \bvec{x}\right)\]
         
         Note that the value $Y^T \left(K + \lambda I_N\right)^{-1}$ can be computed once during training, and then be reused at every evaluation of the model.
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Classification}{
-
+    \begin{subparag}{Classification}
         Ridge regression can be used for classification tasks, by inputting the result into a softmax function (defined right after), but this does not work very well because we are not encoding this in the objective function.
 
         This is named a \important{least-square classifier}.
-}
+    \end{subparag}
+\end{parag}
 
-
-
-\parag{Logistic regression}{
+\begin{parag}{Logistic regression}
     In \important{logistic regression} (which is a linear classification algorithm), we consider negative samples to be $y_i = 0$.
 
     The output of logistic regression is computed by using the \important{softmax function}: 
@@ -342,9 +309,7 @@
     There is no closed-form formula, so we need the gradient of the empirical risk in order to do gradient descent (the solution is unique since the function is convex):
     \[\nabla_{W} R\left(W\right) = \sum_{i=1}^{N} \bvec{x}_i \left(\hat{\bvec{y}}_i - \bvec{y}_i\right)^T\]
 
-}
-
-\paragsubparag{}{One dimension}{
+    \begin{subparag}{One dimension}
         Let's consider $C = 1$. This special case of the softmax function is named the \important{logistic function}:
         \[\hat{y}\left(\bvec{x}\right) = \sigma\left(\bvec{w}^T \bvec{x}\right) = \frac{1}{1 + \exp\left(- \bvec{w}^T \bvec{x}\right)}\]
 
@@ -354,16 +319,14 @@
 
         The gradient of one-dimensional cross-entropy is: 
         \[\nabla_{\bvec{w}} R\left(\bvec{w}\right) = \sum_{i=1}^{N} \left(\hat{y}_i - y_i\right)\bvec{x}_i\]
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Kernelisation}{
-
+    \begin{subparag}{Kernelisation}
         This algorithm can be kernalised even though this is not very common.
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Support vector machine}{
+\begin{parag}{Support vector machine}
     In \important{support vector machine} (SVM) classification (which is also a linear classifier), we consider negative samples to be $y_i = -1$. Also, we leave $\widetilde{\bvec{w}}$ to be the vector of parameters without $w^{\left(0\right)}$, and $\bvec{x} \in \mathbb{R}^D$ to not have an added 1. Note that we only consider $C = 1$ for now.
 
     The idea of SVM is to maximise the size of the margin. A prediction is given by whether $w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i$ is closest to $-1$ or $1$ (as always for linear classifiers), and the decision boundary is given by $w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x} = \frac{-1 + 1}{2} = 0$. 
@@ -376,15 +339,11 @@
 
     This representation of the problem is known as the \important{primal problem}.
 
-}
-
-\paragsubparag{}{Support vectors}{
+    \begin{subparag}{Support vectors}
         We notice that, for the margin to be maximised, there must be at least a point from each class lying on it. Such points are named \important{support vectors}. 
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Hinge loss}{
-
+    \begin{subparag}{Hinge loss}
         By rewriting the constraints, we get: 
         \[\xi_i \geq 1 - y_i\left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i\right)\]
         
@@ -394,11 +353,9 @@
         
         This new term is called the \important{hinge loss}: 
         \[\max\left(0, 1 - y_i \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i\right)\right)\]
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Dual problem}{
-
+    \begin{subparag}{Dual problem}
         We can reformulate our problem by letting one variable per training sample (meaning that we have $N$ variables instead of $\left(D+1\right)$): 
         \[\argmax_{\left\{\alpha_i\right\}} \left(\sum_{i=1}^{N} \alpha_i - \frac{1}{2} \sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_i \alpha_j y_i y_j \bvec{x}_i^T \bvec{x}_j\right),\]
         subject to $\sum_{i=1}^{N} \alpha_i y_i = 0$ and $0 \leq \alpha_i \leq C$ for all $i$.
@@ -413,11 +370,9 @@
 
         In other words, for every sample, either of those terms is equal to 0. The samples for which $\alpha_i^* \neq 0$ are the support vectors. However, most samples are not support vectors, so we can decrease the computations by leaving $\mathcal{S}$ to be the set of support vectors: 
         \[\hat{y}\left(\bvec{x}\right) = w^{\left(0\right)*} + \sum_{i \in\mathcal{S}}^{} \alpha_i^* y_i \bvec{x}_i^T \bvec{x}_i\]
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Kernelisation}{
-     
+    \begin{subparag}{Kernelisation}
         We need the dual problem to kernelise the SVM: 
         \[\argmax_{\left\{\alpha_i\right\}} \left(\sum_{i=1}^{N} \alpha_i - \frac{1}{2} \sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_i \alpha_j y_i y_j k\left(\bvec{x}_i, \bvec{x}_j\right)\right),\]
         subject to $\sum_{i=1}^{N} \alpha_i y_i = 0$ and $0 \leq \alpha_i \leq C$ for all $i$.
@@ -426,66 +381,62 @@
         \[\hat{y}\left(\bvec{x}\right) = w^{\left(0\right)*} + \sum_{i \in \mathcal{S}}^{} \alpha_i^* y_i k\left(\bvec{x}_i, \bvec{x}\right)\]
 
         Note that we still have $\alpha_i^* = 0$ for all samples that are not support vectors.
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Multi-class SVM}{
-    
+    \begin{subparag}{Multi-class SVM}
         To generalise our algorithm to multiple class, we can use multiple ways. The idea is always to use several binary classifiers.
 
         One way is to use \important{one-vs-rest}: we train classifiers stating if the component is in class $i$ or not. Another way is to use \important{one-vs-one}: we train classifiers to know if the component is closer to class $i$ or $j$, and then pick the best one. However, in both cases, there are some samples which will give ambiguous answers (belonging to multiple classes or to none).
-}
+    \end{subparag}
 
+    \begin{subparag}{Primal derivation}
+        Let's consider how we got the formula for the primal model, since it may typically help to remember and understand it.
 
-\paragsubparag{}{Primal derivation}{
-    Let's consider how we got the formula for the primal model, since it may typically help to remember and understand it.
+        First, we know that any two points on the decision boundary have the same prediction (which is 0), which yields that: 
+        \[0 = \hat{y}_1 - \hat{y}_2 = \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_1\right) - \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_2\right) = \widetilde{\bvec{w}}^T \left(\bvec{x}_1 - \bvec{x}_2\right)\]
 
-    First, we know that any two points on the decision boundary have the same prediction (which is 0), which yields that: 
-    \[0 = \hat{y}_1 - \hat{y}_2 = \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_1\right) - \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_2\right) = \widetilde{\bvec{w}}^T \left(\bvec{x}_1 - \bvec{x}_2\right)\]
+        This is a dot product, and it thus means that $\widetilde{\bvec{w}}$ is orthogonal to the decision boundary. 
 
-    This is a dot product, and it thus means that $\widetilde{\bvec{w}}$ is orthogonal to the decision boundary. 
+        Second, we use this information to split any point into a component colinear to $\widetilde{\bvec{w}}$, and one orthogonal to it (meaning colinear to the decision boundary): 
+        \[\bvec{x} = \bvec{x}_{\perp} + r \frac{\widetilde{\bvec{w}}}{\left\|\widetilde{\bvec{w}}\right\|}\]
+        where $r$ is the signed orthogonal distance of any point to the decision boundary.
 
-    Second, we use this information to split any point into a component colinear to $\widetilde{\bvec{w}}$, and one orthogonal to it (meaning colinear to the decision boundary): 
-    \[\bvec{x} = \bvec{x}_{\perp} + r \frac{\widetilde{\bvec{w}}}{\left\|\widetilde{\bvec{w}}\right\|}\]
-    where $r$ is the signed orthogonal distance of any point to the decision boundary.
+        Now, looking at the prediction yielded by this point, we get: 
+        \[\hat{y}\left(\bvec{x}\right) = w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x} = w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_{\perp} + r \frac{\widetilde{\bvec{w}}^T \widetilde{\bvec{w}}}{\left\|\widetilde{\bvec{w}}\right\|} = y\left(\bvec{x}_{\perp}\right) + r\left\|\widetilde{\bvec{w}}\right\|\]
 
-    Now, looking at the prediction yielded by this point, we get: 
-    \[\hat{y}\left(\bvec{x}\right) = w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x} = w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_{\perp} + r \frac{\widetilde{\bvec{w}}^T \widetilde{\bvec{w}}}{\left\|\widetilde{\bvec{w}}\right\|} = y\left(\bvec{x}_{\perp}\right) + r\left\|\widetilde{\bvec{w}}\right\|\]
+        However, we know that $y\left(\bvec{x}_{\perp}\right) = 0$ since it is on the decision boundary, meaning that: 
+        \[\hat{y}\left(\bvec{x}\right) = r\left\|\widetilde{\bvec{w}}\right\| \iff r = \frac{\hat{y}\left(\bvec{x}\right)}{\left\|\widetilde{\bvec{w}}\right\|}\]
+        which is, to recall, the signed orthogonal distance of $\bvec{x}$ to the decision boundary.
 
-    However, we know that $y\left(\bvec{x}_{\perp}\right) = 0$ since it is on the decision boundary, meaning that: 
-    \[\hat{y}\left(\bvec{x}\right) = r\left\|\widetilde{\bvec{w}}\right\| \iff r = \frac{\hat{y}\left(\bvec{x}\right)}{\left\|\widetilde{\bvec{w}}\right\|}\]
-    which is, to recall, the signed orthogonal distance of $\bvec{x}$ to the decision boundary.
+        Note that we can then make use of the ground truth label being $-1$ or 1 to make an unsigned distance: 
+        \[\widetilde{r}_i = y_i r_i = \frac{y_i\left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i\right)}{\left\|\widetilde{\bvec{w}}\right\|}\]
 
-    Note that we can then make use of the ground truth label being $-1$ or 1 to make an unsigned distance: 
-    \[\widetilde{r}_i = y_i r_i = \frac{y_i\left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i\right)}{\left\|\widetilde{\bvec{w}}\right\|}\]
+        This is what we would like to maximise, but it is hard. We thus need to turn it to an equivalent problem. To do so, we notice that there is an infinite number of solutions that matter, since we only want the direction of $\bvec{w}$ and that its magnitude does not matters. This can be proven mathematically by multiplying our weights by a $\lambda$, and seeing that we get the same $\widetilde{r}_i$ above (the $\lambda$ cancel out in the fraction).
 
-    This is what we would like to maximise, but it is hard. We thus need to turn it to an equivalent problem. To do so, we notice that there is an infinite number of solutions that matter, since we only want the direction of $\bvec{w}$ and that its magnitude does not matters. This can be proven mathematically by multiplying our weights by a $\lambda$, and seeing that we get the same $\widetilde{r}_i$ above (the $\lambda$ cancel out in the fraction).
+        So, we may as well require that the margin has size $\frac{1}{\left\|\widetilde{\bvec{w}}\right\|}$, meaning that: 
+        \[r_i \geq \frac{1}{\left\|\widetilde{\bvec{w}}\right\|} \iff r_i \left\|\widetilde{\bvec{w}}\right\| \geq 1 \iff y_i \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i\right) \geq 1\]
 
-    So, we may as well require that the margin has size $\frac{1}{\left\|\widetilde{\bvec{w}}\right\|}$, meaning that: 
-    \[r_i \geq \frac{1}{\left\|\widetilde{\bvec{w}}\right\|} \iff r_i \left\|\widetilde{\bvec{w}}\right\| \geq 1 \iff y_i \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i\right) \geq 1\]
+        Now, maximising the margin means maximising $\frac{1}{\left\|\widetilde{\bvec{w}}\right\|}$ which can be shown to be equivalent to minimising $\left\|\widetilde{\bvec{w}}\right\|^2$. Our problem has thus become: 
+        \[\argmin_{\bvec{w}} \frac{1}{2} \left\|\widetilde{\bvec{w}}\right\|^2, \mathspace \text{subject to } y_i \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i\right) \geq 1, \ \forall i\]
+        where the factor $\frac{1}{2}$ was added for convenience.
 
-    Now, maximising the margin means maximising $\frac{1}{\left\|\widetilde{\bvec{w}}\right\|}$ which can be shown to be equivalent to minimising $\left\|\widetilde{\bvec{w}}\right\|^2$. Our problem has thus become: 
-    \[\argmin_{\bvec{w}} \frac{1}{2} \left\|\widetilde{\bvec{w}}\right\|^2, \mathspace \text{subject to } y_i \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i\right) \geq 1, \ \forall i\]
-    where the factor $\frac{1}{2}$ was added for convenience.
+        However, if the data is not linearly separable, we need a way to let some samples violate this rule. This is done by adding \important{slack variables} $\xi_i \geq 0$ for each sample: 
+        \[y_i \left(w^{\left(0\right)} + \widetilde{\bvec{w}} \bvec{x}_i\right) \geq 1 - \xi_i\]
 
-    However, if the data is not linearly separable, we need a way to let some samples violate this rule. This is done by adding \important{slack variables} $\xi_i \geq 0$ for each sample: 
-    \[y_i \left(w^{\left(0\right)} + \widetilde{\bvec{w}} \bvec{x}_i\right) \geq 1 - \xi_i\]
+        In other words, if $0 < \xi_i \leq 1$, the sample $i$ lies inside in the margin but is still correctly classified. If $\xi_i \geq 1$, then the sample $i$ is misclassified. 
 
-    In other words, if $0 < \xi_i \leq 1$, the sample $i$ lies inside in the margin but is still correctly classified. If $\xi_i \geq 1$, then the sample $i$ is misclassified. 
+        We minimise those variables jointly with our original problem, giving us our final formulation:
+        \[\argmin_{\bvec{w}, \left\{\xi_i\right\}} \frac{1}{2} \left\|\widetilde{\bvec{w}}\right\|^2 + C \sum_{i=1}^{N} \xi_i, \]
+        subject to $y_i \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i\right) \geq 1 - \xi_i$ and $\xi_i \geq 0$, for all $i$.
+    \end{subparag}
+\end{parag}
 
-    We minimise those variables jointly with our original problem, giving us our final formulation:
-    \[\argmin_{\bvec{w}, \left\{\xi_i\right\}} \frac{1}{2} \left\|\widetilde{\bvec{w}}\right\|^2 + C \sum_{i=1}^{N} \xi_i, \]
-    subject to $y_i \left(w^{\left(0\right)} + \widetilde{\bvec{w}}^T \bvec{x}_i\right) \geq 1 - \xi_i$ and $\xi_i \geq 0$, for all $i$.
-}
-
-\parag{$K$-nearest neighbours}{
+\begin{parag}{$K$-nearest neighbours}
     The idea of \important{$k$-nearest neighbours} (kNN) is to compute the distance between the test sample $\bvec{x}$ and all training samples $\left\{\bvec{x}_i\right\}$ and find the $k$ samples with minimum distances. Then, we can do classification by finding the most common label amongst these $k$ nearest neighbours, or do regression by computing $\hat{\bvec{y}}$ as a function of those neighbours and their distance to $\bvec{x}$.
 
     To compute close points efficiently we can use datastructures such as $k$-d trees.
 
-}
-
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         The result of this model depends on the choice of the distance function. One can take the \important{Euclidean distance}: 
         \[d\left(\bvec{x}_i, \bvec{x}\right) = \sqrt{\sum_{d=1}^{D} \left(x_i^{\left(d\right)} - x^{\left(d\right)}\right)^2}\]
         
@@ -493,23 +444,18 @@
         \[d\left(\bvec{x}_i, \bvec{x}\right) = \sqrt{\chi^2 \left(\bvec{x}_i, \bvec{x}\right)} = \sqrt{\sum_{d=1}^{D} \frac{\left(x_i^{\left(d\right)} - x^{\left(d\right)}\right)^2}{x_i^{\left(d\right)} + x^{\left(d\right)}}} \]
         
         The important thing to remember from this paragraph is that the choice of the distance function is important.
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Curse of dimensionality}{
-
+    \begin{subparag}{Curse of dimensionality}
         Because of a principle named the \important{curse of dimensionality}, we need exponentially more points to cover a space as the number of dimensions increases. Using dimensionality reduction is a good idea with this algorithm.
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Complexity}{
-    
-
+    \begin{subparag}{Complexity}
         Unlike most of the other models, increasing the hyperparameter of this model (the $k$) leads to decreased complexity: the higher the $k$, the less complex the decision boundary is and thus the less overfit we have.
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Neural networks}{
+\begin{parag}{Neural networks}
     Neural networks can do both classification and regression (depending on the output representation and the empirical risk used, typically square loss for regression and cross-entropy for classification), and their main advantage is that they learn a good model during the training.
 
     This method is named \important{neural network}, \important{multi-layer perceptron} (MLP), or \important{deep learning} (as long as there are at least two hidden layers).
@@ -525,9 +471,7 @@
     
     We can compute $\frac{\partial z_{\left(l\right)}}{\partial z_{\left(l-1\right)}} $ and $\frac{\partial z_{\left(l\right)}}{\partial W_l} $ rather easily if we store the values of each layer during the forward pass. We can then propagate backwards those value, by computing the gradients from the end and updating the weights.
 
-}
-
-\paragsubparag{}{Activation functions}{
+    \begin{subparag}{Activation functions}
         There are multiple choice for activation functions. The important thing is that they are non-linear.
 
         We can for instance take the ReLU (Rectified Linear Unit) activation function: 
@@ -538,11 +482,9 @@
         
         Another choice could be the sigmoid: 
         \[f\left(a\right) = \frac{1}{1 + \exp\left(-a\right)}\]
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Convolutional network}{
-
+    \begin{subparag}{Convolutional network}
         When working with pictures, just vectorising them may give a lot of elements while removing the fact that the picture is inherently two-dimensional. A way to circumvent this problem is using convolutions.
 
         To make a convolution, we need a small matrix of elements (plus a bias). We center this matrix at an element, compute the weighted sum resulting from it, add the bias, and use this as our result. We can then shift it to center it on each element, yielding a new picture. This allows to extract some features of our original picture, such as the edges.
@@ -554,12 +496,12 @@
         The main interest then comes from stacking those operations. For instance, beginning with a $28 \times 28$ input, we may apply convolutions to get a $3 \times 24 \times 24$ layer (we loose some pixels because we may require the filter to ignore pixels where it has to be partly outside of the picture) and then a pooling layer to get a $3 \times 12 \times12$ layer.
 
         The idea of a \important{convolutional neural network} (CNN) is to make some convolutions (typically before the input layers, but also in-between some layers). The main idea is that we also optimise the values inside the filters of our convolutions. To compute the gradient for them, we also use back-propagation.
-}
-
+    \end{subparag}
+\end{parag}
 
 \section{Dimensionality reduction and clustering}
 
-\parag{Principle component analysis}{
+\begin{parag}{Principle component analysis}
     Sometimes, we realise that data is given in many dimensions, but actually lies in many less dimensions. The idea of \important{principle component analysis} (PCA) is to project the data on some orthogonal axis (of lower dimension), in a way to maximise the kept variance.
 
     Leaving $\bar{\bvec{x}} = \frac{1}{N}\sum_{i=1}^{N} \bvec{x}_i$ to be the mean, we have: 
@@ -575,28 +517,22 @@
     \[\text{exval} = \frac{\sum_{j=1}^{d} \lambda_j}{\sum_{j=1}^{D} \lambda_j}\]
 
     Using PCA can make the computations of the models much faster without losing much precision, or getting some insight of the data.
-    
-}
 
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         Since the axis on which we project the data are orthogonal, we have: 
         \[W^T W = I_d\]
 
         To make sure of this, we need to take the eigenvector so that they are orthogonal. This can always be done because $C$ is symmetric, thanks to the spectral theorem (this theorem also allows to know that we can compare eigenvalues, since they are real).
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Mapping}{
-
+    \begin{subparag}{Mapping}
         From our computation, we can notice that, for any point $\bvec{y} \in\mathbb{R}^d$, we can move it to the high-dimensional space: 
         \[\hat{\bvec{x}} = \bar{\bvec{x}} + W \bvec{y}\]
 
         This yields all the advantages presented in the first section of this document.
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Kerenelisation}{
-
+    \begin{subparag}{Kerenelisation}
         PCA can be kernalised in a non-trivial fashion.
 
         First, we need to account for the fact that our data may not be centered in input-space (this was done above by considering the mean of our input values), letting: 
@@ -613,10 +549,10 @@
         If we want $d > 1$, we can again take the $d$ eigenvectors with greatest eigenvalues, and compute each component of $\bvec{y}_i$ thanks to a different eigenvector.
 
         Note that we can no longer map data from $d$ dimensions back to $D$ dimensions with the kernalised method (since it would require us to know the feature expansion mapping $\phi\left(\bvec{x}\right)$).
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Autoencoder}{
+\begin{parag}{Autoencoder}
     Another way to do dimensionality reduction is through a neural network.
 
     The idea is to have a double funnel shaped neural network: an encoder decreasing the dimension, a layer with $d$ neurons, and a decoder increasing back the number of dimensions.
@@ -624,20 +560,16 @@
 
     We can train it to output the same data as what we input it, using a least square empirical risk. That way, it must learn an intelligent code.
 
-}
-
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         This can also be used to both do dimensionality reduction and mapping data back from the low-dimensional space.
-}
+    \end{subparag}
 
-
-\paragsubparag{}{Convolutional autoencoder}{
-    
+    \begin{subparag}{Convolutional autoencoder}
         We can use convolutional neural networks for autoencoders. To do so, we use the inverse functions of those convolutions.
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Fisher linear discriminant analysis}{
+\begin{parag}{Fisher linear discriminant analysis}
     Even though \important{Fisher linear discriminant analysis} (LDA) is a dimensionality reduction algorithm, it is a supervised learning one. Its goal is to project data on lower space, while keeping classes (hence the supervision) clustered. It considers that clustering should be done relatively to compactness, meaning distance between points within a cluster should be small, whereas distances across clusters should be large.
 
     The goal is to minimise the distances within a class, meaning the distance of the elements of a class to their class center $E_W\left(\bvec{w}\right)$, while maximising the distance of cluster centers (weighted by the number of elements in the class) $E_B\left(\bvec{w}\right)$. This is better expressed thanks to the within-class scatter matrix $S_W$ and the between-class scatter matrix $S_B$: 
@@ -648,23 +580,21 @@
     \[S_B \bvec{w}_{\left(1\right)} = \lambda_1 S_w \bvec{w}_{\left(1\right)}\]
     
     As for PCA we are in fact looking for the $d$ eigenvectors with largest eigenvalues. 
-}
+\end{parag}
 
-\parag{$K$-means clustering}{
+\begin{parag}{$K$-means clustering}
     The idea of \important{$k$-means clustering} is to consider that clustering should also be done relatively to compactness.
 
     To do so, we consider $K$ (an hyperparameter) cluster centers $\left\{\bvec{\mu}_1, \ldots, \bvec{\mu}_K\right\}$. While we are not converged, we assign each data point $\bvec{x}_i$ to the nearest center $\bvec{\mu}_k$, and then move  $\bvec{\mu}_k$ to the mean of the points that were assigned to it.
 
     This algorithm is guaranteed to converge, even though it may not be to the expected solution: some clusters may end up completely empty. A good way to fix this problem is to run it multiple times with different initialisation, and pick the solution minimising the sum of the distance between each point and their assigned cluster center.
 
-}
-
-\paragsubparag{}{Hyperparameter}{
+    \begin{subparag}{Hyperparameter}
         To choose the $K$, a good way is to draw a graph of the average within-cluster sum of distances with respect to the number of cluster, and pick a point at its ``elbow'' (where the drop in the $y$-axis becomes less significant).
-}
+    \end{subparag}
+\end{parag}
 
-
-\parag{Spectral clustering}{
+\begin{parag}{Spectral clustering}
     The idea of \important{spectral clustering} is to consider that clustering should be done relatively to connectivity instead: we group the points based on edges in a graph, and remove some of the edges with longest length. Let us first consider the case where we only want to make 2 clusters, meaning that we only want one cut.
 
     To create the graph, we need a way to give weights to edges in order to represent their affinity, a way to do so is: 
@@ -686,22 +616,18 @@
     
     The eigenvector with smallest eigenvalue can be shown to be a vector of all ones with eigenvalue 0. We are thus looking for the eigenvector with second smallest eigenvalue. A positive value in this vector indicates that the corresponding point belongs to one partition, and a negative value to the other.
 
-}
-
-\paragsubparag{}{Remark}{
+    \begin{subparag}{Remark}
         Since we had to relax the problem, the solution is not always optimal.
-}
+    \end{subparag}
 
-
-\paragsubparag{}{$K$-way partitions}{
-    
+    \begin{subparag}{$K$-way partitions}
         To obtain more than two clusters, we have two choices.
 
         The first one is to recursively apply the two-way partitioning algorithm. This is inefficient and unstable.
 
         The second one is to find $K$ eigenvectors. This leads to each point being represented by a $K$-dimensional vector. We can then apply $K$-means clustering to those resulting vectors.
-}
-
+    \end{subparag}
+\end{parag}
 
 \end{document}
 
