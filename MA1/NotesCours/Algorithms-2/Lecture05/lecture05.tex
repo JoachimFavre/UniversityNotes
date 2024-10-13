@@ -1,0 +1,166 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-09-24 at 13:28:55.
+
+\usepackage{../../style}
+
+\title{Algo}
+\author{Joachim Favre}
+\date{Mardi 24 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2024-09-24}{Duality}{
+\begin{itemize}[left=0pt]
+    \item Definition of the min-weight bipartite vertex cover problem.
+    \item Solution of the min-weight bipartite vertex cover problem using a relaxed linear program, and proof of the validity of the algorithm.
+    \item Definition of linear program duality.
+\end{itemize}
+
+}
+
+\subsection{Min-weight bipartite vertex cover}
+
+\begin{parag}{Min-weight bipartite vertex cover problem}
+    Let $G = \left(A \dcup B, E\right)$ be a bipartite graph with non-negative vertex weight function $w: V \mapsto \mathbb{R}_{\geq 0}.$
+
+    Our goal is to find a vertex cover $C \subseteq V$ that minimises the weight: 
+    \[w\left(C\right) = \sum_{v \in C} w\left(v\right).\]
+\end{parag}
+
+\begin{parag}{Linear program}
+    The idea is to define the weights as: 
+    \[x_v = \begin{systemofequations} 1, & \text{if } v \in C \\ 0, & \text{otherwise}. \end{systemofequations}\]
+
+    We then want to minimise the sum of the weights of the vertices we picked, under the constraint that, for any $e = \left\{u, v\right\} \in E$, we moreover want at least one of $u$ and $v$ to be picked:
+    \begin{linearprogram}{Minimise}{$\sum_{v \in V} x_v w\left(v\right)$}
+        $x_u + x_v \geq 1$, & $\forall \left\{u, v\right\} \in E$, \\
+        & $x_v \in \left\{0, 1\right\}$, & $\forall v \in V$.
+    \end{linearprogram}
+
+    Again, this is a NP-hard problem, so we relax it to:
+    \begin{linearprogram}{Minimise}{$\sum_{v \in V} x_v w\left(v\right)$}
+        $x_u + x_v \geq 1$, & $\forall \left\{u, v\right\} \in E$, \\
+        & $x_v \in \left[0, 1\right]$, & $\forall v \in V$.
+    \end{linearprogram}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $G = \left(V, E\right)$ be some graph.
+
+    If $G$ is bipartite, any extreme point under the constraints from the previous paragraph is integral.
+
+    \begin{subparag}{Example}
+        Again, if $G$ is not bipartite, this problem no longer holds. We can consider the fully connected graph with three vertices, setting $w\left(v\right) = 1$ for all $v \in V$. Then, any vertex cover has total weight at least two. However, the linear program can find a solution with weight less than or equal to $\frac{3}{2}$, by picking $x_v = \frac{1}{2}$ for all $v$.
+
+        Note that the general vertex cover problem is NP-hard, so there is probably not any polynomial-time algorithm for general graphs.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $x^*$ be an extreme point, and let $V_f$ be the set of vertices that are fractional: 
+        \[V_f = \left\{v \in V \suchthat 0 < x_v^* < 1\right\}.\]
+
+        We suppose towards contradiction that $V_f \neq \o$, i.e. that there exists some $x_v^*$ that isn't an integer. 
+
+        Since $G$ is bipartite, we know $V$ is split into $V = A \dcup B$. Let $A_f = A \cap V_f$ and $B_f = B \cap V_f$. This allows to split $A$ into three parts: the part where $x_v^* = 0$, the part $A_f$ and the part where $x_v^* = 1$.
+        \svghere[0.55]{MinWeightBipartiteVertexCoverIntegrality.svg}
+
+        Note that we cannot have edges going from $A_f$ to $x_v^* = 0$ or $x_v^* = 0$ to $B_f$ or from $x_v^* = 0$ to $x_v^* = 0$. Otherwise, the sum of the weight of the endpoints of those edges would be strictly less than $1$, which would not respect the linear program constraints.
+
+        Let $\epsilon > 0$ be small enough. We consider a first case where we construct another solution $y$ by adding $\epsilon$ to $A_f$ and $-\epsilon$ to $B_f$:
+        \[y_v = \begin{systemofequations} x^*_v, & \text{if } v \not \in V_f, \\ x^*_v + \epsilon, & \text{if } v \in A_f, \\ x^*_v - \epsilon, & \text{if } v \in B_f.  \end{systemofequations}\]
+
+        We want to show this is indeed feasible. Edges from $A_f$ to $B_f$ have the same weight. Edges from $x_v^* = 1$ to $B_f$ still respect the condition weight 1, since they touch $x_v^* = 1$. More precisely, if $\left(u, v\right) \in E$ with $x_u = 1$ and $v \in B_f$, then: 
+        \[y_u + y_v = 1 + \underbrace{x^*_v - \epsilon}_{\geq 0} \geq 1.\]
+
+        By a similar reasoning, edges from $x_v^* = 1$ to $B_f$ also still respect the condition. All other edges do not have their endpoint modified, so the constraint is also preserved for them.
+
+        We now consider another solution $z$ where we add $-\epsilon$ to $A_f$ and $\epsilon$ to $B_f$:
+        \[z_v = \begin{systemofequations} x^*_v, & \text{if } v \not \in V_f, \\ x^*_v - \epsilon, & \text{if } v \in A_f, \\ x^*_v + \epsilon, & \text{if } v \in B_f. \end{systemofequations}\]
+
+        By a similar reasoning, this is also feasible.
+
+        Now $y, z$ are different from $x$ since $\epsilon \neq 0$, and are both feasible. We moreover notice $x^* = \frac{y + z}{2}$, which means that $x^*$ is a convex combination of two feasible solutions, which is a contradiction to $x^*$ being an extreme point.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Duality}
+
+\begin{parag}{Example}
+    Let us say that we want to solve:
+    \begin{linearprogram}{Minimise}{$7x + 3y$}
+        $x + y \geq 2$, \\
+        & $3x + y \geq 4$, \\
+        & $x \geq 0$, \\
+        & $y \geq 0$.
+    \end{linearprogram}
+
+    It is easy to convince someone that there exists some solution with cost less than or equal to $10$, by simply showing $x = 1$ and $y = 1$ has this property.
+
+    However, it is much harder to show that there is no solution better than $6$. A way to do it is to notice that, since $x \geq 0$ and $y \geq 0$: 
+    \[7 x + 3y \geq 3x + 3y = 3\left(x + y\right) \geq 3\cdot 2 = 6.\]
+
+    We can also show that there is no solution better than 10: 
+    \[7x + 3y = 2\left(3x + y\right) + \left(x + y\right) \geq 2\left(4\right) + 2 = 10.\]
+
+    Therefore, 10 is optimal.
+
+    \begin{subparag}{Remark}
+        This kind of example is important. We may not be able to find the optimal solution in a reasonable time. However, finding a good solution with a lower bound on how bad it is already very interesting.
+
+        There are also certain cases where someone tells us a solution to a problem, which we do not have the computation power to verify but still cannot trust this person. By using duality, they can hand us a certificate that proves their solution is optimal.
+    \end{subparag}
+
+    \begin{subparag}{Formally}
+        Let's try to solve this more formally. Our goal is to add $\lambda_1$ times the first inequality and $\lambda_2$ times the second inequality, to get to our function $7x + 3y$.
+
+        In other words, we have, for any $\lambda_1, \lambda_2 \geq 0$: 
+        \autoeq{\lambda_1\left(x + y\right) + \lambda_2 \left(3 x + y\right) \geq 2\lambda_1 + 4 \lambda_2 \iff x\left(\lambda_1 + 3 \lambda_2\right) + y\left(\lambda_1 + \lambda_2\right) \geq 2 \lambda_1 + 4 \lambda_2.}
+        
+        But then, our goal is to maximise $2 \lambda_1 + 4 \lambda_2$, under the constraints that the left hand side of the inequality is smaller than our equation, i.e.: 
+        \[\lambda_1 + 3 \lambda_2 \leq 7, \mathspace \lambda_1 + \lambda_2 \leq 3.\]
+
+        More intuitively, the second constraint means that we do not want to use the $y$ coefficient more than $3$ times. We could indeed for instance not say that $7x + 3y \geq 4x + 4y = 4\left(x + y\right) \geq 4\cdot 2 = 8$, this would be wrong.
+        
+        We moreover finally want that: 
+        \[\lambda_1 \geq 0, \mathspace \lambda_2 \geq 0.\]
+
+        It turns our that, for linear program, this strategy always gives the best bound. The solution of the dual problem will always coincide with the solution to the original problem. This can be formalised to a theorem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Linear program duality}
+    Let $A \in \mathbb{R}^{m \times n}$ be some matrix, and $c \in \mathbb{R}^{n}$ and $b \in \mathbb{R}^{m}$ be some vectors.
+
+    The two following linear programs are said to be \important{dual}. The first one is said to be the \important{primal problem}, and the second one the \important{dual problem}.
+    \begin{center}
+    \begin{minipage}{0.25\textwidth}
+    \begin{linearprogram}{Minimise}{$c^T x$}
+        $A x \geq b$, \\
+        & $x \geq 0$.
+    \end{linearprogram}
+    \end{minipage}
+    \hspace{0.1\textwidth}
+    \begin{minipage}{0.25\textwidth}
+    \begin{linearprogram}{Maximise}{$b^T y$}
+        $A^T y \leq c$, \\
+        & $y \geq 0$.
+    \end{linearprogram}
+    \end{minipage}
+    \end{center}
+
+    Feasible solutions under the constraints of the first problem is said to be \important{primal feasible}, feasible solutions under of the second are said to be \important{dual feasible}.
+\end{parag}
+
+\begin{parag}{Example}
+    On bipartite graphs, the strong dual linear problem to the maximum cardinality matching problem is the minimum cardinality vertex cover.
+\end{parag}
+
+
+\end{document}

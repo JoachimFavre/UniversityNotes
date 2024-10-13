@@ -1,0 +1,175 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-09-30 at 13:18:08.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Lundi 30 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2024-09-30}{Very nice slackness}{
+\begin{itemize}[left=0pt]
+    \item Since we have \textit{complimentary} slackness.
+    \item Explanation of linear program weak duality, strong duality, and complementary slackness.
+    \item Characterisation of the bipartite perfect matching problem using complementary slackness.
+\end{itemize}
+    
+}
+
+\begin{parag}{Theorem: Weak duality}
+    Let us consider some linear program, and its dual.
+
+    For any primal feasible $x$ and dual feasible $y$.
+    \[\sum_{i=1}^{n} c_i x_i \geq \sum_{j=1}^{m} b_j y_j.\]
+
+    \begin{subparag}{Proof}
+        This is a one-liner, using the definition of primal and dual problem, i.e. that $b_j \leq \sum_{i=1}^{n} A_{ji} x_i$ for the solution to be primal feasible and $\sum_{j=1}^{m} A_{ji} y_i \leq c_i$ for the solution to be dual feasible:
+        \[\sum_{j=1}^{m} b_j y_j \leq \sum_{j=1}^{m} \left(\sum_{i=1}^{n} A_{ji} x_i \right) y_i = \sum_{i=1}^{n} \left(\sum_{j=1}^{m} A_{ji} y_i\right) x_i \leq \sum_{i=1}^{n} c_i x_i.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Strong duality}
+    Let us consider a linear program with bounded primal and dual polytope.
+
+    If $x$ is an optimal solution to the primal problem and $y$ is an optimal dual solution, then: 
+    \[\sum_{i=1}^{n} c_i x_i = \sum_{j=1}^{m} b_j y_j.\]
+
+    \begin{subparag}{Remark}
+        If a linear program polytope is unbounded, then its dual has no optimal solution.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Complementary slackness}
+    Let $x$ be primal feasible and $y$ be dual feasible.
+
+    $x$ and $y$ are both optimal if and only if we have, for all $i \in \left\{1, \ldots, n\right\}$ and $j \in \left\{1, \ldots, m\right\}$: 
+    \[\begin{systemofequations} \forall i \in \left\{1, \ldots, n\right\},\ x_i > 0 \implies c_i = \sum_{j} A_{ji} y_i,\\ y_j > 0 \implies b_j = \sum_{i} A_{ji} x_i. \end{systemofequations}\]
+    
+    \begin{subparag}{Intuition}
+        This means that the constraints related to non-zero variables are tight. 
+
+        More precisely, let us consider the variables $y$. Recall that $y_j$ can be considered as a multiple of the $j$\Th constraint for $x$. What this theorem tells us is that the $j$\Th inequality for $x$ is not tight for the optimal solution, then we do not bother using it when building the dual problem and just let $y_j = 0$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\implies$}
+        We suppose by hypothesis that $x$ and $y$ are optimal. 
+
+        Just like in the proof of weak optimality, for the solution to be dual feasible: 
+        \[\sum_{j=1}^{m} b_j y_j \leq \sum_{j=1}^{m} \left(\sum_{i=1}^{n} A_{ji} x_i \right) y_j = \sum_{i=1}^{n} \left(\sum_{j=1}^{m} A_{ji} y_j\right) x_i \leq \sum_{i=1}^{n} c_i x_i.\]
+        
+        Now, since the solution is optimal, the left hand side is in fact equal to the right hand side by strong duality. But then, all inequalities must be equalities. Now, for the second inequality to indeed be an equality, we necessarily need (we get a direct contradiction otherwise, since $\sum_{j=1}^{m} A_{ji} y_i \leq c_i$): 
+        \[\left(\sum_{j=1}^{m} A_{ji}y_j\right) x_i = c_i x_i.\]
+
+        If $x_i > 0$, we can divide by $x_i$, telling us that, as expected:
+        \[\sum_{j=1}^{m} A_{ji} y_i = c_i.\]
+
+        We can do the exact same reasoning for the first inequality, to get that, for all $j$: 
+        \[y_i > 0 \implies b_j = \sum_{i} A_{ji} x_i.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        Again, we have:
+        \[\sum_{j=1}^{m} b_j y_j \leq \sum_{j=1}^{m} \left(\sum_{i=1}^{n} A_{ji} x_i \right) y_i = \sum_{i=1}^{n} \left(\sum_{j=1}^{m} A_{ji} y_i\right) x_i \leq \sum_{i=1}^{n} c_i x_i.\]
+
+        The hypothesis implies that the left hand side and the right hand side are equal. By weak duality, the two solutions cannot get any better, they are therefore optimal.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Hungarian algorithm for min-cost bipartite perfect matching}
+
+\begin{parag}{Goal}
+    Solving a linear program can be expensive. We are therefore interested in exploiting complementary slackness to design a better algorithm.
+\end{parag}
+
+\begin{parag}{Lemma: Perfect matching dual characterisation}
+    Let $G = \left(A \dcup B, E\right)$ be a bipartite graph.
+
+    A perfect matching $M$ is of minimum cost if and only if there is a feasible dual solution $u, v$ such that: 
+    \[u_a + v_b = c\left(e\right), \mathspace \forall \left(a, b\right) \in M.\]
+
+    Moreover, the dual problem is: 
+    \begin{linearprogram}{Maximise}{$\sum_{a \in A} u_a + \sum_{b \in B} v_b$}
+        $u_a + v_b \leq c\left(e\right)$, & $\forall e \in \left\{a, b\right\} \in E$.
+    \end{linearprogram}
+    
+    \begin{subparag}{Remark}
+        Note that we do not require $u_a, v_b \geq 0$ in the dual problem. This comes from the fact that the corresponding inequalities are, in fact, equalities.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $G = \left(A \dcup B, E\right)$ be a bipartite graph, with some edge cost function $c: E \mapsto \mathbb{R}$. We consider the usual relaxed linear program for min-cost bipartite perfect matching:
+        \begin{linearprogram}{Minimise}{$\sum_{e \in E} c\left(e\right) x_e$}
+            $\sum_{e \in \delta\left(a\right)} x_e = 1$, & $\forall a \in A$, \\
+            & $\sum_{e \in \delta\left(b\right)} x_e = 1$, & $\forall b \in B$, \\
+            & $x_e \geq 0$, & $\forall e \in E$.
+        \end{linearprogram}
+        
+        We want to find the dual problem. Let us first write this linear program in normal form:
+        \begin{linearprogram}{Minimise}{$\sum_{e \in E} c\left(e\right) x_e$}
+            $\sum_{e \in \delta\left(a\right)} x_e \geq 1$, & $\forall a \in A$, \\
+            & $-\sum_{e \in \delta\left(a\right)} x_e \geq -1$, & $\forall a \in A$, \\
+            & $\sum_{e \in \delta\left(b\right)} x_e \geq 1$, & $\forall b \in B$, \\
+            & $-\sum_{e \in \delta\left(b\right)} x_e \geq -1$, & $\forall b \in B$, \\
+            & $x_e \geq 0$, & $\forall e \in E$.
+        \end{linearprogram}
+        
+        To find the dual problem, we introduce variables $u_a^+, u_a^-, v_b^+, v_b^-$ for the first, second, third and fourth constraint set, respectively. The first inequality gives a $\left(+1\right)$ factor for all $u_a^+$, the second one a $\left(-1\right)$ factor for all $u_a^-$, and so on for all variables. This means that we want to maximise:
+        \[\sum_{a \in A} \left(+1\right) u_a^+ + \sum_{a \in A}\left(-1\right)u_a^- + \sum_{b \in B} \left(+1\right)u_b^+ + \sum_{b \in B} \left(-1\right)u_b^-. \]
+
+        Let us consider some arbitrary $x_{e_0}$, for $e_0 = \left(a_0, b_0\right) \in E$. It has a coefficient $c\left(e_0\right)$ in the primal objective function. In the first inequality set, it only appears a single time, when $a = a_0$, with a $\left(+1\right)$ coefficient. Similarly, in the second inequality set, it only appears when $a = a_0$, but with a $\left(-1\right)$ coefficient. We have to sum all its appearances, getting the constraint: 
+        \[u_{a_0}^+ - u_{a_0}^- + v_{b_0}^+ - v_{b_0}^- \leq c\left(e_0\right).\]
+
+        Putting everything together, we get that the dual problem is:
+        \begin{linearprogram}{Maximise}{$\sum_{a \in A} \left(u_a^+ - u_a^-\right) + \sum_{b \in B} \left(v_b^+ - v_b^-\right)$}
+            $\left(u_a^+ - u_a^-\right) + \left(v_b^+ - v_b^-\right) \leq c\left(e\right)$, & $\forall e \in \left\{a, b\right\} \in E$, \\
+            & $u_a^+, u_a^-, v_b^+, v_b^- \geq 0$ & $\forall a \in A,\ \forall b \in B$.
+        \end{linearprogram}
+        
+        By complementary slackness, $\left(x, u^+, u^-, v^+, v^-\right)$ are optimal if and only if: 
+        \[\begin{systemofequations}
+            x_e > 0 \implies \left(u_a^+ - u_a^-\right) + \left(v_b^+ - v_b^-\right) = c\left(e\right), & \forall e = \left\{a, b\right\}\in E, \\
+            u_a^+ > 0 \implies \sum_{e \in \delta\left(a\right)} x_e = 1, & \forall a \in A,\\
+            u_a^- > 0 \implies -\sum_{e \in \delta\left(a\right)} x_e = -1, & \forall a \in A,\\
+            v_b^+ > 0 \implies \sum_{e \in \delta\left(b\right)} x_e = 1, & \forall b \in B,\\
+            v_b^- > 0 \implies -\sum_{e \in \delta\left(b\right)} x_e = -1, & \forall b \in B.\\
+        \end{systemofequations}\]
+        
+        By hypothesis, our $x_e$ are primal feasible (and our $\left(u^+, u^-, v^+, v^-\right)$ are dual feasible). The last four inequalities are therefore tautologies. We can finally use that $x_e \neq 0 \iff e \in M$, and let $u_a = u_a^+ - u_a^- \in \mathbb{R}$ and $v_b = v_b^+ - v_b^- \in \mathbb{R}$ to get that the complementary slackness tells us, for primal-feasible solutions $x$ and dual-feasible $\left(u, v\right)$, then $\left(x, u, v\right)$ are optimal if and only if: 
+        \[e \in M \implies u_a + v_b = c\left(e\right), \mathspace \forall e = \left\{a, b\right\} \in E.\]
+
+        This indeed gives our two results.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Neighbourhood}
+    Let $G = \left(A \dcup B, E\right)$ be some bipartite graph, and let $S \subseteq A$.
+
+    The \important{neighbourhood} of $S$, written $N\left(S\right)$, is defined by all vertices in $B$ that are reachable from elements in $A$ using a single edge: 
+    \[N\left(S\right) = \left\{v \in B \suchthat \left\{a, v\right\} \in E \text{ for some } a \in S\right\}.\]
+\end{parag}
+
+\begin{parag}{Hall's theorem}
+    Let $G = \left(A \cup B, E\right)$ be some bipartite graph.
+
+    $G$ contains a perfect matching if and only if: 
+    \[\left|S\right| \leq \left|N\left(S\right)\right|, \mathspace \forall S \subseteq A.\]
+
+    \begin{subparag}{Proof}
+        We will prove this theorem in the third exercise series.
+    \end{subparag}
+\end{parag}
+
+\end{document}

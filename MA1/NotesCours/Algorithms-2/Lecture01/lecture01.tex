@@ -1,0 +1,184 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-09-09 at 13:22:35.
+
+\usepackage{../../style}
+
+\title{Advanced algorithms}
+\author{Joachim Favre}
+\date{Lundi 09 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2024-09-09}{Matroidvania}{
+\begin{itemize}[left=0pt]
+    \item Definition of matroids.
+    \item Proof that matroids are a complete characterisation of greedy algorithms.
+    \item Here is a small recommendation of metroidvania games I enjoyed a lot: Hollow knight, the two Ori games, Doomblade.
+\end{itemize}
+
+}
+
+\section{Greedy algorithms}
+
+\subsection{Max-weight spanning tree}
+
+\begin{parag}{Definition: Max-weight spanning tree}
+    Let $G = \left(V, E\right)$ be a graph with weights $w: E \mapsto \mathbb{R}$.
+
+    The goal is to find a tree $T \subseteq E$ of maximum total weight: 
+    \[w\left(T\right) = \sum_{e \in T} w\left(e\right).\]
+
+    \begin{subparag}{Remark}
+        This is not unique in general.
+    \end{subparag}
+\end{parag}
+
+\begin{filecontents*}[overwrite]{kruskal.code}
+Sort and label edges in non-decreasing order of weights
+S = EmptySet
+for i = 1 to len(E):
+    if S + e_i is acyclic, then S = S + e_i
+return S
+\end{filecontents*}
+
+\begin{parag}{Kruskal's algorithm}
+    The max-weight spanning tree problem can be solved using a greedy algorithm, named \important{Kruskal's algorithm}. We will also refer to it as \lang{GREEDY}.
+
+    \importcode{kruskal.code}{}
+
+    \begin{subparag}{Proof}
+        Let $n = \left|V\right|$, and let $S = \left\{s_1, \ldots, s_{n-1}\right\}$ be the output of Kruskal's algorithm, ordered in non-increasing weights.
+
+        We suppose towards contradiction that this algorithm does not return a max weight spanning tree. In other words, we suppose that there exists a $T = \left\{t_1, \ldots, t_{n-1}\right\}$ also ordered in non-increasing weights such that $w\left(T\right) > w\left(S\right)$.
+
+        We notice there must be some $p \in \left\{1, \ldots n-1\right\}$ such that $w\left(t_p\right) > w\left(s_p\right)$ (otherwise, we would have $w\left(T\right) \leq w\left(S\right)$). We note $p$ to be the smallest such index.
+
+        We consider the sets $A \subseteq T$ and $B \subseteq S$ such that: 
+        \[A = \left\{t_1, t_2, \ldots, t_p\right\}, \mathspace B = \left\{s_1, s_2, \ldots, s_{p-1}\right\}.\]
+
+        Note that $\left|B\right| = p-1$, but $\left|A\right| = p$. Intuitively, $B$ represents the moment right before \lang{GREEDY} was forced to make a sub-obtimal decision, and $A$ represents the good decision taken by another algorithm.
+
+        Our goal is to show the existence of a $e \in A \setminus B$ such that $B + e$ is acyclic. We call this the key property. This directly comes from the fact that an acyclic graph with $k$ edges has $n-k$ connected components. Indeed, since $\left|A\right| > \left|B\right|$, there are more connected components in $A$ than in $B$. Therefore, there must be an edge in $A$ that connects two different connected components of $B$. This edge has the requested property.
+
+        Now, since $e \in A$ and we sorted our edges by weight, we need to have $w\left(e\right) \geq w\left(t_p\right)$. However, by definition of $p$, $w\left(t_p\right) > w\left(s_p\right)$, so $w\left(e\right) > w\left(s_p\right)$. This means that $e$ was considered before $s_p$ by \lang{GREEDY}. When it considered it, it had an edge solution set $S \subseteq B$. However, since $B + e$ is acyclic, so is $S + e$. This is therefore a contradiction to $e \in A \setminus B$ (i.e. that $e \not \in B$): \lang{GREEDY} would have added $e$ to its solution set when it considered it.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Insight}
+        This proof is based on the two following insights: 
+        \begin{enumerate}
+            \item If $B+e$ is acyclic, so is $B' + e$, for any $B' \subseteq B$. 
+            \item The key property, i.e. that for any $A, B$ for which $\left|A\right| > \left|B\right|$, there exists $e \in A \setminus B$ such that $B+e$ is acyclic.
+        \end{enumerate}
+
+        We abstract this to the following definition.
+    \end{subparag}
+\end{parag}
+
+\subsection{Matroids}
+\begin{parag}{Definition: Matroids}
+    Let $M = \left(E, I\right)$ be a tuple composed of a ground set $E$, and a family of subsets of $E$ denoted $I \subseteq \mathcal{P}\left(E\right)$.
+
+    It is said to be a \important{matroid} if it has the two following properties:
+    \begin{enumerate}
+        \item \textit{Downward-closed property:} If $X \subseteq Y$ and $Y \in I$, then $X \in I$.
+        \item \textit{Extension property:} For any $X, Y \in I$ such that $\left|Y\right| > \left|X\right|$, there exists some $e \in Y \setminus X$ such that $X + e \in I$.
+    \end{enumerate}
+
+    Elements of $I$ are called \important{independent sets}.
+
+    \begin{subparag}{Example}
+        In Kruskal's proof, $E$ is the set of edges, and $I$ is any acyclic set of edges. More formally, $M = \left(E, I\right)$ is a metroid, where $E$ is the edge set of $G = \left(V, E\right)$ and: 
+        \[I = \left\{F \subseteq E \suchthat \text{$F$ is acyclic}\right\}.\]
+
+        In this case, independent sets are acyclic subgraphs.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The size of $I$ can be exponential in the size of $E$ in the general case. We therefore typically suppose that $I$ does not have to be constructed explicitly, but instead that we have an oracle that can tell us efficiently whether, given some $x \subseteq E$, we have $x \in I$.
+
+        This is indeed the case for our example: if we have a subgraph, we can efficiently know if it is acyclic.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Base}
+    Let $M = \left(E, I\right)$ be a matroid. 
+
+    A \important{base}, or maximal independent set, is a $B \in I$ such that, for any $x \in E \setminus I$, $B + x \not \in I$.
+
+    \begin{subparag}{Intuition}
+        In other words, we cannot add any element to $B$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property: Maximum cardinality}
+    Let $M$ be a matroid. 
+
+    Any maximal independent set has the same cardinality, called the \important{maximum cardinality}.
+
+    \begin{subparag}{Proof}
+        This directly comes from the extension property: if we have two independent sets $X, Y$ where $\left|X\right| > \left|Y\right|$, then there exists some edge $e \in X \setminus Y$ such that $Y + e \in I$ and thus $Y$ cannot be maximum.
+
+        \qed
+    \end{subparag} 
+\end{parag}
+
+\begin{filecontents*}[overwrite]{greedy.code}
+Sort and label ground set elements in non-decreasing order of weights
+S = EmptySet
+for i = 1 to len(E):
+    if S + e_i is in I, then S = S + e_i
+return S
+\end{filecontents*}
+
+\begin{parag}{\lang{GREEDY} algorithm}
+    Let $E$ be some set and $I \subset \mathcal{P}\left(E\right)$ be a set of subsets of $E$.
+
+    We define the very general \lang{GREEDY} algorithm:
+    \importcode{greedy.code}{}
+\end{parag}
+
+\begin{parag}{Rado-Gale-Edmonds theorem}
+    Let $E$ be some set, and $I \subseteq \mathcal{P}\left(E\right)$ be a set of subsets of $E$.
+
+    \lang{GREEDY} finds a max weight base of $M = \left(E, I\right)$ \textit{for every} $w: E \mapsto \mathbb{R}$ if and only if $M = \left(E, I\right)$ is a matroid.
+
+    \begin{subparag}{Proof $\implies$}
+        Let's suppose towards contradiction that the downward-closeness property of $M$ is violated. In other words, there must exist some $S, T \subseteq E$ with $S \subset T$ such that $S \not \in I$ but $T \in I$.
+
+        We consider a special weight function $w: E \mapsto \mathbb{R}$ which would force \lang{GREEDY} to not be optimal (which we will do by showing the independent set it outputs has a weight strictly smaller than $w\left(T\right)$): 
+        \[w\left(e\right) = \begin{systemofequations} 2, & \text{if } e \in S, \\ 1, & \text{if } e \in T \setminus S, \\0, & \text{otherwise}. \end{systemofequations}\]
+
+        Thanks to those weights, \lang{GREEDY} will first consider the elements of $S$, taking the most elements it can. It will then consider elements of $T \setminus S$, and finally of $E \setminus T$. Let $S' \subseteq S$ be the elements of $S$ that \lang{GREEDY} chooses for its solution. We know $S' \neq S$ since $S \not \in I$, and \lang{GREEDY} only considers independent sets at any iteration. In particular, this means that $\left|S'\right| < \left|S\right|$. 
+
+        But then, by considering the upper-bound case where \lang{GREEDY} picks all vertices of $T \setminus S$, we have that the solution of \lang{GREEDY} has a weight $w$ such that:
+        \[w \leq \left|T \setminus S\right| + 2 \left|S'\right| < \left|T \setminus S\right| + 2 \left|S\right| = w\left(T\right),\]
+        since $S \subset T$. This is a contradiction to \lang{GREEDY} finding a max weight base of $M$: $T$ is a base with higher weight, $w < w\left(T\right)$.
+
+        We know that the downward-closeness property must hold, so we now suppose towards contradiction that the extension property is violated. In other words, there must exist some $S, T \in I$ such that $\left|S\right| < \left|T\right|$ but for any $e \in T \setminus S$ then $S + e \not \in I$. We consider the following weight function: 
+        \[w\left(e\right) = \begin{systemofequations} 1 + \frac{1}{2\left|S\right|}, & \text{if } e \in S, \\ 1, & \text{if } e \in T \setminus S, \\ 0, & \text{otherwise}. \end{systemofequations}\]
+
+        Again, \lang{GREEDY} will consider elements from $S$ first, since they have highest weight. By the downard-closedness property and since $S \in I$, any subset of $S$ is independent. This means that, while GREED considers elements of $S$, it will always add the element it considers to its solution set. In other words, when it starts to consider elements of $T \setminus S$, its solution set is $S$. However, by hypothesis, there is no element of $T \setminus S$ that we can add to $S$ that would preserve independence. Nonetheless, \lang{GREEDY} might add elements of zero weight (elements of $E \setminus T$), meaning that \lang{GREEDY} ends up with a solution set of weight $w$ given by: 
+        \[w = w\left(S\right) = \left|S\right| \left(1 + \frac{1}{2 \left|S\right|}\right) = \left|S\right| + \frac{1}{2}.\]
+
+        Since $T$ contains $\left|T\right| > \left|S\right|$ elements, which all have a weight greater than or equal to 1, we know that $w\left(T\right) \geq \left|T\right| > \left|S\right| + \frac{1}{2}$. This is again a contradiction that \lang{GREEDY} finds a max weight base of $M$: $T$ is a base with higher weight, $w < w\left(T\right)$.
+   \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        This is exactly the same proof as the one we did for Kruskal's algorithm.
+
+        Intuitively, given a better solution set, we use the extension property to find a better edge that \lang{GREEDY} did not add, whereas, because of the downard-closedness property, it could have; contradicting its definition.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+ 
+
+\end{document}

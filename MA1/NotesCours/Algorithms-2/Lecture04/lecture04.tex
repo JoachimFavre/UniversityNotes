@@ -1,0 +1,157 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-09-23 at 13:16:15.
+
+\usepackage{../../style}
+
+\title{Advanced algorithms}
+\author{Joachim Favre}
+\date{Lundi 23 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2024-09-23}{First linear program application}{
+\begin{itemize}[left=0pt]
+    \item Definition of feasible region, and of extreme point.
+    \item Proof that for a bounded feasible region, a linear program always has an optimum at an extreme point.
+    \item Definition of the max-weight bipartite perfect matching problem.
+    \item Solution of the max-weight bipartite perfect matching problem using a relaxed linear program, and proof of the validity of the algorithm.
+\end{itemize}
+
+}
+
+\begin{parag}{Definition: Convex combination}
+    A convex combination of points $x_1, \ldots, x_n \in \mathbb{R}^d$ is a point $y \in \mathbb{R}^d$ such that there exists $\lambda_i \geq 0$ where $\sum_{i} \lambda_i = 1$ and:
+    \[y = \sum_{i} \lambda_i x_i.\]
+
+    \begin{subparag}{Intuition}
+        A convex combination of two points, is any point on the line linking the two. A convex combination of three points, is any point on the plane that hits the three points, between the three points.
+
+        More generally, any point inside the convex hull of $x_1, \ldots, x_n$ can be written as a convex combination of them.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Feasible region}
+    The points that respect the linear constraints of a linear program is called the \important{feasible region}.
+
+    Elements $x \in \mathbb{R}^d$ of this feasible region are moreover called feasible solutions.
+\end{parag}
+
+\begin{parag}{Definition: Extreme point}
+    Let $x \in \mathbb{R}^d$ be a feasible solution.
+
+    $x$ is said to be an \important{extreme point} if it canot be written as a convex combination of other feasible points.
+    
+    \begin{subparag}{Intuition}
+        This definition can be equivalent to asking for points $x$ such that $d$ linearly independent inequalities are tight.
+
+        Intuitively, this formalises the idea of a vertex of the polytope.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    If the feasible region is bounded and non-empty, then there always exists an optimum, which is an extreme point.
+
+    \begin{subparag}{Remark}
+        The bounded hypothesis is important. For instance, let's say we want to maximise $x$ under the constraint $x \leq 0$. Then, any $\left(0, y\right)$ is a solution, without any of them being an extreme point.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Since any linear function is harmonic (i.e. has a zero Laplacian) and the feasible region is bounded, there is an optimal solution $x^*$ by calculus theorems.
+
+        Since the feasible region is convex, any point in it can be written as a convex combination of extreme points $x^{\left(i\right)}$. In other words, there exists $\lambda_i \geq 0$ such that $\sum_{i} \lambda_i = 1$ and:
+        \[x^* = \sum_{i} \lambda_i x^{\left(i\right)}.\]
+
+        Let $c$ be the vector such that we wish to maximise $c^T x$. The value of our solution is:  
+        \[c^T x^* = c^T \left(\sum_{i} \lambda_i x^{\left(i\right)}\right) = \sum_i \lambda_i c^T x^{\left(i\right)}.\]
+
+        In other words, the value of our solution $x^*$ is a weighted average of the value at the extreme points $x^{\left(i\right)}$. However, since this is an average, there must exist some $c^T x^{\left(i\right)}$ such that $c^T x^{\left(i\right)} \geq c^T x^*$ (otherwise, we get a direct contradiction). Now, since $x^*$ was optimal, this means $c^T x^{\left(i\right)} = c^T x^*$, and thus $x^{\left(i\right)}$ is an optimal solution.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm}
+    There exists multiple algorithms that can solve linear programs. Amongst others, there are the simplex method and the ellipsoid method.
+
+    We will not see any of those algorithms.
+\end{parag}
+
+\subsection{Max-weight bipartite perfect matching}
+
+\begin{parag}{Definition: Perfect matching}
+    Let $G = \left(V, E\right)$ be a graph, and $M$ be a matching on $G$.
+
+    $M$ is a \important{perfect matching} if every vertex is connected to an edge of $M$.
+\end{parag}
+
+\begin{parag}{Max-weight bipartite perfect matching problem}
+    Let $G = \left(A \dcup B, E\right)$ be a bipartite graph, and $w: E \mapsto \mathbb{R}$ be a weight function.
+
+    The goal is to find the perfect matching, with biggest weight: 
+    \[w\left(M\right) = \sum_{e \in M} w\left(e\right).\]
+\end{parag}
+
+\begin{parag}{Linear program}
+    Our goal is to solve this problem using linear programming. The idea is to consider what decisions we need to make; this corresponds to variables. Then, we need to add our objective and constraints.
+
+    The idea is to take one variable for each edge, which is 1 if it is in the matching and 0 otherwise: 
+    \[x_e = \begin{systemofequations} 1, & \text{if } e \in M, \\ 0, & \text{if } e \not \in M. \end{systemofequations}\]
+
+    Our goal is to maximise the sum of weights of the edges we picked, under the constraint, for each vertex $v \in V$, there should be exactly one edge incident to $v$: 
+    \begin{linearprogram}{Maximise}{$\sum_{e \in E} w\left(e\right) x_e$}
+        $\sum_{e | e \text{ incident to $v$}} x_e = 1$, & $\forall v \in V$, \\
+        & $x_e \in \left\{0, 1\right\}$, & $\forall e \in E$.
+    \end{linearprogram}
+
+     However, the last constraint is not a linear constraint. This type of linear program is named an \important{integer linear program}, which are NP-hard to solve in general. So, we relax the constraint into a linear program:
+    \begin{linearprogram}{Maximise}{$\sum_{e \in E} w\left(e\right) x_e$}
+        $\sum_{e | e \text{ incident to $v$}} x_e = 1$, & $\forall v \in V$, \\
+        & $x_e \in \left[0, 1\right]$, & $\forall e \in E$.
+    \end{linearprogram}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $G = \left(V, E\right)$ be some graph.
+
+    If $G$ is bipartite, any extreme point under the constraints from the previous paragraph is an integer.
+
+    \begin{subparag}{Remark}
+        If this is not bipartite, this is not true. For instance, the fully-connected graph with 3 vertices has solution $w_e = \frac{1}{2}$ for each $e \in E$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $x^*$ be an extreme point solution. Moreover, let $E_f$ be all the edges that have a non-integer weight: 
+        \[E_f = \left\{e \in E \suchthat 0 < x_e^* < 1\right\}.\]
+
+        Our goal is to show that $E_f = \o$. Therefore, let us suppose towards contradiction that $E_f \neq \o$, and let $e = \left(v_1, v_2\right) \in E_f$ be an edge with fractional weight. 
+
+        Since $0 < w_e^* < 1$ and the sum of edges incident to $v_2$ sum to 1, there must be another edge $e' = \left(v_2, v_3\right)$ such that $0 < w_{e'}^* < 1$, incident to $v_2$. Similarly, $v_3$ must be linked to another edge with fractional weight. This cannot continue forever, so this will have to loop back to some vertex visited before. Ignoring all vertices visited that are outside this loop (in black in the picture below), this makes us a cycle $C$ (in red and blue in the picture below).
+        \svghere[0.5]{MaxWeightBipartitePerfectMatchingIntegrality.svg}
+
+        We know $V = A \dcup B$ since $G$ is bipartite. Any edge of $G$ connectes an element of $A$ to an element of $B$ by definition of bipartite graphs, so this is true in particular for elements of the cycles. But then, the cycle $C$ must necessarily have an even length (otherwise, we would have an edge between two vertices of $A$, or two vertices of $B$).
+
+        We try to define two other feasible solutions $y, z$ such that $x^* = \frac{y + z}{2}$, which would mean $x^*$ is a convex combination of solutions, contradicting that $x^*$ was an extreme point. We consider an $\epsilon > 0$ small enough such that $\epsilon \leq x_e^* \leq 1 - \epsilon$ for all $e \in C$ (which necessarily exists since $0 < x_e^* < 1$ for all $e \in C$). Moreover, giving a number to every edge in the cycle, we can consider ``even'' and ``odd'' edges (red and blue edges on the picture above). We then define:
+        \[y_e = \begin{systemofequations} x_e^*, & \text{if } e \not \in C \\ x_e^* + \epsilon , & \text{if } e \in C \text{ and ``odd''}, \\ x^*_e - \epsilon, & \text{if } e \in C \text{ and ``even''.} \end{systemofequations}\]
+
+        By definition of $\epsilon$, we do have that $0 \leq y_e \leq 1$ for all $e \in E$. Moreover, since every vertex is connected to exactly an odd and an even edge in this cycle, the sum of the weight of edges connected to every vertices does not change. Putting everything together, $y$ is feasible. Also, $y \neq x^*$ since $\epsilon \neq 0$ and the cycle is non-empty.
+
+        We define similarly:
+        \[z_e = \begin{systemofequations} x_e^*, & \text{if } e \not \in C \\ x_e^* - \epsilon , & \text{if } e \in C \text{ and ``odd''}, \\ x^*_e + \epsilon, & \text{if } e \in C \text{ and ``even''.} \end{systemofequations}\]
+
+        By a similar argument, $z$ is a feasible solution such that $z \neq x^*$. However, we notice that $x^* = \frac{y + z}{2}$, which means that $x^*$ is not an extreme point. This is a contradiction.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Most proofs we will see in this course that try to show any extreme point is integral has a similar contradiction: we consider $x^*$ to be an extreme point, $E_f$ to be the set of solutions that are fractional and suppose towards contradiction that it is non-empty.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

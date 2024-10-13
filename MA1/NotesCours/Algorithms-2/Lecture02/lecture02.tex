@@ -1,0 +1,344 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-09-10 at 13:19:14.
+
+\usepackage{../../style}
+
+\title{Advanced algo}
+\author{Joachim Favre}
+\date{Mardi 10 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2024-09-10}{This algorithm is trivially generalisable}{
+    \begin{itemize}[left=0pt]
+        \item Definition of remarkable matroids: graphic matroid, $k$-uniform matroid, partition matroid, linear matroid and truncation matroids.
+        \item Definition of the intersection of matroids, and explanation on how to use it to solve problems.
+        \item Proof of the max-cardinality bipartite matching algorithm, that can be generalised to solve matroid intersection.
+    \end{itemize}
+    
+}
+
+\begin{parag}{Proposition 1: Graphic matroid}
+    Let $G = \left(V, E\right)$ be some graph.
+
+    We define $I$ to contain all sets of acyclic edges:
+    \[I = \left\{F \subseteq E \suchthat \text{$F$ is acyclic}\right\}.\]
+
+    Then, $M = \left(E, I\right)$ is a matroid, named the \important{graphic matroid}.
+
+    \begin{subparag}{Remark}
+        This is the matroid we used for Krushkal's algorithm.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition 2: $k$-uniform matroid}
+    Let $E$ be some set and let $k \in \mathbb{N}$ be an integer.
+
+    We define $I$ to be all the subsets of $E$ that are of cardinality no greater than $k$: 
+    \[I = \left\{F \subseteq E \suchthat \left|F\right| \leq k\right\}.\]
+    
+    Then, $M = \left(E, I\right)$ is a matroid, named a \important{$k$-uniform matroid}.
+\end{parag}
+
+\begin{parag}{Proposition 3: Partition matroid}
+    Let $E$ be a set, that is partitioned into a disjoint union of $\ell$ sets: 
+    \[E = E_1 \dcup E_2 \dcup \ldots \dcup E_{\ell }.\]
+
+    Moreover, let $k_1, \ldots, k_{\ell } \in \mathbb{N}$ be integers. We define $I$ such that: 
+    \[I = \left\{X \subseteq E \suchthat \left|X \cap E_i\right| \leq k_i, \forall i \in \left\{1, \ldots, \ell \right\}\right\}.\]
+
+    Then, $\left(E, I\right)$ is a matroid, named a \important{partition matroid}.
+
+    \begin{subparag}{Intuition}
+        The idea is that we want all elements of $I$ to have at most $k_i$ elements of the partition $E_i$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition 4: Linear matroid}
+    Let $E$ be a set, $\mathcal{F}$ be a field, and $A \in \mathcal{F}^k$ be a set of vectors over $\mathcal{F}$, and $f: E \mapsto A$ be an index that maps ground set elements to vectors of $A$.
+
+    For any set $X \subseteq E$, we denote $A_X = f\left(X\right)$ to be the set of vectors in $E$ corresponding to the elements of $X$. We moreover define:
+    \[I = \left\{X \subseteq E \suchthat \left|A_X\right| = \left|X\right| \text{ and } A_X \text{ is linearly independent} \right\}.\]
+
+    Then, $\left(E, I\right)$ is a matroid, named a \important{linear matroid}.
+
+    \begin{subparag}{Intuition}
+        In other words, we declare independent any set that is mapped to a linearly independent tuple of vectors.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        Another way to see this matroid is through matrices.
+
+        We can consider $A$ to be a matrix, which is indexed by elements of $E$ (i.e., for any elements in $E$, we have a corresponding column in $A$). Then, $A_X$ is the matrix constructed by taking the column of $A$ corresponding to each element of $X$.
+
+        We finally declare independent any set for which $A_X$ is maximum rank:
+        \[I = \left\{X \subseteq E \suchthat \rank\left(A_X\right) = \left|X\right|\right\}.\]
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        The graphic matroid is a linear matroid. We can take $A$ as the edge vertex incidence matrix of $G$, $A \in \mathbb{F}_2^{\left|V\right| \times \left|E\right|}$ defined by:
+        \[A_{ij} = \begin{systemofequations} 1, & \text{if $e_j$ is incident to $v_i$}, \\ 0, & \text{otherwise}. \end{systemofequations}\]
+
+        This matrix has exactly two ones per column, and no two columns are equal. Since we are working on the finite field $\mathbb{F}_2 = \left\{0, 1\right\}$, the only way for a subset of those columns to be linearly dependent is that the sum of those vectors is $0$. 
+
+        Moreover, it is possible to convince ourselves that a path in the graph is equivalent to adding the columns corresponding to all its edges: if it starts at $v_i \in V$ and ends at $v_j \in V \setminus \left\{v_i\right\}$, then we will get a vector $w \in \mathbb{F}_2^{\left|V\right|}$ that has exactly two ones, at index $i$ and index $j$.
+
+        We can then use this to prove our result.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition 5: Truncation matroid}
+    Let $M = \left(E, I\right)$ be a matroid, and $k \in \mathbb{N}$.
+
+    We declare independent any independent set from $M$ that has cardinality at most $k$:
+    \[I_k = \left\{X \in I \suchthat \left|X\right| \leq k \right\}.\]
+
+    Then, $M_k = \left(E, I_k\right)$ is a matroid, named a \important{truncation matroid}.
+\end{parag}
+
+\subsection{Matroid intersection}
+
+\begin{parag}{Definition: Matroid intersection}
+    Let $M_1 = \left(E, I_1\right)$ and $M_2 = \left(E, I_2\right)$ be two matroids over the same ground set. 
+
+    The \important{intersection} of $M_1$ and $M_2$ is defined by: 
+    \[M_1 \cap M_2 = \left(E, I_1 \cap I_2\right).\]
+
+    \begin{subparag}{Remark}
+        This is not a matroid in general.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Edmonds-Lawler theorem}
+    Let $M_1 \cap M_2$ be the intersection of two matroids. 
+
+    There exists a polynomial-time algorithm for finding a max weight independent set from $M_1 \cap M_2$.
+
+    \begin{subparag}{Proof}
+        We will not prove this theorem in this class. However, we will show that the matching problem is the intersection of two matroids, and we will show an algorithm to solve it. That algorithm can be (non-trivially) generalised to prove this theorem.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This is not true for the intersection of three or more matroids. In fact, finding a max-weight independent set from the intersection of three matroids is NP-hard.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Matching}
+    Let $G = \left(V, E\right)$ be some graph. 
+
+    $M \subseteq E$ is a \important{matching} if every vertex is only connected to at most an edge. In other words, for any $v \in V$: 
+    \[\left|\left\{e \in M \suchthat v \in E\right\}\right| \leq 1.\]
+\end{parag}
+
+\begin{parag}{Definition: Bipartite graph}
+    Let $G = \left(V, E\right)$ be some graph.
+
+    $G$ is said to be \important{bipartite} if the vertex set $V$ admits a partition $V = A \dcup B$ such that edges always link an element from $A$ to an element of $B$: 
+    \[e \cap A \neq \o \text{ and } e \cap B \neq \o, \mathspace \forall e \in E.\]
+
+    \begin{subparag}{Remark}
+        Equivalently, we can require that, for any edge $\left\{u, v\right\} \in E$, we have both:
+        \[u \in A \text{ and } v \in B.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Bipartite matching problem}
+    Let $G = \left(A \dcup B, E\right)$ be some bipartite graph. 
+
+    The goal of the \important{bipartite matching problem} is to find a matching of maximum size in $G$.
+
+    \begin{subparag}{Remark}
+        We cannot take the naive $I = \left\{M \subseteq E \suchthat \text{$M$ is a matching}\right\}$ since it does not respect the extension property. However, it appears to be an intersection of matroids, justifying the previous definition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Edge neighbourhood}
+    Let $G = \left(V, E\right)$ be a graph, and $a \in V$ be some vertex.
+
+    The \important{edge neighbourhood} of $a$, denoted $\delta\left(a\right)$, is defined by: 
+    \[\delta\left(a\right) = \left\{e \in E \suchthat a \in e\right\}.\]
+\end{parag}
+
+\begin{parag}{Proposition 1: Bipartite matching}
+    Let $G = \left(A \dcup B, E\right)$ be a bipartite graph. Our goal is to solve the bipartite matching problem.
+
+    We consider two matroids over the ground set $E$, $M_A$ and $M_B$. For the first one, we declare independent all edge set that does not contain two edges that link to the same vertex from $A$:
+    \[I_A = \left\{F \subseteq E \suchthat \left|F \cap \delta\left(a\right)\right| \leq 1, \forall a \in A\right\}.\]
+
+    The definition of $I_B$ is completely symmetrical, but with respect to $B$: 
+    \[I_B = \left\{F\subseteq E \suchthat \left|F \cap \delta\left(b\right)\right| \leq 1, \forall b \in B\right\}.\]
+
+    Then, any matching on $G$ is an element of $I_A \cap I_B$, and $M_A = \left(E, I_A\right)$ and $M_B = \left(E, I_B\right)$ are partition matroids.
+
+    \begin{subparag}{Proof}
+        By definition of a matching, each vertex of $V = A \dcup B$ must be linked to at most one edge of the matching. The first matroid forces this for all vertices in $A$, and the second one for all vertices in $B$, as expected.
+
+        They are moreover indeed partition matroids, since, by definition of bipartite graph, there is no edge that links two vertices in $A$. Therefore, we have $\delta\left(a_1\right) \cap \delta\left(a_2\right)$ for any $a_1, a_2 \in A$, implying that $\left(\delta\left(a\right) \suchthat a \in A\right)$ is indeed a partition of $E$. We can do a symmetric reasoning for $B$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Colourful spanning tree}
+    Let $G = \left(V, E\right)$ be a graph, such that all vertices have a colour.
+
+    A spanning tree $T$ is said to be \important{colourful} if all its edges have a different colour.
+\end{parag}
+
+\begin{parag}{Colourful spanning tree problem}
+    Let $G = \left(V, E\right)$ be some graph, with coloured vertices.
+
+    The goal of the \important{colourful spanning tree problem} is to know whether $G$ admits a colourful spanning tree.
+\end{parag}
+
+\begin{parag}{Proposition 2: Colourful spanning tree}
+    Let $G = \left(V, E\right)$ be some graph, with coloured vertices.
+
+    We consider two matroids, $M_1$ and $M_2$:
+    \begin{itemize}[left=0pt]
+        \item $M_1 = \left(E, I_1\right)$ is the graphic matroid of $G$. 
+        \item $M_2 = \left(E, I_2\right)$ is the partition matroid of the colour classes. In other words, leaving $E_i$ to be the set of edges of colour $i$, we declare independent any set of edges that have at most 1 edge of any given colour:
+        \[I_2 = \left\{F \subseteq E \suchthat \left|F \cap E_i\right| \leq 1, \forall i\right\}.\]
+    \end{itemize}
+    
+    Elements of the intersection of $I_1 \cap I_2$ are all colourful trees.
+
+    \begin{subparag}{Remark}
+        Using this matroid intersection, we can find the colourful tree of maximum size. If it has size $\left|V\right| - 1$, it is spanning; otherwise, there does not exist any colourful spanning tree.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        By definition of $M_1$ elements of $I_1$ are trees; and by definitions of $M_2$, elements of $I_2$ are edge sets that do not have twice the same colour. Therefore, elements of $I_1 \cap I_2$ are indeed colourful spanning trees.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Arborescence}
+    Let $D = \left(V, E\right)$ be a directed graph. Moreover, let $r \in V$ be some vertex, which we call the root.
+
+    An \important{$r$-arborescence} over $D$ is a spanning tree (viewing $D$ as an undirected graph), that is directed away from $r$.
+
+    \begin{subparag}{Intuition}
+        In other words, an $r$-arborescence is a tree that allows to reach any vertex $v \in V$ by starting from $r$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Arborescence problem}
+    Let $D = \left(V, E\right)$ be a directed graph, rooted at $r \in V$.
+
+    The goal of the \important{arborescence problem} is to know if $D$ admits an $r$-arborescence.
+\end{parag}
+
+\begin{parag}{Proposition 3: Arborescence}
+    Let $D = \left(V, E\right)$ be a rooted directed graph, with root $r \in V$.
+
+    We consider two matroids, $M_1$ and $M_2$:
+    \begin{itemize}[left=0pt]
+        \item $M_1$ is the graphic matroid on $G$, the undirected version of $D$.
+        \item We consider $\delta^{-}\left(v\right)$ to be the set of edges going into $v \in V$:
+        \[\delta^-\left(v\right) = \left\{\left(u, v\right) \in E\right\}.\]
+
+            Then, $M_2$ is the partition matroid, which asks any non-root vertex to have at most one predecessor: 
+        \[I_2 = \left\{F \subseteq E \suchthat \left|F \cap \delta^{-}\right| \leq 1, \ \forall v \in V \setminus \left\{r\right\}\right\}.\]
+    \end{itemize}
+    
+    $T$ is an $r$-arborescence if and only if $\left|T\right| = \left|V\right|-1$ and it is independent in both $M_1$ and $M_2$.
+
+    \begin{subparag}{Proof $\implies$}
+        An arborescence does not have any cycle, and any non-root vertex can indeed be reached by at most one other vertex. Since it is moreover a tree, we do have $\left|T\right| = \left|V\right| - 1$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        Since $T$ is independent in the first matroid and $\left|T\right| = \left|V\right|-1$, then it is a tree. Since moreover every non-root vertex have at most one predecessor, they must all have exactly one predecessor. They can therefore indeed all be reached from the root.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Max-cardinality bipartite matching}
+
+\begin{parag}{Definition: Alternating path}
+    Let $G = \left(A \dcup B, E\right)$ be some bipartite graph, and $M$ be a matching.
+
+    An alternating path with respect to $M$ is a non-trivial path that alternates between $M$ and $E \setminus M$.
+\end{parag}
+
+\begin{parag}{Definition: Augmenting path}
+    Let $G = \left(A \dcup B, E\right)$ be some bipartite graph, and $M$ be a matching.
+
+    An \important{augmenting path} with respect to $M$, is an alternating path that starts and ends with unmatched vertices.
+
+    \begin{subparag}{Example}
+        Consider the following bipartite graph, where bold edges are elements of a matching $M$:
+        \svghere[0.45]{AlternatingPath.svg}
+
+        The path $\left(\left(3, 4\right), \left(4, 1\right), \left(1, 5\right), \left(5, 2\right), \left(2, 6\right)\right)$ is an augmenting path with respect to $M$.
+    \end{subparag}
+
+    \begin{subparag}{Property}
+        Any augmenting path has an odd length.
+
+        Indeed, the path is non-trivial, so there exists at least one edge in it. The first and last edge are not in $M$ since we start and end with unmatched vertices. Since we moreover alternate matched and unmatched edges, this means that there is an odd number of edges. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Symmetric difference}
+    Let $A, B$ be sets. 
+
+    The \important{symmetric difference} of $A$ and $B$, denoted $A \Delta B$, is defined as elements in exactly one of the two sets: 
+    \[A \Delta B = \left\{x \suchthat x \in A \oplus x \in B\right\}.\]
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $G = \left(A \dcup B, E\right)$ be some graph, and $M$ be a matching.
+
+    $M$ is maximum cardinality if and only if there does not exist an augmenting path with respect to $M$.
+
+    \begin{subparag}{Proof $\implies$}
+        We prove this by the contrapositive. In other words, we take as hypothesis that there exists some augmenting path $P$ with respect to $M$, and we want to show that $M$ is not of maximum cardinality.
+
+        We notice that $M \Delta P \subseteq E$ is a matching. Indeed, the first and last vertex of $P$ were unmatched, and they become matched under $M \Delta P$. Since $P$ alternates between edges in $M$ and edges outside $M$, and since $M$ is a matching, the other vertices in $P$ were connected to a single edge in $M$. We however remove this edge from the matching and add another one by doing $M \Delta P$, so all those vertices stay connected to a single edge. Finally, any vertex that is not in $P$ is untouched: it stays connected to the same number of edges. All this does imply that $M \Delta P$ is a matching.
+
+        By a similar reasoning, we also get that $\left|M \Delta P\right| = \left|M\right| + 1$. In other words, $M \Delta P$ is another matching of bigger cardinality, showing that $M$ was not of maximum cardinality.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        Let's suppose toward contradiction that $M$ is not maximum, i.e. that there exists some $M^*$ such that $M^*$ is maximum and $\left|M^*\right| > \left|M\right|$.
+
+        Let us consider $Q = M \Delta M^*$. We notice each vertex has a degree of maximum 2, so the graph is a disjoint union of paths and cycles.
+
+        Necessarily, in both paths and cycles, edges are alternating between elements of $M$ and elements of $M^*$: in both $M$ nor $M^*$, there is no two edge that are connected, by definition of matching. Therefore, cycles and even-length paths have the same number of elements of $M$ and of $M^*$, whereas odd-length path have more edges of one type than the other.
+
+        Since there are more edges of $M^*$ than $M$, there is necessarily an odd-length path that starts and end with an element of $M^*$. By definition of $Q = M \Delta M^*$, any $e \in Q \cap M^*$ is such that $e \not \in M$. Therefore, this odd-length path is an augmenting path under $M$---it starts at an unmatched vertex, alternates between unmatched and matched edges, and finishes at an unmatched vertex---so this is a contradiction.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Algorithm: Max-cardinality bipartite matching}
+    Let $G = \left(A \dcup B, E\right)$ be some graph.
+
+    The following algorithm finds a maximum cardinality matching:
+    \begin{enumerate}
+        \item Initialise $M$ to the empty set.
+        \item While there exists an augmenting path $P$ with respect to $M$, update $M \leftarrow M \Delta P$.
+        \item Return $M.$
+    \end{enumerate}
+   
+    \begin{subparag}{Remark 1}
+        Finding whether there is an augmenting path $P$ can be directly done using BFS or DFS. Starting from an unmatched vertex in $A$, we can explore the graph by alternating matched and unmatched edges, like if the graph was directed and that matched edges link from $A$ to $B$, and that unmatched edges link from $B$ to $A$. If we find a path to an unmatched vertex, this is an alternating path. Otherwise, we have to try another unmatched vertex from $A$. 
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        As mentioned earlier, this algorithm can be generalised to solve any matroid intersection problem.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The fact this algorithm works is a direct corollary of the previous lemma.
+    \end{subparag}
+\end{parag}
+
+\end{document}

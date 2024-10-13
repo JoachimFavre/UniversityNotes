@@ -1,0 +1,193 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-09-17 at 13:16:07.
+
+\usepackage{../../style}
+
+\title{Algo}
+\author{Joachim Favre}
+\date{Mardi 17 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2024-09-17}{Poly-supertop}{
+\begin{itemize}[left=0pt]
+    \item Proof that, on a bipartite graph, the minimum vertex cover problem is the dual of the maximum matching problem.
+    \item Definition of linear program.
+\end{itemize}
+
+}
+
+\subsection{Duality for bipartite matching}
+
+\begin{parag}{Definition: Vertex cover}
+    Let $G = \left(V, E\right)$ be a graph, and $C \subseteq V$.
+
+    $C$ is named a \important{vertex cover} if, for any $e \in E$,  
+    \[e \cap C \neq \o .\]
+
+    In other words, $C$ is a vertex cover if there is no edge $e \in E$ completely contained in $V \setminus C$, i.e. with no endpoint in $V$.
+
+    \begin{subparag}{Example}
+        Let us consider the following graph:
+        \svghere[0.3]{VertexCoverExample.svg}
+
+        On this graph, $C \subseteq V$ is a vertex cover if and only if has size 2 or more.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Whereas we want to maximise the size of matchings, we aim to minimise the size of vertex covers.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Minimum vertex cover problem}
+    In the minimum vertex cover problem, the goal is to find a vertex cover $C$ of minimum cardinality.
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $G = \left(V, E\right)$ be a graph, $M$ be a matching on $G$ and $C$ be a vertex cover.
+
+    Then, 
+    \[\left|M\right| \leq \left|C\right|.\]
+   
+    \begin{subparag}{Proof}
+        Let $M$ be an arbitrary matching and $C$ be an arbitrary vertex cover. To show that $\left|M\right| \leq \left|C\right|$, we construct an injective function that maps edges $e \in M \subseteq E$ to vertices $v \in C \subseteq V$. 
+
+        Let $e \in M$ be arbitrary. Since $C$ is a vertex cover, at least one of the endpoints $v$ of $e$ is an element of $C$: $v \in C$. We let the function map $e$ to this $v$.
+
+        This is indeed an injection, since, by definition of matching, two edges in $M$ cannot share an endpoint. Two edges in the matching can therefore never be mapped to the same vertex.
+
+        \qed
+    \end{subparag}
+    
+    \begin{subparag}{Remark}
+        Whether there exists $M, C$ such that $\left|M\right| = \left|C\right|$ is however not always the case. If we consider the triangle example above again, the maximum matching contains a single edge, but the minimum vertex cover contains two vertices. 
+
+        However, for bipartite graphs, we always have the existence of $M, C$ such that $\left|M\right| = \left|C\right|$, as stated by the following theorem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{König's theorem}
+    Let $G = \left(A \cup B, E\right)$ be some bipartite graph.
+
+    Then, the size of the maximum matching is the size of the minimum vertex cover.
+
+    \begin{subparag}{Remark}
+        This kind of property is named duality; and one problem is said to be the \textit{dual} of the other. We will see many more examples with linear programming.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $M^*$ be a maximum matching in $G$, and let $P$ be the set of alternating paths starting from an unmatched vertex in $A$. We consider $L$ to be the set of vertices that is either unmatched in $A$ or reachable by using a path from $P$. We can partition both $A$ and $B$ thanks to $L$.
+        \svghere[0.8]{KoenigTheorem.svg}
+
+        Our goal is to show that the following is a minimum vertex cover: 
+        \[C^* = \left(A \setminus L\right) \cup \left(B \cap L\right).\]
+
+        We first show that it is a valid vertex cover, we will later verify it is indeed minimum. The only possibility for this not to be a vertex cover is that there exists some uncovered edge, which would have to go from $A \cap L$ to $B \setminus L$. Let us therefore suppose towards contradiction that there exists some $e = \left(a, b\right)$ with $a \in A \cap L$ and $b \in B \setminus L$. 
+
+        Notice that any path in $P$ going to a vertex in $A$ ends with an edge in the matching. Similarly, paths in $P$ going to a vertex in $B$ end with an edge that is not in the matching. We have two possibilities:
+        \begin{itemize}[left=0pt]
+            \item Let us first suppose that $e = \left(a, b\right) \in M^*$. This means that $a$ is matched, and that any path in $P$ going to $a$ has to use this edge (recall that any such path ends with an edge in the matching and, by definition of a matching, this is the only such edge that is connected to $a$). Now, since $a \in A \cap L$ and by definition of $L$, there must exist such an alternating path. Removing $e$ from it, we get an alternating path starting at a vertex in $A$ going to $b$, contradicting that $b \not \in L$.
+            \item Let us now suppose that $e = \left(a, b\right) \not \in M^*$. We can add $e$ to the alternating path that arrives at $a$. Since any such alternating path ends with an edge from the matching, adding $e \not\in M^*$ to it keeps it alternating. This also contradicts the fact that $b \not \in L$.
+        \end{itemize}
+
+        We have shown that there is no edge going from $A \setminus L$ to $B \cap L$, so this is indeed a valid vertex cover. We now want to show that $\left|C^*\right| = \left|M^*\right|$. This comes from the following three observations.
+        \begin{itemize}[left=0pt]
+            \item No vertex in $A \setminus L$ is unmatched. Indeed, by definition of $L$, all unmatched vertices are in $L$.
+            \item No vertex in $B \cap L$ is unmatched. Otherwise, there would be an alternating path starting from an unmatched vertex in $A$ and going to this vertex. This would be an augmenting path, contradicting that $M^*$ is maximal.
+            \item There exists no edge $e = \left(a, b\right)$ of $M^*$ between $A \setminus L$ and $B \cap L$. Otherwise, we could add this edge to paths from $P$ ending in $B$, getting an alternating path ending at $a$, contradicting that $a \in A \setminus L$.
+        \end{itemize}
+
+        Since there is no edge going from $A \setminus L$ to $B \cap L$ (as shown in the first part of the proof), any matched edge either goes from $A \cap L$ to $B \cap L$, or from $A \setminus L$ to $B \setminus L$. Since also all vertices in $A \setminus L$ and in $B \cap L$ are matched, this means that there is a one-to-one correspondance between vertices in $C^* = \left(A \setminus L\right) \cup \left(B \setminus L\right)$ and edges in $M^*$. This indeed shows $\left|C^*\right| = \left|M^*\right|$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\section{Linear programming}
+
+\begin{parag}{Example}
+    Let's say that we want to maximise $f\left(x, y\right) = x + y$ subject to the constraints $x + y \leq 2$, $y \leq 1$ and $x, y \geq 0$.
+
+    We can sum this up by the following diagram, which represents the feasible region under those constraints. We then imagine the straight line $f\left(x, y\right) = c$ decreasing in $c$, until it reaches the domain. Doing so, we find that the best we can do is $f\left(x, y\right) = 2$ with $x \in \left[1, 2\right]$.
+    \svghere[0.4]{LinearProgrammingExample.svg}
+
+    In fact, under the same constraint, no matter the linear function $f\left(x, y\right)$ we try to optimise, one of the vertices of the feasible region is an optimal solution.
+\end{parag}
+
+\begin{parag}{Definition: Vector inequality}
+    Let $u, v \in \mathbb{R}^n$ be two vectors.
+
+    We note $u \geq v$ if and only if: 
+    \[u_i \geq v_i, \mathspace \forall i \in \left\{1, \ldots, n\right\}.\]
+
+    \begin{subparag}{Remark}
+        This will simplify notations for linear programs.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Linear program}
+    Let $A \in \mathbb{R}^{m \times n}$ be some matrix, and $c \in \mathbb{R}^{n}$ and $b \in \mathbb{R}^{m}$ be some vectors.
+
+    A \important{minimisation linear program} is defined by looking for the unknowns $x_1, \ldots, x_n \in \mathbb{R}$ such that:
+    \begin{linearprogram}{Minimise}{$c^T x$}
+        $A x \geq b$, \\
+        & $x \geq 0$.
+    \end{linearprogram}
+
+    A \important{maximisation linear program} is defined by looking for the unknowns $y_1, \ldots, y_m \in \mathbb{R}$ such that:
+    \begin{linearprogram}{Maximise}{$b^T y$}
+        $A^T y \leq c$, \\
+        & $y \geq 0$.
+    \end{linearprogram}
+
+    \begin{subparag}{Remark}
+        For now, the difference in notation between minimisation and maximisation is purely unnecessary. It will however come in handy when we will consider duality.
+    \end{subparag}
+
+    \begin{subparag}{Terminology}
+        In the example before, the set of constraints yield a polygon. In the more general case where we have $n$ variables, this is however a polygon of dimension $n$, called a polytope. We will therefore sometime refer to a set of constraints as a \important{polytope}.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Linear optimisation under linear constraint}
+    Let us consider an arbitrary problem where we try to find $x_1, \ldots, x_n$ that minimise and/or maximise a linear objective function: 
+    \[\sum_{i=1}^{n} c_i x_i,\]
+    subject to $m$ linear constraints: 
+    \[\sum_{i} e_{ij} x_i = b_j, \mathspace \forall j \in \left\{1, \ldots, m_1\right\},\] 
+    \[\sum_{i} d_{ik} x_i \geq g_k, \mathspace \forall k \in \left\{1, \ldots, m_2\right\},\] 
+    \[\sum_{p} f_{ip} x_i \leq \ell_i, \mathspace \forall k \in \left\{1, \ldots, m_3\right\}.\]
+
+    This problem is equivalent to solving a linear program.
+
+    \begin{subparag}{Proof}
+        We can represent $\leq$ using only $\geq$: 
+        \[\sum_{p} f_{ip} x_i \leq \ell_i \iff \sum_{p} \left(-f_{ip}\right) x_i \geq \left(-\ell_i\right).\]
+
+        Then, we can represent equality by using two inequalities: 
+        \[a = b \iff a \leq b \land a \geq b.\]
+        
+        The only real issue seems to appear with the constraint that we always want $x \geq 0$ for linear programs. However, this can be solved by multiplying by two the number of variables, considering $x^+$ and $x^-$. We can then replace $x_i$ everywhere by $x_i^+ - x_i^-$, and add the constraint that $x_i^+ \geq 0$ and $x_i^- \geq 0$. This represents the exact same solution set.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        Note that strict inequalities are not allowed. In other words, we want the feasible region to be closed.
+
+        Otherwise, we might have to maximise $x$ under the constraint $x < 1$. This maximum however does not exist.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Linear programs can be solved in polynomial time in the encoding length of the program, i.e. polynomial in then number of variables and constraints.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

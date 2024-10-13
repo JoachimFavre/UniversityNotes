@@ -1,0 +1,239 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-01 at 13:18:04.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Mardi 01 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2024-10-01}{Hungar games}{
+    \begin{itemize}[left=0pt]
+        \item Explanation and proof of the Hungarian algorithm.
+        \item Motivation and definition of approximation algorithms.
+        \item Explanation of a 2-approximation algorithm for min-weight vertex cover on arbitrary graphs.
+    \end{itemize}
+}
+
+\begin{parag}{The Hungarian algorithm}
+    Let $G = \left(A \dcup B, E\right)$ be some bipartite graph, and $c: E \mapsto \mathbb{R}$ be some edge cost function.
+
+    The idea will be to start with an dual feasible solution $u_a, v_b$ and iteratively improve it. At any given iteration, we say that an edge $\left(a, b\right) \in E$ is tight  if and only if $u_a + v_b = c\left(e\right)$. We moreover define the graph of tight edges at any given iteration by:
+    \[G' = \left(A \cup B, E'\right), \mathspace E' = \left\{\left\{a, b\right\} \in E \suchthat u_a + v_b = c\left(e\right)\right\}.\]
+
+    The \important{Hungarian algorithm} for finding a minimum-cost perfect matching on a bipartite graph goes as follows:
+    \begin{enumerate}
+        \item We start with some arbitrary dual feasible solution, where, for all $a \in A$ and $b \in B$:
+        \[v_b = 0, \mathspace u_a = \min_{e \in \delta\left(a\right)} c\left(e\right).\]
+        \item If $G'$ contains a perfect matching, we stop.
+        \item Otherwise find some $S \subseteq A$ such that $\left|N\left(S\right)\right| < \left|S\right|$ on $G'$, which exists by the contrapositive of Hall's theorem.
+        \item We add some $\epsilon$ to all vertices in $S \subseteq A$ and add $-\epsilon$ to all vertices in $N\left(S\right) \subseteq B$: 
+        \[u_a' = \begin{systemofequations} u_a + \epsilon, & \text{if } a \in S \\ u_a, & \text{otherwise},\end{systemofequations} \mathspace v_b' = \begin{systemofequations} v_b - \epsilon, & \text{if } b \in N\left(S\right) \\ v_b, & \text{otherwise}, \end{systemofequations}\]
+        where $\epsilon > 0$ is defined by:
+        \[\epsilon = \min_{\substack{a \in S \\ b \in B \setminus N\left(S\right)}} \left(c\left(e\right) - u_a - v_b\right).\]
+    
+        \item Continue from step 2.
+    \end{enumerate}
+
+    This algorithm will always halt, with $E'$ being a minimum-cost perfect matching on $G$.
+
+    \begin{subparag}{Intuition}
+        The idea is that we start with some dual feasible solution $\left(u, v\right)$, and update it iteratively by keeping the fact it is dual feasible. By our previous lemma, at any iteration, if the set of tight edges is a perfect matching, then it has minimum cost.
+    \end{subparag}
+
+    \begin{subparag}{Proof duality invariance}
+        Let $\left(u, v\right)$ be some dual feasible solution. We want to show that $\left(u', v'\right)$ is still dual feasible. Let $e = \left\{a, b\right\} \in E$ be some edge.
+        \begin{itemize}
+            \item Let's say $a \in S$ and $b \in N\left(S\right)$. Then: 
+            \[u_a' + v_b' = u_a + \epsilon + v_b - \epsilon = u_a + v_b \leq c\left(e\right).\]
+            \item Let's say that $a \in A \setminus S$ and $b \in N\left(S\right)$. Then:
+            \[u_a' + v_b' = u_a + v_b - \epsilon = c\left(e\right) - \epsilon < c\left(e\right).\]
+            \item If $a \in A \setminus S$ and $b \in B \setminus N\left(S\right)$, then: 
+            \[u_a' + v_b' = u_a + v_b \leq c\left(e\right).\]
+            \item Finally, suppose that $a \in S$ and $b \in B \setminus N\left(S\right)$. We notice it is impossible that $e$ is tight since, otherwise, $b$ would be in the neighbourhood of $a$ on $G'$, i.e. $b \in N\left(S\right)$. This would be a contradiction to $b \in B \setminus N\left(S\right)$.
+
+                We can therefore suppose that $e \not\in E'$ isn't tight, i.e. $u_a + v_b < c\left(e\right)$. Then, we can pick $\epsilon > 0$ small enough such that: 
+            \[u_a' + v_b' = u_a + \epsilon + v_b \leq c\left(e\right).\]
+        \end{itemize}
+
+        In all case, we always have that $u_a' + v_b' \leq c\left(e\right)$. Therefore, $\left(u', v'\right)$ is still a dual solution. $\epsilon$ is moreover constrained to be such that: 
+        \[0 < \epsilon \leq \min_{\substack{a \in S \\ b \in B \setminus N\left(S\right)}} \left(c\left(e\right) - u_a - v_b\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Proof objective function increases}
+        Now, we want to verify that iterations increase the dual objective function: 
+        \[\sum_{a \in A} u_a' + \sum_{b \in B} v_b' = \sum_{a \in A} u_a + \sum_{b} v_b + \epsilon\left|S\right| - \epsilon \left|N\left(S\right)\right|.\]
+        
+        So, there is a change of: 
+        \[\Delta = \epsilon \left|S\right| - \epsilon \left|N\left(S\right)\right| = \epsilon \left(\left|S\right| - \left|N\left(S\right)\right|\right)> 0,\]
+        since $\left|N\left(S\right)\right| < \left|S\right|$, by the choice of $S$. We want $\epsilon$ to be the largest possible for this change to be maximum. We however still want $\epsilon$ not to break any non-tight edge, so we simply take: 
+        \[\epsilon = \min_{\substack{a \in S \\ b \in B \setminus N\left(S\right)}} \left(c\left(e\right) - u_a - v_b\right).\]
+
+        Since edges $e = \left(a, b\right) \in S \times \left(B \setminus N\left(S\right)\right)$ are non-tight as shown before, we always have $\epsilon > 0$, as expected.
+    \end{subparag}
+
+    \begin{subparag}{Complexity}
+        We still want to consider the question of whether the algorithm terminates, whether it is in polynomial time.
+
+        It is possible to show that there are at most $n$ consecutive iterations where the matching size does not increase. Moreover, it increases at most $n$ times. Since finally finding $S$ takes $O\left(E\right) = O\left(n^2\right)$, the algorithm complexity is $O\left(n^4\right)$.
+
+        Note that a more careful implementation can yield $O\left(n^3\right)$.
+    \end{subparag}
+\end{parag}
+
+\section{Approximation algorithms}
+\subsection{Vertex cover}
+
+\begin{parag}{Observation}
+    There are many \lang{NP}-hard optimisation problems. 
+
+    For those problems, unless $\lang{P} = \lang{NP}$, we cannot have all three following properties:
+    \begin{enumerate}
+        \item The algorithm runs in polynomial time.
+        \item The algorithm is reliable, i.e. it works on any input.
+        \item The algorithm finds an optimal solution.
+    \end{enumerate}
+
+    Relaxing the second condition yields heuristics, i.e. algorithms that works well on some inputs but not all. We will instead try to look into algorithm that relax the third condition, approximation algorithms.
+\end{parag}
+
+\begin{parag}{Definition: $\alpha$-approximation algorithm}
+    An \important{$\alpha$-approximation algorithm} for optimisation is an algorithm that runs in polynomial time and outputs a solution $S$ such that: 
+    \begin{itemize}
+        \item $\displaystyle \frac{\text{cost}\left(S\right)}{\text{cost}\left(\text{optimal solution}\right)} \leq \alpha$, for minimisation problems (with $\alpha \geq 1$).
+        \item $\displaystyle \frac{\text{profit}\left(S\right)}{\text{profit}\left(\text{optimal solution}\right)} \geq \alpha$, for maximisation problems (with $\alpha \leq 1$).
+    \end{itemize}
+
+    \begin{subparag}{Intuition}
+        In a minimisation problem, the goal of the algorithm is to find a $S$ that minimises the cost. We may however be ready to find an algorithm that finds a solution which is at most two times the optimal solution.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The main issue is finding a way to bound: 
+        \[\frac{\text{cost}\left(S\right)}{\text{cost}\left(\text{optimal solution}\right)}.\]
+
+        The issue is that the optimal solution is probably very hard to find, and probably has a very bad structure (if it had a good structure, it would be easy to solve). Instead, we will try to find a lower bound such that:
+        \[\text{lower bound} \leq \text{cost}\left(\text{optimal solution}\right).\]
+
+        Then, we will directly have:
+        \[\frac{\text{cost}\left(S\right)}{\text{cost}\left(\text{optimal solution}\right)} \leq \frac{\text{cost}\left(S\right)}{\text{lower bound}}.\]
+
+        The idea will often be to formulate our problem as an integer linear program, i.e. a linear programs with integer variables $x_i \in \mathbb{Z}$. Then, we relax to a linear program (allowing $x_i \in \left[0, 1\right]$ instead of $x_i \in \left\{0, 1\right\}$, for instance). Since we any solution of the first problem is a solution to the second one, this will give us the lower bound we were looking for.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Problem: Vertex cover}
+    Let $G = \left(V, E\right)$ be some \textit{arbitrary} graph, endowed with a vertex weight function $w: V \mapsto \mathbb{R}_+$. 
+
+    The goal is to find a set $C \subseteq V$ that covers all edges in $E$, i.e. $e \cap C \neq \o$ for all $e \in E$, and that minimises: 
+    \[\sum_{v \in C} w_c.\]
+
+    \begin{subparag}{Remark}
+        We have solved the vertex cover on bipartite graphs. However, on arbitrary graphs, this problem is NP-complete; it is therefore believed not to exist any polynomial-time solution.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Linear program}
+    As usual, we consider the linear program with variables $x_v \in \left\{0, 1\right\}$ for all $v \in V$, where: 
+    \[x_v = \begin{systemofequations} 1,  & \text{if } v \in C \\ 0, & \text{otherwise}. \end{systemofequations}\]
+
+    The integer linear program is then:
+    \begin{linearprogram}{Minimise}{$\sum_{v \in V} x_v w\left(v\right)$}
+        $x_u + x_v \geq 1$, & $\forall \left\{u, v\right\} \in E$, \\
+        & $x_u \in \left\{0, 1\right\}$ & $\forall u \in V$.
+    \end{linearprogram}
+
+    As usual, we then relax it to:
+    \begin{linearprogram}{Minimise}{$\sum_{v \in V} x_v w\left(v\right)$}
+        $x_u + x_v \geq 1$, & $\forall \left\{u, v\right\} \in E$, \\
+        & $x_u \geq 0$ & $\forall u \in V$.
+    \end{linearprogram}
+
+    Note that we do not need the condition $x_u \leq 1$. Indeed, if some $x_u$ is set to more than 1, we can set it at 1 without violating the other condition but reaching a lower result. An optimal solution will therefore never take $x_u > 1$. 
+
+    Now, there is no reason that a solution to the linear program would be integral. This therefore brings us to the following lemma.
+\end{parag}
+
+\begin{parag}{Proposition: Vertex cover $2$-approximation}
+    Let $G = \left(V, E\right)$ be some arbitrary graph. We consider $x^*$ to be a solution to the relaxed linear program from the previous paragraph.
+
+    Then, the following is a vertex cover:
+    \[C = \left\{v \in V \suchthat x_v^* \geq \frac{1}{2}\right\}.\]
+
+    Moreover, computing this $C$ is a 2-approximation algorithm to the minimum vertex cover problem. In other words, letting $\text{OPT}\left(G\right)$ be the weight of the minimum weight vertex cover,
+    \[w\left(C\right) \leq 2\cdot \text{OPT}\left(G\right).\]
+
+    \begin{subparag}{Proof vertex cover}
+        Let $\left\{u, v\right\} \in E$ be arbitrary. To show $C$ is a vertex cover, we want to show that $u \in C$ or $v \in C$.
+
+        We know that $x_u^* + x_v^* \geq 1$, so at least one of them must have value at least $\frac{1}{2}$ (otherwise, their sum would be strictly less than $1$). This vertex therefore belongs to the vertex cover, ending this part of the proof.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2-approximation}
+        Now, we want to show that the weight of $C$ is at most 2 times the weight of the optimum vertex cover. By definition of $C$, we have:
+        \[w\left(C\right) = \sum_{v \in C} w\left(v\right) = \sum_{v | x^*_v \geq \frac{1}{2}} w\left(v\right).\]
+
+
+        Now, since $x_v^* \geq \frac{1}{2} \iff 1 \leq 2 x_v^*$:
+        \[w\left(C\right) \leq \sum_{v | x^*_v \geq \frac{1}{2}} 2 x_v^* w\left(v\right).\]
+
+        All terms in the sum are positive, so this is less than or equal to a sum with more terms: 
+        \[w\left(C\right) \leq 2\sum_{v} x_v^* w\left(v\right).\]
+
+        We recognise this to be the twice the weight of the relaxed linear program. Since any solution to the integer linear program is also a solution to the relaxed linear program, the optimal solution of the former is a lower bound on the optimal solution of the latter. In other words: 
+        \[w\left(C\right) \leq 2 \cdot \text{OPT}\left(G\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Optimal solution}
+    We consider some minimisation problem, and $I$ an input to this problem.
+
+    \begin{itemize}
+        \item We note $\text{OPT}\left(I\right)$ to be the weight of the optimal solution;
+        \item We note $\text{OPT}_{LP}\left(I\right)$ to be the weight of the solution of the relaxed linear program.
+    \end{itemize}
+
+    \begin{subparag}{Example}
+        For instance, for the minimum-weight vertex cover problem, $I$ would be some graph.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Definition: Integrality gap}
+    We consider some linear program relaxation of some minimisation problem.
+
+    Let $\mathcal{I}$ be the set of all instances that can be fed to the minimisation problem.
+
+    The \important{integrality gap} of this problem is defined as: 
+    \[g_{LP} = \max_{I \in \mathcal{I}} \frac{\text{OPT}\left(I\right)}{\text{OPT}_{LP}\left(I\right)}.\]
+
+    \begin{subparag}{Intuition}
+        Intuitively, this represents how much better the solution of the relaxed linear program will be when compared to the integer linear problem, in the worst case.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that, some times, we consider $\mathcal{I}$ to be the set of all instances of a given size. This then allows $g_{LP}$ to depend on the size $n$ of the input.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    Let $g_{LP}$ be the integrality gap of some relaxation of some minimisation problem.
+
+    If $\alpha < g_{LP}$, it is impossible to make an $\alpha$-approximation algorithm by rounding the solution of this relaxed linear program.
+
+    \begin{subparag}{Remark}
+        This notably implies that, for the vertex cover relaxation algorithm we have seen so far, we must have $g_{LP} \leq 2$.
+    \end{subparag}
+\end{parag}
+
+ 
+\end{document}

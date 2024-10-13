@@ -1,0 +1,210 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-07 at 13:24:42.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Lundi 07 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2024-10-07}{Randomness makes everything better}{
+    \begin{itemize}[left=0pt]
+        \item Proof that the vertex cover integrality gap is in $\left[2 - \frac{2}{n}, 2\right]$.
+        \item Explanation of an $O\left(\log\left(n\right)\right)$-approximation randomised algorithm for set cover.
+    \end{itemize}
+}
+
+\begin{parag}{Proposition}
+    For vertex cover, the integrality gap is at least $2 - \frac{2}{n}$.
+
+    \begin{subparag}{Implication}
+        Since we found a 2-approximation algorithm, for any given graph size, the integrality gap is between $2 - \frac{2}{n}$ and $2$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We want to find a graph for which $\frac{\text{OPT}\left(G\right)}{\text{OPT}_{LP}\left(G\right)} = 2 - \frac{2}{n}$. We consider the complete graph $K_n$ with $n = \left|V\right|$ vertices, and $w_v = 1$ for all $v \in V$. 
+
+        We notice that $\text{OPT}\left(K_n\right) = n-1$: we must take all vertices but $1$ (if there are two vertices that we do not take, then the edge between the two will not be covered). On the other hand, $\text{OPT}_{LP}\left(K_n\right) = \frac{n}{2}$, which we can reach by setting all vertices to $\frac{1}{2}$. 
+
+       In this case, the integrality gap is: 
+       \[\frac{\text{OPT}\left(K_n\right)}{\text{OPT}_{LP}\left(K_n\right)} = \frac{n-1}{\frac{n}{2}} = 2 - \frac{2}{n}.\]
+
+       \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Other formulation}
+    We consider the following, other formulation, for vertex cover.
+    \begin{linearprogram}{Minimise}{$\sum_{v \in V} x_v w\left(v\right)$}
+        $x_u + x_v \geq 1$, & $\forall \left\{u, v\right\} \in E$, \\
+        & $\sum_{v \in C} x_v \geq \left|C\right| - 1$, & $\forall C \subseteq V$ where $C$ is a clique, \\
+        & $x_v \in \left\{0, 1\right\}$, & $\forall v \in V$.
+    \end{linearprogram}
+
+    Relaxing this linear program does not change the integrality gap, but it may have. It is in fact believed it is impossible to go below 2. However, for other problems, it is important to keep in mind that changing the integer linear program---and thus the corresponding relaxation---may improve the integrality gap.
+
+    An integrality gap is always relative to some specific relaxation procedure.
+\end{parag}
+
+\subsection{Set cover}
+
+\begin{parag}{Set cover}
+    Let $\mathcal{U} = \left\{e_1, \ldots, e_n\right\}$ be a universe, $\mathcal{T} = \left\{S_1, \ldots, S_n\right\} \subseteq \mathcal{P}\left(\mathcal{U}\right)$ be a set of $m$ subsets of $\mathcal{U}$, and let $c: \mathcal{T} \mapsto \mathbb{R}_+$ be a \textit{positive} cost function.
+
+    A collection $C \subseteq \mathcal{T}$ of subsets is said to be a \important{set cover} if it covers all elements, i.e: 
+    \[\bigcup_{S_i \in C}^{} S_i = \mathcal{U}.\]
+    
+    Its weight is defined by:
+    \[c\left(C\right) = \sum_{S_i \in C} c\left(S_i\right).\]
+\end{parag}
+
+\begin{parag}{Minimum-cost set cover}
+    Given $\mathcal{U}, \mathcal{T}, c$ be defined as above.
+
+    The goal of the minimum-cost set cover is to find a set cover that has minimum weight.
+\end{parag}
+
+\begin{parag}{Linear program}
+    The set cover problem can be solved by considering variables representing whether $S_i \in C$, for any $S_i \in \mathcal{T}$: 
+    \[x_i = \begin{systemofequations} 1, & \text{if } S_i \in C, \\ 0, & \text{otherwise}. \end{systemofequations}\]
+
+    This can be done by using the following integer linear program:
+    \begin{linearprogram}{Minimise}{$\sum_{i=1}^{m} x_i c\left(S_i\right)$}
+        $\sum_{i | e \in S_i} x_i \geq 1$, & $\forall e \in \mathcal{U}$, \\
+        & $x_i \in \left\{0, 1\right\}$, & $\forall i \in \left\{1, \ldots, m\right\}$.
+    \end{linearprogram}
+
+    As usual, we relax it to:
+    \begin{linearprogram}{Minimise}{$\sum_{i=1}^{m} x_i c\left(S_i\right)$}
+        $\sum_{i | e \in S_i} x_i \geq 1$, & $\forall e \in \mathcal{U}$, \\
+        & $x_i \in \left[0, 1\right]$, & $\forall i \in \left\{1, \ldots, m\right\}$.
+    \end{linearprogram}
+\end{parag}
+
+\begin{parag}{Definition: Frequency}
+    We consider some set cover instance $\left(\mathcal{U}, \mathcal{T}, c\right)$.
+
+   Its \important{frequency} $f$ is the smallest integer such that each element $e \in \mathcal{U}$ is covered by at most $f$ sets $S_i \in \mathcal{T}$.
+
+   \begin{subparag}{Remark}
+       Note that, for vertex cover, $f = 2$. Indeed, there are only two vertices that can cover any given edge.
+   \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition: Naive relaxation}
+    Let $x^*$ be the optimal solution to the relaxed linear program from above.
+
+    The following is a valid set cover:
+    \[C = \left\{S_i \suchthat x_i \geq \frac{1}{f}\right\}.\]
+
+    This is moreover an $f$-approximation.
+
+    \begin{subparag}{Observation}
+        This is however not a good rounding, since, if $f = \sqrt{n}$, then this would be a $\sqrt{n}$-approximation. We will instead consider another relaxation procedure, that uses randomness.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition: Naive randomised relaxation}
+    Let $x^*$ be the optimal solution to the linear program from above. Then, we add $S_i$ to $C$ with probability $x_i^*$ for all $i \in \left\{1, \ldots, m\right\}$. 
+
+    First, leaving $\text{OPT}_{LP}$ to be the value of the objective function of the relaxed program at $x^*$ as usual: 
+    \[\exval\left[c\left(C\right)\right] = \text{OPT}_{LP}.\]
+
+    Second, for any element $e_j \in \mathcal{U}$: 
+    \[\prob\left(\text{$C$ fails to cover $e_j$}\right) \leq \frac{1}{e}\]
+
+    In other words, we get that around $\SI{37}{\%}$ of our elements are not covered; i.e. it is likely not to be a valid set cover.
+
+    \begin{subparag}{Proof 1}
+        This is a direct equality: 
+        \[\exval\left[c\left(C\right)\right] = \sum_{i=1}^{m} c\left(S_i\right)\prob\left(S_i \in C\right) = \sum_{i=1}^{m} c\left(S_i\right) x_i^* = \text{OPT}_{LP}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        Let $e_j \in \mathcal{U}$ be an arbitrary element. 
+
+        Let's suppose that $k$ sets cover $e_j$, which we name $S_1, \ldots, S_k$. By feasibility of $x^*$, this means: 
+        \[x_1^* + \ldots + x_k^* \geq 1.\]
+        
+        Now, the probability that $C$ fails to cover $e_j$ is the probability that we do not take any of those $S_i$. Since those decisions are independent, this is given by: 
+        \[\prob\left(\text{$C$ fails to cover $e_j$}\right) = \left(1- x_1^*\right) \cdots \left(1 - x_k^*\right).\]
+
+        By Taylor expansion, we know that $\exp\left(x\right) \geq 1 + x$ for all $x$. Therefore:
+        \[\prob\left(\text{$C$ fails to cover $e_j$}\right) \leq e^{- x_1^*} \cdots e^{- x_k^*} = \exp\left(- \sum_{i=1}^{k} x_i^*\right) \leq \frac{1}{e}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition: Randomised relaxation}
+    We solve the linear program to obtain $x^*$. Then, for $i \in \left\{1, \ldots, m\right\}$, we add $S_i$ to $C$ with probability $x_i^*$. We repeat this second step $d \ln\left(n\right)$ times, for some fixed $d$. Note that we may add the same element multiple times to $C$, so this is not strictly speaking a set.
+
+    The following are true:
+    \begin{enumerate}
+        \item We have:
+    \[\exval\left[c\left(C\right)\right] \leq d\ln\left(n\right) \text{OPT}_{LP}.\]
+        \item For any element $e_j \in \mathcal{U}$: 
+        \[\prob\left(\text{$C$ fails to cover $e_j$}\right) \leq \frac{1}{n^d}.\]
+        \item More globally:
+        \[\prob\left(\text{$C$ fails to cover some element}\right) \leq \frac{1}{n^{d-1}}.\]
+        \item Finally, 
+        \[\exval\left(c\left(C\right) \suchthat \text{$C$ is a vertex cover}\right) \in O\left(\ln\left(n\right) \text{OPT}_{LP}\right).\]
+    \end{enumerate}
+
+    In other words, this is a $O\left(\ln\left(n\right)\right)$-approximation algorithm, that works with probability $1 - \frac{1}{n^{d-1}}$.
+
+    \begin{subparag}{Remark}
+        It is possible to improve this algorithm, but the analysis becomes harder. In particular, we can resolve the linear program every time, and stop as soon as we get a vertex cover.
+    \end{subparag}
+
+    \begin{subparag}{Proof 1}
+        We notice that, by the union bound: 
+        \autoeq{\prob\left(S_i \in C\right) = \prob\left(\bigcup_{j=1}^{d\ln\left(n\right)} \left\{\text{$S_i$ is added at iteration $j$}\right\}\right) \leq \sum_{j=1}^{d\ln\left(n\right)} \prob\left(\text{$S_i$ is added at iteration $j$}\right) = d\ln\left(n\right)x_i^*.}
+        
+        We can then directly use this:
+        \[\exval\left[c\left(C\right)\right] = \sum_{i=1}^{m} c\left(S_i\right)\prob\left(S_i \in C\right) \leq d \ln\left(n\right) \sum_{i=1}^{m} c\left(S_i\right) x_i^* = d \ln\left(n\right) \text{OPT}_{LP}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        Let $e_j \in \mathcal{U}$ be an arbitrary element. 
+
+        Let's suppose that $k$ sets cover $e$, which we name $S_1, \ldots, S_k$. By feasibility of $x^*$, this means: 
+        \[x_1^* + \ldots + x_k^* \geq 1.\]
+        
+        Now, the probability that $C$ fails to cover $e_j$ is the probability that we do not take any of those $S_i$ (independently), in any of the $d\ln\left(n\right)$ tries, i.e.: 
+        \[\prob\left(\text{$C$ fails to cover $e_j$}\right) = \left(1- x_1^*\right)^{d \ln\left(n\right)} \cdots \left(1 - x_k^*\right)^{d \ln\left(n\right)}.\]
+
+        Now, by Taylor expansion, we know that $\exp\left(x\right) \geq 1 + x$ for all $x$. So:
+        \autoeq{\prob\left(\text{$C$ fails to cover $e_j$}\right) \leq e^{- d\ln\left(n\right) x_1^*} \cdots e^{- d\ln\left(n\right) x_k^*} = \exp\left(- d\ln\left(n\right) \sum_{i=1}^{k} x_i^*\right) \leq \exp\left(-d \ln\left(n\right)\right) = \frac{1}{n^d}.}
+    \end{subparag}
+
+    \begin{subparag}{Proof 3}
+        Let $E_j$ be the event that $C$ fails to cover some element $e_j$. By the second property, $\prob\left(E_j\right) \leq \frac{1}{n^d}$.
+
+        Applying the union bound:
+        \[\prob\left(\bigcup_{j=1}^{n} E_j\right) \leq \sum_{j=1}^{n} \prob\left(E_j\right) \leq \sum_{j=1}^{n} \frac{1}{n^d} = \frac{1}{n^{d-1}}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 4}
+        Let $V$ be the event that $C$ is a valid vertex cover. Since the cost is non-negative, we notice that: 
+        \[\exval\left[c\left(C\right)\right] = \exval\left[c\left(C\right) \suchthat V\right]\prob\left(V\right) + \underbrace{\exval\left[c\left(C\right) \suchthat \bar{V}\right]}_{\geq 0} \underbrace{\prob\left(\bar{V}\right)}_{\geq 0} \geq \exval\left[c\left(C\right) \suchthat V\right]\prob\left(V\right).\]
+
+        Therefore:
+        \[\exval\left[c\left(C\right) \suchthat V\right] \leq \frac{\exval\left[c\left(C\right)\right]}{\prob\left(V\right)}.\]
+
+        So, we can use the first and third propositions to get that: 
+        \autoeq{\exval\left[c\left(C\right) \suchthat V\right] \leq \frac{d \ln\left(n\right) \text{OPT}_{LP}}{1 - \frac{1}{n^{d-1}}} = \frac{n^{d-1}}{n^{d-1} - 1}\cdot d \ln\left(n\right) \text{OPT}_{LP} \in O\left(d \ln\left(n\right) \text{OPT}_{LP}\right) = O\left(\ln\left(n\right) \text{OPT}_{LP}\right),}
+        by considering $d$ to be a constant.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}
