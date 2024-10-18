@@ -10,96 +10,24 @@ from lib.logger import Logger
 from lib.parser import Parser
 
 
-class Precompiler:
+class GenericPrecompiler:
     def __init__(self, latex: str):
         self.latex = latex
     
-    def full_precompile(self, is_english: bool, lecture_info: LectureInfo|None, latex_path: Path, asset_paths: List[Path]) -> "Precompiler":
-        return Precompiler(self.latex)\
-            .remove_before_begin_document()\
-            .remove_after_end_document()\
-            .remove_make_title()\
-            .increase_section_level()\
-            .increase_asset_name_level(asset_paths)\
-            .replace_chapter_after_lecture_command()\
-            .remove_summary_in_lecture_command()\
-            .merge_consecutive_empty_slides()\
+    def full_precompile(self, is_english: bool, lecture_info: LectureInfo|None, latex_path: Path) -> str:
+        return self\
             .correct_spaces(is_english)\
             .strip()\
             .apply_template()\
-            .make_warnings(lecture_info, latex_path)
+            .make_warnings(lecture_info, latex_path)\
+            .latex
 
-    def remove_before_begin_document(self) -> "Precompiler":
-        match = re.search(r"\\begin{document}", self.latex)
-        if match is None:
-            raise Exception(r"No \begin{document} found in the latex file.")
-        return Precompiler(self.latex[match.end(0):])
-    
-    def remove_after_end_document(self) -> "Precompiler":
-        match = re.search(r"\\end{document}", self.latex)
-        if match is None:
-            raise Exception(r"No \end{document} found in the latex file.")
-        return Precompiler(self.latex[:match.start(0)])
-
-    def remove_make_title(self) -> "Precompiler":
-        return Precompiler(self.latex.replace(r"\maketitle", ""))
-    
-    def increase_section_level(self) -> "Precompiler":
-        latex = self.latex
-        latex = latex.replace("\\section", "\\chapter")
-        latex = latex.replace("\\subsection", "\\section")
-        latex = latex.replace("\\subsubsection", "\\subsection")
-        return Precompiler(latex)
-    
-    def increase_asset_name_level(self, asset_paths: List[Path]) -> "Precompiler":
-        # Turn picture.png into Lecture05/picture.png in LaTeX
-        latex = self.latex
-        for asset_path in asset_paths:
-            asset_name = asset_path.name  # a/b/c/d.png becomes d.png
-            new_asset_name = str(asset_path.relative_to(asset_path.parent.parent))  # a/b/c/d.png becomes c/d.png
-            new_asset_name = new_asset_name.replace("\\", "/")
-            if latex.count(f"{{{asset_name}}}") == 0:
-                Logger.warn(f"Asset in folder but not found in latex file.", asset_path)
-            latex = latex.replace(f"{{{asset_name}}}", f"{{{new_asset_name}}}")
-
-        return Precompiler(latex)
-    
-    def replace_chapter_after_lecture_command(self) -> "Precompiler":
-        lecture_command = Parser.find_lecture_command(self.latex)
-        if lecture_command is None:
-            return self
-        summary_open_bracket = lecture_command.end(0) - 1
-        summary_close_bracket = Parser.matching_parenthesis(self.latex, summary_open_bracket)
-
-        chapter_pattern = r"\\chapter"
-        first_chapter = re.search(chapter_pattern, self.latex)
-        if first_chapter is None:
-            return self
-
-        if Parser.something_between(self.latex, start=summary_close_bracket+1, end=first_chapter.start(0)):
-            return self
-        
-        latex = self.latex
-        latex = latex[:lecture_command.start(0)] + r"\cleardoublepage" + "\n" + latex[lecture_command.start(0):]
-        latex = re.sub(chapter_pattern, r"\\chapterafterlecture", latex, count=1)
-        return Precompiler(latex)
-    
-    def remove_summary_in_lecture_command(self) -> "Precompiler":
-        lecture_command = Parser.find_lecture_command(self.latex)
-        if lecture_command is None:
-            return self
-        summary_open_bracket = lecture_command.end(0) - 1
-        summary_close_bracket = Parser.matching_parenthesis(self.latex, summary_open_bracket)
-        latex = self.latex
-        latex = latex[:summary_open_bracket + 1] + latex[summary_close_bracket:]
-        return Precompiler(latex)
-    
-    def merge_consecutive_empty_slides(self) -> "Precompiler":
+    def merge_consecutive_empty_slides(self) -> "GenericPrecompiler":
         if self.latex.count(r"\begin{slidecomment}") > 0:
             raise NotImplementedError("Merging consecutive empty slides is not implemented yet.")
         return self
     
-    def correct_spaces(self, is_english: bool) -> "Precompiler":
+    def correct_spaces(self, is_english: bool) -> "GenericPrecompiler":
         # We do not want to correct spaces in code environments.
         # We suppose that those \begin and \end are alone
         # on their line.
@@ -129,20 +57,20 @@ class Precompiler:
                         #line = line.replace("https~:", "https:")
                         #line = line.replace("watch~?v=", "watch?v=")
             result.append(line)
-        return Precompiler('\n'.join(result))
+        return GenericPrecompiler('\n'.join(result))
     
-    def strip(self) -> "Precompiler":
-        return Precompiler(self.latex.strip())
+    def strip(self) -> "GenericPrecompiler":
+        return GenericPrecompiler(self.latex.strip())
     
-    def apply_template(self) -> "Precompiler":
+    def apply_template(self) -> "GenericPrecompiler":
         template = FileLoader.latex_template()
         replacement = {
             'content': self.latex,
         }
         latex = FileLoader.replace_in_template(template, replacement)
-        return Precompiler(latex)
+        return GenericPrecompiler(latex)
 
-    def make_warnings(self, lecture_info: LectureInfo|None, file_path: Path) -> "Precompiler":
+    def make_warnings(self, lecture_info: LectureInfo|None, file_path: Path) -> "GenericPrecompiler":
         latex = self.latex
 
         if latex.count(r"\part") - latex.count(r"\partial"):

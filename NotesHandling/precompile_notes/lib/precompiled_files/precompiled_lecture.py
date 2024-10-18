@@ -4,7 +4,7 @@ import shutil
 
 from lib.lecture import Lecture
 from lib.lecture_info import LectureInfo
-from lib.precompilers.generic_precompiler import Precompiler
+from lib.precompilers.lecture_precompiler import LecturePrecompiler
 
 @total_ordering
 class PrecompiledLecture:
@@ -16,7 +16,7 @@ class PrecompiledLecture:
     @staticmethod
     def from_lecture(lecture: Lecture, is_english: bool) -> "PrecompiledLecture":
         lecture_info = LectureInfo.load_from_latex(lecture.latex)
-        latex = Precompiler(lecture.latex).full_precompile(is_english, lecture_info, lecture.path, lecture.assets_path).latex
+        latex = LecturePrecompiler(lecture.latex).full_precompile(is_english, lecture_info, lecture.path, lecture.assets_path)
         return PrecompiledLecture(latex, lecture_info, lecture)
     
     def write(self, root_path: Path):
