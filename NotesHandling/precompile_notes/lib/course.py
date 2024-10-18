@@ -38,13 +38,18 @@ class Course:
         self.name = name
         self.is_summary = is_summary
 
+    @property
+    def semester_name(self) -> str:
+        diploma = "BA" if self.is_bachelor else "MA"
+        return f"{diploma}{self.semester}"
+
     def __repr__(self) -> str:
-        return f"Course({self.name}, {self.is_bachelor}, {self.semester}, {self.is_summary})"
+        return f"Course({self.name}, {self.semester_name}, is_summary={self.is_summary})"
 
     @property
     def root_path(self) -> Path:
         diploma = "BA" if self.is_bachelor else "MA"
-        return Path(f"{diploma}{self.semester}/NotesCours/{self.name}") 
+        return Path(f"{self.semester_name}/NotesCours/{self.name}") 
     
     @property
     def loader(self) -> FileLoader:
@@ -64,5 +69,5 @@ class Course:
 
         semester = self.semester - 1
         if semester >= len(names):
-            raise Exception(f"Semester is not defined.")
+            raise Exception(f"Semester name is not defined for {self}.")
         return names[semester]
