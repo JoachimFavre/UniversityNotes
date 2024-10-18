@@ -39,7 +39,7 @@ courses: List[Course] = [
     # BA2
     #Course(is_bachelor=True, semester=2, name="AICC-2"),
     #Course(is_bachelor=True, semester=2, name="Analyse-2"),
-    Course(is_bachelor=True, semester=2, name="Analyse-2-MethodesDeDemonstration"),
+    #Course(is_bachelor=True, semester=2, name="Analyse-2-MethodesDeDemonstration"),
     #Course(is_bachelor=True, semester=2, name="DigitalSystemDesign"),
     
     # BA3
@@ -61,6 +61,9 @@ courses: List[Course] = [
     
     # BA6
     #Course(is_bachelor=True, semester=6, name="IntroToQuantumComputation-Summary", is_summary=True),
+    
+    # MA1
+    #Course(is_bachelor=False, semester=1, name="Algorithms-2"),
 ]
 
 tag = Tags.NONE

@@ -4,7 +4,7 @@ import shutil
 
 from lib.lecture import Lecture
 from lib.lecture_info import LectureInfo
-from lib.precompiler import Precompiler
+from lib.precompilers.precompiler import Precompiler
 
 @total_ordering
 class PrecompiledLecture:

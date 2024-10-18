@@ -22,8 +22,13 @@ BACHELOR_SEMESTERS_FR = [
     r"Bachelor d'informatique --- Semestre 6 \\ Printemps 2024",
 ]
 
-MASTER_SEMESTERS_EN: List[str] = []
-MASTER_SEMESTERS_FR: List[str] = []
+MASTER_SEMESTERS_EN: List[str] = [
+    r"Quantum science and engineering master --- Semester 1 \\ Autumn 2024",
+]
+
+MASTER_SEMESTERS_FR: List[str] = [
+    r"Master de science et ingénierie quantiques --- Semestre 1 \\ Automne 2024",
+]
 
 
 class Course:
@@ -58,4 +63,6 @@ class Course:
                 names = MASTER_SEMESTERS_FR
 
         semester = self.semester - 1
+        if semester >= len(names):
+            raise Exception(f"Semester is not defined.")
         return names[semester]

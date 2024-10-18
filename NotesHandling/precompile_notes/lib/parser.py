@@ -10,7 +10,7 @@ CLOSING_FOR = {
 class Parser:
     @staticmethod
     def find_lecture_command(latex: str) -> re.Match[str]|None:
-        return re.search(r"\\lecture{(\d+)}{([^\}]+)}{([^\n]+)}{", latex)
+        return re.search(r"\\lecture{(\d+)}{([^\}]*)}{([^\n]*)}{", latex)
 
     @staticmethod
     def matching_parenthesis(string: str, pos: int) -> int:
