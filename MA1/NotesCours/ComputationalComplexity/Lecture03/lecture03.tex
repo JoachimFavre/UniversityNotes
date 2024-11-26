@@ -1,0 +1,165 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-23 at 17:09:12.
+
+\usepackage{../../style}
+
+\title{Compcomp}
+\author{Joachim Favre}
+\date{Jeudi 26 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2024-09-26}{The end of recalls}{
+\begin{itemize}[left=0pt]
+    \item Definition of boolean circuits, and $\lang{P} / \lang{poly}$.
+    \item Sketch of the proof of the Cook-Levin theorem.
+\end{itemize}
+
+}
+
+\subsubsection{Cook-Levin theorem}
+
+\begin{parag}{Definition: Boolean circuit}
+    A \important{boolean circuit} is a directed graph without any directed cycle, which nodes are input variables $x_1, \ldots, x_n$ or gates $\land, \lor, \lnot$; and which has and one or more output wires.
+
+    Its \important{size} is its number of wires.
+
+    \begin{subparag}{Example}
+        For instance, let us consider the following boolean circuit: 
+        \imagehere[0.4]{BooleanCircuitExample.png}
+
+        It encodes the following boolean formula:
+        \[\bar{\left(x_1 \lor x_2\right) \land \left(x_1 \land x_2\right)}\land \left(\left(x_1 \land x_2\right) \lor \left(x_2 \land x_3\right)\right).\]
+
+        Moreover, it has 14 wires and thus it has size 14.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: \lang{SIZE} class}
+    Let $t: \mathbb{N} \mapsto \mathbb{N}$ be some function.
+
+    We define the \important{$\lang{SIZE}\left(t\left(n\right)\right)$} complexity class so that $L \in \lang{SIZE}\left(t\left(n\right)\right)$ if and only if there exists some circuit family $\left\{C_n\right\}_{n \in \mathbb{N}}$ which has the properties that, for all $n$:
+    \begin{itemize}
+        \item $C_n$ has size $O\left(t\left(n\right)\right)$;
+        \item for each $x \in \left\{0, 1\right\}^n$, we have: 
+        \[C_n\left(x\right) = 1 \iff x \in L.\]
+    \end{itemize}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $L \subseteq \left\{0, 1\right\}^*$ be arbitrary. Then: 
+    \[L \in \lang{SIZE}\left(2^n\right).\]
+
+    \begin{subparag}{Proof}
+        Indeed, any language can be represented using a CNF or a DNF formula. In both cases, this takes a circuit of size $O\left(2^n\right)$ for any input of size $n$.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that $L$ is arbitrary, i.e. it can even be undecidable. This comes from the fact that we can have a different circuit for each $n$.
+
+        For instance, order all Turing machines $M_1, \ldots, M_n$, and consider the following undecidable language, which is very close to the Halting problem: 
+        \[L = \left\{1^n \suchthat \text{$M_n$ halts}\right\}.\]
+
+        Given any input size $n$ it is easy to make a circuit: we can just hardcode whether $M_n$ halts, and output this result when the input only contains $1$s. This cannot be done for Turing machines, since we would have to encode whether each Turing machine halts or not in the decider $M$, and there are infinitely many Turing machines.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\lang{P}/\lang{poly}$}
+    We define the \important{$\lang{P}/\lang{poly}$} complexity class as all problems that can be solved using circuits of polynomial size: 
+    \[\lang{P}/\lang{poly} = \bigcup_{k = 1}^{\infty} \lang{SIZE}\left(n^k\right).\]
+
+    \begin{subparag}{Remark}
+        Let us consider again the same undecidable language from the previous paragraph:
+        \[L = \left\{1^n \suchthat \text{$M_n$ halts}\right\}.\]
+
+        Using the same circuits, this yields:
+        \[L \in \lang{P} / \lang{poly}.\]
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        A Turing machine with advice is a Turing machine so that, for all $n$, it has access to some advice bitstring $r_n$ that have a size polynomial in $n$. It is possible to show that $\lang{P} / \lang{poly}$ is all the problems that are decided by poly-time Turing machines with advice. 
+
+        For instance, for the language $L$ above, we could take the advice $r_n = 1$ if and only if $M_n$ halts.
+    \end{subparag} 
+\end{parag}
+ 
+\begin{parag}{Theorem: TM to circuit}
+    Let $M$ be an arbitrary Turing machine, and $n$ be some input length $n$.
+
+    We can compute in time $\lang{poly}\left(t_M\left(n\right)\right)$ a circuit $C_n$ of size $O\left(t\left(n\right)^2\right)$ so that: 
+    \[C_n\left(x\right) = M\left(x\right), \mathspace \forall x \in \left\{0, 1\right\}^n.\]
+
+    \begin{subparag}{Implication}
+        This means that: 
+        \[\lang{P} \subseteq \lang{P}/\lang{poly}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The proof can be found in my notes of the \textit{Theory of computation} class, mentioned earlier.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: \lang{WE}}
+    We consider the following language, witness existence: 
+    \[\lang{WE} = \left\{\left\langle V, x, 1^t \right\rangle \suchthat \exists y, V\left(x, y\right) = 1 \text{ in time $t$}\right\},\]
+    where $V$ is some verifier.
+
+    Then, \lang{WE} is \lang{NP}-complete.
+
+    \begin{subparag}{Proof}
+        The fact that $\lang{WE} \in \lang{NP}$ is trivial: we can use our certificate $c$ to be $y$. 
+
+        Now, let $L \in \lang{NP}$ be arbitrary. It must have some poly-time verifier $V\left(x, c\right)$. Since it is poly-time, there exists some $k$ so that it runs in time $n^k$ for all input size $n$. We can thus simply consider the following reduction: 
+        \[\phi\left(x\right) = \left\langle V, x, 1^{\left(\left|x\right|^k\right)} \right\rangle.\]
+
+        We directly find that, as required:
+        \[x \in L \iff \phi\left(x\right) \in \lang{WE}.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: \lang{CSAT}}
+    We consider the following language, \lang{CircuitSAT}: 
+    \[\lang{CSAT} = \left\{\left\langle C_n \right\rangle \suchthat \exists x \in \left\{0, 1\right\}^n, C_n\left(x\right) = 1\right\}.\]
+
+    Then, $\lang{CSAT}$ is \lang{NP}-complete.
+
+    \begin{subparag}{Proof}
+        The fact that \lang{CSAT} belongs to \lang{NP} is easy.
+
+        We now show that $\lang{WE} \leq_P \lang{CSAT}$. We consider the reduction where we construct some circuit $C_{V, x}\left(y\right) = f\left(\left\langle V, x, 1^t \right\rangle\right)$, with hardcoded values $V$ and $x$, so that: 
+        \[C_{V, x}\left(y\right) = V\left(x, y\right).\]
+
+        This is indeed a poly-time reduction. Indeed, note that $V$ only needs to be run for $t$ steps, which is polynomial in the input size, since $\left|\left\langle 1^t \right\rangle\right| = t$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Cook-Levin theorem}
+    The language \lang{SAT} is \lang{NP}-complete.
+
+    \begin{subparag}{Proof}
+        The fact that \lang{SAT} is in \lang{NP} is easy. 
+
+        We make the reduction $\lang{CSAT} \leq_P \lang{SAT}$. Let $C_n$ be an arbitrary circuit, we aim to construct an equivalent CNF formula. The idea is that, for each wire, we introduce a new variable. For instance, let us consider the following circuit:
+        \imagehere[0.25]{CookLevinTheoremReductionExample.png}
+
+        We have inputs $x_1, x_2$, and introduce the variables $y_1, y_2, y_3$. $y_1$ is true if and only if $x_1 \land x_2$ is true, so we have the constraint $y_1 \leftrightarrow x_1 \land x_2$. Similarly for all other variables, and adding the constraint that we want $y_3$ to be true at the end, this yields, for our example: 
+        \[f\left(C_n\right) = \left(y_1 \leftrightarrow x_1 \land x_2\right) \land \left(y_2 \leftrightarrow \lnot x_2\right) \land \left(y_3 \leftrightarrow y_1 \lor y_2\right) \land y_3.\]
+
+        Each clause can be turned to a CNF of size $O\left(1\right)$, as shown in the third exercise series. Since we have polynomially many wires by definition of poly-size circuit, $f\left(C_n\right)$ can be computed in poly-time. It is moreover indeed a reduction, finishing the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

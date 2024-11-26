@@ -1,0 +1,272 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-10 at 15:17:18.
+
+\usepackage{../../style}
+
+\title{Comp comp}
+\author{Joachim Favre}
+\date{Jeudi 10 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2024-10-10}{Loving it, but I'm not sure of the usefulness}{
+\begin{itemize}[left=0pt]
+    \item Definition of space complexity, and the \lang{PSPACE} and \lang{NPSPACE} complexity classes.
+    \item Proof of Savitch's theorem, i.e. that $\lang{NPSPACE} = \lang{PSPACE}$.
+    \item Proof of a big chain of inclusions between space and time complexity.
+    \item Proof that \lang{TQBF} is \lang{PSPACE}-complete.
+\end{itemize}
+
+}
+
+\subsection{Space complexity}
+
+\subsubsection{Chain of inclusions}
+
+\begin{parag}{Definition: Space complexity}
+    Let $M$ be a Turing machine.
+
+    Its \important{space complexity} is a function $s: \mathbb{N} \mapsto \mathbb{N}$ defined by, 
+    \[s\left(n\right) = \max_{x \in \left\{0, 1\right\}^n} \left\{\text{number of work memory cells accessed by $M$ on $x$}\right\}.\]
+
+    \begin{subparag}{Remark}
+        We do not want to take into account the input size in the space complexity. So, we consider Turing machines that have two tapes: a read-only input tape, and a read-write work tape.
+
+        Note that this is completely equivalent to usual Turing machines, this is just easier for computations.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: \lang{SPACE} class}
+    Let $s: \mathbb{N} \mapsto \mathbb{N}$ be some function.
+
+    The \important{$\lang{SPACE}\left(s\left(n\right)\right)$ class} is defined by:
+    \[\lang{SPACE}\left(s\left(n\right)\right) = \left\{L \suchthat \text{There exists some TM that decides $L$ in space $O\left(s\left(n\right)\right)$}\right\}.\]
+
+    \begin{subparag}{Example}
+        For instance, it is possible to show that $\lang{SPACE}\left(O\left(1\right)\right)$ are regular languages, which were analysed in the \textit{Theory of computation} class.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: \lang{NSPACE} class}
+    Let $s: \mathbb{N} \mapsto \mathbb{N}$ be some function.
+
+    The \important{$\lang{NSPACE}\left(s\left(n\right)\right)$ class} is defined by:
+    \[\lang{NSPACE}\left(s\left(n\right)\right) = \left\{L \suchthat \text{There exists some NTM that decides $L$ in space $O\left(s\left(n\right)\right)$}\right\}.\]
+\end{parag}
+
+\begin{parag}{Definition: Time complexity classes}
+    The complexity class \important{$\lang{L}$} (log space) and \important{\lang{NL}} are defined by: 
+    \[\lang{L} = \lang{SPACE}\left(\log\left(n\right)\right), \mathspace \lang{NL} = \text{\lang{NSPACE}}\left(\log\left(n\right)\right).\]
+
+    We define \important{$\lang{PSPACE}$} and \important{\lang{NPSPACE}} as:
+    \[\lang{PSPACE} = \bigcup_{k=1}^{\infty} \lang{SPACE}\left(n^k\right), \mathspace \lang{NPSPACE} = \bigcup_{k=1}^{\infty} \lang{NSPACE}\left(n^k\right).\]
+\end{parag}
+
+\begin{parag}{Space hierarchy theorem}
+    Let $f, g: \mathbb{N} \mapsto \mathbb{N}$ be functions.
+
+    If $f\left(n\right) \in o\left(g\left(n\right)\right)$, then: 
+    \[\lang{SPACE}\left(f\left(n\right)\right) \subsetneq \lang{SPACE}\left(g\left(n\right)\right).\]
+
+    \begin{subparag}{Intuition}
+        Just like for time complexity, we can make this theorem for space hierarchy. In other words, adding more memory allows for more problems.
+
+        However, simulating Turing machines does not add any asymptotic memory overhead, hence we simply require $f\left(n\right) \in o\left(g\left(n\right)\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    We notice that $\lang{SAT} \in \lang{SPACE}\left(n\right)$. Indeed, the brute-force exponential solution only takes space time $n$.
+
+    Any polynomial reduction can increase the amount of space required, but only in a polynomial way. Since \lang{SAT} is \lang{NP}-complete, this therefore yields: 
+    \[\lang{NP} \subseteq \lang{PSPACE}.\]
+
+    \begin{subparag}{Remark}
+        Just like for $\lang{P}$ vs $\lang{NP}$, we think $\lang{NP} \neq \lang{PSPACE}$, however we do not have any proof.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let us consider $\lang{PALINDROMES}$, the language of all the palindromes (words that can be read in any direction, such as ``kayak'' \textit{(can I make this count as a ``Bref.'' reference?))}. It is possible to show that: 
+    \[\lang{PALINDROMES} \in \lang{L}.\]
+    
+    Indeed, we can consider $n = \left|x\right|$ to be the size of the input. Then, check that $x_i = x_{n-i}$ for all $i \in \left\{1, \ldots, n\right\}$. Storing $n$ takes logarithmic memory.
+
+    \begin{subparag}{Remark}
+        More generally, to show a problem is in $\lang{L}$, we can assume that the size of the input $n = \left|x\right|$ is known, use $O\left(1\right)$ many integer counters with support $\left\{0, \ldots, n^{O\left(1\right)}\right\}$ and do basic arithmetic.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 3}
+    Let us consider the language defined by whether $s$ and $t$ are connected in a \textit{directed} graph: 
+    \[\lang{STCONN} = \left\{\left\langle G, s, t \right\rangle \suchthat \text{there exists a path from $s$ to $t$ in $G$}\right\}.\]
+
+    We notice that $\lang{STCONN} \in \lang{NL}$. Indeed, we can perform a non-deterministic walk that starts from $s$, counting the number of steps we have done. We accept if we visit $t$, and we reject if the counter reaches to $n = \left|V\right|$. There exists a path if and only if our non-deterministic walk finds it.
+
+    Whether $\lang{STCONN} \over{\in}{?} \lang{L}$ is however an open question. It is possible to show that $\lang{STCONN} \in \lang{SPACE}\left(\log\left(n\right)^2\right)$, as Walter Savitch did in the 1970s. This is a theorem we will prove right after the following theorem.
+
+    \begin{subparag}{Remark}
+        We could also have considered \lang{UNDIRECTED-STCONN}, where $G$ is undirected. It has been shown by Omer Reingold in 2005 that $\lang{UNDIRECTED-STCONN} \in \lang{L}$, but this is a much harder proof, which we will not consider in this class.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property: Space and time inclusions}
+    Let $t: \mathbb{N} \mapsto \mathbb{N}$ be an arbitrary function.
+
+    If $t\left(n\right) \in \Omega\left(\ln\left(n\right)\right)$, we have the following chain of inclusions:
+    \[\lang{TIME}\left(t\left(n\right)\right) \subseteq \lang{SPACE}\left(t\left(n\right)\right) \subseteq \lang{TIME}\left(2^{O\left(t\left(n\right)\right)}\right).\]
+
+    \begin{subparag}{Remark}
+        In particular, this means that $\lang{L} \subseteq \lang{P}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof 1}
+        We want to show that: 
+        \[\lang{TIME}\left(t\left(n\right)\right) \subseteq \lang{SPACE}\left(t\left(n\right)\right).\]
+        
+        This directly comes from the fact that, in time $t\left(n\right)$, the Turing machine cannot even consider more than $t\left(n\right)$ memory cells.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        We want to show that:
+        \[\lang{SPACE}\left(t\left(n\right)\right) \subseteq \lang{TIME}\left(2^{O\left(t\left(n\right)\right)}\right).\]
+
+        The configuration of a Turing machine $M$ solving a problem in $\lang{SPACE}\left(t\left(n\right)\right)$ is entirely determined by:
+        \begin{enumerate}
+            \item Its work tape content, which can have at most $O\left(t\left(n\right)\right)$ bits by definition of $\lang{SPACE}$;
+            \item The state of $M$ (its program counter, in some sense), which only has $O\left(1\right)$ possibilities;
+            \item The work and input tape Turing machine pointers, which take $\log\left(n\right) + \log\left(t\left(n\right)\right)$ space.
+        \end{enumerate}
+
+        Assuming that $t\left(n\right) \in \Omega\left(\log\left(n\right)\right)$ by hypothesis, we only need $O\left(t\left(n\right)\right)$ bits to represent the state of the machine. Therefore, there are only $2^{O\left(t\left(n\right)\right)}$ different configurations. Note that, if we have twice the same configuration, it means that the Turing machine loops and will never finish. Since we consider Turing machines that halt on all inputs, this yields that we cannot have twice the same configuration. Therefore, the machine takes at most $2^{O\left(t\left(n\right)\right)}$ time.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{filecontents*}[overwrite]{MiddleFirstSearch.code}
+Path(u, v, k):
+    if k <= 1:
+        return (u = v) or (u, v) in E
+    else:
+        for w in {1, ..., n}:
+            if Path(u, w, k/2) and Path(w, v, k/2):
+                return true
+    return false
+\end{filecontents*}
+
+\begin{parag}{Savitch's theorem}
+    Recall that we defined the language \lang{STCONN} as whether $s$ and $t$ are connected in a \textit{directed} graph: 
+    \[\lang{STCONN} = \left\{\left\langle G, s, t \right\rangle \suchthat \text{there exists a path from $s$ to $t$ in $G$}\right\}.\]
+
+    We have that: 
+    \[\lang{STCONN} \in \lang{SPACE}\left(\log\left(n\right)^2\right).\]
+
+    \begin{subparag}{Proof}
+        The idea is to consider an algorithm that is not fast, but has a small memory footprint, called middle-first search. We consider the following procedure \texttt{Path(u, v, k)} to know if there exists a path from $u$ to $v$ of length $k$:
+        \importcode{MiddleFirstSearch.code}{pseudo}
+
+        Intuitively, it tries to find some middle point vertex $w$, and then recusively calls itself to know whether there is a path of size $\frac{k}{2}$ from $v$ to $w$ and path of size $\frac{k}{2}$ from $w$ to $v$.
+
+        Let us consider $s\left(n, k\right)$ to be the space usage of this algorithm on a graph of size $n$ for a path of size $k$. We notice that it requires $O\left(\log\left(n\right)\right)$ memory to store the $w$, and then runs the same procedure for $k' = \frac{k}{2}$. Note however that we can run each recursive call one at a time, using twice the same memory location for the two calls. This yields: 
+        \[s\left(n, k\right) = O\left(\log\left(n\right)\right) + s\left(n, \frac{k}{2}\right) \implies s\left(n, n\right) = O\left(\log\left(n\right)^2\right).\]
+
+        Note that this algorithm is great for minimising the memory, but it is awful for minimising the time. The time this algorithm takes is:
+        \[t\left(n, k\right) = n \cdot 2t\left(n, \frac{k}{2}\right) \implies t\left(n, n\right) = n^{\Theta\left(\log\left(n\right)\right)} \not\in \lang{poly}\left(n\right).\]
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        It is open to know if \lang{STCONN} is solvable in both $n^{O\left(1\right)}$ time and $\log\left(n\right)^{O\left(1\right)}$ space at the same time.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $s: \mathbb{N} \mapsto \mathbb{N}$ be an arbitrary function.
+
+    If $s\left(n\right) \in \Omega\left(\ln\left(n\right)\right)$, we have that:
+    \[\lang{NSPACE}\left(s\left(n\right)\right) \subseteq \lang{SPACE}\left(s\left(n\right)^2\right).\]
+    
+    \begin{subparag}{Personal remark}
+        This is the theorem referred to as ``Savitch's theorem'' in literature. 
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        In particular: 
+        \[\lang{NPSPACE} = \lang{PSPACE}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $M$ be a NTM solving a problem in $\lang{NSPACE}\left(s\left(n\right)\right)$. As explained in the proof of a previous theorem, its configuration at any step can be represented as some element of $\left\{0, 1\right\}^{O\left(s\left(n\right)\right)}$.
+
+        Therefore, we can consider a graph $G = \left(V, E\right)$ where $V = \left\{0, 1\right\}^{O\left(s\left(n\right)\right)}$, and two configurations are linked by an edge if and only if there exists some non-deterministic step the NTM can follow to go from the first to the second. We can use this to make a deterministic TM that decides this problem, by simply finding if there exists a path from the initial configuration to some accepting state. This is just the problem \lang{STCONN} and, since $G$ has size $O\left(s\left(n\right)\right)$, by Savitch's theorem this takes memory $O\left(s\left(n\right)^2\right)$. This finishes the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Summary}
+    We have the following chain of inclusions: 
+    \[\lang{L} \subseteq \lang{NL} \subseteq \lang{P} \subseteq \lang{NP} \subseteq \lang{PSPACE} = \lang{NPSPACE} \subseteq \lang{EXP}.\]
+
+    The only inequalities we know of are: 
+    \[\lang{P} \subsetneq \lang{EXP}, \mathspace \lang{L} \subsetneq \lang{PSPACE}.\]
+\end{parag}
+
+\subsubsection{\lang{PSPACE}-completeness}
+
+\begin{parag}{Definition: $\lang{TQBF}$ problem}
+    Let $\phi\left(x\right)$ be some CNF formula. We consider the formula $\psi$ defined by:
+    \[\psi = \forall x_1, \exists x_2, \forall x_3, \ldots, Q_n x_n, \phi\left(x\right),\]
+    where $Q_n = \forall$ if $n$ is odd or $Q_n = \exists$ if $n$ is even. Note that it does not have any free variable, hence either $\psi = F$ or $\psi = T$.
+
+    We define the \lang{TQBF} (true quantified boolean formulas) as: 
+    \[\lang{TQBF} = \left\{\left\langle \psi \right\rangle \suchthat \psi = T\right\}.\]
+    
+    \begin{subparag}{Remark 1}
+        This is like playing an adversarial game. An opponent chooses the $x_1$, then we have to choose $x_2$, they can choose $x_3$ in response, and so on. Our goal is to make $\phi\left(x\right)$ true. If we have a winning strategy, then $\psi = T$. Otherwise, $\psi = F$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The fact that we are alternating $\forall$ and $\exists$ here is not important, this is to introduce the polynomial hierarchy more easily. Letting $\forall$ and $\exists$ to appear in an arbitrary order can be done without loss of generality.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        Note that if all quantifiers were $\exists$, this would be exactly \lang{SAT}. Indeed, \lang{SAT} can be rephrased as $\exists x, \phi\left(x\right)$ for some CNF $\phi$. Adding $\forall$ makes the problem harder, it is even believed $\lang{TQBF} \not\in \lang{NP}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    $\lang{TQBF}$ is $\lang{PSPACE}$-complete.
+
+    \begin{subparag}{Proof}
+        \lang{TQBF} belongs to \lang{PSPACE} since the brute-force solution of trying all possible values for $x_1, \ldots, x_n$ takes polynomial space. In other words, we can explore the whole game tree.
+
+        Let $L \in \lang{SPACE}\left(n^k\right)$ be arbitrary. By definition, there exists a poly-space Turing machine $M$ deciding $L$. Our goal is to show that $L \leq_p \lang{TQBF}$.
+
+        Let $G$ be the configuration graph of $M$. We consider the boolean function $\phi_i\left(u, v\right)$, which is $1$ and only if there exists a path from configuration $u$ to configuration $v$ in less than or equal to $2^{i}$ steps in $G$. Recall that there are only $2^j$ configuration possibilities for an available memory $j$. To decide $L$, our aim is thus to evaluate $\phi_{n^k}\left(v_{start}, v_{accept}\right)$, where $v_{start}$ is the starting configuration and $v_{accept}$ is the accepting configuration. This will thus consist in our reduction to \lang{TQBF}. This reduction has to be doable in poly-time, as usual.
+
+        First, for the base case, $\phi_0\left(u, v\right)$ represents whether we can go from $u$ to $v$ in 0 or 1 steps, i.e.:
+        \[\phi_0\left(u, v\right) = \left(u = v\right) \lor \left(u, v\right) \in E.\]
+
+        Whether $\left(u, v\right) \in E$ can be expressed by a circuit of size $O\left(n^k\right)$, so $\phi_0\left(u, v\right)$ can be expressed in poly-time.
+
+        Then, for the inductive step, we take inspiration from middle-first search, and we want to write: 
+        \[\phi_{i+1}\left(u, v\right) = \exists w, \phi_i\left(u, w\right) \land \phi_i\left(w, v\right).\]
+
+        However, since we are doubling the size of the formula every time, $\phi_{n^k}$ is exponentially big. So, we have to use a trick similar to Savitch's theorem in order to reuse work: we use $\forall$ quantifiers to use $\phi_i$ only once. In other words, $\phi_{i+1}\left(u, v\right)$ is defined as: 
+        \[\forall x, \forall y, \exists w, \left(\left(x = u\right) \land \left(y = w\right)\right) \lor \left(\left(x = w\right) \land \left(y=v\right)\right) \to \phi_i\left(x, y\right).\]
+
+        This time, it has size $O\left(n^{2k}\right)$. Knowing whether $\phi_{n^k}\left(v_{start}, v_{accept}\right) = T$ is indeed a reduction to \lang{TQBF}. Since the reduction moreover takes polynomial-time, this finishes the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

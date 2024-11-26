@@ -1,0 +1,305 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-31 at 15:16:59.
+
+\usepackage{../../style}
+
+\title{Computational complexity}
+\author{Joachim Favre}
+\date{Jeudi 31 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2024-10-31}{A diagram taking even more time}{
+\begin{itemize}[left=0pt]
+    \item Definition of probabilistic Turing machine, and the \lang{BPP} complexity class.
+    \item Analysis of the polynomial identity testing problem using the Schwartz-Zippel lemma and a randomised algorithm.
+    \item Analysis of the bipartite perfect matching problem using a randomised algorithm.
+    \item Definition of the \lang{RP} and \lang{ZPP} complexity classes.
+    \item Proof of Adleman's theorem.
+    \item Summary of all the complexity classes we have seen so far.
+\end{itemize}
+
+}
+
+\subsection{Randomised complexity}
+
+\subsubsection{Definitions}
+
+
+\begin{parag}{Definition: Probabilistic Turing machine}
+    A \important{probabilistic Turing machine} (PTM) $M$ has an ability to toss a fair coin. In other words, each configuration has two succesor configuration, each taken with probability $\frac{1}{2}$.
+
+    $M\left(x\right)$ is a random variable. We assume that all branches toss the same number of coins (this can be done by simply tossing coins while waiting for branches that finish earlies), yielding that $\prob\left(M\left(x\right) = 1\right)$ is the fraction of accepting leaves.
+
+    \begin{subparag}{Remark}
+        A non-deterministic Turing machine $M$ can be thought of as a probabilistic Turing machine $M'$ where: 
+        \[x \in L \iff \prob\left(M'\left(x\right) = 1\right) > 0.\]
+
+        Now, a non-deterministic machine may have a single certificate for some input. In other words, $\prob\left(M'\left(x\right) = 1\right)$ may be exponentially small for a NTM, but it would be computationally impossible to randomly find a path that accepts in the corresponding PTM.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: \lang{BPTIME} class}
+    Let $t: \mathbb{N} \mapsto \mathbb{N}$ be arbitrary.
+
+    The \important{$\lang{BPTIME}\left(t\left(n\right)\right)$} (bounded-error probabilistic time) class is defined so that $L \in \lang{BPTIME}\left(t\left(n\right)\right)$ if and only if there exists a PTM $M$ of runtime $O\left(t\left(n\right)\right)$ so that: 
+    \[\prob\left(M\left(x\right) = L\left(x\right)\right) \geq \frac{2}{3}, \mathspace \forall x,\]
+    where we used $L: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ instead of $L \subseteq \left\{0, 1\right\}^n$ as a simpler notation here.
+
+    \begin{subparag}{Remark 1}
+        This is two-sided bounded error: we want both a small number of false positives and false negatives.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        As long as $\prob\left(M\left(x\right) = L\left(x\right)\right) > \frac{1}{2}$, we can boost the probability to a value arbitrarily close to $1$ by running $M\left(x\right)$ as many times as we wish and output the majority vote.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: \lang{BPP} class}
+    The \important{\lang{BPP}} (bounded-error polynomial) complexity class is defined by: 
+    \[\lang{BPP} = \bigcup_{k \in \mathbb{N}} \lang{BPTIME}\left(n^k\right).\]
+
+    \begin{subparag}{Remark 1}
+        We immediately notice that $\lang{P} \subseteq \lang{BPP}$. However, it is unknown whether $\lang{P} \over{=}{?}  \lang{BPP}$, though they are believed to be equal.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        It is unknown whether $\lang{BPP} \over{\subseteq}{?} \lang{NP}$. It is however possible to show $\lang{BPP} \subseteq \Sigma_2 \lang{P} \cap \Pi_2 \lang{P}$---we are expected to know this in exams, although we will not prove it in this class.
+
+        Note that we couldn't just use the randomised paths from a PTM to be paths for a NTM: even if a PTM in \lang{BPP} has small false positive error, it may still have accepting paths for a language that is not in the language.
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Polynomial identity testing}
+
+\begin{parag}{Definition: Arithmetic circuit}
+    An arithmetic circuit is a circuit with variables $x_i \in \mathbb{Z}$, for which we have available gates $+$ and $\times $, and constants $c \in \mathbb{Z}$.
+
+    \begin{subparag}{Example}
+        For instance, $p\left(x\right) = \prod_{i=1}^{n} \left(1- x_i\right)$ can be represented as:
+        \svghere[0.6]{ArithmeticCircuitExample.svg}
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This allows to express polynomials that we could not express using the distributed form in polynomial time (for instance, fully simplifying the polynomial from the tree above, we get $2^n$ terms). However, this also means that it is much harder to analyse such polynomials. For instance, given a polynomial $p\left(x\right)$ in distributed form, it is easy to know if it is the zero polynomial $p \equiv 0$; given a polynomial as a circuit, it is much harder to know if it the zero polynomial.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Uniform notation}
+    Let $S$ be some set.
+
+    We note $\left(x_1, \ldots, x_n\right) \followsdistr S^n$ to mean that $x_1, \ldots, x_n$ are sampled independently from the uniform distribution over $S$.
+\end{parag}
+
+\begin{parag}{Recall: Degree}
+    The \important{degree} (or total degree) of a polynomial is the degree of its term with highest degree. The degree of a term is the sum of the exponents of its variables.
+
+    \begin{subparag}{Example}
+        For instance, let us consider the following polynomial: 
+        \[p\left(x, y\right) = x^3 + 5 x^2 y^2.\]
+        
+        It has two terms: $x^3$, which has degree $3$, and $5x^2 y^2$, which has degree 4. So, $p$ has degree $4$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Schwartz-Zippel lemma}
+    Let $p\left(x_1, \ldots, x_n\right)$ be a degree $d$ polynomial, and let $S \subseteq \mathbb{Z}$ be arbitrary.
+
+    If $p \not\equiv 0$, then:
+    \[\prob_{a \followsdistr S^n} \left(p\left(a\right) \neq 0\right) \geq 1 - \frac{d}{\left|S\right|}.\]
+    
+    \begin{subparag}{Proof}
+        This proof is left as an exercise to the reader. The idea is to do a proof by induction over the number of variables.
+
+        Note that one can find a complete proof of this theorem in my notes for the \textit{Algorithms 2} class, available on my GitHub.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        We have not seen this in class, but the Schwartz-Zippel lemma is true for any integral domain, not just $\mathbb{Z}$. In other words, it is also valid for fields such as $\mathbb{R}$, $\mathbb{C}$ or $\mathbb{Z}/p\mathbb{Z}$ for a prime $p$.
+
+        We use this fact for the following example without making it explicit, hence the reason I thought it was important to specify it.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Polynomial identity testing}
+    Let $p$ be a polynomial given as an arithmetic circuit. We consider the following problem, polynomial identity testing: 
+    \[\lang{PIT} = \left\{\left\langle p \right\rangle \suchthat p \equiv 0\right\}.\]
+    
+    We want to show $\lang{PIT} \in \lang{BPP}$. Let $n$ be the size of the input arithmetic circuit. We consider $N = 2^{100 n}$ and $S \subseteq \mathbb{Z}/N\mathbb{Z}$ so that $\left|S\right| = 2^{10 n}$. Note that $N$ and $\left|S\right|$ are just arbitrarily big values, for the algorithm to work.
+
+    Our algorithm just samples a random element $a$ from $S$, propagates it through the circuit $p\left(x\right)$ using modulo-$N$ arithmetic and outputs true if and only if it gets 0.
+
+    We notice that the largest degree we can make with a circuit of size $d$ is $2^d$ by repeating squaring. We notice that, when $p \in L$, the algorithm has a probability 1 of success. When $p \not \in L$, i.e. $p \not\equiv 0$, the probability of success can be bounded by the Schwartz-Zippel lemma, writing $k$ to be the number of variables for the polynomial: 
+    \[\prob_{a \followsdistr S^k}\left(p\left(a\right) \neq 0\right) \geq 1 - \frac{d}{\left|S\right|} \geq 1 - \frac{2^n}{\left|S\right|} = 1 - \frac{2^n}{2^{10n}} \geq \frac{2}{3}.\]
+
+    Now, all elements of $\mathbb{Z}/N\mathbb{Z}$ can be written in polynomial-time, so sampling $k$ elements from $S$ does take polynomial time. Since moreover we work with integers modulo $N$, we can compute and store all of them in polynomial time (even if the circuit does repeated squaring). Moreover, $N$ is sufficiently big for such an $S \subseteq \mathbb{Z}/N\mathbb{Z}$ to exist.
+
+    This algorithm does show $\lang{PIT} \in \lang{BPP}$.
+
+
+    \begin{subparag}{Remark 1}
+        To know if $p\left(x\right) \equiv q\left(x\right)$ is equivalent to know if $p\left(x\right)- q\left(x\right) \equiv 0$, hence the name of this problem.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Whether $\lang{PIT} \over{=}{?} \lang{P}$ is an open question. Here, the set $S$ has exponential size, so we cannot try all values in it.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        If the polynomial was given explicitly, in its mathematical form, then we could just have simplified it easily.
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Bipartie perfect matching}
+
+\begin{parag}{Definition: Perfect matching}
+    Let $G = \left(V, E\right)$ be a graph, and $M \subseteq E$.
+
+    $M$ is said to be a \important{matching} if each vertex $v \in V$ is connected to at most one edge from $M$. It is moreover said to be \important{perfect} if each vertex $v \in V$ is connected to exactly one edge from $M$.
+\end{parag}
+
+\begin{parag}{Definition: Bipartite graph}
+    Let $G = \left(V, E\right)$ be a graph.
+
+    It is said to be \important{bipartite} if we can split $V = A \dcup B$ so that all edges are between $A$ and $B$, i.e. $E \subseteq A \times B$.
+\end{parag}
+
+\begin{parag}{Definition: Incidence matrix}
+    Let $G = \left(A \dcup B, E\right)$ be some bipartite graph.
+
+    We define its \important{incidence matrix} $A = \left(a_{ij}\right) \in \left\{0, 1\right\}^{\left|A\right| \times \left|B\right|}$ so that: 
+    \[a_{ij} = 1 \iff \left(i, j\right) \in E.\]
+\end{parag}
+
+\begin{parag}{Bipartite perfect matching problem}
+    Let $G = \left(A \dcup B, E\right)$ be some bipartite graph. We consider the following problem: 
+    \[\lang{BipartitePerfectMatching} = \left\{\left\langle G \right\rangle \suchthat \text{$G$ has a perfect matching}\right\}.\]
+
+    We know it is in \lang{P}. We want to make another algorithm using randomness.
+
+    Suppose $\left|A\right| = \left|B\right|$. Otherwise, there is trivially no perfect matching. We note $\left|A\right| = n$. Let $S_n$ be the set of permutations (i.e. bijective functions $\sigma: \left\{1, \ldots, n\right\} \mapsto \left\{1, \ldots, n\right\}$). We notice any matching can be represented as a permutation: $\sigma\left(i\right)$ represents to what vertex in $B$ we match the vertex $i$ from $A$. Now, we only need to verify that all edges we want to use do exist, i.e. whether $\left(i, \sigma\left(i\right)\right) \in E$ for all $i$. Mathematically, we can express that $\sigma$ is an invalid matching if:
+    \[\prod_{i=1}^{n} a_{i, \sigma\left(i\right)} = 0.\]
+    
+    Thus, the following counts the number of matching in $A$: 
+    \[\sum_{\sigma \in S_n} \prod_{i=1}^{n} a_{i, \sigma\left(i\right)}.\]
+
+    We wish to know whether this is equal to 0, but this is very hard to compute. We know how to compute determinants in polynomial time thanks to Gaussian elimination, and we notice the expression of a determinant is very close to the expression above:
+    \[\det\left(A\right) = \sum_{\sigma \in S_n} \sgn\left(\sigma\right) \prod_{i=1}^{n} a_{i, \sigma\left(i\right)}.\]
+
+    If it is non-zero, then the number of matching in $A$ is non-zero. However, the reciprocal may not be true. So, the idea is to consider instead consider some more general matrix $A\left(x_{1, 1}, x_{1, 2}, \ldots, x_{n,n}\right)$ so that: 
+    \[\left(i, j\right) \not \in E \implies a_{ij} = 0, \mathspace \left(i, j\right) \in E \implies a_{ij} = x_{ij}.\]
+
+    This matrix still has the property that, if $\sigma$ is an invalid matching, then:
+    \[\prod_{i=1}^{n} a_{i, \sigma\left(i\right)} = 0.\]
+
+    So, the determinant of $A\left(x\right)$ will be the zero polynomial (as a function of $x$) when $G$ has no valid matching. However, if it has some valid matching, then there is some assignment to the $x_{1,1}, \ldots, x_{n,n}$ so that its determinant is non-zero. In other words, letting $p\left(x\right) = \det\left(A\left(x\right)\right)$, we have that: 
+    \[p \not\equiv 0 \iff G \in \lang{BipartitePerfectMatching}.\]
+    
+    We can again use the Schwartz-Zippel lemma, by considering $S \subseteq \mathbb{Z}$ to be some subset with $\left|S\right| \geq 3n$, sampling a random $x \in S$ and outputting whether $p\left(x\right) \neq 0$. Then, the probability of success when $G \in \lang{BipartitePerfectMatching}$ is given by: 
+    \[\prob\left(p\left(x\right) \neq 0\right) \geq 1 - \frac{d}{\left|S\right|} = 1 - \frac{n}{3n} = \frac{2}{3}.\]
+    
+
+
+    \begin{subparag}{Remark}
+        This algorithm is better than the deterministic one when we want to exploit parallelism.
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Alternative classes}
+
+\begin{parag}{Definition: \lang{RP} class}
+    The \important{\lang{RP}} (one-sided randomised polynomial time) class is defined so that $L \in \lang{RP}$ if and only if there exists a polynomial-time PTM $M$ such that:
+    \begin{itemize}
+        \item $x \in L \implies \prob\left(M\left(x\right) = 1\right) \geq \frac{1}{2}$,
+        \item $x \not \in L \implies \prob\left(M\left(x\right) = 1\right) = 0$.
+    \end{itemize}
+
+    In other words, when $M\left(x\right) = 0$, it may actually mean that $x \in L$. Thus, there might be false negatives, but no false positives (when $M\left(x\right) = 1$, we are sure $x \in L$).
+
+    \begin{subparag}{Remark 1}
+        This is like $\lang{NP}$, except that we also require that there are at least half of the paths that accept when $M\left(x\right) = 1$. Therefore, $\lang{RP} \subseteq \lang{NP}$, by using as certificate the sequence of coin tosses causing $M$ to accept.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We can decrease the error to a value arbitrarily close to $0$ by running $M\left(x\right)$ as many times as we wish, and outputting an OR of all the results.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the polynomial identity testing problem again.
+
+    When $p \in \lang{PIT}$, i.e. when $p \equiv 0$, the algorithm we considered always outputs $M\left(p\right) = 1$. In other words, if we consider $M' = \bar{M}$: 
+    \[p \not\in \bar{\lang{PIT}} \implies 0 = \prob\left(M\left(p\right) = 0\right) = \prob\left(M'\left(p\right) = 1\right).\]
+
+    This shows that: 
+    \[\lang{PIT} \in \lang{coRP}.\]
+
+    Another way to see this is that, when $M'\left(p\right) = 1$, this means that we found some $x_0$ so that $p\left(x_0\right) \neq 0$ and thus we know $p \not\equiv 0$, i.e. $p \in \bar{\lang{PIT}}$. There is thus indeed no false positive for $\bar{\lang{PIT}}$.
+\end{parag}
+
+\begin{parag}{Definition: \lang{ZPP} class}
+    The \important{\lang{ZPP}} (zero-sided error randomised polynomial time) class is defined so that $L \in \lang{ZPP}$ if and only if there exists a PTM $M$ (not necessarily poly-time) such that, for all $x$:
+    \begin{itemize}
+        \item $\prob\left(M\left(x\right) = L\left(x\right)\right) = 1$,
+        \item $\exval\left(\text{runtime}\left(M\left(x\right)\right)\right) \leq n^k$.
+    \end{itemize}
+\end{parag}
+
+\begin{parag}{Theorem}
+    We have that:
+    \[\lang{ZPP} = \lang{RP} \cap \lang{coRP}.\]
+
+    \begin{subparag}{Proof}
+        This proof is left as an exercise to the reader.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Adleman's theorem}
+    Adleman's theorem states that: 
+    \[\lang{BPP} \subseteq \lang{P} / \lang{poly}.\]
+
+    \begin{subparag}{Implication}
+        Karp-Lipton theorem stated that $\lang{NP} \subseteq \lang{P} / \lang{poly}$ implies $\Sigma_2 \lang{P} = \lang{PH}$.
+
+        Since it is believed the polynomial hierarchy does not collapse, this means that it is believed $\lang{NP} \not\subseteq \lang{BPP}$. It is also believed that $\lang{BPP} \not\subseteq \lang{NP}$.
+
+        In other words, $\lang{NP}$ and $\lang{BPP}$ are believed to be incomparable: we believe none is included in the other.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $L \in \lang{BPP}$ be arbitrary, and let $M$ be a PTM solving $L$. By definition, $M$ has a probability of error of at most $\frac{1}{3}$. To simplify the reasoning, we remove the randomness from $M$, making it run deterministically on some bitstring input $r$ (using $r_i$ as the $i$\Th coin toss), but put the randomness in $r$.
+
+        By running the algorithm $m$ times and outputting the majority answer, we get an exponentially reduced error of $2^{- \Omega\left(m\right)}$. So, repeating the algorithm $\Theta\left(n\right)$ times, we have that, for all $x$: 
+        \[\prob_r\left(M_r\left(x\right) \neq L\left(x\right)\right) < 2^{- 2n}.\]
+
+        But then, using the union bound: 
+        \[\prob_r\left(\exists x \in \left\{0, 1\right\}^n, M_r\left(x\right) \neq L\left(x\right)\right) \leq 2^n \cdot 2^{-2n} = 2^{-n}.\]
+
+        In other words, sampling $r$ randomly gives with non-zero probability a Turing machine $M_r$ that makes no error on all inputs. Since the probability is non-zero, such a $r_n$ must exist for any given $n$ (if it did not exist, then the probability to get such an $r_n$ would be 0). We can use this $r_n$ as an advice to our Turing machine. In other words, for all $n$, we can consider the circuit $C_n$ so that $C_n\left(x\right) = M_{r_n}\left(x\right)$ for all $x \in \left\{0, 1\right\}^n$ using the Cook-Levin construction, showing $L \in \lang{P} / \lang{poly}$.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        The method used in the proof above, which shows that an object exists by showing that it has a non-zero probability of appearing when sampling it randomly from a set, is called the \textit{probabilistic method}. I have to admit this is a very clever argument.
+    \end{subparag}
+\end{parag}
+
+\subsection{Diagram}
+
+\begin{parag}{Diagram}
+    A full diagram of all the complexity classes we have seen so far can be found on next page. A black arrow represents inclusion $\subseteq$ (so a black double arrow means equality), a blue arrow means inclusion that is believed though not proved, a red arrow means non-inclusion $\not\subseteq$, and orange arrows mean non-inclusion that is believed though not proved. Moreover, for clarity, it is not repeated over the whole polynomial hierarchy that it is believed not to collapse.
+\end{parag}
+
+\clearpage
+\vspace*{\fill}
+\svghere[0.7]{ComplexityClassesDiagram.svg}
+\vspace*{\fill}
+\clearpage
+
+\end{document}

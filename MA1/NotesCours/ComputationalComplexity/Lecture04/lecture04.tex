@@ -1,0 +1,246 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-03 at 15:29:09.
+
+\usepackage{../../style}
+
+\title{Comp comp}
+\author{Joachim Favre}
+\date{Jeudi 03 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2024-10-03}{This course makes us relativise}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the diagonalisation argument, and application to the time hierarchy theorem.
+    \item Definition of oracle Turing machine.
+    \item Proof that the $\lang{P}$ versus $\lang{NP}$ problem does not relativise.
+\end{itemize}
+
+}
+
+\subsection{Time hierarchy}
+
+\begin{parag}{Diagonalisation}
+    There exists a language that is not decided by any Turing machine.
+
+    \begin{subparag}{Remark}
+        The important thing about this theorem is the diagonalisation argument, which is the only known method to prove limitation of Turing machines.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Order all Turing machines $M_1, M_2, \ldots$, and consider the language of Turing matrices that reject their own encoding: 
+        \[\lang{DIAG} = \left\{\left\langle M \right\rangle \suchthat M\left(\left\langle M \right\rangle\right) = 0\right\}.\]
+
+        We suppose that all Turing machines halt on all inputs, for simplicity of the proof. The argument can be generalised to any Turing machine without too much issue.
+
+        Let us try to construct a Turing machine $N$ that decides \lang{DIAG} towards contradiction. If $M_j\left(\left\langle M_j \right\rangle\right) = 1$, then $N\left(\left\langle M_j \right\rangle\right) = 0$. On the other hand, if $M_j\left(\left\langle M_j \right\rangle\right) = 0$, then $N\left(\left\langle M_j \right\rangle\right) = 1$. In other words, considering the following table of the outputs of Turing machines $M_1, M_2, \ldots$ on inputs $\left\langle M_1 \right\rangle, \left\langle M_2 \right\rangle, \ldots$, we constructed a Turing machine $N$ so that, on input $\left\langle M_j \right\rangle$, it outputs a different value than $M_j$.
+        \imagehere[0.6]{DiagonalisationArgument.png}
+
+        This means that $N$ is not any element of the list. However, this is not possible since we considered all Turing machines.
+
+        Another, more formal argument, is to suppose for contradiction that there there exists some $N$ that decides \lang{DIAG}. Since we listed all Turing machines, it must be in the list: $N = M_i$. We notice the following propositions are equivalent:
+        \begin{itemize}
+            \item $M_i\left(\left\langle M_i \right\rangle\right) = 1$.
+            \item Since $M_i$ decides \lang{DIAG}, $\left\langle M_i \right\rangle \in \lang{DIAG}$.
+            \item By definition of \lang{DIAG}, $M_i\left(\left\langle M_i \right\rangle\right) = 0$.
+        \end{itemize}
+
+        This is however a direct contradiction. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Universal Turing machine}
+    There exists a Turing Machine $U$ such that, for any Turing machine $M$ and input $x$: 
+    \[U\left(\left\langle M, x \right\rangle\right) = M\left(x\right).\]
+
+    It moreover runs in $c_M \cdot t_M\left(n\right)^2$ steps for some constant $c_M$ depending on $M$.
+
+    \begin{subparag}{Intuition}
+        In other words, $U$ is capable of simulating any Turing machine.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The runtime can be optimised. The best known yet is $c_M \cdot t_M\left(n\right) \log\left(t_M\left(n\right)\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Time-hierarchy theorem}
+    Let $f, g: \mathbb{N} \mapsto \mathbb{N}$ be two functions.
+
+    If $f\left(n\right) \log\left(f\left(n\right)\right) \in o\left(g\left(n\right)\right)$, then:
+    \[\lang{TIME}\left(f\left(n\right)\right) \subsetneq \lang{TIME}\left(g\left(n\right)\right).\]
+
+    \begin{subparag}{Intuition}
+        Intuitively, if $g$ grows sufficiently faster than $f$, then there are some problems that are $O\left(g\left(n\right)\right)$ but not $O\left(f\left(n\right)\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        It is possible to show a similar hierarchy for \lang{NTIME}.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We do the proof for the special case $\lang{TIME}\left(n\right) \subsetneq \lang{TIME}\left(n^3\right)$, the general case is completely analogous. We make a diagonalisation argument, similar to the one that shows \lang{DIAG} is undecidable.
+
+        We consider the following language: 
+        \[D = \left\{\left\langle M, 1^k \right\rangle \suchthat U\left(M, \left\langle M, 1^k \right\rangle\right) = 0 \text{ in $k^3$ steps}\right\},\]
+        where $U$ is a universal Turing machine and $1^k$ is $k$ written in unary, i.e. a $1$ repeated $k$ times.
+
+        Note that we only need the universal Turing machine to be able to give a constraint on the number of steps. We cannot say ``run $M$ for $k^3$ steps'': there needs to be a simulation that we can stop, and adding it incurs some slowdown.
+
+        By definition of $D$, $D \in \lang{TIME}\left(n^3\right)$: we can always just run $U$ on the input, which will always take at most $k^3 \in O\left(n^3\right)$ time.
+
+        Now, let's suppose towards contradiction that $D \in \lang{TIME}\left(n\right)$, i.e. that there exists some $M$ that decides $D$ in time $t_M\left(n\right) = c\cdot n$ for some constant $c$. We notice that the following propositions are equivalent:
+        \begin{itemize}
+            \item $M\left(\left\langle M, 1^k \right\rangle\right) = 1$.
+            \item $\left\langle M, 1^k \right\rangle \in D$, since $M$ decides $D$.
+            \item $U\left(M, \left\langle M, 1^k \right\rangle\right) = 0$ in $k^3$ steps, by definition of $D$.
+            \item Since $M$ has a linear runtime and $U$ only introduces a quadratic penalty, on input $M, \left\langle M, 1^k \right\rangle$, $U$ finishes in time: 
+            \[c_m t_M\left(n\right)^2 = c_m c^2 \left(\left|M\right| + k\right)^2 \in \Theta\left(k^2\right).\]
+            
+            However, this yields that, for a sufficiently large $k$: 
+            \[M\left(\left\langle M, 1^k \right\rangle\right) = U\left(M, \left\langle M, 1^k \right\rangle\right) = 0.\]
+        \end{itemize}
+
+        The first and last proposition are in direct contradiction.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Oracle Turing machine}
+
+\begin{parag}{Definition: Oracle Turing machine}
+    Let $A \subseteq \left\{0, 1\right\}^*$ be an arbitrary language (potentially even undecidable). 
+
+    An \important{oracle Turing machine} (OTM) $M^A$ is a Turing machine with a new instruction: in a single step, it can answer queries of the form $x \over{\in}{?} A$ for an arbitrary $x \in \left\{0, 1\right\}^*$.
+
+    \begin{subparag}{Intuition}
+        The idea is that we set some problem $A$ to be easy, and we want to see what impact it has on the complexity world.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Universal OTM}
+    There exists a universal oracle Turing machine $U^{\bullet}$ so that, for all language $A$: 
+    \[U^A\left(\left\langle M^{\bullet}, x \right\rangle\right) = M^A\left(x\right).\]
+    
+    It moreover runs in  $c_M t_M\left(n\right)^2$ steps.
+
+    \begin{subparag}{Intuition}
+        In other words, this oracle Turing machine can simulate any oracle Turing machine, with any oracle.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Oracle complexity class}
+    The $\lang{P}^A$ complexity class is defined by: 
+    \[\lang{P}^A = \left\{L \suchthat L \text{ is decided by a poly-time oracle Turing machine $M^A$}\right\}.\]
+
+    Since \lang{SAT} is \lang{NP}-complete, we moreover note $\lang{P}^{\lang{NP}} = \lang{P}^{\lang{SAT}}$.
+    
+    The $\lang{NP}^A$ complexity class is defined by: 
+    \[\lang{NP}^A = \left\{L \suchthat L \text{ is decided by a poly-time oracle NTM $M^A$}\right\}.\]
+
+    \begin{subparag}{Examples}
+        For instance, we trivially have: 
+        \[\lang{P}^\o = \lang{P}.\]
+
+        Similarly, for any $A \in \lang{P}$: 
+        \[\lang{P}^A = \lang{P}.\]
+
+        More interestingly, if we look at problems in \lang{NP}: 
+        \[\lang{NP} \cup \lang{coNP} \subseteq \lang{P}^{\lang{NP}}.\]
+
+        It is unknown if they are equal or not. This will be formalised with the polynomial hierarchy.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Turing reduction}
+    Let $A, B$ be two languages.
+
+    If $A \leq_P B$, then $A \in \lang{P}^B$.
+
+    \begin{subparag}{Remark}
+        Sometimes, we write $A \in \lang{P}^B$ as $A \leq_p^T B$, and we call this polytime Turing reduction, or Cook reduction.
+
+        Intuitively, the reductions we have seen only allow a single call to the oracle: we must convert the problem $A$ to the problem $B$. On the other hand, if $A \in \lang{P}^{B}$, we can use a polynomial number of calls to the oral for $B$ in the reduction.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This proof is considered trivial and left as an exercise to the reader. \wink
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: \lang{EXP}}
+    The \lang{EXP} complexity class is defined by: 
+    \[\lang{EXP} = \bigcup_{k=1}^{\infty} \lang{TIME}\left(2^k\right).\]
+\end{parag}
+    
+\begin{parag}{Theorem: \lang{EXP}-complete}
+    There exists some language which is \lang{EXP}-complete (under poly-time reductions).
+
+    \begin{subparag}{Proof}
+        This will be shown in the fourth exercise series.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: \lang{P} vs \lang{NP} does not relativise}
+    The \lang{P} versus \lang{NP} problem does not relativise. In other words, There exists languages $A$ and $B$ such that: 
+    \[\lang{P}^A = \lang{NP}^A, \mathspace \lang{P}^B \neq \lang{NP}^B.\]
+
+    \begin{subparag}{Personal remark}
+        I use the terminology ``does not relativise'' I found in the reference book \textit{(Computational complexity: a modern approach}, Sanjeev Arora and Boaz Barak). The Professor instead used the terminology that ``\lang{P} versus \lang{NP} relativises both way''. 
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        In other words, if we have a proof that only considers Turing machines as black boxes that manage to prove that $\lang{P} = \lang{NP}$, then it must be wrong. Indeed, we could use the exact same proof by just adding oracles (that are simply one more instruction for Turing machines), which would imply $\lang{P}^B = \lang{NP}^B$ contradicting this theorem.
+
+        Diagonalisation is a proof technique that considers those Turing machines as black boxes. It can therefore not be used to solve the $\lang{P}$ versus $\lang{NP}$ problem. However, this is the only proof technique we know that can separate complexity classes.
+    \end{subparag}
+
+    \begin{subparag}{Proof $=$}
+        Let $A$ be an \lang{EXP}-complete problem.
+
+        Our goal is to show that: 
+        \[\lang{EXP} \subseteq \lang{P}^A \subseteq \lang{NP}^A \subseteq \lang{EXP}.\]
+
+        The fact that $\lang{EXP} \subseteq \lang{P}^A$ is easy: any language $L \in \lang{EXP}$ can be solved by a single query to the oracle. We thus want to show $\lang{NP}^A \subseteq \lang{EXP}$. For any $L \in \lang{NP}^A$, we can try all exponential number of possibilities for certificate in exponential time, and solve all query access to $A$ in exponential time as well, showing $L \in \lang{EXP}$.
+
+        The chain of inclusions therefore necessarily imply that $\lang{P}^A = \lang{NP}^A$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\neq$}
+        For any given $B$, we can consider the following language: 
+        \[L_B = \left\{1^n \suchthat \exists x \in \left\{0, 1\right\}^n, x \in B\right\}.\]
+
+        We notice that, still for any $B$, we have $L_B \in \lang{NP}^B$. Indeed, we can directly use $x$ as the witness, and then use the oracle to know whether $x \in B$. Our goal will therefore be to construct $B$ in such a way that $L_B \not \in \lang{P}^B$.
+
+        Let $M_1^B, M_2^B, \ldots$ be an ordering of all poly-time Turing machines. We will consider each machine $M_i^B$, one at a time, and update $B$ in such a way that $M_i^B$ fails to decide $L_B$ on some input $1^n$. This will indeed give our result. 
+
+        So, let $M_i^B$ be an arbitrary machine. We consider a $n$ large enough that is not used for any machine before in the list. Note that, since $M_i^B$ is poly-time, it can only make a polynomial number of queries to its oracle $B$ on the input $1^n$. We choose $B \cap \left\{0, 1\right\}^n$ so that all those queries do not belong to $B$. Since there are exponentially many values in $\left\{0, 1\right\}^n$, this moreover necessarily mean that $M_i^B$ could not have considered all the values, and we can still choose to include them in $B$ or not. We do this adversarially, just to make $M_i^B$ wrong: if it outputs yes, we include all of them, otherwise we include none of them (i.e. leaving $B \cap \left\{0, 1\right\}^n = \o$).
+
+        Since we consider a different $n$ for each machine, this yields that $M_i^B$ cannot decide $L_B$, for all $i$. But then, there does not exist any poly-time oracle decider for $L_B$, showing $L_B \not \in \lang{P}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Time hierarchy relativises}
+    The $\lang{TIME}\left(n\right)$ vs $\lang{TIME}\left(n^3\right)$ relativises. In other words, for all language $A$, we have: 
+    \[\lang{TIME}^A\left(n\right) \subsetneq \lang{TIME}^A\left(n^3\right).\]
+    
+    \begin{subparag}{Proof}
+        The argument we used to prove $\lang{TIME}\left(n\right) \subsetneq \lang{TIME}\left(n^3\right)$ was solely based on diagonalisation, which is a relativising argument. Therefore, this result must also relativise.
+
+        In other words, we could use the exact same proof we used for non-oracle Turing machines but with oracle Turing machines, it would still work.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

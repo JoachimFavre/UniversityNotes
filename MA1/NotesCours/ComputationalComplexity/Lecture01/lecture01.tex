@@ -1,0 +1,181 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-09-12 at 15:15:40.
+
+\usepackage{../../style}
+
+\title{Computational complexity}
+\author{Joachim Favre}
+\date{Jeudi 12 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2024-09-12}{Recalls}{
+\begin{itemize}[left=0pt]
+    \item Definition of language.
+    \item Definition of poly-time decider and the \lang{P} complexity class.
+    \item Definition of poly-time non-deterministic decider, poly-time verifier, and the \lang{NP} complexity class.
+\end{itemize}
+
+}
+
+\section{Structural complexity}
+
+\subsection{Recalls}
+
+\begin{parag}{Remark}
+    The first three lectures are completely included in the \textit{Theory of computation} Bachelor class. For completeness, a summary of those lectures will be presented in those notes. For a more complete approach, with more examples, intuition and proofs, one can find my notes for the \textit{Theory of computation} class at:
+    \begin{center}
+        \url{https://github.com/JoachimFavre/UniversityNotes}
+    \end{center}
+\end{parag}
+
+\subsubsection{\lang{P} complexity class}
+
+\begin{parag}{Church-Turing thesis}
+    A Turing machine can be converted to any usual programming language; and any program can be converted to a Turing machine.
+
+    \begin{subparag}{Implication}
+        Therefore, we will not work explicitly work with Turing machines, but simply with algorithms.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Running time}
+    Let $M$ be a Turing machine that halts on all inputs.
+
+    We define its \important{running time}, or \important{time complexity}, as the function $t_M: \mathbb{N} \mapsto \mathbb{N}$, so that: 
+    \[t_M\left(n\right) = \max_{w \in \left\{0, 1\right\}^n} \left\{\text{number of steps for $M\left(w\right)$ to halt}\right\}.\]
+\end{parag}
+
+\begin{parag}{Definition: Kleene star}
+    Let $\Sigma$ be a set.
+
+    The \important{Kleene star} of $\Sigma$, written $\Sigma^*$, is defined all concatenations of elements of $\Sigma$. 
+
+    \begin{subparag}{Example}
+        For instance: 
+        \[\left\{0, 1\right\}^* = \left\{\epsilon, 0, 1, 00, 01, 10, 11, 000, \ldots\right\},\]
+        where $\epsilon$ is the empty string.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Language}
+    Let $\Sigma$ be an alphabet, and let $L \subseteq \Sigma^*$ be arbitrary.
+
+    $L$ is said to be a \important{language}. Moreover, any $x \in L$ is said to belong to the language.
+
+    \begin{subparag}{Remark 1}
+        Typically, $\Sigma = \left\{0, 1\right\}$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        It is possible to see languages equivalently as a function $L: \left\{0, 1\right\}^* \mapsto \left\{0, 1\right\}$, where an element $x$ belongs to the language if and only if $L\left(x\right) = 1$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Encoding}
+    Let $T$ be an arbitrary object and $\Sigma$ be an alphabet. 
+
+    We note $\left\langle T \right\rangle \in \Sigma^*$ to be the smallest encoding of $T$ in our alphabet.
+
+    \begin{subparag}{Remark}
+        We will only work with $\Sigma = \left\{0, 1\right\}$, in which case $\left\langle T \right\rangle$ is just a binary encoding of $T$. For instance, if $T = \left(V, E\right)$ is a graph, $\left\langle T \right\rangle$ would be a way to represent $T$ in the memory of a computer.
+
+        The importance of the term ``smallest'' in the definition appears when we handle numbers: $\left\langle n \right\rangle$ has size $\left\lceil \log_2\left(n\right) \right\rceil $. It is sometimes necessary to consider a unary basis, in which case we write $\left\langle 1^n \right\rangle$, which is a $1$ repeated $n$ times and thus has size $n$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Decider}
+    Let $L$ be a language, and $M$ be a Turing machine.
+
+    $M$ is said to be a \important{decider} for $L$ if: 
+    \[x \in L \iff M\left(x\right) = 1.\]
+
+    It is moreover said to be \important{polynomial time} if its running time on $\left\langle x \right\rangle$ is polynomial in $\left|x\right|$. 
+\end{parag}
+
+\begin{parag}{Definition: \lang{TIME}}
+    Let $t: \mathbb{N} \mapsto \mathbb{N}$ be some function. 
+
+    The \important{$\lang{TIME}\left(t\left(n\right)\right)$} complexity class is defined by: 
+    \[\lang{TIME}\left(t\left(n\right)\right) = \left\{L \subseteq \Sigma^* \suchthat \text{There exists some TM deciding $L$ in time $O\left(t\left(n\right)\right)$}\right\}.\]
+\end{parag}
+
+\begin{parag}{Definition: \lang{P}}
+    The complexity class \important{\lang{P}} (polynomial) is defined as the class of languages that have a poly-time decider:
+    \[\lang{P} = \bigcup_{k=1}^{\infty} \lang{TIME}\left(n^k\right).\]
+\end{parag}
+
+\subsubsection{\lang{NP} complexity class}
+
+\begin{parag}{Definition: Verifier}
+    Let $L$ be a language, and $V$ be a Turing machine.
+
+    $V$ is said to be a \important{verifier} for $L$ if, for all $x \in \Sigma^*$:
+    \begin{itemize}
+        \item If $x \in L$, there exists some $c \in \Sigma^*$ so that $V\left(x, c\right) = 1$.
+        \item If $x \not \in L$, then for all $c \in \Sigma^*$, $V\left(x, c\right) = 0$.
+    \end{itemize}
+    
+    This $c$ is said to be a \important{certificate} or \important{witness}.
+
+    $V$ is moreover said to be \important{polynomial time} if its running time on $\left\langle x, c \right\rangle$ is polynomial in $\left|x\right|$.
+
+    \begin{subparag}{Remark}
+        If $V$ is a poly-time verifier for $L$, then, for any $x \in L$, there exists some $c \in \Sigma^*$ so that $M\left(x, c\right) = 1$ \textit{and} $\left|c\right|$ is polynomial in $\left|x\right|$. Indeed, otherwise, just the time to read $\left|c\right|$ would make the verifier exceed its computation time.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: NTM}
+    Informally, a \important{non-deterministic Turing machine} (NTM) is a Turing machine with the twist that, at any step, it can transition to any number of states (not just one).
+
+    \begin{subparag}{Remark}
+        As mentioned earlier, for a more formal definition, one can consider my \textit{Theory of computation} notes.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Non-deterministic decider}
+    Let $L$ be a language, and $M$ be a non-deterministic Turing machine.
+
+    $M$ is said to be a \important{non-deterministic decider} for $L$ if: 
+    \[x \in L \iff M\left(x\right) = 1.\]
+
+    More precisely, for all $x \in \Sigma^*$: 
+    \begin{itemize}
+        \item If $x \in L$, some computation path of $M$ on $x$ accepts.
+        \item If $x \not \in L$, all computations path of $M$ on $x$ reject.
+    \end{itemize}
+
+    It is moreover said to be \important{polynomial time} if, for all $x$, the running time of its longest computation path is polynomial in $\left|x\right|$.
+\end{parag}
+
+\begin{parag}{Theorem: NTM and verifier equivalence}
+    Let $L$ be a language.
+
+    $L$ has a non-deterministic poly-time decider if and only $L$ has a poly-time verifier.
+\end{parag}
+
+\begin{parag}{Definition: \lang{NTIME}}
+    Let $t: \mathbb{N} \mapsto \mathbb{N}$ be some function.
+
+    The \important{$\lang{NTIME}\left(t\left(n\right)\right)$} complexity class is defined by: 
+    \autoeq{\lang{NTIME}\left(t\left(n\right)\right) = \left\{L \subseteq \Sigma^* \suchthat \text{There exists some NTM deciding $L$ in time $O\left(t\left(n\right)\right)$}\right\} = \left\{L \subseteq \Sigma^* \suchthat \text{There exists some verifier for $L$ running in time $O\left(t\left(n\right)\right)$}\right\}.}
+\end{parag}
+
+\begin{parag}{Definition: \lang{NP} class}
+    The complexity class \important{\lang{NP}} (non-deterministic polynomial) is defined as the class of languages that have poly-time non-deterministic deciders, i.e. languages that have poly-time verifiers: 
+    \[\lang{NP} = \bigcup_{k=1}^{\infty} \lang{NTIME}\left(n^k\right).\]
+
+    \begin{subparag}{Remark}
+        It is easy to notice that $\lang{P} \subseteq \lang{NP}$. Indeed, any problem that has a poly-time decider also has a poly-time verifier: the verifier can simply ignore the certificate and run the decider on $x$. Whether $\lang{NP} \subseteq \lang{P}$ (and thus $\lang{P} = \lang{NP}$) is however an open (and very famous) question.
+
+        We will try to argue with the following lectures why, intuitively, we should have $\lang{P} \neq \lang{NP}$.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

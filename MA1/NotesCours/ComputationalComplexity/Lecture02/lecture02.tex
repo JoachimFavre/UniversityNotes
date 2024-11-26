@@ -1,0 +1,176 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-23 at 16:12:18.
+
+\usepackage{../../style}
+
+\title{Compcomp}
+\author{Joachim Favre}
+\date{Jeudi 19 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2024-09-19}{Guess what\ldots More recalls!}{
+\begin{itemize}[left=0pt]
+    \item Definition of poly-time reduction and $\lang{NP}$-completeness.
+    \item Many examples of \lang{NP}-complete problems.
+\end{itemize}
+}
+
+\subsubsection{\lang{NP}-completeness}
+
+\begin{parag}{Definition: Poly-time computable function}
+    Let $f: \Sigma^* \mapsto \Sigma^*$ be a function.
+
+    $f$ is said to be \important{polynomial time computable} if there exists a poly-time Turing machine $M$ so that, on every input $w$, it outputs $f\left(w\right)$.
+\end{parag}
+
+\begin{parag}{Definition: Reduction}
+    Let $A, B \subseteq \Sigma^*$ be languages, and $f: \Sigma^* \mapsto \Sigma^*$ be some poly-time computable function.
+
+    $f$ is said to be a \important{poly-time reduction} from $A$ to $B$ if, for every $w \in \Sigma^*$: 
+    \[w \in A \iff f\left(w\right) \in B.\]
+    
+    If there exists such a reduction from $A$ to $B$, then we say $A$ is \important{poly-time reducible} to $B$, which we write $A \leq_P B$.
+
+    \begin{subparag}{Intuition}
+        Reduction capture the fact that a problem is harder than another one. In other word, if $A$ reduces to $B$ and we are able to solve $B$ efficiently, then $A$ can also be solved efficiently. Solving $A$ efficiently however does not tell us anything on $B$. This is formalised with the following theorem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: \lang{P} transitivity}
+    Let $A, B$ be two languages.
+
+    If $B \in \lang{P}$ and $A \leq_P B$, then $A \in \lang{P}$. 
+\end{parag}
+
+\begin{parag}{Definition: \lang{NP}-completeness}
+    Let $L$ be a language.
+
+    $L$ is said to be \important{\lang{NP}-complete} if:
+    \begin{itemize}
+        \item (\lang{NP}-membership) $L \in \lang{NP}$;
+        \item (\lang{NP}-hardness) for every $L' \in \lang{NP}$, $L' \leq L_P$.
+    \end{itemize}
+
+    \begin{subparag}{Intuition}
+        If we show that any \lang{NP}-complete problem is in \lang{P}, then all problems in \lang{NP} are in \lang{P} and thus $\lang{P} = \lang{NP}$. Therefore, any \lang{NP}-complete problem is considered not to have any poly-time decider.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: \lang{NP}-transitivity}
+    Let $L$ be a language, and $C$ be a \lang{NP}-complete language.
+
+    If $L \in \lang{NP}$ and $C \leq_P L$, then $L$ is \lang{NP}-complete.
+
+    \begin{subparag}{Remark}
+        This is the main technique we will use to show languages are \lang{NP}-complete.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: CNF}
+    A \important{conjunctive normal form} (CNF) formula is an AND of ORs. More formally:
+    \begin{itemize}
+        \item A \important{literal} is a variable or its negation.
+        \item A \important{clause} is an OR of $m_i$ literals.
+        \item A CNF formula is an AND of $n$ clauses.
+    \end{itemize}
+
+    It is moreover said to be \important{satisfiable} if there exists some variables $x_1, \ldots, x_k$ so that $\phi\left(x_1, \ldots, x_k\right) = 1$.
+    
+    \begin{subparag}{Example}
+        For instance, the following is a CNF formula: 
+        \[\phi = \left(\bar{x} \lor \bar{y} \lor z_0\right) \land \left(x \lor \bar{y} \lor \bar{z}_1\right) \land \left(\bar{x} \lor y \lor z_2\right) \land x.\]
+
+        Its last clause is $x$, and its first clause is: 
+        \[\bar{x} \lor \bar{y} \lor z_0.\]
+
+        The first literal of its first clause is $\bar{x}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: \lang{SAT}}
+    \lang{SAT} is defined by: 
+    \[\lang{SAT} = \left\{\left\langle \phi \right\rangle \suchthat \text{$\phi$ is a satisfiable CNF}\right\}.\]
+\end{parag}
+
+\begin{parag}{Cook-Levin theorem}
+    \lang{SAT} is \lang{NP}-complete.
+
+    \begin{subparag}{Proof}
+        The proof of this theorem will be sketched in the next section.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: $k$\lang{SAT}}
+    We define $k\lang{SAT}$ as: 
+    \[k\lang{SAT} = \left\{\left\langle \phi \right\rangle \suchthat \text{$\phi$ is a satisfiable CNF and each clause has at most $k$ literals}\right\}.\]
+
+    For any $k \geq 3$, then $\lang{SAT} \leq_P k\lang{SAT}$. Since moreover $k\lang{SAT} \in \lang{NP}$, we have that $k\lang{SAT}$ is \lang{NP}-complete.
+\end{parag}
+
+\begin{parag}{Example: \lang{INDSET}}
+    Let $G = \left(V, E\right)$ be some graph. We say that $S \subseteq V$ is an independent set of size $\left|S\right|$ if no two vertices in $S$ are adjacent: 
+    \[\forall u,v \in S, \left\{u ,v\right\} \not\in E.\]
+
+    We define the language \lang{INDSET} as:
+    \[\lang{INDSET} = \left\{\left\langle G, k \right\rangle \suchthat \text{$G$ has an independent set of size $k$}\right\}.\]
+
+    We have that $\lang{SAT} \leq_P \lang{INDSET}$. Since moreover $\lang{INDSET} \in \lang{NP}$, then \lang{INDSET} is $\lang{NP}$-complete.
+\end{parag}
+
+\begin{parag}{Example: \lang{CLIQUE}}
+    Let $G = \left(V, E\right)$ be some graph. $C \subseteq V$ is said to be a clique of $G$ if each pair of different vertices are connected by some edge: 
+    \[\forall u, v \in C, u \neq v \implies \left\{u, v\right\} \in E.\]
+
+    We define the language \lang{CLIQUE} as: 
+    \[\lang{CLIQUE} = \left\{\left\langle G, k \right\rangle \suchthat \text{$G$ has a clique of size $k$}\right\}.\]
+
+    We have that $\lang{INDSET} \leq_P \lang{CLIQUE}$. Since moreover $\lang{CLIQUE} \in \lang{NP}$, then \lang{CLIQUE} is \lang{NP}-complete.
+\end{parag}
+
+\begin{parag}{Example: $\lang{VERTEX-COVER}$}
+    Let $G = \left(V, E\right)$ be some graph. $S \subseteq V$ is said to be a vertex cover if each edge of $E$ is incident to at least one vertex of $S$: 
+    \[\forall e \in E, \exists u \in S, u \in e.\]
+
+    We define the language \lang{VERTEX-COVER} as: 
+    \[\lang{VERTEX-COVER} = \left\{\left\langle G, k \right\rangle \suchthat \text{$G$ is a graph that has a vertex cover of size $k$}\right\}.\]
+
+    We have that $\lang{INDSET} \leq_P \lang{VERTEX-COVER}$. Since moreover $\lang{VERTEX-COVER} \in \lang{NP}$, then \lang{VERTEX-COVER} is \lang{NP}-complete.
+\end{parag}
+
+\begin{parag}{Example: \lang{SET-COVER}}
+    Let $U = \left\{1, \ldots, n\right\}$ be some set, and $\mathcal{F} = \left\{T_1, \ldots, T_m\right\} \in \mathcal{P}\left(U\right)$ be a family of subsets of $U$. A subset $S = \left\{T_{i_1}, \ldots, T_{i_k}\right\} \subseteq \mathcal{F}$ is said to be a set cover of size $k$ if its elements cover all elements of $U$: 
+    \[\bigcup_{j=1}^{k} T_{i_j} = U.\]
+
+    We define the language \lang{SET-COVER} as: 
+    \[\lang{SET-COVER} = \left\{\left\langle U, \mathcal{F}, k \right\rangle \suchthat \text{$\mathcal{F}$ contains a set cover of size $k$}\right\}.\]
+
+    We have that $\lang{VERTEX-COVER} \leq_P \lang{SET-COVER}$. Since moreover $\lang{SET-COVER} \in \lang{NP}$, then \lang{SET-COVER} is \lang{NP}-complete.
+\end{parag}
+
+\begin{parag}{Example: \lang{SUBSET-SUM}}
+    Let $X$ be a multi-set (a set that can contain multiple times the same element) of integers. We define the language \lang{SUBSET-SUM} as: 
+    \[\lang{SUBSET-SUM} = \left\{\left\langle X, s \right\rangle \suchthat \text{$X$ contains a subset whose elements sum to $s$}\right\}.\]
+
+    Then, \lang{SUBSET-SUM} is \lang{NP}-complete.
+\end{parag}
+
+\begin{parag}{Example: \lang{GI}}
+    Let us consider an example of a problem which is not known to be \lang{NP}-complete, although it is in \lang{NP} and we do not know any poly-time algorithm for it.
+
+    Let $G_1 = \left(V_1, E_1\right), G_2 = \left(V_2, E_2\right)$ be graphs. A function $f: V_1 \mapsto V_2$ is said to be a graph isomorphism between $G_1$ and $G_2$ if it is bijection and preserves adjacency: 
+    \[\left\{u, v\right\} \in E_1 \iff \left\{f\left(u\right), f\left(v\right)\right\} \in E_2.\]
+
+    If there exists a graph isomorphism between $G_1$ and $G_2$, they are said to be isomorphic. We thus consider the following language: 
+    \[\lang{GI} = \left\{\left\langle G_1, G_2 \right\rangle \suchthat \text{$G_1$ and $G_2$ are isomorphic}\right\}.\]
+
+    As explained above, $\lang{GI} \in \lang{NP}$, although it is not known whether it is \lang{NP}-complete, nor whether $\lang{GI} \over{\in}{?} \lang{P}$.
+\end{parag}
+
+
+\end{document}

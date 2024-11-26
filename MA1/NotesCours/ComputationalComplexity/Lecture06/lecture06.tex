@@ -1,0 +1,273 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-17 at 15:17:51.
+
+\usepackage{../../style}
+
+\title{Compcomp}
+\author{Joachim Favre}
+\date{Jeudi 17 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2024-10-17}{Pretty diagram that takes way too much time}{
+\begin{itemize}[left=0pt]
+    \item Definition of the polynomial hierarchy complexity classes.
+    \item Proof of inclusions of those complexity classes.
+    \item Proof that if a level of the polynomial hierarchy collapses, then the whole polynomial hierarchy collapses.
+    \item Proof of the Karp-Lipton theorem.
+\end{itemize}
+
+}
+
+\subsection{Polynomial hierarchy}
+
+\begin{parag}{Observation}
+    So far, we have defined: 
+    \[A \in \lang{NP}: x \in A \iff \exists y, M\left(x, y\right) = 1,\]
+    \[B \in \lang{PSPACE}: x \in B \iff Q_1 y_1, Q_2 y_2, \ldots, Q_m y_m, M\left(x, y\right) = 1,\]
+    where $M$ are poly-time Turing machines and $m = n^{O\left(1\right)}$.
+
+    For \lang{NP}, we have a single quantifier $\exists$. For \lang{PSPACE}, we have polynomially many. It is thus interesting to fill in the gaps by introducing some hierarchy.
+\end{parag}
+
+\begin{parag}{Definition: $\Sigma_i$\lang{P} complexity class}
+    We define the \important{$\Sigma_i \lang{P}$} complexity class so that $L \in \Sigma_i \lang{P}$ if and only if there exists a poly-time Turing machine $M\left(x, y\right)$ so that:
+    \[x \in L \iff \exists y_1, \forall y_2, \exists y_3, \ldots, Q y_i, M\left(x, y\right) = 1,\]
+    where $Q = \exists$ if $i$ is odd and $Q = \forall$ if $i$ is even, and where all $y_i$ have polynomial length in $\left|x\right|$.
+
+    \begin{subparag}{Remark}
+        Since we allow the $y_i$ to have polynomial size, note that we can always merge consecutive $\exists$ or consecutive $\forall$ quantifiers: 
+        \[\exists a, \exists b \equiv \exists \left(a, b\right) \equiv \exists c, \mathspace \forall a, \forall b \equiv \forall \left(a, b\right) \equiv \forall c.\]
+
+        So, the $i$ defines the number of transitions from one quantifier to another we are allowed to make, not the number of quantifiers.
+    \end{subparag}
+
+    \begin{subparag}{Mnemonic}
+        $\Sigma$ looks a bit like the $\exists$ quantifier, so $\Sigma \lang{P}$ starts with an $\exists$ quantifier.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\Pi_i \lang{P}$ complexity class}
+    We define the \important{$\Pi_i\lang{P}$} complexity class so that:
+    \[\Pi_i \lang{P} = \lang{co}\Sigma_i\lang{P}\]
+
+    In other words, $L \in \Pi_{i} \lang{P}$ if and only if: 
+    \[\forall y_i, \exists y_2, \forall y_3, \ldots, Q y_i, M\left(x, y\right) = 1,\]
+    where $Q = \forall$ if $i$ is odd and $Q = \exists$ if $i$ is even, and where all $y_i$ have polynomial length in $\left|x\right|$.
+\end{parag}
+
+\begin{parag}{Theorem}
+    We have: 
+    \[\Sigma_i \lang{P} \subseteq \Sigma_{i+1} \lang{P}, \mathspace \Sigma_i \lang{P} \subseteq \Pi_{i+1} \lang{P}.\]
+
+    \begin{subparag}{Proof}
+        The first inclusion comes directly from the definition. The second one comes by simply adding an unused $\forall$ quantifier at the beginning of the chain.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    We have: 
+    \[\lang{P} = \Sigma_0 \lang{P} = \Pi_0 \lang{P},\] 
+    \[\Sigma_1 \lang{P} = \lang{NP}, \mathspace \Pi_1 \lang{P} = \lang{coNP}\]
+\end{parag}
+
+\begin{parag}{Definition: Polynomial hierarchy}
+    We define the \important{polynomial hierarchy} complexity class, written \lang{PH}, as: 
+    \[\lang{PH} = \bigcup_{i=0}^{\infty} \Sigma_i \lang{P} = \bigcup_{i=0}^{\infty}  \Pi_i \lang{P}.\]
+
+    \begin{subparag}{Remark}
+        Since $\lang{PH}$ always has a constant number of quantifiers but \lang{PSPACE} can have polynomially many, we have: 
+        \[\lang{PH} \subseteq \lang{PSPACE}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    We consider the language of circuits for which there are no smaller circuit that compute the same function: 
+    \[\lang{MinCircuit} = \left\{\left\langle C \right\rangle \suchthat \text{$C$ is a circuit of minimal size}\right\}.\]
+
+    We notice that $\left\langle C \right\rangle \in \lang{MinCircuit}$ if and only if all circuit of smaller size compute another function, i.e. 
+    \[\forall C': \left|C'\right| < \left|C\right|, \exists x: C'\left(x\right) \neq C\left(x\right) \equiv \forall C', \exists x, \left(\left|C'\right| < \left|C\right|\right) \to \left(C'\left(x\right) \neq C\left(x\right)\right).\]
+
+    Note that this is indeed valid since $C'$ and $x$ have polynomial size, and $\left|C'\right| < \left|C\right|$ and $C'\left(x\right) \neq C\left(x\right)$ both take polynomial time to check. 
+
+    We can thus see that $\lang{MinCircuit} \in \Pi_2 \lang{P}$. It is not believed to be lower in the hierarchy.
+\end{parag}
+
+\begin{parag}{Example 2}
+    We consider the following language: 
+    \[\lang{MaxIS} = \left\{\left\langle G, k \right\rangle \suchthat \text{the largest independent set in $G$ has size exactly $k$}\right\}.\]
+
+    We showed that $\lang{MaxIS} \in \lang{P}^{\lang{NP}}$ in the fourth exercise series. Let us moreover try to find where it is in the hierarchy.
+
+    We notice that $\left\langle G, k \right\rangle \in \lang{MaxIS}$ if and only if there exists some $S \subseteq V$ which is an independent set so that $\left|S\right| = k$, and for any $S' \subseteq V$, $\left|S'\right| > k$ implies $S'$ is not an independent set. To simplify our notations, we write $\mathbb{S}$ to be the set of independent sets in $G$ (i.e. $S \in \mathbb{S}$ means that $S$ is an independent set):
+    \[\begin{split}
+        & \left(\exists S \subseteq V, S \in \mathbb{S} \land \left|S\right| = k\right) \land \left(\forall S', \left|S'\right| > k \to S' \not\in \mathbb{S}\right) \\
+        & \equiv \exists S \subseteq V, \forall S' \subseteq V, S \in \mathbb{S} \land \left|S\right| = k \land \left(\left|S'\right| > k \to S' \not \in \mathbb{S}\right).
+    \end{split}\]
+
+    So, $\lang{MaxIS} \in \Sigma_2 \lang{P}$. However, the $\exists$ and the $\forall$ quantifiers are independent. So, we can swap them without any issue:
+    \[\begin{split}
+        & \left(\exists S \subseteq V, S \in \mathbb{S} \land \left|S\right| = k\right) \land \left(\forall S', \left|S'\right| > k \to S' \not\in \mathbb{S}\right) \\
+        & \equiv \forall S' \subseteq V, \exists S \subseteq V, \left(\left|S'\right| > k \to S' \not \in \mathbb{S}\right) \land S \in \mathbb{S} \land \left|S\right| = k.
+    \end{split}\]
+
+    This also shows that $\lang{MaxIS} \in \Pi_2 \lang{P}$.
+
+    To sum up, we have seen that $\lang{MaxIS} \in \lang{P}^{\lang{NP}}$ and $\lang{MaxIS} \in \Sigma_2 \lang{P} \cap \Pi_2 \lang{P}$. This is no accident, as the following theorem shows.
+\end{parag}
+
+\begin{parag}{Definition: $\Delta_i \lang{P}$ complexity class}
+    We define the \important{$\Delta_i \lang{P}$} complexity class by: 
+    \[\Delta_i \lang{P} = \lang{P}^{\Sigma_i \lang{\lang{P}}}.\]
+
+    \begin{subparag}{Remark}
+        In particular: 
+        \[\Delta_1 \lang{P} = \lang{P}^{\lang{NP}}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    We have, for all $i$:
+    \[\Delta_i \lang{P} \subseteq \Sigma_{i+1} \lang{P} \cap \Pi_{i+1} \lang{P}.\]
+
+    \begin{subparag}{Remark}
+        In particular, this means that: 
+        \[\lang{P}^{\lang{NP}} = \Delta_1 \lang{P} \subseteq \Sigma_2 \lang{P} \cap \Pi_2 \lang{P}.\]
+    \end{subparag}
+   
+    \begin{subparag}{Proof}
+        We will show the case $i = 1$, i.e. we want to show that:
+        \[\lang{P}^{\lang{NP}} \subseteq \Sigma_2 \lang{P} \cap \Pi_2 \lang{P}.\]
+
+        The other cases can be done using a similar idea.
+
+        Let $L \in \lang{P}^{\lang{SAT}}$ be arbitrary. Let $M^{\lang{SAT}}$ be an oracle poly-time Turing machine that decides $L$, which exists by definition. On input $x$, it will have some configuration tree where we have branching due to the answer of the \lang{SAT} oracle. In other words, $M^{\lang{SAT}}$ will start running and, at some point, it will do a query to its \lang{SAT} oracle. If the oracle answers $\phi_1 \in \lang{SAT}$, the machine will do something; if however $\phi_1 \not\in\lang{SAT}$, the machine will do something potentially different. Every time the machine queries the oracle, this creates more branching in the configuration tree.
+
+        Now, $x$ is accepted if and only if the only valid path in this tree is an accepting path. A path with answers $a = \left(a_1, a_2, \ldots, a_k\right)$ is valid if $a_i = 0$ if and only if $\phi_i \not \in \lang{SAT}$, and $a_i = 1$ if and only if $\phi_i \in \lang{SAT}$. To simplify the notation, we consider the sets of indices where the oracle outputs ``Yes'' and the ones where it outputs ``No'': 
+        \[Y\left(a\right) = \left\{i \suchthat a_i = 1\right\}, \mathspace N\left(a\right) = \left\{i \suchthat a_i = 0\right\}.\]
+        
+        Let $N\left(x, a\right)$ to be the Turing machine that runs $M^{\lang{SAT}}\left(x\right)$ but by answering the $i$\Th call to the oracle by $a_i$. By our reasoning, $x$ is accepted by $M^{\lang{SAT}}\left(x\right)$ if and only if $N\left(x, a\right)$ accepts and the $a$ we feed it is valid:
+        \[\begin{split}
+            & \exists a, \left(\forall i \in Y\left(a\right), \phi_i \in \lang{SAT}\right) \land \left(\forall j \in N\left(a\right), \phi_j \not\in\lang{SAT}\right) \land N\left(x, a\right) \\
+            & \equiv \exists a, \left(\forall i \in Y\left(a\right), \exists y_i, \phi\left(y_i\right) = 1\right) \land \left(\forall j \in N\left(a\right), \forall n_j, \phi\left(n_j\right) = 0\right) \land N\left(x, a\right) \\
+            & \equiv \exists a, \exists y, \forall n, \forall i \in Y\left(a\right), \forall j \in N\left(a\right), \phi_i\left(y_i\right) = 1 \land \phi_j\left(n_j\right) = 0 \land N\left(x, a\right).
+        \end{split}\]
+
+        This does show that $L \in \Sigma_2 \lang{P}$. We have thus shown that $\lang{P}^{\lang{SAT}} \subseteq \Sigma_2 \lang{P}$. Now, considering any arbitrary $L \in \lang{P}^{\lang{SAT}}$ again, we know that $\bar{L} \in \lang{P}^{\lang{SAT}}$, since we can just invert the output of a decider for $L$. So, by what we have found above, this means that: 
+        \[\bar{L} \in P^{\lang{SAT}} \subseteq \Sigma_2 \lang{P} \iff L \in \lang{co} \Sigma_2 \lang{P} = \Pi_2 \lang{P}.\]
+        
+        We have thus shown that $\lang{P}^{\lang{SAT}} \subseteq \Pi_2 \lang{P}$ as well, finishing the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Diagram}
+    We have found the following chain of inclusions for the polynomial hierarchy:
+    \svghere{PolynomialHierarchyInclusions.svg}
+
+    It is a popular hypothesis that \lang{PH} is infinite, i.e., for all $i$:
+    \[\lang{PH} \neq \Sigma_i \lang{P}.\]
+
+    This is formalised thanks to the following proposition.
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $i$ be arbitrary. If $\Sigma_i \lang{P} = \Pi_i \lang{P}$, then:
+    \[\lang{PH} = \Sigma_i \lang{P}.\]
+
+    In other words, if there exists a $i$ such that $\Sigma_i \lang{P} = \Pi_i \lang{P}$, then \lang{PH} collapses.
+
+    \begin{subparag}{Implication}
+        Note that, if $\lang{P} = \lang{NP}$, then $\lang{NP} = \lang{coNP}$; as shown in the first exercise series. So, if $\lang{P} = \lang{NP}$, then the polynomial hierarchy collapses. This does not seem intuitively to be true.
+    \end{subparag}
+    
+    \begin{subparag}{Remark}
+        As mentioned earlier, we believe unlikely that there exists a $i$ such that $\Sigma_i \lang{P} = \Pi_i \lang{P}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We make the proof for $i = 1$, other cases are similar. We therefore suppose by hypothesis that $\lang{NP} = \lang{coNP}$.
+
+        Let $L \in \lang{PH}$ be arbitrary. By definition of $L \in \lang{PH}$, there exists a $k$ such that $L \in \Sigma_k \lang{P}$. We can consider $k$ to be odd, the case where it is even is completely symmetrical. By definition of $\Sigma_k \lang{P}$, we have: 
+        \[x \in L \iff \exists y_1, \forall y_2, \ldots, \forall y_{k-1}, \exists y_k, M\left(x, y\right) = 1.\]
+
+        Intuitively, we use our hypothesis to switch the last quantifier (from $\exists$ to $\forall$ here). This will then allow us to merge those quantifiers, which we can do iteratively.
+
+        More formally, let us consider the following language:
+        \[L' = \left\{\left(x, y_1, \ldots, y_{k-1}\right) \suchthat \exists y_k, M\left(x, y\right) = 1\right\}.\]
+
+        We notice that $L' \in \lang{NP}$ by definition. However, since $\lang{NP} = \lang{coNP}$ by hypothesis, this means $L' \in \lang{coNP}$ as well. In other words, there is some other Turing machine $M'$ allowing us to express $L'$ as:
+        \[L' = \left\{\left(x, y_1, \ldots, y_{k-1}\right) \suchthat \forall y_k, M'\left(x, y\right) = 1\right\}.\]
+
+        This therefore tells us that we can switch the last quantifier, using $M'$ instead of $M$:
+        \[x \in L \iff \exists y_1, \forall y_2, \ldots, \forall y_{k-1}, \forall y_k, M'\left(x, y\right) = 1.\]
+
+        However, we can merge the two last quantifiers: $\forall y_{k-1}, \forall y_k \equiv \forall y_{k-1}'$, showing $L \in \Sigma_{k-1} \lang{P}$. We can iterate this argument, until $L \in \lang{NP}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    There exists an oracle $A$ such that $\lang{PH}^{A}$ is infinite.
+
+    \begin{subparag}{Implication}
+        Just like we saw before, this means that no diagonalisation argument can collapse the polynomial hierarchy.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    If \lang{PH} is infinite, \lang{PH} has no complete problem.
+    
+    \begin{subparag}{Proof}
+        Intuitively, if there was some complete problem, it would have to lie in some level. But then, the whole hierarchy would collapse to this level.
+
+        This theorem will be proven formally in the sixth exercise series.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Karp-Lipton theorem}
+    We have that: 
+    \[\lang{NP} \subseteq \lang{P/poly} \implies \Sigma_2 \lang{P} = \Pi_2 \lang{P}.\]
+    
+    \begin{subparag}{Implication}
+        Since it is believed $\lang{PH}$ is infinite, so this would mean that $\lang{NP} \not\subseteq \lang{P/poly}$. This is a very interesting result, since $\lang{P/poly}$ is a very powerful complexity class.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We suppose by hypothesis that $\lang{NP} \subseteq \lang{P / poly}$, i.e. $\lang{SAT} \in \lang{P / poly}$. We start by analysing what this hypothesis means. By definition of $\lang{P/poly}$, there exists polynomial-size circuits $\left\{C_n\right\}_{n \in \mathbb{N}}$ such that: 
+        \[\phi \in \lang{SAT} \iff C_n\left(\phi\right) = 1.\]
+
+        As we have seen in the first exercise series, we can use iteratively the knowledge whether a CNF is satisfiable to get a satisfying assignment. So, we can actually ask that the polynomial-size circuit are such that: 
+        \[\phi \in \lang{SAT} \iff C_n\left(\phi\right) \text{ outputs a satisfying assignment to $\phi$}.\]
+        
+
+        Since $C_n\left(\phi\right)$ is a satisfiable assignment to $\phi$, this yields: 
+        \[\phi \in \lang{SAT} \iff \phi\left(C_n\left(\phi\right)\right) = 1.\]
+
+        Intuitively, this means that, to show a CNF is satisfiable, we no longer need a satisfying assignment as a certificate; we need a circuit. The big advantage is that this circuit is independent of the CNF, unlike the certificate which could be different for each CNF. This is the big idea of this proof.
+
+        We now want to show $\Sigma_2 \lang{P} = \Pi_2 \lang{P}$. To do so, we start by showing $\Pi_2 \lang{P} \subseteq \Sigma_2 \lang{P}$. So, let $L \in \Pi_2 \lang{P}$ be arbitrary. We know by definition that there exists some Turing machine $M\left(x, y, z\right)$ so that: 
+        \[x \in L \iff \forall y, \exists z, M\left(x, y, z\right) = 1.\]
+
+        We know we can convert $M\left(x, y, z\right)$ to a CNF $\phi\left(x, y, z\right)$ using Cook-Levin constructions. Then, for any $x, y$, we consider $\phi_{x, y}\left(z\right) = \phi\left(x, y, z\right)$ to be a boolean function with hard-wired $x$ and $y$, but parameter $z$. We can put everything together to find that $x \in L$ if and only if:
+        \autoeq[s]{\forall y, \exists z, \left(M\left(x, y, z\right) = 1\right) \equiv \forall y, \exists z, \left(\phi_{x, y}\left(z\right) = 1\right) \equiv \forall y, \exists C_n, \left(\phi_{x, y}\left(C_n\left(\phi_{x, y}\right)\right) = 1\right) \equiv \exists C_n, \forall y, \left(\phi_{x, y}\left(C_n\left(\phi_{x, y}\right)\right) = 1\right),}
+        where we were allowed to commute $\forall y$ and $\exists C_n$ because they are independent.
+
+        We have thus shown that $L \in \Sigma_2\lang{P}$, i.e. $\Pi_2 \lang{P} \subseteq \Sigma_2 \lang{P}$. Now, to show that $\Sigma_2 \lang{P} \subseteq \Pi_2 \lang{P}$, let $L \in \Sigma_2 \lang{P}$ be arbitrary. We know by definition and what we just found that: 
+        \[\bar{L} \in \Pi_2 \lang{P} \subseteq \Sigma_2 \lang{P} \implies \bar{L} \in \Sigma_2 \lang{P} \implies L \in \Pi_2 \lang{P},\]
+        finishing the proof.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}
