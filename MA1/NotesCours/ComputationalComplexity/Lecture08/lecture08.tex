@@ -1,0 +1,338 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-07 at 15:17:16.
+
+\usepackage{../../style}
+
+\title{Compcomp}
+\author{Joachim Favre}
+\date{Jeudi 07 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2024-11-07}{Fangorn coming to the rescue}{
+\begin{itemize}[left=0pt]
+    \item A tree that takes decision, it must definitely be Fangorn.
+    \item Definition of decision tree and decision tree complexity. 
+    \item Definition of certificate complexity, and proof of inequalities.
+    \item Proof of sensitivity and block sensitivity, and proof of inequalities.
+\end{itemize}
+
+}
+
+\section{Concrete complexity}
+
+\begin{parag}{Remark}
+    The only complexity distinction we were able to make so far was the time-hierarchy theorem, and it was using diagonalisation. The rest is purely conjectures. So, we will consider simpler models of computations outside of Turing machines, from which we can actually say things.
+\end{parag}
+
+\subsection{Decision trees}
+
+\subsubsection{Definitions}
+
+\begin{parag}{Definition: Decision tree}
+    A \important{decision tree} is a binary tree with:
+    \begin{itemize}
+        \item internal nodes labelled with input variables.
+        \item leaves labelled with output value.
+    \end{itemize}
+    
+    Each input $x \in \left\{0, 1\right\}^n$ defines a root-to-leaf path, and the output value is the value of the leaf; computing a function $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$.
+
+    \begin{subparag}{Example}
+        For instance, the following is a decision tree of height $3$.
+        \imagehere[0.4]{ExampleDecisionTree.png}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Decision tree complexity}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be some boolean function.
+
+    We define its \important{decision tree complexity}, written $D^{dt}\left(f\right)$, as the smallest achievable height of a decision tree that computes $f$.
+
+    \begin{subparag}{Remark}
+        Note that, for any $f$, we have: 
+        \[D^{dt}\left(f\right) \leq n.\]
+
+        Indeed, we can always make a full tree that considers $x_i$ at depth $i$.
+    \end{subparag}
+    
+    \begin{subparag}{Computation}
+        To show that $D^{dt}\left(f\right) = k$, we tend to, as usual, show $D^{dt}\left(f\right) \leq k$ and $D^{dt}\left(f\right) \geq k$.
+
+        Showing that $D^{dt}\left(f\right) \leq k$ can always be done by showing some tree of height $k$ that computes $f$. To show that $D^{dt}\left(f\right) \geq k$, we can make an adversary argument similar to the one we make when showing $\lang{P}^B \neq \lang{P}^B$ for some $B$: supposing there exists a tree of height smaller than $k$, we choose to what value we fix the variables queried by the tree, and then to what we fix all values that have not been accessed.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    We consider the function $\lang{OR}_n$ defined so that: 
+    \[\lang{OR}_n\left(x_1, \ldots, x_n\right) = 1 \iff x_1 \lor \ldots \lor x_n = 1.\]
+    
+    We want to show $D^{dt}\left(\lang{OR}_n\right) = n$. Indeed, to show $D^{dt}\left(\lang{OR}_n\right) \geq n$, we suppose towards contradiction that there exists some tree of height $h < n$ that computes $\lang{OR}_n$. We fix all the bits it queries to $0$. It queries less than $n$ variables (otherwise, it would have a height $n$), so some of them have not been queried. If it outputs $1$, we set all the remaining variables to $0$, and otherwise we fix them to $1$. In both cases, the tree outputs the wrong value, showing cannot exist.
+\end{parag}
+
+\begin{parag}{Definition: Function composition}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ and $g: \left\{0, 1\right\}^m \mapsto \left\{0, 1\right\}$ be boolean functions.
+
+    We define their composition $f\circ g: \left\{0, 1\right\}^{n\cdot m} \mapsto \left\{0, 1\right\}$ so that, for any $x = \left(x_1, \ldots, x_n\right) \in \left(\left\{0, 1\right\}^n\right)^m$: 
+    \[\left(f \circ g\right)\left(x\right) = f\left(g\left(x_1\right), \ldots, g\left(x_n\right)\right).\]
+\end{parag}
+
+\begin{parag}{Example 2}
+    We want to show that $D^{dt}\left(\lang{AND}_n \circ \lang{OR}_n\right) = n^2$. 
+
+    A good way visualise this function is to make a table, where each column is input to $\lang{OR}_n$, and then the result of each column is fed to $\lang{AND}_n$. We notice that $\lang{AND}_n \circ \lang{OR}_n$ outputs $1$ if and only if there is a $1$ in each column and, equivalently, that it outputs $0$ if and only if there is a column with only zeros.
+    \imagehere[0.8]{AndOrCompositionTable.png}
+
+   We consider an adversary that fixes almost all queried bits to $0$, except if all $n-1$ bits of the column where already fixed to $0$, in which case it fixes it to $1$. If a tree does not consider all bits, we can choose the remaining bits of a column it did not consider to be so that the tree fails to compute $\lang{AND}_n \circ \lang{OR}_n$ correctly. This does show that $D^{dt}\left(\lang{AND}_n \circ \lang{OR}_n\right) \geq n^2$. Since moreover $\lang{AND}_n \circ \lang{OR}_n$ has domain $\left\{0, 1\right\}^{n^2}$, we also know $D^{dt}\left(\lang{AND}_n \circ \lang{OR}_n\right) \leq n^2$, finishing the argument.
+\end{parag}
+
+\begin{parag}{Example 3}
+    Let us consider the index function, $\lang{Ind}: \left\{0, 1\right\}^{\log\left(n\right)} \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$, defined so that: 
+    \[\lang{Ind}\left(i, x\right) = x_i.\]
+    
+    We notice that $D^{dt}\left(\lang{Ind}\right) = \log\left(n\right) + 1$. Indeed, we only need to read at least all bits of $i$ and $x_i$ to be able to output an answer, so $D^{dt}\left(\lang{Ind}\right) \geq \log\left(n\right) + 1$. Constructing a tree that achieves this height is left as an exercise to the reader.
+\end{parag}
+
+\subsubsection{Certificates}
+
+\begin{parag}{Definition: Certificate}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be an arbitrary boolean function and $x \in \left\{0, 1\right\}^n$.
+
+    A partial assignment $\rho \in \left\{0, 1, *\right\}^n$ is a \important{certificate} for $x$, if:
+    \begin{itemize}
+        \item $\rho$ is consistent with $x$. In other words, for all $i$ where $\rho_i \neq *$: 
+        \[\rho_i = x_i.\]
+        \item If $\rho$ is consistent with some $x' \in \left\{0, 1\right\}^n$, then $f\left(x\right) = f\left(x'\right)$.
+    \end{itemize}
+
+    Its \important{size} is defined as the number of non-stars it contains: 
+    \[\left|\rho\right| = \left|\left\{i \suchthat \rho_i \neq *\right\}\right|.\]
+
+    \begin{subparag}{Terminology}
+        If $\rho$ is a certificate for some $x$ where $f\left(x\right) = i \in \left\{0, 1\right\}$, we may say that $\rho$ is a $i$-certificate.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider again $f = \lang{OR}_n$. 
+
+    On input $x = 0011$, a certificate can be $\rho = ***1$ (with $\left|\rho\right| = 1$), $\rho = **1*$ (with $\left|\rho\right| = 1$), $\rho = 0011$ (with $\left|\rho\right| = 4$) and $*011$ (with $\left|\rho\right| = 3$). 
+
+    On input $x = 0000$, the only certificate is $\rho = 0000$, implying that the smallest certificate for this input has size $\left|\rho\right| = n$.
+\end{parag}
+
+\begin{parag}{Definition: Least size certificate}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be some boolean function.
+
+    For any $x \in \left\{0, 1\right\}^n$, we define $C\left(f, x\right)$ to be the \important{least size certificate} for $x$: 
+    \[C\left(f, x\right) = \min_{\rho: \text{certificate for $x$}} \left|\rho\right|.\]
+    
+    Let $i \in \left\{0, 1\right\}$. We also define the \important{certificate complexity for output $i$} as: 
+    \[C_i\left(f\right) = \max_{x: f\left(x\right) = i} C\left(f,x\right),\] 
+
+    Finally, we define the \important{certificate complexity} of $f$  as:
+    \[C\left(f\right) = \max_{x} C\left(f, x\right) = \max \left\{C_1\left(f\right), C_0\left(f\right)\right\}.\]
+
+    \begin{subparag}{Remark}
+        $C_1\left(f\right)$ represents how hard it is to show $f\left(x\right) = 1$, i.e. how many bits of $x$ we need to consider to be able to be convinced $f\left(x\right) = 1$. This is similar to \lang{NP}, in the sense that we could use non-determinism to just tell us which $C_1\left(f\right)$ bits of $x$ we need to consider.
+
+        Similarly, $C_0\left(f\right)$ is similar to \lang{coNP} and $C\left(f\right)$ is similar to $\lang{NP} \cap \lang{coNP}$.
+
+        Note that those analogies are only here for intuition's sake. We are currently working in the world of decision trees, which is not at all the same as the world of Turing machiines.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, as noticed earlier, $C_1\left(\lang{OR}_n\right) = 1$ (we only need to consider a single bit to show $\lang{OR}_n\left(x\right) = 1$) but $C_0\left(\lang{OR}_n\right) = n$ (we need to consider all bits to show $\lang{OR}_n\left(x\right) = 0$).
+    \end{subparag}
+
+    \begin{subparag}{Objective}
+        The goal of this certificate complexity is that it helps reasoning about decision tree complexity, as formalised with the following theorem.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Theorem}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be a boolean function. Then: 
+    \[C\left(f\right) \leq D^{dt}\left(f\right).\]
+    
+    \begin{subparag}{Remark}
+        This is an inequality and not an equality. We can for instance consider the following example.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider again $f = \lang{AND}_n \circ \lang{OR}_n$. We want to show that:
+    \[C\left(f\right) = C\left(\lang{AND}_n \circ \lang{OR}_n\right) = n.\]
+
+    We compute $C_1$ and $C_0$ separately. As explained before, to show that $f\left(x\right) = 0$, we need to exhibit a column full of zeros, showing $C_0\left(f\right) = n$. Similarly, to show that $f\left(x\right) = 1$, we need to exhibit a one in each column, showing $C_1\left(f\right) = n$. This does give our result.
+
+    Note that we have: 
+    \[C\left(f\right) = n < D^{dt}\left(f\right) = n^2.\]
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$.
+
+    Then, $C_0\left(f\right)$ is the least $k$ such that $f$ can be written as a $k$-CNF, and $C_1\left(f\right)$ is the least $k$ such $f$ can be written as a $k$-DNF.
+
+    \begin{subparag}{Proof idea}
+        Let us consider the case for $C_1\left(f\right)$, with intuition instead of formalism.
+
+        Let's suppose that $f$ can be written as a $k$-DNF, i.e. $f = \bigvee_i T_i,$ where each $T_i$ is a term that contains at most $k$ variables. To show that $f\left(x\right) = 1$, we only need to show that there is some $i$ so that $T_i\left(x\right) = 1$. This $T_i$ only has $k$ variables, so it corresponds to a certificate of size $k$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be some boolean function. Moreover, let $\rho_0$ be an arbitrary $0$-certificate, and $\rho_1$ be an arbitrary $1$-certificate.
+
+    Then, they must have a non-empty intersection. In other words, there must be bit where they are both non-stars, i.e. some $i$ so that: 
+    \[\left(\rho_0\right)_i \neq *, \mathspace \text{and} \mathspace \left(\rho_1\right)_i \neq *.\]
+
+    \begin{subparag}{Proof}
+        We suppose towards contradiction that this is false. However, this means that we can find some $x$ that is consistent with both $\rho_0$ and $\rho_1$.
+
+        Since $\rho_0$ is a certificate and $x$ is consistent with it, we must have $f\left(x\right) = 0$. Similarly, since $x$ is consistent with $\rho_1$, we must have $f\left(x\right) = 1$. This is our contradiction.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Theorem}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be a boolean function.
+
+    Then: 
+    \[D^{dt}\left(f\right) \leq C_0\left(f\right) C_1\left(f\right).\]
+
+    \begin{subparag}{Implication}
+        This notably means that: 
+        \[D^{dt}\left(f\right) \leq C\left(f\right)^2.\]
+    \end{subparag}
+
+    \begin{subparag}{Intuitively}
+        Continuing our analogy to Turing machine complexity classes, this would mean that $\lang{P} = \lang{NP} \cap \lang{coNP}$ in the decision tree world.
+
+        Indeed, if we can efficiently verify that $f\left(x\right) = 0$ (i.e. have a small $C_0\left(f\right)$) and efficiently verify that $f\left(x\right) = 1$, then we can make an efficient decision tree.
+    \end{subparag}
+   
+    \begin{subparag}{Proof}
+        The goal of this proof is to construct a decision tree $f$ of height $h$, where $h \leq C_0\left(f\right) C_1\left(f\right)$. Since $D^{dt}\left(f\right) \leq h$, this will indeed show that $D^{dt}\left(f\right) \leq C_0\left(f\right)C_1\left(f\right)$.
+
+        We pick an arbitrary 1-certificate $\rho_1$ for $f$. The tree we construct reads all $\left|\rho_1\right| \leq C_1\left(f\right)$ non-star bits of $\rho_1$ from $x$, storing them in some $\sigma$ and, if they appear to be consistent with $\rho_1$, it outputs $1$. In all other cases, we consider $f_{\sigma}$ as $f$ with $\sigma$ substituted in (meaning that $f_{\sigma}$ has less input variables than $f$).
+
+        We know that any 0-certificate $\rho_0$ shared at least one non-star bit with $\rho_1$ by our lemma. However, since we substituted in all those bits when building $f_{\sigma}$, this means that we can get rid of those bits from $\rho_0$ to build a 0-certificate for $f_{\sigma}$. This means: 
+        \[C_0\left(f_{\sigma}\right) \leq C_0\left(f\right) - 1.\]
+        
+        Moreover, since it is still the same function, we have: 
+        \[C_1\left(f_{\sigma}\right) \leq C_1\left(f\right).\]
+
+        We repeat this recursively until $C_0\left(f_{\sigma}\right) = 0$, each time picking some $1$-certificate $\rho_1$ for $f_{\sigma}$, and making the tree read all $\left|\rho_1\right| \leq C_1\left(f\right)$ bits of the input. At the end, we end up with $C_0\left(f_{\sigma}\right) = 0$, so the tree can just output $0$.
+
+        At any iteration, the tree reads at most $C_1\left(f\right)$ bits of the input, and we have at most $C_0\left(f\right)$ such iterations, yielding that our tree does have a height at most $C_0\left(f\right) C_1\left(f\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Sensitivity}
+
+\begin{parag}{Definition: Sensitivity}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be a boolean function, and let $x \in \left\{0, 1\right\}^n$.
+
+    We define the \important{sensitivity} of $f$ on $x$ as: 
+    \[s\left(f, x\right) = \left|\left\{i \suchthat f\left(x\right) \neq f\left(x^{\left(i\right)}\right)\right\}\right|,\]
+    where $x^{\left(i\right)}$ is $x$ but with $x_i$ flipped: 
+    \[x^{\left(i\right)}_j = \begin{systemofequations} x_j, & \text{if $j \neq i$}, \\ \bar{x}_j, & \text{if $j = i$}. \end{systemofequations}\]
+
+    The sensitivity of $f$ is moreover defined as: 
+    \[s\left(f\right) = \max_x s\left(f, x\right).\]
+
+    \begin{subparag}{Intuition}
+        Variables $i$ such that flipping them changes the result, $f\left(x^{\left(i\right)}\right) \neq f\left(x\right)$, can be considered sensitive. So, the sensitivity, is the number of sensitive variables.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance $s\left(\lang{OR}_n\right) = n$, which is reached on input $x = 0^n$.
+
+        Similarly, it is easy to see that $s\left(\lang{AND}_n \circ \lang{OR}_n\right) \geq n$, by considering a $1$ in each column for instance. Now, to show that $s\left(\lang{AND}_n \circ \lang{OR}_n\right) = n$, we can exploit the following theorem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be a boolean function.
+
+    Then: 
+    \[s\left(f\right) \leq C\left(f\right).\]
+    
+    \begin{subparag}{Proof}
+        Let $x$ be such that $s\left(f, x\right) = s\left(f\right)$. Now, any certificate needs to read all those sensitive bits, since swapping any of them would change the result. So, $C\left(f, x\right) \geq s\left(f, x\right) = s\left(f\right)$. Since $C\left(f\right) \geq C\left(f, x\right)$, we get our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Sensitivity conjecture}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be a boolean function.
+
+    Then, there exists a $k \in \mathbb{N}$ such that: 
+    \[D^{dt}\left(f\right) \leq s\left(f\right)^k.\]
+
+    \begin{subparag}{Remark}
+        Whether this was true stayed open as a conjecture, named the sensitivity conjecture, until 2019.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The proof is not very long, but very non-trivial. Hence, we will only prove the following weaker version.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Block-sensitivity}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be a boolean function, and $x \in \left\{0, 1\right\}^n$.
+
+    Then, we define the \important{block sensitivity} of $f$ on $x$, $bs\left(f, x\right)$, as the maximum number $k$ of disjoint $B_1, \ldots, B_k \subseteq \left\{1, \ldots, n\right\}$ such that: 
+    \[f\left(x\right) \neq f\left(x^{B_i}\right),\]
+    where $x^{B_i}$ is $x$ with all bits in $B_i$ flipped:
+    \[x^{B_i}_j = \begin{systemofequations} x_j, & \text{if $j \not \in B_i$}, \\ \bar{x}_j, & \text{if $j \in B_i$}. \end{systemofequations}\]
+
+    \begin{subparag}{Remark}
+        This is a generalisation of sensitivity: in sensitivity we add the requirement that $\left|B_i\right| = 1$ for all $i$.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Theorem}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$.
+
+    Then: 
+    \[C\left(f\right) \leq s\left(f\right) bs\left(f\right).\]
+
+    \begin{subparag}{Proof}
+        Let $x \in \left\{0, 1\right\}^n$ be arbitrary. 
+
+        We consider $\left(B_1, \ldots, B_k\right)$ to be a maximum collection of blocks, where each is minimal. We consider $\rho$ to be the certificate that stars-out values of $x$ that are not covered by a block. This is a valid certificate. Indeed, otherwise, there exists some $y$ that is consistent with it so that $f\left(y\right) \neq f\left(x\right)$. However, we can construct a new block $B_{k+1}$ with the bits that are different in $y$ and $x$. Since those bits are stars in the certificate, $B_{k+1}$ is disjoint to our collection, contradicting that $\left(B_1, \ldots, B_k\right)$ was a maximum collection of blocks.
+
+        Let $j$ be such that $\left|B_i\right| \leq \left|B_j\right|$. By construction of our certificate, we have:
+        \[C\left(f\right) \leq \left|B_j\right| bs\left(f\right).\]
+
+        Now, we notice that $\left|B_i\right| \leq s\left(f\right)$ for all $i$. Indeed, let us consider $y = x^{B_i}$. By definition of block-sensitivity, $f\left(y\right) \neq f\left(x\right)$. Moreover, since each block is minimal, swapping any bit of $y$ changes the function value (otherwise, we could have taken a smaller block by not considering this bit). So, $s\left(f, y\right) \geq \left|B_i\right|$. Since moreover $s\left(f\right) \geq s\left(f, y\right)$, we do get that $s\left(f\right) \geq \left|B_i\right|$.
+
+        Putting everything together, this does yield that:
+        \[C\left(f\right) \leq \left|B_j\right| bs\left(f\right) \leq s\left(f\right) bs\left(f\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Diagram}
+
+\begin{parag}{Diagram}
+    To summarise, we found the following inequalities for decision trees:
+    \svghere[0.45]{DecisionTreeInequalities.svg}
+\end{parag}
+
+\end{document}

@@ -1,0 +1,314 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use Kuala Tex (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-28 at 15:21:39.
+
+\usepackage{../../style}
+
+\title{Comp comp}
+\author{Joachim Favre}
+\date{Jeudi 28 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2024-11-28}{This took way to long to clean}{
+\begin{itemize}[left=0pt]
+    \item Definition of random protocol.
+    \item Definition of the set-intersection problem, and explanation of its interest.
+    \item Definition of the \lang{NC} complexity class.
+    \item Definition of both the regular and monotone Karchmer-Widgerson relation.
+    \item Explanation of the characterisation of circuit depths using communication complexity, and application to the matching problem.
+\end{itemize}
+
+}
+
+\subsubsection{Random protocols}
+
+\begin{parag}{Definition: Random protocol}
+    A \important{random protocol} $\Pi$ of cost $c$ is a probability distribution over deterministic protocols $\pi$ of cost at most $c$.
+
+    We say that $\Pi$ computes $f: \mathcal{X} \times \mathcal{Y} \mapsto \left\{0, 1\right\}$ with error $\epsilon \in \left]0, 1\right[ $ if, for all $\left(x, y\right) \in \mathcal{X} \times \mathcal{Y}$: 
+    \[\prob_{\pi \in \Pi}\left[\pi\left(x, y\right) = f\left(x, y\right)\right] \geq 1 - \epsilon.\]
+
+    \begin{subparag}{Remark}
+        The choice of the random protocol is done randomly, but Alice and Bob share the same one. In other words, this is a form of shared randomness. Note that they do not have to pay anything on the cost of the protocol to get access to this randomness.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Randomised error}
+    Let $f: \mathcal{X} \times \mathcal{Y} \mapsto \left\{0 ,1\right\}$ be some boolean function, and $\epsilon \in \left]0, 1\right[ $ be some error.
+
+    We define \important{$R_{\epsilon}^{cc}\left(f\right)$} to be the least cost of an $\epsilon$-error protocol for $f$.
+\end{parag}
+
+\begin{parag}{Example 1}
+    For instance, we found that: 
+    \[D^{CC}\left(\lang{EQ}_n\right) = n + 1.\]
+
+    We want to see if random protocols improve this. The idea is to take $r \in \mathbb{F}_2^n$ uniformly at random as shared randomness between Alice and Bob. Alice then computes $x\dotprod r = \sum_{i} x_i r_i \Mod 2 \in \mathbb{F}_2 = \left\{0, 1\right\}$, sends this single bit to Bob, who outputs whether this is equal to $y \dotprod r \in \mathbb{F}_2$.
+
+    If $x = y$, there is never an error. If, however, $x \neq y$, then there must be some $i \in \left\{1, \ldots, n\right\}$ so that $x_i \neq y_i$. We notice that $r_i \in \left\{0, 1\right\}$ with uniform probability. However, fixing the rest of $r$, whether $r_i = 0$ or $r_i = 1$ changes whether $x \dotprod r = y\dotprod r$ since $x_i \neq y_i$. In other words, because of this symmetry, this protocol has a success probability of $\frac{1}{2}$ when $x \neq y$.
+
+    We can repeat this protocol $\log\left(\frac{1}{\epsilon}\right)$ times, taking an OR on the results, to get a success probability arbitrary close to $1$. This yields:
+    \[R_{\epsilon}^{cc}\left(\lang{EQ}_n\right) = O\left(\log\left(\frac{1}{\epsilon}\right)\right).\]
+\end{parag}
+
+\begin{parag}{Example 2}
+    We found that: 
+    \[D^{CC}\left(\lang{GT}_n\right) = n + 1.\]
+
+    We want to make a randomised algorithm, for $\epsilon = \frac{1}{3}$.
+
+    We notice that finding whether $x < y$ is equivalent to finding the largest $i$ so that $x_i \neq y_i$. For instance, $11010 > 11001$, since the fourth most significant bit is the largest $i$ so that $x_i \neq y_i$, and, here, $x_i = 1 > y_i = 0$.
+    
+    This can be done by finding the largest $k$ so that the $k$ most significant bits of $x$ and $y$ are equal, which can be done using a binary search. We have a very efficient equality random protocol, which we can use. Here, binary search asks us to do $\log\left(n\right)$ equality tests. We want them to yield a constant error, so we run each of those equality protocols with some $\epsilon < \frac{1}{3} \frac{1}{\log\left(n\right)}$. 
+
+    We run $\log\left(n\right)$ equality protocols, which all send $O\left(\log\left(\frac{1}{\epsilon}\right)\right) = O\left(\log\left(\log\left(n\right)\right)\right)$ bits. This means that we found a protocol of cost: 
+    \[R_{\frac{1}{3}}\left(\lang{GT}_n\right) = O\left(\log\left(n\right)\log\left(\log\left(n\right)\right)\right) = \widetilde{O}\left(\log\left(n\right)\right),\]
+    using soft-$O$ notation.
+    
+    It is possible to show in fact that $R_{\frac{1}{3}}^{CC}\left(GT\right) = O\left(\log\left(n\right)\right)$, by making a more complex protocol that was shown in an article by Nisan in 1992.
+\end{parag}
+
+\subsubsection{Set-intersection problem}
+
+\begin{parag}{Definition: Set-intersection problem}
+    Let $x, y \in \left\{0, 1\right\}^n$. 
+
+    The goal of the \important{set-intersection problem} is to know whether there exists some $i$ so that $x_i = y_i = 1$. In other words, we define $\lang{SI}_n: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0 ,1\right\}$ so that: 
+    \[\lang{SI}_n\left(x, y\right) = 1 \iff \exists i, x_i = y_i = 1.\]
+    
+    We may moreover note: 
+    \[x \cap y = \left\{i \suchthat x_i = y_i = 1\right\}.\]
+
+    \begin{subparag}{Intuition}
+        Let us consider some set $S = \left\{s_1, \ldots, s_n\right\}$ of size $n$.
+
+        We can consider some $A \subseteq S$ so that: 
+        \[s_i \in A \iff x_i = 1,\]
+        and similarly for $B \subseteq S$.
+
+        Then, this problem is equivalent to knowing whether $A \cap B \neq \o$, hence its name and the notation $x \cap y$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    The set-intersection problem is such that: 
+    \[N_1\left(\lang{SI}_n\right) = \log_2\left(n\right), \mathspace R_{\frac{1}{3}}^{CC}\left(\lang{SI}_n\right) \in \Omega\left(n\right).\]
+
+    \begin{subparag}{Intuition}
+        Intuitively, this means that this problem is exponentially easier for non-deterministic communication protocols than for deterministic (possibly randomised) communication protocols. 
+
+        We will formalise this intuition in the eleventh exercise series, by showing that the set-intersection is, in some sense, \lang{NP}-complete for communication protocols.
+
+        This makes this problem very important. In fact, reductions from the set intersection problem are omnipresent.
+    \end{subparag}
+
+    \begin{subparag}{Proof 1}
+        The first equality is simple: we can use as witness an index $i$, and Alice can check whether $x_i = 1$ and Bob can check whether $y_i = 1$.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        The second equality is a lot harder to show. We will not prove this in this class.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    As an example, we will apply the set-intersection to circuit complexity.
+
+    Recall that circuit have a size, which is basically their time complexity, and a depth, which is basically their parallel time complexity. We will show that the depth of a circuit can be characterised using communication protocol complexity.
+\end{parag}
+
+\begin{parag}{Definition: Uniform circuit family}
+    Let $\left(C_n\right)_{n \in \mathbb{N}}$ be a family of circuits, where $C_n$ is a circuit over $n$ variables.
+
+    $\left(C_n\right)_{n \in \mathbb{N}}$ is said to be a \important{uniform} circuit family if there exists some \textit{poly-time} Turing machine $M$ so that $M\left(1^n\right) = C_n$.
+
+    \begin{subparag}{Intuition}
+        This allows to greatly decrease the power of circuits. Recall for instance that the halting problem can be solved by circuits. Requiring them to be generated by some Turing machine removes this issue. 
+
+        Moreover, requiring the Turing machine to be poly-time adds a constraint on their size.
+
+        The power of those circuit families in practice is that we have some pre-processing step that generates the circuit, and then the circuit can compute things in parallel.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: \lang{NC}}
+    We define the \important{\important{\lang{NC}}} (Nick's class) complexity class so that $A \in \lang{NC}$ if and only if there exists a uniform circuit family of poly-logarithmic depth $\log\left(n\right)^{O\left(1\right)}$ that computes $A$.
+
+    \begin{subparag}{Remark 1}
+        Contrary to \lang{NP} and \lang{NL}, the fact that there is a \lang{N} in \lang{NC} has no link with non-determinism. 
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We have: 
+        \[\lang{NL} \subseteq \lang{NC} \subseteq \lang{P}.\]
+        
+        The second inclusion directly comes from the definition of uniform circuit family, since the Turing machine generating those circuits has to be poly-time. The first inequality requires a more complex argument, which we will not see in this class.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Monotone function}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be some boolean function.
+
+    $f$ is said to be \important{monotone} if for all $x, y$ so that $x \leq y$ (i.e. $x_i \leq y_i$ for all $i$): 
+    \[f\left(x\right) \leq f\left(y\right).\]
+\end{parag}
+
+\begin{parag}{Definition: Monotone circuit}
+    Let $C_n$ be some circuit.
+
+    It is said to be \important{monotone} if it only uses $\land$ and $\lor$, but no $\lnot$.
+
+    \begin{subparag}{Intuition}
+        Monotone circuits compute monotone functions.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Karchmer-Widgerson relation}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be some function, $x \in f^{-1}\left(1\right)$ and $y \in f^{-1}\left(0\right)$.
+
+    The \important{Karchmer-Widgerson relation} is defined as: 
+    \[\left(x, y, i\right) \in KW_f \iff x_i \neq y_i.\]
+
+    If we moreover have a monotone $f$, we define the \important{monotone Karchmer-Widgerson relation} as: 
+    \[\left(x, y, i\right) \in KW_f^+ \iff x_i = 1, y_i = 0.\]
+
+    \begin{subparag}{Remark 1}
+        Since $f\left(x\right) = 1$ but $f\left(y\right) = 0$, we must have $x \neq y$, and thus there must exist at least one valid $i$.
+
+        For a monotone $f$, since $1 = f\left(x\right) > f\left(y\right) = 0$, we must also have $x > y$ necessarily (i.e., not $x \leq y$). This does show that there must exists a $i$ so that $x_i > y_i$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        $KW_f$ is a relation and not a function $KW_f: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{1, \ldots, n\right\}$, because there may be multiple valid outputs, which is not allowed for functions. Recall that relations are generalisations of functions, which solve this issue.
+
+        Given some inputs $x, y$, a communication protocol for $KW_f$ must then just output some $i$ so that $\left(x, y, i\right) \in KW_f$. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be some function.
+
+    We have that:
+    \[R^{CC}\left(KW_f\right) \in O\left(\log\left(n\right)\right),\]
+
+    \begin{subparag}{Proof idea}
+        The idea is the same as for the randomised protocol for $\lang{GT}_n$. 
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This is not so interesting. This shows that, to get interesting results, we really need to consider deterministic communication protocols.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Karchmer-Wigderson theorem}
+    Let $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be some function.
+
+    We have that: 
+    \[D^{CC}\left(KW_f\right) = \text{CircuitDepth}\left(f\right).\] 
+
+    If moreover $f$ is monotone: 
+    \[D^{CC}\left(KW_f^+\right) = \text{CircuitDepth}^+\left(f\right),\]
+    where $\text{CircuitDepth}^+\left(f\right)$ is the smallest depth of a monotone circuit computing $f$.
+
+    \begin{subparag}{Implication}
+        This is very interesting, because it characterises circuit depth thanks to communication complexity.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that it is hopeless to prove a lower bound on a circuit depth, since it would allow to separate complexity classes. This is why the restriction to monotone functions is useful, since proving lower bounds for them does not have consequences that big.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We only prove the case for monotone functions $f$. In fact, we will only show that:
+        \[D^{CC}\left(KW^+_f\right) \leq \text{CircuitDepth}^+\left(f\right).\]
+
+        Let $C$ be some monotone circuit computing $f$. We want to build a communication protocol computing $KW_f^+$. So, we suppose that Alice receives some $x$ so that $f\left(x\right) = 1$ and Bob a $y$ so that $f\left(y\right) = 0$. We want to make them a protocol that outputs a $i$ so that $x_i > y_i$. Note that the circuit $C$ is part of the protocol, so it is known to both Alice and Bob. 
+
+        For Alice, on input $x$, the last gate of the circuit produces a $1$ (since $f\left(x\right) = 1$). Similarly, for Bob the last gate produces a $0$. We notice that, if the last gate is an AND, all the predecessors gates (all nodes which output are wired to this AND) for Alice outputs $1$ (since this is the only possibility for an AND to outputs $1$) and at least one predecessor gate for Bob outputs $0$ (since this AND outputs $0$ for Bob). In this case, Bob sends which predecessor outputs a 0 to Alice, so that they still end up with Alice considering a node outputting a $1$ and Bob considering a node outputting a $0$. 
+
+        On another hand, if the last gate is an OR, this is similar but Alice has at least a predecessor gate that outputs a $1$, and all predecessor gates for Bob output a $0$. So, Alice can sends the predecessor gate which is $1$ for her to Bob. This also preserves that they consider a node outputting $1$ on Alice's input $x$, but outputting $0$ on Bob's input $y$.
+
+        We can preserve this invariant by continuing that way until the end. However, this means that we will end up with input node $x_i$, which is $1$ for Alice and $0$ for Bob. They can just output this $i$.
+
+        Since any node uses only has two predecessors (both AND and OR gates only take two parameters), they only need to communicate a single bit at each node. So, this takes a time that is exactly the depth of the monotone circuit $C$.
+
+        Note that a similar argument can be used to show $D^{CC}\left(KW^+_f\right) \leq \text{CircuitDepth}^+\left(f\right)$, by just switching who holds the $0$ and who holds the $1$ when they hit some NOT gate.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Matching function}
+    Let $G = \left(V, E\right)$ be some graph, with $\left|V\right| = n$. Note that we can make a bijection between $E$ and the bitstrings $s \in \left\{0,1\right\}^{\binom{n}{2}}$, by a similar method to the intuition for the set-intersection problem: there are $\binom{n}{2}$ possible edges, so we can consider $s_i = 1$ if and only if $e_i \in E$.
+    
+    This allows us to consider the function $\important{\text{Matching}}: \left\{0, 1\right\}^{\binom{n}{2}} \mapsto \left\{0, 1\right\}$ defined so that: 
+    \[\text{Matching}\left(s\right) = 1 \iff G = \left(\left\{1, \ldots, n\right\}, E\left(s\right)\right) \text{ admits a perfect matching}.\]
+\end{parag}
+
+
+\begin{parag}{Theorem}
+    Any monotone circuit for the $\text{Matching}$ function needs depth $\Omega\left(n\right)$.
+
+    \begin{subparag}{Proof}
+        We notice that the $\text{Matching}$ function is a monotone function: if a graph admits a perfect matching, adding edges to it will not make it loose its perfect matching. So, we can use the fact that: 
+        \[D^{CC}\left(KW_{\text{Matching}}^+\right) = \text{CircuitDepth}^+\left(\text{Matching}\right).\]
+        
+        We want to show the right hand side is $\Omega\left(n\right)$, which we will do by showing the left hand side is $\Omega\left(n\right)$ by contradiction. We thus suppose towards contradiction that there exists some $o\left(n\right)$ communication protocol for $KW_{\text{Matching}}^+$. We will make a randomised reduction from $\lang{SI}_n$ to $KW_{\text{Matching}}^+$. This will allow to solve $\lang{SI}_n$ with a randomised communication protocol of complexity $o\left(n\right)$ using our deterministic communication protocol for $KW_{\text{Matching}}^+$. This will be a contradiction since we know that $R_{1 / 3}^{CC}\left(\lang{SI}_n\right) \in \Omega\left(n\right)$.
+
+        We consider a simpler problem, where the Matching function is defined as: 
+        \autoeq[s]{\text{Matching}\left(s\right) = 1 \iff G = \left(V, E\right) \text{ admits a matching of size at least $\frac{\left|V\right|- 2}{3} + 1$}.}
+
+        Note that this function is also monotone. We will consider a graph with $\left|V\right| = 3n + 2$, where $n$ is the size of the set-intersection input; so the constraint becomes that we want a matching of size at least $n + 1$. Our reasoning can be generalised to the Matching function defined earlier, but the added complexity would not add any pedagogical interest to this proof.
+
+        Let $x, y$ be inputs to the set-intersection problem. We want to construct inputs to the $KW_{\text{Matching}}^+$ problem, i.e. make a graph for Alice that is an element of $\text{Matching}^{-1}\left(1\right)$ (meaning that it admits a matching of size at least $n+1$), and make a graph for Bob that is an element of $\text{Matching}^{-1}\left(0\right)$ (meaning that all its matchings are of size at most $n$). To do so, we consider classes of graphs for Alice and Bob that do respect those properties, which we will instantiate depending on the value of $x$ and $y$:
+        \begin{itemize}
+            \item Let $M$ be an arbitrary matching of size $n+ 1$. For Alice, we take $E_A = M$. This trivially admits a matching of size $n+1$.
+            \item Let $C \subseteq V$ be an arbitrary vertex set with $\left|C\right| = n$. Edges in Bob's graph are defined so that $C$ is a clique, and all vertices in $V \setminus C$ are connected to all vertices in $C$ but to no vertex in $V \setminus C$. In other words: 
+            \[E_B = \left\{\left(v, w\right) \suchthat v \in C, w \in V\right\}.\]
+            
+            All matching of this graph are of size at most $n$. Indeed, any edge needs to have at least one of its endpoint in $C$, since there is no edge between $V \setminus C$ and $V \setminus C$. There are only $\left|C\right| = n$ available vertices in $C$, so no matching can be bigger than that.
+        \end{itemize}
+
+        Alice will construct $M$ using $x$, and Bob will construct $C$ using $y$. We group the vertices in $n$ triangles of $3$ vertices, plus two more vertices. For Alice, for each $i \in \left\{1, \ldots, n\right\}$, if $x_i = 0$, we add the ``left'' edge of the $i$\Th triangle to $M$ (see the red edges on the picture below for more clarity), otherwise we add the ``right'' edge of this triangle. We moreover add the ``planted solution'', an edge between the two last vertices, to $M$. This does yield that $\left|M\right| = n + 1$ and that $M$ is a matching.
+
+        On the other hand, for Bob, for each $i \in \left\{1, \ldots, n\right\}$, if $y_i = 0$, we add the ``top'' vertex of the $i$\Th triangle to $C$ (see the green circles on the picture below for more clarity), and otherwise we add the ``bottom left'' vertex of this triangle to $C$. This does yield $\left|C\right| = n$.
+
+        For instance, if $n = 4$, $x = 0011$ and $y = 0101$, we get the following graph, were edges in $M$ are marked in red, and vertices in $C$ are marked in green (observe that we do have $\left|M\right| = 5$ red edges, and $\left|C\right| = 4$ green vertices):
+        \imagehere[0.8]{ReductionSetIntersectionMatching.png}
+
+        By definition, solutions to $KW_{\text{Matching}}^+$ are edges that are in Alice's graph but not in Bob's graph. We notice that the planted solution will always be a solution to $KW_{\text{Matching}}^+$. Now, there is a triangle where Alice has an edge which Bob does not have if and only if $x_i = y_i = 1$: in all other cases, one of the endpoint of the edge she chose is in $C$, and the other is not in $C$, so her edge is also in Bob's graph. When $x_i = y_i = 1$, this is the only case where both endpoints of her edge are in $V \setminus C$, meaning that Bob does not have an edge there. All this yields that the number of solutions to $KW_{\text{Matching}}^+$ is $\left|x \cap y\right| + 1$: any place where $x_i = y_i = 1$ plus the planted solution. 
+
+        We can now use the hypothesis we took towards contradiction that $KW_{\text{Matching}}^+$ has a $o\left(n\right)$-deterministic protocol, to build a $o\left(n\right)$-randomised communication protocol for $\lang{SI}_n$. This goes as follows:
+        \begin{enumerate}
+            \item Alice receives a $x$ and Bob receives a $y$ as inputs to the set-intersection problem.
+            \item Alice builds $M$ from $x$, and uses it to build her graph.
+            \item Bob builds $C$ from $y$, and uses it to build his graph.
+            \item Alice and Bob use shared randomness to relabel all vertices, by picking a permutation uniformly at random.
+            \item They run their efficient $KW_{\text{Matching}}^+$ deterministic protocol to find an edge that belongs to Alice but not to Bob.
+            \item If $KW_{\text{Matching}}^+$ outputs the planted solution, they output that $x$ and $y$ are disjoint. Otherwise, $KW_{\text{Matching}}^+$ outputs an edge corresponding to some triangle $i$, and they output $i$.
+        \end{enumerate}
+
+        Since Alice and Bob permute the vertices, $KW_{\text{Matching}}^+$ outputs any of the valid solution with equal probability. In particular, this means that: 
+        \[\prob\left(\text{$KW_{\text{Matching}}^+$ outputs the planted solution}\right) = \frac{1}{1 + \left|x \cap y\right|},\]
+        since, as mentioned before, there are $\left|x \cap y\right| + 1$ valid solutions to $KW_{\text{Matching}}^+$.
+
+        In particular, this means that, if $x$ and $y$ are disjoint (i.e. $\left|x \cap y\right| = 0$), we get the planted solution with probability $1$, and thus this protocol is correct with probability $1$. If there is a non-empty intersection (i.e. $\left|x \cap y\right| \geq 1$), they output correctly that they have a non-empty intersection with probability at least $\frac{1}{2}$. We can therefore repeat this protocol two times, OR-ing the results, to get a randomised communication protocol for $\lang{SI}_n$ with success probability of at least $\frac{2}{3}$. 
+
+        However, the only moment this protocol communicates bits is when running $KW_{\text{Matching}}^+$. They run it twice, both times on a graph that has $3n + 2$ vertices. We supposed that $D^{cc}\left(KW_{\text{Matching}}^+\right) \in o\left(n\right)$, so this yields that our randomised protocol for $\lang{SI}_n$ communicates only $o\left(n\right)$ bits, i.e. $R_{1 / 3}^{CC}\left(\lang{SI}_n\right) \in o\left(n\right)$. This is a contradiction since we know $R_{1 / 3}^{CC}\left(\lang{SI}_n\right) \in \Omega\left(n\right)$. There can therefore not be a $o\left(n\right)$ communication protocol for $KW_{\text{Matching}}^+$, which does show that the monotone circuit depth of the Matching function is $\Omega\left(n\right)$ by our reasoning from the beginning of this proof.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        If we considered the non-monotone Karchmer-Widgerson relation, a protocol for $KW_{\text{Matching}}$ would output an edge that is either in Alice's graph but not in Bob's, or an edge that is in Bob's graph but not in Alice's. However, Bob has a lot of edges which Alice does not have, so the result of this protocol would not tell us anything.
+
+        As mentioned earlier, this is expected: finding a lower-bound on a circuit depth would have too big of a consequence to be that ``easy'' (in the sense that we did not have to create any new proof technique).
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

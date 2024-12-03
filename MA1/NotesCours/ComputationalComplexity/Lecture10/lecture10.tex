@@ -1,0 +1,347 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-21 at 15:16:33.
+
+\usepackage{../../style}
+
+\title{Compcomp}
+\author{Joachim Favre}
+\date{Jeudi 21 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2024-11-21}{Isabelle communicates}{
+\begin{itemize}[left=0pt]
+    \item \textit{Oui, c'est une référence à SLG 75.}
+    \item Definition of communication protocols, and deterministic communication complexity.
+    \item Proof that protocols yield a monochromatic matrix partition.
+    \item Definition of non-deterministic protocols.
+    \item Proof that non-deterministic protocols are in bijection with rectangle covers.
+\end{itemize}
+
+}
+
+\subsection{Communication protocols}
+
+\subsubsection{Deterministic complexity}
+
+\begin{parag}{Remark}
+    The communication model is one of the most restrictive model where we still manage to prove impossibility bounds. Such bounds are widely applicable.
+\end{parag}
+
+\begin{parag}{Communication protocols}
+    Let $f\left(x, y\right): \left\{0,1 \right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be a function that takes two inputs $x \in \left\{0, 1\right\}^n$ and $y \in \left\{0, 1\right\}^n$. Alice knows $x$, Bob knows $y$, and the goal is for them to compute $f\left(x, y\right)$ together.
+
+    To do so, Alice sends some message $a_1\left(x\right)$. Bob can send answer another message $b_1\left(y, a_1\right)$. Alice can then answer $a_2\left(x, a_1, b_2\right)$, and so on. The final bit they send should be $f\left(x, y\right) \in \left\{0, 1\right\}$.
+
+    The \important{cost} of the protocol, is the number of bits that need to be sent, on the worst input. We do not have any constraint on Alice and Bob's computations, their messages may not even be computable by a Turing machine.
+\end{parag}
+
+\begin{parag}{Definition: Deterministic communication complexity}
+    Let $f: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be some boolean function.
+    
+    The \important{deterministic communication complexity} of $f$ is the least cost of a protocol computing $f$.
+
+    \begin{subparag}{Observation}
+        We notice that, for any function $f$: 
+        \[D^{cc}\left(f\right) \leq n + 1.\]
+        
+        Indeed, Alice can just send all her $n$ bits to Bob, which he can use to compute $f$ and send the answer.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $f: \left\{0,1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be an arbitrary boolean function. Then: 
+    \[D^{cc}\left(f\right) \leq D^{dt}\left(f\right).\]
+
+    \begin{subparag}{Proof}
+        Let $T$ be some decision tree for $f$. The communication protocol is based on $T$, which is known by both players.
+
+        When $T$ wants to query a bit that Alice holds, then she sends it to Bob. If on the other hand $T$ wants to query a bit that Bob holds, then he sends it to Alice. They only need to send a single bit per query made by $T$, and $T$ does exactly $D^{dt}\left(f\right)$.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The converse is not true at all. Whereas, at any node, a decision tree makes decision based on a single bit, a communication protocol can make a decision on a very complex computation.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    We consider $f = \lang{XOR}_{2n}$. We have: 
+    \[D^{cc}\left(\lang{XOR}_{2n}\right) = 2.\]
+    
+    Indeed, Alice can compute the XOR of $x$, send this result to Bob, which he can use to compute the answer and send it to Alice.
+
+    For decision trees, it is possible to find that:
+    \[D^{dt}\left(\lang{XOR}_{2n}\right) = 2n.\]
+
+    We do have $D^{cc}\left(f\right) \leq D^{dt}\left(f\right)$ in this case.
+\end{parag}
+
+\begin{parag}{Example 2}
+    We consider the majority function $f = \lang{Maj}_{2n}$, where: 
+    \[\lang{Maj}_{2n}\left(x\right) = \begin{systemofequations} 1, & \text{if $w_H\left(xy\right) \geq n$,} \\ 0, & \text{otherwise,} \end{systemofequations}\]
+    where $w_H$ is the Hamming weight function. In other words, $\lang{Maj}_{2n}$ outputs the value of the most common bit (and $1$ if there is the same number of zeros and ones).
+
+    We notice Alice can just send the number of ones she has to Bob, giving: 
+    \[D^{cc}\left(\lang{Maj}_{2n}\right) \leq \log_2\left(n\right) + 1.\]
+
+    \begin{subparag}{Remark}
+        We will show in the tenth exercise series that, actually, $D^{cc}\left(\lang{Maj}_{2n}\right) \in \Theta\left(\log_2\left(n\right)\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 3}
+    We consider the equality function: 
+    \[\lang{EQ}_n\left(x, y\right) = \begin{systemofequations} 1, & \text{if $x = y$,} \\ 0, & \text{if $x \neq y$.} \end{systemofequations}\]
+
+    It is possible to show that we have: 
+    \[D^{cc}\left(\lang{EQ}_n\right) = n + 1.\]
+    
+    Our next goal is to show that, indeed, $D^{cc}\left(\lang{EQ}_n\right) \geq n + 1$.
+
+    \begin{subparag}{Remark}
+        With randomised communication protocols, which we will consider in the next lecture, we can hash the data to get a better complexity.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Communication matrix}
+    Let $f : \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be a function. 
+
+    We can construct a matrix $M_f \in \left\{0, 1\right\}^{2^n \times 2^n}$, named a \important{communication matrix}, that summaries the value of the function and thus of the communication: 
+    \[\left(M_f\right)_{x, y} = f\left(x, y\right), \mathspace x, y \in \left\{0, 2, \ldots, 2^{n}- 1\right\}.\]
+\end{parag}
+
+\begin{parag}{Definition: Rectangle}
+    Let $f : \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be a function. 
+
+    For arbitrary $A, B \subseteq \left\{0, 1\right\}^n$, $R = A \times B$ is called a \important{rectangle}.
+
+    \begin{subparag}{Intuition}
+        Let $M_f$ be the communication matrix corresponding to $f$. Some rectangle $R$ corresponds to some sub-matrix of it, $M_R$. This looks like a rectangle on a picture, hence the name. Note however that the rectangle does not have to be contiguous in the matrix. For simplicity of the drawings, we might still note them to be contiguous.
+
+        For instance, the $R_1$ and $R_2$ on the following pictures are two valid rectangles:
+        \svghere[0.8]{MatrixRectangle.svg}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Monochromatic rectangle}
+    Let $f : \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be a function, and $R$ be a rectangle of its corresponding communication matrix. 
+
+    $R$ is said to be \important{monochromatic} if all the values of its corresponding submatrix are the same (i.e. all zero or all one).
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $f: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0,1\right\}$ be some boolean function, and $M_f$ be its corresponding communication matrix.
+
+    Any protocol of cost $c$ yields a partition of $M_f$ into $2^c$ monochromatic rectangle.
+
+    \begin{subparag}{Proof}
+        When Alice sends a message, she cuts all rectangles horizontally (with potentially a different line for each rectangle). When Bob sends a bit, he cuts all rectangle vertically. Indeed, at any point, a rectangle represents the state of the communication so far for $\left(x, y\right)$. Based on it, Alice decides whether $x \in S$ for some $S \subseteq \left\{0, 1\right\}^n$ based on the protocol; but whether $x \in S$ corresponds to a cut on the communication matrix.
+
+        For instance, given the following state, Alice may split each rectangle in two using the dashed lines on the following picture:
+        \svghere[0.3]{ProtocolIsPartition.svg}
+
+        At the end of the protocol, they have to output the value of the function. The protocol cannot distinguish any two inputs bringing to the same rectangle. Another way to see this using the decision tree picture, is that each leaf is a rectangle; reciprocally, a leaf rectangle is the set of all $x, y$ that leaf the same leaf $\ell$. Since the protocol does not make a mistake, each rectangle must be monochromatic. 
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        If the communication tree is not balanced, then there might be less than $2^c$ such monochromatic rectangles.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The converse may not be true. For instance, the following partition of $M_f$ into 5 rectangles does not correspond to any protocol:
+        \svghere[0.3]{PartitionNotProtocol.svg}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Partition number}
+    Let $f: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$, and $M_f$ be its corresponding communication matrix.
+
+    The \important{partition number} of $f$, written $\text{part}\left(f\right)$, is the least number of rectangles in any monochromatic rectangle partition of $M_f$.
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $f: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$.
+
+    We have:
+    \[D^{cc}\left(f\right) \geq \log_2\left(\text{part}\left(f\right)\right).\]
+
+    \begin{subparag}{Proof}
+        This directly comes from the fact that any protocol yields a partition, and $\text{part}\left(f\right)$ is the smallest number of rectangles for any partition.
+
+        \qed
+    \end{subparag}
+    
+    \begin{subparag}{Remark}
+        As seen before, all protocols yield a partition, but not all partitions yield a protocol. This is therefore an inequality, not an equality.
+
+        However, we do not loose to much generality, as the following proposition shows.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $f: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$.
+
+    We have:
+    \[D^{cc}\left(f\right) \leq \left(\log_2\left(\text{part}\left(f\right)\right)\right)^2.\]
+
+    \begin{subparag}{Remark}
+        This will be the corollary of a theorem a bit later in this lecture.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We consider again $\lang{EQ}_n$.
+
+    We notice that $M_f = I_{2^n}$ is just the identity matrix. Now, we need a $1 \times 1$ rectangle around each $1$ of the diagonal. If any $1$ is contained in a larger rectangle, then this rectangle must also contain a zero, and is thus not monochromatic. So, we need $2^n$ rectangle just for the diagonal, giving: 
+    \[\text{part}\left(\lang{EQ}_n\right) \geq 2^n.\]
+
+    By considering also the rectangles for the zeroes term, we could have gotten a better lower bound. However, this allows us to know that: 
+    \[D^{cc}\left(\lang{EQ}_n\right) \geq \log_2\left(\text{part}\left(\lang{EQ}_n\right)\right) \geq n.\]
+\end{parag}
+
+\subsubsection{Non-determinism}
+
+\begin{parag}{Definition: Non-deterministic protocol}
+    A protocol deciding a language $L$ is said to be \important{non-deterministic} if, on input $\left(x, y\right)$:
+    \begin{enumerate}
+        \item If $\left(x,y\right) \in L$, there exists some witness $w \in \left\{0, 1\right\}^s$ so that Alice accepts $\left(x, w\right)$ and Bob accepts $\left(y, w\right)$.
+        \item If $\left(x, y\right) \not \in L$, there is no witness $w \in \left\{0, 1\right\}^s$ so that both Alice and Bob accept.
+    \end{enumerate}
+
+    The cost of this protocol is $s$, the size of the witness. 
+\end{parag}
+
+\begin{parag}{Definition: Non-deterministic protocol cost}
+    Let $i \in \left\{0, 1\right\}$ be arbitrary.
+
+    $N_i^{CC}$ is defined as the least cost of a non-deterministic protocol accepting:
+    \[f^{-1}\left(i\right) = \left\{\left(x, y\right) \suchthat f\left(x, y\right) = i\right\}.\]
+
+    \begin{subparag}{Remark}
+        Similarly to decision trees, $N_1^{CC}$ is the communication protocol equivalent to $\lang{NP}$ from the Turing machine world, and $N_0^{CC}$ is similar to $\lang{coNP}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $f: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be arbitrary.
+
+    Then, for any $i \in \left\{0, 1\right\}$: 
+    \[N_i^{CC}\left(f\right) \leq D^{CC}\left(f\right).\]
+
+    \begin{subparag}{Proof}
+        We can encode any deterministic protocol using non-determinisim, by putting in $w$ all bits that would have been sent by Alice and by Bob in the communication. They verify that the bits are indeed the ones they would have sent, and they can use the bits of the other.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Rectangle cover}
+    Let $f: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be arbitrary, $M_f$ be its communication matrix and $i \in \left\{0, 1\right\}$ be arbitrary.
+
+    The \important{rectangle cover number} of $f^{-1}\left(i\right)$ is the least number of monochromatic rectangles necessary to cover $f^{-1}\left(i\right)$. Note that, contrary to deterministic protocols, the rectangles may overlap.
+
+    \begin{subparag}{Example}
+        For instance, the following is a rectangle cover of $f^{-1}\left(1\right)$ using three rectangles:
+        \svghere[0.3]{RectangleCoverExample.svg}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $f: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$ be arbitrary, let $i \in \left\{0, 1\right\}$, and let $m_i$ be the rectangle cover number of $f^{-1}\left(i\right)$.
+
+    Then: 
+    \[N_i^{CC}\left(f\right) = \log_2\left(m_i\right).\]
+
+    \begin{subparag}{Proof}
+        The idea is that the rectangles are in one to one correspondance with the certificates $w \in \left\{0, 1\right\}^s$, where $s = N_i^{CC}\left(f\right)$. Each certificate represents a rectangle. We show this formally by making an injection from rectangles to certificates, and then from certificates to rectangles.
+
+        \begin{itemize}[left=0pt]
+            \item Let's say that we have a rectangle cover of $f^{-1}\left(i\right)$. We want to build a protocol that uses those as certificates. Knowing whether $f\left(x, y\right) = i$ corresponds to knowing if there exists some rectangle in which $\left(x, y\right)$ is contained.
+                
+                We let each $w$ correspond to a different rectangle. Alice checks that the row $x$ is in the rectangle, and Bob checks that column $y$ is in the rectangle; they can do this independently. We notice that $\left(x, y\right)$ is in this rectangle if and only if both their check is valid. As mentioned before, $\left(x, y\right)$ is in some rectangle if and only if $f\left(x, y\right) = i$, showing this is a valid protocol.
+            \item Let's say that we are given a protocol. We want to construct a rectangle cover. For any given witness $\left\{0, 1\right\}^s$, we consider the following rectangle: 
+        \[R_w = \left\{\left(x, y\right) \suchthat \text{Alice accepts $\left(x, w\right)$ and Bob accepts $\left(y, w\right)$}\right\}.\]
+
+        This is indeed a rectangle since it is a cartesian product: 
+        \[R_w = \left\{x \suchthat \text{Alice accepts $\left(x, w\right)$}\right\} \times \left\{y \suchthat \text{Bob accepts $\left(y, w\right)$}\right\}.\]
+        \end{itemize}
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        This is another way to see why any deterministic communication protocol yields a non-deterministic one: a rectangle partition is a rectangle cover, whereas the converse is not true.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    We consider $\lang{EQ}_n$. We notice that: 
+    \[N_1^{cc}\left(\lang{EQ}_n\right) = n.\]
+
+    As studied before, we again need that every 1-chromatic rectangle must be $1 \times 1$. So, we need a rectangle per element on the diagonal of $M_f$, giving that we need $2^n$ rectangles for our cover.
+
+    On the other hand:
+    \[N_0^{cc}\left(\lang{EQ}_n\right) \leq \log_2\left(n\right) + 2.\]
+
+    Indeed, to convince Alice and Bob that they have a different number, they can use a witness that is a lot smaller: they only need some $i \in \left\{1, \ldots, \log_2\left(n\right)\right\}$ and a bit $j$ so that: 
+    \[x_i = j \neq y_i.\]
+
+    More formally, Alice accepts when $x_i = j$ and Bob accepts when $x_i \neq j$. The witness only takes $\log_2\left(n\right) + 1$ bits.
+
+    \begin{subparag}{Remark}
+        This shows that, in the communication model, $\lang{NP} \neq \lang{coNP}$: having a small $N_0^{cc}\left(f\right)$ does not mean that we have a small $N_1^{cc}\left(f\right)$. In particular, this implies that $\lang{P} \neq \lang{NP}$ in this model.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let us consider the function greater than, defined by: 
+    \[\lang{GT}\left(x, y\right) = \begin{systemofequations} 1, & \text{if $x \geq y$,} \\ 0, & \text{if $x < y$}, \end{systemofequations}\]
+    where we consider $x, y \in \left\{0, 1, \ldots, 2^n - 1\right\}$.
+    
+    In the communication matrix picture, this looks like: 
+    \[M_f = \begin{pmatrix} 1 & 0 & 0 & \cdots & 0 \\ 1 & 1 & 0 & \cdots & 0 \\ 1 & 1 & 1 & \cdots & 0 \\ \vdots & \vdots & \vdots & \ddots & \vdots \\ 1 & 1 & 1 & \cdots & 1 \end{pmatrix}.\]
+
+    We again notice that the diagonal ones need $1 \times 1$ rectangle: any larger rectangles are not monochromatic. Similarly, all 0s just above the diagonal (the elements of the superdiagonal), also require to be in their own $1 \times 1$ rectangles. So: 
+    \[N_1^{CC}\left(GT\right) \geq n, \mathspace N_0^{CC}\left(GT\right) \geq \log_2\left(2^n - 1\right).\]
+\end{parag}
+
+\begin{parag}{Definition: fooling set}
+    A \important{fooling set} is a monochromatic set so that, any rectangle containing two elements is not monochromatic.
+
+    \begin{subparag}{Remark}
+        This is exactly what we have been using in all our examples. The diagonal of the communication matrix for $\lang{GT}\left(x, y\right)$ is a fooling set for $N_1^{CC}\left(\lang{GT}\right)$, and its superdiagonal is a fooling set for $N_0^{CC}\left(\lang{GT}\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $f: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}$.
+
+    We have: 
+    \[D^{cc}\left(f\right) \leq N_0^{cc}\left(f\right) N_1^{cc}\left(f\right).\]
+
+    \begin{subparag}{Observation}
+        This is similar to what we found for decision trees: 
+        \[D^{dt}\left(f\right) \leq C_0\left(f\right) C_1\left(f\right).\]
+    \end{subparag}
+    
+    \begin{subparag}{Remark}
+        Using the analogy to Turing machine complexities, this is more or less equivalent to $\lang{P} = \lang{NP} \cap \lang{coNP}$.
+    \end{subparag}
+
+    \begin{subparag}{Corollary}
+        A direct corollary is that:
+        \[D^{cc}\left(f\right) \leq \log_2\left(\text{part}\left(f\right)\right)^2,\]
+        as already seen earlier.
+    \end{subparag}
+\end{parag}
+
+\end{document}

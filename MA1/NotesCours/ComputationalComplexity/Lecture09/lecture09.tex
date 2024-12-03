@@ -1,0 +1,295 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-14 at 15:11:47.
+
+\usepackage{../../style}
+
+\title{Comp comp}
+\author{Joachim Favre}
+\date{Jeudi 14 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2024-11-14}{Pigeon collisions 2: the return of the king}{
+\begin{itemize}[left=0pt]
+    \item Definition of boly-bounded propositional proof systems.
+    \item Proof that it is believed there is no boly-bounded propositional proof system.
+    \item Definition of the resolution propositional proof system.
+    \item Definition of the tree-like resolution proof system, and of the search problem.
+    \item Explanation of the tree-vs-adversary game to compute the size of a tree.
+    \item Proof that the tree-like resolution proof system is not poly-bounded.
+\end{itemize}
+
+}
+
+\subsection{Proof complexity}
+
+\begin{parag}{Definition: Proof system}
+    Let $L \subseteq \left\{0, 1\right\}^*$ be a language, and let $P$ be a Turing machine.
+
+    $P\left(x, \pi\right)$ is said to be a \important{proof system} for $L$, if it runs in time $\left(\left|x\right| + \left|\pi\right|\right)^{O\left(1\right)}$, and is such that: 
+    \[x \in L \iff \exists \pi, P\left(x, \pi\right) = 1.\]
+
+    \begin{subparag}{Remark}
+        \lang{NP} is very similar, except that it requires the Turing machine to run in time polynomial in $\left|x\right|$, whereas here we let it run in time polynomial in $\left|x\right| + \left|\pi\right|$. In other words, here we may have $\left|\pi\right| \gg \left|x\right|$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Propositional proof system}
+    A \important{propositional proof system} is a proof system for: 
+    \[L = \lang{UNSAT} = \left\{\text{CNF $\phi$} \suchthat \forall x, \phi\left(x\right) = 0\right\}.\]
+
+    Or, equivalently, a proof system for: 
+    \[L = \lang{TAUT} = \left\{\text{DNF $\phi$} \suchthat \forall x, \phi\left(x\right) = 1\right\}.\]
+\end{parag}
+
+\begin{parag}{Definition: Poly-bounded proof}
+    Let $P$ be a proof system for \lang{UNSAT}. 
+
+    $P$ is said to be \important{poly-bounded} if and only if: 
+    \[\forall x \in \lang{UNSAT}, \exists \pi, \left|\pi\right| \leq \left|x\right|^{O\left(1\right)}, P\left(x, \pi\right) = 1.\]
+\end{parag}
+
+\begin{parag}{Proposition}
+    $\lang{NP} = \lang{coNP}$ if and only if there exists a poly-bounded proof system.
+
+    \begin{subparag}{Remark}
+        Since it is believed $\lang{NP} \neq \lang{coNP}$, it is believed there exist no poly-bounded proof system.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\implies$}
+        Since $\lang{UNSAT}$ is $\lang{coNP}$-complete, $\lang{UNSAT} \in \lang{coNP}$. Since moreover $\lang{NP} = \lang{coNP}$ by hypothesis, there exists a poly-time verifier $V$ for $\lang{UNSAT}$. This verifier is our poly-bounded proof system.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        We know by hypothesis that there is a poly-bounded proof system for $\lang{UNSAT}$. This means that $\lang{UNSAT} \in \lang{NP}$. Since \lang{UNSAT} is \lang{coNP}-complete, we get $\lang{coNP} \subseteq \lang{NP}$. 
+
+        We now want to show $\lang{NP} \subseteq \lang{coNP}$. Let $L \in \lang{NP}$ be arbitrary. We have, using that $\lang{coNP} \subseteq \lang{NP}$: 
+        \[L \in \lang{NP} \iff \bar{L} \in \lang{coNP} \subseteq \lang{NP} \implies \bar{L} \in \lang{NP} \implies L \in \lang{coNP}.\]
+        
+        This indeed shows $\lang{NP} \subseteq \lang{coNP}$. Combining it with the fact that $\lang{coNP} \subseteq \lang{NP}$, we do get $\lang{NP} = \lang{coNP}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Cook's programme}
+    A way to show $\lang{NP} \neq \lang{coNP}$ would be to consider some increasingly strong concrete proof systems, and show they are not poly-bounded.
+
+    Note that it is ont believed that there is a ``complete'' proof system that would be able to simulate any proof system, so this is not a completely viable approach. However, it might still give some intuition.
+\end{parag}
+
+\begin{parag}{Lemma: Resolution rule}
+    Let $x_k$ be some variable, and $A, B$ be clauses (i.e. boolean functions).
+
+    Then, the following is a tautology: 
+    \[\left(A \lor x_k\right) \land \left(B \lor \bar{x}_k\right) \implies \left(A \lor B\right).\]
+
+    This is called the \important{resolution rule}.
+\end{parag}
+
+\begin{parag}{Definition: Resolution refutation}
+    Let $\phi$ be an arbitrary boolean function in CNF.
+
+    A \important{resolution refutation} of $\phi$ is $\pi = \left(C_1, \ldots, C_s\right)$, a sequence of clauses, where:
+    \begin{itemize}
+        \item For each $i \in \left\{1, \ldots, s\right\}$, either $C_i$ is a clause of $\phi$, or $C_i = A \lor B$ is obtained from $C_j = A \lor x_k$ and $C_{j'} = B \lor \bar{x}_k$ for some $j, j' < i$, by the resolution rule.
+        \item $C_s = \o$ is an empty clause, i.e. a contradiction.
+    \end{itemize}
+
+    When a sequence of clause does respect these properties, the proof is said to be \important{sound}.
+
+    \begin{subparag}{Remark}
+        It is possible to represent a resolution refutation more easily as a directed acyclic graph, where, if a clause $C_i$ is obtained from $C_j$ and $C_{j'}$, we draw an edge from $C_j$ to $C_i$ and from $C_{j'}$ to $C_i$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the following CNF: 
+    \[\phi = \left(y \lor \bar{z}\right) \land \left(x \lor \bar{y}\right) \land \left(z \lor \bar{x}\right) \land \left(\bar{x} \lor \bar{y} \lor \bar{z}\right) \land \left(x \lor y \lor z\right).\]
+
+    We can apply the resolution rule on $z \lor \bar{x}$ and $x \lor \bar{y} \lor \bar{z}$ to get: 
+    \[\bar{x} \lor \bar{y}.\]
+
+    Continuing this for every clause, we get the following graph, which grows from bottom to top.
+    \svghere[0.7]{ResolutionRefutationExample.svg}
+
+    This is a sound proof to show that $\phi = F$ is unsatisfiable.
+\end{parag}
+
+\begin{parag}{Definition: Resolution proof system}
+    The \important{resolution} propositional proof system $P\left(\phi, \pi\right)$, or ``res'', checks whether $\pi$ is a valid resolution refutation for $\phi$.
+\end{parag}
+
+\begin{parag}{Property}
+    The resolution proof system has the following properties:
+    \begin{itemize}[left=0pt]
+        \item (Sound) It cannot prove a satisfiable formula to be unsatisfiable.
+        \item (Complete) It can prove any unsatisfiable formula to be unsatisfiable, possible in exponential size.
+    \end{itemize}
+
+    In other words, it is a valid propositional proof system.
+
+    \begin{subparag}{Proof}
+        The fact that it is sound directly comes from its definition: the resolution rule is a tautology.
+
+        The fact that it is complete will be proven in the ninth exercise series.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Haken's theorem}
+    The pigeonhole principle requires a resolution refutation of size $2^{\Omega\left(n\right)}$.
+
+    \begin{subparag}{Implication}
+        This means that, in particular, the resolution proof system is not poly-bounded.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We will only show a simpler version of this theorem, for treelike resolution refutations.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Treelike resolution refutation}
+    Let $\pi$ be a resolution refutation.
+
+    $\pi$ is said to be \important{treelike} if its underlying directed acyclic graph is a tree. 
+
+    \begin{subparag}{Remark}
+        As we will show in the ninth exercise series, any unsatisfiable formula admits a tree-like resolution refutation. This thus does not remove any power.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Treelike refutation proof system}
+    The \important{treelike refutation} propositional proof system $P\left(\sigma, \pi\right)$, checks whether $\pi$ is a valid treelike refutation for $\phi$.
+
+    \begin{subparag}{Remark}
+        Just like the refutation proof system, it is both complete and sound, i.e. it is a valid propositional proof system as well.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Search problem}
+    Let $\phi \in \lang{UNSAT}$ be a CNF with $n$ variables.
+
+    We define the $\lang{Search}\left(\phi\right)$ problem which, on input $x \in \left\{0, 1\right\}^n$, must output any clause $C$ of $\phi$ such that $C\left(x\right) = 0$.
+    
+    \begin{subparag}{Remark}
+        Such a clause always exists since $\phi \in \lang{UNSAT}$ by hypothesis.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\phi$ be arbitrary.
+
+    $\phi$ admits a tree-like resolution refutation if and only if decision trees can solve $\lang{Search}\left(\phi\right)$.
+
+    \begin{subparag}{Proof $\implies$}
+        Let $\pi$ be an arbitrary tree-like resolution refutation. Our goal is to use it to make a decision tree that solves $\lang{Search}\left(\phi\right)$.
+
+        We construct a decision tree by tracing a path from the top, $\o$, to a leaf, a clause of $\phi$. We do this in such a way that it preserve the invariant that the current clause falsified.
+
+        Suppose that we are some node $C_i$, which we suppose to be false by our invariant. Let $C_j = x_k \lor A$ and $C_{j'} = \bar{x}_k \lor B$ be the two clauses $C_i$ was obtained from using the resolution rule. Since $C_i$ is false, either $C_j$ or $C_{j'}$ must be false. To know which, the tree queries $x_k$ and picks the clause which is not true (i.e., if $x_k = F$, pick $C_j$, otherwise pick $C_{j'}$). 
+
+        For instance, let us consider $\phi = \left(x \lor y\right) \land \left(x \lor z\right) \land \left(\bar{y} \lor \bar{z}\right) \land z \land\left(\bar{x} \lor \bar{z}\right)$, with the treelike refutation shown on the following picture. If $\left(x, y, z\right) = \left(0, 1, 0\right)$, the decision tree would output $x \lor z$ using the following path:
+        \imagehere[0.6]{TreelikeRefutationDecisionTree.png}
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        We can make a tree-like resolution refutation from a decision tree using the same idea.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Tree size}
+    Let $T$ be some tree. Its \important{size} is its number of nodes.
+
+    \begin{subparag}{Remark}
+        This must not be mistaken with its depth.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    In the previous section, we were interested in the depth of decision trees because it was their computation time. However, with our previous lemma, the size of a tree-like resolution can be computed by looking at the size of its underlying decision tree.
+
+    What link the two is the following---very loose inequality:
+    \[\text{depth} \leq \text{size} \leq 2^{\text{depth}}.\]
+
+    The first inequality is reached by a very unbalanced tree (such as the one computing $\lang{AND}_n$, which stops as soon as any $x_i = 0$) and the second inequality is reached by a fully balanced tree. 
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the following clause: 
+    \[\phi = x_1 \land \left(x_1 \to x_2\right) \land \left(x_2 \to x_3\right) \land \ldots \land \left(x_{n-1} \to x_n\right) \land \bar{x}_n,\]
+    where $a \to b \equiv \bar{a} \lor b$ is an implication. Note that we have $x_1$ but $\bar{x}_n$. 
+
+    This is unsatisfiable. Indeed, for it to be satisfiable we would need $x_1$ and $x_n = 0$. However, then, there must exist a $  i$ so that $x_i = 1$ but $x_{i+1} = 0$, which would make the clause $x_i \to x_{i+1}$ false.
+
+    We consider two decision trees that solve the $\lang{Search}\left(\phi\right)$ problem:
+    \begin{itemize}
+        \item We can make a binary search to find the $i$ so that $x_i = 1$ but $x_{i+1} = 0$. This has depth $\log_2\left(n\right)$: any computation takes at most $\log_2\left(n\right)$ queries. Since it is a balanced tree, it has moreover size $n$.
+        \item We can make a linear search (querying $i = 1, 2, 3, \ldots$) until we find a $i$ so that $x_i = 1$ but $x_{i+1} = 0$. This time, this tree has depth $n$ and size $n$.
+    \end{itemize}
+
+    Both those trees have the same size, but a very different depth.
+\end{parag}
+ 
+\begin{parag}{Tree-vs-adversary game}
+    Let $T$ be some tree computing $\lang{Search}\left(\phi\right)$.
+
+    We consider the following game to prove inequalities on its size. In each round, the tree queries $x_i$. Then, either:
+    \begin{itemize}
+        \item The adversary chooses the value of $x_i$.
+        \item The adversary lets the tree choose the value of $x_i$, but scores a point.
+    \end{itemize}
+
+    The game ends when the tree solves $\lang{Search}\left(\phi\right)$.
+\end{parag}
+
+\begin{parag}{Lemma}
+    If there exists an adversary that can score $r$ points, then the decision tree size is at least $2^r$.
+
+    \begin{subparag}{Proof}
+        This will be proven in the ninth exercise series. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: \lang{PHP} formula}
+    Let $n \in \mathbb{N}$.
+
+    We define the pigeon-hole principle formula, $\lang{PHP}_n^{n+1}$, so that:
+    \begin{itemize}
+        \item It has $\left(n+1\right)\log\left(n\right)$ variables.
+        \item For each $i \in \left\{1, \ldots, n+1\right\}$, we consider $x^{i} \in \left\{0, 1\right\}^{\log\left(n\right)}$ to be some integer $x^i \in \left\{1, \ldots, n\right\}$. 
+        \item Finally: 
+        \[\lang{PHP}_n^{n+1} = \bigvee_{i \neq j} \left(x^{i} \neq x^{j}\right).\]
+        
+        Each $x^i \neq x^j$ has $2\log_2\left(n\right)$ variables, and can thus be represented using at most $2^{2 \log_2\left(n\right)} = n^2$ clauses.
+    \end{itemize}
+
+    Intuitively, we have $n+1$ variables $x^i$ for $i \in \left\{1, \ldots, n+1\right\}$, which can take only $n$ different values $x^i \in \left\{1, \ldots, n\right\}$. By the pigeonhole principle, two of those variables must be equal; hence the name of this formula. This however implies that $\lang{PHP}_n^{n+1}$ is indeed unsatisfiable.
+\end{parag}
+
+\begin{parag}{Theorem}
+    $\lang{PHP}_n^{n+1}$ requires a treelike resolution refutation of size $2^{\Omega\left(n\right)}$.
+
+    \begin{subparag}{Implication}
+        In particular, the tree-like propositional proof system is not poly-bounded.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Our goal is to find an adversary strategy scoring $\Omega\left(n\right)$ points. We suppose for simplicity that each $x^i$ is accessed atomically, by simplicity. This proof can easily be generalised for any bit access order.
+
+        When the tree queries a pigeon $x^i$, the tree wants to map it to a hole where there is already a pigeon to finish the resolution refutation quickly, but the adversary wants to map the pigeon to a hole where there is no pigeon yet. We only need a constants number of bits per pigeon to reach $\Omega\left(n\right)$ points, so we consider the following strategy. 
+
+        For the $k$\Th query to some pigeon $x^i$, if $k < \frac{n}{2}$, fix all of its bits except the first one to the binary representation of $k$. For instance, if $n = 8$, the first three queries will be fixed to $?00$, $?01$, $?10$, where the value of the question mark can be chosen by the tree. The tree will not be able to find a pigeon collision while $k < \frac{n}{2}$. Since this strategy scores a point for each of the first $\frac{n}{2}$ pigeon queries, it scores $\frac{n}{2} \in \Omega\left(n\right)$ points.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document}
