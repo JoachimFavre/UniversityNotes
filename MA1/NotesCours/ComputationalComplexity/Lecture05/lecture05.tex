@@ -204,7 +204,7 @@ Path(u, v, k):
     \begin{subparag}{Proof}
         Let $M$ be a NTM solving a problem in $\lang{NSPACE}\left(s\left(n\right)\right)$. As explained in the proof of a previous theorem, its configuration at any step can be represented as some element of $\left\{0, 1\right\}^{O\left(s\left(n\right)\right)}$.
 
-        Therefore, we can consider a graph $G = \left(V, E\right)$ where $V = \left\{0, 1\right\}^{O\left(s\left(n\right)\right)}$, and two configurations are linked by an edge if and only if there exists some non-deterministic step the NTM can follow to go from the first to the second. We can use this to make a deterministic TM that decides this problem, by simply finding if there exists a path from the initial configuration to some accepting state. This is just the problem \lang{STCONN} and, since $G$ has size $O\left(s\left(n\right)\right)$, by Savitch's theorem this takes memory $O\left(s\left(n\right)^2\right)$. This finishes the proof.
+        Therefore, we can consider a graph $G = \left(V, E\right)$ where $V = \left\{0, 1\right\}^{O\left(s\left(n\right)\right)}$, and two configurations are linked by an edge if and only if there exists some non-deterministic step the NTM can follow to go from the first to the second. We can use this to make a deterministic TM that decides this problem, by simply finding if there exists a path from the initial configuration to some accepting state. This is just the problem \lang{STCONN} and, since $G$ has size $2^{O\left(s\left(n\right)\right)}$, by Savitch's theorem this takes memory $O\left(s\left(n\right)^2\right)$. This finishes the proof.
 
         \qed
     \end{subparag}
@@ -269,7 +269,7 @@ Path(u, v, k):
         \[\phi_{i+1}\left(u, v\right) = \exists w, \phi_i\left(u, w\right) \land \phi_i\left(w, v\right).\]
 
         However, since we are doubling the size of the formula every time, $\phi_{n^k}$ is exponentially big. So, we have to use a trick similar to Savitch's theorem in order to reuse work: we use $\forall$ quantifiers to use $\phi_i$ only once. In other words, $\phi_{i+1}\left(u, v\right)$ is defined as: 
-        \[\forall x, \forall y, \exists w, \left(\left(x = u\right) \land \left(y = w\right)\right) \lor \left(\left(x = w\right) \land \left(y=v\right)\right) \to \phi_i\left(x, y\right).\]
+        \[\exists w, \forall x, \forall y, \left(\left(x = u\right) \land \left(y = w\right)\right) \lor \left(\left(x = w\right) \land \left(y=v\right)\right) \to \phi_i\left(x, y\right).\]
 
         This time, it has size $O\left(n^{2k}\right)$. Knowing whether $\phi_{n^k}\left(v_{start}, v_{accept}\right) = T$ is indeed a reduction to \lang{TQBF}. Since the reduction moreover takes polynomial-time, this finishes the proof.
 
