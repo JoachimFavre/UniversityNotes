@@ -1,0 +1,167 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-05 at 13:36:40.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Mardi 05 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2024-11-05}{}{}
+
+\subsection{Polynomial identity testing}
+
+\begin{parag}{Definition: Polynomial}
+    A \important{monomial} is a constant times a product of variables. A \important{polynomial} $p\left(x_1, \ldots, x_n\right)$ is a sum of monomials.
+
+    The \important{degree} of a polynomial is moreover the largest sum of exponents of any monomial.
+
+    \begin{subparag}{Example}
+        For instance, we may consider the following polynomials of degree $3$ and $2$, respectively: 
+        \[2x + 3xy^2, \mathspace 4x^2 + 3x - 1.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    Let $A \in \mathbb{R}^{n \times n}$ be a matrix. Its determinant can be written using permutations: 
+    \[\det\left(A\right) = \sum_{\sigma \in S_n} \text{sgn}\left(\sigma\right) \prod_{i=1}^{n} A_{i, \sigma_i},\]
+    where $S_n$ is the group of permutations on $n$ elements.
+
+    This is a polynomial in the $n^2$ variables $A_{ij}$. We may wish to know some properties on this determinant, like whether $\det\left(A\right) = 0$ for all matrices $A \in \mathcal{A}$ for some $\mathcal{A} \in \mathbb{R}^{n \times n}$. Computing $\det\left(A\right)$ symbolically and looking whether it simplifies to $0$ is very expansive. We however know how to compute $\det\left(A\right)$ in $O\left(n^3\right)$ given some $A$, using Gaussian elimination. This therefore leads to the following problem.
+\end{parag}
+
+\begin{parag}{Polynomial identity testing}
+    Let $f: \mathbb{R}^n \mapsto \mathbb{R}$ be a polynomial. It is given as a black box which we can evaluate, but we cannot consider its monomials separately.
+
+    The goal of the \important{polynomial identity testing} problem is to know if $f \equiv 0$ is the zero-polynomial with few calls to the black box.
+
+    \begin{subparag}{Remark}
+        Let $f, g \in \mathbb{R}^n \mapsto \mathbb{R}$. Knowing whether $f = g$ are the same polynomials is equivalent to knowing whether $f - g = 0$ is the zero polynomial. This justifies the name of this problem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $p\left(x\right)$ be a polynomial of degree $d$ over a single variable, and $S \subset \mathbb{R}$ be be a set. Moreover, let $U\left(S\right)$ be the distribution that outputs a value from $S$ uniformly at random.
+
+    Then: 
+    \[\prob_{x \followsdistr U\left(S\right)}\left(p\left(x\right) = 0 \suchthat p = 0\right) = 1, \mathspace \prob_{x \followsdistr U\left(S\right)}\left(p\left(x\right) = 0 \suchthat p \neq 0\right) \leq \frac{d}{\left|S\right|}.\]
+
+    \begin{subparag}{Remark}
+        We can thus use this lemma to make an algorithm that simply tries a value of $S$ uniformly at random. This allows to solve the polynomial identity testing problem when the polynomial is over a single variable.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        The first probability is trivial: if $p =0$ is the zero polynomial, then $p\left(x\right)=  0$ for all $x \in \mathbb{R}$. The second probability comes from the fundamental theorem of algebra: if a degree-$d$ polynomial over a single variable is not the zero polynomial, then it has at most $d$ roots. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Shwartz-Zippel lemma}
+    Let $p\left(x_1, \ldots, x_n\right)$ be a polynomial of degree $d$ over $n$ variables, and $S \subset \mathbb{R}$ be be a set. Moreover, let $U\left(S\right)$ be the distribution that outputs a value from $S$ uniformly at random, and $X_1, \ldots X_n \iid U\left(S\right)$.
+
+    If $p \neq 0$, then: 
+    \[\prob\left(p\left(X_1, \ldots, X_n\right) = 0\right) \leq \frac{d}{\left|S\right|}.\]
+    
+    \begin{subparag}{Proof}
+        We do this proof by induction on the number of variables $n$. 
+
+        The case $n = 1$ is true by the previous lemma. So, we consider some arbitrary $n \geq 2$. We fix the randomness of $x_1, \ldots, x_{n-1}$, leaving $X_1 = x_1^*, \ldots, X_{n-1} = x_{n-1}^*$. Note that $p\left(x_1^*, \ldots, x_{n-1}^*, X_n\right)$ might be identical to 0. For instance, if $p\left(x_1, x_2\right) = x_1 x_2 - x_2$, we do not want $x_1^* = 1$ since it would yield $p\left(x_1^*, x_2\right) = 0$. So, we need to be careful with the argument.
+
+        We can always factor out the $x_n^j$ coefficients, to write $p$ in the form: 
+        \autoeq[s]{p\left(x_1, \ldots, x_n\right) = x_n^k q_k\left(x_1, \ldots, x_{n-1}\right) + \ldots + x_n q_1\left(x_1, \ldots, x_{n-1}\right) + q_0\left(x_1, \ldots, x_{n-1}\right) = x_n^k q_k\left(x_1, \ldots, x_{n-1}\right) + r\left(x\right).}
+
+        Note that the degree of $x_n$ in $r\left(x_1, \ldots, x_{n}\right)$ is at most $k-1$. We first consider the case where $X_1 = x_1^*, \ldots, X_{n-1} = x_{n-1}^*$ so that $q_k\left(x_1^*, \ldots, x_{n-1}^*\right) \neq 0$. This implies that $p\left(x_1^*, \ldots, x_{n-1}^*, x_n\right)$ is a univariate polynomial on $x_n$ of degree exactly $k$, and it is non-zero; so, by our lemma:
+        \[\prob_{X_n \followsdistr U\left(S\right)}\left(p\left(x_1^*, \ldots, x_{n-1}^*, X_n\right) = 0 \suchthat q_k\left(x_1^*, \ldots, x_{n-1}^*\right) \neq 0\right) \leq \frac{k}{\left|S\right|}.\] 
+        
+        We can now consider the more general case where $X_1 = x_1^*, \ldots, X_{n-1} = x_{n-1}^*$ are arbitrary:
+        \autoeq[s]{\prob\left(p\left(X_1, \ldots, X_n\right) = 0\right) = \prob\left(q_k\left(X_1, \ldots, X_{n-1}\right) = 0\right) \overbrace{\prob\left(p\left(X_1, \ldots, X_n\right) = 0 \suchthat q_k\left(X_1, \ldots, X_{n-1}\right) = 0\right)}^{\leq 1} \fakeequal + \overbrace{\prob\left(q_k\left(X_1, \ldots, X_{n-1}\right) \neq 0\right)}^{\leq 1} \overbrace{\prob\left(p\left(X_1, \ldots, X_n\right) = 0 \suchthat q_k\left(X_1, \ldots, X_{n-1}\right) \neq 0\right)}^{\leq \frac{k}{\left|S\right|}} \leq \prob\left(q_k\left(X_1, \ldots, X_{n-1}\right) = 0\right) + \frac{k}{\left|S\right|}.}
+
+        We however know that $x_n^k q_k\left(x_1, \ldots, x_{n-1}\right)$ has degree at most $d$ so, by the induction hypothesis: 
+        \[\prob\left(q_k\left(X_1, \ldots, X_{n-1}\right) = 0\right) \leq \frac{\deg\left(q_k\right)}{\left|S\right|} \leq \frac{d-k}{\left|S\right|},\]
+        
+        This yields our result: 
+        \[\prob\left(p\left(X_1, \ldots, X_n\right) = 0\right) \leq \frac{d-k}{\left|S\right|} + \frac{k}{\left|S\right|} = \frac{d}{\left|S\right|}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: Perfect matching for bipartite graphs}
+    Let $G = \left(A \cup B, V\right)$ be a bipartite graph, with $\left|A\right| = \left|B\right| = n$. We consider the following generalisation of adjacency matrices: 
+    \[\left(A\right)_{u, v} = \begin{systemofequations} x_{uv}, & \text{if } \left\{u, v\right\} \in E \\ 0, & \text{otherwise}. \end{systemofequations}\]
+
+    Note that $\det\left(A\right) = p\left(x_{uv}\right)$ is a polynomial in $\left|E\right|$ variables.
+
+    $G$ admits a perfect matching if and only if $\det\left(A\right) \not\equiv 0$.
+
+    \begin{subparag}{Example}
+        Let us consider the following graph, and its corresponding adjacency matrix:
+        \begin{center}
+        \begin{minipage}{0.25\textwidth}
+        \svghere{SchwartzZippelPerfectMatchingDetection.svg}
+        \end{minipage}
+        \begin{minipage}{0.45\textwidth}
+        \[\implies A = \begin{pmatrix} x_{11} & 0 & 0 \\ 0 & x_{22} & x_{23} \\ 0 & x_{32} & x_{33} \end{pmatrix}. \]
+        \end{minipage}
+        \end{center}
+        
+        Computing its determinant, we get:
+        \[\det\left(A\right) = x_{11} \left(x_{22} x_{33} - x_{32} - x_{23}\right) = x_{11} x_{22} x_{33} - x_{11} x_{32} x_{23}.\]
+        
+        Looking at the monomials, we notice something interesting: $\left(11, 22, 33\right)$ and $\left(11, 32, 23\right)$ are exactly the two perfect matchings in the graph. This is not an accident, it is possible to show that: 
+        \[\det\left(A\right) = \sum_{\sigma \in S_n} \sgn\left(\sigma\right) \prod_{i=1}^{n} A_{i, \sigma\left(i\right)} = \sum_{\text{$M \subseteq E$ is a PM}} \text{sgn}\left(M\right) \prod_{e \in M} x_e,\]
+        where $S_n$ is the group of permutations on $n$ elements and ``PM'' means perfect matching. Intuitively, this comes from the fact that any perfect matching on a bipartite graph can be represented using a permutation $\sigma: \left\{1, \ldots, n\right\} \mapsto \left\{1, \ldots, n\right\}$, taking the edge $\left(i, \sigma\left(i\right)\right)$ for all vertices $i \in A$. We however just need to make sure the matching is valid, i.e. that all edges $\left(i, \sigma\left(i\right)\right) \in E$, which is done automatically since $x_{i, \sigma\left(i\right)} = 0$ whenever $\left(i, \sigma\left(i\right)\right) \not \in E$. So, in this case, summing on matchings is the same thing as summing on permutations, giving this result.
+        
+        This does mean that $\det\left(A\right) \neq 0$ if and only if $G$ has a perfect-matching. 
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This lemma can be generalised to an arbitrary graph, by replacing $A$ by a Tutte matrix. We take an arbitrary ordering of the vertices $v_1, \ldots, v_n$, and consider the following polynomial: 
+        \[\left(A\right)_{i, j} = \begin{systemofequations} 0, & \text{if $\left\{v_i, v_j\right\} \not\in E$}, \\ x_{ij}, & \text{if $\left\{i, j\right\} \in E$ and $i < j$}, \\ -x_{ij}, & \text{if $\left\{i, j\right\} \in E$ and $i > j$}. \end{systemofequations}\] 
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Application: Perfect matching detection}
+    We want to make an algorithm that detects if a graph admits a perfect matching.
+
+    Let $G = \left(A \cup B, V\right)$ be a bipartite graph, with $\left|A\right| = \left|B\right| = n$. We consider its adjacency matrix $A$, as defined above, which determinant $\det\left(A\right) = p\left(x_{uv}\right)$ is a polynomial in $\left|E\right|$ variables.
+
+    We consider the following algorithm:
+    \begin{enumerate}
+        \item We sample the $x_{uv}^*$ independently from $\left\{1, \ldots, n^2\right\}$, for each $\left\{u, v\right\} \in E$. 
+        \item We compute $\det\left(A^*\right)$, replacing each $x_{uv}$ with the value $x^*_{uv}$.
+        \item We output ``Yes'' if and only if $\det\left(A^*\right) \neq 0$.
+    \end{enumerate}
+    
+    This algorithm has a probability of success of at least $\frac{1}{n}$.
+
+    \begin{subparag}{Remark 1}
+        Using Gaussian elimination, we can compute the determinant of $A$ in time $O\left(n^3\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This algorithm allows to detect if $G$ admits a perfect matching. However, we can use it to actually find a perfect matching in $G$, using the following algorithm.
+
+        Let $e = \left\{u, v\right\} \in E$ be an arbitrary edge. Using our algorithm, we detect if $G \setminus \left\{e\right\}$ admits a perfect matching. If it does, we simply get rid of $e$, since it is not necessary. Otherwise, it means that $e$ is necessary to reach a perfect-matching, so we select $e$ to be part of our perfect-matching $M$, and we recurse on $G \setminus \left\{u, v\right\}$.
+
+        This can be implemented efficiently using parallel computations.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        If $G$ has no perfect-matching, $\det\left(A\right) = 0$ is always correct.  If $G$ however has a perfect-matching, $\det\left(A\right) \neq 0$ isn't the zero polynomial. So, by the Schwartz-Zippel lemma: 
+        \[\prob\left(p\left(x_{uv}\right)\right) \leq \frac{n}{\left|S\right|} = \frac{n}{n^2} = \frac{1}{n}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

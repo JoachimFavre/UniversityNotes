@@ -1,0 +1,299 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-29 at 13:14:45.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Mardi 29 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2024-10-29}{A suboptimal algorithm, although interesting}{
+\begin{itemize}[left=0pt]
+    \item End of the application of the Hedge algorithm for solving LPs.
+    \item Application of the Hedge algorithm to the set cover LP.
+    \item Introduction to randomised algorithms.
+    \item Explanation and proof of Karger's min-cut algorithm.
+\end{itemize}
+
+}
+
+\begin{parag}{Theorem}
+    We consider our algorithm that solves linear programs using the Hedge algorithm, with some $\epsilon$ and $T$.
+
+    Let $\rho$ be the maximum value $\left|m_i^{\left(t\right)}\right|$ that is set during the iterations. Since this algorithm only applies to covering LPs, it is such that: 
+    \[\rho = \max_{i, x}\left\{\left|A_i x - b_i\right|\right\} = \max_{i \in \left\{1, \ldots, n\right\}} \left\{b_i, A_i \bvec{1} - b_i\right\}, \mathspace \text{where } \bvec{1} = \begin{pmatrix} 1 & \cdots & 1 \end{pmatrix}^T.\]
+
+    If $T \geq 4 \rho^2 \ln\left(m\right) / \epsilon^2$, then the result outputted by our algorithm $x^*$ is so that:
+    \begin{enumerate}
+        \item The cost of $x^*$ is at most the cost of the optimal solution (i.e. it is equal or better to the optimal solution).
+        \item $x^*$ is approximately feasible, i.e. for all $i$: 
+        \[A_i x^* \geq b_i - 2 \epsilon.\]
+    \end{enumerate}
+    
+
+    \begin{subparag}{Proof}
+        The first claim directly comes from the fact that, at any iteration, the solution to the collapsed LP is at most the optimal solution of the original LP. But then, their average is also at most the optimal solution.
+
+        We now consider the second claim. We use our corollary for Hedge to know that:
+        \[\sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)} \leq \frac{1}{T} \sum_{t=1}^{T} m_i^{\left(t\right)} + 2\epsilon\]
+
+        Let us look more closely at the first term:
+        \autoeq{\sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)} = \sum_{t=1}^{T} \sum_{i=1}^{n} p_i^{\left(t\right)} m_i^{\left(t\right)} = \sum_{t=1}^{T} \sum_{i=1}^{m} p_i^{\left(t\right)} \left(A_i x^{\left(t\right)} - b_i\right) = \sum_{t=1}^{T} \left(\sum_{i=1}^{m} p_i^{\left(t\right)} A_i x^{\left(t\right)} - \sum_{i=1}^{m} p_i^{\left(t\right)} b_i\right).}
+    
+        We recognise $\sum_{i=1}^{m} p_i^{\left(t\right)} A_i x^{\left(t\right)} \geq \sum_{i=1}^{m} p_i^{\left(t\right)} b_i$ to be the only constraint of the collapsed linear program in the $i$\Th iteration. By definition of linear programs, this inequality must be met, giving that the value we just computes is non-negative, i.e.:
+        \[\sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)} \geq 0.\]
+
+        Feeding this to our corollary, this gives us that:  
+        \[0 \leq \frac{1}{T} \sum_{t=1}^{T} m_i^{\left(t\right)} + 2\epsilon.\]
+
+        Let us now look at the second term: 
+        \autoeq{\frac{1}{T} \sum_{t=1}^{T} m_i^{\left(t\right)} = \frac{1}{T} \sum_{t=1}^{T} \left(A_i x^{\left(t\right)} - b_i\right) = A_i \cdot \frac{1}{T}\sum_{t=1}^{T} x^{\left(t\right)} - \frac{1}{T} \sum_{t=1}^{T} b_i = A_i\cdot \frac{1}{T} \sum_{t=1}^{T} x^{\left(t\right)} - b_i = A_i x^* - b_i,}
+        where we recognised our output solution $x^* = \sum_{t=1}^{T} x^{\left(t\right)}/T$.
+
+        Therefore, our corollary gives us our bound: 
+        \[0 \leq A_i x^* - b_i + 2\epsilon \iff A_i x^* \geq b_i - 2 \epsilon.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Application: Set cover}
+    For set cover, our result means that, solving the relaxed linear program using Hedge, we get a $x^*$ so that: 
+    \[\sum_{S : e \in S} x_S^* \geq 1 - 2 \epsilon, \mathspace \forall e \in U.\]
+
+    This may however not be the result we wish for, since all sets may not be fully covered. We can thus boost it, by considering: 
+    \[x_S' = \min\left\{1, \frac{x_S^*}{1 - \epsilon}\right\}.\]
+
+    This yields a result so that:
+    \begin{enumerate}
+        \item (All inequalities are met) $\displaystyle \sum_{S : e \in S} x_S' \geq 1$ for all $e \in U$.
+        \item (The cost is reasonable) $\displaystyle \sum_{S} x_S' c\left(S\right) \leq \frac{1}{1 - 2\epsilon} \text{OPT}_{LP}$.
+    \end{enumerate}
+
+    \begin{subparag}{Remark 1}
+        The inequality on cost is not so bad: set cover already looses a logarithmic factor when we use linear programs, so loosing a small constant more is not a big issue.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        Instead of boosting the result we get from Hedge, it may be tempting to make the constraints of the LP we feed to the Hedge algorithm harder, by considering some $\widetilde{b}_i = 1 + 2 \epsilon$. That way, if the Hedge algorithm finds a solution, it will meet all constraints.
+
+        The issue is that, by increasing the constraints like that, we may render the LP no longer feasible. Consider for instance that all elements are covered by exactly one set. Taking $\widetilde{b}_i = 1 + 2 \epsilon$ asks for each set to be covered slightly more than once, which makes the problem no longer solvable.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    There are many other applications of the Hedge algorithm. Moreover, linear programs also have very efficient other solvers, so using Hedge might not be the best solution for them. 
+
+    The problem we analysed however clearly has a very interesting pedagogical interest, showcasing the usefulness and versatility of Hedge.
+\end{parag}
+
+\section{Randomised algorithms}
+\subsection{Introduction}
+
+\begin{parag}{Introduction}
+    There are many algorithms we only know an efficient randomised algorithm. For instance, given some $x$, finding a prime number in the interval $\left[x, 2x\right]$ in polynomial time in the size of the input (i.e. in logarithmic time in $x$) can only be done using randomised algorithms today.
+
+    Such algorithms are typically nice because they are often faster and simpler.
+\end{parag}
+
+\begin{parag}{Remark}
+    It is believed that anything we can do in randomised polynomial time can also be done in deterministic polynomial time.
+
+    \begin{subparag}{Justification}
+        Let's suppose that we have a one-way function (like in cryptography). If we send an encrypted message, it should look like a random bit string for polynomial time algorithms. This is a deterministic bitstring, but it looks random to the algorithm, and should just be equivalent.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    If \lang{SAT} has no circuit of size $2^{o\left(n\right)}$ (i.e. of subexponential size), then all polynomial time algorithms can be derandomised.
+\end{parag}
+
+\subsection{Karger's algorithm}
+
+\begin{parag}{Min-cut problem}
+    Let $G = \left(V, E\right)$ be a graph.
+
+    Our goal is to output some $S \subsetneq V$ so that $S \neq \o$, such that $E\left(S, \bar{S}\right)$ is minimised, where $E\left(S, \bar{S}\right)$ is the set of edges between $S$ and $\bar{S}$: 
+    \[E\left(S, \bar{S}\right) = \left\{\left\{u, v\right\} \in E \suchthat u \in S, v \in \bar{S}\right\}.\]
+\end{parag}
+
+\begin{parag}{Definition: Graph contraction}
+    Let $G = \left(V, E\right)$ be a graph, and $e = \left\{u, v\right\} \in E$ be an edge.
+
+    The \important{contraction} of $G$ on $e$ is the graph $G' = \left(V', E'\right)$ where: 
+    \[V' = V \setminus \left\{u, v\right\} \cup \left\{uv\right\}, \mathspace E' = f\left(E \setminus \left\{e\right\}\right),\]
+    where: 
+    \[f\left(\left\{w, z\right\}\right) = \begin{systemofequations} e, & \text{if } e \not \in \delta\left(u\right) \cup \delta\left(v\right), \\ \left\{z, uv\right\}, & \text{if $w \in \left\{u, v\right\}$}, \\ \left\{w, uv\right\}, & \text{if $z \in \left\{u, v\right\}$}. \end{systemofequations}\]
+
+    \begin{subparag}{Remark}
+        Note that we allow $E'$ to be a multi-set, i.e. we allow to have multiple edges between two vertices.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, if we contract the first graph on the bold blue edge:
+        \svghere{GraphContractionExample.svg}
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Karger's min-cut algorithm}
+    Let $G = \left(V, E\right)$ be some graph. We consider the following randomised algorithm to find a min-cut.
+
+    If the graph $G = \left(V, E\right)$ has two vertices, output the only cut cut. Otherwise: 
+    \begin{enumerate}
+        \item Select an edge $e \in E$ uniformly at random.
+        \item Contract $e = \left\{u, v\right\}$ to obtain a smaller graph $G'$ with $\left|V\right| - 1$ vertices.
+        \item Recurse on $G'$.
+    \end{enumerate}
+
+    \begin{subparag}{Example}
+        For instance, we may consider the following graph and random choice of edges, which would output $\left(S, \bar{S}\right) = \left(\left\{a\right\}, \left\{b, c, d\right\}\right)$:
+        \svghere{KargersAlgorithmExample.svg}
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Our goal is to show that this algorithm outputs a min-cut with reasonable probability. We first have to consider the following lemmas.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma 1}
+    Let $G = \left(V, E\right)$ be some graph, and $\left(S^*, \smash{\bar{S}}^*\right)$ be a min-cut. We also note $k = \left|E\left(S^*, \smash{\bar{S}}^*\right)\right|$.
+
+    Then, every vertex $v$ of $G$ has degree at least $k$: 
+    \[d\left(v\right) \geq k, \mathspace \forall v \in V.\]
+    
+    \begin{subparag}{Proof}
+        We suppose towards contradiction that there exists a vertex $v$ that has degree $d\left(v\right) < k$. We consider the following cut: 
+        \[\left(S, \smash{\bar{S}}\right) = \left(\left\{v\right\}, V \setminus \left\{v\right\}\right).\]
+
+        By definition of degree, there are $d\left(v\right)$ edges crossing this cut, i.e.: 
+        \[\left|E\left(S, \smash{\bar{S}}\right)\right| = d\left(v\right) < k = \left|E\left(S^*, \smash{\bar{S}}^*\right)\right|.\]
+
+        This is however a contradiction to the fact $\left(S^*, \smash{\bar{S}}^*\right)$ was a min-cut.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        Note in particular that, since all degrees have degree at least $k$, we must have by the handshake lemma:
+        \[\left|E\right| \geq \frac{nk}{2}, \mathspace \text{where } n = \left|V\right|.\]
+
+        Indeed, there are $n$ vertices, each being connected to at least $k$ edges; and we must think to divide by $2$ because each edge is counted twice. This yields to the following lemma.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma 2}
+    Let $G = \left(V, E\right)$ be some graph, and $\left(S^*, \smash{\bar{S}}^*\right)$ be a min-cut. Also, let $e \in E$ be chosen uniformly at random.
+
+    Then, the probability that $e$ is in the cut, can be bounded by: 
+    \[\prob\left(e \in E\left(S^*, \smash{\bar{S}}^*\right)\right) \leq \frac{2}{n}.\]
+
+    \begin{subparag}{Proof}
+        Let $k = \left|E\left(S^*, \smash{\bar{S}}^*\right)\right|$. Since $e$ is chosen uniformly at random, the probability is, using our lemma: 
+        \[\frac{\left|E\left(S^*, \smash{\bar{S}}^*\right)\right|}{\bar{E}} = \frac{k}{\left|E\right|} \leq \frac{k}{\frac{nk}{2}} = \frac{2}{n}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma 3}
+    Let $G = \left(V, E\right)$ be some graph, $\left(S^*, \smash{\bar{S}}^*\right)$ be a min-cut, and $e \in E$.
+
+    If $e \not \in E\left(S^*, \smash{\bar{S}}^*\right)$, then $\left(S^*, \smash{\bar{S}}^*\right)$ has size at least $k$ in the contracted graph $G'$.
+    
+    \begin{subparag}{Intuition}
+        In other words, contracting does not decrease the size of the min-cut.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $G = \left(V, E\right)$ be a graph with $n$ vertices. Let $\left(S^*, \smash{\bar{S}}^*\right)$ be an arbitrary min-cut.
+
+    Then, Karger's algorthm outputs $\left(S^*, \smash{\bar{S}}^*\right)$ with probability at least $\binom{n}{2}^{-1} = \frac{2}{n\left(n-1\right)}$.
+
+    \begin{subparag}{Remark 1}
+        This algorithm may output another min-cut. The probability corresponds to this specific min-cut.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This theorem is tight.
+
+        Indeed, consider the graph which consists only of a single cycle. It has $\binom{n}{2}$ min-cuts (we can choose any two vertices to represent the end-points of the cut, and include all vertices connecting the two). Hence, one of them has to be outputted with probability at most $\binom{n}{2}^{-1}$. The theorem cannot be tighter for this min-cut.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $A_i$ be the event that the $i$\Th edge picked is not in $E\left(S^*, \smash{\bar{S}}^*\right)$.
+
+        The probability that the algorithm outputs $\left(S^*, \smash{\bar{S}}^*\right)$ is given by: 
+        \autoeq[s]{\prob\left(A_1 \cup \ldots \cup A_{n-2}\right) = \prob\left(A_1\right) \prob\left(A_2 \suchthat A_1\right) \prob\left(A_3 \suchthat A_1, A_2\right)\cdots \prob\left(A_{n-2} \suchthat A_1, \ldots, A_{n-3}\right) \geq \left(1 - \frac{2}{n}\right) \left(1 - \frac{2}{n-1}\right) \hdots \left(1- \frac{2}{3}\right) = \frac{n-2}{n} \cdot  \frac{n-3}{n-1} \cdots \frac{1}{3} = \frac{\left(n-2\right)!}{n!/2} = \frac{2}{n\left(n-1\right)}.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $G = \left(V, E\right)$ be an arbitrary graph.
+
+    If $G$ is connected, then it has at most $\binom{n}{2}$ min-cuts.
+
+    \begin{subparag}{Remark}
+        This is a very non-trivial theorem, which is very hard to prove without Karger's algorithm.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $\mathcal{A}$ be a family of min-cuts.
+
+        For any $\left(S^*, \smash{\bar{S}}^*\right) \in \mathcal{A}$, we note $\prob\left(S^*, \smash{\bar{S}}^*\right)$ to be the probability that Karger's algorithm outputs this min-cut. By our theorem, for all $\left(S^*, \smash{\bar{S}}^*\right) \in \mathcal{A}$: 
+        \[\prob\left(S^*, \smash{\bar{S}}^*\right) \geq \binom{n}{2}^{-1}.\]
+
+        Now, Karger's algorithm only outputs a single cut, so all elements of $\mathcal{A}$ are disjoint event. The sum of their probabilities should be at most $1$: 
+        \[\sum_{\left(S^*, \smash{\bar{S}}^*\right) \in \mathcal{A}} \prob\left(S^*, \smash{\bar{S}}^*\right) \leq 1.\]
+
+        However: 
+        \[1 \geq \sum_{\left(S^*, \smash{\bar{S}}^*\right) \in \mathcal{A}} \prob\left(S^*, \smash{\bar{S}}^*\right) \geq \binom{n}{2}^{-1} \sum_{\left(S^*, \smash{\bar{S}}^*\right) \in \mathcal{A}} = \left|\mathcal{A}\right| \binom{n}{2}^{-1}.\]
+
+        This directly gives our result: 
+        \[\left|\mathcal{A}\right| \leq \binom{n}{2}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $G = \left(V, E\right)$ be some graph, and $\left(S^*, \smash{\bar{S}}^*\right)$ be a min-cut. We also note $k = \left|E\left(S^*, \smash{\bar{S}}^*\right)\right|$.
+
+    The number of cuts of value $\leq \alpha k$ in $G$ is at most $n^{2 \alpha}$.
+
+    \begin{subparag}{Remark}
+        This is a generalisation of the corollary above.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Success probability}
+    Let $G = \left(V, E\right)$ be some graph, and $\left(S^*, \smash{\bar{S}}^*\right)$ be a min-cut. We also note $k = \left|E\left(S^*, \smash{\bar{S}}^*\right)\right|$.
+
+    For any $c > 0$, running Karger's min-cut algorithm at least $c\cdot n^2 \ln\left(n\right)$ times, the probability of failure is: 
+    \[\prob\left(\text{failure}\right) \leq \frac{1}{n^c}.\]
+
+    \begin{subparag}{Proof}
+        Indeed, if there is a single min-cut in $G$, then Karger's min-cut algorithm may only succeed with probability $n^{-2}$. Repeating it $c\cdot n^2 \ln\left(n\right)$ times, we get: 
+        \[\prob\left(\text{failure}\right) \leq \left(1 - \frac{1}{n^2}\right)^{c\cdot n^2 \ln\left(n\right)} \leq e^{-\ln\left(n^c\right)} = \frac{1}{n^c}.\]
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Running one iteration of this algorithm takes time $O\left(n^2\right)$. But then, repeating it $O\left(n^2 \ln\left(n\right)\right)$ times, we get a total complexity of $O\left(n^4 \ln\left(n\right)\right)$. This is not great.
+
+        We however notice that the probability to fail at the beginning is a lot smaller than the probability to fail on the last few steps of the algorithm. We will thus improve the success probability by repeating more the steps at the end of the algorithms, which have a higher fail probability.
+    \end{subparag}
+\end{parag}
+
+\end{document}

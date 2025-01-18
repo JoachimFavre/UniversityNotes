@@ -1,0 +1,181 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-11 at 13:19:21.
+
+\usepackage{../../style}
+
+\title{Advanced algo}
+\author{Joachim Favre}
+\date{Lundi 11 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2024-11-11}{Time to focus}{
+\begin{itemize}[left=0pt]
+    \item Proof of Markov's inequality.
+    \item Proof of Chebyshev's inequality.
+    \item Application to concentration inequalities.
+\end{itemize}
+    
+}
+
+\subsection{Concentration inequalities}
+
+\begin{parag}{Goal}
+    Let $D$ be an arbitrary distribution. To get an estimation of its mean, we may draw independent samples $X_1, \ldots, X_n$ from $D$, and return the empirical average $\frac{1}{n} \sum_{i=1}^{n} X_i$. The question is then however how close we can expect $\frac{1}{n} \sum_{i=1}^{n} X_i$ to be to $\exval_{X \followsdistr D}\left(X\right)$, and with what probability.
+
+    In other words, we know that $\sqrt{n} \left(\frac{1}{n} \sum_{i=1}^{n} X_i / \sigma - \mu\right)$ converges to a normal distribution using the central limit theorem, but we want to find bounds that show how fast. Chernhoff bounds are example of such concentration inequalities.
+\end{parag}
+
+\begin{parag}{Example}
+    Let's suppose that the average salary in Switzerland is 6000 CHF. We wonder how small the fraction of the population that earns at most 8000 CHF is. For instance, it is impossible to be 0, since everyone received more than 8000, then the mean would be higher than 6000.
+
+    It is possible to argue that it is in fact at least $\frac{1}{4}$, using Markov's inequality, the following theorem. Note that this is reached if $\frac{1}{4}$ of the population receives 0, and the other $\frac{3}{4}$ receive 8000; indeed yielding an average of $\frac{3}{4}\cdot 8000 = 6000$.
+\end{parag}
+
+\begin{parag}{Theorem: Markov's inequality}
+    Let $X$ be a non-negative random variable, i.e. $\prob\left(X \geq 0\right) = 1$.
+
+    Then, for all $k \in \mathbb{R}^*_+$: 
+    \[\prob\left(X \geq k \exval\left(X\right)\right) \leq \frac{1}{k}.\]
+
+    Equivalently: 
+    \[\prob\left(X \geq k\right) \leq \frac{\exval\left(X\right)}{k}.\]
+    
+    \begin{subparag}{Remark 1}
+        The first inequality only meaningful if $k \geq 1$. Indeed, the fact that $\prob\left(X \geq k \exval\left(X\right)\right) \leq 1$ is trivial.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This inequality is tight. Indeed, we can consider:
+        \[X = \begin{systemofequations} 0, & \text{with probability $1 - \frac{1}{k}$}, \\ k, & \text{with probability $\frac{1}{k}$.} \end{systemofequations}\]
+
+        Then, $\exval\left(X\right) = 1$ and $\prob\left(X \geq k\right) = \frac{1}{k}$, as required.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, for our example before: 
+        \[\prob\left(X \geq 8000\right) = \frac{6000}{8000} = \frac{3}{4},\]
+        as explained.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We suppose $X$ takes integer values, since this class is mostly about discrete structures. This proof can be generalised to arbitrary random variables.
+
+        Then, for all $\epsilon > 0$: 
+        \autoeq{\exval\left(X\right) = \sum_{i = 0}^{\infty} \prob\left(X = i\right) i \geq \sum_{i=k}^{\infty} \prob\left(X = i\right) i \geq \sum_{i=k}^{\infty} \prob\left(X = i\right) k = k\prob\left(X \geq k\right).}
+
+        We directly get the result by dividing by $k$.
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Variance}
+    Let $X$ be a random variable.
+
+    Its \important{variance}, representing its average square distance to its mean, can be equivalently be defined as: 
+    \[\Var\left(X\right) = \exval\left[\left(X - \exval\left(X\right)\right)^2\right] = \exval\left(X^2\right) - \exval\left(X\right)^2.\]
+
+    Its \important{standard deviation} is defined as the average distance to its mean: 
+    \[\sigma = \sqrt{\Var\left(X\right)}.\]
+    
+\end{parag}
+
+\begin{parag}{Chebyshev's inequality}
+    Let $X$ be a random variable of standard deviation $\sigma$.
+
+    Then: 
+    \[\prob\left(\left|X - \exval\left(X\right)\right| > \epsilon\right) \leq \frac{\Var\left(X\right)}{\epsilon^2}.\]
+
+    Equivalently: 
+    \[\prob\left(\left|X - \exval\left(X\right)\right| > k \sigma\right) \leq \frac{1}{k^2}.\]
+
+    \begin{subparag}{Proof}
+        Using Markov's inequality, we directly find: 
+        \autoeq{\prob\left(\left|X - \exval\left(X\right)\right| > \epsilon\right) = \prob\left(\left(X - \exval\left(X\right)\right)^2 > \epsilon^2\right) \leq \frac{\exval\left[\left(X - \exval\left(X\right)\right)^2\right]}{\epsilon^2} = \frac{\Var\left(X\right)}{\epsilon^2}.}
+
+        To get the second inequality, we can simply let $\epsilon = k \sigma$.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Pairwise independence}
+    Let $X_1, \ldots, X_n$ be random variables.
+
+    We say that they are \important{pairwise independent} if $X_i$ and $X_j$ are independent for any $i \neq j$, i.e. if:
+    \[f_{X_i, X_j}\left(x_i, x_j\right) = f_{X_i}\left(x_i\right) f_{X_j}\left(x_j\right).\]
+
+    \begin{subparag}{Remark}
+        We may however not have independence for tuple of three random variables: $X_1, X_2, X_3, \ldots, X_n$ may be pairwise independent while $X_1, X_2, X_3$ are not independent.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Lemma}
+    Let $X_1, \ldots, X_n$ be random variables. 
+
+    If they are pairwise independent, then:
+    \[\Var\left(X_1 + \ldots + X_n\right) = \Var\left(X_1\right) + \ldots + \Var\left(X_n\right).\]
+
+    \begin{subparag}{Proof}
+        By definition: 
+        \autoeq{\Var\left(\sum_{i} X_i\right) = \exval\left(\left(\sum_{i} X_i\right)^2\right) - \exval\left(\sum_{i} X_i\right)^2 = \exval\left(\sum_{i,j} X_i X_j\right) - \sum_{i, j} \exval\left(X_i\right)\exval\left(X_j\right).}
+
+        By linearity of the expectation: 
+        \[\exval\left(\sum_{i, j} X_i X_j\right) = \sum_{i, j} \exval\left(X_i X_j\right).\]
+
+        Moreover, by pairwise independence: 
+        \[\exval\left(X_i X_j\right) = \begin{systemofequations} \exval\left(X_i\right) \exval\left(X_j\right), & \text{if $i \neq j$}, \\ \exval\left(X_i^2\right), & \text{otherwise.} \end{systemofequations}\]
+
+        So, all terms where $i \neq j$ cancel out, giving: 
+        \autoeq{\Var\left(\sum_{i} X_i\right) = \sum_{i, j} \exval\left(X_i X_j\right) - \sum_{i, j} \exval\left(X_i\right)\exval\left(X_j\right) = \sum_{i} \left(\exval\left(X_i^2\right) - \exval\left(X_i\right)^2\right) = \sum_{i} \Var\left(X_i\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Concentration inequality}
+    Let $D$ be some distribution of mean $\exval\left(D\right) = \mu$, and variance $\Var\left(D\right) = \sigma^2$. Moreover, let $X_1, \ldots, X_n \iid D$, and let $\bar{X}_n = \left(X_1 + \ldots + X_n\right)/n$.
+
+    Then: 
+    \[\prob\left(\left|\bar{X}_n - \mu\right| \geq \epsilon\right) \leq \frac{\sigma^2}{n \epsilon^2} = \frac{\Var\left(D\right)}{n \epsilon^2}.\]
+
+    \begin{subparag}{Remark}
+        This is our first concentration inequality.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let us first compute $\Var\left(\bar{X}_n\right)$, using their independence: 
+        \autoeq{\Var\left(\bar{X}_n\right) = \frac{1}{n^2} \Var\left(X_1 + \ldots + X_n\right) = \frac{1}{n^2} \Var\left(X_1\right) + \ldots + \frac{1}{n^2} \Var\left(X_n\right) = n\cdot \frac{1}{n^2}\cdot \sigma^2 = \frac{1}{n} \sigma^2.}
+
+        This gives our result by Chebyshev's inequality: 
+        \[\prob\left(\left|\bar{X}_n - \mu\right| \geq \epsilon\right) \leq \frac{\Var\left(\bar{X}_n\right)}{\epsilon^2} = \frac{\sigma^2}{n \epsilon^2}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Polling}
+    Let us consider the following random variable: 
+    \[X_i = \begin{systemofequations} 1, & \text{with probability $p$}, \\ 0, & \text{with probability $1-p$.} \end{systemofequations}\]
+
+    As for the rest of this section, our setup is that we try to estimate the mean of the distribution, $\exval\left(D\right) = p$, while knowing how fast it converges.
+
+    Its variance is: 
+    \[\Var\left(D\right) = \exval\left(X_i^2\right) - \exval\left(X_i\right)^2 = \left(p\cdot 1^2 + \left(1-p\right)\cdot 0^2\right) - \left(p\cdot 1 + \left(1-p\right)\cdot 0\right)^2 = p - p^2.\]
+
+    Now, we notice that for any $p \in \left[0, 1\right]$, we have $\Var\left(D\right) \leq \frac{1}{4}$. This is useful because we do not know $p$ when we try to estimate $\mu$: if we knew $p$, we would also know $\mu = p$. This yields, taking $\bar{X}_n = \frac{1}{n} \sum_{i=1}^{n} X_i$, by our concentration inequality: 
+    \[\prob\left(\left|\bar{X}_n - \mu\right| \geq \epsilon\right) \leq \frac{\Var\left(D\right)}{n  \epsilon^2} \leq \frac{1}{4n \epsilon^2}.\]
+
+    For instance, if we want $\epsilon = 0.02$ (i.e. we want at most $\SI{2}{\%}$ error), and want a failure probability at most $\delta$. Then, we can solve the following inequality:
+    \[\prob\left(\left|\bar{X}_n - \mu\right| \geq \epsilon\right) \leq \delta \impliedby \frac{1}{4n \epsilon^2} \leq \delta \iff n \geq \frac{1}{4 \epsilon^2 \delta}.\]
+
+    This is nice, but not great. We wish to improve this bound into $O\left(\frac{1}{\epsilon^2} \ln\left(\frac{1}{\delta}\right)\right)$. For this, we need a better concentration bound, the Chernhoff bounds.
+\end{parag}
+
+\end{document}

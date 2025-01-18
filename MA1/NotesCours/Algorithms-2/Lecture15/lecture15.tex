@@ -1,0 +1,189 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-12 at 14:15:16.
+
+\usepackage{../../style}
+
+\title{Algo-2}
+\author{Joachim Favre}
+\date{Mardi 12 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{15}{2024-11-12}{Steak haché}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of the Chenhoff bounds.
+    \item Application to the polling example.
+    \item Introduction to hashing.
+    \item Definition of 2-universal hash family.
+\end{itemize}
+
+}
+
+\begin{parag}{Theorem: Chernhoff bounds}
+    Let $p_1, \ldots, p_n \in \left[0, 1\right]$, and let $X_1, \ldots, X_n$ be $n$ independent Bernoulli random variables, so that: 
+    \[X_i = \begin{systemofequations} 1, & \text{with probability $p_i$}, \\ 0, & \text{with probability $1 - p_i$} \end{systemofequations}.\]
+
+    Moreover, let $X = \sum_{i=1}^{n} X_i$, and $\mu = \exval\left(X\right) = \sum_{i=1}^{n} p_i$.
+
+    Then, for all $\delta > 0$: 
+    \[\prob\left(X \geq \left(1 + \delta\right) \mu\right) \leq \exp\left(-\frac{\delta^2}{2 + \delta} \mu\right), \mathspace \prob\left(X \leq \left(1 - \delta\right) \mu\right) \leq \exp\left(- \frac{\delta^2 \mu}{2}\right).\]
+
+    The first inequality tells us a probability for the upper tail, whereas the second one tells us something for the lower tail. 
+    
+    \begin{subparag}{Remark}
+        Note that the two inequalities are necessary; for the upper tail, we have a linear dependence on $\delta$, whereas for the lower tail, we have a quadratic one.
+
+        However, if we restrict $\delta \in \left]0, 1\right] $, we can bound both tails at once: 
+        \[\prob\left(\left|X - \mu\right| \geq \delta \mu\right) \leq 2 \exp\left(-\frac{\delta^2 \mu}{3}\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 1}
+        We consider the upper tail first. We notice that, applying Markov's bound, for $a = \left(1 + \delta\right) \mu > 0$ and all $s > 0$: 
+        \[\prob\left(X \geq a\right) = \prob\left(sX \geq sa\right) = \prob\left(e^{sX} \geq e^{sa}\right) \leq \frac{\exval\left(e^{s X}\right)}{e^{sa}}.\]
+
+        However, using the independence of our random variables: 
+        \[\exval\left(e^{sX}\right) = \exval\left(e^{s \sum_{i} X_i}\right) = \exval\left(\prod_{i} e^{s X_i}\right) = \prod_{i} \exval\left(e^{s X_i}\right).\]
+        
+        Now, using the fact that our random variables are Bernoulli, for all $i$ we have, using the fact that $1 + x \leq \exp\left(x\right)$ for all $x \in \mathbb{R}$: 
+        \[\exval\left(e^{s X_i}\right) = p_i e^{s\cdot 1} + \left(1 - p_i\right)e^{s\cdot 0} = 1 + p_i \left(e^s - 1\right) \leq \exp\left(p_i\left(e^s - 1\right)\right).\]
+        
+        This means that, by definition of $\mu$:
+        \[\exval\left(e^{sX}\right) = \prod_{i} \exval\left(e^{s X_i}\right) \leq \exp\left(\sum_{i} p_i \left(e^s - 1\right)\right) = \exp\left(\mu \left(e^s - 1\right)\right).\]
+        
+        We can finally feed it back to Markov's inequality: 
+        \[\prob\left(X \geq a\right) \leq \frac{\exp\left(e^{s X}\right)}{e^{sa}} \leq \frac{\exp\left(\mu\left(e^s - 1\right)\right)}{e^{sa}} \leq \frac{\exp\left(\mu\left(e^s - 1\right)\right)}{e^{s \left(1 + \delta\right) \mu}},\]
+        where we used the fact $a = \left(1 + \delta\right)\mu$, since we are considering the upper tail. We can use calculus tools to notice that this function of $s$ is minimised for $s = \ln\left(1 + \delta\right)$, giving: 
+        \[\prob\left(X \geq a\right) \leq \left(\frac{\exp\left(\delta\right)}{\left(1 + \delta\right)^{\left(1 + \delta\right)}}\right)^{\mu}.\]
+
+        The result then comes from the fact $\frac{2 \delta}{2 + \delta} \leq \ln\left(1 + \delta\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        For the lower tail, it is very similar. For $a = \left(1 - \delta\right)\mu > 0$ and all $s < 0$ (this time, $s$ is negative): 
+        \autoeq{\prob\left(X \leq a\right) = \prob\left(sX \geq sa\right) = \prob\left(e^{s X} \geq e^{sa}\right) \leq \frac{\exp\left(e^{s X}\right)}{e^{sa}} \leq \frac{\exp\left(\mu\left(e^s - 1\right)\right)}{e^{s \left(1 - \delta\right)\mu}}.}
+
+        The result then comes by letting $s = -\ln\left(1 - \delta\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Polling}
+    Let us consider again the following random variable: 
+    \[X_i = \begin{systemofequations} 1, & \text{with probability $p$}, \\ 0, & \text{with probability $1-p$.} \end{systemofequations}\]
+
+    Our goal is still to see how well $\sum_{i} X_i$ is an approximation to $\exval\left(D\right) = p$. Recall that, leaving $\bar{X}_n = \frac{1}{n} \sum_{i=1}^{n} X_i$, Chebyshev's bound gave us that, for $n \geq \frac{1}{4 \epsilon^2 \delta} \in \Omega\left(\frac{1}{\epsilon^2 \delta}\right)$, then: 
+    \[\prob\left(\left|\bar{X}_n - p\right| \geq \epsilon\right) \leq \delta.\]
+
+    We want to see the guarantee the Cherhhoff bounds give us. Taking $X = n\cdot \bar{X}_n = \sum_{i=1}^{n} X_i$ to be a sum of Bernoulli random variables, we have: 
+    \autoeq{\prob\left(\left|\frac{1}{n}X - p\right| \geq \epsilon\right) = \prob\left(\left|X - np\right| \geq n\epsilon\right) = \prob\left(X - np \geq n\epsilon\right) + \prob\left(np - X \geq n\epsilon\right) = \prob\left(X \geq np + \epsilon n\right) + \prob\left(X \leq np - \epsilon n\right) = \prob\left(X \geq \left(1 + \frac{\epsilon}{p}\right)np \right) + \prob\left(X \leq \left(1 - \frac{\epsilon}{p}\right)pn\right) \leq \exp\left(\frac{-\left(\frac{\epsilon}{p}\right)^2 np}{2 + \frac{\epsilon}{p}}\right) + \exp\left(\frac{-\left(\frac{\epsilon}{p}\right)^2 np}{2}\right) \in e^{-\Omega\left(\epsilon^2 n\right)}.}
+
+    Asking for this probability to be less than $\delta$ thus asks for $n \in \Omega\left(\frac{1}{\epsilon^2} \ln\left(\frac{1}{\delta}\right)\right)$. This is a much better bound than Chebyshev for the success probability $\delta$; it allows us to ask for a success probability that is exponentially close to $1$.
+\end{parag}
+
+\begin{parag}{Hoeffding's bound}
+    Let $a, b \in \mathbb{R}$, and let $X_1, \ldots, X_n$ be independent random variables, such that $a < X_i < b$ for all $i$. Moreover, let $X = \sum_{i=1}^{n} X_i$ and $\mu = \exval\left(X\right)$.
+
+    Then, for all $\delta > 0$: 
+    \[\prob\left(X \geq \left(1 + \delta\right) \mu\right) \leq \exp\left(-\frac{2 \delta^2 \mu^2}{n\left(b - a\right)^2}\right), \mathspace \prob\left(X \leq \left(1 - \delta\right) \mu\right) \leq \exp\left(-\frac{\delta^2 \mu^2}{n\left(b-a\right)^2}\right).\]
+    
+    Again, the first inequality bounds the upper tail of the distribution, whereas the second one bounds the upper tail.
+
+    \begin{subparag}{Remark}
+        This result is quite powerful, since it only asks for the random variables to be bounded, without any constraint on their distribution.
+    \end{subparag}
+\end{parag}
+
+\subsection{Hashing}
+
+\begin{parag}{Motivational example}
+    Let's say that we have a huge universe $U$, which can be all $1000 \times 1000$ pictures for instance, and let us consider that we have a dataset $S$ with $\left|S\right|$ data items. 
+
+    We want to make a database, in which we can insert, delete, and query whether it contains an element. An idea to do so it to make an array of $\left|U\right|$ bits, where there is a 1 if it is contained, and 0 otherwise. This is really efficient, but takes a huge amount of memory. 
+
+    With hashing, we can get a data structure with $O\left(\left|S\right|\right)$ space complexity, and expected $O\left(1\right)$ insert, delete and query, called a hash table.
+\end{parag}
+
+\begin{parag}{Data structure: Hash table}
+    Let $U$ be some universe, and $h: U \mapsto \left\{1, \ldots, N\right\}$ be some function (which we call ``hash function'').
+
+    A \important{hash table} is a table $T$ of size $N$ where, for every element $i \in S$, we store $i$ in a linked list at $T\left[h\left(i\right)\right]$.
+
+    \begin{subparag}{Remark 1}
+         For this to work, we need the linked lists to be generally small. Indeed, all insert, delete and query procedures run in time $O\left(L_x\right)$, where $L_x$ is the length of the linked list $T\left[h\left(x\right)\right]$, for $x \in S$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that, if we store the elements of $S$ in the hash table, we want $N \in O\left(\left|S\right|\right)$. We will want to design hash functions that allow to have a small $N$ for efficient space complexity, while preserving a small $L_x$ for efficient time complexity.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        We will consider randomness on hash functions in the rest of this class. Note however that the randomness is chosen when the data structure is instantiated; i.e. the hash function used by this data structure will always be the same throughout its runtime.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example 1}
+    A way to construct a hash function $h$ is: 
+    \[\begin{split}
+    h: U &\longmapsto \left\{1, 2, \ldots, N\right\} \\
+    x &\longmapsto x \Mod N.
+    \end{split}\]
+    
+    This is a bad hash function when all the elements of our dataset $S$ have the same residue modulo $N$. A way to fix this is to consider families of hash function $\mathcal{H}$ that are good on average, from which we take a hash function uniformly at random.
+\end{parag}
+
+\begin{parag}{Example 2: Uniform hashing}
+    We can consider the following hash family: 
+    \[\mathcal{H} = \left\{\text{all functions $U \mapsto \left\{1, \ldots, N\right\}$}\right\}.\]
+
+    Note that $\mathcal{H}$ is huge $\left|\mathcal{H}\right| = N^{\left|U\right|}$. We can sample a hash function uniformly at random from this set by taking an element from $\left\{1, \ldots, N\right\}$ uniformly at random for each $U$. Note that this is not really implementable efficiently, it takes size $\log_2\left(\left|\mathcal{H}\right|\right) = \left|U\right|\log_2\left(N\right)$ (we can't even do this lazily: fixing only the values of the function we have already seen require us to know if we have already seen the value using some data structure, and thus this is a chicken-and-egg problem), but this is more or less the best hash family we can do and will thus serve as a comparison point for the following hash functions.
+\end{parag}
+
+\begin{parag}{Definition: 2-universal hash family}
+    Let $\mathcal{H}$ be a family of hash functions $h: U \mapsto \left\{1, \ldots, N\right\}$.
+
+    We say $\mathcal{H}$ is a \important{2-universal hash family} if, for all $x, y \in U$ where $x \neq y$: 
+    \[\prob_{h \followsdistr \mathcal{H}}\left(h\left(x\right) = h\left(y\right)\right) \leq \frac{1}{N}.\]
+
+    \begin{subparag}{Remark}
+        The uniform hashing family is 2-universal, it is such that $\prob_{h \followsdistr \mathcal{H}}\left(h\left(x\right) = h\left(y\right)\right) = \frac{1}{N}$ for $x \neq y$.
+
+        Our goal will however be to construct a 2-universal $\mathcal{H}$ with $O\left(\log\left(\left|U\right|\right)\right)$ elements.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $\mathcal{H}$ be a 2-universal hash family. Also, let $S \subseteq U$ be an arbitrary set, and $x \in S$ be arbitrary. We consider $L_x$ to be the random variable representing the length of the linked list $T\left[h\left(x\right)\right]$ (its randomness comes from the choice of $h \in \mathcal{H}$, chosen at the start of the program, but fixed throughout the execution).
+
+    Then: 
+    \[\exval\left(L_x\right) \leq 1 + \frac{\left|S\right| - 1}{N}.\]
+
+    \begin{subparag}{Remark}
+        We notice that if $N \geq \left|S\right|$, we get $O\left(1\right)$ expected runtime.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Let us consider the following indicator variable:
+        \[I_y = \begin{systemofequations} 1, & \text{if $h\left(y\right) = h\left(x\right)$}, \\ 0, & \text{otherwise,} \end{systemofequations} \mathspace \forall y \in U.\]
+
+        We notice that: 
+        \[L_x = \sum_{y \in S} I_y.\]
+
+        But then, by linearity of expectations: 
+        \autoeq{\exval\left(L_x\right) = \exval\left(\sum_{y \in S} I_y\right) = \sum_{y \in S} \exval\left(I_y\right) = \sum_{y \in S} \prob\left(I_y = 1\right) = 1 + \sum_{\substack{y \in S \\ y \neq x}} \prob\left(h\left(x\right) = h\left(y\right)\right).}
+
+        We can now use the fact that $\mathcal{H}$ is a 2-universal hash family, to get that: 
+        \[\exval\left(L_x\right) \leq 1 + \sum_{\substack{y \in S \\ y \neq x}} \frac{1}{N} = 1 + \frac{\left|S\right| - 1}{N}\]
+        
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+
+\end{document}

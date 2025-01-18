@@ -1,0 +1,152 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-08 at 13:16:41.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Mardi 08 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2024-10-08}{I love voting systems}{
+\begin{itemize}[left=0pt]
+    \item Proof of a lower bound on the set cover linear program.
+    \item Explanation of the prediction with expert advice problem.
+    \item Explanation and proof of the weighted majority algorithm.
+\end{itemize}
+
+}
+
+\begin{parag}{Observation}
+    We basically found that the integrality gap is upper bounded by $O\left(\ln\left(n\right)\right)$. If we are more careful, the best known upper bound and approximation is $H_n = \frac{1}{1} + \frac{1}{2} + \ldots + \frac{1}{n} \approx \ln\left(n\right)$. We will thus now want to find a lower bound on it.
+
+    Note that it is NP-hard to approximate set cover within $\left(1 - \epsilon\right)\ln\left(n\right)$ for any $\epsilon > 0$.
+\end{parag}
+
+\begin{parag}{Proposition}
+    The integrality gap of the set cover linear program is at least $\Omega\left(\ln\left(n\right)\right)$.
+
+    \begin{subparag}{Proof}
+        We want to lower bound the integrality gap, i.e. make some instance that makes relaxing the integrality expensive. Let $d$ be a big even number. We define the universe to be bitstrings with the same number of ones and zeroes: 
+        \[U = \left\{x \in \left\{0, 1\right\}^d \suchthat \sum_{i=1}^{d} x_i = \frac{d}{2}\right\}.\]
+
+        Note that $n = \left|U\right| = \binom{d}{\frac{d}{2}} \leq 2^d$, so $d \geq \log_2\left(n\right)$. Moreover, we consider the dictator function: 
+        \[\tau = \left\{S_1, \ldots, S_d\right\}, \mathspace S_i = \left\{x \in U \suchthat x_i = 1\right\}.\]
+
+        For instance, when $d = 4$: 
+        \[U = \left\{0011, 0101, 1001, 0110, 1010, 1100\right\}, \mathspace S_1 = \left\{1001, 1010, 1100\right\}.\]
+
+        We finally define all sets to have the same cost, $c\left(S_i\right) = 1$ for all $i \in \left\{1, \ldots, d\right\}$.
+
+        Notice that any element $S_k \in \tau$ covers $\frac{d}{2}$ sets. We notice that the relaxed LP can be solved with a very small cost, assigning a weight of $z_i = \frac{2}{d}$ to all sets, $i \in \left\{1, \ldots, d\right\}$. This does respect the property that, for all $x \in U$, $\sum_{i | x \in S_i} z_i \geq 1$. This moreover reaches a value of:
+        \[OPT_{LP} \leq \sum_{i=1}^{d} z_i = \sum_{i=1}^{d} \frac{2}{d} = 2.\]
+
+        We now want to show that any OPT solution is expensive, by showing that any set cover contains at least $\frac{d}{2}$ sets, and hence that $OPT \geq \frac{d}{2}$.
+
+        Suppose towards contradiction that there is a set cover that contains $\frac{d}{2}$ sets (or less), suppose that we took sets $i_1, \ldots, i_{\frac{d}{2}}$. Now, consider $x$ which is 0 at those indices $i_1, \ldots, i_{\frac{d}{2}}$, but 1 everywhere else. It has the same number of zeroes and ones, so $x \in U$. However, it is not covered by any of those sets, contradicting the fact that we had a set cover. 
+
+        So, the integrality gap is at least: 
+        \[\frac{OPT}{OPT_{LP}} \geq \frac{\frac{d}{2}}{2} = \frac{d}{4} \geq \frac{\log_2\left(n\right)}{4} \in \Omega\left(\ln\left(n\right)\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Multiplicative weights algorithm}
+\subsection{Weighted majority algorithm}
+
+
+\begin{parag}{Prediction with expert advice problem}
+    Let us say that we have $N$ experts that give a weather prediction---either sunny or rainy---for the next $T$ days. Ever day, we have to listen to the $n$ experts, and make a prediction. Then, there is a real outcome, chosen by nature, that can depend on our prediction. 
+
+    Note that we may always be wrong, since the real outcome could always just flip our prediction. Our goal is to do at least as well as all experts, i.e. we want no more error than the best expert. This is call the \important{regret}.
+\end{parag}
+
+\begin{parag}{Warmup: Perfect expert}
+    Let's suppose that the best expert is always correct. 
+
+    We consider the following strategy. The first round, we do a majority vote amongst all experts. We then get rid of all experts that made a mistake, and make a majority vote with the remaining experts for the second round. We continue that way until the end.
+
+    Then, our number of mistakes is at most $\left\lceil \log_2\left(N\right) \right\rceil $.
+
+    \begin{subparag}{Proof}
+        Every time we are wrong, at least half of the remaining experts are wrong and we therefore get rid of at least half of the experts. We can however half the number of experts only at most $\left\lceil \log_2\left(N\right) \right\rceil $ times.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Weighted majority algorithm}
+    We initialise $w_i^{\left(1\right)} = 1$. Then, for all $t \in \left\{1, \ldots, T\right\}$:
+    \begin{enumerate}
+        \item Each expert advises Yes or No.
+        \item We predict Yes or No based on a weighted majority using $w^{\left(t\right)}$. In other words, we compare the sum of weights of the experts who said Yes to the sum of weights of the experts who said No, and output the answer with biggest sum of weights.
+        \item Nature decides the outcome Yes or No, potentially adversarially. 
+        \item We update the weights by: 
+        \[w_i^{\left(t+1\right)} = \begin{systemofequations} w_i^{\left(t\right)}, & \text{if $i$ is correct},\\ \frac{w_i^{\left(t\right)}}{2}, & \text{if $i$ is incorrect.} \end{systemofequations}\]
+    \end{enumerate}
+
+    \begin{subparag}{Remark}
+        Note that, if we consider the following weight update rule instead, we get the previous algorithm: 
+        \[w_i^{\left(t+1\right)} = \begin{systemofequations} w_i^{\left(t\right)}, & \text{if $i$ is correct},\\ 0, & \text{if $i$ is incorrect.} \end{systemofequations}\]
+
+        The two algorithms are thus very close.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $M_{WM}$ be the number of mistakes made by the weighted majority strategy, and $M_i$ be the number of mistakes made by expert $i$. 
+
+    Then, for all $i \in \left\{1, \ldots, N\right\}$: 
+    \[M_{WM} \leq 2.41 \left(M_i + \log_2\left(N\right)\right).\]
+
+    \begin{subparag}{Intuition}
+        This means that, for any expert that makes $M_i \in \omega\left(\log_2\left(N\right)\right)$ mistakes, then we will make at most $\sim 2.41$ times their number of mistakes. We can however never be sure that we will make less than $O\left(\ln\left(N\right)\right)$ mistakes.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We consider the following value, which we call a ``potential function'':
+        \[\Phi^{\left(t\right)} = \sum_{i=1}^{N} w_i^{\left(t\right)}.\]
+
+        We notice that $\Phi^{\left(1\right)} = N$. 
+
+        Our goal is to lower bound $\Phi^{\left(T+1\right)}$ based on $M_i$, and upper bound in terms of $M_{WM}$. For the lower bound, we directly get that, for any $i$:
+        \[\Phi^{\left(T+1\right)} = \sum_{j=1}^{N} w_j^{\left(N+1\right)} \geq w_i^{\left(T+1\right)} = \left(\frac{1}{2}\right)^{M_i}.\]
+
+    For the upper bound, let us consider a time $t$ where the weighted majority made a mistake. We compare $\Phi^{\left(t+1\right)}$ to $\Phi^{\left(t\right)}$. Intuitively, at least half of the weight gets halfed, so $\Phi^{\left(t+1\right)} \leq \frac{1}{2}\Phi^{\left(t\right)} + \frac{1}{2} \frac{\Phi^{\left(t\right)}}{2} = \frac{\Phi^{\left(t\right)}}{4}$. More formally, using the fact that we half the weight of all experts that made a mistake: 
+        \autoeq{\Phi^{\left(t+1\right)} = \sum_{i \text{ was correct}} w_i^{\left(t+1\right)} + \sum_{i \text{ was incorrect}} w_i^{\left(t+1\right)} = \sum_{i \text{ was correct}} w_i^{\left(t\right)} + \frac{1}{2} \sum_{i \text{ was incorrect}} w_i^{\left(t\right)} = \frac{1}{2} \sum_{i \text{ was correct}} w_i^{\left(t\right)} + \frac{1}{2} \sum_{i \text{ was correct}} w_i^{\left(t\right)} + \frac{1}{2} \sum_{i \text{ was incorrect}} w_i^{\left(t\right)} = \frac{1}{2} \sum_{i \text{ was correct}} w_i^{\left(t\right)} + \frac{1}{2} \Phi^{\left(t\right)} \leq \frac{\Phi^{\left(t\right)}}{2} + \frac{1}{2} \frac{\Phi^{\left(t\right)}}{2} = \frac{3}{4} \Phi^{\left(t\right)},}
+        where, for our inequality, we used the fact that the weight of the correct experts was less than the weight of the incorrect experts, i.e. that the weight of the correct experts represented at most half of the total weight.
+
+        Since, when we do not make a mistake, we have the general bound $\Phi^{\left(t+1\right)} \leq \Phi^{\left(t\right)}$, this means that we can make bound $\Phi^{\left(T+1\right)}$ based on our number of mistakes:
+        \[\Phi^{\left(T+1\right)} \leq \left(\frac{3}{4}\right)^{M_{WM}} \Phi\left(1\right) = \left(\frac{3}{4}\right)^{M_{WM}} \cdot N.\]
+        
+        We have therefore shown that, for any $i$: 
+        \autoeq{\left(\frac{1}{2}\right)^{M_i} \leq \Phi^{\left(T+1\right)} \leq \left(\frac{3}{4}\right)^{M_{WM}}\cdot N \iff \log_2\left(\left(\frac{1}{2}\right)^{M_i}\right) \leq \log_2\left(\left(\frac{3}{4}\right)^{M_{WM}}\cdot N\right) \iff -M_i \leq \left(\log_2\left(3\right) - 2\right) M_{WM} + \log_2\left(N\right) \iff M_{WM} \leq \frac{1}{2 - \log_2\left(3\right)} \left(M_i + \log_2\left(N\right)\right) \leq 2.41 \left(M_i + \log_2\left(N\right)\right).}
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Proving this type of results will typically follow the same pattern: we find a lower bound on the potential function $\Phi^{\left(T+1\right)}$ using the number of mistakes of expert $i$, and find an upper bound on it using our number of mistakes.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $\epsilon \in \left]0, 1\right] $ be arbitrary. We consider the following, more general, weight update:
+    \[w_i^{\left(t+1\right)} = \begin{systemofequations} w_i^{\left(t\right)}, & \text{if $i$ is correct},\\ \left(1- \epsilon\right) w_i^{\left(t\right)}, & \text{if $i$ is incorrect.} \end{systemofequations}\]
+
+    Then, we have:
+    \[M_{WM} \leq 2\left(1+\epsilon\right) M_i + O\left(\frac{\log\left(N\right)}{\epsilon}\right).\]
+    
+    \begin{subparag}{Remark}
+        It turns out that the factor $2$ is unavoidable. However, if we allow distributions over decisions (i.e. output a value between $-1$ and $1$, instead of just ``Yes'' or ``No''), we can do better, as we study now. 
+    \end{subparag}
+\end{parag}
+
+\end{document}

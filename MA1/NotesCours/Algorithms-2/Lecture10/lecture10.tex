@@ -1,0 +1,182 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-28 at 13:17:15.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Lundi 28 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2024-10-28}{Starting to do botany}{
+\begin{itemize}[left=0pt]
+    \item Explanation of a new game, where experts can suffer a continuous cost.
+    \item Explanation and proof of the Hedge algorithm.
+    \item Beginning of the application of the Hedge algorithm to solving linear programs.
+\end{itemize}
+
+}
+
+\subsection{Hedge strategy}
+
+\begin{parag}{Change of game}
+    We consider another game. For each $t \in \left\{1, \ldots, T\right\}$:
+    \begin{enumerate}
+        \item Each expert $i \in \left\{1, \ldots, N\right\}$ gives some advice.
+        \item We pick a probability distribution $\bvec{p}^{\left(t\right)} = \left(p_1^{\left(t\right)}, \ldots, p_N^{\left(t\right)}\right)$ where $p_i^{\left(t\right)}$ is the probability that we play expert $i$.
+        \item Based on the advice and this probability distribution, an adversary decides a cost vector $\bvec{m}^{\left(t\right)} = \left(m_1^{\left(t\right)}, \ldots, m_N^{\left(t\right)}\right) \in \left[-1, 1\right]^{N}$.
+        \item We observe the cost vector $\bvec{m}^{\left(t\right)}$ and suffer a cost: 
+        \[\exval\left(\text{cost}\right) = \sum_{i=1}^{N} p_i^{\left(t\right)} \cdot m_i^{\left(t\right)} = \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)}.\]
+    \end{enumerate}
+
+    Our ultimate goal is to find a strategy such that we have no more loss than any expert $i$: 
+    \[\sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)} \leq \sum_{t=1}^{T} m_i^{\left(t\right)}.\]
+
+    \begin{subparag}{Remark}
+        We will see strategies that reach a similar asymptotic result: Hedge and MWU (multiplicative weight update) achieve:
+        \[\sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)} \leq \sum_{t=1}^{T} m_i^{\left(t\right)} + \frac{\ln\left(N\right)}{\epsilon} + \epsilon T,\]
+        where the optimal $\epsilon$ is $\epsilon = \frac{1}{\sqrt{T}}$.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        The idea is that we generalised our previous game, where now each expert can be penalised by a continuous value (they are no longer just right or wrong), and we can choose to follow a distribution of experts (like if we were investing and we invested in different stocks).
+
+        Note that the concept of ``advice'' is very abstract here. We in fact do not care what each expert says, all we try to do is to suffer a cost similar to the best-performing expert.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Hedge algorithm}
+    We start by assigning $w_i^{\left(1\right)} = 1$ for all $i \in \left\{1, \ldots, N\right\}$. Then, at day $t$, we play accoding to the probability distribution $p_i^{\left(t\right)} = w_i^{\left(t\right)} / \Phi_i^{\left(t\right)}$ where the potential function $\Phi^{\left(t\right)} = \sum_{i = 1}^{N} w_i^{\left(t\right)}$ is just a normalisation term. After we observe the result, we update our weights by: 
+    \[w_i^{\left(t+1\right)} = e^{- \epsilon m_i^{\left(t\right)}} w_i^{\left(t\right)},\]
+    where $\epsilon \ll 1$ is a learning rate. 
+
+    \begin{subparag}{Intuition}
+        Since $\epsilon \ll 1$ is tiny, 
+        \[e^{- \epsilon m_i^{\left(t\right)}} \approx 1 - \epsilon m_i^{\left(t\right)},\]
+        by Taylor expansion.
+
+        If we have a negative cost $m_i^{\left(t\right)} < 0$ we get a multiplicative weight increase (we give more weight to the expert that gave a correct prediction). If we have a positive cost, we have a multiplicative weight decrease.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Using $w_i^{\left(t\right)} = 1 - \epsilon m_i^{\left(t\right)}$ as a weight update is also possible, giving the \important{multiplicative weight update} (MWU) algorithm. They are very similar (especially when $\epsilon$ is very small), but the reasoning of the Hedge algorithm is easier to analyse.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    The Hedge algorithm outputs a result so that, for any $i \in \left\{1, \ldots, N\right\}$: 
+    \[\sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)} \leq \sum_{t=1}^{T} m_i^{\left(t\right)} + \epsilon T + \frac{\ln\left(N\right)}{\epsilon}.\]
+    
+    \begin{subparag}{Remark}
+        This shows that the Hedge algorithm is better than the weighted majority: we will suffer on average the same cost as the best performing expert (as long as it suffers at least a logarithmic cost) with the Hedge algorithm, whereas with the weighted majority algorithm there was a factor $2$. In other words, if we have the choice to reduce a problem to the weighted majority problem or to the Hedge problem, then the latter is better.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        As usual for this type of proofs, we find a lower bond and an upper bound of the potential function.
+
+        As usual as well, the lower bound is given by the performance of the $i$\Th expert:
+        \autoeq{\Phi^{\left(T+1\right)} = \sum_{j =1}^{N} w_j^{\left(T+1\right)} \geq w_i^{\left(T+1\right)} = 1\cdot \exp\left(-\epsilon m_i^{\left(1\right)}\right)\cdots \exp\left(-\epsilon m_i^{\left(T\right)}\right) = \exp\left(-\epsilon \sum_{t=1}^{t} m_i^{\left(T\right)}\right).}
+
+        And then, we find an upper bound based on our performance, by finding a $\lambda\left(t\right) < 1$ such that $\Phi^{\left(t+1\right)} \leq \lambda\left(t\right) \Phi^{\left(t\right)}$: 
+        \autoeq{\Phi^{\left(t+1\right)} = \sum_{j=1}^{N} w_j^{\left(t+1\right)} = \sum_{j=1}^{N} w_j^{\left(t\right)} \cdot e^{-\epsilon m_j^{\left(t\right)}} \leq \sum_{j = 1}^{N} w_j^{\left(t\right)} \left[1 - \epsilon m_j^{\left(t\right)} + \left(-\epsilon m_j^{\left(t\right)}\right)^2\right],}
+       since $e^x \leq 1 + x + x^2$ for all $x \in \left[-1, 1\right]$. Now, since $m_j^{\left(t\right)} \in \left[-1, 1\right]$, we know $\left(m_j^{\left(t\right)}\right)^2 \leq 1$ and thus: 
+       \autoeq{\Phi^{\left(t+1\right)} \leq \sum_{j=1}^{N} w_j^{\left(t\right)} \left[1 - \epsilon m_j^{\left(t\right)} + \epsilon^2 \cdot 1\right] = \left(1 + \epsilon^2\right) \sum_{j=1}^{N} w_j^{\left(t\right)} - \epsilon \sum_{j=1}^{N} w_j^{\left(t\right)} m_j^{\left(t\right)} = \left(1 + \epsilon^2\right) \Phi^{\left(t\right)} - \epsilon \Phi^{\left(t\right)} \sum_{j=1}^{N} p_j^{\left(t\right)} m_j^{\left(t\right)},}
+        since $\Phi^{\left(t\right)} = \sum_{j} w_j^{\left(t\right)}$ and $p_j^{\left(t\right)} = \frac{w_j^{\left(t\right)}}{\Phi^{\left(t\right)}}$.
+
+        We recognise a dot product, giving: 
+        \autoeq{\Phi^{\left(t+1\right)} \leq \left(1 + \epsilon^2 - \epsilon \bvec{p}^{\left(t\right)}\dotprod \bvec{m}^{\left(t\right)}\right) \Phi^{\left(t\right)} \leq \exp\left(\epsilon^2 - \epsilon\bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)}\right) \Phi^{\left(t\right)},}
+        since $e^{x} \geq 1 + x$ for all $x \in \mathbb{R}$.
+        
+        Using this inequality, this yields that: 
+        \autoeq{\Phi^{\left(T+1\right)} \leq \exp\left(\epsilon^2 - \epsilon \bvec{p}^{\left(T\right)} \dotprod \bvec{m}^{\left(T\right)}\right) \Phi^{\left(T\right)} \leq \exp\left(\epsilon^2 - \epsilon \bvec{p}^{\left(T\right)} \dotprod \bvec{m}^{\left(T\right)}\right) \exp\left(\epsilon^2 - \epsilon \bvec{p}^{\left(T-1\right)} \bvec{m}^{\left(T-1\right)}\right) \Phi^{\left(T-1\right)} \leq \ldots \leq \exp\left(\epsilon^2 T - \epsilon \sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)}\right)\cdot \Phi^{\left(0\right)} = \exp\left(\epsilon^2 T - \epsilon \sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)}\right)\cdot N.}
+        
+        To sum up, so far we found: 
+        \[\exp\left(-\epsilon \sum_{t=1}^{T} m_i^{\left(t\right)}\right) \leq \Phi^{\left(T+1\right)} \leq \exp\left(\epsilon^2 T - \epsilon \sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)}\right)\cdot N.\]
+
+        Taking a natural logarithm on both sides: 
+        \[-\epsilon \sum_{t=1}^{T} m_i^{\left(t\right)} \leq \epsilon^2 - \epsilon \sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)} + \ln\left(N\right).\]
+
+        Dividing by $\epsilon$ and rearranging we get our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $\epsilon \leq 1$. We allow cost vectors $\bvec{m}^{\left(t\right)} \in \left[-\rho, \rho\right]^N$ for some $\rho \in\mathbb{R}$.
+
+    If $T \geq 4 \rho^2 \ln\left(N\right)/\epsilon^2$, then our average cost is almost as bad as any expert average cost: 
+    \[\frac{1}{T} \sum_{t=1}^{T} \bvec{p}^{\left(t\right)} \dotprod \bvec{m}^{\left(t\right)} \leq \frac{1}{T} \sum_{t=1}^{T} m_i^{\left(t\right)} + 2 \epsilon.\]
+
+    \begin{subparag}{Remark}
+        This shows that our result still applies to the more general case where we are able to bound the cost with a constant $\rho$.
+    \end{subparag}
+\end{parag}
+
+\subsection{Application to linear programs}
+
+\begin{parag}{Motivating example}
+    Let us consider an arbitrary linear program:
+    \begin{linearprogram}{Minimise}{$x_1 + 2x_2$}
+        $x_1 + 3 x_2 \geq 2$ \\
+        & $2 x_1 + x_2 \leq 1$\\
+        & $x_1, x_2 \in \left[0, 1\right]$.
+    \end{linearprogram}
+
+    We collapse it into a different linear program by simply averaging the two constraints:
+    \begin{linearprogram}{Minimise}{$x_1 + 2x_2$}
+        $\frac{3}{2} x_1 + 2x_2 \leq \frac{3}{2}$\\
+        & $x_1, x_2 \in \left[0, 1\right]$.
+    \end{linearprogram}
+
+    This problem can be solved using a greedy algorithm, by considering the ``cost'' of each variable, i.e. the ratio between its coefficient in the objective function and the coefficient in the constraint. $x_1$ has cost $1/\frac{3}{2} = 2/3$ whereas $x_2$ has cost $2/2 = 1$. Since $x_1$ has lower cost, we put all our coefficients in it, i.e. $\left(x_1, x_2\right) = \left(1, 0\right)$.
+
+    The issue with this approach is that we are not at all guaranteed to fulfil both inequalities of the original linear program. In our case, the first inequality is not met, while the second one is. We notice that the fact we averaged the two inequalities was completely arbitrary, we may use a weighted average. The idea is thus to find correct weights using Hedge, leading to the following algorithm.
+\end{parag}
+
+\begin{parag}{Lemma}
+    The optimal solution to a collapsed linear program has cost at most the cost of an optimal solution to the original linear program.
+
+    \begin{subparag}{Proof}
+        Indeed, any solution to the original linear program is also a solution to the collapsed one.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Cover linear program}
+    A \important{cover linear program} is a linear programs such that $A \in \mathbb{R}_+^{m \times n}, b \in \mathbb{R}_+^m, c \in \mathbb{R}_+^n$ (notice all coefficients are positive) and $0 \leq x_j \leq 1$: 
+    \begin{linearprogram}{Minimise}{$\sum_{j=1}^{n} c_j x_j$}
+        $Ax \geq b$, \\
+        & $0 \leq x_j \leq 1$, & $\forall j$.
+    \end{linearprogram}
+\end{parag}
+
+
+\begin{parag}{Linear program algorithm}
+    We make an algorithm that aims to solve cover linear programs.
+
+    We run the Hedge algorithm for some $T$ and $\epsilon$, where we play the role of the adversary. We have one expert per constraint, $N = m$. At each iteration $t \in \left\{1, \ldots, T\right\}$:
+    \begin{enumerate}
+        \item Hedge plays some $p^{\left(t\right)}$ by definition.
+        \item As the adversary, we can decide the cost function, based on $p\left(t\right)$. To do so, we solve the following collapsed single-constraint linear program, using a greedy algorithm:
+        \begin{linearprogram}{Minimise}{$\sum_{j=1}^{n} c_j x_j$}
+            $\left(\sum_{i} A_i p_i^{\left(t\right)}\right) \dotprod x \geq \sum_{i} b_i p_i^{\left(t\right)}$, \\
+            & $0 \leq x_i \leq 1$.
+        \end{linearprogram}
+        Let $x^{\left(t\right)}$ be an optimal solution. Note that the cost of $x^{\left(t\right)}$ is at most the cost of an optimal solution to the original linear program by our lemma; although some constraints may not be reached. We want Hedge to put a higher coefficient to constraints that are not met, so we set the weights to be: 
+        \[m_i^{\left(t\right)} = A_i x^{\left(t\right)} - b_i.\] 
+        \item Hedge updates its weights, based on the cost vector.
+    \end{enumerate}
+
+    The weights $m_i^{\left(t\right)}$ may oscillate, and not converge to anything. So, we output the average of all the results: 
+    \[x^* = \frac{1}{T} \sum_{t=1}^{T} x^{\left(t\right)}.\]
+\end{parag}
+
+\end{document}

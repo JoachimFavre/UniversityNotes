@@ -1,0 +1,129 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-04 at 13:11:34.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Lundi 04 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2024-11-04}{Matrix identity testing}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of the Karger-Stein algorithm for min-cuts.
+    \item Explanation and proof of an algorithm for matrix identity testing.
+\end{itemize}
+
+}
+
+\begin{parag}{Karger-Stein algorithm for min-cuts}
+    Let $G = \left(V, E \right)$ be a connected graph. Karger-Stein algorithm for min-cuts goes as follows, with $n = \left|V\right|$.
+    \begin{enumerate}
+        \item If $n = 2$, return the unique cut.
+        \item For $i = 1, 2, \ldots, n - \frac{n}{\sqrt{2}}$, choose a random edge and contract it.
+        \item Let $G'$ be the contracted graph. Note that $\left|V'\right| = \left|V\right| - (n - \frac{n}{\sqrt{2}}) = \frac{n}{\sqrt{2}}$.
+        \item Run this algorithm recursively on $G'$ twice, and return the best cut of the two.
+    \end{enumerate}
+
+    The running time is $\Theta\left(n^2 \ln\left(n\right)\right)$, which is much better than the $O\left(n^4 \ln\left(n\right)\right)$ found before. Moreover, it finds a min-cut with probability at least $\frac{1}{2 \ln\left(n\right)}$.
+
+    \begin{subparag}{Running time}
+        Let $T\left(n\right)$ be the running time on a $n$-vertex graph. We have, by the recursion property: 
+        \[T\left(n\right) = 2T\left(\frac{n}{\sqrt{2}}\right) + \Theta\left(n^2\right).\]
+        
+        We use the master theorem seen in Algorithms 1, noticing that $\log_{\sqrt{2}}\left(2\right) = 2$:
+        \[T\left(n\right) = \Theta\left(n^2 \ln\left(n\right)\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Probability}
+        We prove the success probability by using induction.
+
+        The initial step is easy: for $n = 2$, we succeed with probability $1$.
+
+        Let us now consider the inductive step. Let $G$ be an arbitrary $n$-vertex with a min-cut $\left(S^*, \smash{\bar{S}}^*\right)$ of $k$ edges.
+
+        Like we analysed before, an edge has probability at most $\frac{2}{\left|V'\right|}$ to cross the cut, where $V'$ is the graph at the current iteration step. In other words, the first edge we take has probability at most $\frac{2}{n}$ to cross the cut, the second one has probability at most $\frac{2}{n - 1}$ to cross the cut, and so on. So, the probability of not failure at any iteration is: 
+        \autoeq{p \geq \left(1 - \frac{2}{n}\right)\left(1 - \frac{2}{n-1}\right) \cdots \left(1 - \frac{2}{\frac{n}{\sqrt{2}}}\right) = \frac{n-2}{n} \cdot \frac{n-3}{n-1} \cdot \frac{n-4}{n-2} \cdots \frac{\frac{n}{\sqrt{2}} - 1}{\frac{n}{\sqrt{2}} + 1}\frac{\frac{n}{\sqrt{2}} - 2}{\frac{n}{\sqrt{2}}} = \frac{\left(\frac{n}{\sqrt{2}} - 1\right)\left(\frac{n}{\sqrt{2}} - 2\right)}{n\left(n - 1\right)} \geq \frac{\frac{n}{\sqrt{2}} \cdot \frac{n}{\sqrt{2}}}{n\cdot n} = \frac{1}{2},}
+        since this is a telescoping product.
+
+        We consider the event where $G'$ is good, i.e. that $G'$ contains a min-cut of the same size as $G$. This thus appears with probability at least $\frac{1}{2}$. Moreover, using our inductive hypothesis that that the algorithm finds a min-cut with probability at least $p = \left[2 \ln\left(n / \sqrt{2}\right)\right]^{-1}$ on a valid graph of size $n / \sqrt{2}$: 
+        \autoeq[s]{\prob\left(\text{One of the two recursive calls on $G'$ succeeds} \suchthat \text{$G'$ is good}\right) \geq 1 - \left(1 - p\right)^2 = 2p - p^2.}
+        
+        Hence, combining all our results: 
+        \autoeq[s]{\prob\left(\text{Algorithm succeeds on $G$}\right) = \prob\left(\text{$G'$ is good}\right)\fakeequal \cdot\prob\left(\text{One of the two recursive calls on $G'$ succeeds} \suchthat \text{$G'$ is good}\right) \geq \frac{1}{2} \left(2p - p^2\right) \geq \frac{1}{2\ln\left(n\right)},}
+        where the last inequality can be done using regular analysis tools. This finishes our proof by induction.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        We can repeat Karger-Stein's algorithm logarithmically many times to get a polynomial success probability, just like the analysis we did for Karger's algorithm.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Open question}
+    The minimum spanning tree problem can be solved in time $\Theta\left(\left|E\right| \ln\left(\left|E\right|\right)\right)$ using Kruskal's or Prim's algorith. With randomisation, there exists an algorithm that runs in time $\Theta\left(\left|E\right|\right)$. 
+
+    It is an open question whether there exists a deterministic solution running in $\Theta\left(\left|E\right|\right)$.
+\end{parag}
+
+\subsection{Matrix identity testing}
+
+\begin{parag}{Observation}
+    Let's say that we have some function $f\left(x\right)$, and some input $x$. Moreover, let's say that we have some oracle that pretends being able to compute $f\left(x\right)$, although we do not trust it. 
+
+    It might be more efficient to try and verify that $f\left(x\right)$ is the correct answer with a randomised algorithm, than trying to compute $f\left(x\right)$ ourselves. This leads to a very general problem, called polynomial identity testing, although we first consider a simpler case.
+\end{parag}
+
+\begin{parag}{Matrix identity testing problem}
+    Let's say that we have two matrices $A, B \in \mathbb{R}^{n \times n}$, and a third matrix $C \in \mathbb{R}^{n \times n}$.
+
+    The goal of the \important{matrix identity testing} problem is to know with high probability if $A\cdot B = C$.
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $S \subseteq \mathbb{R}$ be a finite set of numbers (such as all finite numbers that can be stored in a 32-bit signed integer), and consider a vector $x \in S^{n}$ uniformly at random.
+
+    If $C \neq AB$:
+    \[\prob\left(Cx \neq ABx\right) \geq 1 - \frac{1}{\left|S\right|}.\]
+
+    Moreover, computing $ABx = A\left(Bx\right)$ takes $\Theta\left(n\right)$ time: multiplying a matrix by a vector takes linear time.
+
+    \begin{subparag}{Implication}
+        It thus suffices to try a random vector $x \in S^n$, and look whether $Cx \over{=}{?}  ABx$, to be able to know with high probability if $C = AB$, in $\Theta\left(n\right)$ time. This is much better than the $\Theta\left(n^2\right)$ algorithm that computes the matrix product $A\cdot B$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $\left(a_i\right)$ be the rows of $AB$ and $\left(c_i\right)$ be the rows of $C$: 
+        \[AB = \begin{pmatrix}  &  & a_1 &  &  \\  &  & \vdots &  &  \\  &  & a_n &  &  \end{pmatrix}, \mathspace C = \begin{pmatrix}  &  & c_1 &  &  \\  &  & \vdots &  &  \\  &  & c_n &  &  \end{pmatrix}.\]
+
+        We notice that, for all $k$: 
+        \[\left(ABx\right)_k = a_k \dotprod x, \mathspace \left(C x\right)_k = c_k \dotprod x.\]
+
+        By hypothesis, $AB \neq C$. Therefore, there exists some $i$ such that $a_i \neq c_i$. This also means that there is a $j$ such that $a_{ij} \neq c_{ij}$. We can see the following chain of equivalences:
+        \autoeq{\left(ABx\right)_i = \left(Cx\right)_i \iff a_{i} \dotprod x = c_i \dotprod x \iff \sum_{k} a_{ik} x_k = \sum_{k} c_{ik} x_k \iff \left(a_{ij} - c_{ij}\right)x_j = \sum_{k\neq j} \left(c_{ik} - a_{ik}\right) x_k.}
+         
+        We can translate this result to probabilities:
+        \autoeq{p = \prob\left(AB x = Cx\right) \leq \prob\left(a_i x = c_i x\right) = \prob\left(\left(a_{ij} - c_{ij}\right)x_j = \sum_{k \neq j} \left(c_{ik} - a_{ik}\right)x_k\right).}
+
+        We exploit the principle of deferred decision, i.e. we only reveal the randomness of the relevant variables, $x_k$ with $k \neq j$. More formally, using the law of total probability:
+        \autoeq{p \leq \prob_{x_1, \ldots, x_n}\left(\left(a_ij - c_{ij}\right)x_j = \sum_{k \neq j}  \left(c_{ij} - a_{ik}\right)x_k\right) = \sum_{k\neq j} \sum_{x_k^* \in S} \prob\left(x_k = x_k^*\right) \fakeequal \cdot \prob_{x_j} \left(\left(a_{ij} - c_{ij}\right)x_j = \sum_{k\neq j} \left(c_{ik} - a_{ik}\right) x_k \suchthat x_k = x_k^*, \forall k \neq j\right).}
+
+        Now, given a fixed $\alpha = \sum_{k\neq j} \left(c_{ik} - a_{ik}\right) x_k$, there exists at most one $x_j \in S$ so that $\left(a_{ij} - c_{ij}\right) x_j = \alpha$ since $S \subseteq \mathbb{R}$ is a subset of a field, and $a_{ij} - c_{ij} \neq 0$ is invertible. Thus: 
+        \[\prob_{x_j \in S}\left(\left(a_{ij} - c_{ij}\right)x_j = \alpha \suchthat \alpha\right) \leq \frac{1}{\left|S\right|}.\]
+
+        This gives our result:
+        \[p \leq \underbrace{\sum_{k \neq j}\sum_{x_k^* \in S} \prob\left(x_k = x_k^*\right)}_{= 1} \cdot \frac{1}{\left|S\right|} = \frac{1}{\left|S\right|}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document}
