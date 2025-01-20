@@ -35,8 +35,8 @@
 
 ### EPFL Quantum Science and Engineering Master
 #### Master semester 1 (Autumn 2024)
-- [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1-DuringSemester/Algorithms-2.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1-DuringSemester/Algorithms-2.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1-DuringSemester/Algorithms-2.zip) · (WIP) Algorithms 2 — Prof. Michael Kapralov and Prof. Ola Svensson
-- [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1-DuringSemester/ComputationalComplexity.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1-DuringSemester/ComputationalComplexity.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1-DuringSemester/ComputationalComplexity.zip) · Computational complexity — Prof. Mika Göös
+- [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/Algorithms-2.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/Algorithms-2.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/Algorithms-2.zip) · Algorithms 2 — Prof. Michael Kapralov and Prof. Ola Svensson
+- [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/ComputationalComplexity.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/ComputationalComplexity.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/ComputationalComplexity.zip) · Computational complexity — Prof. Mika Göös
 
 ---
 
