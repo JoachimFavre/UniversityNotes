@@ -1,0 +1,252 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-12-09 at 13:11:53.
+
+\usepackage{../../style}
+
+\title{algo 2}
+\author{Joachim Favre}
+\date{Lundi 09 décembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{22}{2024-12-09}{A lecture I enjoyed a lot}{
+\begin{itemize}[left=0pt]
+    \item Definition of convex closure, and proof of its properties.
+    \item Definition of Lovàsz extension.
+    \item Proof that, for submodular functions, the Lovàsz extension is the convex closure.
+\end{itemize}
+    
+}
+
+\subsection{Minimisation}
+
+\begin{parag}{Minimisation problem}
+    Let $f: \left\{0, 1\right\}^N \mapsto \mathbb{R}$ be submodular. We want to minimise it.
+
+    \begin{subparag}{Intuition}
+        The idea we will exploit in the rest of this lecture is it to relax it to a continuous function $\hat{f}: \left[0, 1\right]^N \mapsto \mathbb{R}$ in a smart way. We set $\hat{f} = f^-$ to be the convex closure of $f$, since convex functions are easily minimised. However, for most functions, the convex closure is very hard to compute. Now, for submodular functions, it is a lot easier, since it takes the form of the Lovàsz extension.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Convex closure}
+    Let $f: \left\{0, 1\right\}^N \mapsto \mathbb{R}$ be a set function.
+
+    For any $x \in \left[0, 1\right]^N$, let $D^-\left(x\right)$ be a random distribution of support $2^N$ satisfying:
+    \begin{enumerate}
+        \item \textit{(Marginal preserving)} For every element $e \in N$, then $\displaystyle \prob_{S \followsdistr D^-\left(x\right)}\left(e \in S\right) = x_e.$
+        \item It minimises $\displaystyle \exval_{S \followsdistr D^-\left(x\right)}\left(f\left(S\right)\right).$
+    \end{enumerate}
+
+    We define the \important{convex closure} of $f$ to be a function $f^-: \left[0, 1\right]^n \mapsto \mathbb{R}$ so that: 
+    \[f^-\left(x\right) = \exval_{S \followsdistr D^-\left(x\right)}\left(f\left(S\right)\right).\]
+
+    \begin{subparag}{Remark}
+        As mentioned above, for general functions, the convex closure is hard to evaluate. We will however show that the convex closure of submodular functions can be evaluated easily.
+    \end{subparag}
+   
+    \begin{subparag}{Example}
+        For instance, let us consider $N = \left\{1, 2\right\}$. We consider the following function, which is not linear, but submodular: 
+        \[f\left(S\right) = \min\left\{\left|S\right|, 1\right\}.\]
+        
+        We consider some vector $x = \left(\frac{1}{3}, \frac{1}{2}\right)$. We may consider the distribution $D_1$, where:
+        \[\prob_{S \followsdistr D_1}\left(S = \o\right) = \frac{1}{6}, \mathspace \prob_{S \followsdistr D_1}\left(S = \left\{1\right\}\right) = \frac{1}{3},\]
+        \[\prob_{S \followsdistr D_1}\left(S = \left\{2\right\}\right) = \frac{1}{2}, \mathspace \prob_{S \followsdistr D_1}\left(S = \left\{1, 2\right\}\right) = 0.\]
+
+        This is a marginal preserving distribution since: 
+        \[\prob\left(1 \in S\right) = \prob\left(S = \left\{1\right\}\right) + \prob\left(S = \left\{1, 2\right\}\right) = \frac{1}{3} + 0 = x_1.\]
+        \[\prob\left(2 \in S\right) = \prob\left(S = \left\{2\right\}\right) + \prob\left(S = \left\{1, 2\right\}\right)  = \frac{1}{2} + 0 = x_2.\]
+
+        Moreover, its expected value is: 
+        \[\exval_{S \followsdistr D_1}\left(S\right) = 0\cdot \frac{1}{6} + 1\cdot \frac{1}{3} + 1\cdot \frac{1}{2} + 1\cdot 0 = \frac{5}{6}.\]
+
+        It is possible to show that this is not minimal. We now consider the distribution $D_2$, defined by:
+        \[\prob_{S \followsdistr D_2}\left(S = \o\right) = \frac{1}{2}, \mathspace \prob_{S \followsdistr D_1}\left(S = \left\{1\right\}\right) = 0,\]
+        \[\prob_{S \followsdistr D_1}\left(S = \left\{2\right\}\right) = \frac{1}{6}, \mathspace \prob_{S \followsdistr D_1}\left(S = \left\{1, 2\right\}\right) = \frac{1}{3}.\]
+
+        It is also marginal preserving. Now, it has the following expected value: 
+        \[\exval_{S \followsdistr D_2}\left(S\right) = \frac{1}{2}\cdot 0 + 0\cdot 1 + \frac{1}{6}\cdot 1 + \frac{1}{3}\cdot 1 = \frac{1}{2}.\]
+
+        It is possible to show that this is minimal, using for instance that $f$ is submodular and the results coming after. So, $D^- = D_2$, and: 
+        \[f^-\left(\frac{2}{3}, \frac{1}{2}\right) = \frac{1}{2}.\]
+
+        This reasoning should show intuitively why it is hard to compute the convex closure of an arbitrary function.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Properties}
+    Let $f: \left\{0, 1\right\}^N \mapsto \mathbb{R}$ be a set function, and $f^-$ be its convex closure.
+
+    Then:
+    \begin{enumerate}
+        \item It is an extension of $f$, i.e. for all $S \subseteq N$, noting $1_S$ to be the $x \in \left\{0, 1\right\}^N$ so that $e \in S \iff x_e = 1$, then:
+        \[f^-\left(1_S\right) = f\left(S\right).\]
+        
+        \item $\min\left(f\right) = \min\left(f^-\right)$, where $\min\left(g\right)$ is the minimum value of $g$.
+        \item $f^-$ is a convex function.
+    \end{enumerate}
+
+    \begin{subparag}{Implication}
+        This states that, if we wish to optimise a set function $f: \left\{0, 1\right\}^N \mapsto \mathbb{R}$, and that we are able to efficiently compute its convex closure $f^-: \left[0, 1\right]^N \mapsto \mathbb{R}$, then we can use usual convex optimisation methods to optimise $f^-$ and thus $f$.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 1}
+        There is a single marginal preserving distribution for $x = 1_S$, it is the distribution that outputs $S$ with probability $1$.
+
+        Indeed, the marginal preserving property asks for both:
+        \[e \in S \implies \prob_{T \followsdistr D^-\left(x\right)}\left(e \in T\right) = 1,\]
+        \[e \not \in S \implies \prob_{T \followsdistr D^-\left(x\right)}\left(e \in T\right) = 0.\]
+
+        The second property yields that there is no $T$ in the support that contain an element $e$ that is not in $S$; i.e. $T \subseteq S$ for all $T$. The first property moreover says that there is no $T$ in the support which does not contain some element $e$ of $S$ (since, otherwise, for this element, we would have $\prob\left(e \in T\right) < 1$). But then, the only possible distribution $D^-\left(x\right)$ must contain only $S$ in its support, i.e. $D^-\left(x\right)$ outputs $S$ with probability $1$.
+
+        This is finally such that: 
+        \[f^-\left(x\right) = \exval_{T \followsdistr D^-\left(x\right)}\left(f\left(T\right)\right) = f\left(S\right),\]
+        which is exactly what we wanted to prove.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        We show $\min\left(f\right) = \min\left(f^-\right)$ by showing $\min\left(f\right) \geq \min\left(f^-\right)$ and $\min\left(f\right) \leq \min\left(f^-\right)$.
+
+        The fact that $\min\left(f\right) \geq \min\left(f^-\right)$ directly comes from the fact that $f^-$ is a relaxation of $f$ by (1): all values of $f$ are possible for $f^-$. The relaxation must necessarily find some lower bound which is at least as good.
+
+        We now consider $\min\left(f\right) \leq \min\left(f^-\right)$. We consider an argument $x \in \left[0, 1\right]^N$ that minimises $f^-$. By definition: 
+        \[f^-\left(x\right) = \exval_{S \followsdistr D^-\left(x\right)} \left(f\left(S\right)\right) = p_1 f\left(S_1\right) + p_2 f\left(S_2\right) + \ldots + p_n f\left(S_n\right).\]
+        
+        However, when a weighted average of elements $x_1, \ldots, x_n$ is at least $k$, then there must be an $x_i$ so that $x_i \leq k$. In other words, in our case, there must exist a $S_i \subseteq N$ so that: 
+        \[f\left(S_i\right) \leq f^-\left(x\right).\]
+
+        Note that $f^-\left(1_{S_i}\right) = f\left(S_i\right)$, by our first property. Since we supposed $f^-\left(x\right)$ was minimal, this necessarily means that: 
+        \[f^-\left(x\right) = f^-\left(1_{S_i}\right) = f\left(S_i\right).\]
+
+        The minimum value of $f^-$ is thus indeed achievable by $f$, showing that $\min\left(f\right) \leq \min\left(f^-\right)$. This finishes this argument.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Proof 3}
+        Let $x, y \in \left[0, 1\right]^N$ and $\lambda \in \left[0, 1\right]$ be arbitrary. We want to verify the definition of convexity, i.e. that: 
+        \[\lambda f^-\left(x\right) + \left(1 - \lambda\right) f^-\left(y\right) \geq f^-\left(\lambda x + \left(1 - \lambda\right)y\right).\]
+
+        By definition: 
+        \[\lambda f^-\left(x\right) + \left(1- \lambda\right) f^-\left(y\right) = \lambda \exval_{S \followsdistr D^-\left(x\right)}\left(f\left(S\right)\right) + \left(1 - \lambda\right) \exval_{S \followsdistr D^-\left(y\right)}\left(f\left(S\right)\right).\]
+
+        Let $D$ be the distribution of support $2^N$ , where, with probability $\lambda$, we sample from $D^-\left(x\right)$ and with probability $\left(1 - \lambda\right)$, we sample from $D^-\left(y\right)$. Then, this just means that: 
+        \[\lambda \exval_{S \followsdistr D^-\left(x\right)} \left(f\left(S\right)\right) + \left(1 - \lambda\right) \exval_{S \followsdistr D^-\left(y\right)} \left(f\left(S\right)\right) = \exval_{S \followsdistr D}\left(f\left(S\right)\right).\]
+        
+        We notice that $D$ is marginal preserving with respect to $\lambda x + \left(1 - \lambda\right)y$, since $D^-\left(x\right)$ and $D^-\left(y\right)$ are marginal preserving with respect to $x$ and $y$, respectively:
+        \autoeq{\prob_{S \followsdistr D}\left(e \in S\right) = \lambda\prob_{S \followsdistr D^-\left(x\right)}\left(e \in S\right) + \left(1 - \lambda\right)\prob_{S \followsdistr D^-\left(y\right)}\left(e \in S\right) = \lambda x_e + \left(1 - \lambda\right)y_e = \left(\lambda x + \left(1 - \lambda\right) y\right)_e.}
+
+        Since $D^-\left(\lambda x + \left(1 - \lambda\right)y\right)$ is the distribution that minimises $\exval\left(f\left(S\right)\right)$ amongst all distributions that are marginal preserving with respect to $\lambda x + \left(1 - \lambda\right)y$, this yields: 
+        \autoeq{\lambda f^-\left(x\right) + \left(1 - \lambda\right) f^-\left(y\right) = \exval_{S \followsdistr D}\left(f\left(S\right)\right) \geq \exval_{S \followsdistr D^-\left(\lambda x + \left(1 - \lambda\right)y\right)} \left(f\left(S\right)\right) = f^-\left(\lambda x + \left(1 - \lambda\right) y\right).}
+        
+        This finishes the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Lovàsz extension}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a set function.
+
+    We define its \important{Lovàsz extension}, $\hat{f}: \left[0, 1\right]^N \mapsto \mathbb{R}$, so that: 
+    \[\hat{f}\left(x\right) = \exval_{\theta \followsdistr \text{Unif}\left[0, 1\right]}\left(f\left(\left\{i \suchthat x_i \geq \theta\right\}\right)\right).\]
+
+    \begin{subparag}{Computation}
+        To evaluate $f\left(x_1, \ldots, x_n\right)$, we can sort and relabel the parameters, and introduce parameters $x_0 = 1$ and $x_{n+1} = 0$, so that: 
+        \[1 = x_0 \geq x_1 \geq x_2 \geq \ldots \geq x_n \geq x_{n+1} = 0.\]
+
+        For instance, if $n = 5$, this may look like:
+        \svghere[0.7]{LovaszExtensionComputation.svg}
+
+        The Lovàsz extension consists in taking a random threshold $\theta$, and construct some input $S$ for $f$, by taking all elements $i$ that are above the threshold ($x_i \geq \theta$) and gets rid of all others.
+
+        If $\theta > x_1$, then we have $S = \o$. If $x_1 \geq \theta > x_2$, then we simply have $S = \left\{x_1\right\}$. More generally, leaving $S_i = \left\{1, \ldots, i\right\}$, if $x_i \geq \theta > x_{i+1}$, then we compute $f\left(S_i\right)$. On the diagram above, we would for instance have $f\left(S_2\right) = f\left(\left\{1, 2\right\}\right)$.
+
+        The probability that $x_i \geq \theta > x_{i+1}$ is just $x_i - x_{i+1}$ since $\theta$ is uniform, so this gives us a deterministic definition of $\hat{f}\left(x\right)$:
+        \[\hat{f}\left(x\right) = \sum_{i=0}^{n} f\left(S_i\right) \left(x_i - x_{i+1}\right),\]
+
+        Note moreover note that $\o = S_0  \subseteq S_1 \subseteq S_2 \subseteq \ldots \subseteq S_n$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a set function of convex closure $f^-$ and Lovàsz extension $\hat{f}$.
+
+    $f$ is submodular if and only if $f^- \equiv \hat{f}$ are equivalent.
+
+    \begin{subparag}{Proof $\implies$}
+        Let $x \in \left\{0, 1\right\}^N$ be arbitrary. We suppose that $f$ is submodular, and we want to show $f^-\left(x\right) = \hat{f}\left(x\right)$. 
+
+        Amongst all distributions $D^-\left(x\right)$ that are marginal preserving and minimise $\exval_{S \followsdistr D^-\left(x\right)}\left(f\left(S\right)\right)$, we consider the distribution $D$ that maximises $\exval_{S \followsdistr D}\left(\left|S\right|^2\right)$ (proving that it does exist is outside the scope of this class). The idea is that we will show this distribution is so that, for any sets $S_1, S_2$ in its support, then either $S_1 \subseteq S_2$ or $S_2 \subseteq S_1$. We will then argue that this necessarily implies $D$ is the distribution used by the Lovàsz extension, giving our result. 
+
+        So, suppose towards contradictions that there exists sets $S_1$ and $S_2$ in the support of $D$ that non-trivially cross, i.e. both $S_1 \not\subseteq S_2$ and $S_2 \not \subseteq S_1$. We suppose that $D$ selects $S_1$ and $S_2$ with probability $p_1$ and $p_2$, respectively.
+
+        We consider the distribution $D'$ obtained from $D$ by:
+        \begin{enumerate}
+            \item Decreasing the probability of $S_1$ and $S_2$ by $\min\left\{p_1, p_2\right\}$;
+            \item Increasing the probability of $S_1 \cap S_2$ and $S_1 \cup S_2$ by $\min\left\{p_1, p_2\right\}$.
+        \end{enumerate}
+
+        The idea here is that $D'$ uncrosses $S_1$ and $S_2$. For the sake of intuition, suppose that $p_1 < p_2$. Then, $S_1$ is no longer in the support of $D'$, but $S_1 \cap S_2 \subseteq S_2 \subseteq S_1 \cup S_2$ are (and they only cross trivially). 
+
+        Note that $D'$ is still marginal preserving, since the elements of $S_1$ and $S_2$, are the exact same elements of $S_1 \cap S_2$ and $S_1 \cup S_2$, with same multiplicity; and we decrease the probability of $S_1$ and $S_2$ by the exact same value we increase the probability of $S_1 \cap S_2$ and $S_1 \cup S_2$. Moreover, it also minimises $\exval_{S \followsdistr D}\left(f\left(S\right)\right)$. Indeed, let us consider the following value:
+        \autoeq{\Delta = \exval_{S \followsdistr D'}\left(f\left(S\right)\right) - \exval_{S \followsdistr D}\left(f\left(S\right)\right) = \min\left\{p_1, p_2\right\}\left(f\left(S_1 \cap S_2\right) + f\left(S_1 \cup S_2\right) - f\left(S_1\right) - f\left(S_2\right)\right).}
+        
+        However, by submodularity, $f\left(S_1\right) + f\left(S_2\right) \geq f\left(S_1 \cap S_2\right) + f\left(S_1 \cup S_2\right)$. This means that $\Delta \leq 0$, and hence that $\exval_{S \followsdistr D'}\left(f\left(S\right)\right) \leq \exval_{S \followsdistr D}\left(f\left(S\right)\right)$. However, by construction, $D$ minimised this expected value, yielding that
+        \[\exval_{S \followsdistr D'}\left(f\left(S\right)\right) = \exval_{S \followsdistr D}\left(f\left(S\right)\right) \text{ is minimal}.\]
+
+        This shows that $D'$ is also a candidate for $D^-\left(x\right)$. Now, we aim to show $\exval_{S \followsdistr D'}\left(\left|S\right|^2\right) > \exval_{S \followsdistr D}\left(\left|S\right|^2\right)$, since $D$ was chosen to maximise it, and hence it would be our contradiction. Noticing that $\left|S_1 \cup S_2\right| = \left|S_1 \setminus S_2\right| + \left|S_2 \setminus S_1\right| + \left|S_1 \cap S_2\right|$, $\left|S_1\right| = \left|S_1 \setminus S_2\right| + \left|S_1 \cap S_2\right|$ and $\left|S_2\right| = \left|S_2 \setminus S_1\right| + \left|S_1 \cap S_2\right|$, it is possible to show that: 
+        \[\left|S_1 \cup S_2\right|^2 + \left|S_1 \cap S_2\right|^2 > \left|S_1\right|^2 + \left|S_2\right|^2.\]
+
+        But then, we do have our contradiction: 
+        \autoeq[s]{\exval_{S \followsdistr D'}\left(\left|S\right|^2\right) - \exval_{S \followsdistr D}\left(\left|S\right|^2\right) = \min\left\{p_1, p_2\right\}\left(\left|S_1 \cap S_2\right|^2 + \left|S_1 \cup S_2\right|^2 - \left|S_1\right|^2 - \left|S_2\right|^2\right) > 0,}
+        since, as mentioned above, $D$ maximised this expected value, and we should thus instead have $\exval_{S \followsdistr D'}\left(\left|S\right|^2\right) \leq \exval_{S \followsdistr D}\left(\left|S\right|^2\right)$.
+
+        We have thus proven so far that $D$ is a distribution such that
+        \begin{itemize}
+            \item It is marginal preserving.
+            \item It minimises $\exval_{S \followsdistr D}\left(f\left(S\right)\right)$.
+            \item For any set $A, B$ in its support, then $A \subseteq B$ or $B \subseteq A$.
+        \end{itemize}
+
+        In particular, the second property means that the support of $D$ is $\left\{S_1, \ldots, S_n\right\}$, where $S_1 \subseteq S_2 \subseteq \ldots \subseteq S_n$. We can express those as $S_i = \left\{1, \ldots, i\right\}$ for some labelling of our elements, because of this chain of inclusions. However, by the marginal preserving property, we must have:
+        \autoeq{x_i - x_{i+1} = \prob_{S \followsdistr D}\left(i \in S\right) - \prob_{S \followsdistr D}\left(i + 1 \in S\right) = \sum_{j=i}^{n} \prob\left(S = S_j\right) - \sum_{j=i+1}^{n} \prob\left(S = S_j\right) = \prob\left(S = S_i\right).}
+
+        In other words, set $S_i$ appears with probability $x_i - x_{i+1}$. This is exactly the distribution for the Lovàsz extension, showing: 
+        \[f^-\left(x\right) = \exval_{S \followsdistr D}\left(f\left(S\right)\right) = \hat{f}\left(x\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        We will not show this part of the proposition in this class.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The argument to uncross $S_1$ and $S_2$ is widely used in many other cases.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a submodular function, of Lovàsz extension $\hat{f}: \left\{0, 1\right\}^N \mapsto \mathbb{R}$. 
+
+    To maximise $f$, we maximise $\hat{f}$ using a convex optimisation algorithm. 
+
+    \begin{subparag}{Remark 1}
+        We use here the fact that $\hat{f} \equiv f^-$ is the convex closure of $f$, since $f$ is submodular; and thus that it is convex.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        For any $x$, $\hat{f}\left(x\right)$ can be computed in a polynomial number of evaluations of $f$. So, this algorithm is poly-time in $\left|N\right|$.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 3}
+        An example of a convex optimisation algorithm is the ellipsoid method. We will not see any such algorithm in this class.
+    \end{subparag}
+\end{parag}
+
+\end{document}

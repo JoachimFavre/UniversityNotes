@@ -1,0 +1,278 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-12-17 at 13:18:16.
+
+\usepackage{../../style}
+
+\title{Algorithms 2}
+\author{Joachim Favre}
+\date{Mardi 17 décembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{25}{2024-12-17}{Smile because it happened}{
+    \begin{itemize}[left=0pt]
+        \item \textit{Don't cry because it's over, smile because it happened.}
+        \item Proof of the convergence speed of the mixing of random walks.
+        \item Definition of conductance.
+        \item Explanation of the spectral graph partitioning algorithm.
+        \item Definition of the Laplacian matrix of a graph.
+        \item Explanation and proof of Cheeger's inequalities.
+    \end{itemize}
+}
+
+\begin{parag}{Lemma}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, $M = \frac{1}{d} A$ be its random walk matrix, $\epsilon > 0$ and $C \geq 3$. 
+
+    If $k \geq \frac{C}{2\epsilon}\ln\left(n\right)$ and $\max\left(\lambda_2, \left|\lambda_n\right|\right) \leq 1 - \epsilon$, then for all starting vertex $s \in V$: 
+    \[\left\|M^k p - \begin{pmatrix} \frac{1}{n} \\ \vdots \\ \frac{1}{n} \end{pmatrix} \right\|_2^2 \in o\left(\frac{1}{n^2}\right),\]
+    where $p = e_s$ only has a $1$ at index $s$, and zeros everywhere else.
+    
+    We call the $\epsilon$ the \important{spectral gap.}
+
+    \begin{subparag}{Intuition}
+        This lemma shows that, under some hypotheses, no matter where we start from, the distribution for the random walk will tend to a uniform distribution. In other words, walking long enough, we will forget where we started from.
+
+        Let us moreover justify intuitively the hypothesis that $\max\left(\lambda_2, \left|\lambda_n\right|\right) \leq 1 - \epsilon$. First, $\lambda_2 \approx 1$ is a problem, because it means that there are multiple connected components. But then, we will always stay in the component we started in, never reaching the fully uniform distribution. Second, $\lambda_n \approx -1$ is a problem as well, since it would mean the graph has a bipartite component. Starting in a bipartition at iteration $0$, we will be in this bipartition at every even iteration, and in the other bipartition at every odd iteration. We thus never forget completely where we started from either.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $v_1, v_2, \ldots, v_n$ orthonormal eigenvectors of $M$, associated to eigenvalues $\lambda_1 \geq \lambda_2 \geq \ldots \geq \lambda_n$. We know we can express $p$ in the $\left(v_i\right)$ basis: 
+        \[p = \sum_{i=1}^{n} \alpha_i, v_i, \mathspace \alpha_i = \left\langle p, v_i \right\rangle.\]
+
+        However, note that we can always pick $v_1 = \begin{pmatrix} \frac{1}{\sqrt{n}} & \cdots & \frac{1}{\sqrt{n}} \end{pmatrix}^T $, meaning that: 
+        \[\alpha_1 = \left\langle p, v_1 \right\rangle = \frac{1}{\sqrt{n}}.\]
+        
+        Thus: 
+        \[p = \frac{1}{\sqrt{n}} \begin{pmatrix} \frac{1}{\sqrt{n}} \\ \vdots \\ \frac{1}{\sqrt{n}} \end{pmatrix} + \sum_{i \geq 2} \alpha_i v_i = \begin{pmatrix} \frac{1}{n} \\ \vdots \\ \frac{1}{n} \end{pmatrix} + \sum_{i \geq 2} \alpha_i v_i.\]
+        
+        Now, notice that, using the fact the $v_i$ are eigenvectors of $M$, and that $v_1$ has eigenvalue $1$: 
+        \[M^k p = M^k \left(\begin{pmatrix} \frac{1}{n} \\ \vdots \\ \frac{1}{n} \end{pmatrix} + \sum_{i \geq  2} \alpha_i v_i\right) = \begin{pmatrix} \frac{1}{n} \\ \vdots \\ \frac{1}{n} \end{pmatrix} + \sum_{i \geq 2} \lambda_i^k \alpha_i v_i.\] 
+
+        We are now able to compute our $\ell_2$ norm: 
+        \[x = \left\|M^k p - \begin{pmatrix} \frac{1}{n} \\ \vdots \\ \frac{1}{n} \end{pmatrix} \right\|_2^2 = \left\|\sum_{i\geq 2} \lambda_i^k \alpha_i v_i\right\|^2.\] 
+
+        However, we know that the $\ell_2$ norm is such that, for orthonormal vectors $a, b$ and scalars $\alpha, \beta$:
+        \autoeq{\left\|\alpha a + \beta b\right\|^2 = \left(\alpha a + \beta b\right) \dotprod \left(\alpha a + \beta b\right) = \alpha^2 \left(a \dotprod a\right) + 2 \alpha \beta \left(a \dotprod b\right) + \beta^2 \left(b \dotprod b\right) = \alpha^2 + \beta^2.}
+
+        So, since our eigenvectors are orthonormal by construction, and using the fact that $\left|\lambda_i\right| < 1 - \epsilon$ for all $i$: 
+        \[x = \sum_{i \geq 2} \left(\lambda_i^k \alpha_i\right)^2 = \sum_{i \geq 2} \lambda_i^{2k} \alpha_i^2 \leq \left(1 - \epsilon\right)^{2k} \sum_{i \geq 2} \alpha_i^2.\]
+        
+        However, notice that: 
+        \[\sum_{i \geq 2} \alpha_i^2  \leq \sum_{i \geq 1} \alpha_i^2 = \left\|p\right\| = 1.\]
+        
+        Therefore, using the fact $k \geq \frac{C}{2\epsilon} \ln\left(n\right)$:
+        \[x \leq \left(1 - \epsilon\right)^{2k} \leq \left(1 - \epsilon\right)^{\frac{C}{\epsilon} \ln\left(n\right)} = \left(\left(1 - \epsilon\right)^{\frac{1}{\epsilon}}\right)^{C \ln\left(n\right)}.\]
+        
+        This finally simplifies to our result, using the fact $C \geq 3$: 
+        \[x \leq \frac{1}{e^{C \ln\left(n\right)}} = n^{-C} \leq \frac{1}{n^3} \in o\left(\frac{1}{n^2}\right)\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Graph connectivity}
+
+\begin{parag}{Intuition: Cheeger's inequalities}
+    Our lemma on random walks tell us intuitively that the following affirmations should hold:
+    \begin{enumerate}
+        \item If $\lambda_2$ is small (i.e. far from $1$), then a random walk mixes quickly, and so there are no ``small'' cuts in $G$.
+        \item If $\lambda_2$ is close to $1$, then a random walk takes a lot of time to mix, so then there exits a ``small'' cut, which we want to be able t find efficiently.
+    \end{enumerate}
+    
+    \begin{subparag}{Remark}
+        Small cut are typically not what we want in practice, since a small cut may just be $S = \left\{v\right\}$ where $v$ is connected to a single other vertex. We will thus consider ``sparse'' cuts instead.
+
+        Let us thus formalise the definitions used for this theorem, before proving some lemmas, and then coming back to it formally.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Conductance}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, with $\left|V\right| = n$, and let $S \subsetneq V$ where $S \neq \o$.
+
+    We define the \important{conductance of the cut} $\left(S, V \setminus S\right)$ as: 
+    \[h\left(S\right) = \frac{\left|\delta\left(S\right)\right|}{d \min\left\{\left|S\right|, \left|V \setminus S\right|\right\}},\]
+    where $\delta\left(S\right)$ is the set of edges crossing $\left(S, V \setminus S\right)$.
+
+    The \important{conductance} of $G$ is then defined to be: 
+    \[h\left(G\right) = \min_{\substack{S \subsetneq V \\ S \neq \o}} h\left(S\right).\]
+
+    \begin{subparag}{Property}
+        Note that for any $S \subsetneq V$ with $S \neq \o$: 
+        \[h\left(S\right) = h\left(V \setminus S\right).\]
+    \end{subparag}
+    
+    \begin{subparag}{Intuition}
+        Note that $\left|\delta\left(S\right)\right|$ is, by definition, the number of edges crossing the cut. Moreover, supposing that $\left|S\right| < \left|V \setminus S\right|$ without loss of generality (we can simply switch $S$ and $V \setminus S$ otherwise), $d \min\left\{\left|S\right|, \left|V \setminus S\right|\right\} = d \left|S\right|$ is an estimation of the number of edges incident to vertices $v \in S$. Note however that this is not completely correct. If all those edges cross the cut, then each vertex $v \in S$ has $d$ edges, and so we do have a total of $d \left|S\right|$ edges incident on $S$. However, if none of those edges cross the cut, this strategy double-counts all of them, there is instead $\frac{1}{2} d\left|S\right|$ edges incident on vertices in $S$. 
+
+        All this means is that: 
+        \[h\left(S\right) = c\cdot \text{percentage of edges incident on $S$ that cross the cut},\]
+        for some $c \in \left[\frac{1}{2}, 1\right]$.
+        
+        So, if $h\left(S\right) = 0.1$, then roughly $\SI{10}{\%}$ to $\SI{20}{\%}$ of edges indicent on $S$ leave $S$; and $\SI{80}{\%}$ to $\SI{90}{\%}$ stay in $S$. This is notably interesting to find communities in the graph.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        A cut with small conductance corresponds to the ``sparse'' we were mentioning before.
+    \end{subparag}
+\end{parag} 
+
+\begin{parag}{Spectral graph partitioning algorithm}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, of random walk matrix $M$, and eigenvalues $\lambda_1 \geq \lambda_2 \geq \ldots \geq \lambda_n$.
+
+    We make an algorithm, called \important{spectral partitioning}, that finds a cut of conductance $h\left(G\right) = \sqrt{2\left(1 - \lambda_2\right)}$:
+    \begin{enumerate}
+        \item Sort vertices in non decreasing order of $v_2$: 
+        \[v_2\left(1\right) \leq v_2\left(2\right) \leq \ldots \leq v_2\left(n\right).\]
+        \item Let $i$ be such that $h\left(\left\{1, \ldots, i\right\}\right)$ is minimised.
+        \item Output $S = \left\{1, \ldots, i\right\}$.
+    \end{enumerate}
+
+    \begin{subparag}{Intuition}
+        Intuitively, we put all vertices on a horizontal line in the order given by $v_2$, and try all vertical cuts. This can be implemented very quickly, in time $O\left(n \ln\left(n\right)\right)$. Indeed, step (2) can be computed in time $O\left(n\right)$, because we do not need to look at al edges in the graph to compute $h\left(\left\{1, \ldots, i\right\}\right)$, we can reuse work for $h\left(\left\{1, \ldots, i-1\right\}\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        We will not prove that this algorithm does output a cut of conductance $h\left(G\right) = \sqrt{2\left(1 - \lambda_2\right)}$ in this class.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Rayleigh quotient}
+    Let $x \neq 0$ be some vector and $M$ be some matrix.
+
+    We call the following a \important{Rayleigh quotient}: 
+    \[\frac{x^T M x}{x^T x}.\]
+\end{parag}
+
+\begin{parag}{Lemma 1}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, of random walk matrix $M$, with eigenvalues $\lambda_1 \geq \lambda_2 \geq \ldots \geq \lambda_n$.
+
+    Then, we have: 
+    \[\lambda_1 = \max_{x \neq 0} \frac{x^T M x}{x^T x}.\]
+    
+    \begin{subparag}{Proof}
+        Let $x \neq 0$ be an arbitrary vector. We can write $x$ in the eigenbasis $\left(v_i\right)$ associated to the eigenvalues:  
+        \[x = \sum_{i} \alpha_i v_i \implies \frac{x^T M x}{x^T x} = \frac{\sum_{i} \lambda_i \alpha_i^2}{\sum_{i} \alpha_i^2}.\]
+
+        This is however a weighted average of the eigenvalues. This is maximal when all the weight is put on the largest eigenvalue, $\lambda_1$.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma 2}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, of random walk matrix $M$, with eigenvalues $\lambda_1 \geq \lambda_2 \geq \ldots \geq \lambda_n$ associated to eigenvectors $v_1, \ldots, v_n$.
+    
+    Then, we have: 
+    \[\lambda_2 = \max_{x \perp v_1} \frac{x^T M x}{x^T x}.\]
+\end{parag}
+
+\begin{parag}{Definition: Laplacian matrix}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, of random walk matrix $M$.
+
+    We define $L = I - M$ to be the \important{Laplacian} of $G$, where $I$ is the $n \times n$ identity matrix.
+\end{parag}
+
+\begin{parag}{Property}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, of Laplacian $L$.
+
+    Then, for all $x \in \mathbb{R}^n \setminus \left\{0\right\}$: 
+    \[x^T L x = \frac{1}{d} \sum_{\left\{i, j\right\} \in E} \left(x\left(i\right) - x\left(j\right)\right)^2.\]
+    
+    \begin{subparag}{Proof}
+        This will be proven in the twelfth exercise series.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, of random walk matrix $M$, with eigenvalues $\lambda_1 \geq \lambda_2 \geq \ldots \geq \lambda_n$, associated to normalised eigenvectors $v_1, \ldots, v_n$.
+
+    Then, noting $\bvec{1}$ to be the all ones vector: 
+    \[1 - \lambda_2 = \min_{x \perp \bvec{1}} \dfrac{1}{d}\cdot \dfrac{\sum_{\left\{i, j\right\} \in E} \left(x\left(i\right) - x\left(j\right)\right)^2}{x^T x}.\]
+
+    This bound is moreover tight for $x = v_2$, i.e.:
+    \[1 - \lambda_2 = \frac{1}{d}\cdot \frac{1}{d} \sum_{\left\{i, j\right\} \in E} \left(v_2\left(i\right) - v_2\left(j\right)\right)^2.\]
+
+    \begin{subparag}{Intuition}
+        Putting both affirmations together, this theorem states that:
+        \[1 - \lambda_2 = \frac{1}{d} \sum_{i, j \in E} \left(v_2\left(i\right) - v_2\left(j\right)\right)^2 = \min_{x \perp \bvec{1}} \dfrac{1}{d}\cdot \dfrac{\sum_{\left\{i, j\right\} \in E} \left(x\left(i\right) - x\left(j\right)\right)^2}{x^T x}.\]
+
+        In other words, $v_2$ assigns a value to each vertex, in such a way that the average stretch $\left(v_2\left(i\right) - v_2\left(j\right)\right)^2$ is minimised. However, something that minimises the average stretch is a form of min-cut.  This gives more intuition on why the spectral graph partitioning algorithm works.
+
+        This lemma is the moreover the main intuition on why the following theorem should hold, by a similar reasoning.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        We can always take $v_1 = \bvec{1}$. So, by one of our lemmas: 
+        \autoeq{1 - \lambda_2 = 1 - \max_{x \perp \bvec{1}} \frac{x^T M x}{x^T x} = \min_{x \perp \bvec{1}} \left(1 - \frac{x^T M x}{x^T x}\right)  = \min_{x \perp \bvec{1}} \left(\frac{x^T x - x^T M x}{x^T x}\right) = \min_{x \perp \bvec{1}} \left(\frac{x^T \left(I - M\right)x}{x^T x}\right).}
+
+        We recognise the Laplacian of $G$ so, using its property:
+        \[1 - \lambda_2 = \min_{x \perp \bvec{1}} \frac{x^T L x}{x^T x} = \min_{x \perp \bvec{1}} \frac{1}{d}\cdot \frac{\sum_{\left\{i, j\right\} \in E} \left(x\left(i\right) - x\left(j\right)\right)^2}{x^T x}.\]
+
+        We know that $1 - \lambda_2 = 1 - v_2^T M v_2$. We can then use exactly the same equalities to show that the bound is tight for $x = v_2$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+ 
+\begin{parag}{Theorem: Cheeger's inequalities}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, of random walk matrix $M$, with eigenvalues $\lambda_1 \geq \lambda_2 \geq \ldots \geq \lambda_n$.
+
+    Then:
+    \[\frac{1 - \lambda_2}{2} \leq h\left(G\right) \leq \sqrt{2 \left(1 - \lambda_2\right)}.\]
+
+    \begin{subparag}{Intuition}
+        As we wanted intuitively, when $\lambda_2 \ll 1$ is small, then $h\left(G\right)$ is large. There is thus no ``sparse'' cut in $G$. Also, when $\lambda_2 \approx 1$, then $h\left(G\right) \approx 0$, and so there exists very ``sparse'' cuts, that can be found efficiently using the spectral graph partitioning algorithm.
+
+        Note that this theorem shows the result of the spectral partitioning algorithm is quite interesting.
+    \end{subparag}
+   
+    \begin{subparag}{Remark 1}
+        Note that this is not exactly the same $\epsilon$ as the one we had for mixing time for random walks, but we may still refer to $\epsilon = 1 - \lambda_2$ as a spectral gap.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Both inequalities are tight. We will not see this affirmation formally in this class, however, intuitively:
+        \begin{itemize}[left=0pt]
+            \item The first one is reached for the hypercube, i.e. $V = \left\{0, 1\right\}^d$ and $E = \left\{\left\{x, x + e_i\right\} \suchthat x \in V, i \in \left\{1, \ldots, d\right\}\right\}$, for $d = \log_2\left(n\right)$.
+            \item The second one is reached on the cycle on $n$ vertices.
+
+                It is possible to show that $h\left(G\right) = \frac{2}{n}$, by splitting it in the middle: two edges cross the cut, and $\left|S\right| = \left|V \setminus S\right| = \frac{n}{2}$. It is moreover also possible to show that $\lambda_2 \in 1 - O\left(\frac{1}{n^2}\right)$. We intuitively do have $h\left(G\right) \in O\left(\frac{1}{n}\right)$ and $\sqrt{2\left(1 - \lambda_2\right)} \in O\left(\frac{1}{n}\right)$.
+        \end{itemize}
+    \end{subparag}
+
+    \begin{subparag}{Proof (1)}
+        We want to show the first inequality:
+        \[1 - \lambda_2 \leq 2 h\left(G\right)\]
+
+        Let $S \subseteq V$ be arbitrary. We assume without loss of generality that $\left|S\right| \leq \frac{1}{2} \left|V\right|$ since $h\left(S\right) = h\left(V \setminus S\right)$ (and we could thus replace $S \leftarrow V \setminus S$ if $\left|S\right| > \frac{1}{2} \left|V\right|$). We consider $y = \bvec{1}_S - \frac{\left|S\right|}{\left|V\right|} \bvec{1}$, where $\bvec{1}_S$ is the indicator of $S$. In other words, $y$ is defined by:
+        \[y\left(i\right) = \begin{systemofequations} 1 - \frac{\left|S\right|}{V}, & \text{if $i \in S$,} \\ -\frac{\left|S\right|}{\left|V\right|}, & \text{otherwise}. \end{systemofequations}\]
+        
+        Let $\delta\left(S\right) \subseteq E$ be the set of edges crossing the cut. We notice that for all edge $\left\{i, j\right\} \in \delta\left(S\right)$ crossing the cut, then $\left(y\left(i\right) - y\left(j\right)\right)^2 = 1$. On the other hand, for any edge $\left\{i, j\right\} \not\in \delta\left(S\right)$ staying in $S$ or staying in $V \setminus S$, then $\left(y\left(i\right) - y\left(j\right)\right)^2 = 0$. This yields, by our lemma: 
+        \[1 - \lambda_2 \leq \frac{\sum_{\left\{i, j\right\} \in E} \left(y\left(i\right) - y\left(j\right)\right)^2}{d\cdot y^T y} = \frac{\left|\delta\left(S\right)\right|}{d\cdot y^T y}.\]
+
+        We can moreover compute the squared norm of $y$:
+        \autoeq{y^T y = \sum_{i} y\left(i\right)^2 = \sum_{i \in S} \left(1 - \frac{\left|S\right|}{\left|V\right|}\right)^2 + \sum_{i \in V \setminus S} \left(\frac{\left|S\right|}{\left|V\right|}\right)^2 = \left|S\right| \left(1 - \frac{\left|S\right|}{\left|V\right|}\right)^2 + \left(\left|V\right| - \left|S\right|\right)\left(\frac{\left|S\right|}{\left|V\right|}\right)^2,}
+
+        We can use algebra to simplify this to:
+        \[y^T y = \frac{\left|S\right|\cdot \left|V \setminus S\right|}{\left|V\right|} \geq \frac{\left|S\right|}{2}\]
+        where we used that $\left|V \setminus S\right| \geq \frac{1}{2} \left|V\right|$, since we asked for $\left|S\right| \leq \frac{1}{2} \left|V\right|$.
+        
+        But then, since $\left|S\right| \leq \frac{1}{2}\left|V\right| \leq \left|V \setminus S\right|$, we recognise the definition of conductance: 
+        \[1 - \lambda_2 \leq \frac{\left|\delta\left(S\right)\right|}{d\cdot y^Ty} \leq \frac{2\cdot  \left|\delta\left(S\right)\right|}{d\cdot \left|S\right|} = 2\cdot \frac{\left|\delta\left(S\right)\right|}{d\cdot \min\left\{\left|S\right|, \left|V \setminus S\right|\right\}} = 2 h\left(S\right).\]
+
+        This is exactly the inequality we wished to prove, since $S$ was arbitrary.
+    \end{subparag}
+
+    \begin{subparag}{Proof (2)}
+        The second inequality comes from the spectral partitioning algorithm: it is always possible to find a cut $S$ such that $h\left(S\right) \leq \sqrt{2\left(1 - \lambda_2\right)}$. Since moreover $h\left(G\right) \leq h\left(S\right)$ by definition, this gives our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

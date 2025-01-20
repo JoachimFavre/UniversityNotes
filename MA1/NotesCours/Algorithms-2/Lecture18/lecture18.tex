@@ -1,0 +1,190 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-25 at 13:14:24.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Lundi 25 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{18}{2024-11-25}{Glomgold would call it a scheme}{
+\begin{itemize}[left=0pt]
+    \item Proof of the algorithm for \lang{DISTINCT-ELEMENTS}.
+    \item Usage of the median trick to improve the success probability of this algorithm.
+    \item Definition of stream second moment.
+    \item Explanation of the AMS sketch.
+\end{itemize}
+
+}
+
+\begin{parag}{Theorem}
+    Let $\sigma$ be a stream, of $d\left(\sigma\right)$ distinct elements. Also, let $\hat{d}\left(\sigma\right)$ be the output of our algorithm.
+
+    Then:
+    \[\prob\left(\hat{d}\left(\sigma\right) \geq 3 d\left(\sigma\right)\right) \leq \frac{\sqrt{2}}{3} \approx 0.47, \mathspace \prob\left(\hat{d}\left(\sigma\right) \leq \frac{1}{3} d\left(\sigma\right)\right) \leq \frac{\sqrt{2}}{3} \approx 0.47.\]
+
+    \begin{subparag}{Remark}
+        The failure probabilities are still quite high. We will use something called the median trick to improve them.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        For all $j \in \left\{1, \ldots, n\right\}$ and $r \geq \mathbb{Z}_{\geq 0}$, we define: 
+        \[X_{j, r} = I\left[\text{zeros}\left(h\left(j\right)\right) \geq r\right], \mathspace Y_r = \sum_{\substack{j \in \left\{1, \ldots, n\right\} \\ f_j > 0}} X_{j, r}.\]
+
+        Intuitively, $Y_r$ counts the number of elements $j$ that do appear in the stream $j \in \sigma$ (i.e. for which $f_j > 0$), so that $\text{zeros}\left(h\left(j\right)\right) \geq r$.
+
+        Moreover, let $t$ be the value of $z$ when the algorithm terminates. We notice that, for all $r \in \mathbb{Z}_{\geq 0}$, $t \geq r$ means that there is at least one value in the stream so that $\text{zeros}\left(h\left(j\right)\right) \geq r$, i.e:
+        \[Y_r > 0 \iff t \geq r.\]
+
+        Equivalently, for all $r$: 
+        \[Y_r = 0 \iff t \leq r-1\]
+        
+        We aim to find the probability that $Y_r > 0$, for some specific $r$ we will fix later. To do so, we will use Markov and Chebyshev's inequalities, so we need to compute the first and second moments of $Y_r$. Using our lemma:
+        \[\exval\left(X_{r, j}\right) = \prob\left(\text{zeros}\left(h\left(j\right)\right) \geq r\right) = \prob\left(\text{$2^r$ divides $h\left(j\right)$}\right) = \frac{1}{2^r}.\]
+
+        This yields that:
+        \[\exval\left(Y_r\right) = \sum_{\substack{j \in \left\{1, \ldots, n\right\} \\ f_j > 0}} \exval\left(X_{j, r}\right) = \sum_{\substack{j \in \left\{1, \ldots, n\right\} \\ f_j > 0}} \frac{1}{2^r} = \frac{d}{2^r},\]
+        where $d = d\left(\sigma\right)$ is the number of distinct elements in the stream.
+
+        We now compute the variance. Let us start with the one of $X_{j, r}$: 
+        \[\Var\left(X_{j, r}\right) = \exval\left(X_{j, r}^2\right) - \exval\left(X_{j, r}\right)^2 \leq \exval\left(X_{j, r}^2\right) = \exval\left(X_{j, r}\right) = \frac{1}{2^r},\]
+        since this is a Bernoulli random variable and hence all its moments are equal: $\exval\left(X_{j,r}^k\right) = \left(1-p\right)\cdot 0^k + p\cdot 1^k = p = \exval\left(X_{j, r}\right)$.
+
+        Let us now use this result to compute the variance $Y_{j, r}$. Since the hash function is pairwise independent, $X_{j, r}$ and $X_{j', r}$ are independent, for $j \neq j'$. Since $\Var\left(A + B\right) = \Var\left(A\right) + \Var\left(B\right)$ when $A$ and $B$ are independent: 
+        \[\Var\left(Y_r\right) = \sum_{\substack{j \in \left\{1, \ldots, n\right\} \\ f_j > 0}} \Var\left(X_{j, r}\right) \leq \sum_{\substack{j \in \left\{1, \ldots, n\right\} \\ f_j > 0}} \frac{1}{2^r} = \frac{d}{2^r}.\]
+
+        To sum up, we found: 
+        \[\exval\left(Y_r\right) = \frac{d}{2^r}, \mathspace \Var\left(Y_r\right) \leq \frac{d}{2^r}.\]
+        
+        We can now use Markov'sand Chebyshev's inequalities. Using the fact that $Y_r$ is an integer random variable and Markov's inequality: 
+        \[\prob\left(Y_r > 0\right) = \prob\left(Y_r \geq 1\right) \leq \frac{\exval\left(Y_r\right)}{1} = \frac{d}{2^r}.\]
+
+        Moreover, we notice that if $Y_r = 0$, then $\left|Y_r - \frac{d}{2^r}\right| \geq \frac{d}{2^r}$. This yields, by Chebyhsev's inequality:
+        \[\prob\left(Y_r = 0\right) \leq \prob\left(\left|Y_r - \frac{d}{2^r}\right| \geq \frac{d}{2^r}\right) \leq \frac{\Var\left(Y_r\right)}{\left(d/2^r\right)^2} \leq \frac{2^r}{d}.\]
+        
+        Let $\hat{d} = 2^{t + \frac{1}{2}}$ be the estimate that the algorithm computes. Also, let $a$ be the smallest integer such that $2^{a + \frac{1}{2}} \geq 3d$. Notice that, since $t$ is an integer and $a$ is the smallest such integer: 
+        \[\hat{d} \geq 3d \iff 2^{t + \frac{1}{2}} \geq 3d \iff  2^{t + \frac{1}{2}} \geq 2^{a + \frac{1}{2}} \iff t \geq a.\]
+        
+        But then, using the facts that $Y_r > 0 \iff t \geq r$ and $\prob\left(Y_r > 0\right) \leq \frac{d}{2^r}$ we found earlier, and that $2^{a + \frac{1}{2}} \geq 3d$ by definition: 
+        \[\prob\left(\hat{d} \geq 3d\right) = \prob\left(t \geq a\right) = \prob\left(Y_a > 0\right) \leq \frac{d}{2^a} = \frac{3 d\cdot \sqrt{2}}{3\cdot 2^{a + \frac{1}{2}}} \leq \frac{\sqrt{2}}{3}.\]
+
+        Similarly, let $b$ be the largest integer such that $2^{b + \frac{1}{2}} \leq \frac{d}{3}$. Using the facts that $Y_r = 0 \iff t \leq r -1$ and $\prob\left(Y_r = 0\right) \leq \frac{2^r}{d}$ we found earlier: 
+        \[\prob\left(\hat{d} \leq \frac{d}{3}\right) = \prob\left(t \leq b\right) = \prob\left(Y_{b+1} = 0\right) \leq \frac{2^{b+1}}{d} = \frac{2^{b + \frac{1}{2}} \cdot \sqrt{2}}{d} \leq \frac{\sqrt{2}}{3}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm}
+    We want to get an arbitrary success probability. So, we run $k \in \Theta\left(\log_2\left(\frac{1}{\delta}\right)\right)$ independent copies of the algorithm in parallel, and output the median of their answer.
+
+    This algorithm takes space $O\left(\log_2\left(n\right)\cdot k\right) = O\left(\log_2\left(n\right) \log_2\left(\frac{1}{\delta}\right)\right)$. Moreover, its output $\hat{d}\left(\sigma\right)$ is such that: 
+    \[\prob\left(\frac{1}{3} d\left(\sigma\right) \leq \hat{d}\left(\sigma\right) \leq 3 d\left(\sigma\right)\right) \geq 1- \delta.\]
+    
+    \begin{subparag}{Remark 1}
+        For any $\epsilon > 0$, it is possible to improve this algorithm so that it outputs a result where:
+        \[\prob\left(\left(1 - \epsilon\right) d\left(\sigma\right) \leq \hat{d}\left(\sigma\right) \leq \left(1 + \epsilon\right) d\left(\sigma\right)\right) \geq 1- \delta.\]
+
+        We will however not see it in this class.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that we use the median to aggregate the results of all our algorithms. This is because their bias may not be symmetric, and thus the mean would not necessarily be correct.
+
+        This is known as the median trick.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We want the failure probability to be at most $\delta$, so let us construct $k$ that way. For each $i \in \left\{1, \ldots, k\right\}$, we define: 
+        \autoeq{A_i = I\left(\text{the $i$\Th copy does not overestimate by a factor of $3$ or more}\right) = I\left(\hat{d}_i \leq 3d\right).}
+
+        Using the results we found for a single copy of this algorithm:
+        \[\exval\left(A_i\right) = \prob\left(\hat{d}_i \leq 3d\right) = 1 - \prob\left(\hat{d}_i > 3d\right) \approx 1 - 0.47 = 0.53 > \frac{1}{2}.\]
+        
+        Now, the event that the median overestimates is the event that we do not have enough cases where our algorithm does not overestimate:
+        \autoeq{\prob\left(\text{median of $k$ copies overestimates}\right) = \prob\left(\sum_{i=1}^{k} A_i < \frac{k+1}{2}\right) \in e^{-\Omega\left(k\right)},}
+        using Chernhoff's bound. We can also bound the probability that the median of $k$ copies underestimates by $e^{- \Omega\left(k\right)}$ by a completely analogous argument.
+        
+        But then, we can simply take $k \in \Theta\left(\log\left(\frac{1}{\delta}\right)\right)$ to give the wanted failing probability of $\delta$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{AMS sketch}
+
+\begin{parag}{Definition: Second moment}
+    Let $\sigma = \left\langle a_1, \ldots, a_m \right\rangle$ be a stream.
+
+    We define its \important{second moment} $F_2$ as: 
+    \[F_2 = \left\|f\right\|_2^2 = \sum_{i=1}^{n} f_i,\]
+    where, as usual, $f_i$ is the number of times element $i$ appears in $\sigma$.
+
+    \begin{subparag}{Intuition}
+        Consider the stream to be samples from a random distribution, this is some form of computation of their second moment, hence then name of this value. In other words, this is a measure of how different the numbers of the stream are.
+
+        For instance, if $m \leq n$, this is minimal when all elements are distinct, $f_i \in \left\{0, 1\right\}$ for all $i$; and maximal when all elements are the same, $f_i = m$ for some $i$: 
+        \[m \leq F_2 \leq m^2.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        We may wish to consider the first moment of a stream, analogously. This is however simply: 
+        \[F_1 = \sum_{i=1}^{n} f_i = m.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This was studied by Alon, Matias, Szegeity. The application they had in mind was to detect denial of service attacks. A common property is that the network is flooded by packets, but with a small fraction of source IPs. So, a high $F_2$ moment is correlated to a denials of service attack.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Bad algorithm: Downsampling}
+    We may think that we can sample only a small number $t$ of elements from the stream, ignoring the others, and estimate the second moment of the full stream with them.
+
+    This strategy however does not work. To show why, we consider two streams, both of $m$ values. In the first one, we have $\sqrt{m}$ random values, each repeated $\sqrt{m}$ times and ordered randomly. In the second one, we have $m$ random values, each unique. We notice: 
+    \[F_2^{\left(1\right)} = m, \mathspace F_2^{\left(2\right)} = m\sqrt{m}.\]
+
+    It is possible to show that if $t \ll \sqrt{m}$, for instance if $t = \log\left(m\right)^{O\left(1\right)}$ is poly-logarithmic, then the samples of the two streams mostly look identical, i.e. we cannot distinguish the two streams with those $t$ samples. 
+
+    The two streams however have very different $F_2$ moments (recall that $m \leq F_2^{\left(i\right)} \leq m^2$ in this context), so just sampling random values in the two streams cannot be used to make an $\alpha$-approximation algorithm, where $\alpha$ is constant.
+\end{parag}
+
+\begin{parag}{AMS sketch}
+    We consider the following algorithm, named the AMS sketch:
+    \begin{enumerate}
+        \item Pick a hash function $h: \left\{1, \ldots, n\right\} \mapsto \left\{1, -1\right\}$ from a 4-wise independent hash family $\mathcal{H}$.
+        \item Consider the vector $\sigma \in \left\{1, -1\right\}^n$ defined so that, for each $i \in \left\{1, \ldots, n\right\}$, $\sigma_i = h\left(i\right)$. This vector does not have to be stored, and its components can be recomputed when needed.
+        \item Start with $Z = 0$.
+        \item For each element $a_i$ in the stream, update $Z \leftarrow Z + \sigma_i$.
+        \item Output $Z^2$.
+    \end{enumerate}
+
+    In other words, we associate a value $1$ or $-1$ to each value $i$ and then increment or decrement $Z$ (consistently) when some $i$ arrives.
+
+    \begin{subparag}{Intuition}
+        Note that we require that $\mathcal{H}$ is a $4$-wise independent family, i.e. that, for all $a, b, c, d \in \left\{1, \ldots, n\right\}$ different, then $\left(h\left(a\right), h\left(b\right), h\left(c\right), h\left(d\right)\right) \followsdistr \text{Unif}\left(\left\{-1, 1\right\}^4\right)$.
+
+        Moreover, the result of the algorithm is $Z^4$. We will want to bound it using Chebyshev's inequalities, which requires its variance. The second moment of $Z^2$ is $Z^4$, hence requiring 4-wise independence.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        We notice that: 
+        \[Z = \sum_{i = 1}^{n} f_i \sigma_i = f \dotprod \sigma.\]
+        
+        So, we can consider this algorithm as computing some linear projection of $f$.
+    \end{subparag}
+
+    \begin{subparag}{Terminology}
+        We name this algorithm, the AMS sketch, a \important{sketch} because it compressed the data of a stream into a single value. It is moreover linear in the input stream, so we say it is a \important{linear sketch}.
+    \end{subparag}
+\end{parag}
+
+
+
+\end{document}

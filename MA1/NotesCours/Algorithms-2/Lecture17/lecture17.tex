@@ -1,0 +1,238 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-19 at 13:29:09.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Mardi 19 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{17}{2024-11-19}{A frequent problem}{
+\begin{itemize}[left=0pt]
+    \item Introduction to streaming algorithms. 
+    \item Definition of the \lang{MAJORITY} and the $\lang{FREQUENT}\left(k\right)$ problems.
+    \item Explanation and proof of the Misra-Gries estimator.
+    \item Explanation of the \lang{DISTINCT-ELEMENTS} problem.
+    \item Explanation of an algorithm for the \lang{DISTINCT-ELEMENTS} problem.
+\end{itemize}
+
+}
+
+\section{Streaming algorithms}
+\subsection{Definitions}
+
+\begin{parag}{Observation}
+    Some datasets are so big that it is impossible to load it completely into memory. Instead, we consider that the dataset flies by, and that we want to approximate some values from it by using limited resource.
+
+    \begin{subparag}{Example}
+        For instance, we might be interested by:
+        \begin{itemize}
+            \item The most frequent search query on Google;
+            \item The number of distinct cities on Facebook.
+        \end{itemize}
+        
+        Such algorithm needs to be fast, and have a very small memory footprint. This brings us to the following model of computation.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Streaming model of computation}
+    In the \important{streaming model of computation}, we are given as input a stream $\sigma = \left\langle a_1, \ldots, a_m \right\rangle$ where each $a_i \in \left\{1, \ldots, n\right\}$.
+
+    The goal is to output some statistic $\phi\left(\sigma\right)$. Ideally, we want to use $O\left(\ln\left(m\right) + \ln\left(n\right)\right)$ space. It is however possible to show that there are some statistics it is not possible to get exactly with memory $o\left(\min\left\{n, m\right\}\right)$. We will thus allow approximations and randomised algorithms.
+
+    \begin{subparag}{Example}
+        For instance, $\phi\left(\sigma\right)$ could be the number of distinct elements, or the most frequent item.
+    \end{subparag}
+\end{parag}
+
+\subsection{$\lang{FREQUENT}\left(k\right)$ problem}
+
+\begin{parag}{Definition: Frequency vector}
+    Let $\sigma = \left\langle a_1, \ldots, a_m \right\rangle$ be a stream, where each $a_i \in \left\{1, \ldots, n\right\}$.
+
+    We define the \important{frequency vector} $f \in \mathbb{R}^n$  so that $f_i$ is the number of times the item $i$ appears in $\sigma$.
+
+    \begin{subparag}{Remark}
+        Note that we always have: 
+        \[\sum_{i=1}^{n} f_i = m.\]
+
+        Indeed, there are $m$ elements in total, so summing all frequencies should give $m$.
+    \end{subparag}
+\end{parag}
+ 
+\begin{parag}{\lang{MAJORITY} problem}
+    The goal of the \lang{MAJORITY} problem is to output an element $i^* \in \left\{1, \ldots, n\right\}$ such that $f_{i^*} > \frac{m}{2}$, if it exists, and \lang{NONE} otherwise.
+    
+    \begin{subparag}{Remark}
+        It is possible to show that this problem requires a space $\Omega\left(\min\left\{m, n\right\}\right)$ if we allow a single pass. We will thus allow two-pass algorithms, that can read the stream twice.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm}
+    We consider the following algorithm for the \lang{MAJORITY} problem, where we store an element of the stream $x$ and one counter $c$. We start with $c = 1$ and $x = a_1$. Then for each element $a_2, \ldots, a_m$:
+    \begin{enumerate}
+        \item If $a_i = x$, increment $c$.
+        \item Else if $c > 0$, decrement $c$.
+        \item Else, set $c = 1$ and $x = a_i$.
+    \end{enumerate}
+
+    We can then re-read the stream a second time, to find how many times this element $x$ appears, and, if it does appear more than $\frac{m}{2}$ times, output it; otherwise, output \texttt{None}.
+
+    \begin{subparag}{Proof}
+        Instead or proving this algorithm, we will consider the following more general problem, which algorithm we will prove.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{$\lang{FREQUENT}\left(k\right)$ problem}
+    Let $k \in \mathbb{N}_{\geq 2}$ be arbitrary. The goal of the $\lang{FREQUENT}\left(k\right)$ problem is to output the set: 
+    \[\left\{j \in \left\{1, \ldots, n\right\} \suchthat f_j > \frac{m}{k}\right\}.\]
+
+    \begin{subparag}{Remark 1}
+        Note that the output set has at most $k - 1$ elements, since the sum of their frequencies must be at most $m$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        When $n = 2$, this is exactly the \lang{MAJORITY} problem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Misra-Gries estimator}
+    We store $k-1$ elements of $\left\{1, \ldots, n\right\}$, each associated to some counter. We represent this using an associative array $A$, a data structure like a hash table, except that elements that are not in the table are considered as having the value $0$. The key represents the element of $\left\{1, \ldots, n\right\}$, and its value represents the counter.
+
+    We start with $A$ being empty. Then, for each element $j = a_i$ in the stream, we do:
+    \begin{enumerate}
+        \item If $j \in \text{keys}\left(A\right)$, increment $A\left[j\right]$.
+        \item Else if $\left|\text{keys}\left(A\right)\right| < k-1$, then define $A\left[j\right] = 1$.
+        \item Else, for each $i \in \text{keys}\left(A\right)$:
+            \begin{enumerate}[left=0pt]
+                \item Decrement $A\left[i\right]$.
+                \item If $A\left[i\right]$ is zero, remove $i$ from $\text{keys}\left(A\right)$.
+            \end{enumerate}
+    \end{enumerate}
+
+    Note that, at step (3), we do not use the value of $j$. Moreover, this takes space $O\left(\left(k-1\right)\log_2\left(n\right) + \left(k-1\right)\log_2\left(m\right)\right)$. 
+
+    \begin{subparag}{Remark}
+        When $k = 2$, this is the solution we found for \lang{MAJORITY}.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Consider:
+        \[\sigma = \left\langle 1, 1, 2, 2, 4, 4, 1, 4, 4, 1 \right\rangle, \mathspace k = 3.\]
+
+        Our goal is to find all elements with a frequency $f_j > \frac{m}{k} = \frac{10}{3}$, i.e. that appears at least 4 times.
+
+        Let us make a table to represent the state of the algorithm at any iteration. The first row is each value of $\sigma$, and the second and third rows represent the (up to $k - 1 = 2$) values $\left(i, A\left[i\right]\right)$ such that $A\left[i\right] \neq 0$, right after the corresponding element $\sigma_i$ was processed.
+        \begin{center}
+            \renewcommand{\arraystretch}{1.75}
+            \scalebox{0.85}{
+                \begin{tabular}{|cccccccccc|}
+                    \hline
+                    1 & 1 & 2 & 2 & 4 & 4 & 1 & 4 & 4 & 1 \\
+                    \hline
+                   $\left(1, 1\right)$ & $\left(1, 2\right)$ & $\left(1, 2\right)$ & $\left(1, 2\right)$ & $\left(1, 1\right)$ & & $\left(1, 1\right)$ & $\left(1, 1\right)$ & $\left(1, 1\right)$ & $\left(1, 2\right)$\\
+                   
+                   & & $\left(2, 1\right)$ & $\left(2, 2\right)$ & $\left(2, 1\right)$ & & & $\left(4, 1\right)$ & $\left(4, 2\right)$ & $\left(4, 2\right)$  \\
+                   
+                    \hline
+                \end{tabular}
+            }
+            \renewcommand{\arraystretch}{1}
+        \end{center}
+
+        The two keys that end up with a non-zero are $\text{keys}\left(A\right) = \left\{1, 4\right\}$. We can then go through the stream a second time to verify that they do appear at least four times. In our case, they do, so we can output $\left\{1, 4\right\}$. We are not missing any value for this solution.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $\hat{f}_j = A\left[j\right]$ be the output of Misra-Gries estimator, for $j \in \left\{1, \ldots, n\right\}$.
+
+    Then: 
+    \[f_j - \frac{m}{k} \leq \hat{f}_j \leq f_j.\]
+
+    \begin{subparag}{Implication}
+        In particular, this means that this does solve the $\lang{FREQUENT}\left(k\right)$ problem. Indeed, if $\hat{f}_j = 0$, then:
+        \[f_j - \frac{m}{k} \leq 0 \iff f_i \leq \frac{m}{k}.\]
+
+        In other words, all the $k-1$ elements which end up with a non-zero value are the only candidates for the solution of the $\lang{FREQUENT}\left(k\right)$ problem. Verifying they are indeed correct using a second path gives the full solution.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let us consider a slightly different algorithm that is equivalent: when we have a $j \not \in \text{keys}\left(A\right)$, we increment the counter of $j$, and then we decrement the counter of $j$ and all the counters of $i \in \text{keys}\left(A\right)$. 
+
+        The fact that $\hat{f}_j \leq f_j$ is trivial: we only increment the counter when element $j$ arrives, so we can never get $\hat{f}_j > f_j$. We thus only aim to show that $\hat{f}_j \geq f_j - \frac{m}{k}$.
+
+        Note that, every time a decrement is done, exactly $k$ counters are decreased (if there are less than $k - 1$ counters, then we could have stored $j$). However, we only increment the counters $\sum_{j=1}^{n} f_j = m$ times. We can thus decrement all $k$ counters only at most $\frac{m}{k}$ times. This means in particular that any given counter is only decremented at most $\frac{m}{k}$ times, giving our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{\lang{DISTINCT-ELEMENTS} problem}
+
+\begin{parag}{\lang{DISTINCT-} \lang{ELEMENTS} problem}
+    Let $\sigma$ be a stream. The goal of the \lang{DISTINCT-ELEMENTS} problem is to output its number of distincts elements: 
+    \[d\left(\sigma\right) = \left|\left\{j \in \left\{1, \ldots, n\right\} \suchthat f_j > 0\right\}\right|.\]
+\end{parag}
+
+\begin{parag}{Definition: Zeros function}
+    We define the function $\text{zeros}: \mathbb{N} \mapsto \mathbb{N}$ so that: 
+    \[\text{zeros}\left(x\right) = \argmax_{i \in \mathbb{N}}\left\{2^i \text{ divides } x\right\}\]
+    
+    \begin{subparag}{Intuition}
+        Intuitively, on input $x$, this functions outputs the largest $i$ so that $2^i$ divides $x$. Another way to see this is that it outputs the number of consecutive zeros in the least significant bits of $x$, justifying the name of this function.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $k$ be an integer, and $U\left(0, 2^k-1\right)$ be the uniform distribution on the set $\left\{0, \ldots, 2^k-1\right\}$.
+
+    Then, for all $d$ which is a power of $2$: 
+    \[\prob_{x \followsdistr U\left(0, 2^k - 1\right)}\left(\text{zeros}\left(x\right) \geq \log_2\left(d\right)\right) = \frac{1}{d}.\]
+
+    \begin{subparag}{Proof}
+        Notice that we can sample $x \followsdistr U\left(0, 2^k - 1\right)$ by sampling $k$ bits uniformly and independently from $\left\{0, 1\right\}$.
+
+        The probability that the least significant bit of $x$ is $0$ is then $\frac{1}{2}$. Similarly, the probability that the second least significant bit is $0$ is also $\frac{1}{2}$. Continuing that way for all $\log_2\left(d\right)$ least significant bits to be zero, this yields: 
+        \[\prob_{x \followsdistr U\left(0, 2^k - 1\right)}\left(\text{zeros}\left(x\right) \geq \log_2\left(d\right)\right) = \left(\frac{1}{2}\right)^{\log_2\left(d\right)} = \frac{1}{d}.\]
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        We want to use this to make an algorithm for the \lang{DISTINCT-ELEMENTS} problem. The idea is that, if we have a set of $d$ random elements, then we have a reasonable probability that we have an element $x$ so that $\text{zeros}\left(x\right) = \log_2\left(d\right)$. In other words, if there exists a lot more than $d$ distinct elements, then $\prob\left(\text{zeros}\left(h\left(a_i\right)\right) \geq \log_2\left(d\right) \text{ for some $i$}\right)$ is large; and if there is a lot less than $d$ distinct element, then $\prob\left(\text{zeros}\left(h\left(a_i\right)\right) \geq \log_2\left(d\right) \text{ for some $i$}\right)$ is small.
+
+        We can use hash functions to make a set of $d$ elements to be a set of $d$ random elements; hash functions just add randomness. This yields to the following algorithm.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm}
+    We consider an algorithm to solve the \lang{DISTINCT-ELEMENTS} problems
+
+    Let $\sigma$ be a stream. We pick a $h: \left\{1, \ldots, n\right\} \mapsto \left\{1, \ldots, n\right\} \followsdistr \mathcal{H}$ from a pairwise independent hash family. Then, we start with $z = 0$ and, for all $j = a_i$ in the stream:
+    \begin{enumerate}
+        
+        \item Start with $z  = 0$.
+        \item For all value $j = a_i$ in the stream, if $\text{zeros}\left(h\left(j\right)\right) > z$, set $z = \text{zeros}\left(h\left(j\right)\right)$.
+        \item Output $2^{z + 1/2}$.
+    \end{enumerate}
+
+    Note that this uses space $O\left(\log_2\left(n\right)\right)$.
+   
+    \begin{subparag}{Intuition}
+        The idea comes from the previous lemma, as explained there. Then, $z$ is just the maximum value the zeros function takes on the hashed stream:
+        \[z = \max_{i \in \left\{1, \ldots, m\right\}} \text{zeros}\left(h\left(a_i\right)\right),\]
+
+        Finally, we output $2^{z + 1/2}$, because we know $z$ is achieved in our stream, and $z + 1$ is not achieved in our stream; so we know the real value should be somewhere in the middle.
+    \end{subparag}
+\end{parag}
+
+\end{document}

@@ -1,0 +1,237 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-26 at 13:16:23.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Mardi 26 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{19}{2024-11-26}{The probabilistic method}{
+\begin{itemize}[left=0pt]
+    \item Proof of the AMS sketch. 
+    \item Generalisation of the AMS sketch to dimensionality reduction.
+    \item Proof of the Johnson-Lidenstrauss lemma.
+\end{itemize}
+
+}
+
+\begin{parag}{Proposition}
+    $Z^2$ is an unbiased estimator of $F_2$: 
+    \[\exval\left(Z^2\right) = F_2.\]
+
+    \begin{subparag}{Proof}
+        Recall that randomness here comes from the choice of the hash functions, and thus of the $\sigma_i$.
+
+        We find that: 
+        \[\exval\left(Z^2\right) = \exval\left(\left(\sum_{i=1}^n \sigma_i f_i\right)^2\right) = \sum_{i=1}^{n} \sum_{j=1}^{n} \exval\left(\sigma_i \sigma_j\right) f_i f_j.\]
+
+        Note that if $\sigma_i \in \left\{-1, 1\right\}$ and hence $\sigma_i^2 = 1$. So, for $i = j$: 
+        \[\exval\left(\sigma_i \sigma_j\right) = \exval\left(\sigma_i^2\right) = \exval\left(1\right) = 1.\]
+
+        However, if $i \neq j$, since the hash function is 4-wise independent and thus 2-wise independent in particular: 
+        \[\exval\left(\sigma_i \sigma_j\right) = \exval\left(\sigma_i\right) \exval\left(\sigma_j\right) = 0.\]
+
+        So, this yields: 
+        \[\exval\left(Z^2\right) = \sum_{i} \exval\left(\sigma_i^2\right) f_i^2 + \sum_{\substack{i, j \\ i\neq j}} \exval\left(\sigma_i \sigma_j\right) f_i f_j = \sum_{i} f_i^2 = F_2.\]
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This is a typical idea for streaming algorithms: we make a randomised estimator for our value, which is unbiased. We can then use it to make an approximation to be arbitrary close to our result.
+
+        To argue that it is close to the result, we now want to bound the variance in order to exploit Chebyshev's inequality.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    The variance of $Z^2$ can be bounded by:
+    \[\Var\left(Z^2\right) \leq 2 \left\|f\right\|_2^4 = 2 F_2^2.\]
+
+    \begin{subparag}{Proof}
+        Since we compute $\Var\left(Z^2\right)$, we want the fourth moment of $Z$: 
+        \autoeq{\exval\left(Z^4\right) = \exval\left[\left(\sum_{i} \sigma_i f_i\right)\left(\sum_{j} \sigma_j f_j\right)\left(\sum_{k} \sigma_k f_k\right)\left(\sum_{\ell} \sigma_{\ell} f_{\ell}\right)\right] = \sum_{i, j, k, \ell} \exval\left(\sigma_i \sigma_j \sigma_k \sigma_{\ell}\right) f_i f_j f_k f_{\ell}.}
+
+        We consider multiple types of terms in the sum:
+        \begin{itemize}
+            \item If $i = j = k = \ell$: 
+            \[\sum_{i} \exval\left(\sigma_i^4 f_i^4\right) = \sum_{i} f_i^4.\]
+            \item If indices are matched in pairs, i.e. $i = j < k = \ell$ or any other such permutation:  
+            \[\binom{4}{2} \sum_{\substack{i, j \\ i < j}} \exval\left(\sigma_i^2 \sigma_j^2\right) f_i f_j = 6 \sum_{\substack{i, j \\ i < j}} f_i^2 f_j^2,\]
+            since there are $\binom{4}{2}$ different ways to match four indices into pairs.
+            \item If there is at least one index that is different from all others, then this yields zero. For instance, if $i \neq j = k = \ell$: 
+            \[\exval\left(\sigma_i \sigma_j^3\right) = \exval\left(\sigma_i\right) \exval\left(\sigma_j^3\right) = 0\cdot \exval\left(\sigma_j^3\right) = 0.\]
+
+            Another example, if $i, j, k, \ell$ are all different, by 4-wise independence: 
+            \[\exval\left(\sigma_i \sigma_j \sigma_k \sigma_{\ell}\right) = \exval\left(\sigma_i\right) \exval\left(\sigma_j\right) \exval\left(\sigma_k\right) \exval\left(\sigma_{\ell}\right) = 0\cdot 0\cdot 0\cdot 0 = 0.\]
+        \end{itemize}
+        
+        So, this means that: 
+        \[\exval\left(Z^4\right) = \sum_{i} f_i^4 + 6 \sum_{i < j} f_i^2 f_j^2.\]
+        
+        We can now compute the variance of our estimator, using that $\exval\left(Z^2\right) = F_2$ as we found earlier: 
+        \autoeq{\Var\left(Z^2\right) = \exval\left(Z^4\right) - \exval\left(Z^2\right)^2 = \sum_{i} f_i^4 + 6 \sum_{i < j} f_i^2 f_j^2 - \left(\sum_{i} f_i^2\right)^2 = \sum_{i} f_i^4 + 6 \sum_{i < j} f_i^2 f_j^2 - \left(\sum_{i} f_i^4 + 2 \sum_{i < j} f_i^2 f_j^2\right) = 4 \sum_{i < j} f_i^2 f_j^2}
+
+        This is close to a multiple of $\left\|f\right\|_2^4 = \left(\sum_{i} f_i^2\right)^2 = \sum_{i} f_i^4 + 2\sum_{i< j} f_i^2 f_j^2$, except that we are missing a term. Let us add it since it positive:
+        \autoeq{\Var\left(Z^2\right) \leq 4 \sum_{i < j} f_i^2 f_j^2 + 2\sum_{i} f_i^4 = 2 \sum_{i, j} f_i^2 f_j^2 = 2 \left\|f\right\|_2^4 = 2 F_2^2.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm: Improve bound}
+    We now want to decrease the variance, by running multiple independent copies of our algorithm at the same time. 
+
+    Let $t = \frac{6}{\epsilon^2}$. We maintain $t$ iid copies of $Z$, which we name $Z_1, \ldots, Z_t$ (i.e. we sample an independent hash functions for each), and output: 
+    \[\widetilde{Z}^2 = \frac{1}{t} \sum_{i=1}^{t} Z_i^2.\]
+
+    The output of this algorithm is such that:
+    \[\prob\left(\left(1 - \epsilon\right) F_2 \leq \widetilde{Z}^2 \leq \left(1+\epsilon\right)F_2\right) \geq \frac{2}{3}.\]
+
+    \begin{subparag}{Proof}
+        We want to use Chebyshev's inequality. To do so, we need to compute the variance: 
+        \[\Var\left(\widetilde{Z}^2\right) = \frac{1}{t^2} \Var\left(\sum_{i=1}^{t} Z_i\right) = \frac{1}{t^2} \cdot t \Var\left(Z^2\right) = \frac{1}{t} \Var\left(Z^2\right) \leq \frac{2 F_2^2}{t}.\]
+
+        But then, by Chebyshev's inequality, since $t = \frac{6}{\epsilon^2}$ by hypothesis: 
+        \[\prob\left(\left|\widetilde{Z}^2 - F_2\right| > \epsilon F_2\right) \leq \frac{\Var\left(\widetilde{Z}^2\right)}{\epsilon^2 F_2^2} \leq \frac{2}{t \epsilon^2} = \frac{2}{\frac{6}{\epsilon^2} \epsilon^2} = \frac{1}{3}.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm: Improve success probability}
+    We run the improved algorithm above $\Theta\left(\log_2\left(\delta\right)\right)$ times, and output the median. 
+
+    This is so that:
+    \[\prob\left(\left(1 - \epsilon\right) F_2 \leq \hat{F}_2 \leq \left(1 + \epsilon\right) F_2\right) \geq 1 - \delta.\]
+
+    Moreover, it takes a space is $O\left(\frac{1}{\epsilon^2} \ln\left(m\right) \ln\left(\frac{1}{\delta}\right)\right)$.
+
+    \begin{subparag}{Proof}
+        This is the exact same reasoning as the one we did for the \lang{DISTINCT-ELEMENTS} problem.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that we used a very important trick here: we first improved the bound by taking an average, and then we improved the success probability by taking the median. This is very general, and can be applied to many cases. Let us however argue why we used first the mean, and then the median; and why not twice the mean, or the opposite for instance.
+
+        To improve the bound, we cannot use the median. Indeed, the median of many iid random variables does not necessarily converge to their expected value. The mean however does, and thus we do not have a choice on what to use to improve the bound.
+
+        To improve the success probability, we could use both the mean and the median. Indeed, taking $t = \frac{2 \delta}{\epsilon^2}$ in the previous paragraph, we get the same bound but with a fail probability of $\delta$. However, this requires a space complexity of $O\left(t \ln\left(m\right)\right) = O\left(\frac{1}{\epsilon^2} \ln\left(m\right) \frac{1}{\delta}\right)$. Now, using the median allows us to use the Chernhoff bounds, giving a much better inequality and thus allowing to have a space complexity of only $O\left(\frac{1}{\epsilon^2} \ln\left(m\right) \ln\left(\frac{1}{\delta}\right)\right)$. The median is therefore much better.
+    \end{subparag}
+\end{parag}
+
+\subsection{Generalisation to dimensionality reduction}
+
+\begin{parag}{Remark}
+    We want to make a link between the AMS sketch and dimensionality reduction. So, $n$ and $m$ are no longer values related to streams. We may instead consider that $m$ is a lot smaller than $n$; and our goal is to project down vectors from $\mathbb{R}^n$ to $\mathbb{R}^m$ while preserving some properties.
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $m \in O\left(\frac{1}{\epsilon^2}\right)$. There exists some $u$ so that the distribution $A \followsdistr \text{Unif}\left(\left\{-\frac{1}{u}, \frac{1}{u}\right\}^{m \times n}\right)$ is such that, for all $x \in \mathbb{R}^n$: 
+    \[\prob_{A}\left[\left|\left\|A x\right\|_2^2 - \left\|x\right\|^2\right| > \epsilon \left\|x\right\|^2\right] < \frac{1}{3}.\]
+    
+    \begin{subparag}{Proof}
+        This may be surprising, but this is exactly what we proved for the AMS sketch.
+
+        When we improved our bound, we had that:
+        \autoeq{\prob\left(\left(1 - \epsilon\right) F_2 \leq \widetilde{Z}^2 \leq \left(1+\epsilon\right)F_2\right) \geq \frac{2}{3} \iff \prob\left(\left|\widetilde{Z}^2 - F_2\right| > \epsilon F_2\right) \leq \frac{1}{3}.}
+
+        A way to see this is that we sampled some random matrix $B \in \left\{-1, 1\right\}^{t \times n}$, with $t \in O\left(\frac{1}{\epsilon^2}\right)$. Each row of this matrix, $\sigma^{\left(i\right)}$, corresponds to another instance of the program running in parallel. We can then rewrite $\widetilde{Z}^2$ as:
+        \[\widetilde{Z}^2 = \frac{1}{t} \sum_{i=1}^{t} Z_i^2 = \frac{1}{t} \sum_{i=1}^{t} \left(\sigma^{\left(i\right)} \dotprod f\right)^2 = \frac{1}{t} \sum_{i=1}^{t} \left(B f\right)_i^2 = \frac{1}{t} \left\|B f\right\|^2.\]
+
+        So, our result for the AMS sketch stated that:
+        \[\prob_{B}\left[\left|\frac{1}{t} \left\|B f\right\|_2^2 - \left\|f\right\|_2^2\right| > \epsilon \left\|f\right\|_2^2\right] < \frac{1}{3}.\]
+
+        However, nothing we did depended on the definition of the frequency vector $f$, we just considered it to be an arbitrary vector $x \in \mathbb{R}^n$. We may thus just as well call it $x$. Moreover, we can let $A = \frac{1}{\sqrt{t}} B \in \left\{-\frac{1}{\sqrt{t}}, \frac{1}{\sqrt{t}}\right\}^{t \times n}$ to get: 
+        \[\prob_{A}\left[\left|\left\|A x\right\|_2^2 - \left\|x\right\|_2^2\right| > \epsilon \left\|x\right\|_2^2\right] < \frac{1}{3}.\]
+
+        This is exactly our result, by relabelling $m \leftarrow t$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $A \in \mathbb{R}^{m \times n}$ be a matrix, $x \in \mathbb{R}^n$ be a vector, and $\epsilon \in \left]0, 1\right[ $ be a scalar.
+
+    If $\left(1 - \epsilon\right) \left\|x\right\|^2 \leq \left\|A x\right\|^2 \leq \left(1 + \epsilon\right) \left\|x\right\|^2$, then: 
+    \[\left(1 - \epsilon\right) \left\|x\right\| \leq \left\|A x\right\| \leq \left(1 + x\right) \left\|x\right\|.\]
+
+    \begin{subparag}{Implication}
+        In other words, if $A$ is a random matrix, we have the following relation between the two random events:
+        \autoeq[s]{\left\{\left(1 - \epsilon\right) \left\|x\right\|^2 \leq \left\|A x\right\|^2 \leq \left(1 + \epsilon\right) \left\|x\right\|^2\right\} \subseteq \left\{\left(1 - \epsilon\right) \left\|x\right\| \leq \left\|A x\right\| \leq \left(1 + x\right) \left\|x\right\|\right\}.}
+
+        This means that the matrix distribution from the previous theorem is such that:
+        \autoeq[s]{\prob_A\left(\left(1 - \epsilon\right)\left\|x\right\| \leq \left\|A x\right\| \leq \left(1 + \epsilon\right) \left\|x\right\|\right) \geq \prob_A\left(\left(1 - \epsilon\right)\left\|x\right\|^2 \leq \left\|A x\right\|^2 \leq \left(1 + \epsilon\right) \left\|x\right\|^2\right) \geq \frac{2}{3}.}
+
+        This is a form of dimensionality reduction: $A x$ is a smaller vector than $x$, but it has a very similar norm.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        We suppose by hypothesis that $\left(1 - \epsilon\right) \left\|x\right\|^2 \leq \left\|A x\right\|^2 \leq \left(1 + \epsilon\right) \left\|x\right\|^2$. But then, taking the square root: 
+        \[\sqrt{1 - \epsilon} \left\|x\right\| \leq \left\|A x\right\| \leq \sqrt{1 + \epsilon} \left\|x\right\|.\]
+        
+        Now, we know that $1 - \epsilon < \sqrt{1 - \epsilon}$ and $\sqrt{1 + \epsilon} < 1 + \epsilon$, for $\epsilon \left]0, 1\right[ $. This gives our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Gaussian sketch}
+    Let $m$ be arbitrary. We consider the distribution of matrices so that $A_{ij} \followsdistr \mathcal{N}\left(0, \frac{1}{m}\right)$ independently.
+
+    Then, there exists some constant $C > 0$ so that, for all $x \in \mathbb{R}^n$:
+    \[\prob_A\left(\left|\left\|A x\right\|^2 - \left\|x\right\|^2\right| > \epsilon \left\|x\right\|^2\right) < \exp\left(-C \epsilon^2 m\right).\]
+
+    \begin{subparag}{Remark 1}
+        This matrix distribution has the same mean and variance as the one we had above. The only difference is that the coefficients now follow a Gaussian distribution, instead of being sampled from a set with two values.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We notice that if $m = \frac{C}{\epsilon^2} \ln\left(3\right)$ is sufficiently big, then the success probability is $\frac{1}{3}$, just like we had before. However, this theorem is a lot more powerful, because, if we take $m$ to be larger, the error decreases exponentially fast.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        Applying our lemma, this means that:
+        \[\prob_A\left[\left(1 - \epsilon\right)\left\|x\right\| \leq \left\|A x\right\| \leq \left(1 + \epsilon\right) \left\|x\right\|\right] \geq 1 - e^{-C \epsilon^2 m}.\]
+
+        This is again a great result for dimensionality reduction.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Johnson-Lidenstrauss lemma}
+    Let $\epsilon \in \left]0, 1\right[ $ and $x_1, \ldots, x_n \in \mathbb{R}^d$ be arbitrary.
+
+    There exists some $M \in \mathbb{R}^{m \times d}$, where $m \in O\left(\frac{1}{\epsilon^2} \log\left(n\right)\right)$, such that, for all $i, j \in \left\{1, \ldots, n\right\}$: 
+    \[\left(1 - \epsilon\right) \left\|x_i - x_j\right\|_2 \leq \left\|M\left(x_i - x_j\right)\right\|_2 \leq \left(1+\epsilon\right) \left\|x_i - x_j\right\|_2.\]
+    
+    \begin{subparag}{Intuition}
+        Intuitively, we have $n$ points which we can project onto a space of much smaller dimension (in logarithmic dimension), while preserving the distances.
+
+        Note that this is a may be surprising result. Moreover, this is really a property of Euclidean geometry. We can for instance not make a similar theorem for the $L_1$ distance.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We exploit the probabilistic method. In other words, we show that there is a distribution of matrices $M$ so that the required property has a non-zero probability to appear, which necessarily implies that there is at least a matrix in that distribution that respects this property.
+
+        We consider the distribution of $m \times d$ matrix where each coefficient is a zero mean Gaussian with variance $\frac{1}{m}$. Moreover, for all $i, j$, we define $y^{ij} = x_i - x_j$. By our theorem, we know that there exists some $C > 0$ so that: 
+        \[\prob_M\left(\left|\left\|M y^{ij}\right\| - \left\|y^{ij}\right\|\right| > \epsilon \left\|y^{ij}\right\|\right) \leq e^{-C \epsilon^2 m}.\]
+        
+        We choose $m$ so that $e^{-C \epsilon^2 m} \leq 1/n^4$, i.e. $m = \frac{4}{C \epsilon^2} \ln\left(n\right) \in O\left(\frac{1}{\epsilon^2} \ln\left(n\right)\right)$. By the union bound, the probability a matrix $M$ does not have the required property is such that: 
+        \autoeq[s]{\prob\left(\exists i, j, \left|\left\|M y^{ij}\right\| - \left\|y^{ij}\right\|\right| > \epsilon \left\|y^{ij}\right\|\right) \leq \sum_{i,j} \prob_M\left(\left\|M y^{ij}\right\| - \left\|y^{ij}\right\| > \epsilon \left\|y^{ij}\right\|\right) \leq \sum_{i,j} \frac{1}{n^4} \leq \frac{n^2}{n^4} = \frac{1}{n^2} < 1.}
+
+        This shows that there is a non-zero probability to have a matrix following the required property when sampling this random distribution, which means that there is at least such a matrix in the support of the distribution. This finishes the proof.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

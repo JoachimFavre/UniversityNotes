@@ -1,0 +1,198 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-12-03 at 13:35:23.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Mardi 03 décembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{21}{2024-12-03}{Eating ice cream}{
+\begin{itemize}[left=0pt]
+    \item Definition of submodular function.
+    \item Proof of an equivalent definition for submodular functions.
+    \item Examples of submodular functions.
+\end{itemize}
+
+}
+
+\section{Submodular function optimisation}
+
+\subsection{Definitions}
+
+\begin{parag}{Definition: Power set}
+    Let $N$ be a set.
+
+    We define its \important{power set}, written $2^N = \mathcal{P}\left(N\right)$, as the set of its subsets: 
+    \[2^N = \left\{C \suchthat C \subseteq N\right\}.\]
+
+    \begin{subparag}{Intuition}
+        This notation is justified when we consider cardinalities: 
+        \[\left|2^N\right| = 2^{\left|N\right|}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Set function}
+    A \important{set function} is a function $f: 2^N \mapsto \mathbb{R}$ for some set $N$. 
+
+    \begin{subparag}{Intuition}
+        Intuitively, it assigns a value to each subset of $N$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Submodular function}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a set function.
+    
+    $f$ is said to be \important{submodular} if, for all $C, D \subseteq N$: 
+    \[f\left(C\right) + f\left(D\right) \geq f\left(C \cup D\right) + f\left(C \cap D\right).\]
+
+    \begin{subparag}{Intuition}
+        This definition may seem abstract. We will thus show an equivalence on this definition, which will make it more intuitive.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Given notation}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a set function, and $A \subseteq N$ and $u \in N$.
+
+    We define $f\left(u | A\right)$ to be how much more value we get when adding the element $u$ to $A$: 
+    \[f\left(u | A\right) = f\left(A + u\right) - f\left(A\right).\]
+
+    \begin{subparag}{Remark}
+        We may also abuse slightly this notation, by also applying it to sets $B \subseteq N$: 
+        \[f\left(B \suchthat A\right) = f\left(A \cup B\right) - f\left(A\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a set function.
+
+    $f$ is submodular if and only if, for all $A, B \subseteq N$ so that $A \subseteq B$ and for all $u \in N \setminus B$: 
+    \[f\left(u | A\right) \geq f\left(u | B\right).\]
+
+    We call this the \important{diminishing return property}.
+    
+    \begin{subparag}{Intuition}
+        This lemma gives a much more intuitive definition of submodular functions.
+
+        The idea is that adding an element $u$ to a set that already has many elements $B$ is less interesting than adding $u$ to a set with less elements $A \subseteq B$. For instance, if we create one iPhone, it is insanely expensive. If we create one iPhone after having created a billion iPhones, it is a lot cheaper. Similarly, eating our first spoon of ice cream of the day gives a lot more happiness than the fifth consecutive spoon.
+
+        Submodular function thus capture the idea of diminishing returns, hence the name of this property. Finding algorithms to optimise this type of function will thus allow to consider something else than just the typical optimisation of linear functions.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\implies$}
+        We suppose that $f$ is submodular by hypothesis. We notice that, by definition of submodularity: 
+        \autoeq{f\left(A + u\right) + f\left(B\right) \geq f\left(\left(A + u\right) \cup B\right) + f\left(\left(A + u\right) \cap B\right) = f\left(B + u\right) + f\left(A\right).}
+
+        Reordering the terms, this yields our result: 
+        \[f\left(A + u\right) - f\left(A\right) \geq f\left(B + u\right) - f\left(B\right) \iff f\left(u | A\right) \geq f\left(u | B\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        We suppose by hypothesis that $f$ respects: 
+        \[f\left(u|A\right) \geq f\left(u|B\right).\]
+        
+        Let $C, D \subseteq N$ be arbitrary. We want to verify that $f\left(C\right) + f\left(D\right) \geq f\left(C \cup D\right) + f\left(C \cap D\right)$. We consider the elements of $D \setminus C = \left\{d_1, d_2, \ldots, d_h\right\}$, and use them to write $D_0 = \o$ and $D_i = \left\{d_1, d_2, \ldots, d_i\right\}$. Note that $D_h = D \setminus C$.
+
+        Using these notations, our goal is to show that: 
+        \autoeq{f\left(D\right) - f\left(C \cap D\right) \geq f\left(C \cup D\right) - f\left(C\right) \iff f\left(C \cap D + D_h\right) - f\left(C \cap D\right) \geq f\left(C + D_h\right) - f\left(C\right).}
+
+        Intuitively, we want to show $f\left(D_h \suchthat C \cap D\right) \geq f\left(D_h \suchthat C\right)$. This is very close to what our hypothesis tells us, since $C \cap D \subseteq C$. However, our hypothesis only gives us a comparison for sets that differ by a single element, and $D_h$ contains many elements. So, we split our comparison into a telescoping sum, in order to only have to compare sets that have a single element of difference:
+        \autoeq{f\left(D\right) - f\left(C \cap D\right) = f\left(C \cap D + D_h\right) - f\left(C \cap D + D_0\right) = \left(f\left(C \cap D + D_1\right) - f\left(C \cap D + D_0\right)\right) \fakeequal + \left(f\left(C \cap D + D_2\right) - f\left(C \cap D + D_1\right)\right) \fakeequal + \ldots \fakeequal + \left(f\left(C \cap D + D_h\right) - f\left(C \cap D + D_{h-1}\right)\right) = \sum_{i=1}^{h} \left(f\left(C \cap D + D_i\right) - f\left(C \cap D + D_{i-1}\right)\right)  = \sum_{i=1}^{h} f\left(d_i \suchthat C \cap D + D_{i-1}\right).}
+        
+        Now, notice that $C + D_{i-1} \subseteq C \cap D + D_{i-1}$. So, using our hypothesis, this yields, collapsing the new telescoping series:
+        \autoeq{f\left(D\right) - f\left(C \cap D\right) \geq \sum_{i=1}^{h}  f\left(d_i \suchthat C + D_{i-1}\right) = \sum_{i=1}^{h} \left(f\left(C + D_i\right) - f\left(C+ D_{i-1}\right)\right) = f\left(C + D_h\right) - f\left(C + D_{h-1}\right) \fakeequal + \ldots \fakeequal + f\left(C + D_{1}\right) - f\left(C + D_0\right) = f\left(C + D_h\right) - f\left(C + D_0\right) = f\left(C \cup D\right) - f\left(C\right),}
+        
+        Reordering the terms, we get our result: 
+        \[f\left(C\right) + f\left(D\right) \geq f\left(C \cup D\right) + f\left(C \cap D\right).\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: Cut functions}
+    Let $G = \left(V, E\right)$ be some graph. We define $\delta: 2^V \mapsto \mathbb{R}$ to be the cut function, i.e., for any $S \subseteq V$, $\delta\left(S\right)$ is the number of edges between $S$ and $\bar{S}$.
+
+    Then, $\delta$ is submodular.
+
+    \begin{subparag}{Proof}
+        As usual when we speak of cuts, let $E\left(S, \bar{S}\right)$ be the set of edges crossing the cut $S \subseteq V$: 
+        \[E\left(S, \bar{S}\right) = \left\{\left\{u, v\right\} \in E \suchthat u \in S, v \in \bar{S}\right\}.\]
+ 
+        Our function is thus simply: 
+        \[\delta\left(S\right) = \left|E\left(S, \bar{S}\right)\right|.\]
+
+        To show this function is submodular, we want to better understand $\delta\left(v \suchthat S\right)$, for any $S \subseteq V$ and $v \in V \setminus S$. We notice that, when we add some vertex $v$ to $S$, all edges that connect $v$ to $S$ no longer cross the cut, but all edges that connect $v$ to $V \setminus \left(S + v\right)$ now start crossing the cut. More mathematically:
+        \[\delta\left(v \suchthat S\right) =  - \left|E\left(v, S\right)\right| + \left|E\left(v, V \setminus \left(S + v\right)\right)\right|.\]
+        \svghere[1]{CutfunctionIsSubmodular.svg}
+        
+        We want to verify $\delta\left(v \suchthat S\right) \geq \delta\left(v \suchthat T\right)$ when $S \subseteq T$. When increasing the size of $S$, then $\left|E\left(v, S\right)\right|$ increases but $\left|E\left(v, V \setminus \left(S + v\right)\right)\right|$ decreases. This shows that $\delta\left(u \suchthat S\right)$ is decreasing in $S$. This is the diminishing return property, finishing the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let us consider a set of topics $U$, and $n$ documents $T_1, \ldots, T_n \subseteq U$ that each cover some topics.
+
+    We consider $f: 2^N \mapsto \mathbb{R}$ be defined to be the number of topics covered by documents in $S \subseteq N = \left\{T_1, \ldots, T_n\right\}$: 
+    \[f\left(S\right) = \left|\bigcup_{i \in S} T_i\right|.\]
+    
+    This $f$ is submodular. Adding more documents yields a decreasing increase of the objective function $f$.
+\end{parag}
+
+\begin{parag}{Example 3: Independent set rank}
+    Let $M = \left(N, \mathcal{I}\right)$ be a matroid. We consider the function $\text{rank}: 2^N \mapsto \mathbb{R}$ defined so that $\text{rank}\left(S\right)$ is the cardinality of a maximal independent set that is a subset of $S$: 
+    \[\text{rank}\left(S\right) = \max_{\substack{A \subseteq S \\ A \in \mathcal{I}}} \left|S\right|.\]
+    
+    Then, $\text{rank}$ is submodular.
+
+    \begin{subparag}{Proof}
+        Let $A, B$ be arbitrary. We want to show that: 
+        \[\text{rank}\left(A\right) + \text{rank}\left(B\right) \geq \text{rank}\left(A \cup B\right) + \text{rank}\left(A \cap B\right).\]
+
+        Let $C$ be the maximal independent set in $A \cap B$. We then extend $C$ to obtain $D$ to be the maximal independent set of $A \cup B$ by running the \lang{GREEDY} algorithm (which we can do by the matroid extension property, since $A \cap B \subseteq A \cup B$). By definition, these are so that: 
+        \[\left|C\right| = \text{rank}\left(A \cup B\right), \mathspace \left|D\right| = \text{rank}\left(A \cap B\right).\]
+
+        We can visualise the setup so far using the following diagram:
+        \svghere[0.8]{RankIsSubmodular.svg}
+        
+        Consider $D_A = D \cap A = C \cup \left(D \setminus B\right)$ to be the projection of $D$ where we only keep elements in $A$. Since $D \cap A \subseteq D$, this means that $D_A$ is an independent set by the downard-closedness property of matroids. Since $\text{rank}\left(A\right)$ is the size of the largest independent set in $A$, this notably means that: 
+        \[\text{rank}\left(A\right) \geq \left|D_A\right| = \left|C\right| + \left|D \setminus B\right|.\]
+        
+        Doing a completely symmetrical argument for $B$, this yields that: 
+        \[\text{rank}\left(B\right) \geq \left|C\right| + \left|D \setminus A\right|.\]
+
+        This finally yields our result, using the fact $\left|D \setminus B\right| + \left|C\right| + \left|D \setminus A\right| = \left|D\right|$ of which we can convince ourselves using the diagram above: 
+        \autoeq{\text{rank}\left(A\right) + \text{rank}\left(B\right) \geq \left|C\right| + \left|D \setminus B\right| + \left|C\right| + \left|D \setminus A\right| = \left|C\right| + \left|D\right| = \text{rank}\left(A \cup B\right) + \text{rank}\left(A \cap B\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example 4: Influence maximisation}
+    We want to sell a new product. We can give away $k$ free samples. When we give a product to a person $p$, they tell all their friends with probability $\frac{1}{2}$, who will tell their friends with probability $\frac{1}{2}$, and so on. The friend graph is known.
+
+    Given some set of vertices $S$, we consider $f\left(S\right)$ to be the expected number of people that are reached when giving free samples to everyone in $S$. 
+
+    This is a submodular function. We will analyse it in more details in the eleventh exercise series.
+
+    \begin{subparag}{Remark}
+        Given this function, our real goal is to maximise it. This leads us to the following.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Submodular function optimisation}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a submodular function. We want to optimise $f$ in time $\lang{poly}\left(\left|N\right|\right)$ (but not in time $2^{\left|N\right|}$, i.e. we cannot try all possible inputs of $f$). We moreover consider that we have an oracle representation of $f$ so that, on input $S \subseteq N$, we can efficiently ask for the value $f\left(S\right)$.
+
+    As we will see, minimisation is in \lang{P} (with a non-trivial algorithm). On the other hand, maximisation is \lang{NP}-hard, so we will consider an approximation algorithm (which will appear to be quite simple). 
+\end{parag}
+
+\end{document}

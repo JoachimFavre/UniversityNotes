@@ -1,0 +1,279 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-18 at 13:17:50.
+
+\usepackage{../../style}
+
+\title{Alga 2}
+\author{Joachim Favre}
+\date{Lundi 18 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{16}{2024-11-18}{I love algebra}{
+\begin{itemize}[left=0pt]
+    \item Construction of a 2-universal hash function.
+    \item Explanation of the two-hashing scheme for hash tables.
+    \item Definition of $k$-wise independence.
+    \item Construction of a $k$-wise independent hash function.
+    \item Explanation of load balancing.
+\end{itemize}
+}
+
+\begin{parag}{Bertrand's postulate}
+    Let $n > 1$ be an integer.
+
+    Then, there exists a primer number $p$ so that: 
+    \[n \leq p < 2n.\]
+\end{parag}
+
+\begin{parag}{Definition}
+    Let $p$ be a prime number between $\left|U\right|$ and $2\left|U\right|$. For $a, b \in \mathbb{F}_p$ but $a \neq 0$, we define: 
+    \[f_{a, b}\left(x\right) = \left(ax + b\right) \Mod p, \mathspace h_{a, b}\left(x\right) = f_{a, b}\left(x\right) \Mod N.\]
+    
+   Then, we define the following hash family:  
+   \[\mathcal{H} = \left\{h_{a,b} \suchthat a, b \in \mathbb{F}_p, a \neq 0\right\}.\]
+
+   \begin{subparag}{Remark}
+       We notice that $\left|\mathcal{H}\right| = p\left(p-1\right) \approx p^2$. So, a hash function takes memory $\log_2\left(\left|\mathcal{H}\right|\right) = O\left(2 \log_2\left(p\right)\right) = O\left(\log_2\left(\left|U\right|\right)\right)$. This is indeed storable.
+   \end{subparag}
+
+   \begin{subparag}{Intuition}
+       Intuitively, $f_{a, b}\left(x\right)$ first reorders elements of U, by adding space between consecutive elements for instance. Then, $h_{a, b}\left(x\right)$ compresses the space onto $\left\{0, \ldots, N-1\right\}$.
+   \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $p$ be a prime number, and let $y, s, t \in \mathbb{F}_p$ be arbitrary.
+
+    For any $x \in \mathbb{F}_p \setminus \left\{y\right\}$, the following system has exactly one solution $a, b \in \mathbb{F}_p^2$, modulo $p$: 
+    \[\begin{systemofequations} ax + b = s, \\ ay + b = t. \end{systemofequations}\]
+
+    \begin{subparag}{Proof}
+        This system is of the form: 
+        \[\begin{pmatrix} x & 1 \\ y & 1 \end{pmatrix} \begin{pmatrix} a \\ b \end{pmatrix}  = \begin{pmatrix} s \\ t \end{pmatrix}.\]
+
+        Solving it over our field $\mathbb{F}_p$, we find that: 
+        \[a = \left(x-y\right)^{-1} \left(s - t\right), \mathspace b = s - ax.\]
+
+        This is indeed unique, when $x \neq y$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+        $\mathcal{H}$ is 2-universal.
+
+        \begin{subparag}{Remark}
+            This hash family could thus be used for hash tables.
+        \end{subparag}
+
+        \begin{subparag}{Proof}
+            Let $x \neq y$. Our previous lemma yields that, for any $s, t$: 
+            \[\prob_{a, b}\left(f_{a, b}\left(x\right) = s \land f_{a, b}\left(y\right) = t\right) = \begin{systemofequations} 0, & \text{if $s = t$,} \\ \frac{1}{p\left(p-1\right)}, & \text{if $s \neq t$.} \end{systemofequations}\]
+
+            Indeed, our lemma tells us that there exists a unique $\left(a, b\right)$ that solves both $f_{a, b}\left(x\right) = s$ and $f_{a, b}\left(y\right) = t$. When $s = t$, we will always have $a = 0$, which is not valid by definition of our Hash function. When $s \neq t$, the $\left(a, b\right)$ pair will always be valid (since $a \neq 0$). However, we pick $\left(a, b\right)$ uniformly at random in a set of $\left(p-1\right)\cdot p$ possibilities ($\left(p-1\right)$ possibilities for $a$ and $p$ for $b$), giving this result.
+
+            So, for all $x, y \in U$ so that $x \neq y$:
+            \autoeq[s]{\prob_{h \followsdistr \mathcal{H}}\left(h\left(x\right) = h\left(y\right)\right) = \sum_{\substack{s, t \in \mathbb{F}_p \\ s = t \Mod N}} \prob_{a, b}\left(f_{a, b}\left(x\right) = s \land f_{a, b}\left(y\right) = t\right) = \sum_{s, t \in \mathbb{F}_p} I\left(s = t \Mod N\right) \prob\left(f_{a, b}\left(x\right) = s \land f_{a, b}\left(y\right) = t\right) = \frac{1}{p\left(p-1\right)} \underbrace{\sum_{\substack{s, t \in \mathbb{F}_p \\ s \neq t}} I\left(s = t \Mod N\right)}_{= S}.}
+
+            Our goal is to show that the sum $S$ is so that $S \leq \frac{p\left(p-1\right)}{N}$, since it would indeed show the 2-universal property, i.e. that $\prob\left(h\left(x\right) = h\left(y\right)\right) \leq \frac{1}{N}$. Given a fixed $s$, note that there are at most $\left\lceil \frac{p-1}{N} \right\rceil $ values in $\left\{0, \ldots, p-1\right\}$ that have the same rest modulo $N$ as $s$. For instance, considering the following diagram where $p = 11$ and $N = 3$, there are at most one element with any given rest modulo $N$ per block. Also, since almost each block has size $N = 3$, there are $\left\lceil \frac{p-1}{N} \right\rceil = \left\lceil \frac{10}{3} \right\rceil = 4$ blocks. This shows there are at most $\left\lceil \frac{p-1}{N} \right\rceil $ elements with any given rest modulo $N$.
+            \begin{center}
+            \renewcommand{\arraystretch}{1.75}
+            \begin{tabular}{r|ccc|ccc|ccc|cc|}
+                \cline{2-12}
+                $x$ & $0$ & $1$ & $2$ & $3$ & $4$ & $5$ & $6$ & $7$ & $8$ & $9$ & $10$ \\
+                $x \Mod 3$ & $0$ & $1$ & $2$ & $0$ & $1$ & $2$ & $0$ & $1$ & $2$ & $0$ & $1$ \\
+                \cline{2-12}
+            \end{tabular}
+            \renewcommand{\arraystretch}{1}
+            \end{center}
+            
+
+            Mathematically, this translates to:
+            \[\sum_{\substack{t \in \mathbb{F}_p \\ t \neq s}} I\left(s = t \Mod N\right) \leq \left\lceil \frac{p-1}{N} \right\rceil - 1 \leq \frac{p-1}{N}.\]
+
+            This allows us to finish the proof: 
+            \autoeq{\prob_{h \followsdistr \mathcal{H}}\left(h\left(x\right) = h\left(y\right)\right) = \frac{1}{p\left(p-1\right)} \sum_{s \in \mathbb{F}_p} \sum_{\substack{t \in \mathbb{F}_p \\ t \neq s}} I\left(s = t \Mod N\right) \leq \frac{1}{N\cdot p} \sum_{s \in \mathbb{F}_p} = \frac{1}{N}.}
+
+            \qed
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Collision free hashing}
+
+\begin{parag}{Goal}
+    As explained before, a hash table uses a linked list to handle collisions. We want to consider another hash table scheme.
+\end{parag}
+
+\begin{parag}{Proposition: Expected number of collisions}
+    Let $S$ be some dataset we want to store in a hash table, $\mathcal{H}$ be a 2-universal hash family, and let $C$ be a random variable that counts the number of collisions.
+
+    Then: 
+    \[\exval\left(C\right) \leq \binom{\left|S\right|}{2} \cdot \frac{1}{N}.\]
+
+    If moreover $N \geq \left|S\right|^2$, then: 
+    \[\exval\left(C\right) \leq \frac{1}{2}.\]
+
+    \begin{subparag}{Proof}
+        We have using the fact that $\mathcal{H}$ is a 2-universal hash family: 
+        \[\exval\left(C\right) = \sum_{\substack{x, y \in S \\ x \neq y}} \prob_{h \followsdistr \mathcal{H}}\left(h\left(x\right) = h\left(y\right)\right) \leq \frac{1}{N} \sum_{\substack{x, y \in S \\ x \neq y}} = \binom{\left|S\right|}{2} \frac{1}{N}.\]
+
+        The second inequality directly comes from the fact that $\binom{\left|S\right|}{2} \cdot \frac{1}{N} \leq \frac{1}{2}$ when $N \geq \left|S\right|^2$.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This states that, if we have a hash table of quadratic size, then we can expect to have no collision; which would thus not require any linked list.
+
+        However, quadratic memory is not great, which leads to the following scheme.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Collision-free two-hashing scheme}
+    We consider a hash table with hash function $h$ where, instead to use a linked list to handle collision, we use a quadratic size hash table In other words, for each $i \in \left\{1, \ldots, N\right\}$, there is a hash table with hash function $h_i$, which uses enough space so that it does not have to use linked lists.
+
+    This scheme takes memory $O\left(\left|S\right|\right)$.
+
+    \begin{subparag}{Proof}
+        For $i \in \left\{1, \ldots, N\right\}$, let $s_i$ be the number of elements of $S$ hashing into the $i$\Th slot: 
+        \[s_i = \left|\left\{x \in S \suchthat h\left(x\right) = i\right\}\right|.\]
+
+        Then, there exists a collision free hash function $h_i$ for $\left\{x \in S \suchthat h\left(x\right) = i\right\}$ that requires $s_i^2$ slots, i.e. quadratically many. We can for instance find it by sampling it randomly from our hash family, as the proposition above states.
+
+        The expected total size is the sum of the second-layer hash tables:
+        \[\exval\left(\sum_{i} s_i^2\right) = \exval\left(\sum_{i} s_i\left(s_i - 1\right)\right) + \exval\left(\sum_{i} s_i\right).\]
+
+        Note that $\frac{s_i\left(s_i - 1\right)}{2}$ is the number of pairs in the $i$\Th second-level table. By construction, elements of this second-level table hash to the same value under the first-level hash function $h$. But then, $\sum_{i} \frac{s_i \left(s_i - 1\right)}{2}$ is the total number of collisions in the whole table, the $C$ from the propositions above. This yields that, using our proposition: 
+        \[\exval\left(\sum_{i} s_i\left(s_i - 1\right)\right) = 2 \exval\left(\sum_{i} \frac{s_i\left(s_i - 1\right)}{2}\right) = 2 \exval\left(C\right) \leq 2\cdot \binom{\left|S\right|}{2} \cdot \frac{1}{N}.\]
+
+        Moreover, the sum of elements of the second level tables, $\sum_{i} s_i$, is the total number of elements in the whole table, i.e. $\sum_{i} s_i = \left|S\right|$. Putting both together, the expected size is, if $N \geq \left|S\right|$: 
+        \[\exval\left(\sum_{i} s_i^2\right) = 2 \binom{S}{2}\cdot \frac{1}{N} + \left|S\right| \leq 2\left|S\right|.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsubsection{$k$-wise independence}
+
+\begin{parag}{Definition: Pairwise independence}
+    Let $\mathcal{H}$ be a family of hash functions.
+
+    $\mathcal{H}$ is said to be \important{pairwise independent} if for all $x, y \in \mathcal{U}$ so that $x \neq y$, and for all $s, t \in \left\{0, \ldots, N-1\right\}$: 
+    \[\prob_{h \followsdistr \mathcal{H}}\left(h\left(x\right) = s \land h\left(y\right) = t\right) = \frac{1}{N^2}.\]
+
+    \begin{subparag}{Intuition}
+        In other words, the joint distribution $\left(h\left(x\right), h\left(y\right)\right)$ is uniform.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $\mathcal{H}$ be a pairwise independent hash family. 
+
+    Then, it is 2-universal.
+
+    \begin{subparag}{Proof}
+        The proof is direct:
+        \[\prob\left(h\left(x\right) = h\left(y\right)\right) = \sum_{s = 0}^{N-1} \prob\left(h\left(x\right) = s \land h\left(y\right) = s\right) = \sum_{s = 0}^{N - 1} \frac{1}{N^2} = \frac{1}{N}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Onewise independence}
+    Let $\mathcal{H}$ be a family of hash functions.
+
+    $\mathcal{H}$ is said to be \important{onewise independent} if for all $x \in \mathcal{U}$ and for all $s \in \left\{0, \ldots, N-1\right\}$: 
+    \[\prob_{h \followsdistr \mathcal{H}}\left(h\left(x\right) = s\right) = \frac{1}{N}.\]
+
+    \begin{subparag}{Remark}
+        Pairwise independence implies onewise independence.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $k$-wise independence}
+    Let $\mathcal{H}$ be a family of hash functions.
+
+    $\mathcal{H}$ is said to be \important{$k$-wise independent} if the joint distribution of $\left(h\left(x_1\right), \ldots, h\left(x_k\right)\right)$ is uniform for all $x_1, \ldots, x_k$.
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $k \in \mathbb{N}$ be some integer. Also, let $p$ be a prime between $\left|U\right|$ and $2\left|U\right|$. For $a_0, \ldots, a_{k-1} \in \mathbb{F}_p$, we define: 
+    \[f_{a_0, \ldots, a_{k-1}}\left(x\right) = a_{k-1}x^{k-1} + \ldots + a_1 x + a_0, \mathspace h_{a_0, \ldots, a_{k-1}}\left(x\right) = f_{a_0, \ldots, a_{k-1}}\left(x\right) \Mod N.\]
+   
+    Finally, we define the following hash family: 
+    \[\mathcal{H} = \left\{h_{a_0, \ldots, a_{k-1}} \suchthat a_0, \ldots, a_{k-1} \in \mathbb{F}_p\right\}.\]
+    
+    This hash family is $k$-wise independent.
+
+    \begin{subparag}{Remark}
+        This can also be stored efficiently, in $O\left(k\ln\left(\left|U\right|\right)\right)$ memory.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        This is very similar to our definition above for a 2-universal hash family, generalised to polynomials of arbitrary degree, except that we also allow allow all coefficients to be $0$.
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Load balancing}
+
+\begin{parag}{Load balancing problem}
+    We have $n$ keys hashing into $n$ slots. We want to analyse what type of load balancing we can hope for, i.e., with high probability, what the maximum number of keys hashed to the same number of slots.
+
+    \begin{subparag}{Terminology}
+        We will refer to the keys as ``balls'', and the slots as ``bins''. The question is then, putting each ball to a random bin, what is the largest number of balls we can expect to have in a single bin. 
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        This is for instance useful to split users trying to log in to a website, onto some web servers.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    We have that:
+    \[\prob\left(\text{there exists a bin that gets at least $\Omega\left(\frac{\ln\left(n\right)}{\ln\left(\ln\left(n\right)\right)}\right)$ balls}\right) \leq \frac{1}{n}.\]
+
+    In other words, with high probability, no bin will receive more than $\Omega\left(\frac{\ln\left(n\right)}{\ln\left(\ln\left(n\right)\right)}\right)$ balls.
+
+    \begin{subparag}{Proof}
+        Let $i, k$  be arbitrary. We want to compute the probability that the $i$\Th bin gets at least $k$ balls. Since there are $n$ balls in total, there are $\binom{n}{k}$ ways to put $k$ balls in the bin; each having probability $\frac{1}{n^k}$ to appear. The probability that bin $i$ gets $k$ balls is the union of all these events so, by the union bound, it is less than or equal to the sum of their probabilities:
+        \[\prob\left(\text{bin $i$ gets at least $k$ balls}\right) \leq \prob\left(\text{bin $i$ gets $k$ balls}\right) \leq \binom{n}{k} \frac{1}{n^k}.\]
+
+        We can simplify this to:
+        \autoeq{\prob\left(\text{bin $i$ gets at least $k$ balls}\right) \leq \binom{n}{k} \frac{1}{n^k} = \frac{n\left(n-1\right) \cdots \left(n - k + 1\right)}{k!} \cdot \frac{1}{n^k} = \frac{1}{k!}\cdot \frac{n}{n}\cdot \frac{n-1}{n}\cdots \frac{n-k+1}{n} \leq \frac{1}{k!}.}
+        
+        Now, by Stirling's formula: 
+        \[k! \sim \sqrt{2\pi k} \left(\frac{k}{e}\right)^k.\]
+
+        So, if $k \in \Omega\left(\frac{\ln\left(n\right)}{\ln\left(\ln\left(n\right)\right)}\right)$, then $\frac{1}{k!} \leq \frac{1}{n^2}$. The union bound thus implies that:
+        \autoeq[s]{\prob\left(\text{there exists a $i$ so that bin $i$ gets at least $k$ balls}\right) \leq n \prob\left(\text{bin $i$ gets at least $k$ balls}\right) = n\cdot \frac{1}{k!} \leq n\cdot \frac{1}{n^2} = \frac{1}{n}.}
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        It can be shown that, actually, with high probability, there is a bin that receives at least $\Omega\left(\frac{\ln\left(n\right)}{\ln\left(\ln\left(n\right)\right)}\right)$ ball, i.e. that this result is tight.
+
+        However, we may consider a slightly different scheme, which improves this result.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let's suppose that each ball samples two bins $b_1 = h_1\left(x\right), b_2 = h_2\left(x\right)$ at random, and goes to the least loaded bin.
+
+    Then, the maximum bin load is $O\left(\ln\left(\ln\left(n\right)\right)\right)$.
+
+    This is named the power of two choices.
+
+    \begin{subparag}{Remark}
+        Going from two to three choices does not change the asymptotic behaviour.
+    \end{subparag}
+\end{parag}
+
+\end{document}

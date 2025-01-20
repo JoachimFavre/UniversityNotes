@@ -1,0 +1,286 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-12-16 at 13:16:44.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Lundi 16 décembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{24}{2024-12-16}{Objectively the best subject}{
+    \begin{itemize}[left=0pt]
+        \item Definition of normalised adjacency matrix.
+        \item Recall of the spectral theorem.
+        \item Proof of the link between the eigenvalues of the normalised adjacency matrix of a graph, and its properties. 
+    \end{itemize}
+}
+
+\section{Spectral graph theory}
+
+\subsection{Eigenvalues of the adjacency matrix}
+
+\begin{parag}{Observation}
+    A graph can be represented using a matrix, for instance using its adjacency matrix. We have very interesting linear algebra tools to study matrices, such as eigenvalues. We thus wonder what we can learn about combinatorial properties of $G$ from linear algebraic properties of $A$.
+\end{parag}
+
+\begin{parag}{Definition: Adjacency matrix}
+    Let $G = \left(V, E\right)$ be a graph, and $n = \left|V\right|$. 
+
+    Its \important{adjacency matrix} $A \in \left\{0, 1\right\}^{n \times n}$ is defined by: 
+    \[A_{ij} = \begin{systemofequations} 1, & \text{if } \left\{i, j\right\} \in E, \\ 0, & \text{otherwise.} \end{systemofequations}\]
+\end{parag}
+
+\begin{parag}{Definition: $d$-regular graph}
+    Let $G = \left(V, E\right)$ be a graph, and $d \in \mathbb{N}$.
+
+    $G$ is said to be \important{$d$-regular graph}, if all vertices $v \in V$ have degree $d$.
+
+    \begin{subparag}{Remark}
+        We will only consider $d$-regular graphs from now on. Our results will generalise well, but it gets messier to prove.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Normalised adjacency matrix}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, of adjacency matrix $A$.
+
+    Its \important{normalised adjacency matrix}, or random walk matrix, is defined to be: 
+    \[M = \frac{1}{d} A.\]
+\end{parag}
+
+\begin{parag}{Definition: Random walk}
+    Let $G = \left(V, E\right)$ be some graph, $n = \left|V\right|$ and $s \in V$.
+
+    A \important{random walk} on $G$ goes as follows. We start at $s$. At any iteration, we go to one of the vertices which is neighbour to the one we currently stand on, with uniform probability. 
+
+    We let $p^t \in \mathbb{R}^{n}$ to be the probability to be at any given vertex at iteration $t$. 
+
+    \begin{subparag}{Property}
+        Suppose that $G$ is $d$-regular.
+
+        We start with $p_s^0 = 1$ and $p_v^0 = 0$ for all $v \in V \setminus \left\{s\right\}$. Then, for all $t$, we have: 
+        \[p^{t+1} = M p^t.\]
+
+        We will justify this intuitively with the following example. In particular, this means: 
+        \[p^t = M^t p^0.\]
+
+        This justifies the fact we name $M$ the random walk matrix of $G$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider a 4-cycle:
+    \svghere[0.2]{FourCycle.svg}
+
+    Its adjacency matrix is: 
+    \[A = \begin{pmatrix} 0 & 1 & 0 & 1 \\ 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & 1 \\ 1 & 0 & 1 & 0 \end{pmatrix} .\]
+    
+    Since moreover it is a 2-regular graph, its normalised adjacency matrix is: 
+    \[M = \frac{1}{2}\begin{pmatrix} 0 & 1 & 0 & 1 \\ 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & 1 \\ 1 & 0 & 1 & 0 \end{pmatrix} \]
+
+    Now, let's say that we do a random walk that starts at $s = a$. We thus start with: 
+    \[p^0 = \begin{pmatrix} 1 & 0 & 0 & 0 \end{pmatrix}^T.\]
+    
+    At the next iteration, we have $\frac{1}{2}$ probability to be at $b$, and $\frac{1}{2}$ probability to be at $d$. Thus, we do have: 
+    \[p^1 = \begin{pmatrix} 0 & \frac{1}{2} & 0 & \frac{1}{2} \end{pmatrix}^T = M p^0.\]
+\end{parag}
+
+\begin{parag}{Property}
+    Let $G$ be a $d$-regular graph, of normalised adjacency matrix $M$.
+
+    Then, $M$ is a real symmetric matrix.
+
+    \begin{subparag}{Remark}
+        This only holds for undirected graphs $G$. Otherwise, $M$ is not necessarily symmetric.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We know $M \in \left\{0, 1\right\}^{n \times n}$ so, in particular, it is indeed a real matrix.
+
+        Know, we know that $\left\{i, j\right\}\in E$ if and only if $\left\{j, i\right\} \in E$, since it is an undirected graph. But then, this means that: 
+        \[A_{ij} = A_{ji}.\]
+
+        This shows $A$ is symmetric, i.e. that $A^T = A$, by definition.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Eigenvector}
+    Let $M \in \mathbb{R}^{n\times n}$ be some matrix, $v \in \mathbb{C}^{n}$ be some vector, and $\lambda \in \mathbb{C}$ be some scalar.
+
+    We say that $v$ is an \important{eigenvector} of $M$ associated to the \important{eigenvalue} $\lambda$ if: 
+    \[M v = \lambda v.\]
+
+    \begin{subparag}{Observation}
+        Even for a fixed $\lambda$, eigenvectors are not unique. Indeed, if $v$ is an eigenvector associated to $\lambda$, then $c\cdot v$ is also an eigenvector associated to the same eigenvalue, for any $c \in \mathbb{C}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Spectral theorem}
+    Let $M \in \mathbb{R}^{n \times n}$ be a real symmetric matrix. Then: 
+    \begin{enumerate}
+        \item $M$ has $n$ (not necessarily distinct) \textit{real} eigenvalues $\lambda_i \in \mathbb{R}^n$: 
+        \[\lambda_1 \geq \lambda_2 \geq \ldots \geq \lambda_n.\]
+        \item Let $v_1, \ldots, v_{i-1}$ be eigenvectors associated to $\lambda_1, \ldots, \lambda_{i-1}$. Then, the next eigenvalue $\lambda_i$ is the largest real value such that there exists some $v_i$ which is orthogonal to all $v_1, \ldots, v_{i-1}$, and so that $M v_i = \lambda_i v_i$. Any such $v_i$ can be selected as an eigenvector.
+    \end{enumerate}
+
+    \begin{subparag}{Remark}
+        The second property means that we can find an orthogonal set of eigenvectors for $M$. We can moreover scale them however we want, to get, in fact, an orthonormal basis.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Notation}
+    Let $v \in \mathbb{R}^n$ be a vector.
+
+    We note $v\left(i\right)$ to be its $i$\Th component: 
+    \[v\left(i\right) = v_i.\]
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, of normalised adjacency matrix $M$.
+
+    Let $x \in \mathbb{R}^n$, and $y = M x$. Then, for all $i$: 
+    \[y\left(i\right) = \frac{1}{d} \sum_{\left\{i, j\right\} \in E} x\left(j\right).\]
+
+    \begin{subparag}{Remark}
+        This justifies formally why $M$ is the random-walk matrix of $G$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is a direct proof:
+        \autoeq{y\left(i\right) = \sum_{j} M_{ij} x\left(j\right) = \frac{1}{d} \sum_{j} A_{ij} x\left(j\right) = \frac{1}{d} \sum_{j} I\left(\left\{i, j\right\} \in E\right) x\left(j\right) = \frac{1}{d} \sum_{j: \left\{i, j\right\} \in E} x\left(j\right).}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $G = \left(V, E\right)$ be a $d$-regular graph, $M$ be its normalised adjacency matrix, of eigenvalues $\lambda_1 \geq \ldots \geq \lambda_n$.
+
+    Then:
+    \begin{enumerate}
+        \item $\lambda_1 = 1$.
+        \item $\lambda_2 = 1$ if and only if $G$ is disconnected.
+        \item $\lambda_k = 1$ if and only if $G$ has at least $k$ connected components.
+        \item $\lambda_n = -1$ if and only if at least one connected component of $G$ is bipartite.
+    \end{enumerate}
+
+    \begin{subparag}{Remark}
+        This theorem can be generalised to get rid of the $d$-regularity hypothesis.
+
+        Let $G$ be an arbitrary undirected graph, of adjacency matrix $A$. Let $d_i$ be the degree of vertex $i \in V$. We use those to construct the matrix: 
+        \[D = \text{diag}\left(d_1, \ldots, d_n\right) = \begin{pmatrix} d_1 &  &  \\  & \ddots &  \\  &  & d_n \end{pmatrix}.\]
+
+        We can then define: 
+        \[M = D^{-1/2} A D^{-1/2}, \mathspace \text{where } D^{-1/2} = \begin{pmatrix} d_1^{-1/2} &  &  \\  & \ddots &  \\  &  & d_n^{-1/2}\end{pmatrix}.\]
+
+        Then, the same results apply for $G$ and $M$. The results are however messier to prove for this case, so we focus on $d$-regular graphs.
+    \end{subparag}
+    
+    \begin{subparag}{Proof (1)}
+        We will show $\lambda_1 \geq 1$ and $\lambda_1 \leq 1$. This will give our result.
+
+        \begin{itemize}[left=0pt]
+            \item We first show $\lambda_1 \geq 1$, by showing there exists an eigenvector of eigenvalue $1$. We consider $x = \begin{pmatrix} 1 & \cdots & 1 \end{pmatrix}^T.$ Using our lemma, we have that $y = Mx$ is given by: 
+            \[y\left(i\right) = \frac{1}{d} \sum_{\left\{i, j\right\} \in E} x\left(j\right) = \frac{1}{d} \sum_{\left\{i, j\right\} \in E} 1 = \frac{1}{d}\cdot d = 1.\]
+
+            So, $y = \begin{pmatrix} 1 & \cdots & 1 \end{pmatrix}^T = x$. This shows this eigenvector has eigenvalue $1$.
+
+            \item  There may however still exist an eigenvector of eigenvalue strictly greater than $1$. We thus want to show that $\lambda_1 \leq 1$. Suppose towards contradiction that there exists some $x \in \mathbb{R}^n$ so that $M x = \lambda x$ for some $\lambda > 1$. We consider $i^*$ to be so that $x\left(i^*\right) \geq x\left(j\right)$ for all $j$. If $x\left(i^*\right) < 0$, consider $x \leftarrow -x$ to be another eigenvector associated to the same eigenvalue, yielding a $x\left(i^*\right) \geq 0$. By hypothesis: 
+            \[\left(Mx\right)_{i^*} = \left(\lambda x\right)_{i^*} = \lambda x\left(i^*\right) > x\left(i^*\right).\]
+            
+            But then, using the fact $x\left(i^*\right) \geq x\left(j\right)$ for all $j$ by construction:
+            \[y\left(i^*\right) = \frac{1}{d} \sum_{\left\{i^*, j\right\} \in E} x\left(j\right) \leq \frac{1}{d} x\left(i^*\right) \sum_{\left\{i^*, j\right\} \in E} = x\left(i^*\right) < \lambda x\left(i^*\right).\]
+
+            By definition of eigenvalue, we should have $y\left(i^*\right) = \lambda x\left(i^*\right)$, so this is our contradiction.
+        \end{itemize}
+    \end{subparag}
+
+    \begin{subparag}{Proof (2) $\implies$}
+        By hypothesis, $\lambda_2 = 1$. Suppose towards contradiction that $G$ is connected.
+
+        Let $v_2 \in \mathbb{R}^n$ be an eigenvector associated to $\lambda_2 = 1$, orthogonal to $v_1 = \begin{pmatrix} 1 & \cdots & 1 \end{pmatrix} $. We use a similar proof technique as for the first property.
+
+        First, we notice there must exist a vertex $i \in V$ so that at least one of its neighbour has a different value assigned by $v_2$, i.e. a vertex $i$ for which there exists a $j \in N\left(i\right)$ with $v_2\left(j\right) \neq v_2\left(i\right)$. Indeed, otherwise, any pair of vertices that are connected by a path on $G$ would have the same value; but, since $G$ is connected by hypothesis, all vertices would have the same value $v_2\left(j\right)$. This means that $v_2 = c\cdot v_1$ for some $c$, which contradicts the fact that $v_1$ and $v_2$ are orthogonal.
+
+        This shows there exists a vertex so that at least one of its neighbour has a different value assigned by $v_2$. We call such vertices ``interesting''.
+
+        Let $i^*$ be the interesting vertex with maximal $v_2\left(i^*\right)$. Note that all its neighbours have a value which is smaller than or equal to $v_2\left(i^*\right)$. Indeed, if there is some $j \in N\left(i^*\right)$ so that $v_2\left(j\right) > v_2\left(i^*\right)$, this would mean vertex $j$ is also interesting, but with a larger value assigned; contradicting that $v_2\left(i^*\right)$ was maximal.
+
+        However, this means that, for $y_2 = M v_2$:
+        \[y_2\left(i^*\right) = \frac{1}{d}\sum_{\left\{i^*, j\right\} \in E} v_2\left(j\right) < \frac{1}{d} v_2\left(i^*\right) \sum_{\left\{i^*, j\right\} \in E} =  v_2\left(i^*\right).\]
+        
+        This is our contradiction, we should have $y_2 = \lambda v_2 = v_2$ by definition of eigenvector.
+    \end{subparag}
+
+    \begin{subparag}{Proof (2) $\impliedby$}
+        We suppose by hypothesis that $G$ is disconnected. Let $S$ be a connected component. Note that $V \setminus S \neq \o$ is disconnected from $S$, by construction.
+
+        By the spectral theorem, to show $\lambda_2 = 1$, it is enough to exhibit a $v$ orthogonal to $v_1 = \begin{pmatrix} 1 & \cdots & 1 \end{pmatrix}^T$ so that $M v = v$. We consider:
+        \[v_i = \begin{systemofequations} \dfrac{1}{\left|S\right|}, & \text{if $i \in S$}, \\ -\dfrac{1}{\left|V \setminus S\right|}, & \text{otherwise.} \end{systemofequations}\]
+
+        This vector is orthogonal to $v_1$: 
+        \[\left\langle v, v_1 \right\rangle = \sum_{i \in V} v\left(i\right) v_1\left(i\right) = \sum_{i \in V} v_1\left(i\right) = \frac{1}{\left|S\right|}\cdot \left|S\right| + \left(-\frac{1}{\left|V \setminus S\right|}\right)\cdot \left|V \setminus S\right| = 0.\]
+
+        We moreover have $y = Mv = v$. Indeed, if $i \in S$: 
+        \[y\left(i\right) = \frac{1}{d} \sum_{\left\{i, j\right\} \in E} x\left(j\right) = \frac{1}{d} \sum_{\left\{i, j\right\} \in E} \frac{1}{\left|S\right|} = \frac{1}{\left|S\right|},\]
+        since all edges $\left\{i, j\right\} \in E$ with $i \in S$ are so that $j \in S$, by connectedness. We find similarly that $y\left(i\right) = 1/\left|V \setminus S\right|$ for all $i \in V \setminus S$. 
+
+        This shows that $v$ is a valid eigenvector for $\lambda_2 = 1$.
+    \end{subparag}
+
+    \begin{subparag}{Proof (3) and (4)}
+        The proof for properties (3) and (4) are left as an exercise to the reader.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We consider again the same example, the 4-cycle:
+    \begin{center}
+    \begin{minipage}{0.4\textwidth}
+        \svghere[0.5]{FourCycle.svg}
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+        \[M = \frac{1}{2} \begin{pmatrix} 0 & 1 & 0 & 1 \\ 1 & 0 & 1 & 0 \\ 0 & 1 & 0 & 1 \\ 1 & 0 & 1 & 0 \end{pmatrix} .\]
+    \end{minipage}
+    \hfill
+    \end{center}
+
+    It is possible to find that: 
+    \[\lambda_1 = 1, \mathspace \lambda_2 = 0, \mathspace \lambda_3 = 0, \mathspace \lambda_4 = -1,\] 
+    \[v_1 = \frac{1}{2} \begin{pmatrix} 1 \\ 1 \\ 1 \\ 1 \end{pmatrix}, \mathspace v_2 = \frac{1}{\sqrt{2}} \begin{pmatrix} 0 \\ -1 \\ 0 \\ 1 \end{pmatrix}, \mathspace v_3 = \frac{1}{\sqrt{2}} \begin{pmatrix} -1 \\ 0 \\ 1 \\ 0 \end{pmatrix}, \mathspace v_4 = \frac{1}{2}\begin{pmatrix} -1 \\ 1 \\ -1 \\ 1 \end{pmatrix}.\]
+
+    The first value is indeed $\lambda_1 = 1$. Since $\lambda_2 \neq \lambda_1 = 1$, the graph is connected. Since moreover $\lambda_n = \lambda_4 = -1$, we know that $G$ has a bipartite component. Since it is connected, it has a single component, and hence it is bipartite. $a$ and $c$ have a negative entry in $v_4$, but $b$ and $d$ have a positive entry. This tell us the bipartition: $A = \left\{a, c\right\}$ and $B = \left\{b, d\right\}$.
+\end{parag}
+
+\begin{parag}{Remark}
+    Note that we already know well how to find if a graph is connected or bipartite, without spectral theory. Being able to use eigenvalues to do this is mostly only a toy problem.
+
+    However, the following section has real practical use.
+\end{parag}
+
+\subsection{Mixing time of random walks}
+
+\begin{parag}{Goal}
+    Let $G = \left(V, E\right)$ be a graph, and let $s \in V$.
+
+    We start at $s$, and run a random walk for $k$ steps. As mentioned earlier, the probability distribution after step $k$ is $p^k = M^k p^0$. We wonder what is $M^k p^0$ when $k \to \infty$.
+
+    \begin{subparag}{Intuition}
+        Intuitively, we should forget where we started from. More precisely, the random walk should mix to the uniform distribution. We however wonder how big $k$ has to be before forgetting where we started from.
+
+        All this is formalised by the following lemma.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

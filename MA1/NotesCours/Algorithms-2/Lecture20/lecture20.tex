@@ -1,0 +1,193 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-12-02 at 13:15:29.
+
+\usepackage{../../style}
+
+\title{Algo 2}
+\author{Joachim Favre}
+\date{Lundi 02 décembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{20}{2024-12-02}{Nearest neighbourhood search}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the nearest neighbourhood search problem.
+    \item Explanation of the approximate nearest neighbourhood search problem.
+    \item Definition of locality sensitive hash families.
+    \item Explanation and proof on how to use a locality sensitive hash family to build an approximate nearest neighbourhood datastructure.
+\end{itemize}
+
+}
+
+\subsubsection{Locality sensitive hashing and nearest neighbourhood search}
+
+\begin{parag}{Nearest neighbourhood search problem}
+    We have $n$ documents $p_1, \ldots, p_n \in \mathbb{R}^d$, that are embedded in a $d$-dimensional space so that similar documents are close in the space (like for large language models). 
+
+    Given a query $q \in \mathbb{R}^d$, the goal is to find a document $p_i$ that minimises the distance between $p_i$ and $q$: 
+    \[\text{dist}\left(p_i, q\right) \leq \text{dist}\left(p_j, q\right), \mathspace \forall j.\]
+    
+    \begin{subparag}{Remark}
+        We can for instance take the following distances:
+        \begin{itemize}
+            \item \textit{(Euclidean norm)} $\text{dist}\left(p, q\right) = \left\|p - q\right\|_2$;
+            \item \textit{(Squared Euclidean norm)} $\text{dist}\left(p, q\right) = \left\|p - q\right\|_2^2$;
+            \item \textit{(Cosine similarity)} $\text{dist}\left(p, q\right) = p\dotprod q$ assuming $\left\|p\right\| = \left\|q\right\| = 1$;
+            \item \textit{($L_1$ distance)} $\displaystyle \text{dist}\left(p, q\right) = \left\|p - q\right\|_1 = \sum_{i=1}^{d} \left|p_i - q_i\right|.$
+            \item \textit{(Hamming distance)} $\displaystyle \text{dist}\left(p, q\right) = \left\|p - q\right\|_1 = \left|\left\{i \suchthat p_i \neq q_i\right\}\right|$, where $p, q \in \mathbb{F}_2^d$.
+        \end{itemize}
+        
+        We will focus on the last distance in this course.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Naive approach}
+    Naively, we can compare $q$ with all $p_1, \ldots, p_n$ and return the best. Each comparison takes time $\Theta\left(d\right)$, so the whole running time is $\Theta\left(nd\right)$.
+
+    This is however not great if we have many queries to do.
+\end{parag}
+
+\begin{parag}{One-dimensional approach}
+    Let us suppose that $d = 1$ as a start. If we preprocess the database by sorting it, we can do a binary search in time $O\left(\log\left(n\right)\right)$. This is much better.
+
+    However, binary search does not generalise well for higher dimensions, because of the curse of dimensionality.
+
+    \begin{subparag}{Remark}
+        Solving the problem as we stated is non-trivial. We will thus instead relax it.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Approximate nearest neighbour search problem}
+    We relax our problem to the \important{approximate nearest neighbour search} (ANNS).
+
+    Our goal is to build a data-structure $\text{ANNS}\left(c, r\right)$ with parameters $c \geq 1$ and $r \geq 0$ that has the following guarantees on a query $q$:
+    \begin{itemize}
+        \item If there exists some $p_i$ such that $\text{dist}\left(p_i, q\right) \leq r$, then return a $p_j$ so that $\text{dist}\left(p_j, q\right) \leq c\cdot r$.
+        \item Otherwise, there is no guarantee on the output.
+    \end{itemize}
+
+    \begin{subparag}{Example}
+        We may for instance consider the following case, where we input $q$. There exists a $p_i$ that has distance $r$ from $q$, so a potential output is $p_j$.
+        \svghere[0.5]{ApproximateNearestNeighbourSearchExample.svg}
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This $r$ may be annoying, so we want to consider how to circumvent this issue.
+        
+        If $r \to \infty$, there will always be a point respecting the conditions of the first guarantee, but this would no longer give any guarantee on $p_j$. Let us thus consider a better way to get rid of $r$.
+
+        We first scale our distances so that no distance is bigger than $1$ (constructing our dataset in such a way that they are all normalised for the Euclidean distance, or using cosine-distance for instance). We define the smallest possible distance between two points to be $\delta$, called the aspect ratio of the dataset (more generally, $\delta$ is the margin of error at which we accept two documents to be considered equal). We can then construct a $\text{ANNS}\left(r, c\right)$ data-structures for $r \in \left\{\delta, \left(1 + \epsilon\right) \delta, \left(1 + \epsilon\right)^2 \delta, \ldots\right\}$. We run all of them in parallel, and return the best result.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    Let us suppose that we have a hash family $\mathcal{H}$ such that: 
+    \[\prob_{h \followsdistr \mathcal{H}}\left[h\left(x\right) = h\left(y\right)\right] = \begin{systemofequations} 1, & \text{if } \text{dist}\left(x, y\right) \leq r, \\ 0, & \text{if $\text{dist}\left(x, y\right) > cr$.} \end{systemofequations}\]
+
+    We can then solve $\text{ANNS}\left(c, r\right)$ by using a simple hash table. It may have an insane number of collisions if all elements are at a distance at most $r$, but this is not an issue for our problem since we can just output the first element of the linked list our query hashes to.
+
+    However, this type of hash function is not really doable, so we relax it to the following definition.
+\end{parag}
+
+\begin{parag}{Definition: Locality sensitive hashing function}
+    Let $\mathcal{H}$ be a hash family.
+
+    $\mathcal{H}$ is said to be an \important{$\left(r, cr, p_1, p_2\right)$-locality sensitive hash (LSH) family} if, for all $x ,y \in \mathbb{R}^d$:
+    \begin{itemize}
+        \item If $\text{dist}\left(x, y\right) \leq r$, then $\displaystyle \prob_{h \followsdistr \mathcal{H}}\left(h\left(x\right) = h\left(y\right)\right) \geq p_1.$
+        \item If $\text{dist}\left(x, y\right) \geq cr$, then $\displaystyle \prob_{h \followsdistr \mathcal{H}}\left(h\left(x\right) = h\left(y\right)\right) \leq p_2.$
+    \end{itemize}
+    
+    We moreover let $\alpha$ to be such that $p_1 = p_2^{\alpha}$, i.e. $\alpha = \log_{p_2}\left(p_1\right) = \frac{\ln\left(p_1\right)}{\ln\left(p_2\right)}$. We will see that $\alpha$ is a critical parameter, time complexity will depend on this value. It represents how much bigger $p_1$ is to $p_2$.
+
+    \begin{subparag}{Intuition}
+        Intuitively, this is allows us to ask $\mathcal{H}$ to be of the form:
+        \[\prob_{h \followsdistr \mathcal{H}}\left[h\left(x\right) = h\left(y\right)\right] = \begin{systemofequations} \text{high}, & \text{if $\text{dist}\left(x, y\right) \leq r$} \\ \text{low}, & \text{if $\text{dist}\left(x, y\right) \geq cr$.} \end{systemofequations}\]
+
+        This is thus indeed a relaxation of the constraint on hash families considered in the previous paragraph.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We consider a hashing family for the universe $U = \left\{0, 1\right\}^d$, and Hamming distance: 
+    \[\text{dist}\left(x, y\right) = \left|\left\{i \suchthat x_i \neq y_i\right\}\right| = \left\|x - y\right\|_1.\]
+    
+    We define $\mathcal{H} = \left\{h_1, \ldots, h_d\right\}$ where $h_i\left(x\right) = x_i$ just outputs the $i$\Th coordinate of the vector. Let $x, y \in \left\{0, 1\right\}^d$. We have two cases to consider to see if this is a good LSH family:
+    \begin{itemize}[left=0pt]
+        \item If $\text{dist}\left(x, y\right) \leq r$, this means by definition of Hamming distance that at least $d - r$ components of $x$ and $y$ are the same, so: 
+        \[\prob_{h_i \followsdistr \mathcal{H}}\left(h_i\left(x\right) = h_i\left(y\right)\right) = \prob_{i \in \left\{1, \ldots, n\right\}}\left(x_i = y_i\right) \geq \frac{d-r}{d} = 1 - \frac{r}{d} \approx \exp\left(-\frac{r}{d}\right).\]
+        \item If $\text{dist}\left(x, y\right) > cr$, then at most $d - cr$ components of $x$ and $y$ are the same, and thus: 
+        \[\prob_{h_i \followsdistr \mathcal{H}}\left(h_i\left(x\right) = h_i\left(y\right)\right) \leq 1 - \frac{cr}{d} \approx \exp\left(-\frac{cr}{d}\right).\]
+    \end{itemize}
+
+    So, this is a LHS, with: 
+    \[\alpha = \frac{\ln\left(p_1\right)}{\ln\left(p_2\right)} \approx \frac{-r/d}{-cr/d} = \frac{1}{c}.\]
+   \end{parag}
+
+\begin{parag}{Algorithm}
+    We construct an $\text{ANNS}\left(c, r\right)$ data structure from a $\text{LSH}\left(r, c, p_1, p_2\right)$ family.
+
+    To construct it, we do:
+    \begin{enumerate}
+        \item Let $\ell \in C\cdot n^{\alpha} \ln\left(n\right)$ for some $C > 0$ and $k = \frac{\ln\left(1/n\right)}{\ln\left(p_2\right)}$.
+        \item Choose $k\cdot \ell$ hash functions $h_{11}, h_{12}, \ldots, h_{1k}, h_{21}, \ldots \ldots, h_{\ell k}$ independently from the LSH family. 
+        \item Construct $\ell$ hash tables, one for each hash function $f_i = \left[h_{i1}, \ldots, h_{ik}\right]$.
+        \item Hash each data point $p_j$ in each table.
+    \end{enumerate}
+
+    Then, on a query $q$, we do the following for each $i \in \left\{1, \ldots, \ell\right\}$ until one returns:
+    \begin{enumerate}
+        \item Compute $f_i\left(q\right)$.
+        \item Loop over all points $p$ that hashes to the same value, $f_i\left(p\right) = f_i\left(q\right)$. If $p$ is such that $\text{dist}\left(p, q\right) \leq c\cdot r$, return $p$.
+    \end{enumerate}
+
+    When there exists some $p_i$ so that $\text{dist}\left(p_i, q\right) \leq r$, this algorithm returns a valid $p_j$ with probability at least $1 - \frac{1}{n^C}$. It runs in expected time $\Theta\left(\ell\cdot d\right) = \Theta\left(n^{\alpha} \ln\left(n\right) d\right)$. Its space is $\Theta\left(n \ell\right) = \Theta\left(n^{1 + \alpha} \ln\left(n\right)\right)$. 
+
+    \begin{subparag}{Intuition}
+        The idea to make some ``super-hash functions'' $f_i = \left[h_{i1}, \ldots, h_{ik}\right]$ that combine many hash functions is here to decrease the number of bad collisions from $p_2$ to $p_2^k = \frac{1}{n}$. Then, the idea to run multiple hash tables at the same time is here to increase the success probability.
+
+        Those two ideas are important.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We build this datastructure constructively, from a simple hash table using a single LSH function.
+
+        \begin{itemize}[left=0pt]
+            \item First, we want to decrease the number of bad collisions, i.e. the number of points $p_i, p_j$ that hash to the same value $h\left(p_i\right) = h\left(p_j\right)$ even though $\text{dist}\left(p_i, p_j\right) \geq cr$. Currently, there are $p_2\cdot n$ such collisions on expectation, which is very bad. 
+
+            So, we instead consider a single table with a ``super-hash function'': 
+            \[f\left(p\right) = \left[h_1\left(p\right), h_2\left(p\right), \ldots, h_k\left(p\right)\right],\]
+            where each $h_i \in \mathcal{H}$ are taken independently.
+
+            For $p, q$ with $\text{dist}\left(p, q\right) > cr$, we have, by independence of the hash functions: 
+            \[\prob\left(h\left(p\right) = h\left(q\right)\right) \leq p_2^k.\]
+           
+            We can thus select $k$ so that $p_2^k = \frac{1}{n}$. Intuitively, we just made a LSH function $f$ so that $\widetilde{p}_2 \approx 0$. We now want to boost $\widetilde{p}_1$ to $1$.
+            
+            \item More formally, if $\text{dist}\left(p, q\right) \leq r$, we notice that, by independence:
+            \[\prob\left(h\left(p\right) = h\left(q\right)\right) \geq p_1^k = p_2^{\alpha k}.\]
+
+            We want to boost this value to increase the success probability, by considering $\ell = C \ln\left(n\right)n^{\alpha} $ independent ``super-hash functions'': 
+            \[f_i = \left[h_{i1}, h_{i2}, \ldots, h_{ik}\right], \mathspace i \in \left\{1, \ldots, \ell\right\}.\]
+
+            We construct a hash table for each $f_1, \ldots, f_{\ell}$. This yields that, for $p, q$ so that $\text{dist}\left(p, q\right) \leq r$, the success probability of the whole datastructure is: 
+            \autoeq{\prob\left(\exists i \suchthat f_i\left(p\right) = f_i\left(q\right)\right) = 1 - \prob\left(\forall i \in \left\{1, \ldots, \ell\right\} \suchthat f_i\left(p\right) \neq f_i\left(q\right)\right) \geq 1 - \left(1 - p_1^k\right)^{\ell} \geq 1 - e^{- p_1^k \ell} \geq 1 - \exp\left(-\frac{1}{n^{\alpha}} \ell\right) \geq 1 - \frac{1}{n^c},}
+            if $\ell = C \ln\left(n\right) n^{\alpha}$.
+        \end{itemize}
+
+        We have just proven the success probability. We finally just need to consider its time and space complexity.
+
+        The expected running time on a query is the expected number of bad collisions. The probability of a bad collision is at most $p_2^k = \frac{1}{n}$ by the first step so, since we have $n$ elements, each table has 1 bad collision on expectation. Since there are $\ell = n^{\alpha} \ln\left(n\right)$ hash tables and computing a distance takes time $\Theta\left(d\right)$, we get a running time of $\Theta\left(n^{\alpha} \ln\left(n\right)d\right)$.
+
+        For the space complexity, we have $\ell$ hash tables, each containing $n$ elements, giving $\Theta\left(n \ell\right) = \Theta\left(n^{1 + \alpha} \ln\left(n\right)\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

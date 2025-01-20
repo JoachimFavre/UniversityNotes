@@ -1,0 +1,354 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-12-10 at 13:17:01.
+
+\usepackage{../../style}
+
+\title{Algo}
+\author{Joachim Favre}
+\date{Mardi 10 décembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{23}{2024-12-10}{Back to greed}{
+    \begin{itemize}[left=0pt]
+        \item Explanation of the monotone submodular function maximisation problem.
+        \item Explanation and proof of the greedy algorithm to solve the monotone submodular function maximisation problem.
+        \item Explanation of the submodular function maximisation problem.
+        \item Explanation and proof of the double-greedy algorithm to solve the submodular function maximisation problem.
+    \end{itemize}
+    
+}
+
+\subsection{Maximalisation}
+
+\begin{parag}{Definition: Monotone submodular function}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a set function.
+
+    $f$ is said to be \important{monotone} if, for all $A, B \subseteq N$ so that $A \subseteq B$. 
+    \[f\left(A\right) \leq f\left(B\right).\]
+
+    \begin{subparag}{Remark}
+        Equivalently, $f$ is monotone if and only if, for all set $B \subseteq N$ and element $u \in N$, then: 
+        \[f\left(u \suchthat B\right) \geq 0.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Normalised set function}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a set function.
+
+    It is said to be \important{normalised} if $f\left(\o\right) = 0$.
+
+    \begin{subparag}{Remark}
+        For the rest of this section, we will consider that our set functions are normalised.
+
+        Note that this can always be done without loss of generality since, given a set function $f'\left(x\right)$, we can normalise it by considering $f\left(x\right) = f'\left(x\right) - f'\left(\o\right)$; and optimising the first function is equivalent to optimising the second one.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Monotone submodular function maximisation}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a normalised monotone submodular function, and $k \in \mathbb{N}$.  
+
+    We want to maximise it subject to the cardinality constraint $k$, i.e. we want to find a $S \subseteq N$ such that $\left|S\right| \leq k$ and $f\left(S\right)$ is maximised: 
+    \[S = \argmax_{\substack{T \subseteq N \\ \left|T\right| \leq k}} f\left(T\right).\]
+
+    \begin{subparag}{Remark}
+        Maximising submodular functions is an \lang{NP}-hard problem, since it generalises the max-cut problem. So, we will consider approximation algorithms.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Wrong greedy algorithm}
+    We want to make a greedy algorithm.
+
+    We may intuitively wish to do the following algorithm:
+    \begin{enumerate}
+        \item Order $e_1, \ldots, e_n$ so that $f\left(e_1\right) \geq f\left(e_{i+1}\right)$
+        \item Output $\left\{e_1, \ldots, e_k\right\}$.
+    \end{enumerate}
+
+    However, the issue here is that we only consider how much each element brings, when adding them to the empty set $\o$. We should instead consider how much it increases the objective function, at each iteration. This leads to the following argument.
+\end{parag}
+
+\begin{parag}{Greedy algorithm}
+    We consider the following greedy algorithm for maximising monotone submodular functions $f$.
+    \begin{enumerate}
+        \item $S \leftarrow \o$.
+        \item For $i = 1, \ldots, k$, take $u_i = \argmax_{u \in N \setminus S} f\left(u \suchthat S\right)$, and increase $S \leftarrow S + u_i$.
+        \item Output $S$.
+    \end{enumerate}
+    
+    \begin{subparag}{Example}
+        For instance, let us consider the following sets $T_1 = \left\{1, 2, 3, 4\right\}$, $T_2 = \left\{1, 2, 5\right\}$, and $T_3 = \left\{3, 4, 6\right\}$:
+        \svghere[0.6]{SubmodularFunctionMaximisationGreedyExample.svg}
+
+        We consider the submodular function $f$ that maps each $S \subseteq \left\{1, 2, 3\right\}$ to $\left|\bigcup_{i \in S} T_i\right|$. Finally, we suppose that $k = 2$.
+
+        The greedy algorithm first picks the set with largest marginal value, $T_1$, with a marginal value of $4$. Then, $T_2$ and $T_3$ have the same marginal value of $1$, so it adds one of them. It thus outputs $5$.
+
+        However, the optimal solution is taking the sets $T_2$ and $T_3$, yielding a value of $6$. This shows indeed that this is only an approximation algorithm.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a submodular function, and $S, T \subseteq N$.
+
+    Then: 
+    \[\sum_{e \in T \setminus S} f\left(e \suchthat S\right) \geq f\left(S \cup T\right) - f\left(S\right) = f\left(T \suchthat S\right).\]
+    
+    \begin{subparag}{Intuition}
+        For $S = \o$, this theorem reads, when $f$ is normalised: 
+        \[\sum_{e \in T} f\left(e\right) \geq f\left(T\right).\]
+        
+        However, the intuitive definition of a submodular function is that we have a diminishing return, i.e. indeed that the sum of the individual returns should be less than the total return. 
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We make a proof similar to the one we made when proving an equivalent definition of submodular functions.
+
+        We order elements of $T \setminus S$ as $e_1, e_2, \ldots, e_{\left|T \setminus S\right|}$, and we let $T_i = \left\{e_1, e_2, \ldots, e_i\right\}$. We notice that $T_0 = \o$ and $T_{\left|T \setminus S\right|} = T \setminus S$. 
+
+        Using submodularity and collapsing the telescopic series: 
+        \autoeq{\sum_{e \in T \setminus S} f\left(e \suchthat S\right) = \sum_{i=1}^{\left|T \setminus S\right|} f\left(e_i \suchthat S\right) \geq \sum_{i=1}^{\left|T \setminus S\right|} f\left(e_i \suchthat S \cup T_{i-1}\right) = \sum_{i=1}^{\left|T \setminus S\right|} \left[f\left(S \cup T_i\right) - f\left(S \cup T_{i-1}\right)\right] = f\left(S \cup T_{\left|T \setminus S\right|}\right) - f\left(S \cup T_0\right) = f\left(S \cup T\right) - f\left(S\right).}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a normalised monotone submodular function, and $k \in \mathbb{N}$. Also, let $S$ be the output of the greedy algorithm on $\left(f, k\right)$, and $O$ be an optimal solution (of cardinality at most $k$).
+
+    Then: 
+    \[f\left(S\right) \geq \left(1 - \left(1 - \frac{1}{k}\right)^k\right) f\left(O\right).\]
+    
+    \begin{subparag}{Implication}
+        In particular, this means that, for all $k$: 
+        \[f\left(S\right) \geq \left(1 - \frac{1}{e}\right) f\left(O\right) \geq 0.632 f\left(O\right).\]
+
+        The greedy algorithm is thus a $\left(1- \frac{1}{e}\right)$-approximation algorithm, which can be shown to be tight.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $u_i$ be the $i$\Th element selected by the greedy algorithm, and $S_i = \left\{u_1, \ldots, u_i\right\}$. We first show a recursive relation between $f\left(S_i\right)$ and $f\left(S_{i-1}\right)$, which we then use to show our inequality by induction.
+
+        By definition of the greedy algorithm: 
+        \[f\left(u_i \suchthat S_{i-1}\right) \geq f\left(u \suchthat S_{i-1}\right), \mathspace \forall u \in N \setminus S_i.\]
+
+        We can make a stronger claim since any $u \in S_i$ that was already picked would not add any value to the function. Indeed, for all $u \in S_i$, $f\left(u \suchthat S_i\right) = 0$, and $f\left(u_i \suchthat S_{i-1}\right) \geq 0$ since $f$ is monotone. Thus:
+        \[f\left(u_i \suchthat S_{i-1}\right) \geq f\left(u \suchthat S_{i-1}\right), \mathspace \forall u \in N.\]
+
+        In particular, this holds for all $u \in O \setminus S_{i-1}$. We add up this inequality for all $u \in O \setminus S_{i-1}$, giving: 
+        \[\left|O \setminus S_{i-1}\right| f\left(u_i \suchthat S_{i-1}\right) \geq \sum_{u \in O \setminus S_{i-1}} f\left(u \suchthat S_{i-1}\right).\]
+        
+        We can now use our lemma to simplify this to:
+        \[\left|O \setminus S_{i-1}\right|\cdot f\left(u_i \suchthat S_{i-1}\right) \geq f\left(O \suchthat S_{i-1}\right) = f\left(O \cup S_{i-1}\right) - f\left(S_{i-1}\right).\]
+
+        By monotonicity of $f$, we know $f\left(O \cup S_{i-1}\right) \geq f\left(O\right)$. So, using the fact $\left|O\right| \leq k$ by hypothesis: 
+        \autoeq{\left|O \setminus S_{i-1}\right|\cdot f\left(u_i \suchthat S_{i-1}\right) \geq f\left(O\right) - f\left(S_{i-1}\right) \iff f\left(u_i \suchthat S_{i-1}\right) \geq \frac{f\left(O\right) - f\left(S_{i-1}\right)}{\left|O \setminus S_{i-1}\right|} \geq \frac{f\left(O\right) - f\left(S_{i-1}\right)}{k}.}
+
+        This is our recurrence relation. We want to use it to show by induction that, for all $i \leq k$: 
+        \[f\left(S_i\right) \geq \left[1 - \left(1 - \frac{1}{k}\right)^i\right]f\left(O\right).\]
+
+        The case where $i = 0$ is easy, since $f$ is normalised, so $f\left(S_0\right) = f\left(\o\right) = 0$, and hence both sides are equal to $0$. For the inductive case, we have, using the inductive hypothesis: 
+        \autoeq{f\left(S_i\right) = f\left(u_i \suchthat S_{i-1}\right) + f\left(S_{i-1}\right) \geq \frac{f\left(O\right) - f\left(S_{i-1}\right)}{k} + f\left(S_{i-1}\right) = \frac{f\left(O\right)}{k} + \left(1 - \frac{1}{k}\right)f\left(S_{i-1}\right) \geq \frac{f\left(O\right)}{k} + \left(1 - \frac{1}{k}\right)\left[1 - \left(1 - \frac{1}{k}\right)^{i-1}\right]f\left(O\right) = \frac{f\left(O\right)}{k} + \left(1 - \frac{1}{k}\right)f\left(O\right) - \left(1 - \frac{1}{k}\right)^{i}f\left(O\right) = \left[1 - \left(1 - \frac{1}{k}\right)^i\right]f\left(O\right),}
+        finishing the proof.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        There are other algorithms that relax the hypotheses. For instance, the continuous greedy algorithm and the non-oblivious local search algorithms allow to give a $\left(1 - \frac{1}{e}\right)$-approximation for maximising a monotone submodular function subject to a matroid constraint; i.e. it drops the cardinality constraint, replacing it by a matroid constraint.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Submodular function maximisation}
+    Let $f : 2^N \mapsto \mathbb{R}$ be a normalised submodular function.
+
+    We want to maximise it, i.e. we want to find a $S \subseteq N$ such that $f\left(S\right)$ is maximised:
+    \[S = \argmax_{T \subseteq N} f\left(T\right).\] 
+
+    \begin{subparag}{Remark}
+        This is almost the same problem as the one we were considering before, except that we now drop the hypothesis that $f$ is monotone, and the cardinality constraint $k$.
+
+        The cardinality constraint was important when $f$ was monotone because, for a monotone function, the maximum is always $f\left(N\right)$. For a non-monotone function, a smaller set may give a bigger value.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        For this problem, the greedy algorithm fails terribly.
+
+        Consider the set $N = \left\{u_1, \ldots, u_n, v\right\}$, with the submodular function given by: 
+        \[f\left(S\right) = \begin{systemofequations} 2, & \text{if } v \in S,\\ \left|S\right|, & \text{otherwise.} \end{systemofequations}\]
+
+        Note that this $f$ is not monotone, $\left\{u_1, u_2, u_3\right\} \subseteq \left\{u_1, u_2, u_3, v\right\}$, but: 
+        \[f\left(\left\{u_1, u_2, u_3\right\}\right) = 3 > f\left(\left\{u_1, u_2, u_3, v\right\}\right) = 2.\]
+
+        The greedy algorithm will start by picking $S_1 = \left\{v\right\}$, since it is the one that gives the best instantaneous return. However, then, there is nothing else it can add to $S_i$ to increase the return, it will not be able to increase the objective function at any other iteration, outputting $2$. On the other hand, the best solution is $k$, with for instance $S_k = \left\{u_1, \ldots, u_k\right\}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Double greedy algorithm}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a normalised submodular function.
+
+    The double greedy algorithm goes as follows:
+    \begin{enumerate}
+        \item Order elements $u_1, \ldots, u_n$ arbitrarily.
+        \item Start with $X_0 = \o$ and $Y_0 = N$.
+        \item For each $i = 1, \ldots, n$: 
+            \begin{enumerate}
+                \item We note: 
+                \[a_i = f\left(X_{i-1} + u_i\right) - f\left(X_{i-1}\right) = f\left(u_i \suchthat X_{i-1}\right),\] 
+                \[b_i = f\left(Y_{i-1} - u_i\right) - f\left(Y_{i-1}\right) = f\left(u_i \suchthat Y_{i-1}\right).\]
+                \item If $a_i \geq b_i$, we add $u_i$ to both $X_i$ and $Y_i$. In other words, we define $X_i = X_{i-1} + u_i$, and $Y_i = Y_{i-1} + u_i = Y_{i-1}$.
+                \item  If $a_i < b_i$, we remove $u_i$ form both set. In other words, we define $X_i = X_{i-1} - u_i = X_{i-1}$ and $Y_i = Y_{i-1} - u_i$.
+            \end{enumerate}
+        \item Return $X_n$ (which equals $Y_n$).
+    \end{enumerate}
+
+    \begin{subparag}{Intuition}
+        Intuitively, there are two ways to implement greedy.
+
+        On one hand, we can start with $S = \o$, and then repeatedly add elements $u$ that maximises $f\left(S + u\right) - f\left(S\right)$. On the other hand, we can start with $S = N$, and repeatedly remove elements $u \in S$ that maximises $f\left(S - u\right) - f\left(S\right)$.
+
+        The idea of this double greedy algorithm is to merge the two greedy algorithms.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        A good way to visualise this algorithm is using inclusion vectors, i.e. a vector $x \in \left\{0, 1\right\}^N$ so that $x_i = 1 \iff i \in S$.
+
+        The algorithm starts with: 
+        \[X_0 = \left(0, 0, \ldots, 0\right), \mathspace Y_0 = \left(1, 1, \ldots, 1\right).\]
+        
+        Then, at iteration $i$, the algorithm have made inclusion decisions $d_1, \ldots, d_i \in \left\{0, 1\right\}$, and we will have: 
+        \[X_i = \left(d_1, d_2, \ldots, d_i, 0, \ldots, 0\right), \mathspace Y_i = \left(d_1, d_2, \ldots, d_i, 1, \ldots, 1\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma 1}
+    Let $i$ be arbitrary.
+
+    At iteration $i$, the double greedy algorithm is such that: 
+    \[a_i + b_i \geq 0.\]
+
+    \begin{subparag}{Remark}
+        Note however that we may have $a_i < 0$ or $b_i < 0$, since $f$ is not monotone.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        By construction, at iteration $i-1$, we have: 
+        \[X_{i-1} = \left(d_1, \ldots, d_{i-1}, 0, \ldots, 0\right), \mathspace Y_{i-1} = \left(d_1, \ldots, d_{i-1}, 1, \ldots, 1\right).\]
+        
+        Thus, $X_{i-1} \subseteq Y_{i-1}$, and $u_i \in Y_{i-1}$. We also notice that $X_{i-1} + u_i$ is $X_{i-1}$ with a $1$ at the $i$\Th bit, and $Y_{i-1} - u_i$ is $Y_i$ with a 0 at the $i$\Th bit: 
+        \[X_{i-1} + u_i = \left(d_1, \ldots, d_{i-1}, 1, 0, \ldots, 0\right),\]
+        \[Y_{i-1} - u_i = \left(d_1, \ldots, d_{i-1}, 0, 1, \ldots, 1\right).\]
+        
+        Their intersection and their union are thus: 
+        \[\left(X_{i-1} + u_i\right) \cap \left(Y_{i-1} - u_i\right) = X_{i-1},\]
+        \[\left(X_{i-1} + u_i\right) \cup \left(Y_{i-1} - u_i\right) = Y_{i-1}.\]
+        
+        But then, by submodularity, we get: 
+        \autoeq[s]{f\left(X_{i-1} + u_i\right) + f\left(Y_{i-1} - u_i\right) \geq f\left(\left(X_{i-1} + u_i\right) \cap \left(Y_{i-1} - u_i\right)\right) + f\left(\left(X_{i-1} + u_i\right) \cup \left(Y_{i-1} - u_i\right)\right) = f\left(X_{i-1}\right) + f\left(Y_{i-1}\right).}
+        
+        This yields the result: 
+        \[a_i + b_i = f\left(X_{i-1} + u_i\right) - f\left(X_{i-1}\right) + f\left(Y_{i-1} - u_i\right) - f\left(Y_{i-1}\right) \geq 0.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma 2}
+    Let $i$ be arbitrary.
+
+    Let $OPT$ be an optimal set, and $OPT_i = \left(OPT \cup X_i\right) \cap Y_i$.
+
+    At iteration $i$, the double greedy algorithm is such that:
+    \[\left[f\left(X_i\right) + f\left(Y_i\right)\right] - \left[f\left(X_{i-1}\right) + f\left(Y_{i-1}\right)\right] \geq f\left(OPT_{i-1}\right) - f\left(OPT_i\right).\]
+    
+    \begin{subparag}{Intuition}
+        We will use this lemma for the following theorem, to show that the double greedy algorithm is a $\frac{1}{3}$-approximation algorithm.
+
+        The idea is that we can use this to make an elevator argument. The algorithm starts with $f\left(X_0\right) = 0$ and $f\left(OPT_0\right) = f\left(OPT\right)$ is optimal. Then, we can use this lemma to bound how much $OPT_{i}$ decreases every time we increase $X_i$ every iteration; until the algorithm gets to $X_n = OPT_{n}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Note that we have:
+        \[X_i = \left(d_1, \ldots, d_i, 0, \ldots, 0\right),\] 
+        \[Y_i = \left(d_1, \ldots, d_i, 1, \ldots, 1\right),\]
+        \[OPT_i = \left(d_1, \ldots, d_{i}, o_{i+1}, \ldots, o_n\right).\]
+
+        We suppose that $a_i \geq b_i$ (the case where $a_i < b_i$ is similar). By definition of the double greedy algorithm, we have: 
+        \[X_i = X_{i-1} + u_i, \mathspace Y_{i} = Y_{i-1}.\]
+
+        Since $a_i + b_i \geq 0$ by our previous lemma, and since we supposed $a_i \geq b_i$, this means $a_i \geq 0$. Recall that our goal is to show:
+        \[\underbrace{\left[f\left(X_i\right) + f\left(Y_i\right)\right] - \left[f\left(X_{i-1}\right) + f\left(Y_{i-1}\right)\right]}_{=LHS} \geq \underbrace{f\left(OPT_{i-1}\right) - f\left(OPT_i\right)}_{= RHS}.\]
+
+        But then, the left hand-side $LHS$ is simply:
+        \[LHS = f\left(X_{i-1} + u_i\right) - f\left(X_{i-1}\right) = f\left(u_i \suchthat X_{i-1}\right) = a_i \geq 0.\]
+
+        Our goal is to show that the right-hand side $RHS$ is at most $a_i$, or at most $0$.
+
+        Notice $OPT_i = OPT_{i-1} + u_i$ by definition. We thus consider two cases.
+        \begin{itemize}[left=0pt]
+            \item Suppose first that $u_i \in OPT$. This means $OPT_i = OPT_{i-1}$, and hence the right hand side is just $0$: 
+            \[RHS = f\left(OPT_{i-1}\right) - f\left(OPT_i\right) = 0.\]
+
+            This does imply that $LHS \geq RHS$.
+
+            \item Suppose now that $u_i \not\in OPT$. This yields:
+            \[OPT_{i-1} = \left(d_1, \ldots, d_{i-1}, 0, o_{i+1}, \ldots, o_n\right),\] 
+            \[OPT_{i} = \left(d_1, \ldots, d_{i-1}, 1, o_{i+1}, \ldots, o_n\right).\]
+            
+            We thus have $OPT_{i-1} \subseteq Y_{i-1} - u_i$. But then, the right hand side becomes, by submodularity: 
+            \autoeq{RHS = f\left(OPT_{i-1}\right) - f\left(OPT_i\right) = -f\left(u_i \suchthat OPT_{i-1}\right) \leq -f\left(u_i \suchthat Y_{i-1} - u_i\right) = f\left(Y_{i-1} - u_i\right) - f\left(Y_{i-1}\right) = b_i.}
+            
+            However, $a_i \geq b_i$, showing $LHS = a_i \geq b_i \geq RHS$.
+        \end{itemize}
+
+        In both cases, we have $LHS \geq RHS$, showing our result.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $f: 2^N \mapsto \mathbb{R}$ be a normalised submodular function, and $OPT$ be its maximum value.
+
+    The double greedy algorithm returns a solution of value at least $\frac{1}{3} OPT$.
+
+    \begin{subparag}{Remark}
+        It is possible to improve this algorithm to get $\frac{1}{2} OPT$, by adding a random choice between the two branches.
+
+        Let us explain this randomised algorithm intuitively. Recall that $a_i + b_i \geq 0$, so $a_i \geq 0$ or $b_i \geq 0$. When $b_i < 0$, we still pick the branch $a_i \geq b_i$ (i.e. the branch that adds $u_i$ to both $X_{i-1}$ and $Y_{i-1}$). Similarly, when $a_i < 0$, we still take the branch $a_i < b_i$ (i.e. the branch that removes $u_i$ from both $X_{i-1}$ and $Y_{i-1}$). However, when both $a_i \geq 0$ and $b_i \geq 0$, then we consider the first branch with probability $\frac{a_i}{a_i + b_i}$ and the second one with probability $\frac{b_i}{a_i + b_i}$. 
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $OPT$ be the optimal set, i.e. $OPT = \argmax_{S \subseteq N} f\left(S\right)$. Just like our lemma, we define: 
+        \[OPT_i = \left(OPT \cup X_i\right) \cap Y_i.\]
+
+        We again have: 
+        \[X_i = \left(d_1, \ldots, d_i, 0, \ldots, 0\right),\] 
+        \[Y_i = \left(d_1, \ldots, d_i, 1, \ldots, 1\right),\]
+        \[OPT_i = \left(d_1, \ldots, d_{i}, o_{i+1}, \ldots, o_n\right).\]
+
+        In particular, this means $OPT_0 = OPT$ and $OPT_n = X_n = Y_n$.
+
+        Our second lemma states that:
+        \[\left[f\left(X_i\right) + f\left(Y_i\right)\right] - \left[f\left(X_{i-1}\right) + f\left(Y_{i-1}\right)\right] \geq f\left(OPT_{i-1}\right) - f\left(OPT_i\right).\]
+
+        Adding these equations for each $i \in \left\{1, \ldots, n\right\}$:
+        \autoeq[s]{\sum_{i=1}^{n} \left[\left(f\left(X_i\right) + f\left(Y_i\right)\right) - \left(f\left(X_{i-1}\right) - f\left(Y_{i-1}\right)\right)\right] \geq \sum_{i=1}^{n} \left[f\left(OPT_{i-1}\right) - f\left(OPT_i\right)\right].}
+        
+        We recognise that they are telescoping series so, using the fact $OPT_0 = OPT$ and $OPT_n = X_n = Y_n$, and that $f\left(\o\right) = 0$ since it is normalised:
+        \autoeq{f\left(X_n\right) + f\left(Y_n\right) - f\left(X_0\right) - f\left(Y_0\right) \geq f\left(OPT_0\right) - f\left(OPT_n\right) \iff f\left(X_n\right) + f\left(Y_n\right) \geq f\left(OPT_0\right) - f\left(OPT_n\right) \iff 3f\left(X_n\right) \geq f\left(OPT\right),}
+        giving our result.
+
+        \qed
+
+    \end{subparag}
+\end{parag}
+
+
+\end{document}
