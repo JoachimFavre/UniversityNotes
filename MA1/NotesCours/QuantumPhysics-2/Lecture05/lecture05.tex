@@ -1,0 +1,374 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-14 at 10:18:02.
+
+\usepackage{../../style}
+
+\title{Quantum physics 2}
+\author{Joachim Favre}
+\date{Lundi 14 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2024-10-14}{The most Physicsy lecture of the semester}{
+\begin{itemize}[left=0pt]
+    \item Definition of Fermions and Bosons.
+    \item Derivation of a basis for the wavefunction of identical Fermions and identical Bosons.
+    \item Explanation of the second quantisation.
+    \item Explanation of the Hong-Ou-Mandel effect.
+\end{itemize}
+
+}
+
+\section{Identical multi-particle systems}
+
+\subsection{Two identical particles}
+
+\begin{parag}{Goal}
+    Let's say that we have two identical particles. Their joint wave-function is constrained in some way, and we are curious how.
+    
+    \begin{subparag}{Remark}
+        The following argument may seem fiddly, but textbooks do it in a similar way. Making a bulletproof argument would require a lot more explanations. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\psi\left(\bvec{r}_1, \bvec{r}_2\right)$ be the wavefunction of a system with two identical particles, of position $\bvec{r}_1$ and $\bvec{r}_2$ respectively. 
+
+    Then, there is some $s \in \left\{1, -1\right\}$ so that, for all $\bvec{r}_1, \bvec{r}_2$:
+    \[\psi\left(\bvec{r}_1, \bvec{r}_2\right) = s \psi\left(\bvec{r}_2, \bvec{r}_1\right).\]
+
+    \begin{subparag}{Proof}
+        Since particles are identical, the probability to the first at $\bvec{r}_1$ and the second at $\bvec{r}_2$ should be exactly the same as the probability to find the first at $\bvec{r}_2$ and the second at $\bvec{r}_1$, i.e.:
+        \[\left|\psi\left(\bvec{r}_1, \bvec{r}_2\right)\right|^2 = \left|\psi\left(\bvec{r}_2, \bvec{r}_1\right)\right|^2.\]
+
+        This implies that they are equal up to the phase, i.e. that there exists some $\phi \in \left[0, 2\pi\right]$ such that: 
+        \[\psi\left(\bvec{r}_1, \bvec{r}_2\right) = e^{i \phi} \psi\left(\bvec{r}_2, \bvec{r}_1\right).\]
+
+        It is possible to argue that this $\phi$ is the same for all $\bvec{r}_1, \bvec{r}_2$. The idea is that we suppose the universe is invariant under reflections (more generally, we suppose the universe is isotropic), so if $\psi\left(\bvec{r}, -\bvec{r}\right) = e^{i\phi}\psi\left(-\bvec{r}, \bvec{r}\right)$ for some $\bvec{r}$, then we must also have $\psi\left(-\bvec{r}, \bvec{r}\right) = e^{i\phi} \psi\left(\bvec{r}, -\bvec{r}\right)$. By changing our coordinate system so that the origin is at the middle of $\bvec{r}_1$ and $\bvec{r}_2$, we can always express $\left(\bvec{r}_1, \bvec{r}_2\right)$ as $\left(\bvec{r}, -\bvec{r}\right)$.
+
+        In particular, since this true for all $\bvec{r}_1, \bvec{r}_2$, this is also true for $\bvec{r}_2, \bvec{r}_1$: 
+        \[\psi\left(\bvec{r}_2, \bvec{r}_1\right) = e^{i \phi} \psi\left(\bvec{r}_1, \bvec{r}_2\right).\]
+
+        Combining the two:
+        \[\psi\left(\bvec{r}_1, \bvec{r}_2\right) = e^{2 i \phi} \psi\left(\bvec{r}_1, \bvec{r}_2\right) \implies e^{2 i \phi} = 1 \implies e^{i \phi} = \pm 1.\]
+        
+        This does yield our result:
+        \[\psi\left(\bvec{r}_1, \bvec{r}_2\right) = \pm \psi\left(\bvec{r}_2, \bvec{r}_1\right).\]
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This reasoning can be generalised so that it not only applies to positions, but also to any vector $\bvec{x}$ representing the variables associated with the particles (such as generalised position or momentum).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Permutation operator}
+    We define the \important{permutation operator} $P_{12}$ so that: 
+    \[P_{12} \psi\left(\bvec{x}_1, \bvec{x}_2\right) = \psi\left(\bvec{x}_2, \bvec{x}_1\right).\]
+    
+    \begin{subparag}{Remark}
+        We take the natural assumption that permuting the vectors twice takes us back where we started: 
+        \[P_{12}^2 \psi\left(\bvec{x}_1, \bvec{x}_2\right) = \psi\left(\bvec{x}_1, \bvec{x}_2\right).\]
+
+        Note that this is a bit fiddly since, as we are working on the wave function, there could be some global phase. This is however natural, so we admit it. This implies that $P_{12}^2 = I$. 
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        This is strongly linked with the symmetric group, which we will use a lot. If the reader wants a refresher on this group, I invite them to take a look at my Algebra notes, available on my GitHub:
+        \begin{center}
+            \url{https://github.com/JoachimFavre/UniversityNotes}
+        \end{center}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Bosons and Fermions}
+    By our lemma, we have:
+    \[P_{12} \psi\left(\bvec{x}_1, \bvec{x}_2\right) = \psi\left(\bvec{x}_2, \bvec{x}_1\right) = \pm \psi\left(\bvec{x}_1, \bvec{x}_2\right).\]
+
+    In other words, there are two different types of identical particles:
+    \begin{itemize}
+        \item Those that, when we swap, we get a $+1$. They are called \important{Bosons}.
+        \item Those that, when we swap, we get a $-1$. They are called \important{Fermions}.
+    \end{itemize}
+   
+    \begin{subparag}{Example}
+        For instance, photons and gluons are Bosons; and electrons and quarks are Fermions. Experimentally, we notice that Bosons have integer spin, and Fermions have half-integer spin.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Pauli exclusion principle}
+    We consider two identical Fermions. 
+
+    They cannot be found at the same position.
+
+    \begin{subparag}{Proof}
+        Since they are at the same place and have the same properties, their $\bvec{x}$ are exactly equal. So, we have: 
+        \[\psi\left(\bvec{x}, \bvec{x}\right) = -\psi\left(\bvec{x}, \bvec{x}\right) \implies \psi\left(\bvec{x}, \bvec{x}\right) = 0.\]
+
+        But then: 
+        \[\left|\psi\left(\bvec{x}, \bvec{x}\right)\right|^2 = 0.\]
+        
+        So, the probability of finding them at the same place is indeed zero. 
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        If any of the properties differ between the two Fermions, then they are no longer identical and they can be found at the same position.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Notations}
+    We will now write $x = \bvec{x}$, to simplify the notation.
+\end{parag}
+
+\begin{parag}{Proposition}
+    We consider an arbitrary two-particle wavefunction: 
+    \[\ket{\psi} = \sum_{x, x'} a_{x, x'} \ket{x, x'}.\]
+
+    If the two particles are the same, and they are a Fermion, then: 
+    \[a_{x, x'} = -a_{x', x}, \mathspace \forall x, x'.\]
+    
+    \begin{subparag}{Example}
+        Consider two Fermions that can be in state $\ket{0}$ or $\ket{1}$. Then, we necessarily have: 
+        \[\ket{\psi} = \frac{\ket{01} - \ket{10}}{\sqrt{2}}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We notice that:
+        \[\ket{\psi} = \sum_{x, x'} a_{x, x'} \ket{x, x'} = \sum_{x, x'} a_{x, x'} \left(-1\right)\ket{x', x}.\]
+        
+        Now, in the sum, $x$ and $x'$ are just dummy variables. We are free to relabel them as $\left(x, x'\right) \leftarrow \left(x', x\right)$. This yields: 
+        \[\ket{\psi} = \sum_{x, x'} \underbrace{\left(-1\right) a_{x', x}}_{= a_{x, x'}} \ket{x, x'}.\]
+        
+        By inspection, this means that: 
+        \[a_{x, x'} = \left(-1\right) a_{x', x} = -a_{x', x}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+%\begin{parag}{Proposition}
+%    We wonder what we can say about the form of the wavefunction for identical Fermions. Let us consider an arbitrary two-particle wavefunction: 
+%    \[\sum_{x, x'} a_{x, x'} \ket{x, x'}.\]
+%
+%    We know that $P_{12} \ket{\psi} = -\ket{\psi}$ since they are Fermion. Since moreover $P_{12} \ket{x, x'} = \ket{x', x}$ by definition of $P_{12}$: 
+%    \[P_{12} \sum_{x, x'} a_{x, x'} \ket{x, x'} = \sum_{x, x'} a_{x, x'} P_{12} \ket{x, x'} = \sum_{x, x'} a_{x, x'} \ket{x', x}.\]
+%
+%    Now, in the sum, $x$ and $x'$ are just dummy variables. We are free to relabel them as $\left(x, x'\right) \leftarrow \left(x', x\right)$. This yields: 
+%    \[\sum_{x, x'} a_{x, x'} \ket{x', x} = -\sum_{x, x'} a_{x, x'} \ket{x, x'} = -\sum_{x, x'} a_{x', x} \ket{x', x}.\]
+%
+%    This yields the following constraint on coefficients: 
+%    \[a_{x, x'} = -a_{x, x'}.\]
+%
+%    \begin{subparag}{Example}
+%        Consider two Bosons that can be in state $\ket{0}$ or $\ket{1}$. Then, we necessarily have: 
+%        \[\ket{\psi} = \frac{\ket{01} - \ket{10}}{\sqrt{2}}.\]
+%    \end{subparag}
+%\end{parag}
+
+\begin{parag}{Proposition}
+    We consider an arbitrary two-particle wavefunction: 
+    \[\ket{\psi} = \sum_{x, x'} a_{x, x'} \ket{x, x'}.\]
+
+    If the two particles are the same, and they are a Boson, then: 
+    \[a_{x, x'} = a_{x', x}, \mathspace \forall x, x'.\]
+
+    \begin{subparag}{Example}
+        Consider two Bosons that can be in state $\ket{0}$ or $\ket{1}$. Then, we can have any linear combination of the following states: 
+        \[\frac{\ket{01} + \ket{10}}{\sqrt{2}}, \mathspace \ket{00}, \mathspace \ket{11}.\]
+
+        In other words, their general state is of the form: 
+        \[\frac{\alpha}{\sqrt{2}} \left(\ket{01} + \ket{10}\right) + \beta \ket{00} + \gamma \ket{11}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The proof is completely similar to the case of Fermions.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Multiple identical particles}
+
+\begin{parag}{Generalisation}
+    Let $\psi\left(x_1, \ldots, x_n\right)$ be the wavefunction of a system with $n$ identical particles.
+
+    Then, there is some $s \in \left\{-1, 1\right\}$ so that, for all $j \neq k$: 
+    \autoeq{P_{jk} \psi\left(x_1, \ldots, x_j, \ldots, x_k, \ldots, x_n\right) = \psi\left(x_1, \ldots, x_k, \ldots, x_j, \ldots, x_n\right) = s \psi\left(x_1, \ldots, x_j, \ldots, x_k, \ldots, x_n\right).}
+
+    \begin{subparag}{Intuition}
+        By permuting any two identical particles of an $n$ particle system, we get a $+1$ sign for Bosons and $-1$ sign for Fermions. 
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We can use the exact same derivation as before to find that, for all $j, k$, there is some $s_{j, k} \in \left\{-1, 1\right\}$ (which may depend on $j$ on $k$) so that: 
+        \[P_{jk} \psi\left(x_1, \ldots, x_n\right) = s_{jk} \psi\left(x_1, \ldots, x_n\right).\]
+
+        Our goal is thus to show that, in fact, $s_{jk}$ does not depend on $j, k$. To do so, we notice that:
+        \[P_{jk} = P_{1j} P_{2k} P_{12} P_{2k} P_{1j}.\]
+
+        Indeed, using the orbital notation of the permutation group: 
+        \[\left(jk\right) = \left(1j\right)\left(2k\right)\left(12\right)\left(2k\right)\left(1j\right).\]
+        
+        So, this means that, for all $j, k$: 
+        \autoeq{s_{jk} \psi\left(x_1, \ldots, x_n\right) = P_{jk} \psi\left(x_1, \ldots, x_n\right) = P_{1j} P_{2k} P_{12} P_{2k} P_{1j} \psi\left(x_1, \ldots, x_n\right) = s_{1j} s_{2k} s_{12} s_{2k} s_{1j} \psi\left(x_1, \ldots, x_n\right) = s_{12} \psi\left(x_1, \ldots, x_n\right),}
+        since $s_{1j}^2 = s_{2k}^2 = 1$. By inspection, this means that $s_{jk} = s_{12}$ for all $j, k$, and thus indeed that $s_{jk}$ does not depend on $j, k$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Properties of the permutation operator}
+    Permutation operators have the following properties:
+    \begin{enumerate}
+        \item $P_{jk} = P_{kj}$. Indeed, swapping $j$ and $k$ is the same as swapping $k$ and $j$.
+        \item $P_{jk}^{-1} = P_{jk}$, since $P_{jk}^2 = I.$
+        \item They are Hermitian, i.e. $P_{jk}^{\dagger} = P_{jk}$.
+    \end{enumerate}
+\end{parag}
+
+\begin{parag}{Property}
+    Let $\ket{\psi_{12}}$ be a state corresponding to two identical particles, and $O$ be an arbitrary observable.
+
+    Then: 
+    \[\bra{\psi_{12}}O \ket{\psi_{12}} = \bra{\psi_{12}} P_{12}^{\dagger} O P_{12} \ket{\psi_{12}}.\]
+   
+    \begin{subparag}{Proof}
+        We can show this using the property of the permutation operator, but we will consider a more physical proof. Since the two particles are identical, swapping them should not change anything to the result. Therefore, those two expected value must be equal.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        In particular, this means that, for any $O$: 
+        \[O = P_{12}^{\dagger} O P_{12} \iff P_{12} O = O P_{12} \iff \left[P_{12}, O\right] = 0,\]
+        where we used $P_{12}^{\dagger} = P_{12} = P_{12}^{-1}$.
+
+        In particular, this means that the permutation operator permutes with the Hamiltonian of identical particles. Commutation is another way to show symmetries of a system, and this will be formalised with representation theory presented later in the class.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{State of $n$ Bosons}
+    A basis for the state of $n$ Bosons is given by: 
+    \[\left\{\psi_{\bvec{x}} = \mathcal{N} \sum_{\mathbb{P} \in S_n} \mathbb{P} \ket{x_1, \ldots, x_n} = \mathcal{N} \sum_{\mathbb{P} \in S_n} \ket{x_{\mathbb{P}\left(1\right)}, \ldots, x_{\mathbb{P}_n}} \suchthat \bvec{x} = \left(x_1, \ldots, x_n\right)^T\right\},\]
+    where $S_n$ is the symmetric group over $n$ elements, and $\mathcal{N}$ is given by:
+    \[\mathcal{N} = \frac{1}{\sqrt{n!} \cdot \sqrt{\prod_{k} n_k!}},\]
+    where $n_k$ is the number of times $k$ is repeated in $\bvec{x}$.
+
+    \begin{subparag}{Intuition}
+        The idea is that we take a state that is not properly symmetrised $\ket{x_1, \ldots, x_n}$, and we symmetrise it using the symmetric group.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We will prove the formula for $\mathcal{N}$ in the sixth exercise series.
+    \end{subparag}
+
+    \begin{subparag}{Example 1}
+        Note that, for 2 Bosons, we had the three following possibilities: 
+        \[\ket{00}, \mathspace \ket{11}, \mathspace \frac{1}{\sqrt{2}}\left(\ket{01} + \ket{10}\right).\]
+        
+        They can be indeed equivalently written as: 
+        \[\psi_{\bvec{x}} \propto \sum_{\mathbb{P} \in S_2} \mathbb{P} \ket{x_1, x_2} = \sum_{\mathbb{P} \in S_2} \ket{x_{\mathbb{P}\left(1\right)}, x_{\mathbb{P}\left(2\right)}},\]
+        where $\bvec{x} = \begin{pmatrix} x_1 & x_2 \end{pmatrix}^T$ is some vector, and $S_2 = \left\{I, P_{12}\right\}$ is the permutation group with two elements.
+
+        For instance: 
+        \[\sum_{\mathbb{P} \in S_2} \ket{00} = I \ket{00} + P_{12}\ket{00} = 2 \ket{00} \propto \ket{00},\] 
+        \[\sum_{\mathbb{P} \in S_2} \ket{01} = \ket{01} + \ket{10} \propto \frac{\ket{01} + \ket{10}}{\sqrt{2}}.\]
+    \end{subparag}
+
+    \begin{subparag}{Example 2}
+        Let us consider an unsymmetric state $\ket{001}$, of which we want to find a symmetric state. We notice that, in this case: 
+        \[S_3 = \left\{I, P_{12}, P_{13}, P_{23}, P_{123}, P_{321}\right\},\]
+        where $P_{ijk} = P_{ij} P_{jk}$. Therefore: 
+        \autoeq[s]{\sum_{\mathbb{P} \in S_3} \mathbb{P} \ket{001} = I \ket{001} + P_{12}\ket{001} + P_{23}\ket{001} + P_{13}\ket{001} + P_{123}\ket{001} + P_{321}\ket{001} = \ket{001} + \ket{001} + \ket{010} + \ket{010} + \ket{100} + \ket{010} \propto \frac{\ket{001} + \ket{010} + \ket{100}}{\sqrt{3}}.}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{State of $n$ Fermions}
+    A basis for the state of $n$ Fermions is given by: 
+    \[\left\{\ket{\psi_{\bvec{x}}} = \frac{1}{\sqrt{n!}} \sum_{\mathbb{P} \in S_n} \text{sign}\left(\mathbb{P}\right) \mathbb{P} \ket{x_1, \ldots, x_n}, \suchthat \bvec{x} = \left(x_1, \ldots, x_n\right)^T\right\},\]
+    where each $\bvec{x}$ does not have any repeated element (by the Pauli exclusion principle), and where $\text{sign}\left(\mathbb{P}\right)$ is the sign of the permutation, i.e. 1 if the number of swaps is even, -1 otherwise.
+
+    \begin{subparag}{Remark}
+        The normalisation factor $\mathcal{N} = \frac{1}{\sqrt{n}}$ is simpler since we cannot have repeated terms in $\bvec{x}$.
+    \end{subparag}
+\end{parag}
+
+\subsection{Second quantisation}
+
+\begin{parag}{Idea}
+    The second quantisation is a switch from listing the properties of each particle to counting how many particles have each property. Indeed, if we have two identical properties, it does not really make sense to list their properties separately; instead it is more meaningful to count how many there are that have those properties.
+
+    For instance: 
+    \[\ket{\uparrow \uparrow} \leftrightarrow \ket{2, 0}, \mathspace \ket{\downarrow \downarrow} \leftrightarrow \ket{0, 2}, \mathspace \frac{\ket{\uparrow \downarrow} + \ket{\downarrow \uparrow}}{\sqrt{2}} \leftrightarrow \ket{1, 1}.\]
+
+    Note that, in this case, we would have to remember that our particles are Bosons. For Fermions, the first quantisation equivalent to the second quantisation $\ket{1, 1}$ would be $\frac{\ket{\uparrow \downarrow} - \ket{\downarrow \uparrow}}{\sqrt{2}}$.
+\end{parag}
+
+\begin{parag}{Creation and annihilation operators}
+    We introduce creation and annihilation operators to increase and decrease the particle numbers. It appears working with those in the second quantisation is simpler.
+
+    \begin{subparag}{Bosons}
+        For the Bosonic operators, it behaves just like the Quantum Harmonic oscillator: 
+        \[c_i^{\dagger} \ket{n_1, \ldots, n_i, \ldots} = \sqrt{n_i + 1}\ket{n_1, \ldots, n_i + 1, \ldots},\]
+        \[c_i \ket{n_1, \ldots, n_i, \ldots} = \sqrt{n_i} \ket{n_1, \ldots, n_i - 1, \ldots}.\]
+
+        It is a good exercise to check that: 
+        \[\left[c_i, c_j\right] = \left[c_i^{\dagger}, c_j^{\dagger}\right] = 0, \mathspace \left[c_i, c_j^{\dagger}\right] = \delta_{ij}.\]
+
+    \end{subparag}
+
+    \begin{subparag}{Fermion}
+        On the other hand, the Fermionic case is much more messy and subtle. The creation operator is: 
+        \[c_i^{\dagger} \ket{n_1, \ldots, n_i, \ldots} = \left(-1\right)^{n_1 + \ldots + n_{i-1}} \left(1 - n_i\right) \ket{n_1, \ldots, n_{i}+1, \ldots}.\]
+
+        The factor $\left(1 - n_i\right)$ is here for the Pauli exclusion principle: if $n_i = 1$, then we cannot create a new particle with these properties. The $-1$ factor depending only on $n_1, \ldots, n_{i-1}$ (but not the $n_j$ with $j > i$) is here for the property $P_{12} \ket{\psi} = -\ket{\psi}$.
+
+        The annihilation operator is similarly defined by: 
+        \[c_i \ket{n_1, \ldots, n_i, \ldots} = \left(-1\right)^{n_1 + \ldots + n_{i-1}} n_i \ket{n_1, \ldots, n_i-1, \ldots}\]
+
+        It is again a good exercise to then check that: 
+        \[\left\{c_i, c_j\right\} = \left\{c_i^{\dagger}, c_j^{\dagger}\right\} = 0, \mathspace \left\{c_i, c_j\right\}^{\dagger} = c_i c_j^{\dagger} + c_j c_i^{\dagger} = \delta_{ij}.\]
+        
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Hong-Ou-Mandel effet}
+    We consider an experiment where we have a polarised photon coming from the left or right, hits a beamsplitter, and gets split into two. We note $L_H$ to be the annihilation operator for a photon on the left with a horizontal polarisation, and similarly for $L_V$ for vertical polarisation, and $R_H$ and $R_V$ for annihilation operators for photons on the right. We admit that the beamsplitter acts in the following way: 
+    \[L_k^{\dagger} \to \frac{L_k^{\dagger} + R_k^{\dagger}}{\sqrt{2}}, \mathspace R_k^{\dagger} \to \frac{L_k^{\dagger} - R_k^{\dagger}}{\sqrt{2}},\]
+    where $k \in \left\{H, V\right\}$.
+
+    We consider two scenarios.
+    \begin{enumerate}[left=0pt]
+        \item Let's say that we have a horizontally-polarised particle coming from the left and a vertically-polarised particle from the right. Mathematically, we start with: 
+    \[\ket{1}_{L_H} \ket{0}_{L_V} \ket{0}_{R_H} \ket{1}_{R_V} = L_H^{\dagger} R_V^{\dagger} \ket{0000}.\]
+
+    Applying the effect of the beamsplitter:
+    \autoeq{L_H^{\dagger} R_V^{\dagger} \ket{0000} \to \frac{1}{2} \left(L_H^{\dagger} + R_H^{\dagger}\right)\left(L_V^{\dagger} - R_V^{\dagger}\right) \ket{0000} = \frac{\ket{1100} + \ket{0110} - \ket{1001} - \ket{0011}}{2}.}
+
+    In other words, we end up with four different options: both are on the left, both are on the right, both go through or both bounce. This seems reasonable, since it is the four different possibilities for the two particles.
+    \imagehere{BosonicBunching.png}
+
+    \item Let us now say that both particles are horizontally polarised, giving: 
+    \[L_H^{\dagger} R_H^{\dagger} \ket{0000} \to \frac{1}{2} \left(L_H^{\dagger} + R_H^{\dagger}\right)\left(L_H^{\dagger} - R_H^{\dagger}\right) \ket{0000} = \frac{\ket{2000} - \ket{0020}}{\sqrt{2}},\]
+    where the extra $\sqrt{2}$ constant came from the creation operator, $L_H^{\dagger} \ket{1000} = \sqrt{2} \ket{2000}$.
+
+    In other words, either both photons end up on the left, or they both end up on the right. On the picture above, this is only the first two possibilities.
+    \end{enumerate}
+
+    The idea to remember from this effect is that when Bosons are indistinguishable (like in the second case, where they both have the same polarisation), then they tend to end up in the same state. This is the opposite of identical Fermions, which are never in the same state.
+   
+    \begin{subparag}{Remark}
+        This effect is known as the Hong-ou-Mandel effect, or Bosonic Bunching.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

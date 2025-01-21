@@ -1,0 +1,299 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-12-02 at 10:16:19.
+
+\usepackage{../../style}
+
+\title{Quantum physics 2}
+\author{Joachim Favre}
+\date{Lundi 02 décembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2024-12-02}{Integrating over groups}{
+    \begin{itemize}[left=0pt]
+        \item Definition of conjugacy classes, and explanation that the number of conjugacy classes of a group is its number of irreps.
+        \item Explanation of Burnside's lemma.
+        \item Explanation of the grand orthogonality theorem.
+        \item Application to group averaging.
+    \end{itemize}
+    
+}
+
+\subsection{Finding the number of irreps}
+
+\begin{parag}{Definition: Equivalent elements}
+    Let $G$ be a group, and $h, h' \in G$.
+
+    $h$ and $h'$ are said to be \important{equivalent}, written $h \sim h'$, if there exists some $g \in G$ so that: 
+    \[h' = g^{-1} h g.\]
+     
+    \begin{subparag}{Intuition}
+        Intuitively, some elements of a group do very different things, such as a $\frac{\pi}{10}$ rotation around the $z$-axis and a $\frac{\pi}{20}$ rotation about the $z$-axis, or $I$ and $SWAP$. However, some other elements are, in some sense, equivalent such as a $\frac{\pi}{10}$ rotation around the $x$-axis and a $\frac{\pi}{10}$ rotation about the $z$-axis, or permutations $\begin{pmatrix} 1 & 2 & 3 \end{pmatrix} $ and $\begin{pmatrix} 1 & 3 & 2 \end{pmatrix} $. In fact, we can do a change of basis to show they are indeed similar: 
+        \[\begin{pmatrix} 2 & 3 \end{pmatrix}^{-1} \begin{pmatrix} 1 & 2 & 3 \end{pmatrix} \begin{pmatrix} 2 & 3 \end{pmatrix} = \begin{pmatrix} 1 & 3 & 2 \end{pmatrix}.\]
+        
+        This is of the form $g^{-1} h g = h'$, justifying the definition.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This is an equivalence relation, so we can consider the following definition. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Conjugacy classes}
+    Let $G$ be a group.
+
+    Its \important{conjugacy classes} are the equivalence classes based on the relation defined above: 
+    \[C_h = \left\{g^{-1} h g \suchthat g \in G\right\}, \mathspace h \in G.\]
+
+    Its number of distinct conjugacy classes is written $N_c$.
+\end{parag}
+
+\begin{parag}{Example}
+    We consider the permutation group over three elements again: 
+    \[C3v = S_3 = \left\{e, \begin{pmatrix} 1 & 2 \end{pmatrix}, \begin{pmatrix} 1 & 3 \end{pmatrix}, \begin{pmatrix} 2 & 3 \end{pmatrix}, \begin{pmatrix} 1 & 2 & 3 \end{pmatrix}, \begin{pmatrix} 1 & 3 & 2 \end{pmatrix}\right\}.\]
+
+    An element is equivalent with any elements that have the same orbit structure. So, we have the three following conjugacy classes, showing $N_C = 3$: 
+    \[\left\{e\right\}, \mathspace \left\{\begin{pmatrix} 1 & 2 \end{pmatrix}, \begin{pmatrix} 1 & 3 \end{pmatrix}, \begin{pmatrix} 2 & 3 \end{pmatrix}\right\}, \mathspace \left\{\begin{pmatrix} 1 & 2 & 3 \end{pmatrix}, \begin{pmatrix} 1 & 3 & 2 \end{pmatrix}\right\}.\]
+\end{parag}
+
+\begin{parag}{Property}
+    The identity will always be alone in its own conjugacy class: 
+    \[C_e = \left\{e\right\}.\]
+
+    \begin{subparag}{Proof}
+        For any $g \in G$: 
+        \[g^{-1} e g = g^{-1} g = e.\]
+
+        So, by definition, $C_e = \left\{e\right\}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $G$ be a finite group, with $n$ non-equivalent irreps and $N_c$ distinct conjugacy classes.
+
+    Then, $n = N_c$.
+
+    \begin{subparag}{Proof}
+        We will later prove that $n \leq N_c$ using the Petit orthogonality theorem. Proving that $n \geq N_c$ can be done using the Grand orthogonality theorem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Burnside's lemma}
+    Let $G$ be a finite group with $n$ non-equivalent irreps, of dimensions $\ell_a$ for $a \in \left\{1, \ldots, n\right\}$ respectively.
+
+    Then: 
+    \[\sum_{a=1}^{n} \ell_a^2 = \left|G\right|.\]
+
+    \begin{subparag}{Remark}
+        While the previous theorem allows to know how many irreps we are missing, this lemma allows to make a guess on the dimension of those irreps.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $G$ be a finite group.
+
+    If $G$ is Abelian, $G$ has $\left|G\right|$ non-equivalent irreps.
+\end{parag}
+
+\begin{parag}{Example}
+    For instance, let us consider again $\mathbb{Z}_2$. It has two irreps: 
+    \[e \mapsto 1, a \mapsto -1, \mathspace e \mapsto 1, a \mapsto 1.\]
+    
+    Both have dimension 1, so it does respect Burnside's lemma: 
+    \[\ell_1^2 + \ell_2^2 = 1^2 + 1^2 = 2 = \left|Z_2\right|.\]
+\end{parag}
+
+\begin{parag}{Remark}
+    Our first theorem allows us to know how many irreps we have, and Burnside's lemma puts strong constraints on their dimensions. Those two theorems thus help us know what irreps we are missing.
+
+    The orthogonality theorems, which come right after, are other tools to help on this idea.
+\end{parag}
+
+\begin{parag}{Observation}
+    We can think of irreps as giving a vector of matrices: 
+    \[\left(R\left(g\right)\right)_{g \in G} = \begin{pmatrix} R\left(g_1\right) \\ R\left(g_2\right) \\ \vdots \end{pmatrix}.\]
+\end{parag}
+
+\begin{parag}{Grand orthogonality theorem}
+    Let $G$ be a group be a finite group of order $N$. Also, let $R_a$ and $R_b$ be two non-equivalent unitary irreps of $G$, of dimension $n_a$ and $n_b$ respectively.
+
+    Then, for all $c, d \in \left\{a, b\right\}$: 
+    \[\sum_{g \in G} \frac{n_c}{N} \left[R_c\left(g\right)^{\dagger}\right]_{jk} \left[R_d\left(g\right)\right]_{\ell m} = \delta_{cd} \delta_{jm} \delta_{\ell k}.\]
+     
+    \begin{subparag}{Intuition}
+        There are many proposition in this theorem. It states that: 
+        \begin{itemize}
+            \item $\displaystyle \sum_{g \in G} \left[R_a\left(g\right)^{\dagger}\right]_{jk} \left[R_b\left(g\right)\right]_{\ell m} = 0$.
+            \item If $j \neq m$ or $\ell \neq k$, then $\displaystyle \sum_{g \in G} \left[R_a\left(g\right)^{\dagger}\right]_{jk} \left[R_a\left(g\right)\right]_{\ell m} = 0$.
+            \item $\displaystyle \sum_{g \in G} \left[R_a\left(g\right)^{*}\right]_{kj} \left[R_a\left(g\right)\right]_{kj} = \frac{N}{n_a}$.
+        \end{itemize}
+
+        Note that the $\frac{N}{n_a}$ is some form of normalisation coefficient.
+    \end{subparag}
+
+    \begin{subparag}{Personal intuition}
+        Another way to understand this theorem, which justifies its name, is to notice that we can think of irreps as giving a vector of matrices: 
+        \[\left(R\left(g\right)\right)_{g \in G} = \begin{pmatrix} R\left(g_1\right) \\ R\left(g_2\right) \\ \vdots \end{pmatrix}.\]
+
+        In particular, we can only look at the $\left(j, k\right)$ component of each matrix, giving some vector: 
+        \[\left(R\left(g\right)_{jk}\right)_{g \in G} = \begin{pmatrix} R\left(g_1\right)_{jk} \\ R\left(g_2\right)_{jk} \\ \vdots \end{pmatrix}.\]
+
+        What this theorem states is that the following set is an orthonormal set of vectors: 
+        \[\left\{\sqrt{\frac{n_c}{N}} \left(R_c\left(g\right)_{jk}\right)_{g \in G} \suchthat c \in \left\{a, b\right\}, j, k\right\} = \left\{\sqrt{\frac{n_c}{N}} \begin{pmatrix} R_c\left(g_1\right)_{jk} \\ R_c\left(g_2\right)_{jk} \\ \vdots \end{pmatrix} \suchthat c , j, k\right\}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This theorem can be used to get missing irreps, as mentioned earlier.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    We consider $\mathbb{Z}_2$ and its two irreps: 
+    \[R_1\left(e\right) = 1, R_1\left(a\right) = 1, \mathspace R_2\left(e\right) = 1, R_2\left(a\right) = -1.\]
+
+    We want to verify the grand orthogonality theorem in this context. We notice that: 
+    \[\sum_{g \in G} R_1\left(g\right)^{\dagger} R_2\left(g\right) = 1\cdot 1 + 1\cdot \left(-1\right) = 0.\]
+
+    Similarly, since $N = 2$ and $n_1 = n_2 = 1$: 
+    \[\sum_{g \in G} R_1\left(g\right)^{\dagger} R_1\left(g\right) = 1^2 + \left(-1\right)^2 = 2 = \frac{2}{1} = \frac{N}{n_1},\] 
+    \[\sum_{g \in G} R_2\left(g\right)^{\dagger} R_2\left(g\right) = 1^2 + 1^2 = 2 = \frac{N}{n_2}.\]
+\end{parag}
+
+\begin{parag}{Example 2}
+    We consider $C3v$. The following is a 2D irrep for this group: 
+    \[e = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}, \mathspace c_+ = \begin{pmatrix} -\frac{1}{2} & -\frac{\sqrt{3}}{2} \\ \frac{\sqrt{3}}{2} & -\frac{1}{2} \end{pmatrix}, \mathspace c_- = \begin{pmatrix} -\frac{1}{2} & \frac{\sqrt{3}}{2} \\ -\frac{\sqrt{3}}{2} & -\frac{1}{2} \end{pmatrix},\]
+    \[\sigma = \begin{pmatrix} -1 & 0 \\ 0 & 1 \end{pmatrix}, \mathspace \sigma' = \begin{pmatrix} \frac{1}{2} & \frac{\sqrt{3}}{2} \\ \frac{\sqrt{3}}{2} & -\frac{1}{2} \end{pmatrix}, \mathspace \sigma'' = \begin{pmatrix} \frac{1}{2} & -\frac{\sqrt{3}}{2} \\ -\frac{\sqrt{3}}{2} & -\frac{1}{2} \end{pmatrix}.\]
+    
+    We notice that, considering that the $1, 1$ element is the bottom-right corner of the matrix (using 0-indexing, like qubits $\ket{0}, \ket{1}$):
+    \[\sum_{g \in G} \left[R^{\dagger}\left(g\right)\right]_{11} R\left(g\right)_{11} = 1^2 + \left(-\frac{1}{2}\right)^2 + \left(-\frac{1}{2}\right)^2 + 1^2 + \left(-\frac{1}{2}\right)^2 + \left(-\frac{1}{2}\right)^2 = 3 = \frac{6}{2} = \frac{N}{n},\]
+    as expected by the grand orthogonality theorem.
+\end{parag}
+
+\subsection{Group Averaging}
+
+\begin{parag}{Definition: Group averaging}
+    Let $G$ be some finite group of cardinality $N$, $R\left(g\right) = U_g$ be some unitary $d$-dimensional representation of $G$, and $X$ be some $d \times d$ unitary.
+
+    We define the \important{group averaging} (or \important{group twirling}) of $X$ as: 
+    \[\left\langle X \right\rangle_G = \frac{1}{N} \sum_{g \in G} R\left(g\right) X R\left(g\right)^{\dagger} = \frac{1}{N} \sum_{g \in G} U_g X U_g^{\dagger}.\]
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $G$ be a finite group of cardinality $N$, $R$ be a unitary $d$-dimensional representation of $G$, and $X$ be a $d \times d$ unitary.
+
+    If $R$ is irreducible, we have: 
+    \[\left\langle X \right\rangle_G = \frac{1}{d} \Tr\left(X\right) I.\]
+
+    \begin{subparag}{Remark}
+        This generalises to compact groups $G$: 
+        \[\left\langle X \right\rangle_G = \int_{G} d \mu\left(g\right) U\left(g\right) X U\left(g\right)^{\dagger} = \frac{1}{d}\Tr\left(X\right)I,\]
+        where $d\mu\left(g\right)$ is the continuous equivalent of $\frac{1}{N}$, generalising the idea of uniform distribution.
+
+        Note that $O\left(n\right)$, $SO\left(n\right)$, $U\left(n\right)$ and $SU\left(n\right)$ are compact groups.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Expanding the matrix products using a sum, we get: 
+        \autoeq{\left\langle X \right\rangle_G = \frac{1}{N} \sum_{j, k, \ell, m} \sum_{g} \left[R\left(g\right)\right]_{\ell m} X_{mj} \left[R\left(g\right)^{\dagger}\right]_{jk} \ket{\ell} \bra{k} = \frac{1}{N} \sum_{j, k, \ell, m} \left(\sum_{g} \left[R\left(g\right)\right]_{\ell m} \left[R\left(g\right)^{\dagger}\right]_{jk}\right) X_{mj} \ket{\ell} \bra{k} .}
+
+        We can now use the Grand orthogonality theorem: 
+        \[\left\langle X \right\rangle_G = \frac{1}{d} \sum_{j, k, \ell, m} \delta_{\ell k} \delta_{jm} X_{mj} \ket{\ell} \bra{k} = \frac{1}{d} \sum_{j} X_{jj} \sum_{k} \ket{k}\bra{k} = \frac{1}{d} \Tr\left(X\right) I.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We consider the single-qubit Pauli group: 
+    \[G = \left\{\phi P \suchthat \phi \in \left\{\pm 1, \pm i\right\}, P \in \left\{I, \sigma_x, \sigma_y, \sigma_z\right\}\right\}.\]
+
+    Pauli matrices are dimension $d = 2$. So, given any state $\rho$: 
+    \[\left\langle \rho \right\rangle_G = \frac{1}{2} \Tr\left(\rho\right) I = \frac{1}{2} I.\]
+
+    This is the maximally mixed state, which makes sense intuitively: letting $\rho$ evolve under an average Pauli, should give a state which representation on the Bloch sphere is not biased towards any direction.
+
+    Let us also compute this result using the definition of group averaging: 
+    \[\left\langle \rho \right\rangle_G = \frac{1}{16} \sum_{g} U_g \rho U_g^{\dagger} = \frac{1}{16} \sum_{\phi, P} \phi P \rho \phi^* P^{\dagger}.\]
+
+    We notice that $\phi \phi^* = \left|\phi\right|^2 = 1$ for all $\phi \in \left\{\pm 1, \pm i\right\}$. This yields that: 
+    \[\left\langle \rho \right\rangle_G = \frac{4}{16} \sum_{P} P \rho P = \frac{1}{4} \sum_{P} P \rho P.\]
+    
+    We know that we  can express $\rho = \frac{1}{2}\left(I + r \dotprod \sigma\right)$, and the identity $\sigma_i \sigma_j \sigma_i = -\sigma_j$ for $i \neq j$ \textit{(the Professor left a note on the black board: USEFUL, REMEMBER ME)}, so: 
+    \[\sigma_x \rho \sigma_x = \frac{1}{2}\left(I + r_x \sigma_x - r_y \sigma_y - r_z \sigma_z\right), \mathspace \sigma_y \rho \sigma_y = \frac{1}{2}\left(I - r_x \sigma_x + r_y \sigma_y - r_z \sigma_z\right),\]
+    \[\sigma_z \rho \sigma_z = \frac{1}{2}\left(I - r_x \sigma_x - r_y \sigma_y + r_z \sigma_z\right), \mathspace I \rho I = \frac{1}{2}\left(I + r_x \sigma_x + r_y \sigma_y + r_z \sigma_z\right).\]
+
+    Adding everything, we notice that the coefficients in front of $I$ add to $2$, and the coefficients in front of all other Paulis cancel out, yielding indeed: 
+    \[\left\langle \rho \right\rangle_G = \frac{2I}{4} = \frac{1}{2} I.\]
+\end{parag}
+
+
+\begin{parag}{Proposition}
+    Let $G$ be a finite group of cardinality $N$, $R\left(g\right) = U\left(g\right)$ be a unitary $d$-dimensional representation of $G$, and $X$ be a $d \times d$ unitary.
+
+    We moreover suppose that we can express $U\left(g\right)$ as a direct sum of irreducible representations:
+    \[U\left(g\right) = \bigoplus_{x} U_x\left(g\right) = \begin{pmatrix} U_1\left(g\right) &  &  \\  & 0 &  \\  &  & \ddots \end{pmatrix} + \begin{pmatrix} 0 &  &  \\  & U_2\left(g\right) &  \\  &  & \ddots \end{pmatrix} + \ldots.\]
+
+    Finally, we note $\Pi_x$ to be the projector on the subspace represented by $U_x\left(g\right)$ (i.e., to be a projector on its corresponding block), $I_x$ to be the identity matrix on the subspace represented by $U_x\left(g\right)$, and $d_x$ be the dimension of $U_x\left(g\right)$ (i.e. $U_x\left(g\right) \in \mathbb{C}^{d_x \times d_x}$).
+
+    If all representations $U_x$ are non-equivalent, then: 
+    \[\left\langle X \right\rangle_G = \sum_x \frac{1}{d_x} \Tr\left(X \Pi_x\right) \Pi_x = \bigoplus_x \frac{1}{d_x} \Tr\left(X \Pi_x\right) I_x.\]
+
+    \begin{subparag}{Remark 1}
+        Note that, sometimes, we write:
+        \[\left\langle X \right\rangle_G = \bigoplus_x \frac{1}{d_x} \Tr\left(X \Pi_x\right) \Pi_x.\]
+
+        This is however only an abuse of notations.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        This proposition also generalises to compact groups.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        Note that this proposition is not true in general if there exists $x \neq x'$ so that $U_x$ and $U_{x'}$ are equivalent. 
+
+        Consider for instance the trivial group $G = \left\{e\right\}$, with the representation: 
+        \[U_g = I_2 = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} = 1 \oplus 1.\]
+
+        We use twice the trivial irrep, which are naturally equivalent. Considering $X = \sigma_X$ to be the Pauli matrix, we notice that: 
+        \[\left\langle X \right\rangle_G = I X I^{\dagger} = X,\]
+        \[\frac{1}{1} \Tr\left(X \ket{0}\bra{0}\right) \ket{0}\bra{0} + \frac{1}{1} \Tr\left(X \ket{1}\bra{1}\right) \ket{1}\bra{1} = 0.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let us note $\ket{x, i}$ to be a basis for $U\left(g\right)$, where the $x$ indexes the representation and the $i$ indexes the elements of the representation. In other words: 
+        \[\bra{x, i} U\left(g\right) \ket{x', j} = \delta_{x x'} \bra{i} U_x\left(g\right) \ket{j}.\]
+
+        We notice that: 
+        \autoeq{\left\langle X \right\rangle_G = \frac{1}{N} \sum_{g} U\left(g\right) X U\left(g\right)^{\dagger} = \frac{1}{N} \sum_{x, x'} \sum_{i, j, k, \ell} \sum_{g} \left(U_x\left(g\right)\right)_{ij} \bra{x, j} X \ket{x', k} \left(U_x\left(g\right)^{\dagger}\right)_{k \ell} \ket{x, i}\bra{x', \ell}.}
+        
+        We can apply the Grand orthogonality theorem since there is no representations $U_x$ and $U_x'$ with $x \neq x'$ that are equivalent. Our equation therefore simplifies to: 
+        \autoeq{\left\langle X \right\rangle_G = \frac{1}{N} \sum_{x, x'} \sum_{i, j, k, \ell} \bra{x, j} X \ket{x', k} \delta_{x x'} \delta_{i \ell} \delta_{j k} \frac{N}{d_x} \ket{x, i}\bra{x', \ell} = \sum_{x} \frac{1}{d_x} \sum_{j} \bra{x, j} X \ket{x, j} \sum_{i} \ket{x, i}\bra{x, i} = \sum_{x} \frac{1}{d_x} \Tr\left(\Pi_x X\right) \Pi_x.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider $R_Z\left(\theta\right) = \exp\left(-i \theta \sigma_z\right)$.  We want to compute:
+    \[\left\langle \rho \right\rangle_{R_Z\left(\theta\right)} = \frac{1}{2\pi} \int_{0}^{2\pi} d \theta R_Z\left(\theta\right) \rho R_Z\left(\theta\right)^{\dagger}.\]
+
+    $R_Z\left(\theta\right)$ is a representation of $U\left(1\right)$ (any element of $U\left(1\right)$ is on the unit circle, and can thus be interpreted as an angle). However, it is not an irreducible representation: $U\left(1\right)$ is Abelian, so all its irreducible representations have dimension $1$. $U\left(1\right)$ has many irreps (infinitely many in fact), but it is possible to convince ourselves that the trivial one $U_1\left(\theta\right) = 1$ and $U_2\left(\theta\right) = e^{i \theta}$ are examples of irreps, and that they are non-equivalent. We can decompose $R_Z\left(\theta\right)$ as a direct sum of irreps: 
+    \[R_Z\left(\theta\right) = \exp\left(-i \theta \sigma_Z\right) = \begin{pmatrix} 1 & 0 \\ 0 & e^{i \theta} \end{pmatrix} = \begin{pmatrix} U_1\left(\theta\right) &  \\  & U_2\left(\theta\right) \end{pmatrix}.\]
+
+    Note that here, we are in fact really considering $R_Z\left(\theta\right)' = \exp\left(-i \theta \left(\sigma_z + I\right)\right)$ for slightly simpler computations. However, it only differs from $R_Z\left(\theta\right)$ by a global phase, so they are physically equivalent.
+
+    Both are our irreps are $1\times 1$ (i.e. $d_1 = d_2 = 1$), so $\Pi_0 = \ket{0}\bra{0}$ and $\Pi_1 = \ket{1}\bra{1}$. This yields: 
+    \autoeq{\left\langle \rho \right\rangle_{\theta} = \frac{1}{2\pi} \int_{0}^{2\pi} R_Z\left(\theta\right) \rho R_Z\left(\theta\right)^{\dagger} d \theta = \bigoplus_x \frac{1}{d_x} \Tr\left(\rho \Pi_x\right) \Pi_x = \Tr\left(\rho \ket{0}\bra{0}\right) \ket{0}\bra{0} + \Tr\left(\rho \ket{1}\bra{1}\right) \ket{1}\bra{1} = \bra{0} \rho \ket{0} \ket{0} \bra{0} + \bra{1} \rho \ket{1} \ket{1}\bra{1}.}
+    
+    This makes intuitive sense: we project on the $z$-axis. This is where the term twirling comes from: by averaging the position over a rotation along the $z$-axis, we loose any information on the $x$ and $y$ axes.
+\end{parag}
+
+\end{document}

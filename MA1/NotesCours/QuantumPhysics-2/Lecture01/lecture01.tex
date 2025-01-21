@@ -1,0 +1,353 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-09-09 at 10:12:53.
+
+\usepackage{../../style}
+
+\title{Quantum physics 2}
+\author{Joachim Favre}
+\date{Lundi 09 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2024-09-09}{Recalls}{
+\begin{itemize}[left=0pt]
+    \item Definition of qubit.
+    \item Explanation of the time evolution axiom.
+    \item Definition of Pauli matrices, and explanation of their properties.
+    \item Explanation of the measurement axiom.
+    \item Definition of tensor product.
+    \item Explanation of the composite system axiom.
+\end{itemize}
+
+}
+
+\section{Basics}
+\subsection{Qubits}
+
+\begin{parag}{Definition: Qubit}
+    A qubit is a 2-level quantum system.
+
+    Its state can therefore always be written as $\ket{\psi} = \alpha \ket{0} + \beta \ket{1}$, where $\alpha, \beta \in \mathbb{C}$ and $\left|\alpha\right|^2 + \left|\beta\right|^2 = 1$.
+
+    \begin{subparag}{Examples}
+        For instance, an electron's spin $\left\{\ket{\uparrow}, \ket{\downarrow}\right\}$, the polarisation of a photon $\left\{\ket{H}, \ket{V}\right\}$, the two enegy levels of any atom or molecule $\left\{\ket{G}, \ket{E}\right\}$ and a photon in different arms of a beamsplitter $\left\{\ket{L}, \ket{R}\right\}$ are examples of such 2-level systems.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Bloch sphere}
+    Let $\ket{\psi}$ be the state of some q-bit.
+
+    Then, there exists a $\theta \in \left[0, \pi\right]$ and a $\phi \in \left[0, 2\pi\right[ $ such that we can write: 
+    \[\ket{\psi} = \cos\left(\frac{\theta}{2}\right)\ket{0} + e^{i\phi} \sin\left(\frac{\theta}{2}\right) \ket{1}.\]
+
+    \begin{subparag}{Intuition}
+        $\left(\theta, \phi\right)$ can be interpreted as coordinates on a sphere. In other words, we can visualise is using the following unit vector: 
+        \[\bvec{v} = \begin{pmatrix} \sin\left(\theta\right)\cos\left(\phi\right) & \sin\left(\theta\right)\sin\left(\phi\right) & \cos\left(\theta\right) \end{pmatrix}^T.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        When we will later look at density matrices, the fact that $\theta$ is divided by 2 will appear naturally.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This directly comes from the fact that the general phase does not matter (i.e. $e^{i \delta} \ket{\psi} \equiv \ket{\psi}$ for all $\delta \in \mathbb{R}$), and that $\left|\alpha\right|^2 + \left|\beta\right|^2 = 1$.
+    \end{subparag}
+\end{parag}
+
+\subsection{Time evolution}
+\begin{parag}{Axiom: Time evolution}
+    Let $H$ be the Hamiltonian of a system, and $\ket{\psi_0}$ be the initial state of the system.
+
+    We can get the state of a system at any time $t$, $\ket{\psi\left(t\right)}$, by solving the equation: 
+    \[\frac{\partial \ket{\psi\left(t\right)}}{\partial t} = \frac{H}{i} \ket{\psi_0}.\]
+
+    This is also known as \important{Schrödinger's equation}.
+
+    \begin{subparag}{Remark}
+        Note that, formally, $H = \frac{H'}{\hbar}$, and $H'$ is the real Hamiltonian of the system. Our convention allows to simplify notations. Note moreover that $H = H'$ in natural units \textit{(but natural units are really awful)}.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Unitary matrix}
+    Let $U$ be a matrix in some Hilbert space. It is said to be \important{unitary} if: 
+    \[U U^{\dagger} = U^{\dagger} U = I.\]
+
+    \begin{subparag}{Properties}
+        \begin{itemize}[left=0pt]
+            \item Unitary matrices are reversible: given $\ket{\psi'} = U\ket{\psi}$, we can find $\ket{\psi} = U^{\dagger} \ket{\psi'}$.
+            \item They preserved lengths: given $\ket{\psi'} = U \ket{\psi}$, we have
+            \[\braket{\psi'}{\psi'} = \bra{\psi} U^{\dagger} U \ket{\psi} = \braket{\psi}{\psi} = 1.\]
+            \item As all matrices, they are linear:
+            \[U \left(\alpha \ket{\psi} + \beta \ket{\phi}\right) = \alpha U \ket{\psi} + \beta U \ket{\phi}.\]
+        \end{itemize}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Unitary evolution}
+    There always exists a unitary $U\left(t\right)$ that solves Schrödinger's equation: 
+    \[\ket{\psi\left(t\right)} = U\left(t\right) \ket{\psi\left(0\right)}.\]
+
+    \begin{subparag}{Example}
+        For instance, if $H$ is time-independent:
+        \[U\left(t\right) = e^{-i H t}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Pauli Matrices}
+    The \important{Pauli matrices} are defined by: 
+    \[\sigma_0 = I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}, \mathspace \sigma_1 = \sigma_X = X = NOT = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix},\]
+    \[\sigma_2 = \sigma_Y = Y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \mathspace \sigma_3 = \sigma_Z = Z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.\]
+    
+    The different notation can be used interchangeably. Those matrices are both Hermitian and unitary.
+
+    \begin{subparag}{Pauli vector}
+        We can write the $\left(X, Y, Z\right)$ Pauli matrices as a pseudo-vector: 
+        \[\bvec{\sigma} = \begin{pmatrix} \sigma_1 & \sigma_2 & \sigma_3 \end{pmatrix}^T.\]
+
+        This is useful to use dot-products as a short-hand notation: 
+        \[\bvec{\sigma} \dotprod \begin{pmatrix} \alpha & \beta & \gamma \end{pmatrix}^T = \alpha \sigma_1 + \beta \sigma_2 + \gamma \sigma_3.\]
+    \end{subparag}
+
+    \begin{subparag}{Properties}
+        Pauli matrices have properties that can save a lot of time.
+        \begin{enumerate}[left=0pt]
+            \item $\Tr\left(I\right) = 2$ and $\Tr\left(X\right) = \Tr\left(Y\right) = \Tr\left(Z\right) = 0$.
+            \item Squaring a Pauli gives identity and multiplying two different Paulis gives the third one up to a constant factor. In other words, for $i,j \in \left\{1, 2, 3\right\}$: 
+            \[\sigma_i \sigma_j = \delta_{ij} I + i \epsilon_{ijk} \sigma_k,\]
+            where $\epsilon_{ijk}$ is the Levi-Civita symbol, and where we use Einstein's summation notation.
+            
+            \item For $i,j \in \left\{1, 2, 3\right\}$:
+            \[\left[\sigma_i, \sigma_j\right] = 2 i \epsilon_{ijk} \sigma_k.\]
+
+            \item For $i, j \in \left\{1, 2, 3\right\}$:
+            \[\left\{\sigma_i, \sigma_j\right\} = 2\delta_{ij}I.\]
+
+            \item Pauli matrices form an orthogonal basis. In other words, for $i, j \in \left\{0, 1, 2, 3\right\}$: 
+            \[\Tr\left(\sigma_i \sigma_j\right) = 2 \delta_{ij}.\]
+            
+        \end{enumerate}
+        
+        All properties directly come from the two first.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark: Paulis are gates}
+    Since Paulis are unitary, they can be used as gates (i.e. discrete time evolution). For instance: 
+    \[X \ket{0} = \ket{1}, \mathspace X \ket{1} = \ket{0}.\]
+    
+    This justifies this gate can be called the $NOT$ gate.
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $H$ be an operator such that $H^2 = I$.
+
+    Then: 
+    \[\exp\left(i \alpha H\right) = \cos\left(\alpha\right) I + i \sin\left(\alpha\right) H.\]
+
+    \begin{subparag}{Proof}
+        This directly comes from the definition of the exponential of an operator. It will be proven in the first exercise series.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Remark: Pauli are generators}
+    Since Paulis are Hermitian, they can be used as Hamiltonians. In fact, since they form a basis, any single-qubit Hamiltonian can be expressed as a sum of Paulis: 
+    \[H = \sum_{i=1}^{3} \omega n_i \sigma_i = \omega\left(n_1 X + n_2 Y + n_3 Z\right) = \omega \bvec{n} \dotprod \bvec{\sigma},\]
+    where $\omega \in \mathbb{R}$ is arbitrary, and $\begin{pmatrix} n_1 & n_2 & n_3 \end{pmatrix}^T \in \mathbb{R}^3$ is a unit vector.
+    
+    Note that the sum ranges from $1$ to $3$, skipping $\sigma_0 = I$. Indeed, the corresponding unitary is $U\left(t\right) = \exp\left(-i H t\right)$, but once we take the exponential, any identity term would become a global phase: 
+    \[\exp\left(i \theta I + i\phi B\right) = \exp\left(i \theta I\right) \exp\left(i \phi B\right) = \underbrace{\exp\left(i \theta\right)}_{\text{global}} \exp\left(i \phi B\right).\]
+
+    Recall that global phases do not matter in quantum physics. Therefore, using our theorem above, any arbitrary qubit unitary can be written as: 
+    \[U = \exp\left(-i H t\right) = \exp\left(-i \omega \bvec{n} \dotprod \bvec{\sigma} t\right) = \cos\left(\omega t\right) I - i \sin\left(\omega t\right) \bvec{n} \dotprod \bvec{\sigma}.\]
+
+    It can be proven that this induces a rotation on the Bloch sphere around the $\bvec{n}$ axis at a rate of $2 \omega t$.
+
+    \begin{subparag}{Example}
+        Let us consider: 
+        \[\bvec{n} = \bvec{n}_z = \begin{pmatrix} 0 \\ 0 \\ 1 \end{pmatrix} \implies \bvec{n}_z \dotprod \bvec{\sigma} = \sigma_z.\]
+
+        Then, we have: 
+        \autoeq{e^{-i \omega \bvec{n} \dotprod \bvec{\sigma} t} \ket{\psi} = e^{-i \omega \sigma_z t} \left(\cos\left(\frac{\theta}{2}\right)\ket{0} + e^{i \phi} \sin\left(\frac{\theta}{2}\right)\ket{1}\right) = \cos\left(\frac{\theta}{2}\right) e^{-i \omega t} \ket{0} + \sin\left(\frac{\theta}{2}\right) e^{i \phi} e^{i \omega t} = e^{-i \omega t} \left(\cos\left(\frac{\theta}{2}\right) \ket{0} + \sin\left(\frac{\theta}{2}\right) e^{i \left(\phi + 2 \omega t\right)} \ket{1}\right).}
+
+        We then have $\theta\left(t\right) = \theta$ and $\phi\left(t\right) = \phi + 2 \omega t$. Therefore, $U$ makes $\ket{\psi}$ rotate on the Bloch sphere around the $z$-axis at a rate of $2 \omega t$, as expected.
+    \end{subparag}
+\end{parag}
+
+\subsection{Measurements}
+
+\begin{parag}{Definition: Observables}
+    An \important{observable} is an Hermitian matrix $M$.
+
+    \begin{subparag}{Property}
+        By using the spectral theorem, $M$ can always be orthodiagonalised with real eigenvalues: 
+        \[M = \sum_{k} \lambda_k \ket{\lambda_k} \bra{\lambda_k}, \mathspace \lambda_k \in \mathbb{R},\]
+        \[\braket{\lambda_i}{\lambda_j} = \delta_{ij}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Expectation}
+    The \important{expectation} of an observable $M$ in state $\ket{\psi} = \sum_{k} \alpha_k \ket{\lambda_k}$ is: 
+    \[\left\langle M \right\rangle = \sum_{k} \left|\alpha_k\right|^2 \lambda_k.\]
+
+    This is moreover equal to: 
+    \[\left\langle M \right\rangle = \bra{\psi}M \ket{\psi}\]
+
+    \begin{subparag}{Intuition}
+        This is indeed an expectation: the $\left|\alpha_k\right|^2$ are probabilities of different observation result, and the $\lambda_k$ are the value measured from those observations.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        This is a direct equality:
+        \[\left\langle M \right\rangle = \bra{\psi}M \ket{\psi} = \sum_{k, k', j} \alpha_k \alpha_{k'}^* \underbrace{\braket{\lambda_k}{\lambda_j}}_{\delta_{kj}} \underbrace{\braket{\lambda_j}{\lambda_{k'}}}_{\delta_{j k'}}\lambda_k = \sum_{k} \left|\alpha_k\right|^2 \lambda_k.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Projector}
+    The \important{projector} on the $k$\Th outcome of an observable $M$ is defined by: 
+    \[\Pi_k = \ket{\lambda_k}\bra{\lambda_k}.\]
+
+    The probability of getting the outcome $k$ is given by: 
+    \[p_k = \bra{\psi} \Pi_k \ket{\psi}.\]
+
+    Moreover, in the case of an ideal measurement, the state after measurement is said to collapse to: 
+    \[\ket{\psi'} = \frac{\Pi_k \ket{\psi}}{\sqrt{p_k}}.\]
+
+    \begin{subparag}{Remark}
+        The last claim has many issues. We will come back to it when we will see the measurement problem. The idea is that, after measuring a state, it may collapse to a lot of different states; although, in the end, it does not really matter.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Thought experiment}
+    We consider the four following experiments, where we start with some state, let it evolve for some time (all experiments evolve under the same Hamiltonian), and measure it. All four experiments are possible to make in a lab.
+    \begin{enumerate}[left=0pt]
+        \item We start with a system in state $\ket{0}$. We then wait half an hour and measure it, measuring $\ket{0}$ half of the time and $\ket{1}$ the other half.
+        \item We start with a system in $\ket{1}$. We then wait half an hour and measure it, measuring $\ket{0}$ half of the time and $\ket{1}$ the other half.
+        \item We start with a system in state $\ket{0}$. We then wait half an hour, and measure it. We wait another half hour and measure. For both measures, we get $\ket{0}$ half of the time, and $\ket{1}$ the other half.
+        \item We start with a system in state $\ket{0}$. We then wait a full hour, and measure. We always measure the result to be in state $\ket{0}$.
+    \end{enumerate}
+
+    Let us explain those experiments mathematically.
+    \begin{enumerate}[left=0pt]
+        \item Experiment 1 can be described as: 
+        \[\ket{0} \over{\longrightarrow}{wait 30 min} \frac{\ket{0} + \ket{1}}{\sqrt{2}}.\]
+
+        In other words: 
+        \[U\left(\SI{30}{\minute}\right) \ket{0} = \frac{\ket{0} + \ket{1}}{\sqrt{2}}.\]
+        
+        \item For experiment 2, we need to get a state that is orthogonal to $\frac{\ket{0} + \ket{1}}{\sqrt{2}}$ after waiting (because unitary transformations map orthogonal states to orthogonal states), so we can take: 
+        \[\ket{1} \over{\longrightarrow}{wait 30 min} \frac{\ket{0} - \ket{1}}{\sqrt{2}}.\]
+
+        \item Since measuring a state collapses its state to $\ket{0}$ or $\ket{1}$, the third experiment is like chaining the first and second experiments.
+
+        \item Merging the idea of the first and second experiment, we have, for the fourth experiment:
+        \[\ket{0} \over{\longrightarrow}{wait 30 minutes} \frac{1}{\sqrt{2}} \left(\ket{0} + \ket{1}\right) \over{\longrightarrow}{wait 30 minutes} \frac{1}{\sqrt{2}}\left(\frac{\ket{0} + \ket{1}}{\sqrt{2}} + \frac{\ket{0} - \ket{1}}{\sqrt{2}}\right) = \ket{0}.\]
+    \end{enumerate}
+
+    \begin{subparag}{Takeaway message}
+        This shows the very unintuitiveness of quantum mechanics: the measure in experiment 3 had an impact.
+    \end{subparag}
+\end{parag}
+
+\section{Composite systems and entanglement}
+
+\subsection{Tensor product}
+
+
+\begin{parag}{Definition: Tensor product}
+    Let $\mathcal{H}_A$ be a Hilbert space spanned by $\left\{\ket{\mu_1}, \ldots, \ket{\mu_{d_A}}\right\}$ and $\mathcal{H}_B$ be a Hilbert space spanned by $\left\{\ket{\nu_1}, \ldots, \ket{\nu_{d_B}}\right\}$. 
+
+    The \important{tensor product} (also called Kronecker product) of $\mathcal{H}_A$ and $\mathcal{H}_B$, written $\mathcal{H}_A \otimes \mathcal{H}_B$, is a space spanned by: 
+    \[\ket{\lambda_{ij}} = \ket{\mu_i} \otimes \ket{\nu_j}, \mathspace i \in \left\{1, \ldots, d_A\right\}, j \in \left\{1, \ldots, d_B\right\}.\]
+
+    It has dimension $d_{AB} = d_A d_B$. The inner product on basis elements of this Hilbert space is:
+    \[\braket{\lambda_{ij}}{\lambda_{k \ell }} = \braket{\mu_i\nu_j}{\mu_i \nu_j} = \braket{\mu_i}{\mu_k} \braket{\nu_j}{\nu_{\ell }}.\]
+
+    Moreover, the tensor product of vectors is defined in such a way that it follows the two following properties:
+    \begin{itemize}
+        \item \textit{(Linearity)} $a \left(\ket{\nu} \otimes \ket{\omega}\right) = \left(a \ket{\nu}\right) \otimes \ket{\omega} = \ket{\nu} \otimes \left(a \ket{\omega}\right).$
+        \item \textit{(Distributivity)} $\left(\ket{\nu_1} + \ket{\nu_2}\right) \otimes \ket{\omega} = \ket{\nu_1} \otimes \ket{\omega} + \ket{\nu_2} \otimes \ket{\omega}.$
+    \end{itemize}
+
+    \begin{subparag}{Properties}
+        Let $\ket{\phi} = \sum_{ij} b_{ij} \ket{\lambda_{ij}}$ and $\ket{\psi} = \sum_{ij} c_{ij} \ket{\lambda_{ij}}$ be any arbitrary element of $\mathcal{H}_{AB}$. Then, their inner product is given by: 
+        \[\braket{\phi}{\psi} = \sum_{i j k \ell } b_{ij}^* c_{k \ell } \delta_{ik} \delta_{j \ell } = \sum_{ij} \beta_{ij}^* c_{ij},\]
+        just like we would expect from any basis.
+
+        Similarly, the identity can simply be written as: 
+        \[I_{AB} = I_A \otimes I_B = \sum_{ij} \ket{\lambda_{ij}}\bra{\lambda_{ij}}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        We can chain tensor products to consider larger systems, such as $\mathcal{H}_{ABC} = \mathcal{H}_A \otimes \mathcal{H}_B \otimes \mathcal{H}_C$. This has dimension $d_{ABC} = d_A d_B d_C$.
+    \end{subparag}
+    
+
+    \begin{subparag}{Notation}
+        It is typical to drop the $\otimes$ when we write tensor products, or even merge them into the same ket: 
+        \[\ket{\mu_i} \otimes \ket{\nu_j} = \ket{\mu_i} \ket{\nu_j} = \ket{\mu_i \nu_j}.\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Composite system}
+    Let $A, B$ be two systems living in Hilbert spaces $\mathcal{H}_A$ and $\mathcal{H}_B$, respectively.
+
+    The composite system $AB$ lives in a Hilbert space $\mathcal{H}_{AB} = \mathcal{H}_A \otimes \mathcal{H}_B$, where $\otimes$ is a tensor product (also called Kronecker product).
+
+    \begin{subparag}{Example}
+        Let us consider $A$ and $B$ to be single qubit systems, i.e. $AB$ is a two-qubit system. Both $A$ and $B$ are spanned by $\left\{\ket{0}, \ket{1}\right\}$, so $AB$ is spanned by: 
+        \[\ket{0} = \ket{0}\otimes \ket{0}, \mathspace \ket{1} = \ket{0}\otimes \ket{1}, \mathspace \ket{2} = \ket{1} \otimes \ket{0}, \mathspace \ket{3} = \ket{1} \otimes \ket{1}.\]
+
+        Any state can then be expressed as: 
+        \[\ket{\psi} = c_0 \ket{0} + c_1 \ket{1} + c_2 \ket{2} + c_3 \ket{3}.\]
+
+        We can for instance consider: 
+        \[\ket{\phi} = \frac{\ket{01} - \ket{10}}{\sqrt{2}} = \frac{\ket{1} - \ket{2}}{\sqrt{2}}.\]
+
+        It is indeed normalised since the sum of the modulus squared of its coefficient is 1. More formally: 
+        \[\braket{\phi}{\phi} = \left|\frac{1}{\sqrt{2}}\right|^2 + \left|-\frac{1}{\sqrt{2}}\right|^2 = 1.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Operators in composite systems}
+    Let $T_A$ and $T_B$ be operators acting on the reparte systems. The resulting joint operator on $AB$, written $T_A \otimes T_B$, is defined such taht: 
+    \[\left(T_A \otimes T_B\right) \left(\ket{\phi}_A \otimes \ket{\psi}_B\right) = \left(U_A \ket{\phi}_A\right) \otimes \left(U_B \ket{\psi}_B\right).\]
+
+    $T_A \otimes I_B$ and $I_A \otimes T_B$ are called \important{local operators}. 
+
+    \begin{subparag}{Property}
+        Local operators that act on different systems always commute: 
+        \autoeq{\left(T_A \otimes I_B\right) \left(I_A \otimes T_B\right) = \left(T_A I_A\right) \otimes \left(I_B T_B\right) = T_A \otimes T_B = \left(T_A \otimes I_B\right)\left(I_A \otimes T_B\right).}
+    \end{subparag}
+    
+    \begin{subparag}{Notation}
+        When we have indices that denote on which system an operator acts, we may drop identities. That way, we note: 
+        \[U_A \otimes I_B \equiv U_A.\]
+
+        This moreover allows us to write $U_A \otimes U_B$ more easily: 
+        \[U_A U_B = \left(U_A \otimes I_B\right) \left(I_A \otimes U_B\right) = U_A \otimes U_B.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Explicit vector and matrix representation}
+    Up to an isomorphism, it is possible to show that, given any vector $\ket{v}$: 
+    \[\begin{pmatrix} a_1 \\ \vdots \\ a_n \end{pmatrix} \otimes \ket{v} = \begin{pmatrix} a_1 \ket{v} \\ \vdots \\ a_n \ket{v} \end{pmatrix}.\]
+
+    Similarly, given any matrix $A$:
+    \[\begin{pmatrix} a_1 & \cdots & a_{1n} \\ \vdots & \ddots & \vdots \\ a_{n1} & \cdots & a_{nn} \end{pmatrix} \otimes A = \begin{pmatrix} a_{11} A & \cdots & a_{1n} A \\ \vdots & \ddots & \vdots \\ a_{n1} A & \cdots & a_{nn} A \end{pmatrix}.\]
+
+    \begin{subparag}{Example}
+        For instance:
+        \[\begin{pmatrix} a \\ b \end{pmatrix} \otimes \begin{pmatrix} \alpha \\ \beta \end{pmatrix} = \begin{pmatrix} a \begin{pmatrix} \alpha \\ \beta \end{pmatrix}  \\ b \begin{pmatrix} \alpha \\ \beta \end{pmatrix} \end{pmatrix} = \begin{pmatrix} a \alpha \\ a \beta \\ b \alpha \\ b \beta \end{pmatrix}.\]
+    \end{subparag}
+\end{parag}
+
+\end{document}

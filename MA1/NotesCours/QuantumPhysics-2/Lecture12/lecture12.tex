@@ -1,0 +1,358 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-12-09 at 10:18:17.
+
+\usepackage{../../style}
+
+\title{Qp2}
+\author{Joachim Favre}
+\date{Lundi 09 décembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2024-12-09}{The climax}{
+\begin{itemize}[left=0pt]
+    \item Definition of representation character.
+    \item Proof of the Petit orthogonality theorem.
+    \item Proof of a necessary and sufficient condition for a representation to be an irreducible representation.
+    \item Definition of lie algebra, and structure constants. 
+    \item Example with the group of rotations.
+\end{itemize}
+
+}
+
+\subsection{Petit orthogonality theorem}
+
+\begin{parag}{Remark}
+    We notice that the grand orthogonality theorem is an orthogonality relation between vectors of matrices, so it may be hard to exploit. We want to build the petit orthogonality theorem, which is an orthogonality relation between composant of traces of representations.
+\end{parag}
+
+\begin{parag}{Definition: Character}
+    Let $G$ be a group, and $R$ be a representation.
+
+    We define the \important{character} of $R$ as the set $\left\{\chi_R\left(g\right) \suchthat g \in G\right\}$, where, for any $g$:
+    \[\chi_R\left(g\right) = \Tr\left(R\left(g\right)\right).\]
+    
+    \begin{subparag}{Property}
+        Note that, for instance: 
+        \[\Tr\left(R\left(g\right)^{\dagger}\right) = \Tr\left(R\left(g\right)\right)^* = \chi_R\left(g\right)^*.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    The character of two equivalent representations are the same.
+
+    \begin{subparag}{Proof}
+        This directly comes from the fact that a change of basis leaves the trace unchanged.
+
+        More formally, let $R_1, R_2$ be equivalent representations. By definition, this means that there exists some invertible matrix $P$ so that, for all $g \in G$:
+        \[R_1\left(g\right) = P R_2\left(g\right) P^{-1}.\]
+
+        But then, for all $g$: 
+        \[\Tr\left(R_1\left(g\right)\right) = \Tr\left(P R_2\left(g\right) P^{-1}\right) = \Tr\left(P^{-1} P R_2\left(g\right)\right) = \Tr\left(R_2\left(g\right)\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Proposition}
+    Let $G$ be a group, and $R$ be a representation.
+
+    The representation of two elements of $G$ in the same conjugacy class have the same trace. 
+
+    \begin{subparag}{Proof}
+        Let $x, y$ be in the same conjugacy class, i.e. 
+        \[x = u^{-1} y u.\]
+
+        We notice that, using first the homomorphism property and then the cyclicity of the trace: 
+        \autoeq{\Tr\left(R\left(x\right)\right) = \Tr\left(R\left(u^{-1} y u\right)\right) = \Tr\left(R\left(u^{-1}\right) R\left(y\right) R\left(u\right)\right) = \Tr\left(R\left(u\right) R\left(u^{-1}\right) R\left(y\right)\right) = \Tr\left(R\left(u^{-1} u\right)R\left(y\right)\right) = \Tr\left(R\left(y\right)\right).}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Petit orthgonality theorem}
+    Let $G$ be a finite group of order $N$. Also, let $R_a$ and $R_b$ be two non-equivalent unitary irreps of $G$, of dimension $n_a$ and $n_b$ respectively.
+
+    Then, for all $c, d \in \left\{a, b\right\}$: 
+    \[\sum_{g \in G} \chi_a^*\left(g\right) \chi_b\left(g\right) = N \delta_{ab}.\]
+
+    Equivalently, noting $C_{\mu}$ to be equivalence classes, $n_{\mu} = \left|C_{\mu}\right|$, and $N_c$ to be the number of equivalence classes, then, for all $c, d \in \left\{a, b\right\}$:
+    \[\sum_{\mu = 1}^{N_c} n_{\mu} \chi_a^*\left(C_{\mu}\right) \chi_b\left(C_{\mu}\right) = N \delta_{ab}.\]
+
+    \begin{subparag}{Rephrasing}
+        Considering $N_c$ to be the number of conjugacy classes, and $n_{\mu}$ to be the number of elements in the $\mu$\Th conjugacy class, we can easily rephrase this theorem as: 
+        \[\sum_{\mu=1}^{N_c} n_{\mu} \chi_a^*\left(C_{\mu}\right) \chi_b\left(C_{\mu}\right) = N \delta_{ab}.\]
+
+        This might be easier to use.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This theorem states that the following set of vectors is orthonromal: 
+        \[\left\{\left[\sqrt{\frac{n_{\mu}}{N}} \chi_a\left(C_{\mu}\right)\right]_{\mu = 1}^{N_c} \suchthat a\right\} = \left\{\sqrt{\frac{1}{N}} \begin{pmatrix} n_1 \chi_a\left(C_1\right) \\ n_2 \chi_a\left(C_2\right) \\ \cdots \end{pmatrix} \suchthat a\right\}\]
+        
+        Note that each vector is $N_c$-dimensional. However, there can be at most $N_c$ orthonormal vectors of dimension $N_c$. Therefore, there are at most $N_c$ non-equivalent irreps. Recall that we claimed last lecture there are exactly $N_c$ non-equivalent irreps, this is thus one side of the argument.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        From the Grand orthogonality theorem, we notice that: 
+        \autoeq{\sum_{g \in G} \frac{n_a}{N} \chi_a^*\left(g\right) \chi_b\left(g\right) = \sum_{jk} \sum_{g \in G} \frac{n_a}{N} \left[R_a\left(g\right)^{\dagger}\right]_{jj} \left[R_b\left(g\right)\right]_{kk} = \delta_{ab} \sum_{j = 1}^{n_a} \sum_{k = 1}^{n_a} \delta_{jk} \delta_{jk} = \delta_{ab} n_a, }
+        
+        We get our result by multiplying by $\frac{N}{n_a}$ on both sides.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        We lost information when deriving this theorem. It might be easier to use than the Petit orthogonality theorem, but it is less powerful.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We want to verify our results for the following irrep of the $C3v$ group. Recall that the following is an irrep of this group:
+    \[e = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}, \mathspace c_+ = \begin{pmatrix} -\frac{1}{2} & -\frac{\sqrt{3}}{2} \\ \frac{\sqrt{3}}{2} & -\frac{1}{2} \end{pmatrix}, \mathspace c_- = \begin{pmatrix} -\frac{1}{2} & \frac{\sqrt{3}}{2} \\ -\frac{\sqrt{3}}{2} & -\frac{1}{2} \end{pmatrix},\]
+    \[\sigma = \begin{pmatrix} -1 & 0 \\ 0 & 1 \end{pmatrix}, \mathspace \sigma' = \begin{pmatrix} \frac{1}{2} & \frac{\sqrt{3}}{2} \\ \frac{\sqrt{3}}{2} & -\frac{1}{2} \end{pmatrix}, \mathspace \sigma'' = \begin{pmatrix} \frac{1}{2} & -\frac{\sqrt{3}}{2} \\ -\frac{\sqrt{3}}{2} & -\frac{1}{2} \end{pmatrix}.\]
+
+
+    We notice that, first, the trace of elements in the same conjugacy class are the same: 
+    \[\chi\left(e\right) = 2, \mathspace \chi\left(c^+\right) = \chi\left(c^-\right) = -1, \mathspace \chi\left(\sigma\right) = \chi\left(\sigma'\right) = \chi\left(\sigma''\right) = 0.\]
+    
+    Moreover, the petit orthogonality theorem is indeed verified: 
+    \[\sum_{\mu=1}^{N_C} n_{\mu} \chi^*\left(C_{\mu}\right) \chi\left(C_{\mu}\right) = 1\cdot 2^2 + 3\cdot 0^2 + 2\cdot \left(-1\right)^2 = 6 = N.\]
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $G$ be a group, and $R\left(g\right)$ be a representation.
+
+    We know we can write $R\left(g\right)$ as a direct sum: 
+    \[R\left(g\right) = \bigoplus_{a} \bigoplus_{x=1}^{b_a} R_{a, x}\left(g\right),\]
+    where $a$ is an index for different non-equivalent irreps, and $x \in \left\{1, \ldots, b_a\right\}$ is an index for the degeneracy of the irrep.
+
+    Then, noting $\chi_a\left(g\right) = \Tr\left(R_a\left(g\right)\right)$ and $\chi_R\left(g\right) = \Tr\left(R\left(g\right)\right)$:
+    \[b_a = \frac{1}{N}\sum_{\mu=1}^{N_c} n_{\mu} \chi_a^*\left(C_{\mu}\right) \chi_R\left(C_{\mu}\right).\]
+    
+    \begin{subparag}{Intuition}
+        This theorem allows to compute the degeneracy $b_a$ of an irreducible representation in the direct sum expansion of some representation $R\left(g\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We notice that:
+        \autoeq{\chi_R\left(g\right) = \Tr\left(R\left(g\right)\right) = \Tr\begin{pmatrix} R_{1,1}\left(g\right) &  &  &  &  & \\  & R_{1,2}\left(g\right) &  &  &  & \\  &  & \ddots & &  & \\  &  &  & R_{1, b_1}\left(g\right) &  & \\  &  &  &  & R_{2, 1}\left(g\right) & \\ & & & & & & \ddots\end{pmatrix} = \sum_{a, x} \Tr\left(R_a\left(g\right)\right) = \sum_{a} b_a \Tr\left(R_a\left(g\right)\right) = \sum_{a} b_a \chi_a\left(g\right).}
+
+        Injecting this in the petit orthogonality theorem, this means: 
+        \autoeq{\sum_{\mu = 1}^{N_c} n_{\mu} \chi_b^*\left(C_{\mu}\right) \chi_R\left(C_{\mu}\right) = \sum_{\mu=1}^{N_c}  n_{\mu} \sum_{a} b_a \chi_b^*\left(C_{\mu}\right) \chi_a\left(C_{\mu}\right) = \sum_{a} b_a N \delta_{ab} = N b_b.}
+
+        This yields our result, by dividing both sides by $N$ (and replacing the pseudo-variable $b$ by $a$).
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $G$ be a group of order $N$, and $R$ be a representation.
+
+    $R$ is an irrep if and only if:
+    \[\sum_{\mu=1}^{N_c} n_{\mu} \left|\chi_R\left(C_{\mu}\right)\right|^2 = N.\]
+
+    \begin{subparag}{Remark}
+        This theorem finally allows us to know if a representation is irreducible.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Just like the previous theorem, we decompose our representation $R$ into a direct sum of irreps:
+        \[R\left(g\right) = \bigoplus_{a} \bigoplus_{x=1}^{b_a} R_{a, x}\left(g\right),\]
+
+        Note that this is an irrep if and only if there is some $i$ so that $b_i = 1$ and for all $j \neq i$, $b_j = 0$.  We found that: 
+        \[\chi_R\left(g\right) = \sum_{a} b_a \chi_a\left(g\right).\]
+
+        Therefore, feeding it to the Petit orthogonality theorem:
+        \autoeq{\sum_{\mu=1}^{N_c} n_{\mu} \left|\chi_R\left(C_{\mu}\right)\right|^2 = \sum_{i, j} b_i b_j \sum_{\mu=1}^{N_c} n_{\mu} \chi_i\left(C_{\mu}\right)^* \chi_j\left(C_{\mu}\right) = N \sum_{i,j} b_i b_j \delta_{ij} = N \sum_{i} b_i^2.}
+
+        As mentioned above, $R$ is an irrep if and only if a single $b_i$ is non-zero and it is equal to $1$, i.e. if and only if $\sum_{i} b_i^2 = 1$. This gives our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We consider $C3v$, as usual. We can check that our 2D representation is indeed an irrep: 
+    \[\sum_{\mu=1}^{N_c} n_{\mu} \left|\chi\left(C_{\mu}\right)\right|^2 = 1\cdot 2^2 + 2\cdot \left(-1\right)^2 + 3\cdot 0 = 6 = N.\]
+
+    Since there are three conjugacy classes, there are three irreps, and we thus have two more irreps to find. As usual, we have the trivial representation: 
+    \[g \mapsto 1, \mathspace \forall g \in C3v.\]
+
+    We can now use Burnside's lemma to identify the dimension of the remaining irrep: 
+    \[\sum_{i} d_i^2 = N \implies 1^2 + 2^2 + d_3^2 = 6 \iff d_3 = 1.\]
+
+    Since it has dimension $1$, the trace of an element is equal to the element. We can thus use the petit orthogonality theorem. The 2D irrep and trivial irrep have character, respectively: 
+    \[\bvec{v} = \left(2, -1, -1, 0, 0, 0\right)^T, \mathspace \bvec{u} = \left(1, 1, 1, 1, 1, 1\right)^T.\]
+
+    The unknown irrep moreover has character:
+    \[\bvec{w} = \left(\chi_e, \chi_{c^-}, \chi_{c^+}, \chi_{\sigma}, \chi_{\sigma'}, \chi_{\sigma''}\right) = \left(\chi_e, \chi_{c}, \chi_{c}, \chi_{\sigma}, \chi_{\sigma}, \chi_{\sigma}\right)^T.\]
+    
+    The petit orthogonality theorem tells us that: 
+    \[\begin{systemofequations} \bvec{v} \dotprod \bvec{w} = 0 \iff 2 \chi_e  - 2 \chi_c = 0, \\ \bvec{u} \dotprod \bvec{w} = 0 \iff \chi_e + 2 \chi_c + 3 \chi_{\sigma} = 0.\end{systemofequations}\]
+    
+    However, this yields $\chi_e = \chi_c = - \chi_{\sigma}$. We know $R\left(e\right) = 1$, so: 
+    \[R\left(e\right) = R\left(c_+\right) = R\left(c_{-}\right)  = 1, \mathspace R\left(\sigma\right) = R\left(\sigma'\right) = R\left(\sigma''\right) = -1.\]
+
+    We have used all the theory we built (mainly orthogonality relations) to successfully find a missing irrep.
+\end{parag}
+
+\section{Lie algebras and angular momentum}
+
+\subsection{Rotations}
+
+\begin{parag}{Motivational example: 2D}
+    To study rotations, it suffices to study infinitesimal rotations. A rotation through an infinitesimal angle is almost no rotation (i.e. very close to identity), so we can write it as a perturbation from identity: 
+    \[R\left(\theta\right) = I + A\left(\theta\right).\]
+
+    Now, we know that rotations are orthogonal matrices, i.e. they satisfy $R^T R = I$. Considering infinitesimal rotations, we can substitute in those two expressions, considering only the first order: 
+    \[I = R^T R = \left(I + A^T\right)\left(I + A\right) = I + A^T + A + A^T A\approx I + A^T + A \iff A^T = -A.\]
+
+    This shows that $A$ is anti-symmetric. For instance, in two dimensions:
+    \[A = \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix} \theta = J \theta.\]
+\end{parag} % This is very much of a hack, I don't have time to fix this. There is a problem with the "heigh plus" entry in the paragbox entry in my style
+\begin{parag}{}
+    Note that here we made a choice on $J$: we could have chosen $J' = \frac{1}{2} J$, giving a similar result but with a dependence on $2\theta$ instead of $\theta$. This would be a correct choice as well, but choosing $J$ that way is simply more natural.
+
+    In other words, still for two dimensions, $R\left(\theta\right) = I + J \theta + O\left(\theta^2\right)$. This matrix $J$, the thing that determines the form of an infinitesimal rotation, is called the \important{generator} of rotations (i.e. of the group of rotations). 
+
+    We recall that $e^x = \lim_{n \to \infty} \left(1 + \frac{x}{n}\right)^n$. We can use this to write an arbitrary rotation using a product of many small rotations: 
+    \[R\left(\theta\right) = \lim_{n \to \infty} R\left(\frac{\theta}{n}\right)^n = \lim_{n \to \infty} \left(I + \frac{\theta J}{n} + O\left(\frac{\theta^2}{n^2}\right)\right)^n = e^{\theta J}.\]
+    
+    We again see intuitively that $J$ generates the 2D rotations. As a small sanity check, we notice that, since $J^2 = I$ but skipping the details: 
+    \autoeq{e^{\theta J} = \sum_{n=0}^{\infty} \frac{\theta^n J^n}{n!} = \sum_{n=0}^{\infty} \frac{\theta^{2n} J^{2n}}{\left(2n\right)!} + \sum_{n=0}^{\infty} \frac{\theta^{2n + 1}J^{2n + 1}}{\left(2n + 1\right)!} = \cos\left(\theta\right)I + \sin\left(\theta\right)J = \begin{pmatrix} \cos\left(\theta\right) & \sin\left(\theta\right) \\ -\sin\left(\theta\right) & \cos\left(\theta\right) \end{pmatrix} .}
+
+    This does give back our familiar representation of $SO\left(2\right)$, the group of 2D rotations.
+
+    \begin{subparag}{3D case}
+        We may have wished to consider the 3D case as well. It is possible to convince ourselves that the following is a basis for anti-symmetric matrices $A$:
+        \[J_x = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{pmatrix}, \mathspace J_y = \begin{pmatrix} 0 & 0 & -1 \\ 0 & 0 & 0 \\ 1 & 0 & 0 \end{pmatrix}, \mathspace J_z = \begin{pmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}.\]
+
+        In other words, we can write any matrix $A$ so that $A^T = -A$ as
+        \[A = \theta_x J_x + \theta_y J_y + \theta_z J_z\]
+
+        Note again that the choice of the $\left\{J_x, J_y, J_z\right\}$ basis is arbitrary. We chose this one because we know it will give us back our usual 3D rotation matrices. By a similar reasoning to the 2D case, this yields that an arbitrary 3D rotation can be written as: 
+        \[R\left(\theta\right) = e^{\theta_x J_x + \theta_y J_y + \theta_z J_z}.\]
+    \end{subparag}
+
+    \begin{subparag}{General case}
+        More generally, we can always write a rotation as:
+        \[R\left(\theta\right) = e^{\sum_{i} \theta_i J_i},\]
+        where $\sum_{i} \theta_i J_i$ is an arbitrary anti-symmetric matrix.
+
+        We moreover notice that this looks a lot like the evolution operators $e^{i H}$, but without a $i$. So, in quantum physics, we tend to redefine our $J_k$ with an $i$, $\widetilde{J}_k = -i J_k$, so that, instead:
+        \[R\left(\theta\right) = e^{i \sum_{i} \theta_k \widetilde{J}_k}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Motivational example: Structure constants}
+    An important property of rotations is the fact that they do not commute.
+
+    Let $R \approx I + A$ and $R' \approx I + B$ be two infinitesimal rotations. We know that: 
+    \[I = R R^T \approx \left(I + A\right)\left(I + A\right)^T = \left(I + A\right)\left(I - A\right).\]
+    
+    So, $R^{-1} \approx I - A$. This yields that:
+    \[R R' R^{-1} \approx \left(I + A\right)R' \left(I - A\right) = R' + A R' - R'A = I + B + AB - BA = R' + \left[A, B\right].\]
+
+    In other words: 
+    \[R R' \approx R' R + \left[A, B\right]R \iff \left[R, R'\right] \approx \left[A, B\right]R.\]
+    
+    This shows that the amount $R$ and $R'$ do not commute is captured by the commutator of the generators. Now, for generic rotations, $A$ and $B$ will be linear combinations of generators: 
+    \[A = i \sum_{j} \theta_j \widetilde{J}_j, \mathspace B = i \sum_{j} \theta_j' \widetilde{J}_j.\]
+    
+    We thus notice that: 
+    \[\left[A, B\right] = i^2 \sum_{i, j} \theta_i \theta_j' \left[\widetilde{J}_i, \widetilde{J}_j\right].\]
+
+    This means that the commutator of the basis of the generators $\left[\widetilde{J}_i, \widetilde{J}_j\right]$ fully captures the non-commutation property of the group. We call this the structure constants of the group, and we will come back to it.
+\end{parag}
+
+\begin{parag}{Recipe to find and characterise the generator of a group}
+    Let us generalise our two motivational examples.
+
+    Let $G$ be some continuous group. To find and characterise the generators of $G$, we do:
+    \begin{enumerate}[left=0pt]
+        \item Expand the group elements (such as a rotation) around the identity by considering the limit where continuous parameters go to zero (such as a small angle), $g \approx I + A$.
+        \item Find a basis in which any arbitrary $A$ for that group can be written, i.e. a set of $T_a$ such that $A = i \sum_{a} \theta_a T_a$.
+        \item For any two group elements near identity, $g_1 = I+A$ and $g_2 = I+B$, $g_1 g_2 g_1^{-1} = g_2 + \left[A, B\right]$. In particular, $\left[A, B\right]$ captures the essence of the group near identity.
+        \item $A$ and $B$ can be written as a linear combinations of the generators, and we know $g_1 g_2 g_1^{-1}$ is close to identity, so the commutation relation between generators give another generator. In particular, $\left[T_a, T_b\right] = i \sum_{c} f_{a b c} T_c$.  We sometimes use Einstein's notation to write $\left[T_a, T_b\right] = i f_{abc} J_c$.
+    \end{enumerate}
+    
+    This means in some sense that the commutation relation between generators capture the essence of the generator of the group. 
+\end{parag}
+
+\subsection{Definitions}
+
+\begin{parag}{Definition: Lie algebra}
+    Let $G$ be a lie group (i.e. some form of continuous group). A \important{lie algebra} $\mathfrak{g}$ is a linear space spanned by a linear combination $\sum_{j} \theta_j J_{j}$ of the generators associated with $G$, together with a lie bracket $\left[., .\right]$.
+
+    In this class, the lie bracket will always be the commutator $\left[A, B\right] = AB - BA$; but this is an algebraic structure that is more general.
+
+    \begin{subparag}{Remark 1}
+        As Lie groups are differentiable, it is always possible to write an element $g \in G$ as the exponential of an element $J \in \mathfrak{g}$ in the corresponding lie algebra, i.e. 
+        \[\mathfrak{g} = \left\{J \suchthat e^{i J} \in G\right\}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Since they are related by exponentiation, we sometimes write:
+        \[G = e^{i \mathfrak{g}}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        It is typically a lot easier to analyse lie algebra than lie groups, since lie algebras is a linear spaces.
+
+        For instance, $\mathfrak{so}\left(n\right)$ is the vector space of the anti-symmetric matrices. Vector spaces behave very well, and it is for example very easy to represent an arbitrary anti-symmetric matrix. On the other hand, $SO\left(n\right)$ is a lot harder to manipulate.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Structure constants}
+    Let $\mathfrak{g}$ be a lie algebra, and $J_k$ be generators (i.e. a basis of $\mathfrak{g}$).
+
+    We define the \important{structure constants} of $\mathfrak{g}$, noted $f_{abc}$, as the commutation relations of the generators: 
+    \[\left[J_a, J_b\right] = i \sum_{c} f_{abc} J_c.\]
+
+    \begin{subparag}{Remark}
+        Lie algebras are in one-to-one correspondance with structure constants. Therefore, if we find that two lie algebras have the same structure constants, then they are the same lie algebra (up to isomorphisms).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lie algebra representation}
+    Representing an algebra means that we can find a set of matrices such that the defining commutation relations are satisfied. For instance, we saw before that 
+    \[J_x = -i \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{pmatrix}, \mathspace J_y = -i \begin{pmatrix} 0 & 0 & -1 \\ 0 & 0 & 0 \\ 1 & 0 & 0 \end{pmatrix}, \mathspace J_z = -i \begin{pmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}.\]
+
+    It is moreover possible to show $\left[J_i, J_j\right] = i\cdot \epsilon_{ijk} J_k$, where $\epsilon_{ijk}$ is the Levi-Civita constant. As physicists, we started from the representations to get the structure constants. A more mathematical approach is to start from the structure constants $f_{ijk} = \epsilon_{ijk}$, and get some representation from it (such as the $J_x$, $J_y$, $J_z$ we found, but others are possible).
+
+    \begin{subparag}{Remark}
+        Like for groups, it is easier as physicists to think of representation of lie algebras instead of the lie algebras directly. This is exactly what we did for rotations for instance; we saw the $J$ matrices, instead of their underlying group elements.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Link between representations}
+    Let $G$ be a Lie group associated to a Lie algebra $\mathfrak{g}$, $R$ be a representation of $G$.
+
+    Then, we can find a representation of $\mathfrak{g}$, given by: 
+    \[r\left(X\right) = \frac{d}{d\theta} R\left(e^{\theta X}\right) \eval_{\theta = 0}, \mathspace\forall X \in \mathfrak{g},\]
+    
+    This is named the representation of $\mathfrak{g}$ induced by $R$.
+
+    \begin{subparag}{Remark}
+        The converse is not true in general: exponentiating a representation of $\mathfrak{g}$ does not always give a representation of $G$. Now, this is true if $G$ is a simply connected group; although we will not define what this means in this class.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Consider the following element of the usual representation of $SO\left(3\right)$: 
+        \[R_x\left(\theta\right) = \begin{pmatrix} 1 & 0 & 0 \\ 0 & \cos\left(\theta\right) & -\sin\left(\theta\right) \\ 0 & \sin\left(\theta\right) & \cos\left(\theta\right) \end{pmatrix}.\]
+
+        Differentiating it, we do find an element of the representation of $\mathfrak{so}\left(3\right)$ (the vector space of anti-symmetric matrices) we presented: 
+        \autoeq{\frac{d}{d \theta} R_x\left(\theta\right) \eval_{\theta = 0} = \frac{d}{d \theta} \begin{pmatrix} 1 & 0 & 0 \\ 0 & \cos\left(\theta\right) & -\sin\left(\theta\right) \\ 0 & \sin\left(\theta\right) & \cos\left(\theta\right) \end{pmatrix} \eval_{\theta = 0} = \begin{pmatrix} 0 & 0 & 0 \\ 0 & -\sin\left(\theta\right) & -\cos\left(\theta\right) \\ 0 & \cos\left(\theta\right) & -\sin\left(\theta\right) \end{pmatrix} \eval_{\theta = 0} = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{pmatrix} = i J_x.}
+    \end{subparag}
+\end{parag}
+
+\end{document}
+

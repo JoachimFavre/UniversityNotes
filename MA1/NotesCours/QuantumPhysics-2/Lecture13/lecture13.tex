@@ -1,0 +1,275 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-12-16 at 11:50:30.
+
+\usepackage{../../style}
+
+\title{QP2}
+\author{Joachim Favre}
+\date{Lundi 16 décembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2024-12-16}{Ah yes, $\mathfrak{so}\left(3\right) = SO\left(3\right)$}{
+\begin{itemize}[left=0pt]
+    \item Construction of irreps for $\mathfrak{so}\left(3\right)$.
+    \item Explanation and examples of the Clebsch-Gordan decomposition.
+\end{itemize}
+
+}
+
+\subsection{Addition of angular momentum}
+
+\begin{parag}{Personal remark}
+    This lecture was not given by the Professor, we had to read the lecture notes instead. This is my best attempt to explain how I understood this subject, notably compiling some questions I asked to TAs. There are probably some inaccuracies, do not hesitate to point them out to me.
+
+    \begin{subparag}{Acknowledgement}
+        A big thanks to Nathan Brunet, Jonas Daverio, Gabriel Pescia and Reyhaneh Saem for their answers and their patience on my questions.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Angular momentum}
+    Let $\mathcal{H}$ be a quantum system, with position operator $\hat{r} = \left(\hat{x}, \hat{y}, \hat{z}\right)$ and momentum operator $\hat{p} = \left(\hat{p}_x, \hat{p}_y, \hat{p}_z\right)$.
+
+    We define its angular momentum operators as:
+    \[\begin{pmatrix} \hat{J}_x \\ \hat{J}_y \\ \hat{J}_z \end{pmatrix} = \begin{pmatrix} \hat{y} \hat{p}_z - \hat{z} \hat{p}_y \\ \hat{z} \hat{p}_x - \hat{x} \hat{p}_z \\ \hat{x} \hat{p}_y - \hat{y} \hat{p}_x \end{pmatrix}.\]
+
+    \begin{subparag}{Intuition}
+        Recall that, in classical mechanics, we defined angular momentum as:
+        \[\bvec{L} = \bvec{x} \times \bvec{p} = \begin{pmatrix} y p_z - z p_y \\ z p_x - x p_z \\ x p_y - y p_x\end{pmatrix}.\]
+
+        We thus simply promote everything to an operator for quantum systems.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $\mathcal{H}$ be a quantum system, of angular momentum operators $J_x, J_y, J_z$.
+
+    Then, $i J_x, i J_y, i J_z$ represent a basis for a representation of $\mathfrak{so}\left(3\right)$.
+
+    \begin{subparag}{Proof}
+        It is possible to prove, like we did in Quantum physics I, that: 
+        \[\left[J_i, J_x\right] = i \hbar \sum_{k} \epsilon_{ijk} J_k.\]
+
+        Leaving $\hbar = 1$ for simplicity, this shows that their structure constants are the same as the lie algebra corresponding to the orthogonal group $SO\left(3\right)$. Since lie algebras can be identified by their structure constants, this shows our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $j \in \left\{0, \frac{1}{2}, 1, \ldots\right\}$ be arbitrary.
+
+    We can construct a representation of $\mathfrak{so}\left(3\right)$, which we note $j$, given by some eigenvectors $\ket{j m}$ of $J_z$. 
+
+    To do so, we define the following ladder operators: 
+    \[J_- = J_x - i J_y, \mathspace J_+ = J_x + i J_y.\]
+    
+    They are such that:
+    \begin{itemize}
+        \item $J_z \ket{j, m} = m$.
+        \item $\left[J_z, J_{\pm}\right] = \pm J_{\pm}.$
+        \item $\left[J_+, J_-\right] = 2J_z$.
+        \item $J_+ \ket{j, m} = \sqrt{j\left(j+1\right) - m\left(m+1\right)} \ket{j, m+1}$.
+        \item $J_- \ket{j, m} = \sqrt{j\left(j+1\right) - m\left(m-1\right)} \ket{j, m-1}.$
+    \end{itemize}
+    
+    All these properties allow to compute $\bra{j, m'} J_z \ket{j, m} = m \delta_{m, m'}$, and the coordinates of $J_x = \frac{1}{2}\left(J_+ + J_-\right)$ and $J_y = \frac{1}{2i}\left(J_+ - J_y\right)$. These $J_x, J_y, J_z$ form a basis for a representation of $\mathfrak{so}\left(3\right)$.
+
+    \begin{subparag}{Example}
+        For instance, the $j= 0$ representation is the trivial irrep: 
+        \[J_x = J_y = J_z = 0.\]
+
+        Moreover, the $j = \frac{1}{2}$ irrep is, in the $\ket{\frac{1}{2}, \frac{1}{2}}, \ket{\frac{1}{2}, -\frac{1}{2}}$ basis: 
+        \[J_x = \frac{1}{2} \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}, \mathspace J_y = \frac{1}{2}\begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \mathspace J_z = \frac{1}{2} \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.\]
+
+        We recognise the Pauli matrices. As a last example, the $j = 1$ irrep is, in the $\ket{1, 1}, \ket{1, 0}, \ket{1, -1}$ basis: 
+        \[J_x = \frac{1}{\sqrt{2}} \begin{pmatrix} 0 & 1 & 0 \\ 1 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix}, \mathspace J_y = \frac{1}{\sqrt{2}} \begin{pmatrix} 0 & -i & 0 \\ i & 0 & -i \\ 0 & i & 0 \end{pmatrix},\]
+        \[J_z = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & -1 \end{pmatrix}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We make a constructive proof.
+
+        We want to construct a representation of $\mathfrak{so}\left(3\right)$, by diagonalising $J_z$. So, let $\ket{m}$ be an eigenstate associated to eigenvalue $m$: 
+        \[J_z \ket{m} = m \ket{m}.\]
+
+        Since $\left[J_x, J_z\right] \neq 0$ and $\left[J_y, J_z\right] \neq 0$, this shows that we cannot block diagonalise them at the same time, and hence the $\ket{m}$ are not eigenstates of $J_x$ and $J_y$. Let us instead introduce some helper operators: 
+        \[J_+ = J_x + i J_y, \mathspace J_- = J_x - i J_y.\]
+        
+        Notice that they are such that, using the commutation properties of the angular momentum operators: 
+        \[\left[J_z, J_{\pm}\right] = \left[J_z, J_x \pm i J_y\right] = iJ_y \pm i\cdot \left(-i J_x\right) = i J_y \pm J_x = \pm J_{\pm},\]
+        \[\left[J_+, J_-\right] = \left[J_x + i J_y, J_x - i J_y\right] = 2i \left[J_y, J_x\right] = 2i\left(-i J_z\right) = 2 J_z.\]
+
+        Moreover, we notice that $J_{\pm}^{\dagger} = J_{\mp}$ since $J_x$ and $J_y$ are Hermitian. 
+
+        We can thus evaluate: 
+        \autoeq{J_z J_{\pm} \ket{m} = J_{\pm} J_z \ket{m} + \left[J_z, J_{\pm}\right]\ket{m} = m J_{\pm} \ket{m} \pm J_\pm \ket{m} = \left(m \pm 1\right) J_{\pm} \ket{m}.}
+
+        In other words, $J_+\ket{m}$ is an eigenket of $J_z$, with eigenvalue $m + 1$; hence $J_+ \ket{m} = c_{m+1}\ket{m+1}$ for some constant $c_{m+1}$. Similarly, $J_- \ket{m} = b_{m-1} \ket{m - 1}$. This justifies the notation $J_+$ and $J_-$: they allow to move up or down on the ladder of eigenstates $\ldots, \ket{m-2}, \ket{m-1}, \ket{m}, \ket{m+1}, \ldots$.
+
+        Moreover, we can link $c_m$ and $b_m$ by using the fact that $J_+ = J_-^{\dagger}$:
+        \autoeq{b_m = \bra{m} J_- \ket{m + 1} = \bra{m+1} J_{-}^{\dagger} \ket{m}^* = \bra{m+1} J_+ \ket{m}^* = c_{m+1}^*.}
+
+        This shows that $J_+ \ket{m} = c_{m+1} \ket{m+1}$ and $J_- \ket{m} = c_m^* \ket{m-1}$. We want to evaluate those values $c_m$ explicitly, by finding a recurrence relation. We notice that: 
+        \[J_+ J_- \ket{m} =  c_m^* J_+ \ket{m-1} = \left|c_m\right|^2 \ket{m},\]
+        \[J_- J_+ \ket{m} = c_{m+1} J_- \ket{m+1} = \left|c_{m+1}\right| \ket{m}.\]
+
+        This allows us to find a recurrence relation for our coefficients, using the fact $\left[J_+, J_-\right] = 2J_z$ as found above: 
+        \autoeq{\left|c_m\right|^2 - \left|c_{m+1}\right|^2 = \bra{m}\left(J_+ J_- - J_- J_+\right) \ket{m} = \bra{m} \left[J_+, J_-\right] \ket{m} = \bra{m} 2J_z \ket{m} = 2m.}
+
+        We thus only need an initial condition in order to be able to solve our recurrence, i.e. we need to the value of some $c_{m_0}$. To do so, we notice that we aim to make a finite-dimensional representation of $\mathfrak{so}\left(3\right)$, so we cannot just have infinitely many such eigenvectors in our ladder. This means that there is some lower bound $\ell$ and upper bound $j$ so that all our states are $\ket{\ell}, \ket{\ell + 1}, \ldots, \ket{j-1}, \ket{j}$. In particular, this asks for: 
+        \[J_+\ket{j} = 0 \implies c_{j+1} = 0, \mathspace J_- \ket{\ell} = 0 \implies c_{\ell} = 0.\]
+
+        This allows us to find the initial condition for our recurrence relation: 
+        \autoeq{0 = \bra{j} J_- J_+ \ket{j} = \bra{j} J_+ J_- \ket{j} + \bra{j} \left[J_+, J_-\right] \ket{j} = \left|c_j\right|^2 + 2\bra{j} J_z \ket{j} = \left|c_j\right|^2 + 2j.}
+
+        Therefore, $\left|c_j\right|^2 = 2j$. However this, together with the recurrence $\left|c_m\right|^2  = \left|c_{m+1}\right|^2 + 2m$ we found earlier, can be solved to find, for all $s \geq 0$: 
+        \autoeq{\left|c_{j-s}\right|^2 = \left|c_{j-s + 1}\right|^2 + 2\left(j-s\right) = \left|c_{j-s + 2}\right|^2 + 2\left(j-s + 1\right) + 2\left(j-s\right) = \ldots = \left|c_j\right|^2 + 2 \sum_{k=j-s}^{j} k.}
+
+        Being careful on the fact that the sum may range between negative and positive numbers (we may have $j - s < 0$), we can finally simplify this to: 
+        \[\left|c_{j-s}\right|^2 = \left(s+1\right)\left(2j - s\right).\]
+        
+        In particular, we notice that this goes to zero if and only if $s = 2j$, i.e. $c_{-j} = 0$. This shows that $J_- \ket{-j} = c_{-j} = 0$. This means that the ladder terminates at this point, and hence that we had $\ell = -j$. Moreover, we know that we can apply $2j$ times the operator $J_-$ on $\ket{j}$ to get to $\ket{-j}$, so $2j$ must be an integer. This thus forces that $j$ is a half integer, $j \in \left\{0, \frac{1}{2}, 1, \frac{3}{2}, \ldots\right\}$. Since this is a fundamental parameter in our construction, we may write $\ket{m} \equiv \ket{j, m}$.
+        
+        To finish with, we can express $\left|c_m\right|$:
+        \autoeq{\left|c_{j-s}\right|^2 = \left(s+1\right)\left(2j - s\right) \implies \left|c_m\right|^2 = \left(j-m+1\right)\left(2j - j + m\right) = \left(j-m+1\right)\left(j + m\right) \implies \left|c_m\right| = \sqrt{\left(j-m+1\right)\left(j+m\right)}.}
+        
+        We have a choice on the phase of the $c_m$, which makes sense since global phases do not matter in quantum physics. By simplicity, we can thus simply write: 
+        \[c_m = \sqrt{\left(j-m+1\right)\left(j+m\right)} = \sqrt{j\left(j+1\right) - m\left(m-1\right)}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $j \in \left\{0, \frac{1}{2}, 1, \ldots\right\}$ be arbitrary.
+
+    The representation $j$ of $\mathfrak{so}\left(3\right)$ is an irrep.
+
+    \begin{subparag}{Remark 1}
+        We did not define formally the notion of irreducible representation of lie algebras. Intuitively, this is just like for groups, a representation is reducible if all its elements can be block diagonalised. In particular, it suffices to block diagonalise a basis, $J_x, J_y, J_z$ in our case.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that before in the course we were considering finite groups, and hence there was a finite number of irreps. Now that we are considering a continuous group, it is not surprising that we have infinitely many irreps.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Clebsch-Gordan algorithm}
+    We consider the following algorithm, which allows to decompose the representation $j \otimes j'$ as a direct sum of irreps.
+
+    The idea is to decompose the $\ket{J, M}$ basis (associated to the angular momentum of the larger system $J_k = J_k^{\left(1\right)} \otimes I + I \otimes J_k^{\left(2\right)}$) into the basis $\ket{j_1, m_1} \otimes \ket{j_2, m_2}$ (associated to the angular momentum of the two sub-systems). To do so, we can use an inductive process with the following three rules:
+    \begin{enumerate}
+        \item Start with $\ket{J = j_1 + j_2, M = j_1 + j_2} = \ket{j_1, j_1} \otimes \ket{j_2, j_2}$.
+        \item Given $\ket{J = j, M = m}$, find $\ket{J = j, M = m - 1}$ using the fact:
+        \autoeq[s]{\ket{J = j, M = m-1} \propto J_- \ket{J = j, M = m} = \left(J_-^{\left(1\right)} \otimes I\right) \ket{J = j, M = m} + \left(I \otimes J_-^{\left(2\right)}\right) \ket{J = j, M = m}.}
+        \item Given $\ket{J = j+1, M = j}, \ldots, \ket{J = j_1 + j_2, M = j}$, find $\ket{J = j, M = j}$ using the fact it is orthogonal to all $\ket{J = j+1, M = j}, \ldots, \ket{J = j_1 + j_2, M = j}$ and that it uses the same basis ket (i.e. it can be expressed in the basis $\left\{\ket{j_1, m_1 = k} \otimes \ket{j_1, m_2 = j - k} \suchthat k \right\}$).
+    \end{enumerate}
+
+    We can moreover make the process faster, by using the following symmetry: 
+    \autoeq[s]{\left(\bra{j_1, -m_1} \otimes \bra{j_2, -m_2}\right)\ket{J=j, M=-m} = \left(-1\right)^{j_1 + j_2 - j} \left(\left(\bra{j_1, m_1} \otimes \bra{j_2, m_2}\right)\right)\ket{J=j, M=m}.}
+
+    In other words, we get $\ket{J=j, M=-m}$ from $\ket{J=j, M=m}$ by replacing each $\ket{j_1, m_1} \otimes \ket{j_2, m_2}$ in its basis expansion by $\left(-1\right)^{j_1 + j_2 - j} \ket{j_1, m_1} \otimes \ket{j_2, m_2}.$
+
+    \begin{subparag}{Remark}
+        Methodically, we may always start with $J = j_1 + j_2$ and $M = j_1 + j_2$. We can then find $\ket{J = j_1 + j_2, M}$ for each $M = j_1 + j_2, \ldots, -j_1 - j_2$. We can then decrease the value of $J$ by one, and start again; doing this until $J = j_1 - j_2$.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        The idea is that we know $J_x^{\left(1\right)}, J_y^{\left(1\right)}, J_z^{\left(1\right)}$ form a basis for the $j_1$ irrep of $\mathfrak{so}\left(3\right)$, and similarly for $J_x^{\left(2\right)}, J_y^{\left(2\right)}, J_z^{\left(2\right)}$. We know that this implies $J_k^{\left(1\right)} \otimes J_k^{\left(2\right)}$ for $k \in \left\{x, y, z\right\}$ is also the basis for a representation of $\mathfrak{so}\left(3\right)$ (although not an irrep). 
+
+        However, physically, $\ket{j_1, m_1} \otimes \ket{j_2, m_2}$ is a basis that shows the angular momentum of two subsystems. We can expect that there is some states $\ket{J, M}$ that should represent the total angular momentum of the full system. Since we want angular momentums to add, this means that the larger system has basis $J_k = J_k^{\left(1\right)} \otimes I + I \otimes J_k^{\left(2\right)}$. Indeed, for instance, we do have $J_z \ket{j_1, m_1} \otimes \ket{j_2, m_2} = m_1 + m_2$.
+
+        This construction thus allows to find how to change between bases $\ket{j_1, m_1} \otimes \ket{j_2, m_2}$ and $\ket{J, M}$. To do so, we use the three rules explained above iteratively. Let us explain the intuition behind them.
+        \begin{enumerate}
+            \item  The first one states that the only way for the full system to reach total $z$-angular momentum $M = j_1 + j_2$ is that both sub-systems have a maximal $z$-angular momentum, $m_1 = j_1$ and $m_2 = j_2$. 
+            \item The second rule simply uses the ladder operator on the full system, since we know how it will act on the subsystems.
+            \item The third rule uses orthogonality, and the fact that $\ket{J = j, M = m}$ uses the exact same basis as $\ket{J = j', M = m}$, $\left\{\ket{j_1, m_1 = k} \otimes \ket{j_2, m_2 = m-k} \suchthat k\right\}$. The latter fact can be understood intuitively by stating that, for the whole system to have $z$-angular momentum $M$, then the subsystems must be such that $m_1 + m_2 = M$.
+        \end{enumerate}
+        
+
+        Finally, we range $J \in \left\{\left|j_1 - j_2\right|, \ldots, j_1 + j_2\right\}$. Indeed, the total angular momentum $J$ is maximal when the angular momentum of both subsystems go in the same direction, in which case it is $j_1 + j_2$; and it is minimal when the angular momentum of both subsystems go in the opposite direction, in which case it is $\left|j_1 - j_2\right|$. Note that this intuition relies heavily on the classical intuition, there is no real concept of ``direction'' for angular momentum in quantum.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    We have: 
+    \[\frac{1}{2} \otimes \frac{1}{2} = 1 \oplus 0.\]
+
+    \begin{subparag}{Proof}
+        \begin{itemize}[left=0pt]
+            \item We start by finding all $\ket{J, M}$ for $J = 1$. We know:
+            \[\ket{J = 1, M = 1} = \ket{j_1 = \frac{1}{2}, m_1 = \frac{1}{2}} \otimes \ket{j_1 = \frac{1}{2}, m_1 = \frac{1}{2}}.\]
+
+            For the sake of simplicity, we will write this equivalently as: 
+            \[\ket{1, 1} = \ket{\frac{1}{2}, \frac{1}{2}} \otimes \ket{\frac{1}{2}, \frac{1}{2}}.\]
+        
+
+            Since we know $J_- \ket{1, 1} = \sqrt{2} \ket{1, 0}$ and $J_-^{\left(1\right)} \ket{\frac{1}{2}, \frac{1}{2}} = \ket{\frac{1}{2}, -\frac{1}{2}}$:
+            \autoeq{\ket{1, 0} = \frac{1}{\sqrt{2}} J_- \ket{1, 1} = \frac{\left(J_-^{\left(1\right)} \otimes I\right) \ket{1, 1} + \left(I \otimes J_-^{\left(2\right)}\right) \ket{1, 1}}{\sqrt{2}} = \frac{J_-^{\left(1\right)} \ket{\frac{1}{2}, \frac{1}{2}} \otimes \ket{\frac{1}{2}, \frac{1}{2}} + \ket{\frac{1}{2}, \frac{1}{2}} \otimes J_-^{\left(2\right)} \ket{\frac{1}{2}, \frac{1}{2}}}{\sqrt{2}} = \frac{\ket{\frac{1}{2}, -\frac{1}{2}} \otimes \ket{\frac{1}{2}, \frac{1}{2}} + \ket{\frac{1}{2}, \frac{1}{2}} \otimes \ket{\frac{1}{2}, -\frac{1}{2}}}{\sqrt{2}}.}
+            
+            Finding $\ket{1, -1}$ is again very similar, since $J_- \ket{1, 0} = \sqrt{2} \ket{1, -1}$ and $J_-^{\left(1\right)} \ket{\frac{1}{2}, -\frac{1}{2}} = 0$: 
+            \autoeq[s]{\ket{1, -1} = \frac{1}{\sqrt{2}} J_- \ket{1, 0} = J_- \frac{\ket{\frac{1}{2}, -\frac{1}{2}} \otimes \ket{\frac{1}{2}, \frac{1}{2}} + \ket{\frac{1}{2}, \frac{1}{2}} \otimes \ket{\frac{1}{2}, -\frac{1}{2}}}{2} = \frac{0 \otimes \ket{\frac{1}{2}, \frac{1}{2}} + \ket{\frac{1}{2}, -\frac{1}{2}} \otimes \ket{\frac{1}{2}, -\frac{1}{2}} + \ket{\frac{1}{2}, -\frac{1}{2}} \otimes \ket{\frac{1}{2}, -\frac{1}{2}} + \ket{\frac{1}{2}, \frac{1}{2}} \otimes 0}{2} = \ket{\frac{1}{2}, -\frac{1}{2}} \otimes \ket{\frac{1}{2}, -\frac{1}{2}}.}
+             
+             \item We now look for all $\ket{J, M}$ for $J = 0$. We know $\ket{J = 0, M = 0}$ is orthogonal to $\ket{J = 1, M = 0}$. Therefore, it must be: 
+             \[\ket{J=0, M =0} = \frac{\ket{\frac{1}{2}, -\frac{1}{2}} \otimes \ket{\frac{1}{2}, \frac{1}{2}} - \ket{\frac{1}{2}, \frac{1}{2}} \otimes \ket{\frac{1}{2}, -\frac{1}{2}}}{\sqrt{2}}.\]
+        \end{itemize}
+
+        As a quick sanity check, one can verify that all those vectors are indeed normalised.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2}
+    We have:
+    \[1 \otimes 1 = 2 \oplus 1 \oplus 0.\]
+
+    \begin{subparag}{Proof}
+        \begin{itemize}
+            \item We start with $\ket{J, M}$ for $J = j_1 + j_2 = 2$. We know: 
+            \[\ket{J = 2, M = 2} = \ket{j_1 = 1, m_1 = 1} \otimes \ket{j_2 = 1, m_2 = 1}.\]
+
+            Let us simplify the notation even more than before, since we know that $j_1 = 1$ and $j_2 = 1$ will always hold. We thus write this in the form: 
+            \[\ket{2, 2} = \ket{1} \otimes \ket{1}.\]
+
+            \textit{(We may even write this as $\ket{2, 2} = \ket{1, 1}$ if we really feel like we want to use horrendous notations as good physicists.)} Then, doing something completely similar to the previous example: 
+            \[\ket{2, 1} = \frac{\ket{1} \otimes \ket{0} + \ket{0} \otimes \ket{1}}{\sqrt{2}}.\]
+            
+            We can apply this again, using the fact $J_- \ket{J=2, M=1} = \sqrt{6}\ket{J=2, M=0}$: 
+            \autoeq{\ket{2, 0} = \frac{1}{\sqrt{6}}J_- \ket{2, 1} = \frac{\sqrt{2}\ket{-1} \otimes \ket{1} + \sqrt{2} \ket{0} \otimes \ket{0} + \sqrt{2} \ket{-1} \otimes \ket{1} + \sqrt{2} \ket{0} \otimes \ket{0}}{\sqrt{6}\cdot \sqrt{2}} = \frac{\ket{-1} \otimes \ket{1} + 2 \ket{0} \otimes \ket{0} + \ket{-1} \otimes \ket{1}}{\sqrt{6}}.}
+            
+            We can now exploit symmetry, to find that: 
+            \[\ket{2, -1} = \frac{\ket{-1} \otimes \ket{0} + \ket{0} \otimes \ket{-1}}{\sqrt{2}},\]
+            \[\ket{2, -2} = \ket{-1} \otimes \ket{-1}.\]
+             
+            \item We now consider $J = 1$.  We know that $\ket{1, 1}$ must be orthogonal with $\ket{2,1}$, so we can take: 
+            \[\ket{1, 1} = \frac{\ket{0} \otimes \ket{1} - \ket{1} \otimes \ket{0}}{\sqrt{2}}.\]
+
+            We then find: 
+            \[\ket{1, 0} = \frac{\ket{-1} \otimes \ket{1} - \ket{1} \otimes \ket{-1}}{\sqrt{2}},\]
+            \[\ket{1, -1} = \frac{\ket{-1} \otimes \ket{0} - \ket{0} \otimes \ket{-1}}{\sqrt{2}}.\]
+            
+            \item We finally consider $J = 0$. We know $\ket{0, 0}$ must be orthogonal to both $\ket{2, 0}$ and $\ket{1, 0}$. It is possible to guess the answer, or solve a linear system, to find that: 
+            \[\ket{0, 0} = \frac{\ket{-1} \otimes \ket{1} - \ket{0} \otimes \ket{0} + \ket{1} \otimes \ket{-1}}{\sqrt{3}}.\]
+        \end{itemize}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{$SO\left(3\right)$ representation}
+    Note that, all we have done so far only applies to representations of $\mathfrak{so}\left(3\right)$. Indeed, $SO\left(3\right)$ is not simply connected, so we cannot just get a representation of $SO\left(3\right)$ by exponentiating the representations of $\mathfrak{so}\left(3\right)$.
+
+    However, physically, this actually works. Indeed, exponentiating a representation of $SO\left(3\right)$, we get something called a ``projective representation'', where we allow global phases i.e. $R\left(g_1\right)\cdot R\left(g_2\right) = e^{i\phi} R\left(g_1 * g_2\right)$. Since global phases do not matter in quantum physics, everything we did here actually also allows us to find representations $SO\left(3\right)$.
+
+    In practice, since there is this strong link between $\mathfrak{so}\left(3\right)$ and $SO\left(3\right)$, people may use the symbol $SO\left(3\right)$ when speaking of either. This is why, in exercise series, $\ket{j, m}$ is called a representation of $SO\left(3\right)$ (when, formally, it is really a representation of $\mathfrak{so}\left(3\right)$).
+
+    \begin{subparag}{Personal remark}
+        This actually took me so long to understand. A big thanks to Jonas Daverio for explaining me this.
+        \imagehere[0.6]{BetterNotationsWouldHaveSavedMeASoMuchTimeThisIsDeserved.png}
+    \end{subparag}
+\end{parag}
+
+\end{document}

@@ -1,0 +1,199 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-28 at 10:15:32.
+
+\usepackage{../../style}
+
+\title{QP 2}
+\author{Joachim Favre}
+\date{Lundi 28 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2024-10-28}{Perturbation theory}{
+\begin{itemize}[left=0pt]
+    \item Proof of the formulas for non-degenerate time-independent perturbation theory.
+    \item Explanation of sufficient conditions for first order non-degenerate time-independent perturbation theory.
+\end{itemize}
+
+}
+
+\section{Perturbation theory}
+
+\subsection{Non-degenerate and time-independent}
+
+\begin{parag}{Goal}
+    Let's say that we have a Hamiltonian $H$, and that we want to find its eigenspectrum (i.e. eigenstates and eigenvalues). In many cases, we can split $\hat{H} = \hat{H}_0 + \lambda \hat{V}$ where $H_0$ is a part we can easily get its eigenspectrum, $\lambda \geq 0$ is some perturbation strength and $V$ is a perturbation.
+    
+    The idea is therefore to compute results on $H$ from results on $H_0$.
+\end{parag}
+
+\begin{parag}{Theorem: Non-degenerate perturbation theory}
+    Let $H = H_0 + \lambda V$ be some Hamiltonian, with $\lambda \geq 0$. We moreover note $H_0 \ket{\phi_n} = \epsilon_n \ket{\phi_n}$ and $H \ket{\psi_n} = E_n \ket{\psi_n}$ to be their eigenvalues and eigenvectors. We suppose that $\epsilon_n$ and $\ket{\phi_n}$ are known, and our goal is to compute $E_n$ and $\ket{\psi_n}$.
+
+    We furthermore suppose that $\ket{\phi_n}$ is approximately $\psi_n$, but with some correction terms $\ket{\psi_n^{\left(i\right)}}$ and $E^{\left(n\right)}$:
+    \[\ket{\psi_n} =  \ket{\phi_n} + \lambda \ket{\psi_n^{\left(1\right)}} + \lambda^2 \ket{\psi_n^2} + \ldots, \mathspace E_n = \epsilon_n + \lambda E_n^{\left(1\right)} + \lambda^2 E_n^{\left(2\right)} + \ldots\]
+
+    Finally, we take the global (non-physical) phase of $\ket{\psi_n^{\left(1\right)}}$ and $\ket{\phi_n}$ so that $\braket{\phi_n}{\psi_n^{\left(1\right)}} \in \mathbb{R}$.
+
+    If the eigenspectrum of $H_0$ is non-degenerate, i.e. if $\epsilon_n \neq \epsilon_m$ for all $n \neq m$, then:
+    \begin{enumerate}
+        \item $\displaystyle E_n^{\left(1\right)} = \bra{\phi_n}V \ket{\phi_n}$, 
+        \item $\displaystyle \ket{\psi_n^{\left(1\right)}} = \sum_{m \neq n} \frac{\bra{\phi_m} V \ket{\phi_n}}{\epsilon_n - \epsilon_m} \ket{\phi_m}$,
+        \item $\displaystyle E_n^{\left(2\right)} = \bra{\phi_n} V \ket{\psi_n^{\left(1\right)}} = \sum_{m \neq n} \frac{\left|\bra{\phi_m} V \ket{\phi_n}\right|^2}{\epsilon_n - \epsilon_m}$.
+    \end{enumerate}
+
+    \begin{subparag}{Remark 1}
+        It is possible to find these results in a more general way. However, this is rarely used past the second term and we will not do it in this class.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        Note that we divide by $\epsilon_n - \epsilon_m$, hence the hypothesis that the eigensepctrum is non-degenerate. If it is degenerate, we have to use another method, called degenerate perturbation theory, which we will see later in the class.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let us feed our Ansatz on $H$, $\ket{\psi_n}$ and $E_n$ to the equation $H \ket{\psi_n} = E_n \ket{\psi_n}$: 
+        \autoeq[s]{\left(H_0 + \lambda V\right)\left(\ket{\phi_n} + \lambda \ket{\psi_n^{\left(1\right)}} + \lambda^2 \ket{\psi_n^{\left(2\right)}} + \ldots\right) = \left(\epsilon_n + \lambda E_n^{\left(1\right)} + \lambda^2 E_n^{\left(2\right)} + \ldots\right)\left(\ket{\phi_n} + \lambda \ket{\psi_n^{\left(1\right)}} + \lambda^2 \ket{\psi_n^{\left(2\right)}} + \ldots\right).}
+
+        We want this to be true for any $\lambda$, so we can consider each order separately. We will only need the three first orders:
+        \begin{itemize}[left=0pt]
+            \item $\displaystyle H_0 \ket{\phi_n} = \epsilon_n \ket{\phi_n}$,
+            \item $\displaystyle  \lambda H_0 \ket{\psi_n^{\left(1\right)}} + \lambda V \ket{\phi_n}  = \lambda \epsilon_n \ket{\psi_n^{\left(1\right)}} + \lambda E_n^{\left(1\right)} \ket{\phi_n}$, 
+            \item \mbox{$\displaystyle \lambda^2 H_0 \ket{\psi_n^{\left(2\right)}} + \lambda^2 V \ket{\psi_n^{\left(1\right)}} = \lambda^2 \epsilon \ket{\psi_n^{\left(2\right)}} + \lambda^2 E_n^{\left(1\right)} \ket{\psi_n^{\left(1\right)}} + \lambda^2 E_n^{\left(2\right)} \ket{\phi_n}$.}
+        \end{itemize}
+
+        Let us now look for our three results.
+        \begin{enumerate}[left=0pt]
+            \item We want to find $E_n^{\left(1\right)}$. To do so, we can multiply by $\bra{\phi_n}$ on both sides of the equation of order $\lambda^1$, getting
+        \[\bra{\phi_n} H_0 \ket{\psi_n^{\left(1\right)}} + \bra{\phi_n} V \ket{\phi_n} = \epsilon_n \braket{\phi_n}{\psi_n^{\left(1\right)}} + E_n^{\left(1\right)} \braket{\phi_n}{\phi_n}.\]
+
+        We notice that $\braket{\phi_n}{\phi_n} = 1$. Moreover, since $H_0 \ket{\phi_n} = \epsilon \ket{\phi_n}$ and $H_0$ is Hermitian, we know $\bra{\phi_n} H_0 = \epsilon_n \bra{\phi_n}$. Therefore:
+        \autoeq{\epsilon_n \braket{\phi_n}{\psi_n^{\left(1\right)}} + \bra{\phi_n}V \ket{\phi_n} = \epsilon_n \braket{\phi_n}{\psi_n^{\left(1\right)}} + E_n^{\left(1\right)} \iff E_n^{\left(1\right)} = \bra{\phi_n}V \ket{\phi_n}.}
+
+        
+        \item We now want to express $\ket{\psi_n^{\left(1\right)}}$ in the basis $\ket{\phi_m}$,
+        \[\ket{\psi_n^{\left(1\right)}} = \sum_{m} \braket{\phi_m}{\psi_n^{\left(1\right)}} \ket{\phi_m}.\]
+
+        We therefore have to compute $\braket{\phi_m}{\psi_n^{\left(1\right)}}$ for all $m$. We first suppose $m \neq n$. Multiplying by $\bra{\phi_m}$ on both sides of our first order equation: 
+        \autoeq{\bra{\phi_m} H_0 \ket{\psi_n^{\left(1\right)}} + \bra{\phi_m} V \ket{\phi_n} = \epsilon_n \braket{\phi_m}{\psi_n^{\left(1\right)}} + E_n^{\left(1\right)} \overbrace{\braket{\phi_m}{\phi_n}}^{= 0} \iff \epsilon_m \braket{\phi_m}{\psi_n^{\left(1\right)}} + \bra{\phi_m}V \ket{\phi_n} = \epsilon_n \braket{\phi_m}{\psi_n^{\left(1\right)}} \iff \bra{\phi_m}V \ket{\phi_n} = \left(\epsilon_n - \epsilon_m\right) \braket{\phi_m}{\psi_n^{\left(1\right)}} \iff \braket{\phi_m}{\psi_n^{\left(1\right)}} = \frac{\bra{\phi_m}V \ket{\psi_n}}{\epsilon_n - \epsilon_m}.}
+
+        Let us now consider the case $m = n$. We know that $\braket{\psi_n}{\psi_n} = 1$, so:
+        \autoeq{1 = \braket{\psi_n}{\psi_{n}} = \left(\bra{\phi_n} + \lambda \bra{\psi_n^{\left(1\right)}} + \lambda^2 \bra{\psi_n^{\left(2\right)}} + \ldots\right)\fakeequal \cdot\left(\ket{\phi_n} + \lambda \ket{\psi_n^{\left(1\right)}} + \lambda^2 \ket{\psi_n^{\left(2\right)}} + \ldots\right).}
+
+        Up to the first order, this reads: 
+        \[1 = \braket{\phi_n}{\phi_n} + \lambda\left(\braket{\phi_n}{\psi_n^{\left(1\right)}} + \braket{\phi_n^{\left(1\right)}}{\phi_n}\right) + O\left(\lambda^2\right).\]
+
+        The first order on the left handside must be equal to the first order on the right handside, i.e.:
+        \autoeq{0 = \braket{\phi_n}{\psi_n^{\left(1\right)}} + \braket{\psi_n^{\left(1\right)}}{\phi_n} \iff \Re\left(\braket{\phi_n}{\psi_n^{\left(1\right)}}\right) = 0 \iff \braket{\phi_n}{\psi_n^{\left(1\right)}} = 0,}
+        where we used the hypothesis that $\braket{\phi_n}{\psi_n^{\left(1\right)}} \in \mathbb{R}$.
+
+        Putting everything together, this does yield that:
+        \[\ket{\psi_n^{\left(1\right)}} = \sum_{m \neq n} \frac{\bra{\phi_m} V \ket{\phi_n}}{\epsilon_n - \epsilon_m} \ket{\phi_m}.\]
+        
+        \item We can now consider the second order. Recall the equation of order $\lambda^2$:
+        \[H_0 \ket{\psi_n^{\left(2\right)}} + V \ket{\psi_n^{\left(1\right)}} = \epsilon_n \ket{\psi_n^{\left(2\right)}} + E_n^{\left(1\right)} \ket{\psi_n^{\left(1\right)}} + E_n^{\left(2\right)} \ket{\phi_n}.\]
+
+        Multiplying both sides by $\bra{\phi_n}$, this means, using the facts that $\bra{\phi_n} H_0 = \epsilon_n \bra{\phi_n}$ and $\braket{\phi_n}{\phi_n} = 1$: 
+        \[\epsilon_n \braket{\phi_n}{\psi_n^{\left(2\right)}} + \bra{\phi_n} V \ket{\psi_n^{\left(1\right)}} = \epsilon_n \braket{\phi_n}{\psi_n^{\left(2\right)}} + E_n^{\left(1\right)} \braket{\phi_n}{\psi_n^{\left(1\right)}} + E_n^{\left(2\right)}.\]
+
+        Notice that the $\epsilon_n \braket{\phi_n}{\psi_n^{\left(2\right)}}$ cancel out on both sides of the equation, and recall that $\braket{\phi_n}{\psi_n^{\left(1\right)}} = 0$, so we are left with: 
+        \autoeq{E_n^{\left(2\right)} = \bra{\phi_n} V \ket{\psi_n^{\left(1\right)}} = \sum_{m \neq n} \frac{\bra{\phi_m} V \ket{\phi_n}}{\epsilon_n - \epsilon_m} \bra{\phi_n} V \ket{\phi_m} = \sum_{m \neq n} \frac{\left|\bra{\phi_m} V \ket{\phi_n}\right|^2}{\epsilon_n - \epsilon_m}.}
+        \end{enumerate}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $n$ be arbitrary. We define $\Delta$ to be the minimum energy difference to $\epsilon_n$: 
+    \[\Delta = \min_m \left|\epsilon_m - \epsilon_n\right|.\]
+    
+    We suppose that at least one of the following conditions hold: 
+    \begin{enumerate}
+        \item $\displaystyle \left|\frac{\bra{\phi_n} V^2 \ket{\phi_n}}{\bra{\phi_n} V \ket{\phi_n}} - \bra{\phi_n} V \ket{\phi_n}\right| \ll \Delta$,
+        \item $\displaystyle \left|\bra{\phi_m} V \ket{\phi_n}\right| \ll \left|\epsilon_n - \epsilon_m\right|$.
+    \end{enumerate}
+    
+    Then: 
+    \[\left|E_n^{\left(2\right)}\right| \ll \left|E_n^{\left(1\right)}\right|.\]
+
+    \begin{subparag}{Remark 1}
+        For perturbation theory to be applicable up to the first order, we need exactly $\left|E_n^{\left(2\right)}\right| \ll \left|E_n^{\left(1\right)}\right|$. This theorem therefore gives us two sufficient conditions for perturbation theory to be applicable, without having to compute $E_n^{\left(1\right)}$ and $E_n^{\left(2\right)}$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The second hypothesis is looser than the first one.
+    \end{subparag}
+   
+    \begin{subparag}{Proof 1}
+        We first prove that the first hypothesis does indeed yield $\left|E^{\left(2\right)}\right| \ll \left|E^{\left(1\right)}\right|$.
+
+        We notice that, by the triangle inequality: 
+        \[\left|E_n^{\left(2\right)}\right| = \left|\sum_{m \neq n} \frac{\left|\bra{\phi_m} V \ket{\phi_n}\right|^2}{\epsilon_n - \epsilon_m}\right| \leq \sum_{m\neq n} \left|\frac{\left|\bra{\phi_m}V \ket{\phi_n}\right|^2}{\epsilon_n - \epsilon_m}\right|,\]
+        
+        Using the $\Delta = \min_m \left|\epsilon_n - \epsilon_m\right|$ we defined in the hypotheses, this gives us
+        \autoeq{\left|E_n^{\left(2\right)}\right| \leq \frac{1}{\Delta} \sum_{m \neq n} \left|\bra{\phi_m}V \ket{\phi_n}\right|^2 = \frac{1}{\Delta} \left(\sum_{m} \left|\bra{\phi_m} V \ket{\phi_n}\right|^2 - \left|\bra{\phi_n}V \ket{\phi_n}\right|^2\right) = \frac{1}{\Delta} \left(\sum_{m} \bra{\phi_n} V \ket{\phi_m} \bra{\phi_m} V \ket{\phi_n} - \left|\bra{\phi_n} V \ket{\phi_n}\right|^2\right).}
+        
+        We know $\sum_{m} \ket{\phi_m}\bra{\phi_m} = I$ by the completeness relation, so: 
+        \[\left|E_n^{\left(2\right)}\right| \leq \frac{1}{\Delta}\left(\bra{\phi_n} V^2 \ket{\phi_n} -  \left|\bra{\phi_n} V \ket{\phi_n}\right|^2\right).\]
+
+        Since $E_n^{\left(1\right)} = \bra{\phi_n} V \ket{\phi_n}$, we thus want: 
+        \autoeq{\frac{1}{\Delta}\left(\bra{\phi_n} V^2 \ket{\phi_n} - \left|\bra{\phi_n} V \ket{\phi_n}\right|^2\right) \ll \left|\bra{\phi_n} V \ket{\phi_n}\right| \iff \frac{\bra{\phi_n} V^2 \ket{\phi_n}}{\left|\bra{\phi_n} V \ket{\phi_n}\right|} - \left|\bra{\phi_n} V \ket{\phi_n}\right| \ll \Delta \impliedby \left|\frac{\bra{\phi_n} V^2 \ket{\phi_n}}{\bra{\phi_n} V \ket{\phi_n}} - \bra{\phi_n} V \ket{\phi_n}\right| \ll \Delta,}
+        since $\bra{\phi_n} V^2 \ket{\phi_n} \geq 0$. This is indeed respected by the first hypothesis.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        Remember that:
+        \[E_n^{\left(2\right)} = \sum_{m \neq n} \frac{\left|\bra{\phi_m} V \ket{\phi_n}\right|^2}{\epsilon_n - \epsilon_m}.\]
+        
+        Therefore, the second condition simply asks for all terms in this sum to decay sufficiently fast.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example}
+    We consider a perturbed quantum harmonic oscillator:  
+    \[H = \frac{p^2}{2m} + \frac{1}{2} m \omega^2 x^2 - q E x.\]
+
+    We have $H_0 = \frac{p^2}{2m} + \frac{1}{2} m \omega^2 x^2$ and we can let $\lambda = 1$ to get $V = -q E x$. As seen in Quantum physics 1, the quantum oscillator has eigenstate $\ket{n}$ with eigenvalues $\epsilon_n = \hbar \omega \left(n + \frac{1}{2}\right)$: 
+    \[H_0 \ket{n} = \epsilon_n \ket{n} = \hbar \omega \left(n + \frac{1}{2}\right) \ket{n}.\]
+
+    We moreover exploit ladder operators when working with the quantum oscillator: 
+    \[a \ket{n} = \sqrt{n} \ket{n-1}, \mathspace a^{\dagger} \ket{n} = \sqrt{n+1} \ket{n+1}.\]
+
+    We can rewrite $V$ using those ladder operators: 
+    \[V = -q E x = -q E \sqrt{\frac{\hbar}{2 m \omega}} \left(a + a^{\dagger}\right).\]
+
+    First order perturbation theory tells us that since, in our context, $\ket{\phi_n} = \ket{n}$: 
+    \autoeq{E_n^{\left(1\right)} = \bra{\phi_n} V \ket{\phi_n} = -qE \sqrt{\frac{\hbar}{2m \omega}} \bra{n} \left(a + a^{\dagger}\right) \ket{n} = -qE \sqrt{\frac{\hbar}{2m \omega}} \bra{n} \left(\sqrt{n} \ket{n-1} + \sqrt{n+1}\ket{n+1}\right) = 0.}
+
+    This makes sense since $\ket{n}$ are symmetric (they have an even probability function $\left|\braket{x}{n}\right|^2$), so the expected value of $V \propto x$ should indeed be $0$. 
+
+    We can now compute the second correction term: 
+    \autoeq{E_n^{\left(2\right)} = \sum_{k \neq n} \frac{\left|\bra{k} V \ket{n}\right|^2}{\epsilon_k - \epsilon_n} = \sum_{k\neq n} \left(-q E \sqrt{\frac{\hbar}{2m \omega}}\right)^2 \frac{\left|\bra{k}\left(a + a^{\dagger}\right)\ket{n}\right|^2}{\hbar \omega \left(n - k\right)} = \frac{q^2 E}{2 m \omega^2} \sum_{k \neq n} \frac{\left|\sqrt{n}\braket{k}{n-1}\right|^2 + \left|\sqrt{n+1} \braket{k}{n+1}\right|^2}{n - k} = \frac{q^2 E^2}{2 m \omega^2} \left(\frac{\left|\sqrt{n}\right|^2}{n - \left(n-1\right)} + \frac{\left|\sqrt{n+1}\right|^2}{n - \left(n+1\right)}\right) = \frac{q^2 E^2}{2 m \omega^2} \left(n - \left(n+1\right)\right) = \frac{-q^2 E^2}{2 m \omega^2}.}
+
+    This means that, up to the second order: 
+    \[E_n \approx h \omega \left(n + \frac{1}{2}\right) - \frac{q^2 E^2}{2m \omega^2}.\]
+    
+
+    \begin{subparag}{Remark 1}
+        This may seem like being a toy problem that was just designed to be an example. However, it does appear in real life: this was a problem Prof. Holmes used during their PhD.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        In this very specific case, it is possible to find the full perturbation by completing the square:
+        \autoeq{H = \frac{p^2}{2m} + \frac{1}{2} m \omega^2 x^2 - q E x = \frac{p^2}{2m} + \frac{1}{2} m \omega^2 \left(x - \frac{qE}{m \omega^2}\right)^2 - \left(\frac{q E}{m \omega^2}\right)^2 = \frac{p^2}{2m} + \frac{1}{2} m \omega^2 \left(x - x_0\right)^2 - \underbrace{\frac{1}{2} m \omega^2 x_0^2}_{E_n^{\left(2\right)}}.}
+
+        We thus notice that, still in this very specific case, the second order gave us the full correction: the perturbation reduces the energy by $\frac{1}{2} m \omega^2 x_0^2 = \frac{q^2 E^2}{2 m \omega^2} = E_n^{\left(2\right)}$. In other words: 
+        \[E_n = h \omega \left(n + \frac{1}{2}\right) - \frac{q^2 E^2}{2 m \omega^2}.\]
+
+        It is not true in the general case that the second order approximation gives us the exact result.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

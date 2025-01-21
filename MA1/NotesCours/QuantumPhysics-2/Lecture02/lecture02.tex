@@ -1,0 +1,269 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-09-23 at 10:16:14.
+
+\usepackage{../../style}
+
+\title{QP 2}
+\author{Joachim Favre}
+\date{Lundi 23 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2024-09-23}{Star Trek goes brrr}{
+\begin{itemize}[left=0pt]
+    \item Explanation of global and local measurement.
+    \item Explanation of the quantum eraser.
+    \item Explanation of the no-signaling theorem.
+    \item Explanation of the quantum psychics game.
+\end{itemize}
+    
+}
+
+\begin{parag}{Definition: Entangled state}
+    A state $\ket{\Psi}$ is said to be \important{entangled} if and only if it cannot be written as a product state: 
+    \[\ket{\Psi} \neq \ket{\phi} \ket{\psi}\]
+   
+    \begin{subparag}{Example}
+        For instance, the following is an entangled state: 
+        \[\frac{\ket{00} + \ket{11}}{\sqrt{2}}.\]
+        
+        However, the following are two product states: 
+        \[\ket{0}\ket{1}, \mathspace \frac{\ket{00} + \ket{01} + \ket{10} + \ket{11}}{2} = \frac{\ket{0} + \ket{1}}{\sqrt{2}} \otimes \frac{\ket{0} + \ket{1}}{\sqrt{2}}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Axiom: Global measurement}
+    On an arbitrary composite system, a measurement is represented by a Hermitian operator $M_{AB} = \sum_{i} \lambda_i \ket{\lambda_i} \bra{\lambda_i}$. This type of measurement is said to be \important{global}.
+
+    \begin{subparag}{Remark}
+        This is exactly what we had before for arbitrary quantum systems. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Axiom: Local measurement}
+    A measurement on a single subsystem $A$ of a composite system $AB$ is represented by $M_A \otimes I$, where $M_A$ is a Hermitian operator. This type of measurements is said to be \important{local}.
+
+    \begin{subparag}{Remark}
+        Let us verify this makes sense for expected values. We decompose $M_A = \sum_{i} \mu_i \ket{\mu_i}\bra{\mu_i}$ and $\ket{\Psi} = \sum_{i,j}^{\infty} \alpha_{ij} \ket{\mu_i \nu_j}$. Then: 
+        \[\left\langle M_A \otimes I \right\rangle = \sum_{ij} \left|\alpha_{ij}\right|^2 \mu_{i} = \sum_{i} \left(\sum_{j} \prob\left(\mu_i \nu_j\right)\right) \mu_i = \sum_{i} \prob\left(\mu_i\right) \mu_i.\]
+
+        This is exactly what we want the expected value to be when we measure on the subsystem $A$.
+    \end{subparag}
+\end{parag}
+
+\subsection{The quantum eraser}
+
+\begin{parag}{Thought experiment: The quantum eraser}
+    We will consider four experiments, which are variations of the double-slit experiment. The idea is that the photon will behave as a wave (making interference pattern) if and only if we have no way of knowing through which slit it went through.
+\end{parag}
+
+\begin{parag}{Experiment 1}
+    We consider the regular double-slit experiment: we send a photon toward a wall that has two small holes, and with a screen behind. We moreover consider the photon to be horizontally polarised.
+
+    Then, we have interference patterns: photons behave as waves.
+
+    \imagehere[0.4]{QuantumEraser-1.png}
+
+    \begin{subparag}{Proof}
+        Let $\ket{\Psi_1\left(x, t\right)}$ be the wave function of the photon on that went through the first slit on the screen, and $\ket{\Psi_2\left(x, t\right)}$ be the one of the second. The wave function at the screen is simply: 
+        \[\ket{\Psi\left(x, t\right)} = \frac{\ket{\Psi_1\left(x, t\right)} + \ket{\Psi_2\left(x, t\right)}}{\sqrt{2}} \otimes \ket{H}.\]
+        
+        The screen measures the position. In other words, our measurement is $\ket{x}\bra{x}$, giving that the probability to the photons is measured on any given position $x$ on the screen is:
+        \autoeq{\prob\left(x\right) = \bra{\Psi\left(x, t\right)} \left(\ket{x}\bra{x} \otimes I\right) \ket{\Psi\left(x, t\right)} = \frac{1}{2} \braket{\Psi_1\left(x, t\right)+\Psi_2\left(x, t\right)}{x} \braket{x}{\Psi_1\left(x, t\right)+\Psi_2\left(x, t\right)} \braket{H}{H} = \frac{\left|\Psi_1\left(x, t\right) + \Psi_2\left(x, t\right)\right|^2}{2}.}
+        
+        This does rise to interference pattern. They are very high and destructive at places where $\Psi_1\left(x, t\right) \approx - \Psi_2\left(x, t\right)$, in which case: 
+        \[\prob\left(x\right) \approx 0.\]
+
+        On the other hand, they are very high and constructive at places where $\Psi_1\left(x, t\right) \approx \Psi_2\left(x, t\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Experiment 2}
+    We consider the same experiment setup as the first experiment, except that we add a $\SI{90}{\degree}$ polarisation rotator (that turns the horizontally polarised photon to a vertically polarised one) behind one of the holes.
+    
+    This time, we no longer have any interference. In other words, there are two regions: photons behave as particles.
+
+    \imagehere[0.4]{QuantumEraser-2.png}
+
+    \begin{subparag}{Proof}
+        We use the same notations as in the first experiment. 
+
+        The first photon going through the first slit has a vertical polarisation, so: 
+        \[\ket{\Psi\left(x, t\right)} = \frac{1}{\sqrt{2}}\left(\ket{\Psi_1\left(x, t\right)} \ket{V} + \ket{\Psi_2\left(x, t\right)} \ket{H}\right).\]
+
+        Then, the probability to measure the photon at any place on the screen, and writing $\ket{\Psi\left(x, t\right)} = \ket{\Psi}$ for a lighter notation: 
+        \autoeq{\prob\left(x\right) = \bra{\Psi} \left(\ket{x}\bra{x} \otimes I\right) \ket{\Psi} = \frac{1}{2} \left(\bra{\Psi_1}\bra{V} + \bra{\Psi_2}\bra{H}\right) \left(\ket{x}\bra{x} \otimes I\right) \left(\ket{\Psi_1}\ket{V} + \ket{\Psi_2}\ket{H}\right) = \frac{1}{2} \left(\braket{\Psi_1}{x} \braket{x}{\Psi_1} + \braket{\Psi_2}{x} \braket{x}{\Psi_2}\right) = \frac{\left|\Psi_1\left(x, t\right)\right|^2 + \left|\Psi_2\left(x, t\right)\right|^2}{2}.}
+
+        This does not leave the room for any interference.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Experiment 3: Quantum eraser}
+    We consider the same experiment setup as the second experiment, except that we add a $\SI{45}{\degree}$ polarisation filter between the holes and the screen. 
+
+    We now get some interference patterns; photons behave as waves. The interference patterns are however half the intensity as the ones of the first experiment.
+
+    \imagehere[0.4]{QuantumEraser-3.png}
+
+    \begin{subparag}{Remark}
+        This experiment is named the quantum eraser since, by adding some more measurement \emph{later} in the experiment, we managed to change the behaviour at the slit. In the second experiment it behaved as a particle, but adding some polarisation filter in this third experiment makes it believe again as a wave.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The state after the polarisation rotator is the same as the second experiment: 
+        \autoeq{\ket{\Psi\left(x, t\right)} = \frac{\ket{\Psi_1}\ket{V} + \ket{\Psi_2}\ket{H}}{\sqrt{2}} = \frac{\ket{\Psi_1} \left(\ket{\nearrow} - \ket{\swarrow}\right)}{2} + \frac{\ket{\Psi_2} \left(\ket{\nearrow} + \ket{\swarrow}\right)}{2}.}
+        
+        The polarisation filter only keeps the state $\ket{\nearrow} = \frac{\ket{H} + \ket{V}}{\sqrt{2}}$. Therefore, the photon goes through the filter with probability $\frac{1}{2}$, in which case it collapses to:
+        \[\ket{\widetilde{\Psi}\left(x, t\right)} = \frac{\ket{\Psi_1} + \ket{\Psi_2}}{\sqrt{2}} \frac{\ket{H} + \ket{V}}{\sqrt{2}}.\]
+
+        When computing the probabilities, we only need to be careful about the fact that the polarisation filter lets through half of the photons. Therefore, we get the same result as in the first experiment, but with an extra $\frac{1}{2}$ factor: 
+        \[\prob\left(x\right) = \frac{\left|\Psi_1 + \Psi_2\right|^2}{4}.\]
+
+        This therefore again gives rise to interference patterns.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Experiment 4: Delayed quantum eraser}
+    We go back to something closer to the double-slit experiment. The photon is no longer polarised, but behind the first hole, we put an atom. If the photon goes through the slit behind which there is this atom, it will change the state of the atom from $\ket{\uparrow}$ to $\ket{\downarrow}$, without being absorbed. We observe \emph{the atom} before the photon hits the screen, either in the basis $\left\{\ket{\uparrow}, \ket{\downarrow}\right\}$ or in the basis $\left\{\ket{\nearrow}, \ket{\swarrow}\right\}$.
+
+    \imagehere[0.4]{QuantumEraser-4.png}
+
+    Depending on the choice of the basis and its outcome, we get different patterns:
+    \begin{itemize}
+        \item If we measure $\ket{\uparrow}$, we have a pattern $\prob_{\uparrow}\left(x\right) = \left|\Psi_1\left(x\right)\right|^2$.
+        \item If we measure $\ket{\downarrow}$, we have a pattern $\prob_{\downarrow}\left(x\right) = \left|\Psi_2\left(x\right)\right|^2$.
+        \item If we measure $\ket{\nearrow}$, we have a pattern $\prob_{\nearrow}\left(x\right) = \frac{1}{2} \left|\Psi_1\left(x\right) + \Psi_2\left(x\right)\right|^2$.
+        \item If we measure $\ket{\swarrow}$, we have a pattern $\prob_{\swarrow}\left(x\right) = \frac{1}{2} \left|\Psi_1\left(x\right) - \Psi_2\left(x\right)\right|^2$.
+    \end{itemize}
+
+    In particular, in the first and second cases, the photon behaves a particle; in the third and fourth cases, the photon behaves as a wave, giving rise to interference patterns. 
+
+    \begin{subparag}{Remark}
+        This is named the delayed quantum eraser because we can choose very late to measure the atom in the basis $\left\{\ket{\uparrow}, \ket{\downarrow}\right\}$ for the photon to behave as a particle, or in the basis $\left\{\ket{\nearrow}, \ket{\swarrow}\right\}$ for the photon to behave a wave.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{No-signaling theorem}
+    It is not possible to make a quantum protocol that allows to send information faster than the speed of light.
+
+    \begin{subparag}{Remark}
+        This is very important for quantum physics to be coherent with special relativity.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We will see a proof of this theorem when we consider density matrices later in the class. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Delayed quantum eraser signaling}
+    Let us consider the following faulty protocol. Bob sends to Alice a photon that when through the double-slits and atom of the fourth experiment (the delayed quantum eraser). Bob waits until just before Alice measures the photon with her screen. If Bob wants to send a $0$, he measures the atom in $\left\{\ket{\uparrow}, \ket{\downarrow}\right\}$. If he wants to send a $1$, he measure the atom in the basis $\left\{\ket{\nearrow}, \ket{\swarrow}\right\}$. Alice can then decode the information, using whether she sees interference patterns or not.
+
+    This protocol does not work.
+
+    \begin{subparag}{Proof}
+        This is a direct consequence of the no-signaling theorem. However, let us get some physical intuition on why.
+
+        The idea is that, to see a pattern $\prob\left(x\right)$, Alice needs to receive many photons on her screen and average the positions. Suppose that Bob wants to send a $0$. In this cases, he measures the atom in the basis $\left\{\ket{\uparrow}, \ket{\downarrow}\right\}$, and has a $\frac{1}{2}$ probability to get either case. However, Alice does not know which was his result, so all she can measure is: 
+        \[\prob_0\left(x\right) = \frac{1}{2} \prob_{\uparrow}\left(x\right) + \frac{1}{2} \prob_{\downarrow}\left(x\right) = \frac{\left|\Psi_1\left(x\right)\right|^2 + \left|\Psi_2\left(x\right)\right|^2}{2}.\]
+
+        There is no interference pattern, as expected.
+        
+        Similarly, if Bob wants to send a $1$, all Alice can measure is the average of the two interference patterns $\prob_{\nearrow}\left(x\right) = \frac{1}{2} \left|\Psi_1\left(x\right) + \Psi_2\left(x\right)\right|^2$ and $\prob_{\swarrow}\left(x\right) = \frac{1}{2} \left|\Psi_1\left(x\right) - \Psi_2\left(x\right)\right|^2$: 
+        \[\prob_1\left(x\right) = \frac{1}{2}\left(\frac{\left|\Psi_1\left(x\right) + \Psi_2\left(x\right)\right|^2}{2} + \frac{\left|\Psi_1\left(x\right) - \Psi_2\left(x\right)\right|^2}{2}\right).\]
+        
+        However, it is possible to show using analysis tools that $\frac{1}{2}\left|z_1 + z_2\right|^2 + \frac{1}{2}\left|z_1 - z_2\right|^2 = \left|z_1\right|^2 + \left|z_2\right|^2$ for any $z_1, z_2 \in \mathbb{C}$. This implies that $\prob_1\left(x\right) = \prob_0\left(x\right)$. In other words, when Bob wants to send $1$, the interference patterns average out to give no interference pattern at all. Alice can therefore not distinguish the case Bob sends a $0$ or a $1$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Bell inequalities}
+
+\begin{parag}{Quantum psychics game}
+    Alice and Bob pretend to be psychics, and Spock and Kirk try to find out if this is true. They make an experiment to decide this. They put Alice and Bob in separate boxes, preventing them from communicating. The only communication medium is that Alice can speak to Spock, and Bob can speak to Kirk. 
+
+    Both Spock and Kirk toss a coin, and get either heads or tails, and tell the result to their participant (Spock to Alice, and Kirk to Bob). Alice and Bob must say $1$ or $-1$, depending on the protocol and the result of their coins. The goal of Spock and Kirk is to make a protocol that allows to verify they are indeed psychics.
+
+    Alice and Bob are allowed to make a strategy before the game starts, but cannot communicate as soon as it started.
+\end{parag}
+
+\begin{parag}{Experiment 1}
+    We consider the protocol where Alice and Bob must give the same answer if and only if the two coins gave the same result.
+
+    This is a bad protocol.
+
+    \begin{subparag}{Proof}
+        Alice and Bob can just give $1$ when they hear ``Head'', and $-1$ when they hear ``Tail''. This respects the protocol with probability $1$, even though they do not need to be psychics.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Experiment 2}
+    We consider the protocol where Alice and Bob must give the same answer if and only if the two coins gave a different result.
+
+    This is again a bad protocol.
+
+    \begin{subparag}{Proof}
+        Alice can do like in the first experiment, and Bob the other way around. This again, this respects the protocol with probability $1$, even if they are not psychics.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Experiment 3}
+    We consider the protocol where Alice and Bob must give a different answer if and only if both coins give $H$.
+
+    Then:
+    \begin{enumerate}
+        \item If Alice and Bob only use classical physics, they have a $\frac{3}{4}$ probability of success and hence this is a good protocol.
+        \item However, if they share a Bell state $\ket{\Phi^+} = \frac{1}{\sqrt{2}}\left(\ket{00} + \ket{11}\right)$, they can get a higher probability of success (which is $\frac{2 + \sqrt{2}}{4}$), and fool Kirk and Spock.
+    \end{enumerate}
+
+    \begin{subparag}{Remark}
+        Note that they are not transmitting any information, they just manage to get a higher correlation on their guesses. Moreover, this is what we call a ``Bell inequality''. We will formalise this right after, but the idea is that it shows hidden variables cannot explain quantum physics.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 1}
+        We define $A_H \in \left\{1, -1\right\}$ to be what Alice says when she hears ``Head'', and similarly for $B_H, A_T, B_T$. Note that this means Alice and Bob have deterministic strategies. Using this deterministic case, it is possible to extend this argument to the more general case where $\left(A_H, A_T\right)$ and $\left(B_H, B_T\right)$ are independent random variables, i.e. to the case where Alice and Bob have randomised strategies. The rules of the experiment ask for: 
+        \[A_H B_H = -1, \mathspace A_T B_T = 1, \mathspace A_T B_H = 1, \mathspace A_T B_T = 1.\]
+
+        Multiplying all four equations together, we get: 
+        \[A_H^2 B_H^2 A_T^2 B_T^2 = -1.\]
+
+        This is impossible, we always have $A_H^2 B_H^2 A_T^2 B_T^2 = 1$. Therefore, all equations cannot be fulfilled at the same time, and Alice and Bob cannot find a strategy that works all the time. The best they can do is fulfil three of those equations at any time. Since Kirk and Spock look at exactly one of those four equations with uniform probability, no matter their strategy, Alice and Bob cannot win more than $\frac{3}{4}$ of the time.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        The idea is that quantum allows to make the random variables $\left(A_H, A_T\right)$ and $\left(B_H, B_T\right)$ dependent, without communicating. This can be considered to be some form of telepathy.
+    
+        We consider the following protocol.
+        \begin{itemize}
+            \item If Alice gets told ``Head'', she measures in the $Z$-basis and says $1$ on getting $\ket{0}$ and $-1$ on $\ket{1}$.
+            \item If Alice gets told ``Tail'', she measures in the $X$-basis, and says $1$ on getting $\ket{+}$ and $-1$ on $\ket{-}$. 
+            \item If Bob gets told ``Head'', he measures in the basis $\left\{\ket{h}, \ket{\bar{h}}\right\}$, and says $1$ on getting $\ket{h}$ and $-1$ on $\ket{\bar{h}}$, where: 
+            \[\ket{h} = \sin\left(\frac{\pi}{8}\right) \ket{0} + \cos\left(\frac{\pi}{8}\right)\ket{1}, \mathspace \ket{\bar{h}} = \cos\left(\frac{\pi}{8}\right)\ket{0} - \sin\left(\frac{\pi}{8}\right)\ket{1}.\]
+         \item  If Bob gets told ``Tail'', he measures in the basis $\left\{\ket{t}, \ket{\bar{t}}\right\}$, and says $1$ on $\ket{t}$ and $-1$ on $\ket{\bar{t}}$, where: 
+            \[\ket{t} = \cos\left(\frac{\pi}{8}\right) \ket{0} + \sin\left(\frac{\pi}{8}\right)\ket{1}, \mathspace \ket{\bar{t}} = \sin\left(\frac{\pi}{8}\right)\ket{0} - \cos\left(\frac{\pi}{8}\right) \ket{1}.\]
+        \end{itemize}
+        
+        We will check in the third exercise series that the probability they succeed is: 
+        \[p = \cos\left(\frac{\pi}{8}\right)^2 = \frac{2 + \sqrt{2}}{4} \approx 0.854,\]
+        hence beating the sceptic.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

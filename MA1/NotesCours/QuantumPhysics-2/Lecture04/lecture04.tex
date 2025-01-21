@@ -1,0 +1,294 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-10-07 at 10:16:33.
+
+\usepackage{../../style}
+
+\title{Quantum physics 2}
+\author{Joachim Favre}
+\date{Lundi 07 octobre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2024-10-07}{Philosophy feat.\ Outer Wilds}{
+\begin{itemize}[left=0pt]
+    \item Proof of the properties of density operators.
+    \item Definition and justification of reduced states.
+    \item Definition of partial trace, and explanation of its properties.
+    \item Proof of the no-signaling theorem.
+    \item Explanation of the measurement problem, the collapse postulate and decoherence.
+\end{itemize}
+
+}
+
+\begin{parag}{Definition: Thermal state}
+    In thermodynamics, for a given Hamiltonian $H = \sum_{i} E_i \ket{E_i}\bra{E_i}$, the thermal state $\gamma$ is defined by: 
+    \[\gamma = \frac{e^{- \beta H}}{Z}, \mathspace Z = \sum_{i} e^{- \beta E_i},\]
+    where $Z$ is a normalisation term and $\beta$ is the inverse temperature (multiplied by some constant).
+
+    \begin{subparag}{Observation}
+        Note that $\gamma$ is a mixed state. Moreover, $Z$ is indeed a normalisation factor, since: 
+        \[Z = \sum_{i} e^{- \beta E_i} = \Tr\left(e^{-\beta H}\right) \implies \Tr\left(\gamma\right) = 1.\]
+    \end{subparag}
+   
+    \begin{subparag}{Intuition}
+        In a thermal distribution, we are in state $\ket{E_i}$ with probability $p_i = e^{- \beta E_i} / Z$. This lets us construct $\gamma$: 
+        \[\gamma = \sum_{i} p_i \ket{E_i}\bra{E_i} = \sum_{i} \frac{e^{- \beta E_i}}{Z} \ket{E_i}\bra{E_i} = \frac{e^{-\beta H}}{Z},\]
+        since $\exp\left(A\right)$ has the same eigenvectors as $A$, but with eigenvalues $\exp\left(a\right)$ instead of $a$.
+
+        This is a good example of a physical system that requires both classical and quantum randomness, justifying an interest for mixed states.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Properties of density operators}
+    Let $\rho$ be some operator.
+
+    $\rho$ is a density operator if and only if:
+    \begin{enumerate}
+        \item \textit{(Normalisation constraint)} $\Tr\left(\rho\right) = 1$.
+        \item \textit{(Positive semi-definite)} $\rho$ it has positive eigenvalues.
+        \item \textit{(Hermitian)} $\rho^{\dagger} = \rho$.
+    \end{enumerate}
+
+    \begin{subparag}{Proof $\implies$}
+        The first property directly comes from the fact that eigenvalues of a density operator represents probabilities. They must therefore sum to 1. The second property follows from a similar argument.
+
+        For the third one, we directly find that: 
+        \[\left(\sum_{i} p_i \ket{\psi_i}\bra{\psi_i} \right)^{\dagger} = \sum_{i} p_i^* \left(\ket{\psi_i}\bra{\psi_i}\right)^{\dagger} = \sum_{i} p_i \ket{\psi_i}\bra{\psi_i} = \rho\]
+        since, by a similar argument to the first properties, the eigenvalues are real.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        Let $\rho$ be an arbitrary operator respecting the three properties. Since it is Hermitian, we know it is orthodiagonalisable in a real basis: 
+        \[\rho = \sum_{i} p_i \ket{\psi_i}\bra{\psi_i}, \mathspace p_i \in \mathbb{R}.\]
+
+        Since it is positive semi-definite, $p_i \geq 0$ for all $i$. Since moreover it traces to $1$: 
+        \[\sum_{i} p_i = \Tr\left(\rho\right) = 1.\]
+        
+        This means that the $p_i$ represent a valid probability distribution. This indeed yields that it is a valid density operator, where we have state $\ket{\psi_i}$ with probability $p_i$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The fact that the Bloch vector has a norm less than 1 directly comes from those properties.
+    \end{subparag}
+\end{parag}
+
+
+\subsection{Reduced states}
+
+\begin{parag}{Observation}
+    So far, we have imagined that we have a state $\ket{\psi}_A$ in a system $A$ and state $\ket{\phi}_B$ in system $B$. We then wrote down their joint state as $\ket{\psi}_A \otimes \ket{\phi}_B$.
+
+    Now, we may want to go the other direction. We may have a state $\ket{\Psi}_{AB}$, and want to write down the state corresponding to the system $A$. Note that the sate may not even be a product state, we may for instance have $\ket{\Psi}_{AB} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}$. In the most general case, we may even have $\rho_{AB}$ to be a mixed state.
+
+    Given $\rho_{AB}$, our goal is therefore to find some mathematical entity $\rho_A$ that allows us to compute properties of the system $A$ only, i.e. so that:
+    \[\left\langle O_A \otimes I_B \right\rangle_{AB} = \Tr\left(\rho_{AB} \left(O_A \otimes I_B\right)\right) = \Tr\left(\rho_A O\right) = \left\langle O_A \right\rangle_{A}.\] 
+\end{parag}
+
+\begin{parag}{Theorem: Reduced state}
+    Let $\rho_{AB}$ be a mixed state in system $\mathcal{H}_A \otimes \mathcal{H}_B$.
+
+    We define the state $\rho_A$, called a \important{reduced state}, as: 
+    \[\rho_A = \sum_{k=1}^{d_B} \left(I \otimes \bra{k}\right) \rho_{AB} \left(I \otimes \ket{k}\right).\]
+
+    Then, for all observable $O$ acting on $\mathcal{H}_A$: 
+    \[\Tr\left(\rho_A O\right) = \left\langle O \right\rangle.\]
+    
+    \begin{subparag}{Proof}
+        We make a constructive proof. In other words, we try to find $\rho_A$ from the result we wish to obtain.
+
+        Let us first recap what an expected value is. Expressing $O$ in its eigenbasis, $O = \sum_{j=1}^{d_A} \lambda_j \ket{\lambda_j}\bra{\lambda_j}$, we have:
+        \[\left\langle O \right\rangle = \sum_{j=1}^{d_A} \lambda_j \prob_A\left(\lambda_j\right),\]
+        where $\prob_A\left(\lambda_j\right)$ is the probability to measure $\lambda_j$ on system $A$ in $\rho_{AB}$.
+
+        We are going to express $\prob_A\left(\lambda_j\right)$ in terms of $\rho_{AB}$. Let $\left\{\ket{k}_B\right\}$ be some arbitrary orthonormal basis of $\mathcal{H}_B$. We know that:
+        \[\prob_{AB}\left(\lambda_j, k\right) = \Tr\left(\ket{\lambda_j k}\bra{\lambda_j k} \rho_{AB}\right) = \bra{\lambda_j k} \rho_{AB} \ket{\lambda_j k}.\]
+
+        This can be verified by the definition of mixed states. Another way to see this is that $\prob_{AB}\left(\lambda_j, k\right)$ is the expected value of the indicator random variable that we measure $\lambda_j, k$. This can just be represented using the observable $\ket{\lambda_j k}\bra{\lambda_j k}$.
+
+        But then, using the marginalisation of joint probabilities: 
+        \[\prob_A\left(\lambda_j\right) = \sum_{k=1}^{d_B} \prob_{AB}\left(\lambda_j, k\right) = \sum_{k=1}^{d_B} \bra{\lambda_j k} \rho_{AB} \ket{\lambda_j k}.\]
+
+        This gives us that:
+        \autoeq{\left\langle O \right\rangle = \sum_{j=1}^{d_A} \lambda_j \prob_A\left(\lambda_j\right) = \sum_{j=1}^{d_A} \lambda_j \sum_{k=1}^{d_B} \left(\bra{\lambda_j} \otimes \bra{k}\right) \rho_{AB} \left(\ket{\lambda_j} \otimes \ket{k}\right) = \sum_{j=1}^{d_A} \lambda_j \bra{\lambda_j} \left(\sum_{k=1}^{d_B} \left(I \otimes \bra{k}\right) \rho_{AB} \left(I \otimes \ket{k}\right)\right) \ket{\lambda_j},}
+
+        We can now consider the $\rho_A$ defined in the hypotheses, by seeing that this directly gives us the result we swish for:
+        \[\left\langle O \right\rangle = \sum_{j=1}^{d_A} \lambda_j \bra{\lambda_j} \rho_A \ket{\lambda_j} = \Tr\left(\sum_{j=1}^{d_A} \lambda_j \ket{\lambda_j}\bra{\lambda_j} \rho_A\right) = \Tr\left(O \rho_A\right)\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Partial trace}
+    Let $\rho_{AB}$ be some mixed state in $\mathcal{H}_A \otimes \mathcal{H}_B$.
+
+    We define the \important{partial trace} over $\mathcal{H}_B$ as:
+    \[\rho_A = \Tr_{B}\left(\rho_{AB}\right) = \sum_{k=1}^{d_B} \left(I \otimes \bra{k}\right) \rho_{AB} \left(I \otimes \ket{k}\right).\]
+
+    \begin{subparag}{Remark}
+        Note that this is exactly the state we had in the theorem above. In other words, for all observable $O$: 
+        \[\Tr\left(O \rho_A\right) = \Tr\left(\left(O \otimes I_B\right) \rho_B\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        If we were doing the full trace, we would be computing: 
+        \[\Tr\left(\rho_{AB}\right) = \sum_{jk} \left(\bra{j} \otimes \bra{k}\right) \rho_{AB} \left(\ket{j} \otimes \ket{k}\right).\]
+
+        In our case, we only trace on one of the systems (replacing the $\ket{j}$ by identities) getting an operator instead of a scalar.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Properties}
+    The partial trace has the following properties:
+    \begin{enumerate}
+        \item $\displaystyle \Tr_B\left(O_A \otimes O_B\right) = O_A \Tr\left(O_B\right).$
+        \item $\displaystyle \Tr_B\left(\ket{ij}\bra{k\ell}\right) = \ket{i}\bra{k} \Tr\left(\ket{j}\bra{\ell}\right) = \ket{i}\bra{k} \braket{\ell}{j}.$
+        \item \textit{(Cyclicity)} $\displaystyle \Tr_B\left(M_A N_A \otimes M_B N_B\right) = \Tr_B\left(M_A N_A \otimes N_B M_B\right).$
+        \item \textit{(Linearity)} $\displaystyle \Tr_B\left(\sum_{i} \lambda_i O_i\right) = \sum_{i} \lambda_i \Tr_B\left(O_i\right).$
+    \end{enumerate}
+    
+    \begin{subparag}{Remark 1}
+        It is not necessary to use the formal definition of the partial trace. Those properties are typically enough.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        For instance, the first property directly implies that the mixed reduced state of $\rho_A \otimes \rho_B$ would be:
+        \[\Tr_B\left(\rho_A \otimes \rho_B\right) = \rho_A \Tr\left(\rho_B\right) = \rho_A.\]
+
+        This is very intuitive: the mathematical entity that represents just system $A$ should indeed be $\rho_A$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Proving those properties is a good exercise.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider a Bell state: 
+    \[\ket{\psi_{AB}} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}.\]
+
+    Its corresponding mixed state is: 
+    \[\rho_{AB} = \ket{\Psi_{AB}}\bra{\Psi_{AB}} = \frac{\ket{00}\bra{00} + \ket{00}\bra{11} + \ket{11}\bra{00} + \ket{11}\bra{11}}{2}.\]
+
+    Then, the reduced state on system $A$ is: 
+    \autoeq{\rho_A = \Tr_B\left(\rho_{AB}\right) = \frac{\Tr_B\left(\ket{00}\bra{00}\right) + \Tr_B\left(\ket{00}\bra{11}\right) + \Tr_B\left(\ket{11}\bra{00}\right) + \Tr_B\left(\ket{11}\bra{11}\right)}{2} = \frac{\ket{0}\bra{0} \cdot \braket{0}{0} + \ket{0}\bra{1}\cdot \braket{0}{1} + \ket{1}\bra{0} \cdot \braket{1}{0} + \ket{1}\bra{1}\cdot \braket{1}{1}}{2} = \frac{\ket{0}\bra{0} + \ket{1}\bra{1}}{2} = \frac{I}{2}.}
+
+    This is a mixed state, with probability $\frac{1}{2}$ to have $\ket{0}$ and probability $\frac{1}{2}$ to have $\ket{1}$; this is just a classical coin toss. Here, we lost coherence: we have a classical mixture instead of quantum state in superposition.
+
+    \begin{subparag}{Remark 1}
+        $\rho_A = \frac{I}{2}$ is named the maximally mixed state, it is at the centre of the Bloch sphere.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We get the exact same result for of the four Bell states. Since multiple mixed state yield the same reduced state, the partial trace is not bijective.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        It is possible to find by symmetry that $\rho_B = \frac{I}{2}$ as well. Note however that $\rho_{AB} \neq \rho_A \otimes \rho_B$. In other words, when looking at only one of the two systems, this is just a classical coin toss; but, as soon as we wish to analyse both systems at the same time, quantum physics adds some correlation.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{No-signaling theorem}
+    We suppose that Alice and Bob share many entangled qubit pairs. 
+
+    There is no way for Bob to signal anything (i.e. transmit data) to Alice by applying operators and measuring (in any basis) its part of the pairs.
+
+    \begin{subparag}{Proof}
+        The reduced mixed state is the unique mathematical object that determines the expected value of Alice's measure. It however does not depend on anything Bob does on its part of the qubit, giving our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Measurement problem}
+
+\begin{parag}{Axioms}
+    We will consider the following hypotheses:
+    \begin{enumerate}
+        \item A good measuring device is accurate. 
+        \item Quantum mechanics is a universal (it applies to everything) and fundamental theory.
+        \item \textit{(Weak physicalist postulate)} The description of the behaviour of large objects must be consistent with the laws governing the behaviour of the smaller objects of which they consist.
+    \end{enumerate}
+
+    The two last hypotheses imply that we should be able to describe a measuring device using the rules of quantum mechanics. 
+\end{parag}
+
+\begin{parag}{Measuring device}
+    A measuring device is a device which can extract information from a quantum system. 
+
+    \begin{subparag}{Example}
+        For instance, we may have a system $\ket{x} \otimes \ket{\psi}$ where $\ket{x} \in \left\{\ket{\text{ready}}, \ket{\text{up}}, \ket{\text{down}}\right\}$ represents the state of the measuring device, and $\ket{\psi}$ represents the state of some electron. We want our measurement device to be such that: 
+        \[\ket{\text{ready}} \otimes \ket{\uparrow} \to \ket{\text{up}} \otimes \ket{\uparrow},\]
+        \[\ket{\text{ready}} \otimes \ket{\downarrow} \to \ket{\text{down}} \otimes \ket{\downarrow},\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Problem}
+    The issue is that time evolution is linear, but doing a measure makes a projection on the state. Projections are not linear.
+
+    \begin{subparag}{Example}
+        For our example before, if we try to measure the state $\ket{\psi} = \frac{\ket{\uparrow} + \ket{\downarrow}}{\sqrt{2}}$, our measurement device will be such that, by linearity: 
+        \[\ket{\text{ready}} \otimes \frac{\ket{\uparrow} + \ket{\downarrow}}{\sqrt{2}} \to \frac{\ket{\text{up}} \otimes \ket{\uparrow} + \ket{\text{down}} \otimes \ket{\downarrow}}{\sqrt{2}}\]
+        
+        This is however not how quantum mechanics predicts a measurement to happen.
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        Since we have a contradiction, we must drop one of our assumptions. Not all quantum mechanics formalism requires that a state collapse to some specific state after we measure it. This however does not fix everything, since it would still contradict our macroscopic world. Similarly, it seems to break the Born rule, which states we are able to measure something with a given probability.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Measurement problem}
+    The measurement problem is thus to try and reconcile the concept of measurement and time evolution. This is a very philosophical question, to which there is no definite answer. Let us consider two potential solutions, and their criticisms.
+\end{parag}
+
+\begin{parag}{Solution: Collapse postulate}
+    A way to solve the problem is by considering that there are, in fact, two fundamental laws in quantum mechanics:
+    \begin{itemize}
+        \item When no measurement is going on, states evolve linearly.
+        \item When a measurement is going on, states evolve according to the postulate of collapse.
+    \end{itemize}
+
+    \begin{subparag}{Issues}
+        The big issue is then the definition of measurement. A photon bouncing off an atom effectively measures an atom, and similarly seeing Schrödinger's cat dead is a measurement as well. So, we need to trace a line between what is a measurement and what is time evolution. This is not precise enough to be a fundamental role in the laws of physics. 
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        Fun fact, this is the solution chosen by Outer Wilds. In this game, we define measurements relative to ``conscious'' beings; if a conscious being looks at a quantum object, then it is projected to one of its possibilities. Naturally, this raises many more questions than it solves (good luck defining consciousness physically; Conway's free will theorem for instance states that, under some axioms, we may suppose electrons have a free will), but this was just a good occasion for me to tell you to play this game. ::)  % I have warnings when I have some unclosed parentheses, so here is an opening one ( 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Solution: Decoherence}
+    Another way to solve this problem is is to add a term in the superposition, representing the environment. The environment then acts as some form of ``sink'', which absorbs information from the quantum system.
+
+    Let us consider the usual example to explain this, supposing we want to measure $\ket{\psi} = \frac{\ket{\uparrow} + \ket{\downarrow}}{\sqrt{2}}$. We then postulate that the environment starts in some state $\ket{E_0}$, and that it then evolves differently whether the electron is in $\ket{\uparrow}$ or $\ket{\downarrow}$, i.e. that our measurement device is such that: 
+    \[\ket{E_0} \otimes \ket{\text{ready}} \otimes \frac{\ket{\uparrow} + \ket{\downarrow}}{\sqrt{2}} \to \frac{\ket{E_{\uparrow}} \otimes \ket{\text{up}} \otimes \ket{\uparrow} + \ket{E_{\downarrow}} \otimes \ket{\text{up}} \otimes\ket{\downarrow}}{\sqrt{2}}.\]
+
+    This is a linear evolution, which can be explained with a physical Hamiltonian. Leaving $r = \braket{E_{\uparrow}}{E_{\downarrow}}$, the reduced state corresponding to the measurement device and the electron (i.e. the partial trace of the density matrix corresponding to the evolved state) is given by: 
+    \[\rho_{decoh} = \frac{\ket{\text{up}\uparrow}\bra{\text{up}\uparrow} + \ket{\text{down}\downarrow}\bra{\text{down}\downarrow} + r\ket{\text{up}\uparrow}\bra{\text{down}\downarrow} + r^*\ket{\text{down}\downarrow}\bra{\text{up}\uparrow}}{2}.\]
+
+    On the other hand, the Born rule tells us that, when measure $\ket{\psi} = \frac{\ket{\uparrow} + \ket{\downarrow}}{\sqrt{2}}$, we should get $\ket{\text{up}\uparrow}$ with probability $\frac{1}{2}$, and $\ket{\text{down}\downarrow}$ with probability $\frac{1}{2}$, i.e. that measurement can be represented by the statistical mixture $\rho_{born}$, where: 
+    \[\rho_{born} = \frac{\ket{\text{up}\uparrow}\bra{\text{up}\uparrow} + \ket{\text{down}\downarrow}\bra{\text{down}\downarrow}}{2}.\]
+
+    We see that $\rho_{decoh} \to \rho_{born}$ as $r \to 0$, which can again be done physically. This seems to make the Born rule coherent.
+    
+    \begin{subparag}{Criticism}
+        Saying that $\rho_{decoh} \to \rho_{born}$ does not really make sense physically. $\rho_{decoh}$ is a reduced state, whereas $\rho_{born}$ is a statistical mixture. They are represented by the same mathematical object, and have a similar intuition, but they are fundamentally different.
+
+        More precisely, we define a mixed state $\rho$ that arises from ignorance of an underlying pure state (such as a statistical mixture) to be a \important{proper mixture}; and a mixed state that arises because we are considering a subsystem to be a \important{improper mixture}. Those two objects are mathematically the same, but physically and conceptually different.
+    \end{subparag}
+        
+    \begin{subparag}{Remark}
+        We will see in the fifth exercise series an exercise that puts more maths on all this reasoning.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

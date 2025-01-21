@@ -1,0 +1,440 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-18 at 10:19:41.
+
+\usepackage{../../style}
+
+\title{Quantum physics 2}
+\author{Joachim Favre}
+\date{Lundi 18 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2024-11-18}{Group definition time}{
+\begin{itemize}[left=0pt]
+    \item Proof and explanation of the variational principle.
+    \item Motivation of groups.
+    \item Definition and examples of finite groups and lie groups.
+    \item Definition of homomorphism, isomorphism, and representation.
+\end{itemize}
+
+}
+
+\section{Variational principle}
+
+\begin{parag}{Proposition: Variational principle}
+    Let $H$ be a Hamiltonian, of diagonalisation $H \ket{\phi_n} = E_n \ket{\phi_n}$, and ground state $\ket{\phi_0}$ and ground state energy $E_0$. Then: 
+    \begin{itemize}
+        \item For all normalised $\ket{\psi}$, $\bra{\psi} H \ket{\psi} \geq E_0$.
+        \item For all normalised $\ket{\psi}$ orthogonal to $\ket{\phi_0}$, $\bra{\psi} H \ket{\psi} \geq E_1$.
+    \end{itemize}
+
+    We might sometimes want to work with non-normalised states $\ket{\psi'}$, in which case the variational principle becomes: 
+    \begin{itemize}
+        \item For all $\displaystyle \ket{\psi'}$, $\frac{\bra{\psi'} H \ket{\psi'}}{\braket{\psi'}{\psi'}} \geq E_0$.
+        \item For all $\ket{\psi'}$ orthogonal to $\displaystyle \ket{\phi_0}$, $\frac{\bra{\psi'} H \ket{\psi'}}{\braket{\psi'}{\psi'}} \geq E_1$.
+    \end{itemize}
+    
+    \begin{subparag}{Remark 1}
+        This principle is conceptually very simple---it literally just states that the average energy of a state is always more than the energy of the ground state---but it might require having to solve very nasty integrals. In exams, it might be easier to start with questions that are conceptually harder, since, if we understand them well, they will be easier to solve than hard integrals.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This allows to get an estimate of the ground state energy, by taking some Ansatz and finding its minimum energy. To find an estimate of the first excited state energy, we can then take an Ansatz that is orthogonal to the first one: if the first one is a good approximation to the ground state, the second one cannot be the ground state and can therefore not yield the ground state energy.
+
+        Note that, in this class, we will always be given the Ansätze. In real life, finding good Ansätze is a big field of research.  
+    \end{subparag}
+
+    \begin{subparag}{Proof 1}
+        We consider the case where $\ket{\psi}$ is normalised, the other case directly follows by leaving $\ket{\psi} = \frac{1}{\left\|\ket{\psi'}\right\|} \ket{\psi'}$.
+
+        We know $H$ can be expressed as: 
+        \[H = \sum_{n=0}^{\infty} E_n \ket{\phi_n} \bra{\phi_n}.\]
+
+        We note $p_n\left(\psi\right) = \left|\braket{\psi}{\phi_n}\right|^2$ for simpler notations. Given any normalised $\ket{\psi}$, we thus have:
+        \[\bra{\psi}H \ket{\psi} = \sum_{n=0}^{\infty} E_n p_n\left(\psi\right) \geq E_0 \sum_{n=0}^{\infty} p_n\left(\psi\right) = E_0,\]
+        since the probabilities sum to $1$ for normalised states.
+
+        Moreover, given any normalised $\ket{\psi}$ so that $\braket{\phi_0}{\psi} = 0$, the reasoning is completely similar and just uses the fact $p_0\left(\psi\right) = 0$: 
+        \[\bra{\psi}H \ket{\psi} = \sum_{n=1}^{\infty} E_n p_n\left(\psi\right) \geq E_1 \sum_{n=1}^{\infty} p_n\left(\psi\right) = E_1.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the simple Harmonic oscillator: 
+    \[H = T + V = -\frac{\hbar^2}{2m} \frac{d^2}{dx^2} + \frac{1}{2} m \omega^2 x^2.\]
+
+    We want to guess the ground state energy. To do so, we consider the following class of non-normalised quantum states: 
+    \[\psi_a\left(x\right) = \frac{1}{x^2 + a}.\]
+
+    We need to compute the three following integrals: 
+    \[\bra{\psi_a} T \ket{\psi_a} = \frac{-\hbar^2}{2m} \int_{-\infty}^{\infty} dx \frac{1}{x^2 + a} \frac{d^2}{dx^2} \frac{1}{x^2 + a},\]
+    \[\bra{\psi_a} V \ket{\psi_a} = \frac{1}{2} m \omega^2 \int_{-\infty}^{\infty} dx \frac{x^2}{\left(x^2 + a\right)^2},\] 
+    \[\braket{\psi}{\psi} = \int_{-\infty}^{\infty} dx \frac{1}{\left(x^2 + a\right)^2}.\]
+
+    We will not compute those integrals in class (and, in exams, we would have some small hints on how to compute them), but solving them and doing some bit of algebra, we find: 
+    \[E\left(a\right) = \frac{\bra{\psi_a} H \ket{\psi_a}}{\braket{\psi_a}{\psi_a}} = \frac{\bra{\psi_a} T \ket{\psi_a}}{\braket{\psi_a}{\psi_a}} + \frac{\bra{\psi_a} V \ket{\psi_a}}{\braket{\psi_a}{\psi_a}} = \frac{\hbar^2}{2m} \frac{1}{a} + \frac{1}{2} m \omega^2 a.\]
+
+    By the variational principle, $E\left(a\right) \geq E_0$ for all $a$. So, in particular, $E_0 \leq \min_a E\left(a\right)$. We now do some more algebra to minimise $E\left(a\right)$: 
+    \[\frac{\partial E\left(a\right)}{\partial a} = -\frac{\hbar^2}{ma^2} + \frac{1}{2} m \omega^2 = 0 \implies a = \frac{\hbar}{m \omega \sqrt{2}} \implies E\left(a\right) = \frac{\hbar \omega}{2} \approx 0.72\hbar\omega.\]
+
+    The real ground state is $0.5 \hbar \omega$, so this is not too bad of an approximation.
+
+    Let's say that we now want to compute an estimate on the first excited state energy. To do so, we pick an Ansatz for the first excited wave function that is orthogonal to the ground state. Indeed, assuming our first Ansatz gets close the ground state, the lowest energy of this new Ansatz cannot be the ground state and will thus be an estimate for the first excited state. Since $\psi_a\left(x\right)$ is even, we can take $\phi_a\left(x\right)$ to be odd. The following works well: 
+    \[\phi_a\left(x\right) = \frac{x}{\left(x^2 + a\right)^2}.\]
+
+    By doing a lot of algebra, we find that: 
+    \[\min_a E_1\left(a\right) = \sqrt{3} \hbar \omega \approx 1.732 \hbar \omega.\]
+
+    The correct energy is $\frac{3}{2} \hbar \omega$, so this is again a reasonable result.
+\end{parag}
+
+\section{Groups and representation theory}
+\subsection{Motivational examples}
+
+\begin{parag}{Translational symmetry}
+    Let's say that we have a system with a translational symmetry, i.e. shifting it does not change it, $\psi\left(x + a\right) \equiv \psi\left(x\right)$ for all $a$. Intuitively, this is very restrictive. The case $\psi\left(x\right) = \text{constant}$ directly comes to mind, but this is not the only possibility. We can consider the following class of states, defined for any $p' \in \mathbb{R}$:
+    \[\psi\left(x\right) = e^{i p' x}.\]
+
+    This is indeed period, since shifting it only gives a non-physical global phase (it is global since it does not depend on $x$): 
+    \[\psi\left(x + a\right) = e^{i p' x} e^{i p' a} = e^{i p' a} \psi\left(x\right) \equiv \psi\left(x\right).\]
+    
+    Taking the Fourier transform, this yields: 
+    \[\phi\left(p\right) = \delta\left(p - p'\right).\]
+
+    \begin{subparag}{Remark}
+        We notice two things from this example:
+        \begin{enumerate}[left=0pt]
+            \item First, symmetries are associated with constants: for instance, the translational symmetry is associated with conservation of momentum. This can be generalised thanks to Noether's theorem.
+            \item Second, symmetries heavily constrain the allowed states. This is for instance useful for finding Ansätze for the variational principle. Another example of this is that we found in Quantum physics I that $V\left(x\right) = V\left(-x\right)$ necessarily implies the eigenstates are even or odd.
+        \end{enumerate}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{The mystery of degeneracy}
+    Given a generic Hamiltonian $H$, we would expect the eigenvalues of $H$ to be distinct. However, in real cases, $H$ often has lots of degenerate eigenvalues. In early days of quantum mechanics, this was rather mysterious. Symmetries provide an explanation.
+
+    Let us consider a unitary $U$ that leaves $H$ invariant: 
+    \[U^{\dagger} H U = H \iff HU = UH.\]
+
+    Now, leaving $\ket{\psi}$ to be an eigenvalue of $H$, $H \ket{\psi} = E\ket{\psi}$, this yields: 
+    \[H\left(U \ket{\psi}\right) = UH \ket{\psi} = U\left(E \ket{\psi}\right) = E \left(U \ket{\psi}\right).\]
+
+    In other words, $U \ket{\psi}$ is also an eigenstate of $H$, with the same energy $E$. In other words, a symmetry $U$ implies degeneracy.
+\end{parag}
+
+\subsection{Introduction to groups}
+
+\begin{parag}{Definition: Symmetry}
+    A symmetry describes some property of a system that is left unchanged by some operation. In quantum mechanics, this operation will be a unitary $U$.
+\end{parag}
+
+\begin{parag}{Definition: Group}
+    A set $G$ equipped with some operation $*: G \times G \mapsto G$ is a \important{group} $\left(G, *\right)$, if:
+    \begin{itemize}
+        \item (Closed) $\forall a, b \in G, \ a * b \in G.$
+        \item (Associativity) $\forall a, b, c \in G, \ \left(a * b\right) * c = a* \left(b * c\right)$.
+        \item (Identity) $\exists e \in G, \forall g \in G, \ e * g = g * e = g$.
+        \item (Inverse) $\forall a \in G, \exists b \in G, \ a*b = b*a = e$, and we note $b = a^{-1}$.
+    \end{itemize}
+
+    \begin{subparag}{Remark}
+        We will typically consider a group over multiplication, such as $\left(\mathbb{R}^*, \cdot\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    The set of all unitaries $U$ such that the map $\rho \mapsto U \rho U^{\dagger}$ leaves some property unchanged forms a group together with multiplication.
+
+    \begin{subparag}{Proof}
+        \begin{itemize}[left=0pt]
+            \item Multiplying two unitaries gives a unitary matrix.
+            \item $U = I$ is always such that $\rho \mapsto U \rho U^{\dagger}$ preserves all properties.
+            \item If $\rho \mapsto U \rho U^{\dagger}$ preserves some property, then so does its inverse $\rho \mapsto U^{\dagger} \rho U$. Indeed, applying $U$ leaves a property unchanged, so undoing what $U$ did must also keep this property unchanged. In other words, we do have that if $U \in G$, then $U^{-1} = U^{\dagger} \in G$  .
+            \item If applying $U$ and applying $V$ leave properties unchanged, applying $U$ and then $V$ also leaves property unchanged. In other words, if $U, V \in G$, then $UV \in G$.
+        \end{itemize}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Finite group}
+    Let $\left(G, *\right)$ be a group.
+
+    If $G$ is finite, $\left(G, *\right)$ is said to be a \important{finite group}. Its number of elements $\left|G\right|$ is named to be the \important{order} of the group.
+\end{parag}
+
+\begin{parag}{Definition: Cayley table}
+    Let $\left(G, *\right)$ be a finite group.
+
+    Its \important{Cayley table} is a $\left|G\right| \times \left|G\right|$ table representing its operation. Each cell $\left(a, b\right)$ represents $a * b$.
+\end{parag}
+
+\begin{parag}{Intuition: Representation}
+    Let $\left(G, *\right)$ be a finite group.
+
+    Informally, a representation $\left\{R\left(g\right)\right\}$ is a set of $d\times d$ matrices that obey the rules of the group: 
+    \[R\left(g_1\right)\cdot R\left(g_2\right) = R\left(g_1 * g_2\right).\]
+
+    \begin{subparag}{Remark}
+        We will build this definition formally. However, the idea is not too complicated, and we can already find some examples.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    The only order 1 group is:
+    \begin{center}
+    \begin{tabular}{c|c}
+        $*$ & $e$ \\
+        \hline
+        $e$ & $e$ 
+    \end{tabular}
+    \end{center}
+
+    The following are three representations of this group: 
+    \[e \to 1, \mathspace e \to \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}, \mathspace e \to \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}.\]
+\end{parag}
+
+\begin{parag}{Example 2}
+    To find the only order 2 group, we notice that $e * a = a$ and, since $a$ needs an inverse, $a * a = e$. So:
+    \begin{center}
+    \begin{tabular}{c|cc}
+        $*$ & $e$ & $a$ \\
+        \hline
+        $e$ & $e$ & $a$  \\
+        $a$ & $a$ & $e$
+    \end{tabular}
+    \end{center}
+
+    The following are five representations of this group: 
+    \[\begin{systemofequations} e \to 1, \\ a \to 1, \end{systemofequations} \mathspace \begin{systemofequations} e \to 1, \\ a \to -1, \end{systemofequations} \mathspace \begin{systemofequations} e \to I, \\ a \to \sigma_X, \end{systemofequations} \mathspace \begin{systemofequations} e \to I, \\ a \to \sigma_Z, \end{systemofequations} \mathspace \begin{systemofequations} e \to I, \\ a \to SWAP. \end{systemofequations}\]
+
+    Indeed, all those matrices behave similarly to the group. For instance, for the fourth representation, $I\cdot I = I$, $I\cdot \sigma_Z = \sigma_Z \cdot  I = \sigma_Z$ and $\sigma_Z \cdot  \sigma_Z = I$, showing indeed $I$ behaves like $e$ and $\sigma_Z$ behaves like $a$.
+\end{parag}
+
+\begin{parag}{Example 3}
+    It is possible to show that the following is the only order 3 group:
+    \begin{center}
+    \begin{tabular}{c|ccc}
+        $*$ & $e$ & $a$ & $b$ \\
+        \hline
+        $e$ & $e$ & $a$ & $b$ \\
+        $a$ & $a$ & $b$ & $e$ \\
+        $b$ & $b$ & $e$& $a$
+    \end{tabular}
+    \end{center}
+
+    This is the $\mathbb{Z}_3$ cyclic group. A possible representation is the third roots of unity: 
+    \[e \to 1, \mathspace a \to e^{i \frac{2\pi}{3}}, \mathspace b \to e^{i \frac{4 \pi}{3}}.\]
+
+    Note that this also represents the symmetrical rotations of an equilateral triangle.
+\end{parag}
+
+\begin{parag}{Example 4}
+    Some order 4 group is:
+    \begin{center}
+    \begin{tabular}{c|cccc}
+        $*$ & $e$ & $a$ & $b$ & $c$  \\
+        \hline
+        $e$ & $e$ & $a$ & $b$ & $c$ \\
+        $a$ & $a$ & $b$ & $c$ & $e$  \\
+        $b$ & $b$ & $c$ & $e$ & $a$ \\
+        $c$ & $c$ & $e$ & $a$ & $b$ \\
+    \end{tabular}
+    \end{center}
+
+    This is the $\mathbb{Z}_4$ cyclic group. A representation is $e^{i 2\pi \frac{j}{4}}$. We could construct another representation by recognising it is the group of some symmetries of a square.
+\end{parag}
+
+\begin{parag}{Example 5}
+    The other order 4 group is:  
+    \begin{center}
+    \begin{tabular}{c|cccc}
+        $*$ & $e$ & $a$ & $b$ & $c$  \\
+        \hline
+        $e$ & $e$ & $a$ & $b$ & $c$ \\
+        $a$ & $a$ & $e$ & $c$ & $b$  \\
+        $b$ & $b$ & $c$ & $e$ & $a$ \\
+        $c$ & $c$ & $b$ & $a$ & $e$ \\
+    \end{tabular}
+    \end{center}
+
+    A representation can be done by representing this as the symmetries of a rectangle (rotations of $0$, rotation of $\pi$, vertical symmetry, horizontal symmetry).
+\end{parag}
+
+\begin{parag}{Definition: Cyclic group}
+    The cyclic group $\mathbb{Z}_n$ of order $n$ is defined so that: 
+    \[a_{i} a_j = a_{i + j \Mod n}, \mathspace e = a_0.\]
+
+    A representation is $a_j = e^{i 2\pi \frac{j}{n}}$.
+\end{parag}
+
+\begin{parag}{Definition: Symmetric permutation group}
+    The symmetric permutation group $S_n$ is all the permutation of $n$ objects. Its order is 
+    \[\left|S_n\right| = n!.\]
+
+    In physics, this is important since it is the symmetry of indistinguishable particles.
+
+    \begin{subparag}{Example}
+        For instance: 
+        \[S_3 = \left\{I, SWAP_{12}, SWAP_{13}, SWAP_{23}, CYCLE_{123}, CYCLE_{321}\right\}.\]
+
+        Using the usual notation of the symmetric permutation group, this can also be written as: 
+        \[S_3 = \left\{e, \begin{pmatrix} 1 & 2 \end{pmatrix}, \begin{pmatrix} 1 & 3 \end{pmatrix}, \begin{pmatrix} 2 & 3\end{pmatrix}, \begin{pmatrix} 1 & 2 & 3 \end{pmatrix}, \begin{pmatrix} 3 & 2 & 1 \end{pmatrix} \right\}\]
+        
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Lie group}
+    Informally, a \important{Lie group} is a continuous group that depends analytically on some continuous parameter $\lambda$.
+\end{parag}
+
+\begin{parag}{Definition: Orthogonal matrix}
+    Let $O \in \mathbb{R}^{n \times n}$. It is said to be orthogonal if: 
+    \[O^T O = O O^T = I.\]
+    
+    \begin{subparag}{Remark 1}
+        Orthogonal matrices are the real equivalent to unitary matrices.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that: 
+        \[1 = \det\left(I\right) = \det\left(O^T O\right) = \det\left(O\right)^2.\]
+        
+        There are thus two possibilities, $\det\left(O\right) = 1$ and $\det\left(O\right) = -1$. In the first case, $O$ represents a rotation; in the second case it represents a reflection.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Orthogonal group}
+    The \important{orthogonal group}, $O\left(d\right)$, is the group of orthogonal matrices: 
+    \[O\left(d\right) = \left\{O \in \mathbb{R}^{n \times n} \suchthat \text{$O$ is orthogonal}\right\}.\]
+
+    This represents the group of matrices that preserve the norm of real vectors, i.e. matrices that do rotations and reflections. This is a lie group.
+\end{parag}
+
+\begin{parag}{Definition: Special orthogonal group}
+    The \important{special orthogonal group}, $SO\left(d\right)$, is the real rotation matrices on $d$ dimensional systems: 
+    \[SO\left(d\right) = \left\{O \in \mathbb{R}^{n \times n} \suchthat \text{$O$ is orthogonal and $\det\left(O\right) = 1$}\right\}.\]
+
+    This is a lie group.
+
+    \begin{subparag}{Example}
+        For instance, an arbitrary element of $SO\left(2\right)$ is: 
+        \[\begin{pmatrix} \cos\left(\phi\right) & -\sin\left(\phi\right) \\ \sin\left(\phi\right) & \cos\left(\phi\right) \end{pmatrix}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Unitary group}
+    The \important{unitary group}, $U\left(d\right)$, is the group of unitary matrices: 
+    \[U\left(d\right) = \left\{U \in \mathbb{C}^{n \times n} \suchthat \text{$U$ is unitary}\right\}.\]
+
+    This represents the group of matrices that preserves the norm of complex vectors. This is a lie group.
+\end{parag}
+
+\begin{parag}{Definition: Special unitary group}
+    The \important{special unitary group}, $SU\left(d\right)$, is the group of unitary matrices: 
+    \[SU\left(d\right) = \left\{U \in \mathbb{C}^{n \times n} \suchthat \text{$U$ is unitary and $\det\left(U\right) = 1$}\right\}.\]
+
+    This is a lie group.
+
+    \begin{subparag}{Remark}
+        Note that: 
+        \[1 = \det\left(I\right) = \det\left(U^{\dagger} U\right) = \det\left(U\right)^* \det\left(U\right) = \left|\det\left(U\right)\right|^2.\]
+
+        Therefore, there exists some $\phi$ so that: 
+        \[\det\left(U\right) = e^{i \phi}.\]
+        
+        Asking that $\det\left(U\right) = 1$ therefore simply fixes a choice on the global phase of $U$. In other words, this group represents the group of matrices that preserves the norm of complex vectors, quotiented by the global phase. 
+    \end{subparag}
+\end{parag}
+
+\subsection{Basic definitions}
+
+\begin{parag}{Definition: Abelian group}
+    Let $\left(G, *\right)$ be a group.
+
+    $\left(G, *\right)$ is said to be an \important{Abelian group} if $*$ is commutative, i.e. if:
+    \[g_1 * g_2 = g_2 * g_1, \mathspace \forall g_1, g_2 \in G.\]
+\end{parag}
+
+\begin{parag}{Definition: Subgroup}
+    Let $\left(G, *\right)$ be a group, and $H \subseteq G$ be a subset.
+
+    $\left(H, *\right)$ is said to be a \important{subgroup} of $G$, if it is a group.
+\end{parag}
+
+\begin{parag}{Definition: Proper subgroup}
+    Let $G$ be a group, and $H \subseteq G$ be a subgroup.
+
+    If $H \neq \left\{e\right\}$ and $H \neq G$, then $\left(H, *\right)$ is said to be a \important{proper subgroup}.
+\end{parag}
+
+\begin{parag}{Lagrange theorem}
+    Let $G$ be a finite group and $H$ be a subgroup.
+
+    Then, $\left|H\right|$ divides $\left|G\right|$.
+
+    \begin{subparag}{Implication}
+        This implies that groups with a prime number of elements have no proper subgroup. Moreover, it is possible to show that $\mathbb{Z}_n$ for a prime $n$ is the unique group with no proper subgroup. This is an argument that allows to show that $\mathbb{Z}_3$ is unique.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Group homomorphism}
+    Let $\left(G, *\right)$ and $\left(H, \star\right)$ be two groups.
+
+    A function $\phi: G \mapsto H$ is said to be a \important{homomorphism} between $G$ and $H$ if : 
+    \[\phi\left(g_1 * g_2\right) = \phi\left(g_1\right) \star \phi\left(g_2\right), \mathspace \forall g_1, g_2 \in G.\]
+
+    \begin{subparag}{Intuition}
+        In other words, a homomorphism is a function between groups that preserves group operations. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Group isomorphism}
+    Let $\left(G, *\right)$ and $\left(H, \star\right)$ be two groups, and $\phi: G \mapsto H$ be a homomorphism.
+
+    If $\phi$ is also bijective, we say it is an \important{isomorphism}.
+
+    If there exists such an isomorphism, $G$ and $H$ are said to be \important{isomorphic}. Intuitively, this captures the idea that two groups are essentially the same.
+
+    \begin{subparag}{Intuition}
+        In other words, an isomorphism is a function between groups that sets up a one-to-one correspondance between elements, in such a way that it preserves group operations. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Group representation}
+    Let $\left(G, *\right)$ be a group, and $V$ be a vector space.
+
+    A \important{representation} $R$ of $G$ on $V$ is a group homomorphism from $G$ to a set of invertible matrices that act on $V$.
+
+    \begin{subparag}{Remark}
+        We will only consider $V = \mathbb{C}^m$ in this class.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        The set of invertible matrices that act on $V$ is typically marked as $GL_n\left(V\right)$. So, $R: G \mapsto GL_n\left(V\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Terminology}
+        Representations might be referred to as ``reps''. 
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, any group has a trivial representation: 
+        \[R\left(g\right) = I, \mathspace \forall g \in G.\]
+
+        As mentioned earlier, the following are all representations of the parity group $Z_2 = \left\{e, a\right\}$: 
+        \[\left\{1, -1\right\}, \mathspace \left\{1, 1\right\}, \mathspace \left\{I, X\right\}, \mathspace \left\{I, Z\right\}, \mathspace \left\{I, SWAP\right\}.\]
+
+        Lie groups over matrices have their fundamental representations which are ``just the obvious matrices that define the group''. For instance, $O\left(3\right)$ is the group of orthogonal matrices in three dimensions, and this group's fundamental representation is just those matrices: 
+        \[R\left(O\right) = O, \mathspace \forall O \in O\left(3\right).\]
+    \end{subparag}
+\end{parag}
+
+\end{document}

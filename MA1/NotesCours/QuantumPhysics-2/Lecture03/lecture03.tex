@@ -1,0 +1,264 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-09-30 at 10:14:39.
+
+\usepackage{../../style}
+
+\title{Quantum physics II}
+\author{Joachim Favre}
+\date{Lundi 30 septembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2024-09-30}{Hidden variables are not a valid model}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the CHSH inequality.
+    \item Explanation of Bell's inequalities.
+    \item Definition of density operator, pure state, and mixed state.
+\end{itemize}
+
+}
+
+\begin{parag}{CHSH inequality}
+    We consider the following value, the total coalition coefficient: 
+    \[C = \left\langle A_T B_T \right\rangle + \left\langle A_H B_T \right\rangle + \left\langle A_T B_H \right\rangle - \left\langle A_H B_H \right\rangle,\]
+    where, for instance, $\left\langle A_H B_H \right\rangle$ is the average value of the product of the two values Bob and Alice say if they both get head: 
+    \autoeq{\left\langle A_H B_H \right\rangle = \left(-1\right) \prob\left(A_H=1, B_H=-1 \suchthat H, H\right) + \left(-1\right) \prob\left(A_H=-1, B_H=1 \suchthat H, H\right) \fakeequal + \prob\left(A_H=1, B_H=1 \suchthat H, H\right) + \prob\left(A_H=-1, B_H=-1 \suchthat H, H\right).}
+
+    Then:
+    \begin{enumerate}
+        \item In the classical world, we always have $C \leq 2$.
+        \item In the quantum world, it is possible to reach $C = 2\sqrt{2}$.
+    \end{enumerate}
+    
+    \begin{subparag}{Remark}
+        This is just a rephrasing of the third quantum psychics experiment above, in a more mathematical but less intuitive phrasing. There is a direct link between the probability of winning and the coalition coefficient $C$. Note however that this is typically phrased this way in literature, which we typically refer to as the CHSH inequality.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Our goal is to link the probability of winning in the third experiment to the coalition coefficient. The inequalities will then come from our previous results.
+
+        We can now express their probability of winning, i.e. the probability that they give different answers if and only if both coins give head, is given by: 
+        \autoeq[s]{\prob\left(\text{win}\right) = \frac{1}{4} \prob\left(A_H=1, B_H=-1 \suchthat H, H\right) + \frac{1}{4} \prob\left(A_H=-1, B_H=1 \suchthat H, H\right) \fakeequal + \frac{1}{4} \prob\left(A_H=1, B_T=1 \suchthat H, T\right) + \frac{1}{4} \prob\left(A_H=-1, B_T=-1 \suchthat H, T\right) \fakeequal + \frac{1}{4} \prob\left(A_T=1, B_H=1 \suchthat T, H\right) + \frac{1}{4} \prob\left(A_T=-1, B_H=-1 \suchthat T, H\right) \fakeequal + \frac{1}{4} \prob\left(A_T=1, B_T=1 \suchthat T, T\right) + \frac{1}{4} \prob\left(A_T=-1, B_T=-1 \suchthat T, T\right).}
+
+        Now note that, since the probabilities sum to one, we can write:
+        \autoeq{\left\langle A_H B_H \right\rangle = 1 - 2\prob\left(A_H=1, B_H=-1 \suchthat H, H\right) \fakeequal - 2\prob\left(A_H=-1, B_H=1 \suchthat H, H\right).}
+
+        We can find something similar for all other terms. Doing some algebra, we can express the probability of winning as:
+        \autoeq{\prob\left(\text{win}\right) = \frac{1}{2} + \frac{1}{8}\left(-\left\langle A_H B_H \right\rangle + \left\langle A_H B_T \right\rangle + \left\langle A_T B_H \right\rangle + \left\langle A_T B_T \right\rangle\right) = \frac{1}{2} + \frac{C}{8}.}
+
+        In other words: 
+        \[C = 8 \prob\left(\text{win}\right) - 4.\]
+
+        Let us now consider the classical and the quantum case.
+        \begin{enumerate}
+            \item In the classical case, we found that $\prob\left(\text{win}\right) \leq \frac{3}{4}$. This gives that: 
+            \[C \leq 8\cdot \frac{3}{4} - 4 = 6 - 4 = 2,\]
+            as expected.
+            \item We found that it is possible to reach $\prob\left(\text{win}\right) = \frac{2 + \sqrt{2}}{4}$ in the quantum case, giving, in this case: 
+            \[C = 8\cdot \frac{2 + \sqrt{2}}{4} - 4 = 4 + 2\sqrt{2} - 4 = 2\sqrt{2}.\]
+        \end{enumerate}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Bell's inequality}
+    Let us be more formal and more general. We consider a very similar scenario, where we have some source that sets up the experience. Alice and Bob both have a measurement device that can measure in two different bases, $A, A'$ for Alice and $B, B'$ for Bob. 
+
+    We take the following hypotheses, which intuition are explained after:
+    \begin{enumerate}
+        \item \textit{(Setting independence)} We suppose that there exists some $\lambda$ so that: 
+        \[\prob\left(\ell \suchthat L, B, \lambda\right) = \prob\left(\ell \suchthat L, B', \lambda\right).\]
+        where $L \in \left\{A, A'\right\}$ and $R \in \left\{B, B'\right\}$ represent which measurement device was used by Alice or Bob.
+        \item \textit{(Outcome independence)} We also suppose that the following is true:
+        \[\prob\left(\ell \suchthat L, R, r, \lambda\right) = \prob\left(\ell \suchthat L, R, r', \lambda\right).\]
+        \item \textit{(Single outcome assumption)} There is only one outcome obtained on each device.
+        \item \textit{(No conspiracy assumption)} It is fair to calculate $C$ by averaging over many runs of the experiment. In other words, in some sense, there isn't a superior being tricking the probabilities giving us absurd statistical results.
+    \end{enumerate}
+
+    We consider the following correlation coefficient: 
+    \[C = \left|\left\langle LR \right\rangle - \left\langle LR' \right\rangle\right| + \left|\left\langle LR \right\rangle + \left\langle L'R \right\rangle\right|,\]
+    where, for instance: 
+    \[\left\langle LR \right\rangle = \sum_{\ell, r \in \left\{-1, 1\right\}} \ell r \prob\left(\ell, r \suchthat L, R\right). \]
+
+    Then, $C \leq 2$. It is possible to make an experiment where $C = 2 \sqrt{2}$, so one of the four hypotheses must be wrong.
+
+    \begin{subparag}{Hypotheses intuition}
+        Let us get some intuition on our hypotheses.
+        
+        \begin{enumerate}[left=0pt]
+            \item The first hypothesis states that Alice's result does not depend on Bob's choice of measurement device.  She might get different probabilities depending on the results Bob gets, but it must depend on the result, not just the choice of the basis (similarly to what we discussed for using the delayed quantum eraser for signalling).
+            \item The second hypothesis is the most important one. It states that Alice's result does not depend on Bob's result, but only on some hidden variable $\lambda$, i.e. something that summarises all the shared history of the two qubits. In other words, we suppose that, when the source created the two qubits, it annotated some value $\lambda$ in it, that the qubits use on measurement. This supposes in some sense that the value is decided upon creation of the qubits, not on their measurement.
+
+            Another way to understand the first and second hypothesis is by noticing that that they together imply that:
+            \autoeq{\prob\left(\ell , r \suchthat L, R, \lambda\right) =  \prob\left(\ell \suchthat L, R, \lambda\right) \prob\left(r \suchthat L, R, \lambda\right) = \prob\left(\ell \suchthat L, \lambda\right) \prob\left(r \suchthat R, \lambda\right),}
+            where we used first outcome independence and then setting independence. This property is named \textit{factorisability}.
+
+            This property means that $\ell|L$ and $r|R$ are both \textit{independent} random functions of the same $\lambda$. This is exactly the hypothesis that local hidden variable theories use: they suppose the behaviour of one qubit is not determined by the measurement of the other, but instead of some shared common $\lambda$.
+
+            Note that this does not mean $\ell | L$ and $r | R$ are not independent (just like the number of people in the subway in Lausanne and in Paris at any given time are very dependent random variables, but one being big does not cause the other to be big, they are independent random functions of the time $t$).
+            
+            \item The third hypothesis is quite unquestionable.
+            \item The fourth hypothesis basically states that we can estimate an expected value by averaging values obtained in a lab. Questioning this hypothesis would be a big issue for the scientific method.
+        \end{enumerate}
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        Since it is possible to  make an experiment where $C = 2 \sqrt{2}$, one of the four hypotheses must be wrong. We do not want to question the third or the fourth. Moreover, the first hypothesis would break the no-signaling theorem: Bob could choose $B$ or $B'$ depending on the value he wants to send to Alice.
+
+        This necessarily means that the second hypothesis, outcome independence, has to be violated. Note that this is more general than just quantum mechanics. No matter the physical model, the experiments we did that show $C = 2 \sqrt{2}$ are valid. Therefore, outcome independence will never be possible, even in successors of quantum physics. 
+
+        This notably shows that local hidden variables theory are not valid and will never be.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Contextuality}
+    Let us consider the following matrix of operators, named the Peres-Mermin square: 
+    \[\begin{pmatrix} A & B & C \\ a & b & c \\ \alpha & \beta & \gamma \end{pmatrix}.\]
+
+    We moreover consider the following value:
+    \[\left\langle PM \right\rangle = \left\langle ABC \right\rangle + \left\langle abc \right\rangle + \left\langle \alpha \beta \gamma \right\rangle + \left\langle A a \alpha \right\rangle + \left\langle B b \beta \right\rangle - \left\langle C c \gamma \right\rangle.\]
+
+    In the classical case, we have $\left|C\right| \leq 4$. With quantum, it is possible to choose the operators so that $C = 6$.
+
+    \begin{subparag}{Remark}
+        This is a result which is very analogous to Bell's inequalities. The fact that $\left|C\right| \leq 4$ in the classical case means that the measure of some property does not depend on its context, i.e. it does not change because of the measure of other properties.
+
+        The fact that $C = 6$ is reachable with quantum means that this is not true for quantum physics.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We only prove the quantum case, the classical case can be argued in a very similar way to the quantum psychic game. We consider the following Peres-Mermin square:
+        \[\begin{pmatrix} Z \otimes I & I \otimes Z & Z \otimes Z \\ I \otimes X & X \otimes I & X \otimes X \\ Z \otimes X & X \otimes Z & Y \otimes Y \end{pmatrix}.\]
+
+        Notice that all elements in a single row and all elements in a single column commute and are therefore jointly measurable. Computing one of the terms, we notice: 
+        \[\left\langle ABC \right\rangle = \bra{\psi} \left(Z \otimes I\right) \left(I \otimes Z\right) \left(Z \otimes Z\right) \ket{\psi} = \braket{\psi}{\psi} = 1.\]
+
+        The product of every row and column gives identity, except for the last column which gives $-I$. This means that: 
+        \[\left\langle PM \right\rangle = 1 + 1 + 1 + 1 + 1 - \left(-1\right) = 6.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Density operators}
+
+\subsection{Pure states}
+
+
+\begin{parag}{Definition: Density operator}
+    Let $\ket{\psi}$ be some state.
+
+    Its corresponding \important{density operator} is $\rho = \ket{\psi}\bra{\psi}$.
+
+    \begin{subparag}{Example}
+        For instance, if $\ket{\psi} = \ket{1} = \begin{pmatrix} 0 & 1 \end{pmatrix}^T$, then: 
+        \[\rho = \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix}.\]
+
+        Similarly:
+        \[\ket{\psi} = \frac{\ket{01} - \ket{10}}{\sqrt{2}} = \frac{1}{\sqrt{2}}\begin{pmatrix} 0 \\ 1 \\ -1 \\ 0 \end{pmatrix} \implies \rho = \frac{1}{2}\begin{pmatrix} 0 & 0 & 0 & 0 \\ 0 & 1 & -1 & 0 \\ 0 & -1 & 1 & 0 \\ 0 & 0 & 0 & 0 \end{pmatrix} .\]
+
+        Finally, for an arbitrary qubit $\ket{\psi} = \cos\left(\frac{\theta}{2}\right) \ket{0} + e^{i \phi} \sin\left(\frac{\theta}{2}\right) \ket{1}$:
+        \[\rho = \begin{pmatrix} \cos^2\left(\frac{\theta}{2}\right) & \cos\left(\frac{\theta}{2}\right) \sin\left(\frac{\theta}{2}\right) e^{-i \phi} \\ \cos\left(\frac{\theta}{2}\right)\sin\left(\frac{\theta}{2}\right) e^{i \phi} & \sin^2\left(\frac{\theta}{2}\right) \end{pmatrix} .\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition: Expected value}
+    Let $\rho$ be a density operator, and $O$ be an observable.
+
+    Then, the expected value of $O$ under the state $\rho$ is defined by: 
+    \[\left\langle O \right\rangle = \Tr\left(\rho O\right).\]
+
+    \begin{subparag}{Proof}
+         This is a direct proof, using properties of the trace:
+        \[\left\langle O \right\rangle = \Tr\left(\rho O\right) = \Tr\left(\ket{\psi}\bra{\psi}O\right) = \Tr\left(\bra{\psi}O \ket{\psi}\right) = \bra{\psi}O \ket{\psi}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Arbitrary single qubit state}
+    Let $\ket{\psi}$ be an arbitrary qubit, and $\rho$ be its corresponding density matrix. Moreover, let $\bvec{v}$ be the unit vector on the Bloch sphere that represents $\ket{\psi}$.
+
+    Then: 
+    \[\bvec{v} = \begin{pmatrix} \left\langle X \right\rangle \\ \left\langle Y \right\rangle \\ \left\langle Z \right\rangle \end{pmatrix}, \mathspace \rho = \frac{1}{2}\left(I + \bvec{\sigma} \dotprod \bvec{v}\right).\]
+    
+
+    \begin{subparag}{Proof}
+        Since $\rho$ is a Hermitian matrix, we can represent it in the Pauli basis: 
+        \[\rho = u_0 I + u_x X + u_y Y + u_z Z.\]
+        
+        Since moreover $\rho = \ket{\psi}\bra{\psi}$, we notice that $\Tr\left(\rho\right) = 1$. Therefore, we must have: 
+        \autoeq{1 = \Tr\left(\rho\right) = u_0 \Tr\left(I\right) + u_x \Tr\left(X\right) + u_y \Tr\left(Y\right) + u_z \Tr\left(Z\right) = 2 u_0 \iff u_0 = \frac{1}{2}.}
+        
+
+        We now need to get the other coefficients. Let us consider the following expectation value: 
+        \[\left\langle X \right\rangle = \Tr\left(\rho X\right) = \Tr\left(\frac{1}{2}X + u_x X^2 + u_y YX + u_z ZX\right) = u_x\Tr\left(I\right).\]
+        
+        Since $\Tr\left(I\right) = 2$, this means that $u_x = \frac{1}{2} \left\langle X \right\rangle$. We can do a similar reasoning for the other coefficients, getting: 
+        \[\rho = \frac{1}{2}\left(I + \bvec{\sigma} \dotprod \bvec{v}\right), \mathspace \text{where } \bvec{v} = \begin{pmatrix} \left\langle X \right\rangle \\ \left\langle Y \right\rangle \\ \left\langle Z \right\rangle \end{pmatrix}.\]
+
+        We will moreover verify in the fourth exercise sheet that: 
+        \[\bvec{v} = \begin{pmatrix} \sin\left(\theta\right)\cos\left(\phi\right) \\ \sin\left(\theta\right)\sin\left(\phi\right) \\ \cos\left(\theta\right) \end{pmatrix}.\]
+
+        So, $\bvec{v}$ is indeed the vector representing $\ket{\psi}$ and $\rho$ on the Bloch sphere .
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Mixed states}
+
+\begin{parag}{Classical randomness}
+    We want to add classical randomness in our constructions. Let's say that someone gives us a state, $\ket{\psi}$ with probability $p$ and $\ket{\phi}$ with probability $1-p$. Our goal is to find a single mathematical object that allows us to easily get the expected value.
+
+    The expected value is: 
+    \autoeq{\left\langle O \right\rangle = p \bra{\psi}O \ket{\psi} + \left(1-p\right) \bra{\phi} O \ket{\phi} = p \Tr\left(\ket{\psi}\bra{\psi} O\right) + \left(1-p\right) \Tr\left(\ket{\phi}\bra{\phi}O\right) = \Tr\left[\left(p \ket{\psi}\bra{\psi} + \left(1-p\right)\ket{\phi}\bra{\phi}\right)O\right].}
+
+    The mathematical entity that appears to have all the information about the expected value is therefore: 
+    \[\rho = p \ket{\psi}\bra{\psi} + \left(1-p\right) \ket{\phi}\bra{\phi}.\]
+
+    This is also a density operator, but related to what we call a mixed state. This yields the following definition.
+\end{parag}
+
+\begin{parag}{Definition: Density operator}
+    Let's say we have a set of $m$ states $\ket{\psi_k}$, which appear with probability $p_k$.
+
+    We can represent this using a \important{density operator}, defined by: 
+    \[\rho = \sum_{k = 1}^m p_k \ket{\psi_k}\bra{\psi_k}.\]
+
+    If $m = 1$ (i.e. if $\rho = \ket{\psi} \bra{\psi}$), $\rho$ is said to be a \important{pure state}. Otherwise, it is said to be a \important{mixed state}.
+\end{parag}
+
+\begin{parag}{Theorem: Bloch ball}
+    Let's say that we have states $\ket{\psi}$ and $\ket{\phi}$ corresponding to Bloch sphere vectors $\bvec{v}_{\psi}$ and $\bvec{v}_{\phi}$, respectively: 
+    \[\ket{\psi}\bra{\psi} = \frac{1}{2} \left(I + \bvec{v}_{\psi} \dotprod \bvec{\sigma}\right), \mathspace \ket{\phi}\bra{\phi} = \frac{1}{2} \left(I + \bvec{v}_{\phi} \dotprod \bvec{\sigma}\right).\]
+
+    Moreover, suppose that we have $\ket{\psi}$ with probability $p$ and $\ket{\phi}$ with probability $1 - p$. Then, $\rho = p \ket{\psi}\bra{\psi} + \left(1-p\right) \ket{\phi}\bra{\phi}$ has Block \textit{ball} vector $\bvec{u}$, where: 
+    \[\bvec{u} = p \bvec{v}_{\psi} + \left(1 - p\right) \bvec{v}_{\phi}.\]
+
+    \begin{subparag}{Intuition}
+        In other words, $\bvec{u}$ is a convex combination of $\bvec{v}_{\psi}$ and $\bvec{v}_{\phi}$; it is on the line connecting those two vectors. Thus, whereas those two vectors are on the surface of the Bloch sphere, $\bvec{u}$ is inside of it. This is hence not a sphere, it is a ball.
+
+        This can be generalised $\rho$ being a linear combination of an arbitrary of pure states.
+    \end{subparag}
+    
+    \begin{subparag}{Property}
+        Any pure state is on the Bloch sphere, $\left\|\bvec{v}\right\| = 1$. Any mixed state is inside the ball, $\left\|\bvec{v}\right\| < 1$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We directly find that: 
+        \autoeq{\rho = p \ket{\psi} \bra{\psi} + \left(1 - p\right) \ket{\phi}\bra{\phi} = \frac{1}{2} p \left(I + \bvec{v}_{\psi}\dotprod \bvec{\sigma}\right) + \frac{1}{2} \left(1 - p\right) \left(I + \bvec{v}_{\phi} \dotprod \bvec{\sigma}\right) = \frac{1}{2} \left[\left(p + \left(1 - p\right)\right) I + \left(p \bvec{v}_{\psi} + \left(1 - p\right)\bvec{v}_{\phi}\right) \dotprod \bvec{\sigma}\right] = \frac{1}{2} \left(I + \bvec{u} \dotprod \bvec{\sigma}\right).}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

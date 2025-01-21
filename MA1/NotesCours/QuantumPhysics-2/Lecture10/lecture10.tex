@@ -1,0 +1,273 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-25 at 10:17:09.
+
+\usepackage{../../style}
+
+\title{Quantum physics 2}
+\author{Joachim Favre}
+\date{Lundi 25 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2024-11-25}{Diagonalising matrices, slowly but Schur-ly}{
+\begin{itemize}[left=0pt]
+    \item Definition of irreducible representation.
+    \item Explanation of Schur's lemmas.
+    \item Application of Schur's lemma to the block diagonalisation of Hamiltonians.
+\end{itemize}
+    
+}
+
+\begin{parag}{Definition: Equivalent representation}
+    Let $G$ be a group, and $R_1, R_2$ be two representations on a space of matrices of the same dimension.
+
+    $R_1$ and $R_2$ are said to be \important{equivalent} if they are equal up to a change of basis, i.e. there exists some invertible matrix $S$ so that, for all $g \in G$: 
+    \[R_1\left(g\right) = S R_2\left(g\right) S^{-1}.\]
+\end{parag}
+
+\begin{parag}{Example: Tensor product representation}
+    Let $G$ be a group, and $R_1, R_2$ be representations.
+
+    The two following are also representations on $G$: 
+    \[R_1\left(g\right) \otimes R_2\left(g\right), \mathspace R_1\left(g\right)^{\otimes k}.\]
+
+    \begin{subparag}{Intuition}
+        This directly comes from the fact that $\left(A \otimes B\right)\cdot \left(C \otimes D\right) = \left(A\cdot C\right) \otimes \left(B \cdot D\right)$. In other words, each representation just multiply independently.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Direct sum}
+    Let $A, B$ be two matrices.
+
+    We define their \important{direct sum}, written $A \oplus B$, as: 
+    \[A \oplus B = \begin{pmatrix}  &  &  &  &  &  \\  & A &  &  & 0 &  \\  &  &  &  &  &  \\  &  &  &  &  &  \\  & 0 &  &  & B &  \\  &  &  &  &  &  \end{pmatrix}.\]
+\end{parag}
+ 
+
+\begin{parag}{Example: Direct sum representation}
+    Let $G$ be a group, and $R_1, R_2$ be representations.
+
+    Their direct sum $R_1\left(g\right) \oplus R_2\left(g\right)$ is also a representation of $G$. 
+\end{parag}
+
+\subsection{Irreducible representations}
+
+\begin{parag}{Idea}
+    The goal is to reduce mess looking representations (often tensor product representations) into direct sums of simpler representations. In other words, this amounts to doing a block diagonalisation of the representation.
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider a tensor product representation of $SU\left(2\right)$: 
+    \[R\left(U\right) = U \otimes U.\]
+
+    Our goal is to write write $R\left(U\right)$ as a direct sum: 
+    \[R_1\left(g\right) \otimes R_2\left(g\right) = \begin{pmatrix}  &  &  &  &  &  \\  & A\left(g\right) &  &  & 0 &  \\  &  &  &  &  &  \\  &  &  &  &  &  \\  & 0 &  &  & B\left(g\right) &  \\  &  &  &  &  &  \end{pmatrix}.\]
+    
+    We notice that $SWAP$ commutes with all elements of the representation: 
+    \autoeq{SWAP \left(U \otimes U\right) SWAP^{\dagger} = U \otimes U \iff SWAP \left(U \otimes U\right) = \left(U \otimes U\right) SWAP \iff \left[U \otimes U, SWAP\right] = 0.}
+
+    We know that if two operators commute, then they are block-diagonalisable in the same basis. We notice that $SWAP$ has eigenvalues $1$ and $-1$. Its $\lambda = 1$ eigenspace is spanned by: 
+    \[\ket{00}, \mathspace \ket{11}, \mathspace \frac{\ket{01} + \ket{10}}{\sqrt{2}}.\]
+    
+    Equivalently, using the Bell basis, the $\lambda = 1$ eigenspace is spanned by: 
+    \[\ket{\phi^+} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}, \mathspace \ket{\phi^-} = \frac{\ket{00} - \ket{11}}{\sqrt{2}}, \mathspace \ket{\psi^+} = \frac{\ket{01} + \ket{10}}{\sqrt{2}}.\]
+    
+    The $\lambda = -1$ eigenspace is spanned by the last Bell state: 
+    \[\ket{\psi^{-}} = \frac{\ket{01} - \ket{10}}{\sqrt{2}}.\]
+    
+    Therefore, in the Bell basis, there exists some matrices $U_1 \in \mathbb{C}^{3 \times 3}$ and $U_2 \in \mathbb{C}$ so that: 
+    \[U \otimes U = \begin{pmatrix}  &  &  & 0 \\  &  U_1 &  & 0 \\  &  &  & 0 \\ 0 & 0 & 0 & U_2 \end{pmatrix} = U_1 \oplus U_2.\]
+
+    It is possible to convince ourselves that $U_1$ and $U_2$ are still unitaries, i.e. that $U_1 \in SU\left(3\right)$ and $U_2 \in SU\left(1\right) = \left\{1\right\}$. Thanks to this block-diagonal form, we can consider invariant subspaces (spaces that are left unchanged by any $U \otimes U$). In other words, looking at $U \otimes U = U_1 \oplus U_2$:
+    \[\left(U \otimes U\right) \ket{\psi^-} = \ket{\psi^-},\] 
+    \[\left(U \otimes U\right)\left(a \ket{\phi^+} + b \ket{\phi^-} + c \ket{\psi^+}\right) = d \ket{\phi^+} + e \ket{\phi^-} + f \ket{\psi^+}.\]
+    
+    We notice that the two invariant subspaces are the symmetric and antisymmetric one. In other words, the first one consists of bosons and the second one of bosons and, physically, it makes sense that we cannot turn a photon to an electron.
+
+    \begin{subparag}{Takeaway}
+        The important things to take away from this example is that we can sometimes split a representation into a direct sum, in which case it shows invariant subspaces.
+
+        Note that, in some sense, this is what we did for addition of angular momentum in Quantum physics 1. We will later see that there is indeed a strong link, hence the importance.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Reducibility}
+    Let $G$ be a group and $R: G \mapsto GL_n\left(V\right)$ be a representation.
+
+    $R$ is said to be \important{reducible} if there exists an invariant subspace. In other words, it is reducible if there exists some non-trivial subspace $W$ (i.e. $W \neq \left\{0\right\}$ and $W \neq V$) so that, for each $\ket{w} \in W$: 
+    \[R\left(g\right) \ket{w} \in W.\]
+
+    A representation is then said to be \important{irreducible} if it is not reducible. An irreducible representation is called an irrep.
+\end{parag}
+
+\begin{parag}{Definition: Complete reducibility}
+    A representation $R\left(g\right)$ of a group $G$ is completely reducible if it splits into a direct sum of irreducible representation: 
+    \[R\left(g\right) = \bigoplus_{j=1}^{k} R_j\left(g\right) = \begin{pmatrix} R_1\left(g\right) &  &  &  \\  & R_2\left(g\right) &  &  \\  &  & \ddots &  \\  &  &  & R_k\left(g\right) \end{pmatrix}.\]
+
+    \begin{subparag}{Remark}
+        We trivially notice that a completely reducible representation is reducible.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $R\left(g\right)$ be a unitary representation, i.e. $R\left(g\right) \in U\left(n\right)$ for all $g$.
+
+    If $R\left(g\right)$ is reducible, then it is completely reducible.
+
+    \begin{subparag}{Remark}
+        In other words, a unitary representation is reducible if and only if it is completely reducible. We will only consider unitary representations in this class, we will thus consider the two interchangeably.
+
+        However, this is not necessarily true for arbitrary representations. For instance, the following is a representation of $\left(\mathbb{R}, +\right)$: 
+        \[M\left(x\right) = \begin{pmatrix} 1 & x \\ 0 & 1 \end{pmatrix}.\]
+
+        We do have $M\left(x\right)M\left(y\right) = M\left(x + y\right)$, so this is a valid representation. Moreover, it is reducible, since $M\left(x\right) \ket{0} = \ket{0}$. However, it is not completely reducible.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $G$ be a group. Then, the trivial representation $R\left(g\right) = 1$ for all $g \in G$, is completely reducible.
+
+    \begin{subparag}{Remark}
+        If we are asked to find all the reducible representations of a group during an exam, then we can thus get some free points by citing the trivial representation.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        By definition, any one-dimensional representation is completely reducible.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Schur's first lemma}
+    Let $G$ be a group, and $R_1\left(g\right),R_2\left(g\right)$ be two non-equivalent irreducible representations. 
+
+    If there is a matrix $A$ such that $A R_1\left(g\right) = R_2\left(g\right) A$ for all $g \in G$, then $A = 0$.
+
+    \begin{subparag}{Implication}
+        So, if there exists some matrix $A$ so that $A R_1\left(g\right) = R_2 A$ and $R_1, R_2$ are non-equivalent, then they are reducible.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Schur's second lemma}
+    Let $G$ be a group, and $R\left(g\right)$ be an irreducible representation.
+
+    If $A R\left(g\right) = R\left(g\right) A$ for all $g \in G$, then $A = \lambda I$ for some $\lambda \in \mathbb{C}$.
+
+    \begin{subparag}{Implication}
+        So, if there is some non-identity matrix $A \neq \lambda I$ that commutes with everything $\left[A, R\left(g\right)\right] = 0$---for instance a symmetry---then the representation is reducible. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    Schur's lemma give us a means of indicating if a representation is reducible. As we will see right after, they also help us to block diagonalise operators.
+\end{parag}
+
+\begin{parag}{Property}
+    Let $G$ be an Abelian group.
+
+    Then, its irreducible representations are one dimensional.
+
+    \begin{subparag}{Example}
+        For instance, let us consider the following representation of the $\mathbb{Z}_2$ group: 
+        \[R\left(e\right) = I, \mathspace R\left(a\right) = X.\]
+
+        We notice that $A = X$ commutes with both $I$ and $X$. Since $X \neq \lambda I$, this means that $R$ is reducible. Since it is a unitary representation, it is also completely reducible. In other words, there is some basis so that: 
+        \[R\left(g\right) = \begin{pmatrix} R_1\left(g\right) &  \\  & R_2\left(g\right) \end{pmatrix}.\]
+        
+        We recall that there are two 1D representations: 
+        \[\left\{1, 1\right\}, \mathspace \left\{1, -1\right\}.\]
+
+        $R_1$ and $R_2$ must be either of those representations. 
+
+        Moreover, using the $\left\{\ket{+}, \ket{-}\right\}$ basis (since we use the matrix $A = X$):  
+        \[I = \begin{pmatrix} 1 &  \\  & 1 \end{pmatrix}, \mathspace X = \begin{pmatrix} 1 &  \\  & -1 \end{pmatrix}.\]
+
+        So, we clearly see that taking $R_1\left(g\right) = 1$ to be the trivial representation, and $R_2\left(I\right) = 1$ and $R_2\left(X\right) = -1$ to be the signed representation, we do get a valid representation, which is diagonal: 
+        \[R\left(e\right) = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}, \mathspace R\left(X\right) = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $R$ be an arbitrary irreducible representation of $G$, and let $h \in G$ be arbitrary. By definition of representation, we notice that, for all $g \in G$: 
+        \[R\left(g\right) R\left(h\right) = R\left(g * h\right) = R\left(h * g\right) = R\left(h\right)R\left(g\right).\]
+
+        However, this means that the matrix $R\left(h\right)$ commutes with all elements of the representation $R\left(g\right)$. By Schur's second lemma, we must have $R\left(h\right) = \lambda I$ for some $\lambda \in \mathbb{C}$. However, $R\left(h\right) = \lambda I$ is only irreducible if it is one-dimensional, so $R\left(h\right)$ is one-dimensional.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Block diagonalisation}
+
+\begin{parag}{Observation}
+    In a quantum context, we are interested in studying systems (represented by some Hamiltonian $H$) with certain symmetries, i.e. we will have some Hamiltonian such that $\left[R\left(g\right), H\right] = 0$ for all $g \in G$, where $G$ is some symmetry group and $R\left(g\right)$ is a unitary transformation that represents that symmetry group on the Hilbert space of our system. Irreps tell us information on the structure of $H$.
+\end{parag}
+
+\begin{parag}{Theorem}
+    We state this theorem using an example, it can be generalised easily, but making it formal requires heavy notations, which would only decrease its pedagogical interest.
+
+    Let $H$ be Hamiltonian. Also, let $G$ be a group, and $R\left(g\right)$ be a representation so that: 
+    \[\left[R\left(g\right), H\right] = 0, \mathspace \forall g \in G.\]
+
+    We moreover us suppose that $R$ can be decomposed into irreducible representations as follows: 
+    \[R\left(g\right) = R_1\left(g\right) \oplus R_2\left(g\right) \oplus R_3\left(g\right) = \begin{pmatrix} R_1\left(g\right) &  &  \\  & R_2\left(g\right) &   \\  &  &  R_3\left(g\right)  \\  &  &  \end{pmatrix} .\]
+
+    Furthermore, let us consider a representation of $H$ in this basis: 
+    \[H = \begin{pmatrix} H_{11} & H_{12} & H_{13} \\ H_{21} & H_{22} & H_{23} \\ H_{31} & H_{32} & H_{33} \end{pmatrix}   ,\]
+    where each $H_{ij}$ is a matrix, and $H_{ii}$ is a matrix of the same dimension as $R_i\left(g\right)$.
+
+    If $R\left(g\right) = R_1\left(g\right) \oplus R_2\left(g\right) \oplus R_3\left(g\right)$ is ordered so that equivalent representations are next to each others, and that $R_1\left(g\right)$ is equivalent to $R_2\left(g\right)$, but not to $R_3\left(g\right)$, then:
+    \[H = \begin{pmatrix} \lambda_1 I_1 & H_{12} &  \\ H_{21} & \lambda_2 I_2 &  \\  &  & \lambda_3 I_3 \end{pmatrix}.\]
+
+    \begin{subparag}{Implication}
+        This implies that the dimension of the irreducible representations tells us the size of the degeneracies, when the irreps are non-equivalent. For instance, we have $d_3 = \dim I_3$ states with eigenvalue $\lambda_3$. In other words, the degeneracies of an Hamiltonian are determined by the dimension of its non-equivalent irreducible representations, and thus degeneracies of the Hamiltonian come from symmetries.
+    \end{subparag}
+
+    \begin{subparag}{Prof}
+        We notice that:
+        \autoeq{R\left(g\right)H = \begin{pmatrix} R_1\left(g\right) &  &  \\  & R_2\left(g\right) &  \\  &  & R_3\left(g\right) \end{pmatrix} \begin{pmatrix} H_{11} & H_{12} & H_{13} \\ H_{21} & H_{22} & H_{23} \\ H_{31} & H_{32} & H_{33} \end{pmatrix} = \begin{pmatrix} R_1\left(g\right) H_{11} & R_1\left(g\right) H_{12} & R_1\left(g\right) H_{13} \\ R_2\left(g\right) H_{21} & R_2\left(g\right) H_{22} & R_2\left(g\right) H_{23} \\ R_3\left(g\right) H_{31} & R_3\left(g\right) H_{32} & R_3\left(g\right)H_{33} \end{pmatrix}.}
+
+        Similarly:
+        \autoeq{H R\left(g\right) = \begin{pmatrix} H_{11} & H_{12} & H_{13} \\ H_{21} & H_{22} & H_{23} \\ H_{31} & H_{32} & H_{33} \end{pmatrix}\begin{pmatrix} R_1\left(g\right) &  &  \\  & R_2\left(g\right) &  \\  &  & R_3\left(g\right) \end{pmatrix} = \begin{pmatrix} H_{11}R_1\left(g\right) & H_{12}R_2\left(g\right) & H_{13} H_3\left(g\right) \\ H_{21} R_1\left(g\right) & H_{22} R_2\left(g\right) & H_{23} R_3\left(g\right) \\ H_{31} R_1\left(g\right) & H_{32} R_2\left(g\right) & H_{33} R_3\left(g\right) \end{pmatrix}.}
+
+        However, by hypothesis $R\left(g\right) H = R\left(g\right) H$ for all $g \in G$. This means that $R_j\left(g\right) H_{jk} = H_{jk} R_k\left(g\right)$ for any $j, k$. We consider the case $j = k$ (the diagonal terms) and the case $j \neq k$ (the non-diagonal terms) differently:
+        \begin{itemize}[left=0pt]
+            \item We suppose $j = k$. We know that $R_k\left(g\right) H_{kk} = H_{kk} R_k\left(g\right)$. By Schur's second lemma, this means $H_{kk} = \lambda_k I$ for some $\lambda_k \in \mathbb{C}$.
+            \item We suppose $j \neq k$, and that $R_j$ and $R_k$ are not equivalent relations. By Schur's first lemma, $H_{jk} = 0$.
+        \end{itemize}
+
+        This implies that $H$ is block diagonal (ordering $R_1 \oplus R_2 \oplus \ldots$ in such a way that equivalent representations are next to each others). In our case, $R_1$ and $R_2$ are equivalent, and they are not equivalent to $R_3$, so: 
+        \[H = \begin{pmatrix} \lambda_1 I_1 & H_{12} &   \\ H_{21} & \lambda_2 I_2 &   \\  &  & \lambda_3 I_3  \\  &  &  \end{pmatrix}.\]
+
+        This reasoning can easily be generalised to any other scenario.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us consider the Hamiltonian of two indistinguishable quits. It is easier to first notice the representation of the symmetry group: 
+    \[I \otimes I, \mathspace SWAP.\]
+
+    The symmetry group that has this representation is the parity group $\mathbb{Z}_2$, and the representation we took is $R\left(e\right) = I$ and $R\left(a\right) = SWAP$. In the computation basis, we know that: 
+    \[SWAP = \begin{pmatrix} 1 &  &  &  \\  & 0 & 1 &  \\  & 1 & 0 &  \\  &  &  & 1 \end{pmatrix}.\]
+
+    As explained before, SWAP is diagonalised in the Bell basis $\left(\ket{\psi^+}, \ket{\psi^-}, \ket{\phi^+}, \ket{\phi^-}\right)$.
+    \[SWAP = \begin{pmatrix} 1 &  &  &  \\  & 1 &  &  \\  &  & 1 &  \\  &  &  & -1 \end{pmatrix}.\]
+
+    We consider again $R_1\left(g\right) = 1$ to be the trivial representation, and $R_2\left(e\right) = 1$ and $R_2\left(a\right) = -1$ to be the sign representation. Therefore, in the Bell basis, we get: 
+    \[R\left(g\right) = \begin{pmatrix} R_1\left(g\right) &  &  &  \\  & R_1\left(g\right) &  &  \\  &  & R_1\left(g\right) &  \\  &  &  & R_2\left(g\right) \end{pmatrix} = R_1\left(g\right) \oplus R_1\left(g\right) \oplus R_1\left(g\right) \oplus R_2\left(g\right).\]
+    
+    We notice that $R_1$ is equivalent to $R_1$ (trivially), but $R_1$ and $R_2$ are not equivalent. This yields: 
+    \[H = \begin{pmatrix} \lambda_1 & H_{12} & H_{13} & 0 \\ H_{21} & \lambda_2 & H_{23} & 0 \\ H_{31} & H_{32} & \lambda_3 & 0 \\ 0 & 0 & 0 & \lambda_4 \end{pmatrix}.\]
+
+    \begin{subparag}{Remark}
+        This is not a huge result as is, but if we were considering a more complex system this would have been a huge help. 
+    \end{subparag}
+\end{parag}
+
+\end{document}

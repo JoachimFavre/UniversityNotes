@@ -1,0 +1,106 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-11 at 10:18:02.
+
+\usepackage{../../style}
+
+\title{Quantum physics 2}
+\author{Joachim Favre}
+\date{Lundi 11 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2024-11-11}{Dodgy bit of Physicist math}{
+\begin{itemize}[left=0pt]
+    \item Examples of application of the interaction picture to compute transition probabilities. 
+\end{itemize}
+    
+}
+
+\begin{parag}{Example 1}
+    Let $V$ be a constant operator. We consider a Hamiltonian of the form $H\left(t\right) = H_0 + V\left(t\right)$, where: 
+    \[V\left(t\right) = \begin{systemofequations} 0, & t < t_0, \\ V, & t > t_0. \end{systemofequations}\]
+
+    In other words, we turn on some constant potential at $t_0$. We consider $H_0 \ket{n} = E_n \ket{n}$ to be the eigendecomposition of $H_0$. We moreover suppose that we start at an eigenstate $i$ in the Schrödinger picture, $\ket{\phi_S\left(t_0\right)} = \ket{i}$. We are interested in the transition amplitude and transition probabilities: 
+    \[C_n\left(t\right) = \braket{n}{\phi_S\left(t\right)} = \bra{n} U_S\left(t, t_0\right) \ket{i}, \mathspace P_{i \to n}\left(t\right) = \left|\braket{n}{\phi_S\left(t\right)}\right|^2 = \left|C_n\left(t\right)\right|^2.\]
+    
+    Using the interaction picture, and the fact $\bra{n} H_0 = E_n \bra{n}$:
+    \[C_n\left(t\right) = \bra{n} U_S\left(t, t_0\right) \ket{i} = \bra{n} e^{-i H_0 \left(t- t_0\right)} U_I\left(t, t_0\right) \ket{i} = e^{-i E_n \left(t- t_0\right)} \bra{n} U_I\left(t, t_0\right) \ket{i}.\]
+    
+    Now, using the first order expansion of $U_I\left(t, t_0\right)$, and supposing $n \neq i$: 
+    \autoeq{\bra{n} U_I\left(t, t_0\right) \ket{i} = \braket{n}{i} -i \int_{t_0}^{t} dt_1 \bra{n} V_I\left(t_1, t_0\right) \ket{i}  = -i \int_{t_0}^{t} dt_1 \bra{n} e^{i H_0\left(t - t_0\right)} V\left(t_1, t_0\right) e^{-i H_0\left(t - t_0\right)} \ket{i} = -i \int_{t_0}^{t} dt_{1} e^{-i \left(E_n - E_i\right)\left(t - t_0\right)} \bra{n} V\left(t_1, t_0\right) \ket{i}.}
+
+    We also directly get that: 
+    \autoeq{P_{i \to n}\left(t\right) = \left|e^{-i E_n \left(t - t_0\right)} \bra{n} U_I\left(t, t_0\right) \ket{i}\right|^2 = \left|\bra{n} U_I\left(t, t_0\right) \ket{i}\right|^2 = \left|-i \int_{t_0}^{t} dt_1 e^{i \left(E_n - E_i\right)\left(t_1 - t_0\right)} \bra{n} V\left(t_1, t_0\right) \ket{i}\right|^2.}
+
+    Note that we have only used $V\left(t\right) = 0$ for all $t < t_0$ for now, and hence this is a general expression for the transition probability of any potential up we turn on $t_0$, up to the first order. We can now exploit the fact that $V\left(t\right) = V$ is in fact constant for $t \geq t_0$, to get our transition probability to simplify to: 
+    \autoeq{P_{i \to n}\left(t\right) = \left|\bra{n}V\ket{i} \int_{t_0}^{t} dt_1 e^{i \left(E_n - E_i\right)\left(t_1 - t_0\right)}\right|^2 = \left|\bra{n} V \ket{i} \frac{\exp\left(i \left(E_n - E_i\right) \left(t - t_0\right)\right) - 1}{E_n - E_i}\right|^2 = \left|\bra{n} V \ket{i}\right|^2 \frac{4}{\left(E_n - E_i\right)^2} \sin^2\left(\frac{\left(E_n - E_i\right)\left(t - t_0\right)}{2}\right).}
+    
+    We now exploit a ``dodgy bit of Physicist maths'': 
+    \[\lim_{t \to \infty} \frac{\sin^2\left(xt\right)}{x^2} = \pi t \delta\left(x\right).\]
+    The fact that there is a $t$ on the right hand side is very dodgy, and not at all formal. Intuitively, we have: 
+    \[\frac{\sin^2\left(xt\right)}{\left(xt\right)^2} \to \pi \delta\left(x\right) \iff \frac{\sin^2\left(xt\right)}{x^2 t} \to \pi \delta\left(x\right) \iff \frac{\sin^2\left(xt\right)}{x^2} \to \pi t \delta\left(x\right).\]
+
+    Another way to see this is that $\frac{\sin^2\left(xt\right)}{x^2}$ gets spikier and spikier as $t$ gets larger, so it gets well approximated by a constant times a Dirac delta. However, since $\frac{\sin^2\left(xt\right)}{x^2}$ integrates to $\pi \left|t\right|$ on $\mathbb{R}$, the constant must be $\pi t$.
+
+    So now, we get, supposing $t_0 = 0$ by simplicity: 
+    \[\lim_{t \to \infty} P_{i \to n}\left(t\right) = 4 \left|\bra{n} V \ket{i}\right|^2 \lim_{t \to \infty} \frac{1}{\omega^2} \sin^2\left(\frac{\omega t}{2}\right) = 2 \pi t \left|\bra{n} V \ket{i}\right|^2 \delta\left(E_n - E_i\right).\]
+
+    Note that if $n \neq i$, the probability of transition is $0$. This makes a lot of sense, by conservation of energy a state cannot just magically gain energy. Note that this probability can grow larger than $1$, but this is because we used only the first order. Insuring that $\left|E_1\right| \gg \left|E_2\right|$ requires $t$ to be sufficiently small for the distribution to be almost normalised. Considering higher orders would allow the approximation to be valid for a larger time $t$.
+
+    Moreover, it is sometimes easier to think as the transition probability rate is: 
+    \[\frac{\partial P_{i \to n}\left(t\right)}{\partial t} = 2 \pi \left|\bra{n} V \ket{i}\right|^2 \delta\left(E_n - E_i\right).\]
+
+    This shows that, as time passes, the probability to go to another state of same energy increases linearly. This is some form of \textit{Fermi's golden rule}.
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let $V$ be a constant operator. We consider a Hamiltonian of the form $H\left(t\right) = H_0 + V\left(t\right)$, where $V\left(t\right)$ is an oscillatory potential: 
+    \[V\left(t\right) = \begin{systemofequations} 0, & \text{if $t \leq t_0$}, \\ V e^{i \omega t} + V^{\dagger} e^{-i \omega t}, & \text{if $t > t_0$.} \end{systemofequations}\]
+
+    As found in the first example, since $V\left(t\right) = 0$ for $t \leq t_0$, when $n \neq m$: 
+    \[P_{i \to n}\left(t\right) = \left|-i \int_{t_0}^{t} dt_1 e^{i \left(E_n - E_1\right) t_1} \bra{n} V\left(t\right) \ket{i}\right|.\]
+    
+    Therefore, in our context, the transition probability is given by: 
+    \autoeq{P_{i \to n}\left(t\right) = \left|-i \int_{t_0}^{t} dt_1 e^{i \left(E_n - E_1\right) t_1} \left(\bra{n} V \ket{i} e^{i \omega t_1} + \bra{n} V^{\dagger} \ket{i} e^{-i \omega t_1}\right)\right| = \left|\frac{1 - \exp\left(i \left(E_n - E_i + \omega\right) t\right)}{E_n - E_i + \omega} \bra{n} V \ket{i} + \frac{1 - \exp\left(i \left(E_n - E_i - \omega\right)t\right)}{E_n - E_i - \omega} \bra{n} V^{\dagger} \ket{i}\right|^2.}
+    
+
+    We can now do some algebra to get a squared sine term, and take the limit as $t \to \infty$: 
+    \[\lim_{t \to \infty} P_{i \to n}\left(t\right) = 2 \pi t \left|\bra{n} \hat{V} \ket{i}\right|^2 \delta\left(E_n - E_i + \omega\right) + 2 \pi t \left|\bra{n} V^{\dagger} \ket{i}\right|^2 \delta\left(E_n - E_i - \omega\right).\]
+
+    This means that, for a large $t$, it will tend to transition to states of energy $E_n = E_i \pm \omega$.
+\end{parag}
+
+\begin{parag}{Example 3}
+    Let $V$ be a constant operator. We consider a Hamiltonian of the form $H\left(t\right) = H_0 + V\left(t\right)$, where:
+    \[V\left(t\right) = V e^{\epsilon t}.\]
+   
+    Note that $V\left(t_1\right)$ commutes with $V\left(t_2\right)$ for any $t_1, t_2$. We can therefore drop the time-ordering operator in the Dyson series. Therefore, up to the second order, we have: 
+    \[U_I\left(t, -\infty\right) = I - i \int_{-\infty}^{t} dt_1 V_I\left(t_1\right) - \frac{1}{2} \int_{-\infty}^{t} dt_1 \int_{-\infty}^{t} dt_2 V_I\left(t_1\right) V_I\left(t_2\right).\]
+
+    So, this means that, when $n \neq i$:  
+    \[P_{i \to n}\left(t\right) = \left|-i \int_{-\infty}^{t} dt_1 \bra{n} V_I\left(t_1\right) \ket{i} - \frac{1}{2} \int_{-\infty}^{t} dt_1 \int_{-\infty}^{t} dt_2 \bra{n} V_I\left(t_1\right) V_I\left(t_2\right) \ket{i}\right|^2.\]
+
+    We have two integrals to compute. The first one gives: 
+    \autoeq{I_1\left(t\right) = \int_{-\infty}^{t} \bra{n} V_I\left(t\right) \ket{i} = \bra{n} V \ket{i} \int_{-\infty}^{t} dt_1 e^{i \left[\left(E_n - E_1\right)t_1 - i \epsilon t_1\right]} = \bra{n} V \ket{i} \frac{\exp\left[i\left(\left(E_n - E_i\right) t_1 - i \epsilon t_1\right)\right]}{i \left(E_n - E_i - i \epsilon\right)} \eval_{-\infty}^{t}.}
+    
+    
+    So, if we were to ignore the second integral, we could do some algebra to get: 
+    \[P_{i \to n}\left(t\right) = \left|\bra{n} V \ket{i}\right|^2 \frac{e^{2 \epsilon t}}{\left(E_n - E_i\right)^2 + \epsilon^2},\] 
+    \[\frac{\partial P_{i \to n}\left(t\right)}{\partial t} = \left|\bra{n} V \ket{i}\right|^2 \frac{2 \epsilon e^{2 \epsilon t}}{\left(E_n - E_i\right)^2 + \epsilon^2}.\]
+    
+    For the second integral, we can compute: 
+    \autoeq{I_2\left(t\right) = \sum_{m} \int_{-\infty}^{t} dt_1 \int_{-\infty}^{t} dt_2 \bra{n} V_I\left(t_1\right) \ket{m}\bra{m} V_I\left(t_2\right) \ket{i} = \sum_{m} \bra{n} V \ket{m} \bra{m} V \ket{i} \int_{-\infty}^{t} dt_1 \int_{-\infty}^{t_1}  dt_2 e^{i \left(E_n - E_m - i\epsilon\right)t_1} e^{i \left(E_m - E_i - i \epsilon\right)t_2} = \sum_{m} \bra{n} V \ket{m} \bra{m} V \ket{i} \int_{-\infty}^{t} dt_1 e^{i\left(E_n - E_m - i \epsilon\right)t_1} \frac{e^{i \left(E_m - E_i - i \epsilon\right)t_2}}{E_m - E_i - i \epsilon} \eval_{-\infty}^{t_1} = - \sum_{m} \bra{n} V \ket{m} \bra{m} V \ket{i} \frac{e^{i \left(E_n - E_i - 2 i \epsilon\right)t}}{\left(E_m - E_i - i\epsilon\right) \left(E_n - E_i - 2i\epsilon\right)}.}
+    
+    Considering that $\epsilon \approx 2\epsilon$ in the limit of small $\epsilon$, we get: 
+    \[P_{i \to n}\left(t\right) = \left|\bra{n} V \ket{i} + \sum_{m} \frac{\bra{n} V \ket{m}\bra{m} V \ket{i}}{E_m - E_i - i \epsilon}\right|^2 \frac{e^{- 2 \epsilon t}}{\left(E_n - E_i\right)^2 + \epsilon}. \]
+
+    This is very similar to what we obtained when we considered a single order, except that we have some more sum in the absolute value. A way to understand this new terms is as some form of virtual transition: we go from $i$ to some other $m$, then from $m$ to $n$. Intuitively, this means that, for higher order terms, we will have more virtual energy levels.
+\end{parag}
+
+\end{document}
+

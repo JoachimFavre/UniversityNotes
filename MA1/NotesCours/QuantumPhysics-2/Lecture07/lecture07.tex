@@ -1,0 +1,248 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2024-11-04 at 10:17:19.
+
+\usepackage{../../style}
+
+\title{Quantum physics 2}
+\author{Joachim Favre}
+\date{Lundi 04 novembre 2024}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2024-11-04}{Penpineappleapplepen}{
+\begin{itemize}[left=0pt]
+    \item Proof of the degenerate perturbation theory first order results.
+    \item Application to the Stark effect.
+    \item Proof of the Dyson series.
+    \item Definition of the interaction picture, and proof of its evolution laws.
+\end{itemize}
+}
+
+\subsection{Degenerate perturbation theory}
+
+\begin{parag}{Theorem: Degenerate perturbation theory}
+    Let $H = H_0 + \lambda V$ be some Hamiltonian, with $\lambda \geq 0$. We moreover note $H_0 \ket{\phi_n} = \epsilon_n \ket{\phi_n}$ and $H \ket{\psi_n} = E_n \ket{\psi_n}$ to be their eigenvalues and eigenvectors. We suppose that $\epsilon_n$ and $\ket{\phi_n}$ are known, and our goal is to compute $E_n$ and $\ket{\psi_n}$.
+
+    We suppose that for the $n$\Th energy eigenstate of $H_0$, there is an $N$-fold degeneracy, i.e.: 
+    \[H_0 \ket{\phi_{n_i}} = \epsilon_n \ket{\phi_{n_i}}, \mathspace i \in \left\{1, \ldots, N\right\},\]
+    where $\epsilon_n$ is the same for all $i$.
+
+    We furthermore suppose that $\ket{\phi_n}$ is approximately $\psi_n$, but with some correction terms $\ket{\psi_n^{\left(i\right)}}$ and $E^{\left(n\right)}$:
+    \[\ket{\psi_n} =  \sum_{j} c_j \ket{\phi_{n_j}} + \lambda \ket{\psi_n^{\left(1\right)}} + \lambda^2 \ket{\psi_n^2} + \ldots, \mathspace E_n = \epsilon_n + \lambda E_n^{\left(1\right)} + \lambda^2 E_n^{\left(2\right)} + \ldots\]
+    
+    We define a sub-matrix of $V$, which we call $V' \in \mathbb{C}^{N \times N}$, so that: 
+    \[V_{ij}' = \bra{\phi_{n_i}} V' \ket{\phi_{n_j}} = \bra{\phi_{n_i}} V \ket{\phi_{n_j}}\]
+
+    Then, $E_n^{\left(1\right)}$ and $\ket{\psi_n^{\left(0\right)}} = \sum_{j} c_j \ket{\phi_{n_j}}$ respect the following eigenvalue-eigenvector problem: 
+    \[V' \bvec{c} = E_n^{\left(1\right)} \bvec{c}.\]
+    
+    \begin{subparag}{Proof}
+        As mentioned in the hypotheses, our Ansatz is:
+        \[\ket{\psi_n} = \sum_{j} c_j \ket{\phi_{n_j}} + \lambda \ket{\psi_n^{\left(1\right)}} + \lambda^2 \ket{\psi_n^{\left(2\right)}} + \ldots,\]
+        \[E_n = \epsilon_n + \lambda E_n^{\left(1\right)} + \lambda^2 E_n^{\left(2\right)} + \ldots.\]
+
+        It is very similar to the non-degenerate case, except that it also takes into account that all $\ket{\phi_{n_j}}$ have the same energy $\epsilon_n$. Just like for the non-degenerate pertubation theory, we take an eigenstate $\left(H_0 + \lambda V\right) \ket{\psi_n} = E_n \ket{\psi_n}$, and equate the orders. The first order of $\lambda$ yields: 
+        \[\sum_{j} c_j V \ket{\phi_{n_j}} + H_0 \ket{\psi_n^{\left(1\right)}} = \epsilon_n \ket{\psi_n^{\left(1\right)}} + E_n^{\left(1\right)} \sum_{j} c_j \ket{\phi_{n_j}}.\]
+
+        Multiplying both sides by $\bra{\phi_{n_i}}$, we get, using the facts that $\bra{\phi_{n_i}} H_0 = \epsilon_n H_0$ and $\braket{\phi_{n_i}}{\phi_{n_j}} = \delta_{ij}$: 
+        \[\sum_{j} c_j \bra{\phi_{n_i}} V \ket{\phi_{n_j}} + \epsilon_n \braket{\phi_{n_i}}{\psi_n^{\left(1\right)}} = \epsilon_n \braket{\phi_{n_i}}{\psi_n^{\left(1\right)}} + E_n^{\left(1\right)} \sum_{j} c_j \delta_{ij}.\]
+
+        Cancelling out the $\epsilon_n \braket{\phi_{n_i}}{\psi_n^{\left(1\right)}}$ on both sides, and simplifying the sum, this becomes:
+        \[\sum_{j} V_{ij} c_j = E_n^{\left(1\right)} c_i \implies V' \bvec{c} = E_n^{\left(1\right)} \bvec{c},\]
+        where we recognised our sub-matrix $V'$.
+         
+        We identify an eigenvalue equation, which gives us the \nth{0} order correction to the eigenstate $\bvec{c}$, and the \nth{1} order correction to the energy $E_n^{\left(1\right)}$. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Stark effect}
+    We consider the stark effect, i.e. the splitting of the degeneracy of one-electron atoms (such as Hydrogen atoms) in a uniform electric field pointing in the $z$ direction. The Hamiltonian is given by: 
+    \[H = \frac{p_x^2 + p_y^2 + p_z^2}{2m} - \frac{e^2}{4 \pi \epsilon_0 r} \underbrace{- e \mathcal{E} z}_{= V} = H_0 + V.\]
+    
+    Let us consider the energy level $n = 2$. Notice that $H_0$ is a central potential Hamiltonian. As seen in Quantum physics 1, $H_0$ has eigenstate $\ket{n, \ell, m}$ where $n$ is the energy, $\ell$ is the total angular momentum, and $m$ is the angular moment in the $z$ direction. For $n = 2$, we have all the following states that have the same energy: 
+    \[\ket{200}, \mathspace \ket{2,1,-1}, \mathspace \ket{210}, \mathspace \ket{211}.\]
+
+    The $V$ we want to diagonalise is: 
+    \[V = \begin{pmatrix} \bra{200}V \ket{200} & \bra{200}V \ket{210} & \bra{200} V \ket{211} & \bra{200} V \ket{2, 1, -1} \\ \bra{210} V \ket{200} & \bra{210} V \ket{210} & \bra{210} V \ket{211} & \bra{210} V \ket{2, 1, -1} \\ \bra{211} V \ket{200} & \bra{211} V \ket{210} & \bra{211} V \ket{211} & \bra{211} V \ket{2, 1, -1} \\ \bra{2, 1, -1} V \ket{200} & \bra{2, 1, -1} V \ket{210} & \bra{2, 1, -1} V \ket{211} & \bra{2, 1, -1} V \ket{2, 1, -1} \end{pmatrix} .\]
+
+    Let us compute a coefficient in this matrix: 
+    \[V_{imi'm'} = \bra{2im} V \ket{2i'm'} = -e \mathcal{E} \iiint u_{im}^* \underbrace{r \cos\left(\theta\right)}_{= z} u_{i' m'} \underbrace{r^2 \sin\left(\theta\right)}_{= \left|\det J\right|} d \theta d \phi dr.\]
+
+    Recalling the analysis from Quantum physics 1, we have, taking $a_0$ as the Bohr radius: 
+    \[u_{00} \propto \left(1 - \frac{r}{2 a_0}\right) \exp\left(-\frac{r}{2 a_0}\right), \mathspace u_{10} \propto r \cos\left(\theta\right) \exp\left(-\frac{r}{2 a_0}\right),\] 
+    \[u_{11} \propto r \sin\left(\theta\right) \exp\left(i \phi\right) \exp\left(-\frac{r}{2 a_0}\right), \mathspace u_{1, -1} \propto r \sin\left(\theta\right) \exp\left(-i \phi\right) \exp\left(-\frac{r}{2 a_0}\right).\]
+
+    We notice that all the diagonal terms are 0, since we always have an odd function in $\theta$ (since all $u_{ij}$ are either odd or even in $\theta$, they are squared and multiplied by an odd function in $\theta$), and any term containing $u_{11}$ or $u_{1, -1}$ is 0 since $\exp\left(ik \phi\right)$ integrates to 0. Therefore, $V$ is of the form: 
+    \[V = \begin{pmatrix} 0 & \alpha & 0 & 0 \\ \alpha & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \end{pmatrix}, \mathspace \text{where } \alpha = - 3 e \mathcal{E} a_0.\]
+    
+    We directly notice that it is block diagonal, with the top-left corner being $\alpha\cdot \sigma_X$. Therefore, its eigenvalues are $\alpha$, $-\alpha$, $0$ and $0$, with eigenstates being respectively: 
+    \[\frac{1}{\sqrt{2}} \begin{pmatrix} 1 \\ 1 \\ 0 \\ 0 \end{pmatrix}, \mathspace \frac{1}{\sqrt{2}} \begin{pmatrix} 1 \\ -1 \\ 0 \\ 0 \end{pmatrix}, \mathspace \begin{pmatrix} 0 \\ 0 \\ 1 \\ 0 \end{pmatrix}, \mathspace \begin{pmatrix} 0 \\ 0 \\ 0 \\ 1 \end{pmatrix}.\]
+    
+    This shows the Stark effect: states that all have the same energy level under $H_0$ split into states that have three different energy level. 
+\end{parag}
+
+\subsection{Dyson series}
+
+\begin{parag}{Definition: Time-ordering operator}
+    Let $H_1\left(t\right), \ldots, H_n\left(t\right)$ be operators depending on time.
+    
+    We define the \important{time ordering operator} $T$ so that:
+    \[T\left[H\left(t_1\right) H\left(t_2\right) \cdots H\left(t_n\right)\right] = H\left(t_{i_1}\right) H\left(t_{i_2}\right) \cdots H\left(t_{i_n}\right)\]
+    where $t_{i_1} \geq t_{i_2} \geq \ldots \geq t_{i_n}$.
+
+    \begin{subparag}{Example}
+        For instance, if $t_2 > t_1$: 
+        \[T\left(H\left(t_2\right) H\left(t_1\right)\right) = T\left(H\left(t_1\right) H\left(t_2\right)\right) = H\left(t_2\right) H\left(t_1\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This can be defined more properly, in which case it is possible to show it is linear. In other words: 
+        \[T\left(\int H\left(t\right) dt\right) = \int T\left(H\left(t\right)\right) dt.\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Theorem: Dyson series}
+    Let $H\left(t\right)$ be a Hamiltonian depending on time.
+
+    The unitary $U\left(t, t_0\right)$ that solves $\ket{\psi\left(t\right)} = U\left(t, t_0\right) \ket{\psi\left(t_0\right)}$, where $\ket{\psi\left(t\right)}$ is subject to Schrödinger's equation (where we take $\hbar = 1$), is given by:
+    \autoeq{U\left(t, t_0\right) = T\left(\exp\left(-i \int_{t_0}^{t} dt_1 H\left(t_1\right)\right)\right) = I + \sum_{n=1}^{\infty} \left(-1\right)^n \frac{1}{n!} \int_{t_0}^{t} dt_1 \cdots \int_{t_0}^{t} dt_n T\left(H\left(t_1\right) \cdots H\left(t_n\right)\right).}
+
+    \begin{subparag}{Remark}
+        When $H\left(t\right) = H$ is time-independent, this simply reads: 
+        \[U\left(t, t_0\right) = T\left(\exp\left(-i H \int_{t_0}^{t} dt_1\right)\right) = \exp\left(-i H \left(t - t_0\right)\right),\]
+        as expected.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Schrödinger's equation for time-dependent Hamitlonians gives, leaving $\hbar = 1$: 
+        \[i \frac{\partial}{\partial t} \ket{\phi\left(t\right)} = H\left(t\right) \ket{\phi\left(t\right)}.\]
+
+        Let us feed the expression $\ket{\phi\left(t\right)} = U\left(t, t_0\right) \ket{\phi\left(t_0\right)}$ into Schrödinger's equation: 
+        \[i \frac{\partial}{\partial t} U\left(t, t_0\right) \ket{\phi\left(t_0\right)} = H\left(t\right) U\left(t, t_0\right) \ket{\phi\left(t_0\right)}.\]
+
+        Since it holds for any states, we get an equation for $U\left(t, t_0\right)$: 
+        \[i \frac{\partial }{\partial t} U\left(t, t_0\right) = H\left(t\right) U\left(t, t_0\right),\]
+        with the initial condition $U\left(t_0, t_0\right) = I$.
+        
+        Integrating both sides from $t_0$ to $t$, this yields: 
+        \autoeq{i \int_{t_0}^{t} dt_1 \frac{\partial }{\partial t_1} U\left(t_1, t_0\right) = \int_{t_0}^{t} dt_1 H\left(t_1\right) U\left(t_1, t_0\right) \iff i\left(U\left(t, t_0\right) - I\right) = \int_{t_0}^{t} dt_1 H\left(t\right) U\left(t_1, t_0\right) \iff U\left(t, t_0\right) = I - i \int_{t_0}^{t} dt_1 H\left(t_1\right) U\left(t_1, t_0\right).}
+
+        We can now again plug this formulation of $U\left(t, t_0\right)$ in the integral: 
+        \autoeq{U\left(t, t_0\right) = I  -i \int_{t_0}^{t} dt_1 H\left(t_1\right) \left(I - i \int_{t_0}^{t_1} dt_2 H\left(t_2\right) U\left(t_2, t_0\right)\right) = I - i \int_{t_0}^{t} dt_1 H\left(t_1\right) - i^2 \int_{t_0}^{t} dt_1 \int_{t_0}^{t_1} dt_2 H\left(t_1\right) H\left(t_2\right) U\left(t_2, t_0\right).}
+
+        Continuing to do this iteratively, we get, for any $m$: 
+        \autoeq[s]{U\left(t, t_0\right) = I + \sum_{n=1}^{m - 1} \left(-i\right)^{n} \int_{t_0}^{t} dt_1 \int_{t_0}^{t_1} dt_2 \cdots \int_{t_0}^{t_{n-1}} dt_n H\left(t_1\right) H\left(t_2\right) \cdots H\left(t_n\right) \fakeequal + \left(-i\right)^{m} \int_{t_0}^{t} dt_1 \int_{t_0}^{t_1} dt_2 \cdots \int_{t_0}^{t_{m-1}} dt_m H\left(t_1\right) H\left(t_2\right) \cdots H\left(t_m\right) U\left(t_m, t_0\right).}
+        
+        Notice that $U\left(t_m, t_0\right)$ only multiplies the last term in the sum. Since $t_0 \leq t_m \leq \ldots \leq t_1$ by definition of domain of integration, we notice that $\lim_{m \to \infty} t_m = t_0$. This means that, $\lim_{m \to \infty} U\left(t_m, t_0\right) = I$. So, taking $m \to \infty$, this gives us that: 
+        \autoeq[s]{U\left(t, t_0\right) = I + \sum_{n=1}^{\infty} \left(-i\right)^{n} \int_{t_0}^{t} dt_1 \int_{t_0}^{t_1} dt_2 \cdots \int_{t_0}^{t_{n-1}} dt_n H\left(t_1\right) H\left(t_2\right) \cdots H\left(t_n\right).}
+
+        Note that it is a pain how the limits of integration depend on the parameter we are integrating over. It would be much nicer if all limits where between $t_0$ and $t$. We consider one of the integrals in the sum by simplicity. When $n = 2$, we have: 
+        \[J_2 = \int_{t_0}^{t} dt_1 \int_{t_0}^{t_1} H\left(t_1\right) H\left(t_2\right).\]
+        
+        By definition of integrals, we notice $t_2 \in \left[t_0, t_1\right]$, and hence $t_2 \leq t_1$. Therefore: 
+        \[J_2 = \int_{t_0}^{t} dt_1 \int_{t_0}^{t_1} dt_2 T\left(H\left(t_1\right) H\left(t_2\right)\right).\]
+        
+        We can also change the order of integration in order to integrate on $t_2$ first, while being careful on the integral bounds:
+        \autoeq{J_2 = \int_{t_0}^{t} dt_2 \int_{t_2}^{t} dt_1 H\left(t_1\right)H\left(t_2\right) \over{=}{$t_1 \leftrightarrow t_2$}  \int_{t_0}^{t} dt_1 \int_{t_1}^{t} dt_2 H\left(t_2\right)H\left(t_1\right) = \int_{t_0}^{t} dt_1 \int_{t_1}^{t} dt_2 T\left(H\left(t_1\right) H\left(t_2\right)\right),}
+        where we switched the dummy variables $t_1$ and $t_2$.
+        
+        To summarise, we found two equivalent expressions for $J_2$: 
+        \autoeq{J_2 = \int_{t_0}^{t} dt_1 \int_{t_0}^{t_1} dt_2 T\left[H\left(t_1\right)H\left(t_2\right)\right] = \int_{t_0}^{t} dt_1 \int_{t_1}^{t} dt_2 T\left[H\left(t_1\right)H\left(t_2\right)\right].}
+
+        We can thus average those two expressions to get: 
+        \[J_2 = \frac{J_2 + J_2}{2} = \frac{1}{2} \int_{t_0}^{t} dt_1 \int_{t_0}^{t} dt_2 T\left(H\left(t_1\right) H\left(t_2\right)\right).\]
+        
+        It is possible to do this very generally, yielding: 
+        \[U\left(t, t_0\right) = I + \sum_{n=1}^{\infty} \left(-i\right)^n \frac{1}{n!} \int_{t_0}^{t} dt_1 \int_{t_0}^{t} dt_2 \cdots \int_{t_0}^{t} dt_n T\left[H\left(t_1\right) \cdots H\left(t_n\right)\right].\]
+        
+        We can finally use the fact that $T$ is linear, and the definition of the exponential: 
+        \autoeq{U\left(t, t_0\right) = T\left(I + \sum_{n=1}^{\infty} \left(-i\right)^n \frac{1}{n!} \int_{t_0}^{t} dt_1 \int_{t_0}^{t} dt_2 \cdots \int_{t_0}^{t} dt_n H\left(t_1\right) \cdots H\left(t_n\right)\right) = T\left(\sum_{n=0}^{\infty} \frac{\left(-i\right)^n}{n!} \left(\int_{t_0}^{t} dt_1 H\left(t_1\right)\right)^n\right) = T\left(\exp\left(-i \int_{t_0}^{t} dt_1 H\left(t_1\right)\right)\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    Alternatively to the Dyson series, when we want to find the unitary $U\left(t, t_0\right)$ corresponding to some time-dependent Hamiltonian $H\left(t\right)$, we can discretise it :
+    \[U\left(t, t_0\right) = \prod_{j} \exp\left(-i H\left(t_i\right) \delta t\right).\]
+    
+    The error depends on the difference between the continuous Hamiltonian and the discretised one: 
+    \[\left\|\int_{t_0}^{t} ds H\left(s\right) - \delta t \sum_{r=1}^{m_t} H\left(t_0 + r \delta t\right)\right\|^2,\]
+    for some operator norm.
+    
+    So, this is usable in some scenario, if the Hamiltonian does not oscillate too quickly. We will not use it in this class, but it is good to know that this less intimidating and more intuitive approach also exists and is also sometimes used in practice.
+\end{parag}
+
+\subsection[Interaction picture]{Interaction picture and time-dependent perturbation theory}
+
+\begin{parag}{Observation}
+    In Schrödinger's picture, the state evolves but the observable stays constant: 
+    \[i \frac{\partial }{\partial t} \ket{\phi_S\left(t\right)} = H\left(t\right) \ket{\phi_S\left(t\right)}, \mathspace O_S\left(t\right) = O_S.\]
+    
+    On the other hand, in Heisenberg's picture, the observable evolves but the state is constant: 
+    \[O_H\left(t\right) = U_S\left(t, t_0\right)^{\dagger} O_S U_S\left(t, t_0\right), \mathspace \ket{\phi_H\left(t\right)} = \ket{\phi_S\left(t_0\right)}.\]
+    
+    Those two pictures are equivalent, because we have equivalent expectation values: 
+    \[\bra{\phi_H\left(t\right)} O_H\left(t\right) \ket{\phi_H\left(t\right)} = \bra{\phi_H} U\left(t, t_0\right)^{\dagger} O_S \underbrace{U_S\left(t, t_0\right) \ket{\phi_H}}_{= \ket{\phi_S\left(t\right)}} = \bra{\phi_S\left(t\right)} O_S \ket{\phi_S\left(t\right)}.\]
+
+    We are interested in another approach, called the interaction picture, that merges Schrödinger's and Heisenberg's picture.
+\end{parag}
+
+\begin{parag}{Theorem: Interaction picture}
+    We suppose $H\left(t\right) = H_0 + V\left(t\right)$, where $H_0$ is treated in Heisenberg's style and $V\left(t\right)$ is treated in Schrödinger's style. In other words, we define operators and states to evolve as: 
+    \[O_I\left(t\right) = e^{i H_0\left(t- t_0\right)} O_S\left(t\right) e^{-i H_0\left(t- t_0\right)},\]
+    \[\ket{\phi_I\left(t\right)} = e^{i H_0\left(t - t_0\right)} \ket{\phi_S\left(t\right)} = e^{i H_0\left(t- t_0\right)} U_S\left(t, t_0\right) \ket{\phi_S\left(t_0\right)}.\]
+
+    This is equivalent to the Schrödinger's and Heisenberg's picture . Moreover, let us define $U_I\left(t, t_0\right)$ to be the evolution unitary, i.e. the operator so that $U_I\left(t, t_0\right) \ket{\phi_I\left(t_0\right)} = \ket{\phi_I\left(t\right)}$. Then:
+    \autoeq{U_I\left(t, t_0\right) = e^{i H_0 \left(t - t_0\right)} U_S\left(t, t_0\right) = T\left(\exp\left(-i \int_{t_0}^{t} dt_1 V_I\left(t_1\right)\right)\right) = I + \sum_{i=1}^{\infty} \frac{\left(-i\right)^n}{n!} \int_{t_0}^{t} dt_1 \cdots \int_{t_0}^{t} dt_n T\left(V_I\left(t_1\right) \cdots V_I\left(t_n\right)\right).}
+    where $V_I\left(t\right)$ is $V\left(t\right)$ in the interaction picture, i.e. $V_I\left(t\right) = e^{i H_0\left(t- t_0\right)} V\left(t\right) e^{-i H_0\left(t- t_0\right)}$.
+
+    \begin{subparag}{Intuition}
+        Intuitively, $O_I\left(t\right)$ evolves in the Heisenberg's picture under $H_0$, and $\ket{\phi_I\left(t\right)}$ evolves in a way that is similar to the Schrödinger's picture under $V\left(t\right)$. The idea in the definition of $\ket{\phi_I\left(t\right)}$ is that it we let it evolve in the Schrödinger picture under $H\left(t\right)$, and then cancel out the evolution under $H_0$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This allows to do time-independent perturbation theory (where the perturbation $V\left(t\right)$ depends on time) when we are able to compute the first few terms of this sum. For instance, up to the first order:
+        \[U_I\left(t, t_0\right) \approx I - i \int_{t_0}^{t} dt_1 V_I\left(t_1\right).\]
+
+        However, this also has other applications.
+    \end{subparag}
+    
+    \begin{subparag}{Proof equivalence}
+        We show that this is equivalent to Schrödinger's picture (which is equivalent to Heisenberg's picture) by showing that expected values are equal: 
+        \autoeq[s]{\bra{\phi_I\left(t\right)} O_I\left(t\right) \ket{\phi_I\left(t\right)} = \bra{\phi_S\left(t\right)} e^{-i H_0\left(t- t_0\right)} e^{i H_0\left(t - t_0\right)} O_S\left(t\right) e^{-i H_0 \left(t - t_0\right)} e^{i H_0 \left(t- t_0\right)}U_S\left(t, t_0\right) \ket{\phi_S\left(t_0\right)} = \bra{\phi_S\left(t\right)} O_S\left(t\right) \ket{\phi_S\left(t\right)},}
+        since $\exp\left(A\right)\exp\left(B\right) = \exp\left(A+B\right)$ when $\left[A, B\right] = 0$.
+    \end{subparag}
+
+    \begin{subparag}{Proof equality}
+        Recall taht we define: 
+        \[\ket{\phi_I\left(t\right)} = e^{i H_0\left(t - t_0\right)} U_S\left(t, t_0\right) \ket{\phi_S\left(t_0\right)}.\]
+
+        In particular, $\phi_I\left(t_0\right) = \ket{\phi_S\left(t_0\right)}$. Moreover, by definition, $\ket{\phi_I\left(t\right)} = U_I\left(t, t_0\right) \ket{\phi_I\left(t\right)}$. This tells us that:
+        \[U_I\left(t, t_0\right) = e^{i H_0 \left(t - t_0\right)} U_S\left(t, t_0\right).\]
+        
+
+        Therefore, by differentiating both sides:
+        \autoeq{\frac{\partial U_I}{\partial t} = e^{i H_0\left(t - t_0\right)} i H_0 U_S\left(t, t_0\right) - i e^{i H_0\left(t- t_0\right)} H\left(t\right) U_S\left(t, t_0\right) = -i e^{i H_0\left(t - t_0\right)} \underbrace{\left(H\left(t\right) - H_0\right)}_{= V} U_S\left(t, t_0\right) = -i e^{i H_0\left(t - t_0\right)} V e^{-i H_0\left(t- t_0\right)} e^{i H_0 \left(t- t_0\right)} U_S\left(t, t_0\right) = -i V_I\left(t\right) U_I\left(t, t_0\right).}
+
+        Recall however that Schrödinger's equation is: 
+        \[i \frac{\partial}{\partial t} U\left(t, t_0\right) = H'\left(t\right) U\left(t, t_0\right).\]
+
+        We therefore recognise that our equation is Schrödinger's equation with $H'\left(t\right) = V_I\left(t\right)$. This makes sense since, in the interaction picture, the observable evolves because of $H_0$ and the state evolves because of $V\left(t\right)$; we do expect the equation that governs the way our states evolve to be Schrödinger's equation of Hamiltonian $V\left(t\right)$ (in the interaction picture).
+
+        We can therefore use the Dyson series:
+        \autoeq{U_I\left(t, t_0\right) = T\left(\exp\left(-i \int_{t_0}^{t} dt_1 V_I\left(t_1\right)\right)\right) = I + \sum_{i=1}^{\infty} \frac{\left(-i\right)^n}{n!} \int_{t_0}^{t} dt_1 \cdots \int_{t_0}^{t} dt_n T\left(V_I\left(t_1\right) \cdots V_I\left(t_n\right)\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}
