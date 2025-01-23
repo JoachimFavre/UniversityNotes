@@ -30,8 +30,8 @@
     \[\sum_{i=1}^{n} c_i x_i \geq \sum_{j=1}^{m} b_j y_j.\]
 
     \begin{subparag}{Proof}
-        This is a one-liner, using the definition of primal and dual problem, i.e. that $b_j \leq \sum_{i=1}^{n} A_{ji} x_i$ for the solution to be primal feasible and $\sum_{j=1}^{m} A_{ji} y_i \leq c_i$ for the solution to be dual feasible:
-        \[\sum_{j=1}^{m} b_j y_j \leq \sum_{j=1}^{m} \left(\sum_{i=1}^{n} A_{ji} x_i \right) y_i = \sum_{i=1}^{n} \left(\sum_{j=1}^{m} A_{ji} y_i\right) x_i \leq \sum_{i=1}^{n} c_i x_i.\]
+        This is a one-liner, using the definition of primal and dual problem, i.e. that $b_j \leq \sum_{i=1}^{n} A_{ji} x_i$ for the solution to be primal feasible and $\sum_{j=1}^{m} A_{ji} y_j \leq c_i$ for the solution to be dual feasible:
+        \[\sum_{j=1}^{m} b_j y_j \leq \sum_{j=1}^{m} \left(\sum_{i=1}^{n} A_{ji} x_i \right) y_j = \sum_{i=1}^{n} \left(\sum_{j=1}^{m} A_{ji} y_j\right) x_i \leq \sum_{i=1}^{n} c_i x_i.\]
 
         \qed
     \end{subparag}
@@ -52,7 +52,7 @@
     Let $x$ be primal feasible and $y$ be dual feasible.
 
     $x$ and $y$ are both optimal if and only if we have, for all $i \in \left\{1, \ldots, n\right\}$ and $j \in \left\{1, \ldots, m\right\}$: 
-    \[\begin{systemofequations} \forall i \in \left\{1, \ldots, n\right\},\ x_i > 0 \implies c_i = \sum_{j} A_{ji} y_i,\\ y_j > 0 \implies b_j = \sum_{i} A_{ji} x_i. \end{systemofequations}\]
+    \[\begin{systemofequations} x_i > 0 \implies c_i = \sum_{j} A_{ji} y_j,\\ y_j > 0 \implies b_j = \sum_{i} A_{ji} x_i. \end{systemofequations}\]
     
     \begin{subparag}{Intuition}
         This means that the constraints related to non-zero variables are tight. 
@@ -66,19 +66,19 @@
         Just like in the proof of weak optimality, for the solution to be dual feasible: 
         \[\sum_{j=1}^{m} b_j y_j \leq \sum_{j=1}^{m} \left(\sum_{i=1}^{n} A_{ji} x_i \right) y_j = \sum_{i=1}^{n} \left(\sum_{j=1}^{m} A_{ji} y_j\right) x_i \leq \sum_{i=1}^{n} c_i x_i.\]
         
-        Now, since the solution is optimal, the left hand side is in fact equal to the right hand side by strong duality. But then, all inequalities must be equalities. Now, for the second inequality to indeed be an equality, we necessarily need (we get a direct contradiction otherwise, since $\sum_{j=1}^{m} A_{ji} y_i \leq c_i$): 
+        Now, since the solution is optimal, the left hand side is in fact equal to the right hand side by strong duality. But then, all inequalities must be equalities. Now, for the second inequality to indeed be an equality, we necessarily need (we get a direct contradiction otherwise, since $\sum_{j=1}^{m} A_{ji} y_j \leq c_i$): 
         \[\left(\sum_{j=1}^{m} A_{ji}y_j\right) x_i = c_i x_i.\]
 
         If $x_i > 0$, we can divide by $x_i$, telling us that, as expected:
-        \[\sum_{j=1}^{m} A_{ji} y_i = c_i.\]
+        \[\sum_{j=1}^{m} A_{ji} y_j = c_i.\]
 
         We can do the exact same reasoning for the first inequality, to get that, for all $j$: 
-        \[y_i > 0 \implies b_j = \sum_{i} A_{ji} x_i.\]
+        \[y_j > 0 \implies b_j = \sum_{i} A_{ji} x_i.\]
     \end{subparag}
 
     \begin{subparag}{Proof $\impliedby$}
         Again, we have:
-        \[\sum_{j=1}^{m} b_j y_j \leq \sum_{j=1}^{m} \left(\sum_{i=1}^{n} A_{ji} x_i \right) y_i = \sum_{i=1}^{n} \left(\sum_{j=1}^{m} A_{ji} y_i\right) x_i \leq \sum_{i=1}^{n} c_i x_i.\]
+        \[\sum_{j=1}^{m} b_j y_j \leq \sum_{j=1}^{m} \left(\sum_{i=1}^{n} A_{ji} x_i \right) y_j = \sum_{i=1}^{n} \left(\sum_{j=1}^{m} A_{ji} y_j\right) x_i \leq \sum_{i=1}^{n} c_i x_i.\]
 
         The hypothesis implies that the left hand side and the right hand side are equal. By weak duality, the two solutions cannot get any better, they are therefore optimal.
 
@@ -100,7 +100,7 @@
 
     Moreover, the dual problem is: 
     \begin{linearprogram}{Maximise}{$\sum_{a \in A} u_a + \sum_{b \in B} v_b$}
-        $u_a + v_b \leq c\left(e\right)$, & $\forall e \in \left\{a, b\right\} \in E$.
+        $u_a + v_b \leq c\left(e\right)$, & $\forall e = \left\{a, b\right\} \in E$.
     \end{linearprogram}
     
     \begin{subparag}{Remark}

@@ -96,7 +96,7 @@
     Moreover, computing $ABx = A\left(Bx\right)$ takes $\Theta\left(n\right)$ time: multiplying a matrix by a vector takes linear time.
 
     \begin{subparag}{Implication}
-        It thus suffices to try a random vector $x \in S^n$, and look whether $Cx \over{=}{?}  ABx$, to be able to know with high probability if $C = AB$, in $\Theta\left(n\right)$ time. This is much better than the $\Theta\left(n^2\right)$ algorithm that computes the matrix product $A\cdot B$.
+        It thus suffices to try a random vector $x \in S^n$, and look whether $Cx \over{=}{?}  ABx$, to be able to know with high probability if $C = AB$, in $\Theta\left(n\right)$ time. This is much better than the $\Theta\left(n^3\right)$ algorithm that computes the matrix product $A\cdot B$.
     \end{subparag}
 
     \begin{subparag}{Proof}
@@ -113,7 +113,7 @@
         \autoeq{p = \prob\left(AB x = Cx\right) \leq \prob\left(a_i x = c_i x\right) = \prob\left(\left(a_{ij} - c_{ij}\right)x_j = \sum_{k \neq j} \left(c_{ik} - a_{ik}\right)x_k\right).}
 
         We exploit the principle of deferred decision, i.e. we only reveal the randomness of the relevant variables, $x_k$ with $k \neq j$. More formally, using the law of total probability:
-        \autoeq{p \leq \prob_{x_1, \ldots, x_n}\left(\left(a_ij - c_{ij}\right)x_j = \sum_{k \neq j}  \left(c_{ij} - a_{ik}\right)x_k\right) = \sum_{k\neq j} \sum_{x_k^* \in S} \prob\left(x_k = x_k^*\right) \fakeequal \cdot \prob_{x_j} \left(\left(a_{ij} - c_{ij}\right)x_j = \sum_{k\neq j} \left(c_{ik} - a_{ik}\right) x_k \suchthat x_k = x_k^*, \forall k \neq j\right).}
+        \autoeq{p \leq \prob_{x_1, \ldots, x_n}\left(\left(a_{ij} - c_{ij}\right)x_j = \sum_{k \neq j}  \left(c_{ij} - a_{ik}\right)x_k\right) = \sum_{k\neq j} \sum_{x_k^* \in S} \prob\left(x_k = x_k^*\right) \fakeequal \cdot \prob_{x_j} \left(\left(a_{ij} - c_{ij}\right)x_j = \sum_{k\neq j} \left(c_{ik} - a_{ik}\right) x_k \suchthat x_k = x_k^*, \forall k \neq j\right).}
 
         Now, given a fixed $\alpha = \sum_{k\neq j} \left(c_{ik} - a_{ik}\right) x_k$, there exists at most one $x_j \in S$ so that $\left(a_{ij} - c_{ij}\right) x_j = \alpha$ since $S \subseteq \mathbb{R}$ is a subset of a field, and $a_{ij} - c_{ij} \neq 0$ is invertible. Thus: 
         \[\prob_{x_j \in S}\left(\left(a_{ij} - c_{ij}\right)x_j = \alpha \suchthat \alpha\right) \leq \frac{1}{\left|S\right|}.\]

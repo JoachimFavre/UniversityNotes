@@ -27,7 +27,7 @@
 \begin{parag}{Bertrand's postulate}
     Let $n > 1$ be an integer.
 
-    Then, there exists a primer number $p$ so that: 
+    Then, there exists a prime number $p$ so that: 
     \[n \leq p < 2n.\]
 \end{parag}
 
@@ -242,9 +242,12 @@
     In other words, with high probability, no bin will receive more than $\Omega\left(\frac{\ln\left(n\right)}{\ln\left(\ln\left(n\right)\right)}\right)$ balls.
 
     \begin{subparag}{Proof}
-        Let $i, k$  be arbitrary. We want to compute the probability that the $i$\Th bin gets at least $k$ balls. Since there are $n$ balls in total, there are $\binom{n}{k}$ ways to put $k$ balls in the bin; each having probability $\frac{1}{n^k}$ to appear. The probability that bin $i$ gets $k$ balls is the union of all these events so, by the union bound, it is less than or equal to the sum of their probabilities:
-        \[\prob\left(\text{bin $i$ gets at least $k$ balls}\right) \leq \prob\left(\text{bin $i$ gets $k$ balls}\right) \leq \binom{n}{k} \frac{1}{n^k}.\]
+        Let $i, k$  be arbitrary. We want to compute the probability that the $i$\Th bin gets at least $k$ balls; let us call this event $A$. Moreover, given some set $S \subseteq \left\{1, \ldots, n\right\}$, we consider the event $B_S$ that all elements of $S$ are in the $i$\Th bin. We notice that: 
+        \[A = \bigcup_{\substack{S \subseteq \left\{1, \ldots, n\right\} \\ \left|S\right| = k}} B_S.\]
 
+        There are $\binom{n}{k}$ subsets $S$ of $\left\{1, \ldots, n\right\}$ that have cardinality $\left|S\right| = k$. Since $\prob\left(B_S\right) = \frac{1}{n^{\left|S\right|}}$ this yields, by the union bound:
+        \autoeq{\prob\left(\text{bin $i$ gets at least $k$ balls}\right) = \prob\left(A\right) \leq \sum_{\substack{S \subseteq \left\{1, \ldots, n\right\} \\ \left|S\right| = k}} \prob\left(B_S\right) = \frac{1}{n^k}\sum_{\substack{S \subseteq \left\{1, \ldots, n\right\} \\ \left|S\right| = k}} = \binom{n}{k} \frac{1}{n^k}.}
+        
         We can simplify this to:
         \autoeq{\prob\left(\text{bin $i$ gets at least $k$ balls}\right) \leq \binom{n}{k} \frac{1}{n^k} = \frac{n\left(n-1\right) \cdots \left(n - k + 1\right)}{k!} \cdot \frac{1}{n^k} = \frac{1}{k!}\cdot \frac{n}{n}\cdot \frac{n-1}{n}\cdots \frac{n-k+1}{n} \leq \frac{1}{k!}.}
         
