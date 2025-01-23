@@ -134,7 +134,7 @@
 
     To construct it, we do:
     \begin{enumerate}
-        \item Let $\ell \in C\cdot n^{\alpha} \ln\left(n\right)$ for some $C > 0$ and $k = \frac{\ln\left(1/n\right)}{\ln\left(p_2\right)}$.
+        \item Let $\ell \in C\cdot n^{\alpha} \ln\left(n\right)$ for some $C > 0$ and $k = \frac{\ln\left(1/n\right)}{\ln\left(p_2\right)} = \frac{\ln\left(n\right)}{\ln\left(1 / p_2\right)}$.
         \item Choose $k\cdot \ell$ hash functions $h_{11}, h_{12}, \ldots, h_{1k}, h_{21}, \ldots \ldots, h_{\ell k}$ independently from the LSH family. 
         \item Construct $\ell$ hash tables, one for each hash function $f_i = \left[h_{i1}, \ldots, h_{ik}\right]$.
         \item Hash each data point $p_j$ in each table.
@@ -146,7 +146,7 @@
         \item Loop over all points $p$ that hashes to the same value, $f_i\left(p\right) = f_i\left(q\right)$. If $p$ is such that $\text{dist}\left(p, q\right) \leq c\cdot r$, return $p$.
     \end{enumerate}
 
-    When there exists some $p_i$ so that $\text{dist}\left(p_i, q\right) \leq r$, this algorithm returns a valid $p_j$ with probability at least $1 - \frac{1}{n^C}$. It runs in expected time $\Theta\left(\ell\cdot d\right) = \Theta\left(n^{\alpha} \ln\left(n\right) d\right)$. Its space is $\Theta\left(n \ell\right) = \Theta\left(n^{1 + \alpha} \ln\left(n\right)\right)$. 
+    When there exists some $p_i$ so that $\text{dist}\left(p_i, q\right) \leq r$, this algorithm returns a valid $p_j$ with probability at least $1 - \frac{1}{n^C}$. It runs in expected time $O\left(\ell\cdot \left(k + d\right)\right) = O\left(n^{\alpha} \ln\left(n\right) \left(\frac{\ln\left(n\right)}{\ln\left(1/p_2\right)} + d\right)\right)$. Its space is $O\left(n \ell k\right) = O\left(n^{1 + \alpha} \frac{\ln\left(n\right)^2}{\ln\left(1/p_2\right)}\right)$. 
 
     \begin{subparag}{Intuition}
         The idea to make some ``super-hash functions'' $f_i = \left[h_{i1}, \ldots, h_{ik}\right]$ that combine many hash functions is here to decrease the number of bad collisions from $p_2$ to $p_2^k = \frac{1}{n}$. Then, the idea to run multiple hash tables at the same time is here to increase the success probability.
@@ -182,9 +182,10 @@
 
         We have just proven the success probability. We finally just need to consider its time and space complexity.
 
-        The expected running time on a query is the expected number of bad collisions. The probability of a bad collision is at most $p_2^k = \frac{1}{n}$ by the first step so, since we have $n$ elements, each table has 1 bad collision on expectation. Since there are $\ell = n^{\alpha} \ln\left(n\right)$ hash tables and computing a distance takes time $\Theta\left(d\right)$, we get a running time of $\Theta\left(n^{\alpha} \ln\left(n\right)d\right)$.
+        The expected running time on a query consists in, for each of the $\ell$ table, compute first the $k$ hash functions, and then compute the distance (in time $O\left(d\right)$) with all the $c$ elements that hash to the same value. Since the probability of a bad collision is at most $p_2^k = \frac{1}{n}$ by the first step, and since we have $n$ elements, each table has only $c = 1$ bad collision on expectation. This yields a time complexity of: 
+        \[O\left(\ell \left(k + dc\right)\right) = O\left(\ell \left(k + d\right)\right) = O\left(n^{\alpha} \ln\left(n\right)\left(\frac{\ln\left(n\right)}{\ln\left(1/p_2\right)} + d\right)\right)\]
 
-        For the space complexity, we have $\ell$ hash tables, each containing $n$ elements, giving $\Theta\left(n \ell\right) = \Theta\left(n^{1 + \alpha} \ln\left(n\right)\right)$.
+        For the space complexity, we have $\ell$ hash tables, each containing $n$ elements of size $k$, giving $\Theta\left(n \ell k\right) = \Theta\left(n^{1 + \alpha} \ln\left(n\right) \frac{\ln\left(n\right)}{\ln\left(1/p_2\right)}\right)$.
 
         \qed
     \end{subparag}
