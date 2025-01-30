@@ -5,27 +5,24 @@ from typing import Dict
 from typing_extensions import override
 from lib.course import Course
 from lib.file_loader import FileLoader
-from lib.lecture import Lecture
-from lib.lecture_loader import LectureLoader
+from lib.latex_folder import LatexFolder
 from lib.precompiled_files import AbstractPrecompiledFiles
 from lib.precompilers.generic_precompiler import GenericPrecompiler
 from lib.style import Style
 
 class PrecompiledSummary(AbstractPrecompiledFiles):
-    def __init__(self, course: Course, precompiled_latex: str, original_lecture: Lecture):
-        #TODO: rename Lecture
+    def __init__(self, course: Course, precompiled_latex: str, original_folder: LatexFolder):
         self.course = course
         self.precompiled_latex = precompiled_latex
-        self.original_lecture = original_lecture
+        self.original_folder = original_folder
     
     @staticmethod
     def from_course(course: Course, tag: str|None) -> "PrecompiledSummary":
-        loader = LectureLoader(course.root_path)
-        lecture = loader.to_lecture()
+        folder = LatexFolder.from_path(course.root_path)
         is_english = course.loader.config().english
 
         config = course.loader.config()
-        latex = GenericPrecompiler.full_precompile(lecture.latex, is_english, None, lecture.latex_path)
+        latex = GenericPrecompiler.full_precompile(folder.latex, is_english, None, folder.latex_path)
 
         # Apply template
         template = FileLoader.summary_template()
@@ -46,7 +43,7 @@ class PrecompiledSummary(AbstractPrecompiledFiles):
         }
         latex = FileLoader.replace_in_template(template, replacement)
 
-        return PrecompiledSummary(course, latex, lecture)
+        return PrecompiledSummary(course, latex, folder)
         
     @override
     def write(self, tag: str|None, root_path: Path):
@@ -57,6 +54,6 @@ class PrecompiledSummary(AbstractPrecompiledFiles):
 
         with open(root_path/"main.tex", "w+", encoding="utf-8") as file:
             file.write(self.precompiled_latex)
-        for asset_path in self.original_lecture.assets_path:
+        for asset_path in self.original_folder.assets_path:
             shutil.copy(asset_path, root_path/asset_path.name)
     

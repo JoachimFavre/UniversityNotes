@@ -3,12 +3,12 @@ from pathlib import Path
 from typing import Dict, List
 from typing_extensions import override
 
+from lib.latex_folder import LatexFolder
 from lib.logger import Logger
 
 from .abstract_precompiled_files import AbstractPrecompiledFiles
 from .precompiled_lecture import PrecompiledLecture
 from lib.course import Course
-from lib.lecture_loader import LectureLoader
 from lib.style import Style
 
 
@@ -38,9 +38,8 @@ class PrecompiledLectureGroup(AbstractPrecompiledFiles):
         result: List[PrecompiledLecture] = []
         is_english = course.loader.config().english
         for path in course.loader.lecture_paths():
-            loader = LectureLoader(path)
-            lecture = loader.to_lecture()
-            precompiled = PrecompiledLecture.from_lecture(lecture, is_english)
+            lecture = LatexFolder.from_path(path)
+            precompiled = PrecompiledLecture.from_latex_folder(lecture, is_english)
             result.append(precompiled)
         return PrecompiledLectureGroup(course, result, take_n_first)
 

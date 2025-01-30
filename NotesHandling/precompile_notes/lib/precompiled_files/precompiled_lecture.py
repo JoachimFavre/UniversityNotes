@@ -2,22 +2,22 @@ from functools import total_ordering
 from pathlib import Path
 import shutil
 
-from lib.lecture import Lecture
+from lib.latex_folder import LatexFolder
 from lib.lecture_info import LectureInfo
 from lib.precompilers.lecture_precompiler import LecturePrecompiler
 
 @total_ordering
 class PrecompiledLecture:
-    def __init__(self, precompiled_latex: str, lecture_info: LectureInfo|None, original_lecture: Lecture):
+    def __init__(self, precompiled_latex: str, lecture_info: LectureInfo|None, original_lecture: LatexFolder):
         self.precompiled_latex = precompiled_latex
         self.lecture_info = lecture_info
         self.original_lecture = original_lecture
     
     @staticmethod
-    def from_lecture(lecture: Lecture, is_english: bool) -> "PrecompiledLecture":
-        lecture_info = LectureInfo.load_from_latex(lecture.latex)
-        latex = LecturePrecompiler.full_precompile(lecture.latex, is_english, lecture_info, lecture.path, lecture.assets_path)
-        return PrecompiledLecture(latex, lecture_info, lecture)
+    def from_latex_folder(folder: LatexFolder, is_english: bool) -> "PrecompiledLecture":
+        lecture_info = LectureInfo.load_from_latex(folder.latex)
+        latex = LecturePrecompiler.full_precompile(folder.latex, is_english, lecture_info, folder.path, folder.assets_path)
+        return PrecompiledLecture(latex, lecture_info, folder)
     
     def write(self, root_path: Path):
         lecture_dir = self.original_lecture.latex_path.parents[0].name  # a/b/c/d.txt becomes c
