@@ -18,7 +18,7 @@ class PrecompiledSummary(AbstractPrecompiledFiles):
     
     @staticmethod
     def from_course(course: Course, tag: str|None) -> "PrecompiledSummary":
-        folder = LatexFolder.from_path(course.root_path)
+        folder = LatexFolder(course.root_path)
         is_english = course.loader.config().english
 
         config = course.loader.config()

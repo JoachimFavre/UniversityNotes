@@ -38,7 +38,7 @@ class PrecompiledLectureGroup(AbstractPrecompiledFiles):
         result: List[PrecompiledLecture] = []
         is_english = course.loader.config().english
         for path in course.loader.lecture_paths():
-            lecture = LatexFolder.from_path(path)
+            lecture = LatexFolder(path)
             precompiled = PrecompiledLecture.from_latex_folder(lecture, is_english)
             result.append(precompiled)
         return PrecompiledLectureGroup(course, result, take_n_first)
