@@ -12,12 +12,12 @@ class Date:
     @property
     def full_name(self):
         # Ex: Computer science bachelor --- Semester 1 \\ Autumn 2021
-        return fr"{self.diploma} --- {self.semester_word} {self.semester} \\ {self.season} {self.year}"
+        return fr"{self.diploma} --- {self.semester_word.capitalize()} {self.semester} \\ {self.season} {self.year}"
 
     @property
     def short_name(self):
         # Ex: Autumn semester 2021
-        return f"{self.season} {self.semester_word} {self.year}"
+        return f"{self.season} {self.semester_word.lower()} {self.year}"
 
 class BilingualDate:
     def __init__(self, diploma: Tuple[str, str], semester: int, season: Tuple[str, str], year: int):
