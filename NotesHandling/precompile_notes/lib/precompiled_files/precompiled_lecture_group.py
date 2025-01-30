@@ -3,13 +3,13 @@ from pathlib import Path
 from typing import Dict, List
 from typing_extensions import override
 
-from lib.latex_folder import LatexFolder
+from lib.loaded_files.latex_folder import LatexFolder
 from lib.logger import Logger
 
 from .abstract_precompiled_files import AbstractPrecompiledFiles
 from .precompiled_lecture import PrecompiledLecture
 from lib.course import Course
-from lib.style import Style
+from lib.loaded_files.style import Style
 
 
 class PrecompiledLectureGroup(AbstractPrecompiledFiles):

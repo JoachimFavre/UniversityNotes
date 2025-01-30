@@ -5,10 +5,10 @@ from typing import Dict
 from typing_extensions import override
 from lib.course import Course
 from lib.file_loader import FileLoader
-from lib.latex_folder import LatexFolder
+from lib.loaded_files.latex_folder import LatexFolder
 from lib.precompiled_files import AbstractPrecompiledFiles
 from lib.precompilers.generic_precompiler import GenericPrecompiler
-from lib.style import Style
+from lib.loaded_files.style import Style
 
 class PrecompiledSummary(AbstractPrecompiledFiles):
     def __init__(self, course: Course, precompiled_latex: str, original_folder: LatexFolder):

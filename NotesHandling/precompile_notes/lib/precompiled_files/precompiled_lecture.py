@@ -2,8 +2,8 @@ from functools import total_ordering
 from pathlib import Path
 import shutil
 
-from lib.latex_folder import LatexFolder
-from lib.lecture_info import LectureInfo
+from lib.loaded_files.latex_folder import LatexFolder
+from lib.loaded_files.lecture_info import LectureInfo
 from lib.precompilers.lecture_precompiler import LecturePrecompiler
 
 @total_ordering

@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import Dict, List
 
-from lib.course_config import CourseConfig
+from lib.loaded_files.course_config import CourseConfig
 from lib.logger import Logger
 
 CONFIG_PATH = Path("config.json")

@@ -4,7 +4,7 @@ from typing import List
 from pathlib import Path
 
 from lib.file_loader import FileLoader
-from lib.lecture_info import LectureInfo
+from lib.loaded_files.lecture_info import LectureInfo
 from lib.logger import Logger
 from lib.parser import Parser
 from lib.precompilers.generic_precompiler import GenericPrecompiler
