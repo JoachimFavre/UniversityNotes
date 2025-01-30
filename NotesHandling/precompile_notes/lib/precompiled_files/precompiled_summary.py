@@ -6,6 +6,7 @@ from typing_extensions import override
 from lib.course import Course
 from lib.file_loader import FileLoader
 from lib.loaded_files.latex_folder import LatexFolder
+from lib.logger import Logger
 from lib.precompiled_files import AbstractPrecompiledFiles
 from lib.precompilers.generic_precompiler import GenericPrecompiler
 from lib.loaded_files.style import Style
@@ -47,7 +48,7 @@ class PrecompiledSummary(AbstractPrecompiledFiles):
         
     @override
     def write(self, tag: str|None, root_path: Path):
-        print("WARNING: tag is not used yet")
+        Logger.warn("Tag is not used yet", path=None)
 
         style = Style.from_course(self.course)
         style.write(root_path)
