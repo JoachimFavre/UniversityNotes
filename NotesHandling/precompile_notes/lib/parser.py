@@ -43,7 +43,7 @@ class Parser:
     @staticmethod
     def extract_all_cmd_content(string: str, cmd: str) -> List[str]:
         matches = re.finditer(rf"\\{cmd}{{", string)
-        result = []
+        result: List[str] = []
         for match in matches:
             result.append(Parser.block_content(string, match.end(0) - 1))
         return result

@@ -47,7 +47,7 @@ class PrecompiledLectureGroup(AbstractPrecompiledFiles):
     def _summary_by_lecture_content(self) -> str:
         loader = self.course.loader
         template = loader.summary_by_lecture_template()
-        result = []
+        result: List[str] = []
         for lecture in self.lectures:
             if lecture.lecture_info is None:
                 continue
@@ -61,7 +61,7 @@ class PrecompiledLectureGroup(AbstractPrecompiledFiles):
         return '\n\n'.join(result)
     
     def _content(self) -> str:
-        result = []
+        result: List[str] = []
         for lecture in self.lectures:
             # TODO: Extract this and the other occurence to a function
             full_path = lecture.original_lecture.latex_path

@@ -23,7 +23,7 @@ class FileLoader:
         self.root_path = root_path
     
     def lecture_paths(self) -> List[Path]:
-        result = []
+        result: List[Path] = []
         for path in self.root_path.glob("*/"):
             if not path.is_dir():
                 continue

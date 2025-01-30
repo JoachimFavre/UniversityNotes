@@ -3,7 +3,6 @@ import re
 from typing import List
 from pathlib import Path
 
-from lib.course_config import CourseConfig
 from lib.file_loader import FileLoader
 from lib.lecture_info import LectureInfo
 from lib.logger import Logger

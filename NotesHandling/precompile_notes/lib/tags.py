@@ -1,9 +1,9 @@
 from enum import Enum
 
 class Tags(Enum):
-    NONE = (None, "temp-2")
-    PRINTED = ("printed", "Printed")
-    OFFICIAL = ("official", "Official")
+    NONE = (None, "outputs/temp-3")
+    PRINTED = ("printed", "outputs/Printed")
+    OFFICIAL = ("official", "outputs/Official")
 
     def __init__(self, tag: str|None, output_dir: str):
         self.tag = tag

@@ -1,10 +1,8 @@
 import re
 
-from typing import Callable, List
 from pathlib import Path
+from typing import List
 
-from lib.course_config import CourseConfig
-from lib.file_loader import FileLoader
 from lib.lecture_info import LectureInfo
 from lib.logger import Logger
 from lib.parser import Parser
@@ -15,7 +13,7 @@ class GenericPrecompiler:
         self.latex = latex
     
     @staticmethod
-    def full_precompile(latex, is_english: bool, lecture_info: LectureInfo|None, latex_path: Path) -> str:
+    def full_precompile(latex: str, is_english: bool, lecture_info: LectureInfo|None, latex_path: Path) -> str:
         return GenericPrecompiler(latex)\
             .remove_before_begin_document()\
             .remove_after_end_document()\
@@ -49,7 +47,7 @@ class GenericPrecompiler:
         # We do not want to correct spaces in code environments.
         # We suppose that those \begin and \end are alone
         # on their line.
-        result = []
+        result: List[str] = []
         in_no_touch_env = 0
         no_touch_envs = ["lstlisting", "filecontents*"]
         for line in self.latex.split("\n"):

@@ -13,7 +13,7 @@ class LectureLoader:
         return list(self.path.glob("*.tex"))
 
     def asset_files_paths(self) -> List[Path]:
-        result = []
+        result: List[Path] = []
         for ext in FILE_EXTENSIONS:
             result.extend(list(self.path.glob(f"*.{ext}")))
 

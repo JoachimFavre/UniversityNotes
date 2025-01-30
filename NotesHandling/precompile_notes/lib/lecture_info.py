@@ -1,5 +1,3 @@
-import re
-
 from lib.parser import Parser
 
 class LectureInfo:
