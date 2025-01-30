@@ -7,14 +7,17 @@ class CourseConfig:
         self.professor = str(json["professor"])
         self.english = bool(json["english"])
 
+        self.reorderings: List[List[int]] = []
         if "reorderings" in json:
             reorderings = json["reorderings"]
             if not isinstance(reorderings, List):
                 raise Exception("Reorderings must be a list.")
-            self.reorderings: List[List[int]] = reorderings
+            self.reorderings = reorderings
 
             for reordering in self.reorderings:
                 if len(reordering) != 2:
                     raise Exception("Reorderings must have exactly 2 elements: they switch pairs of consecutive elements.")
-        else:
-            self.reorderings = []
+        
+        self.comment: str|None = None
+        if "comment" in json:
+            self.comment = str(json["comment"])

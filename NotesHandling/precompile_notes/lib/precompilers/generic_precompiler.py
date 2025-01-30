@@ -1,6 +1,6 @@
 import re
 
-from typing import List
+from typing import Callable, List
 from pathlib import Path
 
 from lib.course_config import CourseConfig
@@ -14,13 +14,31 @@ class GenericPrecompiler:
     def __init__(self, latex: str):
         self.latex = latex
     
-    def full_precompile(self, is_english: bool, lecture_info: LectureInfo|None, latex_path: Path) -> str:
-        return self\
+    @staticmethod
+    def full_precompile(latex, is_english: bool, lecture_info: LectureInfo|None, latex_path: Path) -> str:
+        return GenericPrecompiler(latex)\
+            .remove_before_begin_document()\
+            .remove_after_end_document()\
+            .remove_make_title()\
             .correct_spaces(is_english)\
             .strip()\
-            .apply_template()\
             .make_warnings(lecture_info, latex_path)\
             .latex
+
+    def remove_before_begin_document(self) -> "GenericPrecompiler":
+        match = re.search(r"\\begin{document}", self.latex)
+        if match is None:
+            raise Exception(r"No \begin{document} found in the latex file.")
+        return GenericPrecompiler(self.latex[match.end(0):])
+    
+    def remove_after_end_document(self) -> "GenericPrecompiler":
+        match = re.search(r"\\end{document}", self.latex)
+        if match is None:
+            raise Exception(r"No \end{document} found in the latex file.")
+        return GenericPrecompiler(self.latex[:match.start(0)])
+
+    def remove_make_title(self) -> "GenericPrecompiler":
+        return GenericPrecompiler(self.latex.replace(r"\maketitle", ""))
 
     def merge_consecutive_empty_slides(self) -> "GenericPrecompiler":
         if self.latex.count(r"\begin{slidecomment}") > 0:
@@ -61,14 +79,6 @@ class GenericPrecompiler:
     
     def strip(self) -> "GenericPrecompiler":
         return GenericPrecompiler(self.latex.strip())
-    
-    def apply_template(self) -> "GenericPrecompiler":
-        template = FileLoader.latex_template()
-        replacement = {
-            'content': self.latex,
-        }
-        latex = FileLoader.replace_in_template(template, replacement)
-        return GenericPrecompiler(latex)
 
     def make_warnings(self, lecture_info: LectureInfo|None, file_path: Path) -> "GenericPrecompiler":
         latex = self.latex
@@ -88,7 +98,7 @@ class GenericPrecompiler:
         if latex.count(r"\unexpanded") > 0:
             Logger.warn("An unexpanded was kept.", file_path)
 
-        if latex.count("bmatrix") > 0:
+        if latex.count("bmatrix") - latex.count("submatrix") > 0:
             Logger.warn("A bmatrix was left.", file_path)
 
         if latex.count("eq:label") > 0:

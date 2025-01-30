@@ -1,35 +1,26 @@
 from pathlib import Path
-from typing import List
 
+from lib.date import BilingualDate, Date
 from lib.file_loader import FileLoader
 
 # Those are hardcoded, for easier modularity
-BACHELOR_SEMESTERS_EN = [
-    r"Computer science bachelor --- Semester 1 \\ Autumn 2021",
-    r"Computer science bachelor --- Semester 2 \\ Spring 2022",
-    r"Computer science bachelor --- Semester 3 \\ Autumn 2022",
-    r"Computer science bachelor --- Semester 4 \\ Spring 2023",
-    r"Computer science bachelor --- Semester 5 \\ Autumn 2023",
-    r"Computer science bachelor --- Semester 6 \\ Spring 2024",
+BACHELOR = ("Computer science bachelor", "Bachelor d'informatique")
+MASTER = ("Quantum science and engineering master", "Master de science et ingénierie quantiques")
+AUTUMN = ("Autumn", "Automne")
+SPRING = ("Spring", "Printemps")
+
+BACHELOR_SEMESTERS = [
+    BilingualDate(BACHELOR, 1, AUTUMN, 2021),
+    BilingualDate(BACHELOR, 2, SPRING, 2022),
+    BilingualDate(BACHELOR, 3, AUTUMN, 2022),
+    BilingualDate(BACHELOR, 4, SPRING, 2023),
+    BilingualDate(BACHELOR, 5, AUTUMN, 2023),
+    BilingualDate(BACHELOR, 6, SPRING, 2024),
 ]
 
-BACHELOR_SEMESTERS_FR = [
-    r"Bachelor d'informatique --- Semestre 1 \\ Automne 2021",
-    r"Bachelor d'informatique --- Semestre 2 \\ Printemps 2022",
-    r"Bachelor d'informatique --- Semestre 3 \\ Automne 2022",
-    r"Bachelor d'informatique --- Semestre 4 \\ Printemps 2023",
-    r"Bachelor d'informatique --- Semestre 5 \\ Automne 2023",
-    r"Bachelor d'informatique --- Semestre 6 \\ Printemps 2024",
+MASTER_SEMESTERS = [
+    BilingualDate(MASTER, 1, AUTUMN, 2024),
 ]
-
-MASTER_SEMESTERS_EN: List[str] = [
-    r"Quantum science and engineering master --- Semester 1 \\ Autumn 2024",
-]
-
-MASTER_SEMESTERS_FR: List[str] = [
-    r"Master de science et ingénierie quantiques --- Semestre 1 \\ Automne 2024",
-]
-
 
 class Course:
     def __init__(self, *, is_bachelor: bool, semester: int, name: str, is_summary: bool = False):
@@ -48,26 +39,19 @@ class Course:
 
     @property
     def root_path(self) -> Path:
-        diploma = "BA" if self.is_bachelor else "MA"
         return Path(f"{self.semester_name}/NotesCours/{self.name}") 
     
     @property
     def loader(self) -> FileLoader:
         return FileLoader(self.root_path)
     
-    def date(self, english: bool) -> str:
+    def date(self, english: bool) -> Date:
         if self.is_bachelor:
-            if english:
-                names = BACHELOR_SEMESTERS_EN
-            else:
-                names = BACHELOR_SEMESTERS_FR
+            dates = BACHELOR_SEMESTERS
         else:
-            if english:
-                names = MASTER_SEMESTERS_EN
-            else:
-                names = MASTER_SEMESTERS_FR
+            dates = MASTER_SEMESTERS
 
         semester = self.semester - 1
-        if semester >= len(names):
-            raise Exception(f"Semester name is not defined for {self}.")
-        return names[semester]
+        if semester >= len(dates):
+            raise Exception(f"Semester date is not defined for {self}.")
+        return dates[semester].date(english)

@@ -24,6 +24,7 @@ from pathlib import Path
 import time
 from typing import List
 
+from lib.precompiled_files.precompiled_summary import PrecompiledSummary
 from lib.tags import Tags
 from lib.course import Course
 from lib.logger import Logger
@@ -64,6 +65,8 @@ courses: List[Course] = [
     
     # MA1
     #Course(is_bachelor=False, semester=1, name="Algorithms-2"),
+    #Course(is_bachelor=False, semester=1, name="ComputationalComplexity"),
+    Course(is_bachelor=False, semester=1, name="QuantumPhysics-2"),
 ]
 
 tag = Tags.NONE
@@ -72,6 +75,7 @@ beginning_time = time.time()
 
 for course in courses:
     Logger.info("#"*10 + f" Handling {course.name}... " + "#"*10)
+    #lecture_group = PrecompiledSummary.from_course(course, tag.tag)
     lecture_group = PrecompiledLectureGroup.from_course(course)
     lecture_group.make_code_zip_and_compile(tag.tag, Path("NotesHandling/precompile_notes")/tag.output_dir)
     #lecture_group.make_code_zip(tag.tag, Path("NotesHandling/precompile_notes")/tag.output_dir)

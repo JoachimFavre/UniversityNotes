@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import Dict, List
 from typing_extensions import override
 
+from lib.logger import Logger
+
 from .abstract_precompiled_files import AbstractPrecompiledFiles
 from .precompiled_lecture import PrecompiledLecture
 from lib.course import Course
@@ -11,7 +13,7 @@ from lib.style import Style
 
 
 class PrecompiledLectureGroup(AbstractPrecompiledFiles):
-    def __init__(self, course: Course, lectures: List[PrecompiledLecture]):
+    def __init__(self, course: Course, lectures: List[PrecompiledLecture], take_n_first: int|None = None):
         _verify_not_summary(course)
 
         super().__init__(course)
@@ -24,9 +26,13 @@ class PrecompiledLectureGroup(AbstractPrecompiledFiles):
             a = a - 1 + n_lectures_without_info
             b = b - 1 + n_lectures_without_info
             self.lectures[a], self.lectures[b] = self.lectures[b], self.lectures[a]
+        
+        if take_n_first is not None:
+            Logger.warn(f"Taking only the first {take_n_first} lectures.", course.root_path)
+            self.lectures = self.lectures[:take_n_first]
     
     @staticmethod
-    def from_course(course: Course) -> "PrecompiledLectureGroup":
+    def from_course(course: Course, take_n_first: int|None = None) -> "PrecompiledLectureGroup":
         _verify_not_summary(course)
 
         result: List[PrecompiledLecture] = []
@@ -36,7 +42,7 @@ class PrecompiledLectureGroup(AbstractPrecompiledFiles):
             lecture = loader.to_lecture()
             precompiled = PrecompiledLecture.from_lecture(lecture, is_english)
             result.append(precompiled)
-        return PrecompiledLectureGroup(course, result)
+        return PrecompiledLectureGroup(course, result, take_n_first)
 
     def _summary_by_lecture_content(self) -> str:
         loader = self.course.loader
@@ -81,7 +87,7 @@ class PrecompiledLectureGroup(AbstractPrecompiledFiles):
             'by': 'by' if english else 'par',
             'title': config.title,
             'professor': config.professor,
-            'date': self.course.date(english),
+            'date': self.course.date(english).full_name,
             'foreword': loader.foreword(english),
             'tag': f"--{tag}" if tag is not None else "",
             'hommage': loader.hommage(english),

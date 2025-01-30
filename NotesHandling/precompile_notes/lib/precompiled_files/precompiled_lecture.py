@@ -16,7 +16,7 @@ class PrecompiledLecture:
     @staticmethod
     def from_lecture(lecture: Lecture, is_english: bool) -> "PrecompiledLecture":
         lecture_info = LectureInfo.load_from_latex(lecture.latex)
-        latex = LecturePrecompiler(lecture.latex).full_precompile(is_english, lecture_info, lecture.path, lecture.assets_path)
+        latex = LecturePrecompiler.full_precompile(lecture.latex, is_english, lecture_info, lecture.path, lecture.assets_path)
         return PrecompiledLecture(latex, lecture_info, lecture)
     
     def write(self, root_path: Path):

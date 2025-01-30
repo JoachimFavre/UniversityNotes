@@ -15,33 +15,16 @@ class LecturePrecompiler:
     def __init__(self, latex: str):
         self.latex = latex
     
-    def full_precompile(self, is_english: bool, lecture_info: LectureInfo|None, latex_path: Path, asset_paths: List[Path]) -> "str":
-        result = self\
-            .remove_before_begin_document()\
-            .remove_after_end_document()\
-            .remove_make_title()\
+    @staticmethod
+    def full_precompile(latex: str, is_english: bool, lecture_info: LectureInfo|None, latex_path: Path, asset_paths: List[Path]) -> "str":
+        latex = GenericPrecompiler.full_precompile(latex, is_english, lecture_info, latex_path)
+        return LecturePrecompiler(latex)\
             .increase_section_level()\
             .increase_asset_name_level(asset_paths)\
             .replace_chapter_after_lecture_command()\
             .remove_summary_in_lecture_command()\
             .latex
-        return GenericPrecompiler(result).full_precompile(is_english, lecture_info, latex_path)
 
-    def remove_before_begin_document(self) -> "LecturePrecompiler":
-        match = re.search(r"\\begin{document}", self.latex)
-        if match is None:
-            raise Exception(r"No \begin{document} found in the latex file.")
-        return LecturePrecompiler(self.latex[match.end(0):])
-    
-    def remove_after_end_document(self) -> "LecturePrecompiler":
-        match = re.search(r"\\end{document}", self.latex)
-        if match is None:
-            raise Exception(r"No \end{document} found in the latex file.")
-        return LecturePrecompiler(self.latex[:match.start(0)])
-
-    def remove_make_title(self) -> "LecturePrecompiler":
-        return LecturePrecompiler(self.latex.replace(r"\maketitle", ""))
-    
     def increase_section_level(self) -> "LecturePrecompiler":
         latex = self.latex
         latex = latex.replace("\\section", "\\chapter")
@@ -91,3 +74,14 @@ class LecturePrecompiler:
         latex = self.latex
         latex = latex[:summary_open_bracket + 1] + latex[summary_close_bracket:]
         return LecturePrecompiler(latex)
+
+    def apply_template(self) -> "GenericPrecompiler":
+        # Stip latex before applying the template
+        latex = self.latex.strip()
+
+        template = FileLoader.lecture_template()
+        replacement = {
+            'content': latex,
+        }
+        latex = FileLoader.replace_in_template(template, replacement)
+        return GenericPrecompiler(latex)

@@ -9,7 +9,8 @@ CONFIG_PATH = Path("config.json")
 
 TEMPLATES_PATH = Path("NotesHandling/precompile_notes/templates")
 MAIN_TEMPLATE_PATH = TEMPLATES_PATH / "main_template.tex"
-LATEX_TEMPLATE_PATH = TEMPLATES_PATH / "latex_template.tex"
+LECTURE_TEMPLATE_PATH = TEMPLATES_PATH / "lecture_template.tex"
+SUMMARY_TEMPLATE_PATH = TEMPLATES_PATH / "summary_template.tex"
 SUMMARY_BY_LECTURE_TEMPLATE_PATH = TEMPLATES_PATH / "summary_by_lecture_template.tex"
 FOREWORD_EN_PATH = TEMPLATES_PATH / "foreword_en.tex"
 FOREWORD_FR_PATH = TEMPLATES_PATH / "foreword_fr.tex"
@@ -57,8 +58,12 @@ class FileLoader:
         return FileLoader._load_template(MAIN_TEMPLATE_PATH)
     
     @staticmethod
-    def latex_template() -> str:
-        return FileLoader._load_template(LATEX_TEMPLATE_PATH)
+    def lecture_template() -> str:
+        return FileLoader._load_template(LECTURE_TEMPLATE_PATH)
+    
+    @staticmethod
+    def summary_template() -> str:
+        return FileLoader._load_template(SUMMARY_TEMPLATE_PATH)
     
     @staticmethod
     def summary_by_lecture_template() -> str:

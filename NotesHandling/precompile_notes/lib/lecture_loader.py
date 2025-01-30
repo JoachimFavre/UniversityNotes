@@ -27,7 +27,7 @@ class LectureLoader:
     def to_lecture(self) -> Lecture:
         latex_files_paths = self.latex_files_paths()
         if len(latex_files_paths) != 1:
-            raise Exception(f"Multiple tex files found in the same lecture, path {self.path}.")
+            raise Exception(f"Multiple tex files found in the same lecture, path {self.path}: {latex_files_paths}")
         
         with open(latex_files_paths[0], 'r', encoding='utf-8') as file:
             latex = file.read()
