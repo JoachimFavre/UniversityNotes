@@ -1,7 +1,7 @@
 from enum import Enum
 
 class Tags(Enum):
-    NONE = (None, "outputs/temp-3")
+    NONE = (None, "outputs/NoTag")
     PRINTED = ("printed", "outputs/Printed")
     OFFICIAL = ("official", "outputs/Official")
 
