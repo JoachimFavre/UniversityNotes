@@ -76,10 +76,12 @@ beginning_time = time.time()
 
 for course in courses:
     Logger.info("#"*10 + f" Handling {course.name}... " + "#"*10)
-    #lecture_group = PrecompiledSummary.from_course(course, tag.tag)
-    lecture_group = PrecompiledLectureGroup.from_course(course)
-    lecture_group.make_code_zip_and_compile(tag.tag, Path("NotesHandling/precompile_notes")/tag.output_dir)
-    #lecture_group.make_code_zip(tag.tag, Path("NotesHandling/precompile_notes")/tag.output_dir)
+    if course.is_summary:
+        precompiled_files = PrecompiledSummary.from_course(course, tag.tag)
+    else:
+        precompiled_files = PrecompiledLectureGroup.from_course(course)
+    precompiled_files.make_code_zip_and_compile(tag.tag, Path("NotesHandling/precompile_notes")/tag.output_dir)
+    #precompiled_files.make_code_zip(tag.tag, Path("NotesHandling/precompile_notes")/tag.output_dir)
 
     Logger.newline()
 
