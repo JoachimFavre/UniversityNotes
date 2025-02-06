@@ -35,40 +35,40 @@ from lib.precompiled_files import PrecompiledLectureGroup
 
 courses: List[Course] = [
     # BA1
-    CourseList.ANALYSE_1,
-    CourseList.ALGEBRE_LINEAIRE,
-    CourseList.AICC_1,
+    #CourseList.ANALYSE_1,
+    #CourseList.ALGEBRE_LINEAIRE,
+    #CourseList.AICC_1,
 
     # BA2
-    CourseList.AICC_2,
-    CourseList.ANALYSE_2,
-    CourseList.ANALYSE_2_METHODES_DE_DEMONSTRATION,
-    CourseList.DIGITAL_SYSTEM_DESIGN,
+    #CourseList.AICC_2,
+    #CourseList.ANALYSE_2,
+    #CourseList.ANALYSE_2_METHODES_DE_DEMONSTRATION,
+    #CourseList.DIGITAL_SYSTEM_DESIGN,
     
     # BA3
-    CourseList.ALGORITHMS,
-    CourseList.ANALYSE_3,
-    CourseList.COMPUTER_NETWORKS,
-    CourseList.INTRO_TO_MACHINE_LEARNING_BA3,
-    CourseList.NUMERICAL_METHODS,
+    #CourseList.ALGORITHMS,
+    #CourseList.ANALYSE_3,
+    #CourseList.COMPUTER_NETWORKS,
+    #CourseList.INTRO_TO_MACHINE_LEARNING_BA3,
+    #CourseList.NUMERICAL_METHODS,
     
     # BA4
-    CourseList.ANALYSE_4,
-    CourseList.PROBABILITY_AND_STATISTICS,
-    CourseList.SIGNALS_AND_SYSTEMS,
-    CourseList.THEORY_OF_COMPUTATION,
+    #CourseList.ANALYSE_4,
+    #CourseList.PROBABILITY_AND_STATISTICS,
+    #CourseList.SIGNALS_AND_SYSTEMS,
+    #CourseList.THEORY_OF_COMPUTATION,
     
     # BA5
-    CourseList.ALGEBRA,
-    CourseList.INTRO_TO_QUANTUM_INFORMATION_PROCESSING,
+    #CourseList.ALGEBRA,
+    #CourseList.INTRO_TO_QUANTUM_INFORMATION_PROCESSING,
     
     # BA6
-    CourseList.INTRO_TO_QUANTUM_COMPUTATION,
+    #CourseList.INTRO_TO_QUANTUM_COMPUTATION,
     
     # MA1
-    CourseList.ALGORITHMS_2,
-    CourseList.COMPUTATIONAL_COMPLEXITY,
-    CourseList.QUANTUM_PHYSICS_2,
+    #CourseList.ALGORITHMS_2,
+    #CourseList.COMPUTATIONAL_COMPLEXITY,
+    #CourseList.QUANTUM_PHYSICS_2,
 ]
 
 tag = Tags.NONE
