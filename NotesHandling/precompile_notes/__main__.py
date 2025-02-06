@@ -20,6 +20,7 @@ Things to verify before printing a document:
 Created on Wed Jul 10 23:34:40 2024
 @author: Joachim Favre
 """
+import os
 from pathlib import Path
 import time
 from typing import List
@@ -72,6 +73,12 @@ courses: List[Course] = [
 
 tag = Tags.NONE
 
+# Set the correct active path
+module_path = Path(__file__).resolve().parent
+correct_active_path = module_path.parent.parent
+os.chdir(correct_active_path)
+
+# Compile each course
 beginning_time = time.time()
 
 for course in courses:
