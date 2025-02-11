@@ -201,9 +201,31 @@
         Putting both affirmations together, this theorem states that:
         \[1 - \lambda_2 = \frac{1}{d} \sum_{i, j \in E} \left(v_2\left(i\right) - v_2\left(j\right)\right)^2 = \min_{x \perp \bvec{1}} \dfrac{1}{d}\cdot \dfrac{\sum_{\left\{i, j\right\} \in E} \left(x\left(i\right) - x\left(j\right)\right)^2}{x^T x}.\]
 
-        In other words, $v_2$ assigns a value to each vertex, in such a way that the average stretch $\left(v_2\left(i\right) - v_2\left(j\right)\right)^2$ is minimised. However, something that minimises the average stretch is a form of min-cut.  This gives more intuition on why the spectral graph partitioning algorithm works.
+        In other words, $v_2$ assigns a value to each vertex, in such a way that the average stretch $\left(v_2\left(i\right) - v_2\left(j\right)\right)^2$ is minimised, while being prevented to set all vertices to the same value by being orthogonal to $\bvec{1}$. However, something that minimises the average stretch is a form of min-cut.  This gives more intuition on why the spectral graph partitioning algorithm works.
 
-        This lemma is the moreover the main intuition on why the following theorem should hold, by a similar reasoning.
+        This lemma is moreover the main intuition on why the following theorem should hold, by a similar reasoning.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        We can use a generalisation of this lemma to draw graphs. Consider for instance the following hexagonal topology with a small hole:
+        \svghere[0.45]{HexagonalLatticeWithHole_Grid.svg} 
+
+        We can take two arbitrary eigenvectors $v_k$ and $v_{\ell}$, and draw each vertex $i \in V$ at position $\left(v_k\left(i\right), v_{\ell}\left(j\right)\right)$. For $\left(k, \ell\right) = \left(2, 3\right)$ and $\left(k, \ell\right) = \left(n-1, n\right)$, we respectively have:
+        \begin{center}
+        \begin{minipage}{0.45\textwidth}
+        \svghere{HexagonalLatticeWithHole_SmallEigs.svg}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.45\textwidth}
+        \svghere{HexagonalLatticeWithHole_LargeEigs.svg}
+        \end{minipage}
+        \end{center}
+        
+        This makes sense: as stated by the lemma, $v_2$ is the vector orthogonal to $v_1 = \bvec{1}$ that minimises the average stretch $\left(v_2\left(i\right) - v_2\left(j\right)\right)^2$. Similarly $v_3$ is the vector orthogonal to both $v_1$ and $v_2$ that minimises the average stretch. On the other hand, $v_{n-1}$ is the vector that minimises the average stretch while being orthogonal to $v_1, \ldots, v_{n-2}$. In other words, it is one of the vector that maximises the average stretch. Similarly, $v_n$ is the vector that maximises the average stretch.
+
+        So, on the first drawing, the average stretch is very small in both the $x$ and $y$ direction, giving this pretty result. On the second drawing, however, the average stretch is very large in both directions. This explains why connected vertices end up close to one another in the first picture, but far from each other in the second.
+
+        Note that drawing with $\left(k, \ell\right) = \left(2, 3\right)$ is something used in practice to visualise graphs. This is for instance the technique used by the Python package \texttt{networkx} for its \texttt{draw\_spectral} function.
     \end{subparag}
     
     \begin{subparag}{Proof}
