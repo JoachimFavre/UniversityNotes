@@ -28,7 +28,7 @@
 
 #### Bachelor semester 5 (Autumn 2023)
 - [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/BA5/Algebra.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/BA5/Algebra.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/BA5/Algebra.zip) · Algebra — Prof. Anna Lachowska
-- [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/BA5/IntroToQuantumInformationProcessing-Summary.pdf) | [LaTeX](https://www.youtube.com/watch?v=yqWX86uT5jM) | [Open in Overleaf](https://www.youtube.com/watch?v=yqWX86uT5jM) · Introduction to quantum information theory (Detailed summary) — Prof. Nicolas Macris
+- [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/BA5/IntroToQuantumInformationProcessing-Summary.pdf) | [LaTeX](https://www.youtube.com/watch?v=yqWX86uT5jM) | [Open in Overleaf](https://www.youtube.com/watch?v=yqWX86uT5jM) · Introduction to quantum information processing (Detailed summary) — Prof. Nicolas Macris
 
 #### Bachelor semester 6 (Spring 2024)
 - [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/BA6/IntroToQuantumComputation-Summary.pdf) | [LaTeX](https://www.youtube.com/watch?v=yqWX86uT5jM) | [Open in Overleaf](https://www.youtube.com/watch?v=yqWX86uT5jM) · Introduction to quantum computation (Detailed summary) — Prof. Olivier Lévêque and Prof. Rüdiger Urbanke
