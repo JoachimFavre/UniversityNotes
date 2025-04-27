@@ -69,6 +69,9 @@ courses: List[Course] = [
     #CourseList.ALGORITHMS_2,
     #CourseList.COMPUTATIONAL_COMPLEXITY,
     #CourseList.QUANTUM_PHYSICS_2,
+    
+    # MA2
+    CourseList.SUBLINEAR_ALGORITHMS,
 ]
 
 tag = Tags.NONE
@@ -93,3 +96,4 @@ for course in courses:
     Logger.newline()
 
 Logger.info(f"Done in {int(time.time() - beginning_time)} seconds!\a")
+

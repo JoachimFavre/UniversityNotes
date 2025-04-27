@@ -36,3 +36,6 @@ class CourseList:
     ALGORITHMS_2 = Course(is_bachelor=False, semester=1, name="Algorithms-2")
     COMPUTATIONAL_COMPLEXITY = Course(is_bachelor=False, semester=1, name="ComputationalComplexity")
     QUANTUM_PHYSICS_2 = Course(is_bachelor=False, semester=1, name="QuantumPhysics-2")
+
+    # MA2 
+    SUBLINEAR_ALGORITHMS = Course(is_bachelor=False, semester=2, name="SublinearAlgorithms")

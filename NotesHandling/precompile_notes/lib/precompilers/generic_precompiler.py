@@ -104,6 +104,9 @@ class GenericPrecompiler:
             
         if latex.count("Fourrier") > 0:
             Logger.warn("'Fourrier' instead of 'Fourier'.", file_path)
+
+        if latex.count("Chernhoff") > 0:
+            Logger.warn("'Chernhoff' instead of 'Chernoff'.", file_path)
             
         if latex.lower().count("rotationel") > 0:
             Logger.warn("'rotationel' instead of 'rotationnel'.", file_path)
