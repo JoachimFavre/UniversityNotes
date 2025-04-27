@@ -39,6 +39,9 @@
 - [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/ComputationalComplexity.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/ComputationalComplexity.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/ComputationalComplexity.zip) · Computational complexity — Prof. Mika Göös
 - [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/QuantumPhysics-2.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/QuantumPhysics-2.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/QuantumPhysics-2.zip) · Quantum physics II — Prof. Zoë Holmes
 
+#### Master semester 2 (Spring 2025)
+- [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2-during-semester/SublinearAlgorithms.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2-during-semester/SublinearAlgorithms.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2-during-semester/SublinearAlgorithms.zip) · (WIP) Sublinear algorithms for big data analysis — Prof. Michael Kapralov
+
 ---
 
 The "Open in Overleaf" button will create a new project on your account with the given lecture notes, using [Overleaf's API](https://www.overleaf.com/devs). Due to long compilation time, this may require an Overleaf pro account—which is free for many students, [including EPFL's](https://www.overleaf.com/edu/epfl). You may also download the LaTeX project and compile it locally on your computer using LuaLaTeX (this is important), or simply directly download the PDF.
