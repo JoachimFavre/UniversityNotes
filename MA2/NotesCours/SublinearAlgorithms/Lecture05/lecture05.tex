@@ -1,0 +1,134 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-19 at 13:16:15.
+
+\usepackage{../../style}
+
+\title{Sublinear algorithms}
+\author{Joachim Favre}
+\date{Mercredi 19 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2025-03-19}{So many streaming algorithms are just projections}{
+\begin{itemize}[left=0pt]
+    \item Definition of sparse recovery.
+    \item Explanation that \lang{CountSketch} solves sparse recovery for $\ell_2$ norms.
+    \item Definition of the approximation lest squares regression problem.
+    \item Definition of subspace embedding.
+\end{itemize}
+    
+}
+
+\subsection{Sparse recovery}
+
+\begin{parag}{Definition: Sparse recovery}
+    Let $p, q \geq 1$. Given some integer $k \geq 1$, $C \geq 1$, and $A x$ for some $x \in \mathbb{R}^n$, we want to find some $y \in \mathbb{R}^n$ such that: 
+    \[\left\|x -y\right\|_p \leq C \min_{z: \text{$k$-sparse}} \left\|x - z\right\|_q = C \left\|x_T\right\|_q.\]
+
+    \begin{subparag}{Example}
+        For instance, if $p = q = 1$: 
+        \[\left\|x - y\right\|_1 \leq C\min_{z: \text{$k$-sparse}} \left\|x - z\right\|_1.\]
+
+        Similarly, if $p = q = 2$:
+        \[\left\|x - y\right\|_2 \leq C\min_{z: \text{$k$-sparse}} \left\|x - z\right\|_2 = C \left\|x_T\right\|_2.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    If $C = 1 + \epsilon$, then \lang{CountSketch} achieves the $\ell_2$-$\ell_2$ sparse recovery guarantee with some $B \in O\left(k/\epsilon^2\right)$.
+
+    \begin{subparag}{Proof}
+        This was proof was done in the fourth exercise session. Essentially, nothing we did used the fact the frequency vector $x$ had integer coefficients, so all these results hold for any $x \in \mathbb{R}^n$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        It is a good exercise, although hard, to prove that $B \in O\left(\frac{k}{\epsilon}\right)$ actually suffices.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    \lang{CountSketch} is essentially a linear map. More precisely, it maintains a huge vector $y_{i r} = \hat{x}_i^{\left(r\right)} \in \mathbb{R}^{RB}$, from which it can compute the estimation $\hat{x}_i$. This vector is computed in a linear fashion: fixing the hash functions and leaving $y = \text{Est}\left(x\right) \in \mathbb{R}^{RB}$ to be the vector obtained after running \lang{CountSketch} on some some stream of frequencies $x \in \mathbb{R}^n$, we have: 
+    \[\text{Est}\left(\alpha x_1 + \beta x_2\right) = \alpha \text{Est}\left(x_1\right) + \beta \text{Est}\left(x_2\right).\]
+
+    In other words, this means that we can write $\text{Est}\left(x\right) = A x$ for some matrix $A \in \mathbb{R}^{RB \times n}$. This shows that, essentially, \lang{CountSketch} is just a random matrix.
+
+    From the previous theorem, taking $R = O\left(\log\left(n\right)\right)$ and $B = O\left(\frac{k}{\epsilon^2}\right)$, we designed a random matrix $A \in \mathbb{R}^{O\left(k\log\left(n\right)\right) \times n}$ with $O\left(k \log\left(n\right)\right)$ rows such that we are able to fully reconstruct any $k$-sparse vector $x$ from $Ax$.
+
+    \begin{subparag}{Personal remark}
+        When we speak of a ``random matrix $A \in \mathbb{R}^{m \times n}$'', we essentially speak of a random distribution $D$ of support $\supp D \subseteq \mathbb{R}^{m \times n}$. The random matrices $A \followsdistr D$ are then sampled from this distribution.
+
+        Speaking of ``random matrices'' when meaning ``distributions that output random matrices'' will come back often during this course.
+    \end{subparag}
+\end{parag}
+
+\subsection{Least squares regression and subspace embeddings}
+
+\begin{parag}{Definition: Least squares regression}
+    Let $A \in \mathbb{R}^{n \times d}$, and $b \in \mathbb{R}^n$. We want to find some $x^*$ such that: 
+    \[x^* = \argmin_{x \in \mathbb{R}^d} \left\|A x - b\right\|_2.\]
+    
+    \begin{subparag}{Intuition}
+        When thinking of this problem, we should typically think that $n \gg d$, i.e. $A$ is a very tall matrix and hence we do not suppose that there exists any $x$ such that $A x = b$. The idea is that we instead want to find some $x$ which is the best approximation to: 
+        \[Ax \approx b.\]
+
+        In other words, considering $\left(a_i\right)_{i = 1}^n$ to be the rows of $A$, we want $a_i \dotprod x \approx b_i$ for all $i$.
+    \end{subparag}
+
+    \begin{subparag}{Solution}
+         This is solved by the Moore-Penrose pseudo-inverse: 
+         \[x^* = A^+ b = \left(A^T A\right)^{-1} A^T b.\]
+         
+         Using an SVD, we can thus find $x^*$ in $O\left(n d^2\right)$. We however aim to do better. To do so, we will consider a simpler problem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Approximate least square regression problem}
+    Let $A \in \mathbb{R}^{n \times d}$, $b \in \mathbb{R}^n$, and some $\epsilon > 0$.
+
+    We want to find some $x' \in \mathbb{R}^d$ such that: 
+    \[\left\|A x' - b\right\|_2 \leq \left(1 + \epsilon\right) \min_{x^* \in \mathbb{R}^d} \left\|A x^* - b\right\|.\]
+\end{parag}
+
+\begin{parag}{Definition: Subspace embedding}
+    A distribution of matrices $\Pi \in \mathbb{R}^{m \times n}$ is a $\left(d, \epsilon, \delta\right)$-subspace embedding if, for every $d$-dimensional subspace $P$ of $\mathbb{R}^n$, one has: 
+    \[\prob_{\Pi}\left(\forall x \in P, \ \left|\left\|\Pi x\right\|_2 - \left\|x\right\|_2\right| \leq \epsilon \left\|x\right\|_2\right) \geq 1 - \delta.\]
+
+    \begin{subparag}{Intuition}
+        Intuitively, one can think of $\Pi$ to be very wide: $\Pi x \in \mathbb{R}^m$ leaves in a space of  dimension a lot smaller than the one of $x \in \mathbb{R}^n$, i.e. $m \ll n$. We then require that $\Pi x$ approximately preserves the geometry of any $d$-dimensional subspace of $\mathbb{R}^n$, with high probability.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that the definition of our distribution of matrices is oblivious of $P$. In other words, we first commit to the distribution, then are given some $d$-dimension subspace $P$, and finally sampling a matrix $\Pi$ from this distribution should be likely to preserve the norm of all vectors in $P$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Consider for instance the following subspace of $\mathbb{R}^n$, indexed by some set $J \subseteq \left\{1, \ldots, n\right\}$: 
+    \[P_J = \left\{x \in \mathbb{R}^n \suchthat x_j = 0 \text{ if } j \not\in J\right\}.\]
+    
+    If $J = \left\{1, 5, 7\right\}$, we would for example have: 
+    \[P_J = \left\{x \suchthat x_j = 0 \text{ unless } j \in \left\{1, 5, 7\right\}\right\}.\]
+    
+    Taking $\left|J\right| = d$, then $P_J$ is $d$-dimensional. We build $\Pi \in \mathbb{R}^{m \times n}$, by choosing some hash function $h: \left\{1, \ldots, n\right\} \mapsto \left\{1, \ldots, m\right\}$, and then letting: 
+    \[\Pi_{b,j} = \begin{systemofequations} 1, & \text{if } h\left(j\right) = b, \\ 0, & \text{otherwise.} \end{systemofequations}\]
+
+    Intuitively, $\left(\Pi x\right)_b$ is the sum of all $x_j$ where $h\left(j\right) = b$. If $m \geq 10 d^2$, then it is possible to prove that, for all fixed $J \subseteq \left\{1, \ldots, n\right\}$ such that $\left|J\right| = d$, and for all $x \in P_j$: 
+    \[\left\|\Pi x\right\|_2 = \left\|x\right\|_2.\]
+
+    This however does not mean that $\Pi$ is a subspace embedding, since we do not represent all subspaces using $P_J$.
+
+    \begin{subparag}{Proof}
+        Our goal is to prove that $\left\|\Pi x\right\|_2 = \left\|x\right\|_2$. To prove this, we aim to show that $\Pi x \in \mathbb{R}^m$ and $x \in \mathbb{R}^n$ have the same non-zero coefficient, possibly with a different ordering.
+
+        Indeed, as mentioned above $\left(\Pi x\right)_b$ is the sum of all $x_i$, where $i$ hashed to $b$. Now, by construction, each $i$ is hashed to one and exactly one $b$, so we may only have at most $d$ non-zero coefficients. Hence, by the birthday paradox, if $m \geq 10 d^2$, the probability that there is a collision between our non-zero coefficients is very small.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

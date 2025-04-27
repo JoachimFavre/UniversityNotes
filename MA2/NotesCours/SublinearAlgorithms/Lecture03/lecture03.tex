@@ -1,0 +1,173 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-05 at 13:19:38.
+
+\usepackage{../../style}
+
+\title{Sublin algo}
+\author{Joachim Favre}
+\date{Mercredi 05 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2025-03-05}{Counting giraffes in the savannah}{
+\begin{itemize}[left=0pt]
+    \item Explanation of a naive algorithm to solve the distinct elements problem.
+    \item Fix of the algorithm to use a more realistic assumption on the generation of randomness.
+\end{itemize}
+    
+}
+
+\begin{parag}{Lemma}
+    Let $k = \left\|x\right\|_0$. Then: 
+    \[\prob\left(C > 0\right) = 1 - \left(1 - \frac{1}{t}\right)^k.\]
+
+    \begin{subparag}{Proof}
+        We know that: 
+        \[\prob\left(C > 0\right) = 1 - \prob\left(C = 0\right).\]
+        
+        Now, $C = 0$ means that, out of the $k$ elements that arrived in the stream, none of them were taken in $S$. The probability that $S$ misses a single element is $1 - \frac{1}{t}$. The probability that it misses all $k$ elements is $\left(1 - \frac{1}{t}\right)^k$, i.e. $\prob\left(C = 0\right) = \left(1 - \frac{1}{t}\right)^k$. This gives our result.
+
+        More formally, leaving $\supp x = \left\{i \in \left\{1, \ldots, n\right\} \suchthat x_i > 0\right\}$, we have: 
+        \autoeq{\prob\left(C > 0\right) = \prob\left(\text{$S$ contains an element of $\supp x$}\right) = 1 - \prob\left(\text{$S$ contains no element of $\supp x$}\right) = 1 - \prod_{i \in \supp x} \prob\left(i \not \in S\right) = 1 - \left(1 - \frac{1}{t}\right)^k.}
+        
+        Note that we used the mutual independence of elements of $S$ by writing $\prob\left(\text{$S$ contains no element of $\supp x$}\right) = \prod_{i \in \supp x} \prob\left(i \not \in S\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Supposing that $t$ is large enough, then:
+    \[\begin{systemofequations}\prob\left(C > 0\right) \gtrapprox 1 - e^{-2} \approx 0.86, & \text{in the \lang{YES} case,} \\ \prob\left(C > 0\right) \lessapprox 1 - e^{-1} \approx 0.64, & \text{in the \lang{NO} case.}\end{systemofequations}\]
+
+    \begin{subparag}{Remark}
+        Note that the symbols $\gtrapprox$ and $\lessapprox$ may seem non-formal. However, the main idea here is that there is a clear separation between the \lang{NO} and the \lang{YES} case. In other words, our counter $C$ clearly tells us something statistically, even though the failure probability is still very high.
+
+        In fact, this lemma will not even be really used in practice: we will use a different version of this lemma once we will remove the unrealistic assumption that generating and storing $S$ does not create any overhead.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        In the YES case, we know that $k \geq 2t$, so: 
+        \[\prob\left(C > 0\right) = 1 - \left(1 - \frac{1}{t}\right)^k \geq 1 - \left(1 - \frac{1}{t}\right)^{2t} \approx 1 - e^{-2}.\]
+        
+        In the NO case, we know that $k \leq t$, and hence: 
+        \[\prob\left(C > 0\right) = 1 - \left(1 - \frac{1}{t}\right)^k \leq 1 - \left(1 - \frac{1}{t}\right)^t \approx 1 - e^{-1}.\]
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Boosted decision algorithm}
+    We run the algorithm for the decision problem $m$ times independently. We then output \lang{YES} if the number of outcomes is at least $0.7m$, and \lang{NO} otherwise.
+
+    Then, there exists some $m \in O\left(\ln\left(\frac{1}{\delta}\right)\right)$ such that: 
+    \[\prob\left(\text{failure}\right) \leq \delta.\]
+
+    In other words, this algorithm solves the decision problem with improved success probability $1 - \delta$. We call this algorithm $\lang{ALG}_t$.
+
+    \begin{subparag}{Remark}
+        Note that the $0.7$ is an arbitrary value, which is between the $0.64$ and the $0.86$ found in the previous lemma.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        For all $i \in \left\{1, \ldots, m\right\}$, we let: 
+        \[Y_i = \begin{systemofequations} 1, & \text{if the $i$\Th experiment says YES,} \\ 0, & \text{otherwise.} \end{systemofequations}\]
+
+        We notice that, in the \lang{YES} case, for all $i$, $\exval\left(Y_i\right) \geq 0.86$. Therefore, by the Chernoff bound: 
+        \autoeq{\prob\left(\sum_{i} Y_i < 0.7 m\right) = \prob\left(\sum_{i} Y_i < \left(1 - c\right) m \exval\left(Y_i\right)\right)\leq e^{- \Omega\left(m\right)} = \delta,}
+        where $c$ is some constant which may be computed, but which exact value is not important; we only need the facts $c \in \left]0, 1\right[ $ and $c \in \Theta\left(1\right)$.
+
+        The reasoning is similar in the \lang{NO} case.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Distinct elements algorithm}
+    We consider an algorithm that finds a 2-approximation for the distinct element problem.
+
+    $\lang{ALG}_t$ allows us to distinguish $k < t$ and $k > 2t$, so we can run $\lang{ALG}_t$ for $t \in \left\{1, 2, 4, 8, \ldots, n\right\}$ in parallel, each with a probability of failure at most $\delta$. Assuming each instance succeeds, this allows to find a 2-approximation of $k$.
+
+    This algorithm succeeds with probability at least $1 - \delta \log_2\left(n\right)$, and---assuming $S$ does not require any space to be stored---requires $O\left(\log\left(n\right)^2 \log\left(\frac{1}{\delta}\right)\right)$ bits of memory.
+
+    \begin{subparag}{Success probability}
+        Since we run $\log_2\left(n\right)$ instances of the algorithm at a success probability $1 - \delta$, they all succeed with probability at least $1 - \delta \log_2\left(n\right)$ by the union bound.
+
+        This algorithm thus has a success probability of at least $1 - \delta \log_2\left(n\right)$. We can let $\widetilde{\delta} = \frac{\delta}{\log_2\left(n\right)}$, to get a $1 - \widetilde{\delta}$ success probability, although this basically does not change the asymptotic complexity.
+    \end{subparag}
+
+    \begin{subparag}{Space complexity}
+        The boosted decision algorithm $\lang{ALG}_t$ maintains $m \in O\left(\ln\left(\frac{1}{\delta}\right)\right)$ counters. Since we run $\log_{2}\left(n\right)$ copies of this algorithm, we need a total of $O\left(\log\left(n\right) \log\left(\frac{1}{\delta}\right)\right)$ counters. 
+
+        Each counter requires $O\left(\log\left(n\right)\right)$ bits. Hence, assuming there is no overhead in storing $S$, this requires $O\left(\log\left(n\right)^2 \log\left(\frac{1}{\delta}\right)\right)$ bits of memory.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The trick here, to consider a decision problem, and then convert it to an approximation, is a general idea. We will prove that the asymptotic complexity is optimal is optimal for a similar problem later in the course \later{which problem?}, showing that the $\log\left(n\right)^2$ bits is not just an artifact of our trick and is in fact necessary.
+    \end{subparag}
+\end{parag}
+
+\subsection{Correct algorithm}
+
+\begin{parag}{Remark}
+    Our hypothesis that the $S$ used by the decision problem algorithm can be stored without any memory and generated easily is wrong. We aim to remove this bad assumption.
+\end{parag}
+
+\begin{parag}{Definition: Pairwise independent hash family}
+    A family of hash functions $\mathcal{H} = \left\{h: \left\{1, \ldots, n\right\} \mapsto \left\{1, \ldots, B\right\}\right\}$ is said to be \important{pairwise independent} if, for ally $x, y \in \left\{1, \ldots, n\right\}$ such that $x \neq y$ and for all $a, b \in \left\{1, \ldots, B\right\}$: 
+    \[\prob\left(h\left(x\right) = a \text{ and } h\left(y\right) = b\right) = \frac{1}{B^2}.\]
+    
+    \begin{subparag}{Example}
+        For instance, if $p$ is a prime number, we can consider: 
+        \[h_{a, b}\left(x\right) = ax + b \Mod p.\]
+
+        Then, $\mathcal{H} = \left\{h_{a, b} \suchthat a, b \in \mathbb{F}_p\right\}$ is a pairwise independent. Note that, if $p$ is not prime, $\mathcal{H}$ is not pairwise independent. Proving the latter is a nice exercise to understand pairwise independent hashing.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Correct algorithm}
+    We update our decision algorithm, by constructing $S$ differently. We select a hash function $f: \left\{1, \ldots, n\right\} \mapsto \left\{1, \ldots, B\right\}$ from a pairwise independent hash family, for $B \approx t$. We then simply let: 
+    \[S = \left\{i \in \left\{1, \ldots, n\right\} \suchthat h\left(i\right) = 1\right\}.\]
+
+    \begin{subparag}{Remark 1}
+        This uses the fact that, in fact, our algorithm only needs to be able to know efficiently whether $i \in S$. Thus, we do not need to store $S$ (which takes $\Theta\left(n\right)$ memory), we only need to store $f$ (which takes $\Theta\left(\log\left(n\right)^2\right)$ memory.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that, here, elements in $S$ are only pairwise independent, they are not mutually independent independent. The reasoning we used exploited the fact they were mutually independent, so we need to update our analysis. Moreover, each element is taken with probability $\frac{1}{B}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Suppose that $B = 8t$. Then:
+    \[\begin{systemofequations} \prob\left(C > 0\right) \leq 1/8, & \text{in the \lang{NO} case,} \\ \prob\left(C > 0\right) \geq 3/16, & \text{in the \lang{YES} case.} \end{systemofequations}\]
+
+    \begin{subparag}{Remark}
+        This again shows that $C$ makes a statistical separation between the \lang{YES} and the \lang{NO} case. We can then make the rest of the reasoning completely symmetrically. Overall, our algorithm for the decision problem runs $m \in O\left(\ln\left(\frac{1}{\delta}\right)\right)$ counters $C_i$ in parallel, and accepts if at least $\frac{5}{32} m$ counters are positive $C_i > 0$. This is the exact same reasoning as before, using the fact $\frac{5}{32} \in \left]\frac{1}{8}, \frac{3}{16}\right[ $ is an arbitrary value.
+
+        The algorithm for distinct element is then exactly the same.
+    \end{subparag}
+
+    \begin{subparag}{Proof \lang{NO}}
+        Let us consider the \lang{NO} case first, i.e. $k \leq t$. We define again $\supp x = \left\{i \in \left\{1, \ldots, n\right\} \suchthat x_i > 0\right\}$. We have, using the union bound: 
+        \autoeq{\prob\left(\sum_{i \in S} x_i > 0\right) = \prob\left(\supp\left(x\right) \cap S \neq \o\right) = \sum_{i \in \supp x} \underbrace{\prob\left(i \in S\right)}_{= 1 / B} = \frac{k}{B} \leq \frac{t}{B}.}
+    \end{subparag}
+
+    \begin{subparag}{Proof \lang{YES}}
+        Let us now consider the YES case, i.e. $k \geq 2t$. Then, the inclusion-exclusion principle tells us that: 
+        \autoeq{\prob\left(\sum_{i \in S} x_i > 0\right) \geq \sum_{i \in \supp x} \prob\left(i \in S\right) - \sum_{\substack{i, j \in \supp x \\ i \neq j}} \prob\left(i \in S \land j \in S\right) = \sum_{i \in \supp x} \frac{1}{B}  - \sum_{\substack{i, j \in \supp x \\ i \neq j}} \frac{1}{B^2} = \frac{k}{B} - \frac{k\left(k-1\right)}{B^2}.}
+
+        Note that, if $k$ is very large, then this lower-bound is negative. The issue here is that we suppose pairwise independence only; whereas before we had mutual independence. Now, however, if $k \gg 2t$, it seems intuitively that the counter $C$ should have an even greater probability to be positive. So, we can consider $Z \subseteq \supp x$ to be arbitrary such that $\left|Z\right| = 2t$. That way, considering only $S \cap Z$, we are effectively enforcing $\widetilde{k} = \left|\supp x \cap Z\right| = 2t$: 
+        \autoeq{\prob\left(\sum_{i \in S} x_i > 0\right) \geq \prob\left(\sum_{i \in S \cap Z} x_i > 0\right) \geq \frac{2t}{B} - \frac{2t\left(2t - 1\right)}{B^2} \geq \frac{2t}{B} - \frac{4t^2}{B^2} = \frac{1}{4} - \frac{1}{16} = \frac{3}{16},}
+        since we know $B = 8t$.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document} 

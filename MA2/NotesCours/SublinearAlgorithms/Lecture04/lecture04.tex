@@ -1,0 +1,231 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-12 at 13:19:43.
+
+\usepackage{../../style}
+
+\title{Sublinear algorithms}
+\author{Joachim Favre}
+\date{Mercredi 12 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2025-03-12}{Strong punchers}{
+    \begin{itemize}[left=0pt]
+        \item Explanation of the heavy hitters problem.
+        \item Explanation of the \lang{CountSketch} algorithm.
+        \item Proof of a guarantee on the output of \lang{CountSketch}.
+    \end{itemize}
+    
+}
+
+\section{\lang{CountSketch} algorithm}
+\subsection{Heavy hitters problem}
+
+\begin{parag}{Most frequent element problem}
+    Let $\sigma = \left\langle a_1, \ldots, a_m \right\rangle$ be a stream, where $a_i \in \left\{1, \ldots, n\right\}$. 
+
+    Let $x$ be the frequency vector of $\sigma$. The goal is to find the top $K$ elements of $x$, i.e. the $K$ elements that occur the most, using small spaces.
+
+    \begin{subparag}{Example}
+        Consider for instance: 
+        \[\sigma = \left\langle 1, 5, 7, 1, 2, 21, 20, 1, 2, 3 \right\rangle.\]
+
+        $1$ is the most frequent item, and $2$ is the second most.
+    \end{subparag}
+    
+    \begin{subparag}{Remark}
+        Consider a stream with distinct random elements coming from some large set; each element appears exactly once, except for one which appears twice. Finding this special element is however clearly not doable in sublinear space, so we have to instead relax slightly the problem through the following definition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Heavy-hitter}
+    Let $i \in \left\{1, \ldots, n\right\}$, and $\phi \in \left]0, 1\right[ $.
+
+    We say that $i$ is a \important{$\phi$-heavy hitter} if $x_i \geq \phi \left\|x\right\|_2$.
+
+    \begin{subparag}{Remark}
+        It is also possible to define heavy-hitters for other vector norms, such as the $\ell_1$ norm.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Heavy hitters problem}
+    Let $\sigma$ be a stream, and $\phi \in \left]0, 1\right[ $ be arbitrary.
+
+    The goal of the heavy hitters problem is to output a list $L$ such that both the following propositions hold:
+    \begin{itemize}
+        \item $L$ contains all $\phi$-heavy hitters.
+        \item All elements of $L$ are $\frac{\phi}{2}$-heavy hitters.
+    \end{itemize}
+
+    \begin{subparag}{Intuition}
+        The idea is that we want to find all $\phi$-heavy hitters. However, if we have an element $i$ which is not a $\phi$-heavy hitter, but such that $x_i \geq \phi \left\|x\right\|_2 - \epsilon$ for some small $\epsilon$, we are definitely not able to distinguish it from a $\phi$-heavy hitter in sublinear space.
+
+        So, we instead ask the list $L$ to contain all $\phi$-heavy hitters, while also allowing some of the $\frac{\phi}{2}$-heavy hitters to be added to the list as well. 
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        It is possible to improve the $\frac{\phi}{2}$ bound arbitrarily, by tweaking the space complexity of the resulting algorithms.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We will develop an algorithm named \lang{CountSketch} to solve this problem, and it will use $O\left(\log\left(n\right)^2 / \phi^2\right)$ space.
+
+        Note that we can also define $\ell_1$-heavy hitters, using an $\ell_1$ norm: $x_i \geq \phi \left\|x\right\|_1$. It is possible to make an algorithm, named \lang{CountMin}, that uses space $O\left(\log\left(n\right)^2 / \phi\right)$.
+
+        It is not possible to make similar algorithms for $\ell_k$-norms with $k > 2$.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example}
+    We construct a stream $\sigma$ of length $n$ such that there is some element $i_* \in \left\{1, \ldots, n\right\}$ that arrives $\sqrt{n}$ times; and such that the other $n - \sqrt{n}$ elements are distinct. 
+
+    Note that: 
+    \[x_{i_*} = \sqrt{n}, \mathspace \text{and} \mathspace  \forall i \neq i_*,\ x_i \leq 1.\]
+    
+    Let us consider $\ell_1$-heavy hitters first. We notice that:
+    \[\left\|x\right\|_1 = \left(n - \sqrt{n}\right)\cdot 1 + 1\cdot \sqrt{n} = n.\]
+
+    So, to have $x_{i_*} \geq \phi \left\|x\right\|_1$, we need $\phi \leq \frac{1}{\sqrt{n}}$. In other words, $i_*$ is a $\ell_1$-heavy hitter with $\phi=\frac{1}{\sqrt{n}}$. This implies that \lang{CountMin} requires $O\left(\sqrt{n} \log\left(n\right)^2\right)$ space complexity. This is not great: we can consider an algorithm that just samples $\sqrt{n}$ values from the stream randomly, which is able to find $i_*$ with good probability and a better space complexity.
+
+    Let us now consider 2-norms: 
+    \[\left\|x\right\|_2 = \sqrt{\left(n - \sqrt{n}\right)\cdot 1^2 + 1\cdot \left(\sqrt{n}\right)^2} \leq \sqrt{n + n} = \sqrt{2n}.\]
+
+    This shows that $i_*$ is a $\frac{1}{\sqrt{2}}$-heavy hitter for $\ell_2$ norms. Thus, \lang{CountSketch} requires space $O\left(\log\left(n\right)^2\right)$. This is a lot better, and shows a big interest for $\ell_2$-norms.
+\end{parag}
+
+\begin{parag}{\lang{CountSketch} algorithm}
+    We describe the \lang{CountSketch} algorithm to find $\phi$-heavy hitters under the $\ell_2$-norm. Let $R, B$ be parameters to the algorithm. We will ultimately pick $R \in O\left(\log\left(n\right)\right)$ and $B \in O\left(1/\phi^2\right)$.
+
+    Choose $R$ pairwise independent hash functions $h_1, \ldots, h_R: \left\{1, \ldots, n\right\} \mapsto \left\{1, \ldots, B\right\}$, and $R$ pairwise independent sign functions (just a fancy name for hash functions) $s_1, \ldots, s_R: \left\{1, \ldots, n\right\} \mapsto \left\{-1, 1\right\}$.
+
+    While reading the stream, \lang{CountSketch} maintains a matrix $y \in \mathbb{Z}^{R \times B}$ with $R$ rows and $B$ columns, where each row is an approximate hash table:
+    \[y_{r, b} = \sum_{\substack{j \in \left\{1, \ldots, n\right\} \\ h_r\left(j\right) = b}} s_r\left(j\right) x_j, \mathspace \forall b \in \left\{1, \ldots, B\right\}, \forall r \in \left\{1, \ldots, R\right\}.\]
+
+    Then, for all $i \in \left\{1, \ldots, n\right\}$, we output:
+    \[\hat{x}_i = \median_{r \in \left\{1, \ldots, R\right\}} \left\{\hat{x}_i^{\left(r\right)}\right\}, \mathspace \text{where }\hat{x}_i^{\left(r\right)} = y_{r, h_r\left(i\right)} s_r\left(i\right).\] 
+
+    \begin{subparag}{Intuition}
+        The idea of this algorithm is that we want our estimator $\hat{x}_i$ to approximate the frequency $x_i$. To do so, we let each row $r \in \left\{1, \ldots, R\right\}$ of $y$ to be an approximate hash table. In other words, each element of the stream $i \in \left\{1, \ldots, n\right\}$ maps to some unique bucket $b = h_r\left(i\right) \in \left\{1, \ldots, B\right\}$ of any given row $r \in \left\{1, \ldots, R\right\}$; when we receive an element $i \in \left\{1, \ldots, n\right\}$, \lang{CountSketch} increments or decrements (depending on the sign of $s_r\left(i\right)$) the corresponding bucket of each row:
+        \[y_{r, h_r\left(i\right)} \leftarrow y_{r, h_r\left(i\right)} + s_r\left(i\right), \mathspace \forall r \in \left\{1, \ldots, R\right\}.\]
+
+        Supposing there is no collision, the absolute value of each row of $y$ represents how many times exactly each given item arrived. The signs are here in case of collisions. We however want to remove the sign of the element we are considering before outputting how many times it appeared, so this yields the following estimator:
+        \[\hat{x}_i^{\left(r\right)} = y_{r, h_r\left(i\right)} s_r\left(i\right).\]
+
+        Then, to merge all our estimators of our different repetitions $r \in \left\{1, \ldots, R\right\}$ into a single estimator $\hat{x}_i$, we use the median trick.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $k \in \mathbb{N}$ be some integer. Ordering indices such that $\left|x_1\right| \geq \left|x_2\right| \geq \ldots \geq \left|x_n\right|$, we define the vector $x_T$ that only contains the $n - k$ smallest values of $x$: 
+    \[\left(x_T\right)_i = \begin{systemofequations} x_i, & \text{if $i \geq k + 1$,} \\ 0, & \text{otherwise}. \end{systemofequations}\]
+
+    If $k \leq \frac{B}{10}$, then there exists $R \in O\left(\log\left(n\right)\right)$ such that:
+    \[\prob\left(\forall i, \left|\hat{x}_i - x_i\right| \leq \frac{10\left\|x_T\right\|_2}{\sqrt{B}}\right) \geq 1 - \frac{1}{n}.\]
+
+    \begin{subparag}{Remark 1}
+        Considering $\hat{x}$ to be a vector, and using the infinity norm $\left\|v\right\|_{\infty} = \max_{i} \left|v_i\right|$, we can rephrase this result as:
+        \[\prob\left(\left\|\hat{x}_i - x_i\right\|_{\infty} \leq \frac{10\left\|x_T\right\|_2}{\sqrt{B}}\right) \geq 1 - \frac{1}{n}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        A direct corollary to this theorem proves that \lang{CountSketch} does solve the $\ell_2$-heavy hitter problem, as we will see in the following paragraph.
+
+        This specific theorem is however already very interesting. If $x$ is $k$-sparse (i.e. $\left|\supp x\right| \leq k$), then $\left\|x\right\|_T = 0$ and hence \lang{CountSketch} is able to reconstruct $x$ completely. This is a very interesting guarantee which goes beyond streaming algorithms, as we will see with sparse recovery.
+    \end{subparag}
+    
+    \begin{subparag}{Proof} 
+        Let $r \in \left\{1, \ldots, R\right\}$ be arbitrary. We want to see how the error looks like for some specific $\hat{x}_i^{\left(r\right)}$, using the definition of $\hat{x}_i^{\left(r\right)}$ and $y_{r, b}$: 
+        \autoeq{\hat{x}_i^{\left(r\right)} - x_i = s_r\left(i\right)  y_{r, h_r\left(i\right)} - x_i = \sum_{\substack{j \in \left\{1, \ldots, n\right\} \\ h_r\left(j\right) = h_r\left(i\right)}} s_r\left(i\right) s_r\left(j\right) x_j - x_i = \sum_{\substack{j \in \left\{1, \ldots, n\right\} \setminus \left\{i\right\} \\ h_r\left(j\right) = h_r\left(i\right)}} s_r\left(i\right) s_r\left(j\right) x_j,}
+        since $s_r\left(i\right) s_r\left(i\right) x_i = s_r\left(i\right)^2 x_i = x_i$.
+         
+        We order the indices such that $\left|x_1\right| \geq \left|x_2\right| \geq \ldots \geq \left|x_n\right|$. Moreover, considering $k \in \mathbb{N}$ to be some integer we will fix later, we call $x_1, \ldots, x_k$ to be the head $H = \left\{1, \ldots, k\right\}$ of $x$ (i.e. it contains the $k$ most frequent elements), and the tail $T = \left\{k+1, \ldots, n\right\}$ is everything else. This yields: 
+        \[\hat{x}_i^{\left(r\right)} - x_i = \sum_{\substack{j \in H \setminus \left\{i\right\} \\ h_r\left(j\right) = h_r\left(i\right)}} s_r\left(i\right) s_r\left(j\right) x_j + \underbrace{\sum_{\substack{j \in T \setminus \left\{i\right\} \\ h_r\left(j\right) = h_r\left(i\right)}} s_r\left(i\right) s_r\left(j\right) x_j}_{= \Delta\left(i, r\right)}.\]
+
+        Choosing $k$ sufficiently small  (we will show $k \leq \frac{1}{10} B$ works), it is likely $i \in H$ is alone among $H$ in its bucket, and hence the first sum is likely to be $0$. The second sum is likely non-zero, and we call it $\Delta\left(i, r\right)$. We consider two events: the first one that the first sum is zero, the second one that $\Delta\left(i, r\right)$ is small. We will show that those two events happen with good probability.
+        \begin{enumerate}[left=0pt]
+            \item The first event, $\mathcal{E}_{\text{no collision}}\left(i, r\right)$, states that no element in $H \setminus \left\{i\right\}$ collides with $i$ under $h_r$, i.e.\ that there does not exist any $j \in H \setminus \left\{i\right\}$ such that $h_r\left(i\right) = h_r\left(j\right)$. Since the hash family is pairwise independent, for any $j \neq i$: 
+        \[\prob_{h_r}\left(h_r\left(i\right) = h_r\left(j\right)\right) = \frac{1}{B}.\]
+        
+        Therefore, using the union bound, we can bound the negation of our event (i.e.\ the probability of a collision appearing): 
+        \autoeq{\prob\left(\bar{\mathcal{E}}_{\text{no collision}}\left(i, r\right)\right) = \prob\left(\bigcup_{j \in H \setminus \left\{i\right\}} \left\{h_r\left(i\right) = h_r\left(j\right)\right\}\right) \leq \sum_{j \in H \setminus \left\{i\right\}} \prob\left(\left\{h_r\left(i\right) = h_r\left(j\right)\right\}\right) = \frac{\left|H \setminus \left\{i\right\}\right|}{B} \leq \frac{k}{B} \leq \frac{1}{10}.}
+
+        So, with probability at least $\frac{9}{10}$, we know that $\mathcal{E}_{\text{no collision}}\left(i, r\right)$ holds, and hence that the first sum is 0.
+        \item Before stating our second event formally, we compute the two moments of $\Delta\left(i, r\right)$. First, using pairwise independence of $s$: 
+        \autoeq{\exval\left(\Delta\left(i, r\right)\right) = \exval\left(\sum_{\substack{j \in T \setminus \left\{i\right\} \\ h_r\left(i\right) = h_r\left(j\right)}} s_r\left(i\right)s_r\left(j\right) x_j\right) = \sum_{\substack{j \in T \setminus \left\{i\right\} \\ h_r\left(j\right) = h_r\left(i\right)}} \exval\left(s_r\left(i\right)\right) \exval\left(s_r\left(j\right)\right) x_j = 0.}
+
+        The fact it is unbiased does not mean that it is small, we have to also look at the variance. Using the law of total expectation and the fact $h$ and $s$ are independent to get $\exval_{h, s}\left(\ldots\right) = \exval_h\left(\exval_s\left(\ldots\right)\right)$: 
+        \autoeq{\Var\left(\Delta\left(i, r\right)\right) = \exval\left(\Delta\left(i, r\right)^2\right) - \exval\left(\Delta\left(i, r\right)\right)^2 = \exval_h\left[\exval_s\left[\left(\sum_{\substack{j \in T \setminus \left\{i\right\} \\ h_r\left(j\right)= h_r\left(i\right)}} s_r\left(i\right) s_r\left(j\right) x_j\right)^2\right]\right] - 0^2 = \exval_h\left(\sum_{\substack{j \in T \setminus \left\{i\right\} \\ h_r\left(j\right) = h_r\left(i\right)}}\sum_{\substack{j' \in T \setminus \left\{i\right\} \\ h_r\left(j'\right) = h_r\left(i\right)}} x_j x_{j'} \exval_s\left(s_r\left(i\right)^2 s_r\left(j\right) s_r\left(j'\right)\right)\right).}
+        
+        However, $s_r\left(i\right)^2 = 1$. Moreover, if $j \neq j'$, $\exval\left(s_r\left(j\right) s_r\left(j'\right)\right) = \exval\left(s_r\left(j\right)\right) \exval\left(s_r\left(j'\right)\right) = 0$ by pairwise independence. On the other hand, if $j = j'$, $\exval\left(s_r\left(j\right)^2\right) = 1$. This shows:
+        \autoeq{\Var\left(\Delta\left(i, r\right)\right) = \exval_h\left(\sum_{\substack{j \in T \setminus \left\{i\right\} \\ h_r\left(j\right) = h_r\left(i\right)}} x_j^2\right) = \exval_h\left(\sum_{j \in T \setminus \left\{i\right\}} x_j^2 I\left(h_r\left(j\right) = h_r\left(i\right)\right)\right) = \sum_{j \in T \setminus \left\{i\right\}} x_j^2 \prob\left(h_r\left(j\right) = h_r\left(i\right)\right) = \sum_{j \in T \setminus \left\{i\right\}} \frac{x_j^2}{B} \leq \frac{\left\|x_T\right\|_2^2}{B},}
+        where $x_T$ is $x$ where we only keep coefficients from $T$.
+
+        So, we can consider the second event:
+        \[\mathcal{E}_{\text{delta is small}}\left(i, r\right) = \left\{\left|\Delta\left(i, r\right)\right| \leq \frac{10 \left\|x_T\right\|_2}{\sqrt{B}}\right\}.\]
+
+        By Chebyshev's inequality, we directly find that: 
+        \[\prob\left(\bar{\mathcal{E}}_{\text{delta is small}}\left(i, r\right)\right) \leq \frac{\left\|x_T\right\|_2^2 / B}{10^2 \left\|x_T\right\|_2^2 / B} = \frac{1}{100} \leq \frac{1}{10}.\]
+        
+        \end{enumerate}
+
+        Now, if the first event happens, we know that the first sum is zero and hence $\hat{x}_i^{\left(r\right)} - x_i = \Delta\left(i, r\right)$. The second event tells us that $\left|\Delta\left(i, r\right)\right| \leq \frac{10 \left\|x_T\right\|_2}{\sqrt{B}}$. Overall, this means that both events happening tell us $\left|\hat{x}_i^{\left(r\right)} - x_i\right| \leq \frac{10 \left\|x_T\right\|_2}{\sqrt{B}}$. Hence, we get, by the union bound: 
+        \autoeq[s]{\prob\left(\left|\hat{x}_i^{\left(r\right)} - x_i\right| \leq \frac{10 \left\|x_T\right\|_2}{\sqrt{B}}\right) \geq \prob\left(\mathcal{E}_{\text{no collision}}\left(i, r\right) \cap \mathcal{E}_{\text{delta is small}}\left(i, r\right)\right) \geq 1 - \prob\left(\bar{\mathcal{E}}_{\text{no collision}}\left(i, r\right)\right) + \left(\bar{\mathcal{E}}_{\text{delta is small}}\left(i, r\right)\right) \geq 1 - \frac{1}{10} - \frac{1}{10} = \frac{8}{10}.}
+
+        This is for some specific $i, r$. Now, exploiting the median trick with the Chernhoff bound as usual, we know that we can use some large enough $R = O\left(\log\left(n\right)\right)$ so that:
+        \[\prob\left(\left|\median_r\left\{\hat{x}_i^{\left(r\right)}\right\} - x_i\right| > \sqrt{\frac{100}{B}} \left\|x_T\right\|\right) \leq \exp\left(-\Omega\left(R\right)\right) \leq \frac{1}{n^2}.\]
+                
+        The union bound finally gives us our result:
+        \autoeq[s]{\prob\left(\bigcup_{i=1}^n \left\{\left|\median_r\left\{\hat{x}_i^{\left(r\right)}\right\} - x_i\right| > \sqrt{\frac{100}{B}} \left\|x_T\right\|\right\}\right) \leq \sum_{i=1}^n \prob\left(\left|\median_r\left\{\hat{x}_i^{\left(r\right)}\right\} - x_i\right| > \sqrt{\frac{100}{B}} \left\|x_T\right\|\right) \leq \frac{1}{n}.}
+
+        %\begin{enumerate}[left=0pt, start=2]
+        %\item We thus consider the following event: 
+        %\[\mathcal{E}_{\text{small variance}}\left(i, r\right) = \left\{\sum_{\substack{j \in T \setminus \left\{i\right\} \\ h_r\left(j\right) = h_r\left(i\right)}} x_j^2 \leq \frac{10}{B} \left\|x_T\right\|^2\right\}.\]
+
+        %By Markov's inequality: 
+        %\[\prob\left(\mathcal{E_{\text{small variance}}}\left(i, r\right)\right) \geq \frac{9}{10}.\]
+        %
+        %\item The last event we consider is: 
+        %\[\mathcal{E}_{\text{small noise}}\left(i, r\right) = \left\{\Delta\left(i, r\right)^2 \leq 10 \exval\left(\Delta\left(i, r\right)^2\right)\right\}\]
+
+        %\end{enumerate}
+        %
+        %Conditioned on $\mathcal{E}_{\text{no collision}}\left(i, r\right)$ and $\mathcal{E}_{\text{small variance}}\left(i, r\right)$ and $\mathcal{E}_{\text{small noise}}\left(i, r\right)$, we have: 
+        %\[\left|\hat{x}_i^{\left(r\right)} - x_i\right|^2 \leq \frac{100}{B} \left\|x_T\right\|^2 \iff \left|\hat{x}_i^{\left(r\right)} - x_i\right| \leq \sqrt{\frac{100}{B}} \left\|x_T\right\|.\]
+
+        %The probability that all these events happen simultaneously is at least $1 - \frac{3}{10}$ since they all happen with probability at least $\frac{1}{10}$. Therefore, for all $i$: 
+        %\[\prob\left(\left|\text{median}\left\{\hat{x}_i^{\left(r\right)}\right\} - x_i\right| > \sqrt{\frac{100}{B}} \left\|x_T\right\|\right) \leq \exp\left(-\Omega\left(R\right)\right) \leq \frac{1}{n^{10}}.\]
+        %
+        %Taking the union bound, the probability that this holds for all $i$ is very large.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    There exists $R \in O\left(\log\left(n\right)\right)$ such that:
+    \[\prob\left(\forall i, \left|\hat{x}_i - x_i\right| \leq \frac{10\left\|x\right\|_2}{\sqrt{B}}\right) \geq 1 - \frac{1}{n}.\]
+    
+    \begin{subparag}{Remark}
+        This allows \lang{CountSketch} to solve the heavy hitter problem. Indeed, we can take $B = O\left(\frac{1}{\phi^2}\right)$ to be sufficiently large, to get the following guarantee on the output of \lang{CountSketch}: 
+        \[\prob\left(\forall i, \left|\hat{x}_i - x_i\right| \leq \frac{\phi}{4} \left\|x\right\|_2\right) \geq 1 - \frac{1}{n}.\]
+        
+        \lang{CountSketch} is able to produce this estimate for all $i$ in space $O\left(\log\left(n\right)^2 / \phi^2\right)$. But then, we can output all $i$ such that $\hat{x}_i \geq \frac{3}{4} \phi \left\|x\right\|_2$. We will not be missing any $\phi$-heavy hitter with probability at least $1 - \frac{1}{n}$, and all outputted result will be at least $\frac{\phi}{2}$-heavy hitters, thanks to the guarantee on the quality of this estimator. This indeed means that the outputted result solves the $\ell_2$-heavy hitter problem.
+
+        This only takes space $O\left(\log\left(n\right)^2 / \phi^2\right)$, which is really good.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is a direct consequence of the previous theorem: no matter $k$, we have that $\left\|x_T\right\|_2 \leq \left\|x\right\|_2$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

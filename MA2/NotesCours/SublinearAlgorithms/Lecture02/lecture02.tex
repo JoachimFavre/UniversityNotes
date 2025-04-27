@@ -1,0 +1,218 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use Kuala Tex (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-02-26 at 13:18:34.
+
+\usepackage{../../style}
+
+\title{sublinear algorithms}
+\author{Joachim Favre}
+\date{Mercredi 26 février 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2025-02-26}{Chirac jumps over those}{
+    \begin{itemize}[left=0pt]
+        \item \textit{(Look for ``Chirac turnstile'' on the internet.)}
+        \item Boosting Morris algorithm to achieve arbitrary precision at an arbitrary success probability.
+        \item Definition of turnstile streams.
+        \item Explanation of the distinct element problem, and of its decision problem counterpart.
+    \end{itemize}
+    
+}
+
+\begin{parag}{Lemma}
+    Let $X_n$ be the random variable representing the counter after the $n$\Th event occurred. Then: 
+    \[\exval\left(2^{2 X_n}\right) = \frac{3}{2} n^2 + \frac{3}{2} n + 1.\]
+
+    \begin{subparag}{Proof}
+        This has been proven in the first exercise series.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        As I mentioned in the previous lemma, I presented an alternate proof method that makes this type of proofs more intuitive, in my opinion. I think it is worth showcasing what I meant here. Be careful, spoilers of the first exercise series ahead!
+
+        We use the law of total expectation: 
+        \autoeq{\exval\left(2^{2 X_k}\right) = \exval\left(\exval\left(2^{2 X_k} \suchthat X_{k-1}\right)\right) = \exval\left(2^{2 \left(X_{k-1} + 1\right)} 2^{-X_{k-1}} + 2^{2 X_{k-1}} \left(1 - 2^{-X_{k-1}}\right)\right) = \exval\left(2^{X_{k-1} + 2} + 2^{2 X_{k-1}} - 2^{X_{k-1}}\right) = 3\exval\left(2^{X_{k-1}}\right) + \exval\left(2^{2X_{k-1}}\right) = 3k + \exval\left(2^{2X_{k-1}}\right),}
+        where we used our lemma, i.e. the fact $\exval\left(2^{X_{n}}\right) = n + 1$. Chaining those equalities, we find: 
+        \autoeq{\exval\left(2^{2 X_n}\right) = \exval\left(2^{2 X_{n-1}}\right) + 3n = \exval\left(2^{2 X_{n-2}}\right) + 3n + 3\left(n-1\right) = \ldots = \exval\left(2^{2 X_0}\right) + \sum_{k=1}^{n} 3k.}
+
+        We know that $\exval\left(2^{2 X_0}\right) = 2^{2\cdot 0} = 1$ and that $\sum_{k=1}^{n} k = \frac{1}{2} k\left(k+1\right)$, hence: 
+        \[\exval\left(2^{2X_n}\right) = 1 + 3 \sum_{k=1}^{n} k = 1 + \frac{3}{2}n\left(n+1\right) = \frac{3}{2} n^2 + \frac{3}{2} n + 1.\]
+         
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $X_n$ be the random variable representing the counter after the $n$\Th event occurred, and let $\hat{n} = 2^{X_n} - 1$ be the estimator. Then:
+    \[\Var\left(\hat{n}\right) \leq \frac{1}{2}n^2.\]
+
+    \begin{subparag}{Proof}
+        We know that $\Var\left(X + c\right) = \Var\left(X\right)$ for any random variable $X$ and constant $c$. So: 
+        \autoeq{\Var\left(\hat{n}\right) = \Var\left(\hat{n} + 1\right) = \Var\left(2^{X_n}\right) = \exval\left(2^{2X_n}\right) - \exval\left(2^{X_n}\right)^2 = \left(\frac{3}{2} n^2 + \frac{3}{2} n + 1\right) - \left(n+1\right)^2 \leq \frac{1}{2} n^2.}
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        This allows us to know how good of an estimator $\hat{n}$ is. By Chebyshev's inequality: 
+        \[\prob\left(\left|\hat{n} - n\right| \geq \epsilon n\right) \leq \frac{\Var\left(\hat{n}\right)}{n^2 \epsilon^2} \leq \frac{n^2/2}{n^2 \epsilon^2} = \frac{1}{2 \epsilon^2}.\]
+
+        The thing is, if $\epsilon$ is small, then $\frac{1}{2 \epsilon^2}$ is large. This is interesting for large $\epsilon$, but we want it to also hold for smaller $\epsilon$. We thus want to reduce the variance. To do so, we can average estimators, yielding the following algorithm.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Morris+ algorithm}
+    We maintain $t$ copies of Morris' algorithm, which output $X_n^1, \ldots, X_n^t$. We then output: 
+    \[\hat{n} = \frac{1}{t} \sum_{j=1}^{t} \left(2^{X_n^j} - 1\right)\]
+
+    We call this algorithm the Morris+ algorithm. When $t \geq \frac{1}{2 \epsilon^2 \delta}$, this is an $\left(\epsilon, \delta\right)$-approximation algorithm to the counting problem, i.e.:
+    \[\prob\left(\left|\hat{n} - n\right| \geq \epsilon n\right) \leq \delta.\]
+    
+    Moreover, it uses memory $O\left(t \log\left(\log\left(n\right)\right)\right)$.
+    
+    \begin{subparag}{Proof of validity}
+        The expectation of the output is unchanged: 
+        \[\exval\left(\hat{n}\right) = \exval\left(\frac{1}{t} \sum_{j=1}^{t} \left(2^{X_n^j} - 1\right)\right) = \frac{1}{t} \sum_{j=1}^{t} \exval\left(2^{X_n^j} - 1\right) = \frac{1}{t} \sum_{j=1}^{t} n = n.\]
+
+        However, the variance is decreased, since the estimator are independent by construction: 
+        \autoeq{\Var\left(\hat{n}\right) = \Var\left(\frac{1}{t} \sum_{j=1}^{t} 2^{X_n^j} - 1\right) = \frac{1}{t^2} \sum_{j=1}^{t} \Var\left(2^{X_n} - 1\right) = \frac{\Var\left(2^{X_n^j} - 1\right)}{t} \leq \frac{n^2}{2t}.}
+        
+        Chebyshev's inequality therefore tells us that, when $t \geq \frac{1}{2 \epsilon^2 \delta}$: 
+        \[\prob\left(\left|\hat{n} - n\right| \geq \epsilon n\right) \leq \frac{\Var\left(\hat{n}\right)}{\epsilon^2 n^2} \leq \frac{\frac{n^2}{2t}}{\epsilon^2 n^2} = \frac{1}{2 \epsilon^2 t} \leq \delta,\]
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Space complexity}
+        Since we maintain $t$ copies of Morris' algorithm, this does yields a space complexity of $O\left(t \log\left(\log\left(n\right)\right)\right) = O\left(\frac{1}{\epsilon^2 \delta} \log\left(\log\left(n\right)\right)\right)$. The $\frac{1}{\epsilon^2}$ is fine, but the $\frac{1}{\delta}$ is a big problem: we want $\delta$ to be really small to make sure our counter is valid. We consider the following idea to improve it, called the median trick.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Morris++}
+    We take $t \in \Theta\left(\log\left(\frac{1}{\delta}\right)\right)$ independent copies of Morris+ with bound $\epsilon_j = \epsilon$ and failure probability $\delta_j \leq \frac{1}{3}$, and output the median of their results. 
+
+    Since we need a space $O\left(\frac{1}{\epsilon^2} \log\left(\log\left(n\right)\right)\right)$ per copy, and we have $t\in \Theta\left(\log\left(\frac{1}{\delta}\right)\right)$ copies, this takes space $O\left(\frac{1}{\epsilon^2} \log\left(\log\left(n\right)\right) \log\left(\frac{1}{\delta}\right)\right)$.
+
+    \begin{subparag}{Intuition}
+        The idea is that at most $\frac{1}{3}$ of the estimates are outside $\left[n- \epsilon n, n + \epsilon n\right]$ on expectation. For the median to be less than $n - \epsilon$, it means that at least $\frac{1}{2}$ of the estimates were less than $n - \epsilon$, which is very unlikely. Similarly, it is very unlikely that the median is more than $n + \epsilon$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $Y_i$ be the indicator of the $i$\Th estimator being correct:
+        \[Y_i = \begin{systemofequations} 0, & \text{if $i$\Th estimate fails} \\ 1, & \text{otherwise}.\end{systemofequations}\]
+
+        Our goal is to show that, if $t \geq C \log\left(\frac{1}{\delta}\right)$ for some constant $C > 0$, the probability that the median fails is small, i.e. the probability that at least $\frac{t}{2}$ estimates fails is small: 
+        \[\prob\left(\sum_{i=1}^{t} Y_i \leq \frac{t}{2}\right) \leq \delta.\]
+
+        We leave $\mu = \sum_{i} \exval\left(Y_i\right)$. We notice that $\exval\left(Y_i\right) = 1 - \delta_i \geq \frac{2}{3}$, so $\mu \geq \frac{2}{3} t$. Similarly, $\exval\left(Y_i\right) \leq 1$ since they are Bernoulli random variables, and hence $\mu \leq t$. We can massage our result to get a formulation closer to the Chernhoff bounds: 
+        \autoeq{\sum_{i=1}^{t} Y_i \leq \frac{t}{2} \implies \sum_{i} Y_i - \mu  \leq \frac{t}{2} - \mu \leq \frac{1}{2} t - \frac{2}{3} t = -\frac{1}{6} t \implies \left|\sum_{i} Y_i - \mu\right| \geq \frac{1}{6}t \geq \frac{1}{6} \mu,}
+        where we used the fact $x \mapsto \left|x\right|$ is a decreasing function for negative $x$. Since $\sum_{i} Y_i \leq \frac{t}{2}$ necessarily implies that $\left|\sum_{i} Y_i - \mu\right| \geq \frac{1}{6} \mu$, this shows that:
+        \[\prob\left(\sum_{i} Y_i \leq \frac{t}{2}\right) \leq \prob\left(\left|\sum_{i} Y_i - \mu\right| \geq \frac{1}{6} \mu\right).\]
+
+        Now, applying the Chernoff bounds, with $\hat{\delta} = \frac{1}{6}$: 
+        \autoeq{\prob\left(\sum_{i=1}^{n} \leq \frac{t}{2}\right) \leq \prob\left(\left|\sum_{i} Y_i - \mu\right| \geq \frac{1}{6} \mu\right) \leq 2 \exp\left(-\frac{\hat{\delta}^2 \mu}{3}\right) \leq 2 \exp\left(-\frac{\left(\frac{1}{6}\right)^2 \frac{2}{3} t}{3}\right) \leq \delta,}
+        as long as $t \geq C \log\left(\frac{1}{\delta}\right)$, where $C > 0$ is a large enough constant. This is exactly what we wished for.
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        To summarise, we first improved the bound $\epsilon$ arbitrarily and improved the success probability to a constant $1 - \delta = \frac{2}{3}$, by taking an average. We then applied the median trick to improve the success probability $1 - \delta$ arbitrarily. This is a very general trick, that we will apply multiple times during this class.
+
+        Note that to improve the bound $\epsilon$, we cannot use the median: the median of IID random variables does not necessarily converge to their expected value. However, as soon as we have a satisfying bound and a constant success probability which is at least $\frac{1}{2}$, we can make the convergence faster using the median. As we have seen with Morris+, we can also improve the success probability with an average, although the convergence is exponentially slower.
+    \end{subparag}
+\end{parag}
+
+\section{Distinct elements}
+\subsection{Definitions}
+
+\begin{parag}{Definition: Turnstile stream}
+    We define a \important{turnstile stream} to be a stream where items can arrive and depart.  \later{the domain of $\sigma$, what are $m$ and $n$??}
+
+    \begin{subparag}{Example}
+        For instance, we may have:
+        \[\sigma = \left\langle 1, 2, 5, -2, 3001, 1, 2, -3001, 5, 5 \right\rangle.\]
+        
+        A negative value means that an element departed. Note that there might be multiplicites: an element might arrive twice and depart once, so the stream ends up with a single copy of this element.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        In the following lectures, we will refer to ``turnstile streams'' as ``streams''.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Frequency vector}
+    Let $\sigma$ be some stream.
+
+    We define its frequency vector $x \in \mathbb{R}^n$ such that, for all $i \in \left\{1, \ldots, n\right\}$, $x_i$ is the number of times items $i$ arrived so far.
+
+    \begin{subparag}{Properties}
+        Note that $\left\|x\right\|_1 = \sum_{i} \left|x_i\right|$ is the number of items at the end of the stream. Similarly, $\left\|x\right\|_0$ is the number of distinct elements.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Turnstile distinct elements problem}
+    We are given a turnstile stream $\sigma$ of $m$ data items. Data items are integers in $\left\{1, \ldots, n\right\}$.
+
+    We want to know how many distinct elements are left, at the end. More precisely, we want to find a single pass streaming algorithm that outputs a randomised estimator $\widetilde{k}$ of $\left\|x\right\|_0$:
+    \[\prob\left(\left(1- \epsilon\right) \left\|x\right\|_0 \leq \widetilde{k} \leq \left(1+\epsilon\right) \left\|x\right\|_0\right) \geq 1 - \delta.\]
+
+    \begin{subparag}{Intuition}
+         We can suppose that $m = n^{O\left(1\right)}$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The trivial benchmarks are $O\left(m \log\left(n\right)\right)$ (storing the whole stream) and $O\left(n \log\left(m\right)\right)$ (storing $x$). Our algorithm should thus be better than that.
+
+        In fact, we will achieve a 2-approximation algorithm. We will then boost it to a $\left(1+\epsilon\right)$-approximation algorithm with probability $1 - \delta$ of success in space $\lang{poly}\left(\frac{1}{\epsilon}, \ln\left(\frac{1}{\delta}\right), \ln\left(n\right)\right)$ in third exercise series.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Any deterministic algorithm that approximates the number of distinct elements in a stream with error at most $\epsilon = 0.01$ must use $\Omega\left(n\right)$ space.
+
+    \begin{subparag}{Proof}
+        This will be proven in the second exercise series.
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        This theorem means that randomness is necessary for our algorithm.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Distinct element decision problem}
+    In order to solve our problem, we first consider a decision version.
+
+    We are given a stream $\sigma$, and some threshold $t$. Moreover, let $x$ be the frequency vector of $\sigma$.
+
+    The task is to output \lang{YES} if $\left\|x\right\|_0 \geq 2t$, and \lang{NO} if $\left\|x\right\|_0 \leq t$.
+
+    \begin{subparag}{Remark}
+        We do not care what is outputted if $t < \left\|x_0\right\| < 2t$.
+    \end{subparag}
+\end{parag}
+
+\subsection{Naive algorithm}
+\begin{parag}{Algorithm}
+    We consider an algorithm to solve the distinct element decision problem.
+    \begin{enumerate}[left=0pt]
+        \item Select a subset $S \subseteq \left\{1, \ldots, n\right\}$ by including each $i \in \left\{1, \ldots, n\right\}$ independently with probability $\frac{1}{t}$.
+        \item While receiving the stream, compute $C = \sum_{i \in S} x_i$. In other words, when some $i = a_j$ arrives or departs, we add $\text{sign}\left(i\right)$ to $C$ if $i \in S$.
+        \item If $C > 0$ output \lang{YES}. Otherwise, i.e. if $C = 0$, then output \lang{NO}.
+    \end{enumerate}
+
+    \begin{subparag}{Remark}
+        For now, we suppose that $S$ does not cost anything to be stored or to be generated. This allows to better understand the intuition behind this algorithm. We will later refine this hypothesis.
+    \end{subparag}
+    
+    \begin{subparag}{Intuition}
+        Intuitively, if we have very few distinct elements in the stream, they are likely not to be in $S$, and thus it is likely $C = 0$. If otherwise there are many elements, it is likely $C > 0$.
+    \end{subparag}
+\end{parag}
+
+\end{document}

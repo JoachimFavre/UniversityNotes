@@ -1,0 +1,252 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-02-19 at 13:45:54.
+
+\usepackage{../../style}
+
+\title{Sublinear algorithms}
+\author{Joachim Favre}
+\date{Mercredi 19 février 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2025-02-19}{Counting to $n$}{
+\begin{itemize}[left=0pt]
+    \item Motivation of sublinear algorithms.
+    \item Review of the important concentration inequalities: Markov's inequality, Chebyshev's inequality and the Chernoff bounds.
+    \item Explanation of the approximate counting problem.
+    \item Explanation of Morris' algorithm, and start of its proof.
+\end{itemize}
+
+}
+
+\section{Introduction}
+
+\subsection{Goal}
+
+\begin{parag}{Observation}
+    For most of the algorithms we have seen so far in our studies, linear time $O\left(n\right)$ and nearly linear time are the golden standard of algorithmic efficiency. Good examples are that sorting and fast Fourier transform can be done in $O\left(n \ln\left(n\right)\right)$, and hence we tend to accept doing those in an algorithm without much questioning.
+
+    However, such algorithms typically take as hypothesis that the whole dataset is in memory, which may not be doable in practice. We thus consider sublinear algorithms, i.e. algorithms that process an input of size $n$ using resources sublinear in $n$, i.e. in $o\left(n\right)$. We care about multiple computational resources, which we may want to be sublinear: 
+    \begin{itemize}
+        \item \textit{Time}: How long the algorithm runs on an input of size $n$;
+        \item \textit{Space}: How much memory the algorithm needs;
+        \item \textit{Communication:} We may have $n$ parties, where the $i$\Th party knows some $x_i$. The group wants to evaluate a function $f\left(x_1, \ldots, x_n\right)$, by exchanging few bits.
+    \end{itemize}
+    
+    \begin{subparag}{Remark}
+        Sublinear algorithms are nice, however they typically come at a cost. They are often approximate and randomised.
+    \end{subparag}
+\end{parag}
+
+\subsection{Probability review}
+
+\begin{parag}{Remark}
+    In the following paragraphs, all random variables are discrete.
+\end{parag}
+
+\begin{parag}{Intuition}
+    Markov's inequality, Chebyshev's inequality and the Chernoff bounds all allow to prove concentration phenomena, i.e. that some random variable $X$ does not deviate much from its expected value on average: 
+    \[\prob\left(\left|X - \exval\left(X\right)\right| \geq \text{something large}\right) \leq \text{something small}.\]
+
+    We will start by recalling those inequalities.
+\end{parag}
+
+\begin{parag}{Theorem: Markov's inequality}
+    Let $X$ be a random variable. 
+
+    If $X \geq 0$ is non-negative, then, for all $a > 0$: 
+    \[\prob\left(X \geq a\cdot \exval\left(X\right)\right) \leq \frac{1}{a}.\]
+
+    Equivalently, if $X \geq 0$ is non-negative, then, for all $b > 0$: 
+    \[\prob\left(X \geq b\right) \leq \frac{\exval\left(X\right)}{b}.\]
+
+    \begin{subparag}{Proof}
+        We know that, by definition: 
+        \autoeq{\exval\left(X\right) = \sum_{x} x \prob\left(X = x\right) = \sum_{x < a \exval\left(X\right)} x \prob\left(X = x\right) + \sum_{x \geq a \exval\left(X\right)} x \prob\left(X = x\right) \geq \sum_{x \geq a \exval\left(X\right)} x \prob\left(X = x\right) \geq a \exval\left(X\right) \sum_{x \geq a \exval\left(X\right)} \prob\left(X = x\right) = a \exval\left(X\right) \prob\left(X \geq a \exval\left(X\right)\right).}
+
+        This directly gives us our result: 
+        \[\prob\left(X \geq a \exval\left(X\right)\right) \leq \frac{1}{a}.\]
+
+        The second inequality directly comes by setting $b = a \exval\left(X\right) \iff a = \frac{b}{\exval\left(X\right)}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Variance}
+    Let $X$ be a random variable, of expectation $\mu_X$.
+
+    Then, its variance $\sigma_X^2 = \Var\left(X\right)$ can be equivalently defined as: 
+    \[\Var\left(X\right) = \exval\left(\left(X - \mu_X\right)^2\right) = \exval\left(X^2\right) - \exval\left(X\right)^2.\]
+\end{parag}
+
+
+\begin{parag}{Theorem: Chebyshev's inequality}
+    Let $X$ be a random variable of expectation $\mu_X$ and variance $\sigma_X^2$.
+
+    Then, for any $\lambda > 0$: 
+    \[\prob\left(\left|X - \mu_X\right| \geq \lambda\right) \leq \frac{\sigma_X^2}{\lambda^2}.\]
+    
+    \begin{subparag}{Proof}
+        Let $Y$ be the following random variable: 
+        \[Y = \left(X - \mu_X\right)^2.\]
+
+        Note that $Y \geq 0$ is a non-negative random variable. Moreover: 
+        \[\left|X - \mu_X\right| \geq \lambda \iff Y \geq \lambda^2.\]
+        
+        Markov's inequality therefore implies that: 
+        \[\prob\left(\left|X - \mu_X\right| \geq \lambda\right) = \prob\left(Y \geq \lambda^2\right) = \frac{\exval\left(Y\right)}{\lambda^2} = \frac{\Var \left(X\right)}{\lambda^2},\]
+        where we used the fact that $\exval\left(Y\right) = \Var\left(X\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Chernoff bounds}
+    Let $X = X_1 + \ldots + X_n$ be a random variable, where each $X_i \followsdistr \text{Ber}\left(p_i\right)$ is an independent Bernoulli random variable; i.e. $X_i = 1$ with probability $p_i$ and $0$ with probability $1 - p_i$. Moreover, we note $\mu_X = \exval\left(X\right)$.
+
+    Then, for all $\delta \in \left]0, 1\right[ $, the following two affirmations hold:
+    \begin{enumerate}
+        \item $\displaystyle \prob\left(X \geq \left(1 + \delta\right)\mu_X\right) \leq \exp\left(-\frac{\delta^2 \mu_X}{3}\right)$.
+        \item $\displaystyle \prob\left(X \leq \left(1 - \delta\right)\mu_X\right) \leq \exp\left(-\frac{\delta^2 \mu_X}{3}\right).$
+    \end{enumerate}
+
+    \begin{subparag}{Implication}
+        A direct implication of this theorem is that, when $\delta \in \left]0, 1\right[ $: 
+        \[\prob\left(\left|X - \mu_X\right| \geq \delta \mu_X\right) \leq 2 \exp\left(-\frac{\delta^2 \mu_X}{3}\right).\]
+        
+        Indeed, using that $\prob\left(A \cup B\right) = \prob\left(A\right)+ \prob\left(B\right)$ when $A$ and $B$ are disjoint events:
+        \autoeq{\prob\left(\left|X - \mu_X\right| \geq \delta \mu_X\right) = \prob\left(X - \mu_X \geq \delta \mu_X\right) + \prob\left(X - \mu_X \leq -\delta \mu_X\right) = \prob\left(X \geq \left(1 + \delta\right) \mu_X\right) + \prob\left(X \leq \left(1 - \delta\right) \mu_X\right) \leq \exp\left(-\frac{\delta^2 \mu_X}{3}\right) + \exp\left(-\frac{\delta^2 \mu_X}{3}\right).}
+    \end{subparag}
+    
+    \begin{subparag}{Intuition}
+        The central limit theorem tells us that, for $n \to \infty$: 
+        \[\frac{X - \exval\left(X\right)}{\sqrt{\Var\left(X\right)}} \followsdistr \mathcal{N}\left(0, 1\right).\]
+
+        From this, we expect that, for $n$ sufficiently large: 
+        \autoeq{\prob\left(\left|X - \exval\left(X\right)\right| \geq t \sqrt{\Var\left(X\right)}\right) = \prob\left(\frac{\left|X - \exval\left(X\right)\right|}{\sqrt{\Var\left(X\right)}} \geq t\right) \approx \frac{1}{t} \exp\left(-\frac{t^2}{2}\right).}
+        
+        This is, in some sense, what the Chernoff bounds tell us.
+    \end{subparag}
+
+    \begin{subparag}{Proof 1}
+        We pick some arbitrary $t > 0$. We will fix it later, so that our bound is tightest.
+
+        We notice that since $z \mapsto \exp\left(t\cdot z\right)$ is a monotone bijective function: 
+        \[\prob\left(X \geq \left(1 + \delta\right) \mu_X\right) = \prob\left(\exp\left(tX\right) \geq \exp\left(t \left(1 + \delta\right) \mu_X\right)\right).\]
+
+        However, the random variable $\exp\left(tX\right) \geq 0$ is non-negative, so we can apply Markov's inequality to it. 
+        \[\prob\left(\exp\left(tX\right) \geq \exp\left(t \left(1 + \delta\right) \mu_X\right)\right) \leq \frac{\exval\left(\exp\left(tX\right)\right)}{\exp\left(t\left(1 + \delta\right)\mu_X\right)}.\]
+        
+        We need to compute this expected value $\exval\left(e^{tX}\right)$. Since $X = \sum_{i} X_i$: 
+        \[\exval\left(e^{tX}\right) = \exval\left(e^{t \sum_{i} X_i}\right) = \exval\left(\prod_{i} e^{t X_i}\right) = \prod_{i} \exval\left(e^{t X_i}\right),\]
+        where we used the fact that $\exval\left(X\cdot Y\right) = \exval\left(X\right)\exval\left(Y\right)$ for independent random variables. However, we know that, since $X_i \followsdistr \text{Ber}\left(p_i\right)$: 
+        \autoeq{\exval\left(e^{t X_i}\right) = p_i e^{t\cdot 1} + \left(1 - p_i\right)e^{t\cdot 0} = p_i e^t + 1 - p_i = p_i\left(e^t - 1\right) + 1 \leq \exp\left(p_i \left(e^t - 1\right)\right),}
+        since $1 + z \leq \exp\left(z\right)$ for all $z \in \mathbb{R}$. But then, this yields that, since $\mu_X = \sum_{i} \exval\left(X_i\right) = \sum_{i} p_i$: 
+        \autoeq{\exval\left(\exp\left(tX\right)\right) = \prod_{i} \exval\left(e^{t X_i}\right) \leq \prod_{i} \exp\left(p_i \left(e^t - 1\right)\right) = \exp\left(\sum_{i} p_i \left(e^t - 1\right)\right) = \exp\left(\left(e^t - 1\right) \sum_{i} p_i\right) = \exp\left(\left(e^t - 1\right) \mu_X\right).}
+        
+        Now that we are able to bound the expected value $\exval\left(\exp\left(tX\right)\right)$, we can come back to our original inequality: 
+        \autoeq{\prob\left(X \geq \left(1 + \delta\right) \mu_X\right) = \prob\left(\exp\left(tX\right) \geq \exp\left(t \left(1 + \delta\right) \mu_X\right)\right) \leq \frac{\exval\left(\exp\left(tX\right)\right)}{\exp\left(t\left(1 + \delta\right)\mu_X\right)} \leq \frac{\exp\left(\left(e^t - 1\right)\mu_X\right)}{\exp\left(t \left(1 + \delta\right) \mu_X\right)} = \left(\frac{\exp\left(e^t - 1\right)}{\exp\left(t\left(1 + \delta\right)\right)}\right)^{\mu_X} = \exp\left(e^t - 1 - t\left(1 + \delta\right)\right)^{\mu_X}.}
+
+        We wish to minimise the resulting expression, to get an inequality which is as tight as possible. This is equivalent to minimising $e^t - 1 - t\left(1 + \delta\right)$, which derivative is $e^t - \left(1 + \delta\right)$. Setting this to $0$, we get: 
+        \[e^t - \left(1 + \delta\right) = 0 \iff t = \ln\left(1 + \delta\right).\]
+
+        It is possible to verify this critical point is indeed a minimum. Injecting $t = \ln\left(1 + \delta\right) > 0$ in our equality, we get:
+        \[\prob\left(X \geq \left(1 + \delta\right) \mu_X\right) \leq \left(\frac{e^{\delta}}{\left(1+\delta\right)^{1 + \delta}}\right)^{\mu_X}.\]
+
+        This is already a very good inequality, although it is hard to use in practice. We can simplify it more, using the fact that $\left(1 + \delta\right)\ln\left(1 + \delta\right) \geq \delta + \frac{\delta^2}{3}$ when $\delta \in \left]0, 1\right[ $ to get our result:
+        \[\prob\left(X \geq \left(1 + \delta\right) \mu_X\right) \leq \left(\frac{e^{\delta}}{\left(1+\delta\right)^{1 + \delta}}\right)^{\mu_X} \leq \exp\left(-\frac{\delta^2 \mu_X}{3}\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        The lower tail inequality is completely similar, except that we start by considering an arbitrary $t < 0$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Counting}
+
+\begin{parag}{Counting problem}
+    Let $n \in \mathbb{N}$ be some integer. 
+
+    We know there will be at most $n$ events occurring. Our goal is to count exactly how many there are.
+
+    \begin{subparag}{Remark}
+        This is trivial if we are able to store $O\left(\log\left(n\right)\right)$ bits, we can count exactly. We however wonder what happens when we allow randomness.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Approximate counting problem}
+    Let $\delta, \epsilon \in \left]0, 1\right[ $ be arbitrary. Our goal is to output some $\hat{n}$ such that: 
+    \[\prob\left(\left(1 - \epsilon\right) n \leq \hat{n} \leq \left(1 + \epsilon\right) n\right) \geq 1 - \delta.\]
+\end{parag}
+
+\begin{parag}{Static algorithm}
+    The idea, implemented naively, is to find an integer $j$ such that $2^{j-1} \leq n \leq 2^j$. We then output $j$. 
+
+    This is already a 2-approximation, i.e. the result is at most at a factor $2$ of the correct answer.
+
+    \begin{subparag}{Observation}
+        The value we output takes space $\log_2\left(j\right) = \log_2\left(\log_2\left(2n\right)\right) = \log_2\left(\log_2\left(n\right)\right) + O\left(1\right)$. However, computing it still takes space $O\left(\log\left(n\right)\right)$. This brings us to the following algorithm.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Morris' algorithm}
+    We maintain a counter $x$, that starts at $0$. For each event, we then increment $x$ with probability $2^{-x}$. Finally, we output $2^x - 1$.
+
+    \begin{subparag}{Remark}
+        Note that it takes $O\left(\log\left(n\right)\right)$ bits to output the result, but usually only $O\left(\log\left(\log\left(n\right)\right)\right)$ to keep track of the counter during the algorithm. An example of application is Google storing the number of views of photos. They store the $O\left(\log\left(\log\left(n\right)\right)\right)$ randomised counter but, when someone requests this number, they compute and send the $O\left(\log\left(n\right)\right)$-size number.
+
+        Moreover, there is a non-zero probability that the counter increments at every events, yielding a space of $O\left(\log\left(n\right)\right)$. However, in this case, the result $2^x - 1$ is a very poor approximation of $n$. When the counter stays a good approximation, which we will show to happen with high probability, then the counter takes $O\left(\log\left(\log\left(n\right)\right)\right)$ memory.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        Intuitively, we output $2^x - 1$ instead of just $2^x$ because, if there is no event, we would have $x = 0$, and we would want to output $0$; outputting only $2^x$ would make us output $1$. More formally, this is because of the following claim.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $X_n$ be the random variable representing the counter after the $n$\Th event occurred. Then:
+    \[\exval\left(2^{X_n}\right) = n+1.\]
+
+    \begin{subparag}{Implication}
+        This implies that, considering $\hat{n} = 2^{X_n} - 1$ to be the random estimator used in the algorithm: 
+        \[\exval\left(\hat{n}\right) = n.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We do the proof by induction on $n$.
+        \begin{itemize}[left=0pt]
+            \item \textit{(Base case)} We suppose that $n = 0$. This means that $X_n = 0$ with probability $1$, since no event occurred. But then: 
+            \[\exval\left(2^{X_n}\right) = 2^0 = 1 = n + 1.\]
+            \item \textit{(Inductive step)} We suppose that the proposition is true for some $n$, and we want to show it for $n + 1$. By the law of total expectations: 
+            \autoeq{\exval\left(2^{X_{n+1}}\right) = \sum_{j \geq 0} \exval\left(2^{X_{n+1}} \suchthat X_n = j\right)\prob\left(X_n = j\right) = \sum_{j \geq 0} \prob\left(X_n = j\right) \left(2^{j+1} 2^{-j}+ 2^j \left(1 - 2^{-j}\right)\right) = \sum_{j \geq 0} \prob\left(X_n = j\right) \left(2^j + 1\right) = \exval\left(2^{X_n} + 1\right) = \exval\left(2^{X_n}\right) + 1.}
+
+            Since $\exval\left(2^{X_n}\right) = n + 1$ by inductive hypothesis, this shows that: 
+            \[\exval\left(2^{X_{n+1}}\right) = \left(n+1\right) + 1,\]
+            as required.
+        \end{itemize}
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        The proof above is the one we did in class. I would have personally done it slightly differently, this is a matter of opinions, but my method might give more intuition on how we come up with the proposition to prove while however being slightly less formal. It is for instance easier to apply for one of the exercises of the first series, in my opinion.
+
+        We again apply the law of total expectation, but using another form of conditional expected values: 
+        \autoeq{\exval\left(2^{X_{n+1}}\right) = \exval\left(\exval\left(2^{X_{n+1}} \suchthat 2^{X_n}\right)\right) = \exval\left(2^{X_n + 1}\cdot 2^{-X_n} + 2^{X_n} \left(1 - 2^{-X_n}\right)\right) = \exval\left(2 + 2^{X_n} - 1\right) = \exval\left(2^{X_n}\right) + 1.}
+        
+        We can then simply chain the results: 
+        \[\exval\left(2^{X_n}\right) = \exval\left(2^{X_{n-1}}\right) + 1 = \exval\left(2^{X_{n-2}}\right) + 2 = \ldots = \exval\left(2^{X_0}\right) + n = 1 + n,\]
+        since $\exval\left(2^{X_0}\right) = 2^0 = 1$.
+    \end{subparag}
+\end{parag}
+
+\end{document}
+

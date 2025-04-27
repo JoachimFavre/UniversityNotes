@@ -1,0 +1,174 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-26 at 13:22:24.
+
+\usepackage{../../style}
+
+\title{Sublinear algorithms}
+\author{Joachim Favre}
+\date{Mercredi 26 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2025-03-26}{Approximating an approximation}{
+    \begin{itemize}[left=0pt]
+        \item Proof that a subspace embedding yields an algorithm to the approximate least squares problem.
+        \item Proof that \lang{CountSketch} is a subspace embedding.
+        \item Analysis of the algorithm solving the approximate least squares problem using \lang{CountSketch}.
+    \end{itemize}
+}
+
+\begin{parag}{Algorithm}
+    Let $\Pi$ be sampled from a $\left(d+1, \frac{1}{10} \epsilon, \delta\right)$-subspace embedding. We then output the following using the Moore-Penrose pseudo inverse:
+    \[x' = \argmin_{x \in \mathbb{R}^d} \left\|\Pi A x - \Pi b\right\|_2.\]
+
+    This $x'$ solves the approximate linear regression problem, i.e. for $x^* = \argmin_x \left\|A x - b\right\|_2$, with probability $1 - \delta$: 
+    \[\left\|A x' - b\right\|_2 \leq \left(1 + \epsilon\right) \left\|A x^* - b\right\|_2.\]
+    
+    \begin{subparag}{Remark 1}
+        Notice that $\Pi A \in \mathbb{R}^{m \times d}$ and $\Pi b \in \mathbb{R}^m$, hence they have many less rows. Using the Moore-Penrose inverse on $\left(\Pi A, \Pi b\right)$ is hence a lot faster than applying it directly on $\left(A, b\right)$.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        For this algorithm to be faster, we need to be able to compute $\Pi A$ very efficiently. Taking the distribution to be random Gaussian matrix might yield a valid subspace embedding, but they are too dense and make compute $\Pi A$ hard. We will see another construction based on \lang{CountSketch}, which is much more efficient.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We can write: 
+        \[\Pi A x - \Pi b = \Pi \begin{pmatrix} A & b \end{pmatrix} \begin{pmatrix} x \\ -1 \end{pmatrix}.\]
+
+        Note that $\begin{pmatrix} A & b \end{pmatrix} \begin{pmatrix} x \\ -1 \end{pmatrix}$ is a vector that is necessarily in the column span of the matrix $\begin{pmatrix} A & b \end{pmatrix}$. Now, we know that the column span of a matrix with $d+1$ column is at most a $\left(d+1\right)$-dimensional subspace. We can thus apply our subspace embedding guarantee on it.
+
+        $x'$ is the optimal solution of the compressed problem. So, $x^*$ cannot be better than the optimal solution for the compressed problem. Hence, necessarily: 
+        \autoeq{\left\|\Pi A x' - \Pi b\right\|_2 \leq \left\|\Pi A x^* - \Pi b\right\|_2 \implies \underbrace{\left\|\Pi \begin{pmatrix} A & b \end{pmatrix} \begin{pmatrix} x' \\ -1 \end{pmatrix} \right\|_2}_{= LHS} \leq \underbrace{\left\|\Pi \begin{pmatrix} A & b \end{pmatrix} \begin{pmatrix} x^* \\ -1 \end{pmatrix} \right\|_2}_{= RHS}.}
+        
+        By the definition of subspace embedding, with high probability, those norms are approximately preserved since both $\begin{pmatrix} A & b \end{pmatrix} \begin{pmatrix} x' \\ -1 \end{pmatrix}$ and $\begin{pmatrix} A & b \end{pmatrix} \begin{pmatrix} x^* \\ -1 \end{pmatrix}$ are in the $\left(d+1\right)$-dimensional subspace defined by the column span of $\begin{pmatrix} A & b \end{pmatrix}$. In other words, since we are considering a $\left(d+1, \frac{1}{10} \epsilon, \delta\right)$-subspace embedding: 
+        \[\left(1-\frac{1}{10}\epsilon\right) \left\|\begin{pmatrix} A & b \end{pmatrix} \begin{pmatrix} x' \\ -1 \end{pmatrix} \right\|_2 \leq LHS,\]
+        \[RHS \leq \left(1+\frac{1}{10}\epsilon\right) \left\|\begin{pmatrix} A & b \end{pmatrix} \begin{pmatrix} x^* \\ -1 \end{pmatrix} \right\|_2.\]
+        
+        Since we had that $LHS \leq RHS$, this gives us:
+        \autoeq{\left(1-\frac{1}{10}\epsilon\right)\left\|\begin{pmatrix} A & b \end{pmatrix} \begin{pmatrix} x' \\ -1 \end{pmatrix} \right\|_2 \leq \left(1+\frac{1}{10}\epsilon\right) \left\|\begin{pmatrix} A & b \end{pmatrix} \begin{pmatrix} x^* \\ -1 \end{pmatrix} \right\|_2 \implies \left\|Ax' - b\right\|_2 \leq \frac{1 + \frac{1}{10}\epsilon}{1 - \frac{1}{10}\epsilon} \left\|A x^* - b\right\|_2 \leq \left(1 + \epsilon\right)\left\|Ax' - b\right\|,}
+        for some small enough $\epsilon > 0$.
+
+        In other words, the big idea of this proof is that we can use subspace embeddings to project down to a subspace, with the least square loss function approximately preserved. Since these loss functions are approximately preserved, we have a good guarantee when we look back to the original problem. This type of reasoning has many application, for instance in machine learning.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Frobenius norm}
+    Let $A \in \mathbb{R}^{m \times n}$ be some matrix. We define its \important{Frobenius norm} as: 
+    \[\left\|A\right\|_F = \sqrt{\sum_{i=1}^{m} \sum_{j=1}^{n} A_{i,j}^2}.\]
+    
+    \begin{subparag}{Intuition}
+        The Frobenius norm can be seen as flattening the matrix $A$ into a big vector $x \in \mathbb{R}^{m\cdot n}$, and then computing the $\ell_2$-norm of $x$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Spectral norm}
+    Let $A \in \mathbb{R}^{n \times n }$ be some symmetric square matrix. We define its \important{spectral norm} as: 
+    \[A = \max_{x \neq 0} \frac{\left|x^T A x\right|}{x^T x}.\]
+
+    \begin{subparag}{Intuition}
+        Equivalently, $\left\|A\right\|_2$ is the largest eigenvalue of $A$ in absolute value.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    Let $A \in \mathbb{R}^{n \times n}$ be a positive semi-definite square matrix. Then: 
+    \[\left\|A\right\|_2 \leq \left\|A\right\|_F.\]
+\end{parag}
+
+\begin{parag}{Theorem: \lang{CountSketch} is a subspace embedding}
+    We change notation, writing $\Pi$ as $S$.
+
+    Let $h: \left\{1, \ldots, n\right\} \mapsto \left\{1, \ldots, B\right\}$ be some two-wise independent hash function, and let $\sigma: \left\{1, \ldots, n\right\} \mapsto \left\{-1, 1\right\}$ be a four-wise independent sign function. We then consider the random matrix $S \in \mathbb{R}^{B \times n}$ defined by:
+    \[S_{b, i} = \begin{systemofequations} \sigma\left(i\right), & \text{if $h\left(i\right) = b$,}\\ 0, & \text{otherwise.} \end{systemofequations}\]
+   
+    If $B = 2d^2/\left(\delta \epsilon^2\right)$, then $S$ is a $\left(d, \epsilon, \delta\right)$-subspace embedding.
+
+    \begin{subparag}{Intuition}
+        This matrix is the one used by \lang{CountCheck} when $R = 1$: each index $i \in \left\{1, \ldots ,n\right\}$ of the input vector is mapped to some specific index $b = h\left(i\right)$ of the resulting vector $y = S x$, contributing with a sign defined by $\sigma\left(i\right)$. 
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Let $P$ be an arbitrary $d$-dimensional subspace, of orthonormal basis $u_1, \ldots u_d \in \mathbb{R}^n$. We consider the following change of basis matrix, which is an orthonormal matrix since the $u_1, \ldots, u_d$ are orthonormal:
+        \[U = \begin{pmatrix}  &  &  \\ u_1 & \cdots & u_n \\  &  &  \end{pmatrix} \in \mathbb{R}^{n \times d}.\]
+        
+        Any vector $y \in P$ can be written as a linear combination of the columns of $U$. In other words, encoding $x \in \mathbb{R}^d$ to be the coefficients of the vector $y$ in the basis $u_1, \ldots, u_d$, we have $y = U x$. We thus want to show the following: 
+        \[\prob_S\left(\forall x \in \mathbb{R}^d,\ \left\|S U x\right\|_2 \in \left[\left(1 - \epsilon\right) \left\|U x\right\|_2, \left(1 + \epsilon\right) \left\|U x\right\|_2\right]\right) \geq 1 - \delta.\]
+        
+        By properties of orthonormal matrices, we know that:
+        \[\left\|U x\right\|_2 = \left\|x\right\|_2.\]
+
+        We can thus consider the following chain of implications, using the fact $\left(1 - \epsilon\right)^2 \leq 1 - \epsilon$ and $\left(1 + \epsilon\right)^2 \geq 1 + \epsilon$ for $\epsilon$ small enough: 
+        \autoeq{\left(1 - \epsilon\right) \left\|U x\right\|_2 \leq \left\|SU x\right\|_2 \leq \left(1 + \epsilon\right) \left\|U x\right\|_2 \iff \left(1 - \epsilon\right)^2 \left\|U x\right\|_2^2 \leq \left\|SU x\right\|_2^2 \leq \left(1 + \epsilon\right)^2 \left\|U x\right\|_2^2 \impliedby \left(1-\epsilon\right)\left\|x\right\|_2^2  \leq \left\|S U x\right\|_2^2 \leq \left(1+\epsilon\right)\left\|x\right\|_2^2 \iff \left(1-\epsilon\right) x^T x \leq x^T U^T S^T S U x \leq \left(1+ \epsilon\right)x^T x \iff \left|x^T \left(U^T S^T S U - I\right) x\right| \leq \epsilon x^T x \impliedby \left\|U^T S ^T S U - I\right\|_2 \leq \epsilon,}
+        where, as defined above, $\left\|.\right\|_2$ is the spectral norm (and where we used the fact that $B^T B - I$ is symmetric for any matrix $B$). Using the fact that $\left\|A\right\|_2 \leq \left\|A\right\|_F$, we get the following implications: 
+        \autoeq{\left\|U^T S^T S U - I\right\|_F \leq \epsilon \implies \left\|U^T S^T S U - I\right\|_2 \leq \epsilon \implies \left(1 - \epsilon\right) \left\|U x\right\|_2 \leq \left\|SU x\right\|_2 \leq \left(1 + \epsilon\right) \left\|U x\right\|_2.}
+
+        So, proving that $\left\|U^T S^T S U - I\right\|_F \leq \epsilon$ happens with probability at least $1 - \delta$ will suffice to prove our result. Let $M = U^T S^T S U$. We aim to understand $M_{ij}$. We can compute this using the definition of matrix product: 
+        \autoeq{M_{ij} = \left(U^T S^T S U\right)_{ij} = \sum_{r=1}^{B} \sum_{a=1}^{n} \sum_{b=1}^{n} \left(U^T\right)_{ia} \left(S^T\right)_{ar} S_{rb} U_{bj} = \sum_{r=1}^{B} \sum_{a=1}^{n} \sum_{b=1}^{n} S_{ra} S_{rb} U_{ai} U_{bj}.}
+
+        We consider two cases, $a = b$ and $a \neq b$: 
+        \[M_{ij} = \underbrace{\sum_{r=1}^{B} \sum_{a=1}^{n} S_{ra}^2 U_{ai} U_{aj}}_{= \Sigma_1} + \underbrace{\sum_{r=1}^{B} \sum_{a=1}^{n} \sum_{\substack{b = 1 \\ b \neq a}}^{n} S_{ra} S_{rb} U_{ai} U_{bj}}_{= \Sigma_2}.\]
+
+        Consider the first sum, $\Sigma_1$, first. We notice that $\sum_{r=1}^{B} S_{ra}^2 = 1$, because it counts in how many buckets $a$ hashes into. Hence, this reads:
+        \[\Sigma_1 = \sum_{a=1}^{n} U_{a i} U_{a j} \left(\sum_{r=1}^{B} S_{ra}^2\right) = \sum_{a=1}^{n} U_{a i} U_{a j} = u_i \dotprod u_j = \begin{systemofequations} 1, & \text{if $i = j$}, \\ 0, & \text{otherwise,} \end{systemofequations}\]
+        where we used the orthonormality of the basis.
+        
+        This first sum is exactly $\Sigma_1 = I_{i j}$. This means that the second sum is $\sigma_2 = \left(M - I\right)_{i, j}$, which is exactly what we want to show to be small. In other words, this is the error term that we want to bound. Since it is random, we aim to show the second moment $\exval\left(\left\|M - I\right\|_F^2\right)$ is small. By definition of Frobenius norm: 
+        \[\exval\left(\left\|M - I\right\|_F^2\right) = \exval\left(\sum_{i,j=1}^{d} \left(M - I\right)^2_{i, j}\right) = \sum_{i, j}^{d} \exval\left(\left(M - I\right)^2_{i, j}\right).\]
+
+        Fixing some arbitrary $i, j$ for the sake of notation, we find that: 
+        \autoeq[s]{\exval\left(\left(M - I\right)_{i, j}^2\right) = \exval\left(\Sigma_2^2\right) = \exval\left(\sum_{r=1}^{B} \sum_{r'=1}^{B} \sum_{\substack{a, b = 1 \\ a \neq b}}^{n} \sum_{\substack{a', b' = 1 \\ a' \neq b'}}^{n} \left(S_{ra} S_{r b} U_{a i} U_{b j}\right)\left(S_{r' a'} S_{r' b'} U_{a' i} U_{b' j}\right)\right) = \sum_{r=1}^{B} \sum_{r'=1}^{B} \sum_{\substack{a, b = 1 \\ a \neq b}}^{n} \sum_{\substack{a', b' = 1 \\ a' \neq b'}}^{n} \exval\left(S_{ra} S_{r b} S_{r' a'} S_{r' b'}\right) U_{a i} U_{b j} U_{a' i} U_{b' j}.}
+        
+        Note that if $a, b, a', b'$ are all distinct, we have, by four-wise independence: 
+        \[\exval\left(S_{ra} S_{r b} S_{r' a'} S_{r' b'}\right) = \exval\left(S_{ra}\right) \exval\left(S_{r b}\right) \exval\left(S_{r' a'}\right) \exval\left(S_{r' b'}\right) = 0\cdot 0\cdot 0\cdot 0 = 0.\]
+
+        More generally, this will always be zero if we have an odd power of the signs. The only cases where the signs have an even power, are $a = a'$ and $b = b'$, or $a = b'$ and $a' = b$, since we know $a \neq b$ and $a' \neq b'$. We consider the two cases separately.
+        \begin{enumerate}[left=0pt]
+            \item Suppose $a = a'$ and $b = b'$. Note that we must have $r = r' = h\left(a\right)$, because $S_{ra} S_{r' a} = 0$ otherwise: $S_{ra}$ is 0 when $r \neq h\left(a\right)$, and similarly for $S_{r' a}$. This simplifies to: 
+            \[\sum_{r=1}^{B} \sum_{\substack{a, b = 1 \\ a \neq b}}^{n} \exval\left(S_{r a}^2 S_{r b}^2\right) U_{ai}^2 U_{a j}^2.\]
+            
+            We notice that $\exval\left(S_{r a}^2 S_{r b}^2\right)$ is the probability that both $a, b$ hash to the value $r$. Since $a \neq b$, this is at most $\frac{1}{B^2}$, hence: 
+            \autoeq{\sum_{r=1}^{B} \sum_{\substack{a, b = 1 \\ a \neq b}}^{n} \exval\left(S_{r a}^2 S_{r b}^2\right) U_{ai}^2 U_{a j}^2 \leq \sum_{r=1}^{B} \frac{1}{B^2} \sum_{\substack{a, b = 1 \\ a \neq b}} U_{a i}^2 U_{b j}^2 \leq B\cdot \frac{1}{B^2} \sum_{a, b = 1}^{n} U_{a i}^2 U_{b j}^2 = \frac{1}{B} \left(\sum_{a=1}^{n} U_{ai}^2\right) \left(\sum_{b=1}^{n} U_{b j}^2\right) = \frac{1}{B}\cdot 1\cdot 1 = \frac{1}{B}.}
+            
+        \item The case $a = b'$ and $a' = b$ is similar, and is left as an exercise to the reader. As a hint, we instead bound the absolute value of the sum, and then need the triangle inequality and the Cauchy-Shwarz inequality $\sum_{i} a_i b_i \leq \sum_{i} a_i^2 \sum_{j} b_j^2$. Doing so, we find: 
+        \[\left|\sum_{r=1}^{B} \sum_{r' = 1}^{B} \sum_{\substack{a, b = 1 \\ a\neq b}}^{n} \exval\left(S_{r a} S_{r b} S_{r' b} S_{r' a}\right) U_{a i} U_{b j} U_{b i} U_{a j}\right| \leq \frac{1}{B}\]
+        \end{enumerate}
+
+        Overall, this means: 
+        \[\exval\left(\left(M-I\right)^2_{i j}\right) \leq \frac{2}{B}.\]
+
+        This implies that: 
+        \[\exval\left(\left\|M - I\right\|_F^2\right) = \sum_{i, j=1}^{d} \exval\left(\left(M-I\right)^2_{ij}\right) \leq \frac{2d^2}{B}.\]
+        
+        Then, by Markov's inequality: 
+        \autoeq{\prob\left(\left\|M-I\right\|_F > \epsilon\right) = \prob\left(\left\|M-I\right\|_F^2 > \epsilon^2\right) \leq \frac{\exval\left(\left\|M - I\right\|_F^2\right)}{\epsilon^2} \leq \frac{2 d^2}{B \epsilon^2} \leq \delta,}
+        supposing $B = 2 d^2 / \left(\epsilon^2 \delta\right) \in O\left(d^2 / \left(\delta \epsilon^2\right)\right)$. This does prove that the Frobenius norm of $M - I$ is small with good probability, that implies the spectral norm of $M - I$ is small with good probability, that finally implies our result as mentioned above. This thus does finish the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    Consider again the \lang{CountSketch} matrix, $S \in \mathbb{R}^{B \times n}$:
+    \[S_{b, i} = \begin{systemofequations} \sigma\left(i\right), & \text{if $h\left(i\right) = b$,}\\ 0, & \text{otherwise.} \end{systemofequations}\]
+
+    Note that, for any $A \in \mathbb{R}^{n \times d}$, computing $S A$ can be done very efficiently, in time $O\left(\text{nnz}\left(A\right)\right)$, where $\text{nnz}\left(A\right) \in O\left(nd\right)$ is the number of non-zero elements of $A$. Indeed, each of the $\text{nnz}\left(A\right) \in O\left(nd\right)$ non-zero elements $A_{ij}$ will contribute to a single element of $S A \in \mathbb{R}^{B \times d}$.
+
+    Solving approximate least squares with \lang{CountSketch} requires to first evaluate $SA$ and $S b$ in time $O\left(\text{nnz}\left(A\right) + \text{nnz}\left(b\right)\right)$, and then solve the least squares problem $\left(SA\right)x \approx \left(S b\right)$ using the Moore-Penrose pseudo inverse in time $O\left(B d^2\right)$. Since $B \in O\left(d^2 / \left(\delta \epsilon^2\right)\right)$, this means that, overall, we solve the approximate least squares problem in time:
+    \[O\left(\text{nnz}\left(A\right) + \text{nnz}\left(b\right) + d^4 / \left(\delta \epsilon^2\right)\right) = O\left(\text{nnz}\left(A\right) + \text{nnz}\left(b\right) + \lang{poly}\left(d, \frac{1}{\delta}, \frac{1}{\epsilon}\right)\right).\]
+
+    If the matrix $A$ and vector $b$ are sparse, this is much better than the naive $O\left(n d^2\right)$ that solves the exact least squares problem problem using a Moore-Penrose pseudo inverse directly.
+
+    \begin{subparag}{Remark}
+        This time complexity can be slightly improved by being more careful on the exact implementation. 
+    \end{subparag}
+\end{parag}
+
+\end{document}
