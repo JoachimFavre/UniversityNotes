@@ -1,0 +1,148 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-04-09 at 13:18:37.
+
+\usepackage{../../style}
+
+\title{Sublinear algorithms}
+\author{Joachim Favre}
+\date{Mercredi 09 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2025-04-09}{Sampling from compressed vectors}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of how to make an $\ell_0$-sampler.
+    \item Beginning of the application of this idea for sparse recovery.
+\end{itemize}
+
+}
+
+\begin{parag}{Remark}
+    Using similar approaches, we can sketches that do a lot of things, such as preserving the smallest eigenvalue of the Laplacian. A big open question is whether, given any graph $G$, we can make a linear sketch that allows to find a $O\left(\log\left(n\right)\right)$-approximation to the shortest path metric of $G$.
+
+    We now move onto the prove the existence of the $\ell_0$-sampler we used.
+\end{parag}
+
+\begin{parag}{Case 1-sparse}
+    Our goal is to design a random matrix $A$ such that we can sample uniformly from $\supp x$ given $A x$. Let's start by simplifying the problem, by supposing $\left|\supp x\right| = 1$. In other words, $x_{i_*} \neq 0$ for some $i_*$, and $x_i = 0$ for all $i \neq i_*$.
+
+    We can consider: 
+    \[A = \begin{pmatrix} 1 & 1 & \cdots & 1 \\ 1 & 2 & \cdots & n \end{pmatrix} = \begin{pmatrix}  & a_1^T &  \\  & a_2^T &  \end{pmatrix} .\]
+
+    Indeed:
+    \[\left\langle a_1, x \right\rangle = \sum_{i=1}^{n} x_i = x_{i_*}, \mathspace \left\langle a_2, x \right\rangle = \sum_{i=1}^{n} i \cdot x_i = i_* x_{i_*}.\]
+    
+    We can thus indeed compute $i_*$ from $A x$:
+    \[i_* = \frac{\left\langle a_2, x \right\rangle}{\left\langle a_1, x \right\rangle}.\]
+\end{parag}
+
+\begin{parag}{Case $x = 0$}
+    Let's now consider that $\left|\supp x\right| = 0$, i.e. $x = 0$. We would like to be able to detect this.
+
+    \begin{subparag}{CountSketch}
+        We found that \lang{CountSketch} is a subspace embedding, i.e. that it allows to preserve $\ell_2$ norms to a factor $\left(1 \pm \epsilon\right)$, with probability $\frac{9}{10}$. In particular, this would allow to know if $\left\|x\right\| \approx 0$ or not. This however uses $O\left(\frac{1}{\epsilon^2}\right)$ buckets and hence rows of $A$, which is not great. We can do better.
+    \end{subparag}
+
+    \begin{subparag}{Schwartz-Zippel lemma}
+        We can always consider the following polynomial, sampling $a \in \mathbb{F}_q$ at random for some $q \in \lang{poly}\left(n\right)$: 
+        \[p\left(a\right) = \sum_{i=1}^{n} x_i a^i.\]
+        
+        It is well known that, if $p \neq 0$ (i.e. if $x \neq 0$), then $\prob\left(p\left(a\right) = 0\right) = \frac{n}{q}$ (this is the Schwartz-Zippel lemma, for instance seen in Algorithms 2). Since $q \in \lang{poly}\left(n\right)$, this means that we have a very small error probability. Overall, this strategy only uses a single row of $A$, which is very nice.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{General case}
+    We consider some hash function $h: \left\{1, \ldots, n\right\} \mapsto \left\{1, \ldots, \log_{2}\left(n\right)\right\}$, that hash any $i \in \left\{1, \ldots, n\right\}$ into some specific bucket $j \in \left\{1, \ldots, \log_{2}\left(n\right)\right\}$ with probability $2^{-j}$ (note that this is not uniform). Then, for any $b \in \left\{1, \ldots, \log_{2}\left(n\right)\right\}$, we define $y^b \in \mathbb{R}^n$ by:
+    \[y^b_i = \begin{systemofequations} x_i, & \text{if $h\left(i\right) = b$,} \\ 0, & \text{otherwise.} \end{systemofequations}\]
+
+    We store $\left\langle u, y^b \right\rangle$, $\left\langle v, y^b \right\rangle$ and $\left\langle w^b, y^b \right\rangle$ for all $b \in \left\{1, \ldots, \log_{2}\left(n\right)\right\}$ (which can indeed be done through a matrix product), where $w^b$ is the vector used to know if $y^b = 0$, and:
+    \[u = \begin{pmatrix} 1 & 1 & \cdots & 1 \end{pmatrix}^T, \mathspace v =\begin{pmatrix} 1 & 2 & \cdots & n \end{pmatrix}^T.\] 
+
+    To decode, for each $b \in \left\{1, \ldots, \log_{2}\left(n\right)\right\}$, we compute: 
+    \[i_* = \frac{\left\langle v, y^b \right\rangle}{\left\langle u, y^b \right\rangle}, \mathspace val = \left\langle u, y^b \right\rangle.\]
+    
+    We then conjecture that $x$ has value $val$ at index $i_*$, conjecturing that $y^b$ has $\supp x$. Since this is a linear sketch, we can remove $val$ from index $i_*$ from $y^b$, evaluating $z^b = y^b - val\cdot e_{i_*}$, and then test if it is the zero vector $\left\langle w^b, z^b \right\rangle = \left\langle w^b, y^b \right\rangle - val\cdot \left\langle w^b, e_{i_*} \right\rangle$. 
+    
+    We need to store two dot-products and the zero test for every $b \in \left\{1, \ldots, \log_{2}\left(n\right)\right\}$. This is $O\left(\log\left(n\right)^2\right)$ bits for a constant probability, and hence $O\left(\log\left(n\right)^2 \log\left(\frac{1}{\delta}\right)\right)$ for arbitrary success probability $1 - \delta$ using the median trick.
+
+    \begin{subparag}{Intuition}
+        The idea is that we can quickly see: 
+        \[\exval\left(\left\|y^b\right\|_0\right) = 2^{-b} \left\|x\right\|_0.\]
+        
+        So, taking $b = \log_2\left(\left\|x\right\|_0\right)$, we expect $y^b$ to be 1-sparse. We can then use what we found before to sample from a 1-sparse vector.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        The way the hash function $h$ has been defined here is not completely correct: the probabilities of output do not sum to $1$. In other words, for any $i \in \left\{1, \ldots, n\right\}$ 
+        \[\sum_{j = 1}^{\log_2\left(n\right)} \prob\left(h\left(i\right) = j\right) = \sum_{j=1}^{\log_2\left(n\right)} 2^{-j} = 1 - \frac{1}{n} < 1.\]
+
+        With the remaining probability $\frac{1}{n}$, we just disregard the output. In other words, with probability $\frac{1}{n}$, there is no $b$ such that $y_i^b = x_i$.
+
+        For instance, let's suppose that $h\left(1\right) = h\left(2\right) = h\left(3\right) = h\left(4\right) = 1$, $h\left(5\right) = h\left(6\right) = 2$, and $h\left(7\right) = 3$ and input $8$ is disregarded. We may moreover take:
+        \[x = \begin{pmatrix} 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \end{pmatrix}^T.\]
+
+        Then, we would have:
+        \[y^1 = \begin{pmatrix} 1 & 2 & 3 & 4 & 0 & 0 & 0 & 0 \end{pmatrix}^T,\]
+        \[y^2 = \begin{pmatrix} 0 & 0 & 0 & 0 & 5 & 6 & 0 & 0 \end{pmatrix}^T,\]
+        \[y^3 = \begin{pmatrix} 0 & 0 & 0 & 0 & 0 & 0 & 7 & 0 \end{pmatrix}^T.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The idea to construct the hash function is to sieve the vector in smaller subsets. For instance, if $n = 8$, writing $h\left(i\right) = \bot$ when $i$ is disregarded:
+        \svghere[0.7]{NonUniformHashFunctionExample.svg}
+
+        We can then sample a random bucket using a usual hash function, and convert the result to our non-uniform $h$. We will indeed get $1$ with probability $\frac{1}{2}$, $2$ with probability $\frac{1}{4}$, $3$ with probability $\frac{1}{8}$, and disregard the input with the remaining probability.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Instead of supposing $h$ is pairwise independent, we suppose it is completely independent towards simplicity. There are tools that we did not cover in this class that allow to emulate this. It is in fact a good exercise to prove that pairwise independence is enough for the following reasoning.
+
+        We notice that:
+        \autoeq[s]{\prob\left(y^b \text{ is $1$-sparse}\right) = \sum_{i \in \supp x} \prob\left(h\left(i\right) = b \text{ and } h\left(i\right) \neq b \text{ for all } i' \in \supp\left(x\right) \setminus \left\{i\right\}\right) = \sum_{i \in \supp x} \prob\left(h\left(i\right) = b\right) \prod_{i' \in \supp\left(x\right) \setminus \left\{i\right\}} \prob\left(h\left(i'\right) \neq b\right) = \sum_{i \in \supp x} 2^{-b} \left(1 - 2^{-b}\right)^{\left\|x\right\|_0 - 1} = \left\|x\right\|_0 2^{-b} \left(1 - 2^{-b}\right)^{\left\|x\right\|_0 - 1} \geq \left\|x\right\|_0 2^{-b} \left(1 - 2^{-b}\right)^{\left\|x\right\|_0}.}
+        
+        Let $b$ be such that $\left\|x\right\|_0 \leq 2^b < 2 \left\|x\right\|_0$. In that case: 
+        \[\prob\left(y^b \text{ is 1-sparse}\right) \geq \frac{1}{2} \left(1 - 2^{-b}\right)^{2^b} \geq \frac{1}{2}\cdot \frac{1}{4} = \frac{1}{8},\]
+        using the fact $\min_{b \geq 1} \left(1 - 2^{-b}\right)^{2^b} = \frac{1}{4}$, because $\left(1 - \frac{1}{n}\right)^n \to \frac{1}{e}$ from below.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Sparse recovery}
+
+\begin{parag}{Sparse recovery problem}
+    Let $k \in \left\{0, \ldots, n\right\}$ be fixed. 
+
+    The goal of the exact sparse recovery problem is to design a random matrix $A \in \mathbb{R}^{m \times n}$ for $m \ll n$ such that, for all $x$ such that $\left|\supp x\right| \leq k$, given $Ax$, we can recover $x$ exactly with high probability.
+
+    \begin{subparag}{Remark}
+        We already analysed a more general version of this problem for \lang{CountSketch}, which solves this with $m = O\left(k \log\left(n\right)\right)$ rows but decoding time $\Omega\left(n\right)$. 
+
+        We are however interested in a sublinear decoding time. We will manage $m = O\left(k\right)$ rows and decoding time $O\left(k \log\left(k\right)\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Naive algorithm}
+    Consider some hash function, $h : \left\{1, \ldots, n\right\} \mapsto \left\{1, \ldots, n\right\}$ for some $B$ (we will take $B = O\left(k\right)$ later). Then, for all $b \in \left\{1, \ldots, B\right\}$, let: 
+    \[x_i^b = \begin{systemofequations} x_i, & \text{if $h\left(i\right)= b$,} \\ 0, & \text{otherwise.} \end{systemofequations}\]
+    
+    For every $b \in \left\{1, \ldots, B\right\}$, store $\left\langle u, x^b \right\rangle$ and $\left\langle v, x^b \right\rangle$. Then, for decoding, for each $b \in \left\{1, \ldots, B\right\}$. For each $b \in \left\{1, \ldots, B\right\}$, we can consider: 
+    \[i_*^{b} = \frac{\left\langle v, x^b \right\rangle}{\left\langle u, x^b \right\rangle}, \mathspace val^b = \left\langle u, x^b \right\rangle,\]
+    where $u, v$ are the same vectors as for $\ell_0$ samplers.
+
+    We use this to construct vector $\widetilde{x}$ such that, for all $b \in \left\{1, \ldots, B\right\}$:
+    \[\widetilde{x}_{i_*^b} = \begin{systemofequations} val^b, & \text{if $h\left(i_*\right) = b$,} \\ 0, & \text{otherwise.} \end{systemofequations}\]
+
+    \begin{subparag}{Intuition}
+        The idea is very similar to the one of the $\ell_0$ sampler, except that now the hash function is uniform.
+
+        In other words, we are hoping that there isn't any $i, j \in \supp x$ with $i \neq j$ such that $h\left(i\right) = h\left(j\right)$. In that case, each $x^b$ is $1$-sparse, which we recover correctly by the same reasoning to $\ell_0$ samplers.
+    \end{subparag}
+\end{parag}
+
+\end{document}

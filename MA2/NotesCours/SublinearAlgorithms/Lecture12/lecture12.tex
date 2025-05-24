@@ -1,0 +1,307 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-14 at 13:15:55.
+
+\usepackage{../../style}
+
+\title{Sublinear algorithms}
+\author{Joachim Favre}
+\date{Mercredi 14 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2025-05-14}{That took me so much time}{
+\begin{itemize}[left=0pt]
+    \item Proof that any one-way communication problem finding an $\epsilon$-approximation to the maximum matching problem requires $\omega\left(n \log\left(n\right)^c\right)$ space for any constant $c$, when $\epsilon > \frac{2}{3}$.
+    \item Application of this bound for streaming algorithms for $\epsilon$-approximation to the maximum matching problem.
+    \item Quick overview of EDCS to explain how to make a one-way communication protocol for finding an $\epsilon$-approximation to the maximum matching problem in $O\left(n\right)$ space, when $\epsilon < \frac{2}{3}$.
+\end{itemize}
+    
+}
+
+\begin{parag}{Communication matching problem}
+    Let $\epsilon > 0$. Alice is given some graph $G_A = \left(V, E_A\right)$ and Bob some graph $G_B = \left(V, E_B\right)$, with $\left|V\right| = n$. 
+
+    Alice must send the fewest possible bits so that Bob can output a matching $M \subseteq G_A \cup G_B = \left(V, E_A \cup E_B\right)$, such that $\left|M\right| \geq \left(1 - \epsilon\right) M_{opt}$, where $M_{opt}$ is the optimal matching in $G_A \cup G_B$.
+    
+    \begin{subparag}{Remark}
+        This is the communication counter-part to our streaming algorithm, using the usual trick that a lower bound on communication implies a lower bound on streaming.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Hard distribution}
+    To show that any algorithm succeeding with probability at least $\frac{9}{10}$ for the communication matching problem requires at least some number of bits $s$, we will, as usual, consider some ``hard'' distribution. Any algorithm must also succeed with probability at least $\frac{9}{10}$ on this distribution, and we will show that, for this to be possible, it has to store at least $s$ bits. Let us describe our hard distribution.
+
+    We construct it in three steps.
+    \begin{itemize}[left=0pt]
+        \item  Let $G = \left(P, Q, E\right)$ be a $\left(\frac{1}{2} - \frac{\delta}{10}, k, n\right)$-RS graph we know the existence of. Let $M_i = \left(A_i, B_i, E_i\right)$ be the induced matchings.
+        \item We include all edges with probability $1 - \frac{\delta}{10}$ independently. This gives some graph $G' = \left(V, E'\right)$.
+        \item For all $i$, we let $G_i'$ to be $G'$ plus two sets of vertices, $P, Q$, a perfect matching between $P \setminus A_i$ and $S$, and a perfect matching between $Q \setminus B_i$ and $T$.
+    \end{itemize}
+
+    \svghere{HardDistributionMatchingProblem.svg}
+    
+    \begin{subparag}{Observation}
+        By definition of RS-graphs, we have $\left|A_i\right| = \left|B_i\right| = \left(\frac{1}{2} - \frac{\delta}{10}\right)n$. Hence, since $S$ has a perfect matching with $P \setminus A_i$: 
+        \[\left|S\right| = \left|P \setminus A_i\right| = \left|P\right| - \left|A_i\right| = n - \left(\frac{1}{2} - \frac{\delta}{10}\right)n = \left(\frac{1}{2} + \frac{\delta}{10}\right)n.\]
+
+        Completely symmetrically: 
+        \[\left|T\right| = \left|S\right| = \left(\frac{1}{2} + \frac{\delta}{10}\right)n.\]
+
+        Hence, in particular: 
+        \[\left|P \cup T\right| = \left|P\right| + \left|T\right| = n + \left(\frac{1}{2} + \frac{\delta}{10}\right)n = \frac{3n}{2} + \frac{\delta}{10}n.\]
+        
+        This means that $G'$ is a bipartite graph with two bipartitions of size $\frac{3n}{2} + \frac{\delta}{10}n$.
+    \end{subparag}
+
+    \begin{subparag}{Notations}
+        Let us write some notations for the step between $G$ and $G'$. 
+        \begin{itemize}[left=0pt]
+            \item For all $e \in G$, we leave $X_e$ to be the indicator random variable such that $X_e = 1$ if and only if $e$ is included in $G'$. By construction, have: 
+        \[X_e = \begin{systemofequations} 1, & \text{with probability $1 - \frac{\delta}{10}$}, \\ 0, & \text{otherwise.} \end{systemofequations}\]
+            \item We consider $X^i = \bigcup_{e \in M_i}^{} X_e \in \mathbb{R}^{\left|A_i\right|}$ to be a random vector stating which edges of the matching $M_i$ were added to $G'$. We moreover consider $M_i'$ to be what's left of this matching in $G'$.
+            \item We consider the random vector $X = \bigcup_{i=1}^{k} X^i$ to represent all edges.
+        \end{itemize}
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that we do need to consider a hard distribution, we cannot just take the RS graph as input. Otherwise, it only takes 1 bit of memory for the algorithm to know if this is this specific RS graph or not. Randomness makes it a lot harder to know the situation we are in.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    $G_i'$ contains a matching of size $\left(1 - \frac{\delta}{5}\right)\frac{3n}{2}$ for all $i \in \left\{1, \ldots, k\right\}$ with probability at least $1 - e^{-\Omega_{\delta}\left(n\right)}$ .
+
+    \begin{subparag}{Proof}
+        This is just a Chernoff bound.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    For all matching $\hat{M} \subseteq G_i'$, then: 
+    \[\left|\hat{M}\right| \leq \left|P \setminus A_i\right| + \left|Q \setminus B_i\right| + \left|\hat{M} \cap M_i'\right|.\]
+    
+    \begin{subparag}{Proof}
+        It is well known that for any matching $\hat{M} \subseteq G_i'$ and vertex cover $C \subseteq G_i'$, then $\left|\hat{M}\right| \leq \left|C\right|$. We will make an argument which is completely similar to the proof of this fact.
+
+        We consider the following set, which is nearly a vertex cover:
+        \[C = \left(P \setminus A_i\right) \cup \left(Q \setminus B_i\right) \cup \left\{\text{one vertex from each edge in $\hat{M} \cap M_i'$}\right\}.\]
+
+        To show that $\left|\hat{M}\right| \leq \left|C\right|$, we will show that we can map each edge of $\hat{M}$ to a vertex of $C$ injectively. To do that, we aim to show that all edges $e \in \hat{M}$ are covered by at least a vertex $v \in C$. Since, by definition of matching, no edges from $\hat{M}$ share endpoints, this will indeed give our result.
+
+        To help us visualise our problem, consider following diagram of our graph, where only possible edges were added:
+        \svghere[0.5]{VertexCoverForMatchingInequality.svg}
+
+        Now, notice that the vertices $\left(P \setminus A_i\right) \cup \left(Q \setminus B_i\right)$ cover all edges, except for the ones between $A_i$ and $B_i$ (in bold on the diagram). However, we know that the only edges between $A_i$ and $B_i$ are the ones in $M_i'$, by definition of RS-graph and induced matching. Hence, to cover the edges of $\hat{M}$, we are only left with having to cover the edges in $\hat{M} \cap M_i'$. For each $e \in \hat{M} \cap M_i'$, we can pick one of its endpoints arbitrarily.
+
+        This construction gives exactly $C$, and covers all edges of $\hat{M}$ by construction. This does show that: 
+        \[\left|\hat{M}\right| \leq \left|C\right| = \left|P \setminus A_i\right| + \left|Q \setminus B_i\right| + \left|\hat{M} \cap M_i'\right|.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $i \in \left\{1, \ldots, k\right\}$ be fixed. If $G_i'$ contains a matching of size at least $\left(1 - \frac{\delta}{5}\right)\frac{3n}{2}$ (which happens with high probability, by a previous lemma) and $\left|\hat{M}\right| \geq \left(\frac{2}{3}+ \delta\right)\left|M_{opt}\right|$ then: 
+    \[\left|\hat{M} \cap M_i'\right| \geq \frac{\delta}{2}n.\]
+
+    \begin{subparag}{Proof}
+        Using our two hypotheses:
+        \[\left|\hat{M}\right| \geq \left(\frac{2}{3} + \delta\right) \left|M_{opt}\right| \geq \left(\frac{2}{3} + \delta\right)\left(1 - \frac{\delta}{5}\right) \frac{3}{2}n.\]
+
+        Moreover, by the lemma we just proved, we have: 
+        \autoeq{\left|\hat{M} \cap M_i'\right| \geq \left|\hat{M}\right| - \left|P \setminus A_i\right| - \left|Q \setminus B_i\right| \geq \left(\frac{2}{3} + \delta\right)\left(1 - \frac{\delta}{5}\right)\frac{3}{2}n - 2\left(\frac{1}{2} + \frac{\delta}{10}\right)n \geq \frac{\delta}{2} n.}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Any algorithm for the two-party one-way communication maximum matching problem that achieves a $\left(\frac{2}{3} + \delta\right)$-approximation with probability at least $\frac{2}{3}$ must use space:
+    \[n^{1 + \Omega_{\delta}\left(1/\log\left(\log\left(n\right)\right)\right)}.\]
+
+    \begin{subparag}{Proof}
+        Let \lang{ALG} be a protocol that gives a $\left(\frac{2}{3} + \delta\right)$-approximation with probability at least $\frac{2}{3}$.
+
+        Alice is some instance of $G'$ (i.e. $G$ with some edges removed). Bob is given all missing edges to complete $G'$ to $G_i'$ for some $i \in \left\{1, \ldots, k\right\}$. By hypothesis, Alice and Bob find a valid $\left(\frac{2}{3} + \delta\right)$-approximation of the maximum matching with probability $\frac{2}{3}$, for all $i \in \left\{1, \ldots, k\right\}$.
+
+        The idea is that Alice must send a faithful representation of $G'$ to Bob, for him to be able to output a valid $\left(\frac{2}{3} + \delta\right)$-approximation. Indeed, if he doesn't know how the graph looks, the best he can do is only take all the edges he knows of as part of the matching (i.e. edges with an endpoint in $S$ or $T$). However, there are only $\left(1 + \frac{\delta}{5}\right)n$ such edges, so this is not a $\frac{2}{3} + \delta$ approximation to the full matching (which has size at least $\left(1 - \frac{\delta}{5}\right) \frac{3n}{2}$). In other words, Bob must have some knowledge on $M_i$, and hence Alice must compress the graph efficiently. The idea of the following proof is that Alice cannot really compress the graph, and essentially has to send it entirely. Let us now move to a formal proof.
+
+        Let $\Pi$ be the message of Alice, which is a random variable. We consider the following indicator random variable: 
+        \[E_i = \begin{systemofequations} 1, & \text{if \lang{ALG} fails on $i$ or $\left|M_{opt}\right| < \left(1 - \frac{\delta}{5}\right)\frac{3}{2} n$,} \\ 0, & \text{otherwise.} \end{systemofequations}\]
+        
+        We have: 
+        \[\prob\left(E_i\right) \leq \frac{1}{3} + e^{- \Omega_{\delta}\left(n\right)} \leq \frac{1}{2}.\]
+        
+        We consider the random variables $X, X^i, X_e$ that were defined when we defined our hard distribution. We aim to bound: 
+        \[\text{length}\left(\Pi\right) \geq H\left(\Pi\right) \geq I\left(X; \Pi\right) = H\left(X\right) - H\left(X \suchthat \Pi\right).\]
+        
+        We have, by using two chains rules and the fact $H\left(A, B\right) = H\left(A\right) + H\left(B \suchthat A\right) \geq H\left(A\right)$: 
+        \autoeq{H\left(X \suchthat \Pi\right) = \sum_{i=1}^{n} H\left(X^i \suchthat \Pi, X^{< i}\right) \leq \sum_{i=1}^{k} H\left(X^i, E_i \suchthat \Pi, X^{< i}\right) = \sum_{i=1}^{k} \left(H\left(E_i \suchthat \Pi, X^{< i}\right) + H\left(X^i \suchthat E_i, \Pi, X_{<i }\right)\right).}
+
+        Since $E_i$ is a Bernoulli random variable, $H\left(E_i \suchthat \Pi, X^{< i}\right) \leq \log_2\left(\left|\left\{0, 1\right\}\right|\right) = 1$. Hence: 
+        \[H\left(X \suchthat \Pi\right) \leq \sum_{i=1}^{k} \left(1 + H\left(X^i \suchthat E_i, \Pi, X^{<i}\right)\right).\]
+        
+        We now want to upper bound this entropy term $H\left(X^i \suchthat E_i, \Pi, X^{< i}\right)$. We have, using a bunch of information-theoretical inequalities: 
+        \autoeq[s]{H\left(X^i \suchthat E_i, \Pi, X^{< i}\right) = H\left(X^i \suchthat \Pi, X^{< i}, E_i = 1\right)\prob\left(E_i = 1\right) + H\left(X^i \suchthat \Pi, X^{< i}, E_i = 0\right) \prob\left(E_i = 0\right) \leq H\left(X^i\right)\prob\left(E_i = 1\right) + H\left(X^i \suchthat \Pi, X^{<i}, E_i = 0\right)\prob\left(E_i = 0\right) \leq H\left(X^i\right)\prob\left(E_i = 1\right) + \sum_{e \in M_i} H\left(X_e \suchthat \Pi, X^{< i}, E_i = 0\right) \prob\left(E_i = 0\right),}
+        where the last inequality is the subadditivity of entropy. Now, when $E_i = 0$, this means that the algorithm is correct. Hence, leaving $\hat{M}_i$ to be the matching Bob outputs, then $\hat{M}_i$ is a valid $\left(\frac{2}{3} + \delta\right)$ approximation. In particular, for it to be valid, all edges of $\hat{M}_i$ have to be valid edges. More mathematically, all edges in $\hat{M} \cap M_i$ must have $X_e = 1$ and hence have zero entropy. This may seem like a small step, but this is very important since it allows to get rid of a constant fraction of edges, giving our result in the end. This means: 
+        \autoeq[s]{H\left(X^i \suchthat \Pi, X^{< i}, E_i\right) \leq H\left(X^i\right)\prob\left(E_i = 1\right) + \sum_{e \in \hat{M} \setminus M_i} H\left(X_e \suchthat \Pi, X^{< i}, E_i = 0\right) \prob\left(E_i = 0\right).}
+
+        Now, since $\hat{M}_i$ is a valid $\left(\frac{2}{3} + \delta\right)$-approximation, we know that $\left|\hat{M}_i \cap M_i'\right| \geq \frac{\delta}{2} n$ by our previous lemma, i.e. $\left|\hat{M}_i \setminus M_i\right| = \left|M_i\right| - \left|M_i \cap \hat{M}_i\right| \leq \left|M_i\right| - \frac{\delta}{2}n$. Hence:
+        \autoeq[s]{H\left(X^i \suchthat \Pi, X^{< i}, E_i\right) \leq H\left(X^i\right) \prob\left(E_i = 1\right) + \left(\left|M_i\right| - \frac{\delta}{2} n\right)H\left(X_e\right)\prob\left(E_i = 0\right) \leq H\left(X^i\right)\prob\left(E_i = 1\right) + \left(1 - \Omega\left(1\right)\right)\underbrace{H\left(X^i\right)}_{= \left|M_i\right|H\left(X_e\right)}\prob\left(E_i = 0\right).}
+
+        So, coming back to our previous expression, we can use the fact $\prob\left(E_i = 0\right) \geq \frac{1}{2}$ (meaning that $\Omega\left(1\right)\cdot \prob\left(E_i = 0\right) \geq \Omega\left(1\right)$) to rewrite this as:
+        \autoeq{H\left(X \suchthat \Pi\right) \leq \sum_{i=1}^{k} \left(1 + H\left(X^i \suchthat E_i, \Pi, X^{<i}\right)\right) \leq \sum_{i=1}^{k} \left(1 + H\left(X^i\right) \prob\left(E_i = 1\right) + \left(1 - \Omega\left(1\right)\right)H\left(X^i\right) \prob\left(E_i = 0\right)\right) = \sum_{i=1}^{k} \left(1 + H\left(X^i\right) - \Omega\left(1\right) H\left(X^i\right) \prob\left(E_i = 0\right)\right)\leq \sum_{i=1}^{k} \left(1 + \left(1 - \Omega\left(1\right)\right)H\left(X^i\right)\right).}
+
+        However, for $n$ sufficiently large, we can upper bound this by:
+        \autoeq{H\left(X \suchthat \Pi\right) \leq \sum_{i=1}^{k} \left(1 - \Omega\left(1\right)\right)H\left(X^i\right) \over{=}{indep} \left(1 - \Omega\left(1\right)\right) H\left(X\right).}
+
+        This result is very interesting: conditioning on the message, we only decrease the entropy by up to a constant. Now, by indepnedence, and since an RS graph has $n\cdot k$ edges: 
+        \[H\left(X\right) = \sum_{e \in E} H\left(X_e\right) = nk\cdot H\left(1 - \frac{\delta}{10}\right) = \Theta\left(1\right)\cdot n^{1 + \Omega\left(1 / \log\left(\log\left(n\right)\right)\right)}.\]
+        
+
+        Taking everything together, this reads:
+        \autoeq{\text{length}\left(\Pi\right) \geq H\left(X\right) - H\left(X \suchthat \Pi\right)\geq H\left(X\right) - \left(1 - \Omega\left(1\right)\right) H\left(X\right) = \Omega\left(1\right) H\left(X\right) = \Omega\left(1\right) n^{1 + \Omega\left(1/\log\left(\log\left(n\right)\right)\right)}.}
+
+        Overall, this does show that the graph is so dense that Alice cannot compress it.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Any streaming algorithm that achieves a $\left(\frac{2}{3} + \delta\right)$ approximation to the maximum matching problem with probability at least $\frac{2}{3}$ must use space at least space:
+    \[n^{1 + \Omega_{\delta}\left(1/\log\left(\log\left(n\right)\right)\right)}.\]
+
+    \begin{subparag}{Proof}
+        Any streaming algorithm yields a two-party one-way communication algorithm.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        Note that: 
+        \[n^{1 + \Omega\left(\frac{1}{\log\left(\log\left(n\right)\right)}\right)} > n\log^C\left(n\right),\]
+        for any constant $C > 0$.
+
+        Hence, no semi-streaming algorithm can be made for $\left(\frac{2}{3} + \delta\right)$-approximations. Moreover, as we found in the tenth exercise series, $\frac{1}{2}$-approximations can easily be done by being greedy. We may then wonder about $\epsilon \in \left]\frac{1}{2}, \frac{2}{3}\right].$ 
+
+        In literature, the best known upper bound yet is $0.59$, but the best lower bound is still $0.5$. In fact, being able to make an approximation algorithm for any $\epsilon > \frac{1}{2}$, such as $\epsilon = \frac{1}{2} + 10^{-10}$, is a big open question. 
+
+        For the communication problem, the question is however simpler, as the following theorem proves (as a quick note, recall that any streaming algorithm implies a two-party one-way communication algorithm, but the inverse is wrong; hence a better algorithm for communication cannot be used for streaming).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    For all $\epsilon > 0$, there exists a $\left(\frac{2}{3} - \epsilon\right)$-approximate one-way communication protocol for the maximum matching problem using space $O_{\epsilon}\left(n\right)$.
+
+    \begin{subparag}{Proof}
+        We will not see the exact algorithm in this class. 
+
+        The idea is that Alice finds some $\beta$-EDCS (a specific subgraph of her $G_A$, which we define right after), and sends it to Bob. This works because EDCS have good composition properties (i.e., given Alice's EDCS, Bob can extend it nicely) in the sense that they yield good approximations for matching, and we can always find one. We will only prove this second fact, but we will state both below.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: EDCS}
+    Let $G = \left(V, E\right)$ be a graph, $H = \left(V, E_H\right) \subseteq G$ be a subgraph, and $\beta \geq 2$ be an integer.
+
+    $H$ is said to be a \important{$\beta$-EDCS} (edge-degree constrained subgraph) of $G$ if:
+    \begin{enumerate}
+        \item For all $\left(u, v\right) \in H$, $\deg_H\left(u\right) + \deg_H\left(v\right) \leq \beta$.
+        \item For all $\left(u, v\right) \in G \setminus H$, $\deg_H\left(u\right) + \deg_H\left(v\right) \geq \beta-1$.
+    \end{enumerate}
+
+    \begin{subparag}{Intuition}
+        The idea is that any regular graph has a perfect matching. So, if we manage to find a regular subgraph, then we basically found a matching. However, not all graphs contain a regular subgraph, so we instead consider this weaker definition.
+    \end{subparag}
+
+    \begin{subparag}{Proeprty}
+        Any $\beta$-EDCS has size at most $c n \beta$ for some constant $c > 0$. Hence, sending an EDCS with $\beta \in O\left(1\right)$ can be done by sending only $O\left(n\right)$ edges.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        A lot of sublinear research is currently done using EDCS. This notably justifies why we do this (extremely) quick overview of EDCSs in this lecture.
+    \end{subparag}
+
+    \begin{subparag}{Example 1}
+        We can for instance consider the following graph, on which a 3-EDCS was highlighted in blue. Each edge $e = \left(u, v\right)$ is is also labelled with $\deg_H\left(u\right) + \deg_H\left(v\right)$.
+        \svghere[0.4]{ExampleEDCS.svg}
+    \end{subparag}
+
+    \begin{subparag}{Example 2}
+        $H$ is a 2-EDCS if and only if $H$ is a maximal matching.
+    \end{subparag}
+
+    \begin{subparag}{Example 3}
+        Any $\frac{\beta}{2}$-regular graph is a $\beta$-EDCS. Similarly, any $\frac{\beta - 1}{2}$-regular graph is a $\beta$-EDCS.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $G$ be an arbitrary graph, and $\beta \geq 2$ be an arbitrary integer.
+
+    Then, $G$ contains a $\beta$-EDCS.
+
+    \begin{subparag}{Proof}
+        We show the existence by making an algorithm for finding $\beta$-EDCSs. Thus, consider the following procedure.
+
+        We start with $H \leftarrow \o$. While $H$ is not a $\beta$-EDCS, pick some $e \in G$ that violates one of the two properties. If it violated the first property, remove it; otherwise add it.
+
+        Notice that, if the algorithm terminates, then $H$ is a $\beta$-EDCS by construction. We thus only want to prove it terminates. Consider the following potential function: 
+        \[\Phi\left(H\right) = \sum_{u \in V} \left(\deg_H\left(u\right) - \frac{\beta - \frac{1}{2}}{2}\right)^2.\]
+
+        The idea here is that we are measuring how far it is from a regular graph, since we know that a $\frac{\beta}{2}$-regular graph and a $\frac{\beta - 1}{2}$-regular graph are $\beta$-EDCS. We notice that this function has two properties:
+        \begin{itemize}
+            \item $\Phi\left(H\right)\geq 0$ for all $H$.
+            \item $\Phi\left(\o\right) = n \left(\frac{\beta - \frac{1}{2}}{2}\right)^2 \leq n \frac{\beta^2}{4}$.
+        \end{itemize}
+        
+        If we show that this decreases by at least $1$ every step, we will have shown that the algorithm terminates in at most $n \frac{\beta^2}{4}$ iterations.
+
+        Expanding the square, we find:
+        \autoeq[s]{\Phi\left(H\right) = \sum_{u \in V} \deg_H\left(u\right)^2 - \left(\beta - \frac{1}{2}\right) \sum_{v \in V} \deg_H\left(v\right) + n\left(\frac{\beta - \frac{1}{2}}{2}\right)^2 = \underbrace{\sum_{\left(u, v\right) \in H} \left(\deg_H\left(u\right) + \deg_H\left(v\right)\right)}_{= \Phi_+\left(H\right)} - \underbrace{\left(\beta - \frac{1}{2}\right) \sum_{v \in V} \deg_H\left(v\right)}_{= \Phi_-\left(H\right)} + \underbrace{n\left(\frac{\beta - \frac{1}{2}}{2}\right)^2}_{= \Phi_0},}
+        where $\sum_{v \in V} \deg\left(v\right)^2 = \sum_{\left(u, v\right) \in E} \left(\deg\left(u\right) + \deg\left(v\right)\right)$ is a general property of a graph, which proof is not too complicated and is left as an exercise to the reader.
+
+        Since $\Phi_0$ is independent of $H$, we only need to prove that, every iteration, $\Phi_+\left(H\right) - \Phi_-\left(H\right)$ decreases by at least one. We consider two cases.
+        \begin{itemize}[left=0pt]
+            \item Suppose that we remove some $\left(u, v\right)$ violating the first property.  Since it was violating the first property, we had $\deg_H\left(u\right) + \deg_H\left(v\right) \geq \beta + 1$. Hence, $\Phi_+\left(H\right)$ decreases by at least $\beta + 1$ because we remove the edge, and by at least $1$ for each of the $\beta-1$ edges incident on $u$ or $v$ left; i.e.\ it decreases by least $\beta + 1 + \left(\beta - 1\right) = 2 \beta$ in total. Similarly, removing an edge decreases by one the degree of two vertices, hence $\Phi_{-}\left(H\right)$ decreases by $2 \left(\beta - \frac{1}{2}\right) = 2 \beta - 1$. This does mean that $\Phi\left(H\right)$ decreases by at least $1$.
+            \item Suppose now that we add some $\left(u, v\right)$ violating the second property. Since it was violating the second property, it means we had $\deg_H\left(u\right) + \deg_H\left(v\right) \leq \beta - 2$. $\Phi_+\left(H\right)$ increases by at most $\beta + \left(\beta - 2\right) = 2\beta - 2$. Similarly, $\Phi_-\left(H\right)$ increases by $2 \left(\beta - \frac{1}{2}\right) = 2 \beta - 1$. This does mean that $\Phi\left(H\right)$ decreases by at least $1$.
+        \end{itemize}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $G = \left(L, R, E\right)$ be a bipartite graph, and let $\epsilon < \frac{1}{2}$. 
+
+    If $H$ is a $\beta$-EDCS of $G$ with $\beta \geq \frac{8}{\epsilon}$, then: 
+    \[\mu\left(G\right) \leq \left(\frac{3}{2} + \epsilon\right)\mu\left(H\right),\]
+    where $\mu\left(G\right)$ is the size of the maximum matching of $G$.
+
+    \begin{subparag}{Remark}
+        A similar lemma can be made for non-bipartite graphs although, in fact, its proof reduces to the bipartite case. 
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The proof can be found in ``Towards a Unified Theory of Sparsification for Matching Problems'' (Assadi-Bernstein, 2018), this is their lemma 3.1. The case for non-bipartite graph is their lemma 3.2.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\beta = \frac{32}{\epsilon^2} \log\left(\frac{1}{\epsilon}\right)$, and let $H \subseteq G_A$ be a $\beta$-EDCS constructed in a very specific way. Then, still leaving $\mu\left(G\right)$ to be the size of the maximum matching of $G$:
+    \[\mu\left(G_A \cup G_B\right) \leq \left(\frac{3}{2} + \epsilon\right) \mu\left(H \cup G_B\right).\]
+
+    \begin{subparag}{Implication}
+        This lemma shows that the protocol presented above, where Alice constructs a $\beta$-EDCS and sends it to Bob, does give a $\left(\frac{3}{2} + \epsilon\right)$-approximation to the maximum matching problem.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The proof can also be found in ``Towards a Unified Theory of Sparsification for Matching Problems'' (Assadi-Bernstein, 2018), this is their lemma 4.1.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

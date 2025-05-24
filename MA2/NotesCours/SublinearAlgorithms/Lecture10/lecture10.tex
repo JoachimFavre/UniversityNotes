@@ -1,0 +1,190 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-04-30 at 13:17:16.
+
+\usepackage{../../style}
+
+\title{Sublinear algorithms}
+\author{Joachim Favre}
+\date{Mercredi 30 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2025-04-30}{Reductioooooooons \smiley}{
+\begin{itemize}[left=0pt]
+    \item Proof that the \lang{INDEX} and the \lang{AUGMENTED-INDEX} problems require $\Omega\left(n\right)$ space.
+    \item Application to the \lang{MEDIAN} problem.
+    \item Application to the problem of counting with deletions.
+    \item Definition of the \lang{GAP-HAP} problem.
+\end{itemize}
+
+}
+
+\subsection{\lang{INDEX} problem}
+
+\begin{parag}{Definition: INDEX problem}
+    In the \lang{INDEX} problem, Alice is given $x \in \left\{0, 1\right\}^n$, Bob is given $i \in \left\{1, \ldots, n\right\}$. 
+
+    The goal is for Alice to send the least number of bits to Bob, such that he can compute $x_i$.
+\end{parag}
+
+\begin{parag}{Theorem}
+    We have, for all $\delta$: 
+    \[R_{\delta}^{pub, \to}\left(\lang{INDEX}\right) \geq \left(1 - H_2\left(\delta\right)\right)n.\]
+
+    \begin{subparag}{Remark}
+        This bound is tight, there exists a protocol that needs $\left(1 - H_2\left(\delta\right)\right)n$ bits. Note however that plaintext communication (i.e. Alice sending some of here bits to Bob) does not work, the protocol has to be more clever than that. Figuring our this protocol is an interesting task.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Consider an arbitrary protocol that succeeds with probability at least $1 - \delta$ for all inputs. Considering $X \followsdistr \text{Unif}\left(\left\{0, 1\right\}^n\right)$, this protocol must also succeed with probability at least $1 - \delta$ on $X$.
+
+        Let us state this more mathematically. Let $M$ be the random variable representing the message Alice sends to Bob when she has $X \in \left\{0, 1\right\}^n$. For all $i \in \left\{1, \ldots, n\right\}$, Bob has a function $g_i$ such that: 
+        \[\prob\left(g_i\left(M\right) \neq X_i\right) \leq \delta.\]
+        
+        Fano's inequality thus appears naturally: 
+        \[H\left(X_i \suchthat M\right) \leq H_2\left(\delta\right) + \delta \log_2\left(\left|\supp X_i\right| - 1\right) = H_2\left(\delta\right).\]
+
+        Let us use this to make our proof. We can suppose without loss of generality that Alice always sends messages of the same size to Bob (otherwise, just pad the smaller messages with useless bits), and let $s$ be this size. In other words, $M \in \left\{0, 1\right\}^s$. By properties of entropy $H\left(M\right) \leq s$ and hence: 
+        \[R_{\delta}^{pub, \to}\left(\lang{INDEX}\right) = s \geq H\left(M\right) \geq I\left(M; X\right),\]
+        where the second inequality comes from the fact $I\left(M; X\right) \leq \min\left\{H\left(M\right), H\left(X\right)\right\}$.
+
+        To simplify notation, we write $X_{< i} = \left(X_1, \ldots, X_{i-1}\right)$. Since $X = \left(X_1, \ldots, X_n\right)$, using the chain rule for mutual information:
+        \autoeq{I\left(X, M\right) = \sum_{i=1}^{n} I\left(X_i; M \suchthat X_{< i}\right) = \sum_{i=1}^{n} \left(H\left(X_i \suchthat X_{< i}\right) - H\left(X_i \suchthat M, X_{< i}\right)\right) \geq \sum_{i=1}^{n} \left(H\left(X_i\right) - H\left(X_i \suchthat M\right)\right),}
+        where we used that $H\left(X_i \suchthat X_{< i}\right) = H\left(X_i\right)$ since $X_i$ and $X_{<i}$ are independent, and subadditivity $H\left(A \suchthat B\right) \leq H\left(A\right)$.
+
+        We notice that $H\left(X_i\right) = 1$ since $X \followsdistr \text{Unif}\left(\left\{0, 1\right\}^n\right)$ and hence $X_i \followsdistr \text{Unif}\left(\left\{0, 1\right\}\right)$. Using the result we got from Fano's inequality earlier, this gives our result:
+        \[I\left(X, M\right) \geq \sum_{i=1}^{n} \left(1 - \underbrace{H\left(X_i \suchthat M\right)}_{\leq H_2\left(\delta\right)}\right) \geq \left(1 - H_2\left(\delta\right)\right)n.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: \lang{MEDIAN} problem}
+    In the \lang{MEDIAN} problem, we are given $y_1, \ldots, y_n$ in a stream, for some odd $n$. Our goal is to output their median.
+
+    Any streaming algorithm for \lang{MEDIAN} that achieves $\Omega\left(1\right)$ success probability requires $\Omega\left(n\right)$ space.
+
+    \begin{subparag}{Proof}
+        We reduce \lang{INDEX} to \lang{MEDIAN}. 
+
+        Let $x \in \left\{0, 1\right\}^n$ be Alice's input and $i \in \left\{1, \ldots, n\right\}$ be Bob's input to the \lang{INDEX}. Alice first feeds the following elements to the stream: 
+        \[\sigma = \left\langle 2 + x_1, 4 + x_2, 6 + x_3, \ldots, 2n + x_n \right\rangle.\]
+        
+        In other words, $\sigma$ contains $n$ integers, which least significant bits encodes Alice's $x$. She starts running the \lang{MEDIAN} algorithm on this stream. She then sends the memory state of this algorithm to Bob.  
+
+        Bob can now add elements to the algorithm, effectively adding elements to the stream. Suppose first he wants to know $x_1$. Bob can add $n-1$ times the element $0$ to the stream. Then, the stream becomes:
+        $\sigma' = \sigma + \left\langle 0, 0, \ldots, 0 \right\rangle.$
+
+        Overall, the stream contains the following elements: 
+        \[\left\{\underbrace{0, 0, \ldots, 0}_{\text{$n - 1$ times}}, 2 + x_1, 4 + x_2, \ldots, 2n + x_n\right\}.\]
+        
+        The median of the stream is thus $2 + x_1$, so when Bob asks the algorithm to output the answer, it will allow him to get $x_1$. More generally, if he wants the $i$\Th element to be the median, he can add $n-i$ times the element $0$, and $i-1$ times the element $2n + 2$. 
+
+        Overall, this protocol only had to send the memory state of the algorithm for the \lang{MEDIAN} problem to Bob. By our inequality on \lang{INDEX}, this means that this message must contain at least $\Omega\left(n\right)$ bits, and hence that the algorithm for \lang{MEDIAN} must use at least $\Omega\left(n\right)$ space.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This proof shows the interest of analysing communication complexity. A lower bound on communication implies a lower bound on streaming (the other direction does not necessarily hold).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{AUGMENTED-INDEX problem}
+    In the \lang{AUGMENTED-INDEX} problem, Alice is given $x \in \left\{0, 1\right\}^n$, Bob is given $i \in \left\{1, \ldots, n\right\}$ and $x_{< i}$. Bob's goal is to compute $x_i$.
+
+    \begin{subparag}{Remark}
+        We can naturally consider $x_{> i}$ instead of $x_{< i}$, this is equivalent.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    We have: 
+    \[R_{\delta}^{pub, \to}\left(\lang{AUGMENTED-INDEX}\right) \geq \left(1 - H_2\left(\delta\right)\right)n.\]
+
+    \begin{subparag}{Remark}
+        We may consider a problem \lang{EVEN-MORE-AUGMENTED-INDEX} where, instead of being given $x_{< i}$, Bob is given $x_{\neq i}$. In this case, this bound no longer works. Indeed, Alice can always just send the XOR of all her bits to Bob, from which he can compute $x_i$. This only gives a communication complexity of $1$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is the exact proof as the one for \lang{INDEX}. 
+
+        The difference is that there exists a family of functions $g_i$, such that, for all $x \in \left\{0, 1\right\}^n$, and for all $i \in \left\{1, \ldots, n\right\}$: 
+        \[\prob\left(g_i\left(M, X_{<i}\right) \neq X_i\right) \leq \delta.\]
+
+        Therefore, Fano's theorem tells us that, considering $X \followsdistr \text{Unif}\left(\left\{0, 1\right\}^n\right)$: 
+        \[H\left(X_i \suchthat M, X_{< i}\right) \leq \delta.\]
+        
+        The proof is then exactly the same, except that we no longer need to drop drop the conditioning in $H\left(X_i \suchthat M, X_{<i}\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2: Counting with deletions}
+    Any streaming algorithm for $\left(1 \pm \frac{1}{3}\right)$-approximately counting to $n$, where we have both additions and deletions, requires $\Omega\left(\log\left(n\right)\right)$ space.
+
+    \begin{subparag}{Remark}
+        Recall that Morris' algorithm provides a $\left(1+\epsilon\right)$-approximation to $n$ using $O\left(\frac{1}{\epsilon^2} \log\left(\log\left(n\right)\right)\right)$ bits of space, with constant probability. This shows that adding the ability to do deletion increases the asymptotic complexity exponentially to $\Omega\left(\log\left(n\right)\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We make a reduction from the \lang{AUGMENTED-INDEX} problem with input size $\log\left(n\right)$ to counting with deletion. Hence, let $x \in \left\{0, 1\right\}^{\log_{2}\left(n\right)}$ be Alice's input, and $i \in \left\{1, \ldots, \log_{2}\left(n\right)\right\}$ and $x_{> i}$ be Bob's input to the \lang{AUGMENTED-INDEX} problem.
+
+        Let \lang{ALG} be an arbitrary algorithm for counting with deletions. The idea is that Alice runs \lang{ALG} on $\sum_{i=1}^{\log_2\left(n\right)} 10^i x_i$ events. Then, she sends the memory state of \lang{ALG} to Bob. Bob feeds $-\sum_{j > i} 10^j x_j$ events to \lang{ALG} (using the fact it is allowed to have deletions).
+
+        Overall, \lang{ALG} was run on $z = \sum_{j=0}^{i} 10^j x_j$ events. Bob can then ask it to output the result, which will be a $\left(1 \pm \frac{1}{3}\right)$ approximation to the count: 
+        \[z = \sum_{j=0}^{i} 10^j x_j = 10^i x_i + \sum_{j < i} 10^j x_j.\]
+        
+        We aim to show that Bob can determine whether $x_i = 0$ or $x_i = 1$ from this result. Let's suppose that $x_i = 0$ to start with. Then, using the formula for partial geometric series: 
+        \[z = \sum_{j < i} 10^j = \frac{1 - 10^i}{1 - 10} = \frac{10^i - 1}{9} < \frac{1}{9} 10^{i}.\]
+        
+        Suppose now that $x_i = 1$. Then, by a similar reasoning: 
+        \[z = 10^i + \sum_{j < i} x_j 10^j > 10^i.\]
+        
+        The ratio between the gap of the two cases is at least $9$, which means that a $\left(1 \pm \frac{1}{3}\right)$ approximation algorithm is able to differentiate between the two cases. Bob thus finds the correct answer to the \lang{AUGMENTED-INDEX} problem.
+
+        Since the only bits that were communicated was the memory state of \lang{ALG}, and that there must have been at least $\Omega\left(\log\left(n\right)\right)$ bits communicated, \lang{ALG} must use at least $\Omega\left(\log\left(n\right)\right)$ bits of memory.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Gap Hamming distance}
+
+\begin{parag}{Definition: Hamming distance}
+    Let $x, y\in \left\{0, 1\right\}^n$. We define their \important{hamming distance} $\Delta\left(x, y\right)$ as the number of entries where $x$ and $y$ differ.
+
+    \begin{subparag}{Example}
+        For instance: 
+        \[\Delta\left(000, 101\right) = 2, \mathspace \Delta\left(101, 111\right) = 1.\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{\lang{GAP-HAM} problem}
+    In the \lang{GAP-HAM} (gap hamming distance) problem, Alice is given some $x \in \left\{0, 1\right\}^n$ and Bob some $y \in \left\{0, 1\right\}^n$. They are moreover told that they are in either of the two following cases:
+    \begin{itemize}
+        \item \textit{(Far)} $\Delta\left(x, y\right) \geq \frac{n}{2} + C \sqrt{n}$.
+        \item \textit{(Close)} $\Delta\left(x, y\right) \leq \frac{n}{2} - C \sqrt{n}$.
+    \end{itemize}
+
+    Their goal is to find in which situation they are in. 
+
+    \begin{subparag}{Remark}
+        If the algorithm is given an invalid input, for instance such that $\Delta\left(x, y\right) = \frac{n}{2}$, then it can output whatever it wants.
+    \end{subparag}
+    
+    \begin{subparag}{Intuition}
+        The idea is that we promise Alice and Bob that there is a gap. Their goal is then to know if they have a large Hamming distance or not.
+
+        Note that, considering random variables $X, Y \followsdistr \text{Unif}\left(\left\{0, 1\right\}^n\right)$, we can write $\Delta\left(X, Y\right) = \sum_{i=1}^{n} I_i$ for Bernoulli random variables with probability $\frac{1}{2}$ $I_i$ that tell whether $X_i = Y_i$. Thus, $\Delta\left(X, Y\right)$ is a binomial distribution, of mean $\frac{n}{2}$ and standard deviation $2\sqrt{n}$. Hence, by Chebyshev's inequality, we are in one of the two special cases with constant probability. This justifies why this specific cases were picked.
+    \end{subparag}
+\end{parag}
+
+\end{document}

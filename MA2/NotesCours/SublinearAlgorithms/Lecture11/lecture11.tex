@@ -1,0 +1,254 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-07 at 13:17:18.
+
+\usepackage{../../style}
+
+\title{Sublinear algorithm}
+\author{Joachim Favre}
+\date{Mercredi 07 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2025-05-07}{Steamed hams, but it's theoretical CS}{
+\begin{itemize}[left=0pt]
+    \item Proof that the \lang{GAP-HAM} problem has $\Omega\left(n\right)$ one-way communication complexity.
+    \item Reduction from \lang{GAP-HAM} to find a lower bound on the memory of a streaming algorithm for finding the number of distinct elements.
+    \item Start of a proof of a lower bound for the matching problem.
+    \item Definition of Ruzsa-Szemerédi graphs.
+\end{itemize}
+
+}
+
+\begin{parag}{Lemma}
+    Let $n$ be an odd integer.
+
+    Let $u \in \left\{-1, 1\right\}^n$ be an arbitrary vector, $e_i \in \left\{0, 1\right\}^n$ be the $i$\Th element of the canonical basis, i.e. the vector containing zeroes everywhere except for a one at the $i$\Th position. Also, let $r \followsdistr \text{Unif}\left(\left\{-1, 1\right\}^n\right)$. Then, there exists a universal constant $d > 0$ such that:
+    \[\begin{systemofequations} \prob\left(\sgn\left(\left\langle u, r \right\rangle\right) \neq \sgn\left(\left\langle e_i, r \right\rangle\right)\right) \geq \frac{1}{2} + \frac{d}{\sqrt{n}}, & \text{if $u_i = -1$,} \\ \prob\left(\sgn\left(\left\langle u, r \right\rangle\right) \neq \sgn\left(\left\langle e_i, r \right\rangle\right)\right) \leq \frac{1}{2} - \frac{d}{\sqrt{n}}, & \text{if $u_i = +1$.} \end{systemofequations}\]
+
+    \begin{subparag}{Intuition}
+        The idea is that, given $\sgn\left(\left\langle u, r \right\rangle\right)$, we may be able to exploit the probability difference to be able to know if $u_i = -1$ or $u_i = 1$.
+
+        This will be used in the following theorem, where make a reduction from \lang{INDEX} to \lang{GAP-HAM}.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        By definition: 
+        \[\left\langle u, r \right\rangle = \sum_{j=1}^{n} u_j r_j = u_i r_i + \sum_{j \neq i} u_j r_j = u_i r_i + w,\]
+        where $w = \sum_{j\neq i} u_j r_j$.
+        
+        Note that $u_i r_i = u_i \left\langle e_i, r \right\rangle$, so it is extremely to $\sgn\left(\left\langle e_i, r \right\rangle\right)$. We consider two cases.
+        \begin{itemize}[left=0pt]
+            \item Suppose that $w \neq 0$. Since $n$ is odd, $w$ is a sum of an even number of elements of $\left\{+1, -1\right\}$. This necessarily means that $w$ is even, and hence $\left|w\right| \geq 2$. Hence, $u_i r_i$ has no impact on the sign of $\left\langle u, r \right\rangle$: 
+            \[\sgn\left(\left\langle u, r \right\rangle\right) = \sgn\left(w\right).\]
+
+            In particular, this implies that: 
+            \[\prob\left(\sgn\left(\left\langle u, r \right\rangle\right) = 1\right) = \prob\left(\sgn\left(\left\langle u, r \right\rangle\right) = -1\right) = \frac{1}{2}.\]
+            
+            \item Suppose now that $w = 0$. Then: 
+            \[\sgn\left(\left\langle u, r \right\rangle\right) = \sgn\left(u_i r_i\right) = u_i r_i.\]
+
+            This implies that: 
+            \[\prob\left(\sgn\left(\left\langle u_i, r \right\rangle \neq \sgn\left(\left\langle e_i, r \right\rangle\right)\right)\right) = \begin{systemofequations} 1, & \text{if $u_i = -1$}, \\ 0, & \text{if $u_i = 1$.} \end{systemofequations}\]
+        \end{itemize}
+
+        We now only need to prove that we have $w = 0$ with probability at least $\frac{d}{\sqrt{n}}$. It is possible to prove this formally using Stirling's formula. Let's however consider a more intuitive approach. We are interested in:
+        \[w = \sum_{j \neq i} u_j r_j.\]
+
+        This is a sum of $n-1$ random variables, that are uniform in $\left\{-1, +1\right\}$. With enough terms, this converges to a Gaussian, of mean $0$ and variance $n-1$. Hence, essentially, the standard deviation is $\sqrt{n}$. The probability that it is between $-\frac{1}{2}$ and $\frac{1}{2}$ is roughly $\frac{1}{\sqrt{n}}$. More mathematically, we can expect that there is a constant $d$ such that:
+        \[\prob\left(w = 0\right) \geq \frac{d}{\sqrt{n}}.\]
+        
+        To sum up, we have, when $u_i = -1$:
+        \autoeq{\prob\left(\sgn\left(\left\langle u, r \right\rangle\right) \neq \sgn\left(\left\langle e_i, r \right\rangle\right)\right) = \prob\left(w = 0\right) + \frac{1}{2}\left(1 - \prob\left(w = 0\right)\right) = \frac{1}{2} + \frac{1}{2} \prob\left(w = 0\right) \geq \frac{1}{2} + \frac{d/2}{\sqrt{n}}.}
+
+        And, when $u_i = 1$: 
+        \[\prob\left(\sgn\left(\left\langle u, r \right\rangle\right) \neq \sgn\left(\left\langle e_i, r \right\rangle\right)\right) = \frac{1}{2}\left(1 - \prob\left(w = 0\right)\right) \leq \frac{1}{2} - \frac{d/2}{\sqrt{n}}.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Theorem}
+    We have the following constraint on randomised one-way complexity for the \lang{GAP-HAM} problem.
+    \[R_{1/10}^{pub, \to}\left(\lang{GAP-HAM}\right) = \Omega\left(n\right).\]
+
+    \begin{subparag}{Remark}
+        This also holds for two-way communication, although the proof gets a lot more involved.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We make a reduction from the \lang{INDEX} problem. For simplicity, we consider that its input are vectors from $\left\{-1, 1\right\}^n$ instead of $\left\{0, 1\right\}^n$. In other words, let $u \in \left\{-1, 1\right\}^n$ be Alice's input and $i \in \left\{1, \ldots, n\right\}$ to be Bob's input. Their goal is to construct $x, y$ for \lang{GAP-HAM}. For simplicity, we will also use $x, y \in \left\{-1, 1\right\}^N$.  
+
+        We can assume without issue that $n$ is odd to make our lower bound.
+
+        We consider the following reduction, parametrised on some $N \in \Theta\left(n\right)$ we will define later:
+        \begin{enumerate}[left=0pt]
+            \item Pick $N$ vectors $r^1, \ldots, r^N$ where $r^k \followsdistr \text{Unif}\left(\left\{-1, 1\right\}^n\right)$ for all $k \in \left\{1, \ldots, N\right\}$ using shared randomness.
+            \item For $k \in \left\{1, \ldots, N\right\}$, Alice computes $x_k = \sgn\left(\left\langle u, r^k \right\rangle\right)$ and Bob computes $y_k = \sgn\left(e_i, r^k\right)$ where $e_i \in \left\{0, 1\right\}^n$ has zeroes everywhere except for a one in the $i$\Th position.
+            \item Feed $x, y$ into the \lang{GAP-HAM} protocol. Bob outputs $u_i = -1$ if $\Delta\left(x, y\right) \geq \frac{N}{2} + C\sqrt{N}$, and $u_i = +1$ otherwise.
+        \end{enumerate}
+
+        The intuitive idea is that they pick random directions $r^1, \ldots, r^N$. Alice uses them to compute the projections $x_k = \sgn\left(\left\langle u, r^k \right\rangle\right)$. Bob is however only interested in learning the $i$\Th bit, so it does the same, but with $e_i$.
+
+        By our previous lemma, each $y_k$ has a little bit of information about $u_i$. We will show that, cumulatively, this will work. In other words, we want to show that with high probability over the choice of $r^1, \ldots, r^N$, then $\Delta\left(x, y\right) \geq \frac{N}{2} + C \sqrt{N}$ if $u_i = -1$, and $\Delta\left(x, y\right) \leq \frac{N}{2} - C\sqrt{N}$ when $u_i = 1$. 
+
+        Note that: 
+        \autoeq{\Delta\left(x, y\right) = \text{number of coordinates where $x$ and $y$ differ} = \left|\left\{k \in \left\{1, \ldots, N\right\} \suchthat \sgn\left(\left\langle u, r^k \right\rangle\right) \neq \sgn\left(\left\langle e_i, r^k \right\rangle\right)\right\}\right|.}
+
+        We suppose that $u_i = -1$, the case $u_i = 1$ is completely similar. By our lemma, for every $k$: 
+        \[\prob\left(\sgn\left(\left\langle u, r^k \right\rangle\right) \neq \sgn\left(\left\langle e_i, r^k \right\rangle\right)\right) \geq \frac{1}{2} + \frac{d}{\sqrt{n}}.\]
+        
+        Hence: 
+        \[\exval_{r^1, \ldots, r^N}\left(\Delta\left(x, y\right)\right) \geq N\left(\frac{1}{2} + \frac{d}{\sqrt{N}}\right) = \frac{N}{2} + d \frac{N}{\sqrt{n}} \geq \frac{N}{2} + \left(C + 10\right)\sqrt{N},\]
+        by picking $d \frac{N}{\sqrt{n}} \geq \left(C+10\right) \sqrt{N} \iff \sqrt{N} \geq \frac{C + 10}{d} \sqrt{n} \iff N \geq \frac{\left(C + 10\right)^2}{d^2} = \Theta\left(n\right)$. Moreover, since this is a sum of independent Bernoulli random variable: 
+        \[\Var\left(\Delta\left(x, y\right)\right) \leq N.\]
+        
+        Hence, by Chebyshev's inequality: 
+        \[\prob\left(\left|\Delta\left(x, y\right) - \exval\left(\Delta\left(x, y\right)\right)\right| \geq 10 \sqrt{N}\right) \leq \frac{1}{100}.\]
+
+        This shows that, with probability at least $\frac{99}{100}$, we have:
+        \autoeq{\left|\Delta\left(x, y\right) - \exval\left(\Delta\left(x, y\right)\right)\right| \leq 10 \sqrt{N} \implies \exval\left(\Delta\left(x, y\right)\right) - \Delta\left(x, y\right) \leq 10 \sqrt{N} \implies \Delta\left(x, y\right) \geq \exval\left(\Delta\left(x, y\right)\right) - 10 \sqrt{N} \geq \frac{N}{2} + C \sqrt{N}.}
+
+        In that case, Bob outputs the correct answer. As mentioned above, the case of $u_i = 1$ is completely similar.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Any streaming algorithm that $\left(1+\epsilon\right)$-approximates the number of distinct elements with success probability at least $\frac{9}{10}$, for $\epsilon \geq \Omega\left(\frac{1}{\sqrt{n}}\right)$, requires at least the following space:
+    \[\Omega\left(\frac{1}{\epsilon^2} + \log\left(n\right)\right).\]
+
+    \begin{subparag}{Remark}
+        This is tight, even though we only did a protocol that is $O\left(\frac{1}{\epsilon^4} \log\left(n\right)^2\right)$ in exercise series (where we improved the 2-approximation to an arbitrary $\epsilon$ precision), it is possible to find one with $O\left(\frac{1}{\epsilon^2}\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let \lang{ALG} be an arbitrary algorithm that finds a $\left(1+\frac{\epsilon}{2}\right)$-approximation to the number of distinct elements in a stream which elements are in a universe of size $n$.
+
+        Let $m$ be a constant to be defined later. We make a reduction from \lang{GAP-HAM}. So, let $x \in \left\{0, 1\right\}^m$ and $y \in \left\{0, 1\right\}^m$ be inputs for the \lang{GAP-HAM} problem. We can suppose that $\Delta\left(x, y\right) \geq \frac{m}{2} + C\sqrt{m}$ or $\Delta\left(x, y\right) \leq \frac{m}{2} - C\sqrt{m}$.
+
+        Alice constructs a stream (while feeding it to \lang{ALG}) by adding all indices where $x_i = 1$, i.e. elements of the following set: 
+        \[A = \left\{i \in \left\{1, \ldots, m\right\} \suchthat x_i =1\right\}.\]
+
+        Alice then sends the memory state of \lang{ALG} to Bob. He finally adds all elements of the following set to the stream: 
+        \[B = \left\{i \in \left\{1, \ldots, m\right\} \suchthat y_i = 1\right\}.\]
+
+        Note that we must have $n \geq m$ since the universe size of \lang{ALG} must be large enough for this input.
+        
+        The number of distinct elements in $A \cup B$ is just $\left\|x + y\right\|_0$: if $x_i = y_i = 0$ then $i \notin A \cup B$ does not belong to the set, but if $x_i + y_i \in \left\{1, 2\right\}$ then $i \in A \cup B$ belongs to the set.         
+
+        Using \lang{ALG}, Bob finds some $\left(1 +\frac{\epsilon}{2}\right)$-approximation to the number of distinct elements $\left\|x + y\right\|_0$, i.e. some $\hat{L}$ such that: 
+        \autoeq{\left|\left\|x + y\right\|_0 - \hat{L}\right| \leq \frac{\epsilon}{2} \left\|x + y\right\|_0 \iff \left|2 \left\|x + y\right\|_0 - 2\hat{L}\right| \leq \epsilon \left\|x + y\right\|_0 \leq \epsilon m.}
+
+        We want to link $\left\|x + y\right\|_0$ and $\Delta\left(x, y\right)$. To do so, we can consider the following Venn diagram, of $A$ and $B$:
+        \svghere[0.7]{VennDiagramHammingDistance.svg}
+
+        On it, we can read that:
+        \[2 \left\|x + y\right\|_0 = \left\|x\right\|_0 + \left\|y\right\|_0 + \Delta\left(x, y\right).\]
+
+        This thus tells us that our algorithm outputs an estimate $\hat{L}$ such that: 
+        \autoeq{\left|\left\|x\right\|_0 + \left\|y\right\|_0 + \Delta\left(x, y\right) - 2\hat{L}\right| = \left|\Delta\left(x, y\right) - \left(2 \hat{L} - \left\|x\right\|_0 - \left\|y\right\|_0\right)\right| \leq \epsilon m.}
+        
+        This shows that $2\hat{L} - \left\|x\right\|_0 - \left\|y\right\|_0$ is an approximation to $\Delta\left(x, y\right)$, with additive error at most $\epsilon m$. For the algorithm to be able to distinguish $\Delta\left(x, y\right) \geq \frac{n}{2} + C \sqrt{n}$ from $\Delta\left(x, y\right) \leq \frac{n}{2} - C\sqrt{n}$, we need to make sure that this approximation is a sufficiently good one. In particular, this approximation must not cross the gap, i.e. we want: 
+        \[\epsilon m < C \sqrt{m} \iff \sqrt{m} < \frac{C}{\epsilon} \iff m < \frac{C}{\epsilon^2}.\]
+
+        So, taking $m = \frac{C}{\epsilon^2}$, if Alice also sends $\left\|x\right\|_0$ to Bob, he can compute $2 \hat{L}-  \left\|x\right\|_0 - \left\|y\right\|_0$, which will be sufficiently close to $\Delta\left(x, y\right)$ to be able to differentiate the two cases. Note that, as mentioned before, we need $m \leq n$, so we are using the hypothesis $\epsilon \geq \sqrt{\frac{C}{n}}$ here.
+
+        Let $s$ be the space used by \lang{ALG}. Overall, Alice sent to Bob both $s$ bits, and $\log_2\left(m\right)$ bits when sending $\left\|x\right\|_0$. In other words, overall, she sent $s + \log_2\left(m\right)$ bits. We know this has to be at least $\Omega\left(m\right)$ bits because the \lang{GAP-HAM} cannot be solved with less, i.e.: 
+        \[s + \log_2\left(m\right) \geq \Omega\left(m\right) \implies s \geq \Omega\left(m\right) - \log_2\left(m\right) \geq \Omega\left(\frac{1}{\epsilon^2}\right).\]
+
+        Moreover, to simply be able read elements of a universe of size $n$, we need $\Omega\left(\log\left(n\right)\right)$ bits. This gives our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Matching problem}
+
+\begin{parag}{Streaming matching problem}
+    Let $G = \left(V, E\right)$ be a graph given as a stream of edge insertions, and $M_{opt}$ be its maximum matching. 
+
+    Given the stream and $\epsilon$, the goal is to output a matching $M \subseteq E$ such that $\left|M\right| \geq \left(1 - \epsilon\right) \left|M_{opt}\right|$. 
+
+    \begin{subparag}{Remark 1}
+        As stated, an algorithm for this task can fail in multiple ways. It can fail because the outputted set $M$ is too small, but it can also fail because $M \not\subseteq E$ is not a set of valid edges, or because $M$ is not a valid matching.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        In the ninth exercise series, we proved that $\epsilon = 0$ requires $\Omega\left(n^2\right)$ space. We however want to consider the case $\epsilon > 0$.
+
+        Ideally, as mentioned earlier in the class, we want the semi-streaming algorithms, i.e. using $O\left(n \log^c\left(n\right)\right)$ space. Note that, just outputting $M$ already requires $\Omega\left(n \log\left(n\right)\right)$ space. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Induced matching}
+    Let $G = \left(V, E\right)$  be a graph, and $M$ be a matching of $A \subseteq V$ and $B \subseteq V$.
+
+    $M$ is said to be \important{induced}, if $E \cap A \times B = M$.
+
+    \begin{subparag}{Intuition}
+        The idea is that an induced matching is a matching such that, for any $\left(u_1, v_1\right), \left(u_2, v_2\right) \in E$, there does not exist the edge $\left(u_1, u_2\right)$, $\left(u_1, v_2\right)$, $\left(v_1, u_2\right)$, $\left(v_1, v_2\right)$.
+
+        More intuitively, if we restrict the graph $G$ to vertices that are matched by $M$, then all the edges left are the ones of $M$.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, we can consider the following graph, where the blue edges represent a matching. In the first case, the matching is induced; in the second one, the matching isn't induced.
+        \svghere[0.7]{ExampleInducedMatching.svg}
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        A graph has an induced perfect matching if and only if the graph is itself a perfect matching.
+
+        This means that induced perfect matching aren't really interesting.
+    \end{subparag}
+\end{parag}
+ 
+
+\begin{parag}{Definition: Ruzsa-Szemerédi graph}
+    Let $G = \left(P, Q, E\right)$ be a bipartite graph, with $n = \left|P\right| = \left|Q\right|$.
+
+    It is said to be a \important{$\left(\epsilon, k, n\right)$-Ruzsa-Szemerédi graph} (RS graph) if we can write $E = \bigcup_{i=1}^{k} M_i$, where each $M_i$ are induced matchings with $\left|M_i\right| = \epsilon n$ for all $i \in \left\{1, \ldots, k\right\}$.
+
+    \begin{subparag}{Intuition}
+        Intuitively, these are graphs where we can colour edges such that, if we look only at a specific colour, then we have an induced matching. 
+
+        For instance, the following graph is a $\left(\frac{1}{2}, 3, 6\right)$-RS graph, with the three colours highlighted:
+        \svghere[0.25]{ExampleRSGraph.svg}
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        These graphs will be analysed in the eleventh exercise series.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Knowing which $\epsilon$ and $k$ are doable is very hard, and an active area of research. Better graphs yield better inequalities.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 3}
+        A RS-graph has $n\cdot k$ edges.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    There exists a constant $c$ such that for all $\delta \in \left]0, c\right[ $, there exists a $\left(\frac{1}{2} - \delta, k, n\right)$-RS graph with:
+    \[k = n^{\Omega_{\delta}\left(1/\log\left(\log\left(n\right)\right)\right)}= 2^{\Omega_{\delta}\left(\log\left(n\right)/\log\left(\log\left(n\right)\right)\right)}.\]
+
+    \begin{subparag}{Remark 1}
+        The idea here is that $k \in \omega\left(\log\left(n\right)^c\right)$ for any constant $c$ and $k \in o\left(n^d\right)$ for any constant $d$. In other words, it grows faster than polylogarithmically, but slower than polynomially.
+
+        This is interesting, because it means that we cannot store $n\cdot k$ in the semi-streaming model, and hence a semi-streaming algorithm cannot remember everything about the graph. We will exploit this to build our lower-bound.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Taking a step back, this result may be surprising. It states that we have a graph with $n k \in \omega\left(n\right)$ edges (hence quite dense) which we can partition in $k$ independent matchings (implying some sparsity). In other words this is a dense graph, which locally is very sparse.
+    \end{subparag}
+\end{parag}
+
+\end{document}

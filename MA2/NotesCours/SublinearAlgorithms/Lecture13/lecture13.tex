@@ -1,0 +1,241 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-21 at 13:18:22.
+
+\usepackage{../../style}
+
+\title{Sublinear lagorithms}
+\author{Joachim Favre}
+\date{Mercredi 21 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2025-05-21}{Sublinear time, at last}{
+\begin{itemize}[left=0pt]
+    \item Definition of the kernel density problem.
+    \item Explanation of importance sampling.
+    \item Definition of Andoni-Indyk LSH.
+    \item Intuitive idea behind an algorithm to solve the kernel density problem.
+\end{itemize}
+
+}
+
+\section{Sublinear time algorithms}
+\subsection{Kernel density estimation}
+
+\begin{parag}{Definition: Kernel}
+    Let $K: \mathbb{R}^d \times \mathbb{R}^d \mapsto \mathbb{R}$ be a function.
+
+    We say that $K$ is Kernel if there exists some non-increasing function $f: \mathbb{R}_+ \mapsto \mathbb{R}_+$ such that $f\left(0\right) = 1$ and $K\left(p, q\right) = f\left(\left\|p - q\right\|_2\right)$. 
+
+    \begin{subparag}{Intuition}
+        This can be seen as a measure of similarity between two points.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that $K\left(p, q\right) \in \left[0, 1\right]$ for all $p, q \in \mathbb{R}^d$, since $f$ is non-increasing.
+    \end{subparag}
+
+    \begin{subparag}{Examples}
+        For instance, we can consider the following kernels:
+        \begin{itemize}
+            \item \textit{(Gaussian kernel)} $\displaystyle K\left(p, q\right) = e^{-a \left\|p - q\right\|_2^2}$.
+            \item \textit{(Exponential kernel)} $\displaystyle K\left(p, q\right) = e^{-a \left\|p - q\right\|_2}$.
+            \item \textit{($t$-student kernel)} $\displaystyle K\left(p, q\right) = \frac{1}{1 + \left\|x- y\right\|_2^t}$.
+        \end{itemize}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Kernel density}
+    Let $P \subseteq \mathbb{R}^d$ be a finite data-set of size $n = \left|P\right|$, $q \in \mathbb{R}^d$ be a point and $K: \mathbb{R}^d \times \mathbb{R}^d \mapsto \mathbb{R}$ be a kernel. The \important{kernel density} of $P$ at $q$, written $\mu = K\left(P, q\right)$, is: 
+    \[\mu = K\left(P, q\right) = \frac{1}{n} \sum_{p \in P} K\left(p, q\right) \in \left[0, 1\right].\]
+
+
+    \begin{subparag}{Remark}
+        We can always consider a matrix $K \in \mathbb{R}^{\left|P\right|} \times \mathbb{R}^{\left|P\right|}$ such that: 
+        \[K_{i, j} = K\left(p_i, p_j\right), \mathspace p_i, p_j \in P.\]
+
+        Then, if $q \in P$, kernel density can just be written as matrix product:
+        \[\mu = K\cdot  \begin{pmatrix} 1/n \\ \vdots \\ 1/n \end{pmatrix}.\]
+    \end{subparag}
+
+    \begin{subparag}{Application 1}
+        For instance, let's say that we have some dataset $P$. We are given a new point $q$, and we want to know if it is a good idea to add it to the dataset or not. If it is already very covered by the dataset, it is not really interesting, so we shouldn't. A way to evaluate this is kernel density.
+    \end{subparag}
+
+    \begin{subparag}{Application 2}
+        This also has application for increasing the speed of the computation of the self-attention matrix for a transformer.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Approximate kernel density problem}
+    The goal of the approximate kernel density problem is to find a $\left(1+\epsilon\right)$-approximate of $K\left(P, q\right) = \mu$ with success probability at least $\frac{9}{10}$.
+
+    We will evaluate both the space complexity and query time of our data-structure. Our goal is to find a sublinear query time.
+\end{parag}
+
+\begin{parag}{Naive algorithm}
+    We can store the whole data set and, when we receive a point, we can evaluate all pairs. This takes space $O\left(dn\right)$ and time $O\left(dn\right)$. 
+
+    This is our benchmark to improve.
+\end{parag}
+
+\begin{parag}{Less naive algorithm}
+    We sample $P' \subseteq P$ uniformly at random, and store $P'$. Then, when we receive a point $q$, we output $K\left(P', q\right)$.
+
+    If $\left|P'\right| = O\left(\frac{1}{\epsilon^2 \mu}\right)$, then:
+    \[\prob\left(\left|K\left(P', q\right) - K\left(P, q\right)\right| \geq \epsilon \mu\right) \leq \frac{1}{10}.\]
+
+    Moreover, this is sharps: if $\left|P'\right| = o\left(\frac{1}{\epsilon^2 \mu}\right)$, then this algorithm cannot work.
+
+    \begin{subparag}{Remark}
+        This takes space $O\left(\frac{d}{\epsilon^2 \mu}\right)$ and time $O\left(\frac{d}{\epsilon^2 \mu}\right)$.
+
+        This nice, but we want to do even better. We want to make a data-structure which query time is sublinear in $\frac{1}{\mu}$. The algorithm we will see has query time $O\left(\frac{d}{\epsilon^2 \mu^{1/4}}\right)$ and space complexity approximately $\frac{d}{\epsilon^2} n \frac{1}{\mu^{1/4}}$, for the Gaussian kernel.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 1}
+        We first prove that $\left|P'\right| = O\left(\frac{1}{\epsilon^2 \mu}\right)$ suffices.
+
+        Let $p \in P$ be sampled uniformly at random. Notice that $K\left(p, q\right)$ is an unbiased estimator of $\mu$. In order to have a constant success probability, Chebyshev's inequality it suffices to average the following number of independent samples to get an $\epsilon$-approximation with probability at least $1 - O\left(1\right)$: 
+        \[N \geq \frac{O\left(1\right)}{\epsilon^2}\cdot \frac{\Var\left(K\left(p, q\right)\right)}{\exval\left(K\left(p, q\right)\right)^2}.\]
+        
+        Now, since $K\left(p, q\right) \in \left[0, 1\right]$: 
+        \autoeq{\Var\left(K\left(P, q\right)\right) \leq \exval\left(K\left(P, q\right)^2\right) = \frac{1}{\left|P\right|}\sum_{p} K\left(p, q\right)^2 \leq \frac{1}{\left|P\right|}\sum_{p} K\left(p, q\right) = \mu.}
+        
+        Since moreover $\exval\left(K\left(p, q\right)\right) = \mu$ since it is unbiased, we have: 
+        \[N \geq \frac{O\left(1\right)}{\epsilon^2} \frac{\mu}{\mu^2} = O\left(\frac{1}{\epsilon^2 \mu}\right).\]
+        
+    \end{subparag}
+    
+    \begin{subparag}{Proof 2}
+        We now prove that $\left|P'\right| = \Omega\left(\frac{1}{\epsilon^2 \mu}\right)$ is necessary. Suppose $\epsilon = \Theta\left(1\right)$ for simplicity.
+
+        Consider a data set $P$ with two locations that are very far one from another. In the first location, we have $\mu n$ points, and in the second one we have $\left(1 - \mu\right) n$. Considering some $q$ in the first location, it essentially has kernel $1$ relative to points in the first location and $0$ relative to ones in the second location. Hence, $K\left(P, q\right) \approx \frac{\mu n}{n} = \mu$.
+
+        If we sample $k = \left|P'\right|$ points to get $P'$, we will have approximately $k \mu$ in the first location and $k \left(1 - \mu\right)$ in the second. Now, we need $k \mu$ to be a non-zero integer so, to get a $\Theta\left(1\right)$-approximation to $\mu$,  we need $k \geq \Theta\left(1\right)\cdot \frac{1}{\mu}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: Importance sampling}
+    Let $a_1, \ldots, a_n$ be a sequence we want to compute the sum of and $p_1, \ldots, p_n$ be a probability distribution. Consider some random variables such that $X = \frac{a_i}{p_i}$ with probability $p_i$, for all $i$. Then: 
+    \[\exval\left(X\right) = \sum_{i} a_i.\]
+
+    \begin{subparag}{Proof}
+        This is direct: 
+        \[\exval\left(X\right) = \sum_{i} p_i X_i = \sum_{i} p_i \frac{a_i}{p_i} = \sum_{i} a_i.\]
+
+        \qed
+    \end{subparag}
+    
+    \begin{subparag}{Remark 1}
+        Suppose that $a_1, \ldots, a_n \geq 0$. Then, we can let: 
+        \[p_i = \frac{a_i}{\sum_{i} a_i}.\]
+
+        This is nice because: 
+        \[\Var\left(X\right) = 0.\]
+
+        Indeed, for all $i$, with probability $p_i$: 
+        \[X = \frac{a_i}{p_i} = \frac{a_i}{a_i / \sum_{j} a_j} = \sum_{j} a_j.\]
+
+        So, $X = \exval\left(X\right)$ with probability $1$, which does show that it does not have any variance. However, to be able to do this ideal importance sampling, we already need to be able to compute $\sum_{i} a_i$ to be able to evaluate $p_i$ (and hence it is useless). 
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Suppose now that, for all $i$: 
+        \[p_i = \Theta\left(\frac{a_i}{\sum_{j} a_j}\right).\]
+
+        Then, for all $i$, with probability $p_i$: 
+        \[X =\frac{a_i}{\Theta\left(a_i / \sum_{j} a_j\right)} = \Theta\left(\sum_{j} a_j\right).\]
+        
+        Then, in that case: 
+        \[\Var\left(X\right) = O\left(1\right) \exval\left(X^2\right).\]
+
+        This is already nicer. The idea is thus to implement importance sampling for estimating Kernel density.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition}
+    Let $q \in \mathbb{R}^d$ be a query point, and let $J = \left\lfloor \log_2\left(\frac{1}{\mu}\right) \right\rfloor $. Then for all $j \in \left\{1, \ldots, J\right\}$, we define: 
+    \[L_j = \left\{p \in P \suchthat K\left(p, q\right) \in \left]2^{-j}, 2^{-j+1}\right] \right\}.\]
+
+    We moreover define, for the function $f$ such that $K\left(p, q\right) = f\left(\left\|p - q\right\|_2\right)$: 
+    \[r_j = \max_{f\left(r\right) \in \left[2^{-j}, 2^{-j+1}\right[ } r.\]
+    
+    \begin{subparag}{Intuition}
+        These two definitions can be visualised using the following drawing.
+        \svghere[0.5]{GeometricWeightLevels.svg}
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        This $L_j$ is a mathematical object that is used for the analysis of the algorithm, it will not need to compute it.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that the $r_j$ only depend on the choice of the Kernel, not on the dataset $P$. In the rest of this analysis, we will suppose that $f\left(r\right) = e^{-a r^2}$, i.e. that $K$ is the Gaussian kernel. Different query time and space complexity can be reached for different kernels.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        Let $j$ be fixed. Using importance sampling, we want to sample any point $p \in L_j$ with probability:
+        \[\Theta\left(1\right) \cdot \frac{K\left(p, q\right)}{\sum_{p' \in P} K\left(p', q\right)} = \Theta\left(1\right)\cdot \frac{2^{-j} \cdot c}{n \mu} = \Theta\left(1\right)  \frac{2^{-j}}{n \mu},\]
+        for some constant $c \in \left[1, 2\right]$. Note that this probability is independent of $q$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $j$ be fixed. We have: 
+    \[\left|L_j\right| \leq 2^j n \mu.\]
+
+    \begin{subparag}{Proof}
+        Intuitively, the idea is that each point $q \in L_j$ contributes $2^{-j}$ to the sum of kernels, which is $n \mu$. We thus cannot have more than $2^j n \mu$ of these points. More formally:
+        \[n\mu = \sum_{p} K\left(p, q\right) \geq \sum_{p \in L_j} K\left(p, q\right) \geq 2^{-j} \left|L_j\right|.\]
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        This shows that, if we sample a point uniformly at random from $P$, then it has probability approximately $2^j \mu$ to land in $L_j$.
+
+        More precisely, if we sample points independently with probability $\frac{2^{-i}}{n \mu}$, then we can expect $2^{i - j}$ points in $L_j$. More specifically, we expect a constant number of points in $L_j$, and very few in $L_i$ for any $i < j$. This very nice, because it almost allows us to sample from a point in $L_j$. The issue however here is that we expect a lot of points in $L_i$ for any $i > j$. The way to fix this is using locality-sensitive hashing.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Andoni-Indyk LSH}
+    Let $\mathcal{H}$ be a hash family, $r > 0$ and $c \geq 1$. For any $p, q \in \mathbb{R}^d$, we define:
+    \[p_{near} = \prob_{h \in \mathcal{H}}\left[h\left(p\right) = h\left(q\right) \suchthat \left\|p - q\right\| \leq r\right],\]
+    \[p_{far} = \prob_{h \in \mathcal{H}}\left[h\left(p\right) = h\left(q\right) \suchthat \left\|p - q\right\| \geq c\cdot r\right].\]
+
+    We say that $\mathcal{H}$ is a \important{Andoni-Indyk} locality-sensitive hashing (LSH) family if $p_{far} \approx p_{near}^{c^2}$.
+
+    \begin{subparag}{Remark}
+        It can be proven that there does exist such a LSH for any $r > 0$ and $c \geq 1$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm}
+    We can now consider the intuitive idea of how we can make an algorithm work.
+    \begin{itemize}[left=0pt]
+        \item \textit{(Pre-processing)} For each $j \in \left\{1, \ldots, J\right\}$, subsample the space $P_j \subseteq P$, taking each point with probability $\frac{2^{-j}}{n \mu}$. Moreover, sample some $h_j \in \mathcal{H}$ from the Andony-Indyk LSH with near-distance $r = r_j$. Store $P_j$ as a list of buckets, where two points $p, p' \in P$ are in the same bucket if they hash to the same value.
+        \item \textit{(Query)} For each $j \in \left\{1, \ldots, J\right\}$, consider all points in the bucket to which $q$ hashes in $P_j$. Consider this to be $L_j$. Use importance sampling to give a weight to each point accordingly.
+    \end{itemize}
+
+    \begin{subparag}{Justification}
+        The idea is that LSH approximately only keeps point that are at a distance at most $r_j$ from $q$. On the other hand, subsampling the space approximately only keeps points that are in $L_k$ for $k \geq j$, as mentioned above. This means that, overall, our strategy approximately finds $L_j$, for all $j \in \left\{1, \ldots, J\right\}$. However, importance sampling gives the same weight of $\Theta\left(1\right)\cdot \frac{2^{-j}}{n \mu}$ to all points in $L_j$, so this is enough to get our result.
+
+        The trick here to combine subsampling to close points with LSH is very nice to damp far points is very nice.
+    \end{subparag}
+    
+    \begin{subparag}{Remark}
+        This algorithm can be formalised and analysed in more details. Notably, as stated, it requires to know $\mu$, although this is the value we want to compute. This hypothesis can be removed.
+
+        However, we sadly did not have time to do this in class.
+    \end{subparag}
+\end{parag}
+
+\end{document}

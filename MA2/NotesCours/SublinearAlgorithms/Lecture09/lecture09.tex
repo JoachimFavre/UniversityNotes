@@ -1,0 +1,247 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-17 at 15:26:09.
+
+\usepackage{../../style}
+
+\title{Sublinear algorithms}
+\author{Joachim Favre}
+\date{Samedi 17 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2025-04-16}{A class about entropy is a good class}{
+\begin{itemize}[left=0pt]
+    \item Proof of an algorithm for exact sparse recovery.
+    \item Introduction to communication complexity.
+    \item Crash course on information theory: definition of entropy, mutual information and statement of Fano's inequality.
+\end{itemize}
+
+}
+
+\begin{parag}{Lemma}
+    Let $i \in \supp x$ be arbitrary. We say that $i$ is ``good'' if it is alone in its bucket, i.e. if for all $j \in \supp x$ such that $i \neq j$, we have $h\left(i\right) \neq h\left(j\right)$. We say $i$ is ``bad'' otherwise.
+
+    Then: 
+    \[\prob\left(\text{$i$ is good}\right) \geq 1 - \frac{k}{B}.\]
+    
+    \begin{subparag}{Proof}
+        This is a direct proof, using the union bound: 
+        \autoeq{\prob\left(\text{$i$ is bad}\right) = \prob\left(\exists j \in \supp x \setminus \left\{i\right\} \text{ such that $h\left(j\right) = h\left(i\right)$}\right) \leq \sum_{\substack{j \in \supp x \\ j\neq i}} \prob\left(h\left(j\right) = h\left(i\right)\right) = \frac{\left|\supp x\right|-1}{B} = \frac{k-1}{B} \leq \frac{k}{B}.}
+
+        This directly gives our result.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $B = \frac{4k}{\delta}$. Then: 
+    \[\prob_h\left(\left\|\widetilde{x} - x\right\|_0 \leq \frac{k}{2}\right) \geq 1 - \delta.\]
+
+    \begin{subparag}{Proof}
+        Let $i \in \supp x$ be arbitrary. If $i$ is good, then $\widetilde{x}_i = x_i$. If however $i$ is bad, this means that we had two indices of $\supp x$ that hashed in the same bucket although we supposed there was no collision while constructing $\widetilde{x}$. 
+
+        When there is a collision, this means that we get a meaningless $i_*$ and $val$. Hence, in the worst case, we have both $x_i \neq \widetilde{x}_i$ and $x_{i_*} \neq \widetilde{x}_{i_*}$. This shows that $\left\|\widetilde{x} - x\right\|_0$ is at most twice the number of bad $i$. By the previous lemma: 
+        \autoeq{\exval\left[\left\|\widetilde{x} - x\right\|_0\right] \leq 2 \exval\left(\text{number of bad $i$}\right) = 2 \exval\left(\sum_{i \in \supp x} I\left(\text{$i$ is bad}\right)\right) = 2 \sum_{i \in \supp x} \prob\left(\text{$i$ is bad}\right) \leq 2k\cdot \frac{k}{B}.}
+
+        Hence, by Markov's inequality: 
+        \[\prob_h\left(\left\|\widetilde{x} - x\right\|_0 \geq \frac{k}{2}\right) \leq \frac{2k^2/B}{k/2} = \frac{4k}{B} = \delta,\]
+        picking $B = \frac{4k}{\delta}$.
+
+        \qed
+    \end{subparag}
+    
+    \begin{subparag}{Implication}
+        This is not exactly the result we were working for, we are not sure $\widetilde{x} = x$. However, this shows that with high probability $\widetilde{x} - x$ is $\frac{k}{2}$-sparse. The idea will thus to repeat our naive algorithm on $\widetilde{x} - x$.
+
+        In other words, leaving $\widetilde{x}^{\left(1\right)} = \widetilde{x}$, we have that $x - \widetilde{x}^{\left(1\right)}$ is $\frac{k}{2}$-sparse. Running the naive algorithm on it again, we get $\widetilde{x}^{\left(2\right)}$, such that the following vector is $\frac{k}{4}$ sparse:
+        \[\left(x - \widetilde{x}^{\left(1\right)}\right) - \widetilde{x}^{\left(2\right)} = x - \left(\widetilde{x}^{\left(1\right)} + \widetilde{x}^{\left(2\right)}\right).\]
+
+        Repeating this $\log_2\left(k\right)$ times, we get a $0$-sparse vector, i.e.: 
+        \[x - \sum_{i=1}^{\log_2\left(k\right)} \widetilde{x}^{\left(i\right)} \iff x = \sum_{i=1}^{\log_2\left(k\right)} \widetilde{x}^{\left(i\right)}.\]
+        
+        This gives us the following algorithm.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Complete algorithm}
+    Start with $\widetilde{x}^{\left(0\right)} = 0$. Then, for all $i = 1, 2, \ldots, \log_2\left(k\right)$:
+    \begin{enumerate}
+        \item Generate $A^{\left(i\right)} \in \mathbb{R}^{B_i \times n}$ for $\frac{k}{2^i}$-recovery with success probability $\delta_i = \left(\frac{2}{3}\right)^i \delta$ (hence $B_i = \frac{4 k/2^i}{\delta_i}$ as stated above).
+        \item Evaluate $A^{\left(i\right)} x$ and $A^{\left(i\right)} \widetilde{x}^{\left(i-1\right)}$.
+        \item Let $\widetilde{x}^{\left(i\right)}$ be obtained by running our recovery algorithm on $A^{\left(i\right)} x - \sum_{r=1}^{i} \widetilde{x}^{\left(r-1\right)}$.
+    \end{enumerate}
+    Finally, output $\widetilde{x} = \sum_{i=0}^{k} \widetilde{x}^{\left(i\right)}$.
+
+    Then:
+    \begin{itemize}
+        \item The failure probability is $O\left(\delta\right)$.
+        \item We only need to store $m = O\left(k\right)$ dot products of $x$ (and hence, the overall matrix $A$ has $m = O\left(k\right)$ rows) when $\delta$ is constant.
+        \item The runtime is $O\left(k \log\left(k\right)\right)$.
+    \end{itemize}
+    
+    \begin{subparag}{Remark}
+        Note that we can consider a big matrix, containing the matrix of each iteration: 
+        \[A = \begin{pmatrix}  & A^{\left(1\right)} &  \\  & \vdots &  \\  & A^{\left(\log_2\left(k\right)\right)} &  \end{pmatrix} \in \mathbb{R}^{m \times n}.\]
+
+        Then, we only need to evaluate $y = A x \in \mathbb{R}^{m} = \mathbb{R}^{O\left(k\right)}$. To decode it, we can run our algorithm, using linearity of matrix multiplication. For instance: 
+        \[A^{\left(2\right)}\left(x - \widetilde{x}^{\left(0\right)} - \widetilde{x}^{\left(1\right)}\right) = A^{\left(2\right)} x - A^{\left(2\right)} \left(\widetilde{x}^{\left(0\right)} + \widetilde{x}^{\left(1\right)}\right).\]
+    \end{subparag}
+    
+    \begin{subparag}{Proof failure probability}
+        By the union bound, the failure probability is: 
+        \autoeq{\prob\left(\text{failure}\right) = \prob\left(\exists i, \text{ iteration $i$ fails}\right) \leq \sum_{i=1}^{\log_2\left(k\right)} \prob\left(\text{iteration $i$ fails}\right) \leq \sum_{i=1}^{\log_2\left(k\right)} \delta_i .}
+
+        Hence, using the definition of $\delta_i$:
+        \[\prob\left(\text{failure}\right) \leq \delta \sum_{i=1}^{\log_2\left(k\right)} \left(\frac{2}{3}\right)^i \leq \delta \sum_{i=1}^{\infty} \left(\frac{2}{3}\right)^i = 2\delta = O\left(\delta\right)\]
+    \end{subparag}
+
+    \begin{subparag}{Proof memory footprint}
+        The total number of rows is: 
+        \[\sum_{i=1}^{\log_2\left(k\right)} B_i = \sum_{i=1}^{\log_2\left(k\right)} \frac{4k}{2^i \delta^i} = \sum_{i=1}^{\log_2\left(k\right)} \frac{4k}{\delta} \left(\frac{3}{4}\right)^i \leq \frac{4k}{\delta} \sum_{i=1}^{\infty} \left(\frac{3}{4}\right)^i = \frac{12k}{\delta} = O\left(k\right),\]
+        for a constant $\delta$.
+    \end{subparag}
+
+    \begin{subparag}{Proof decoding time}
+        We have $\log_2\left(k\right)$ iterations. Computing $A^{\left(i\right)} x$ takes time $O\left(k\right)$, hence each iteration takes time $O\left(k\right)$. Overall, this does mean a total running time of $O\left(k \log\left(k\right)\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Communication complexity and lower bounds}
+
+\subsection{Introduction}
+
+\begin{parag}{Goal}
+    We have found algorithms with good memory footprints for streaming. We would however want to prove that they are optimal, that nobody can find asymptotically better memory footprints. A good way to do that is through communication complexity.
+\end{parag}
+
+\begin{parag}{Communication settings}
+    Let $f: \mathcal{A} \times \mathcal{B} \mapsto \left\{0, 1\right\}$ be an arbitrary function. Alice is given some $a \in \mathcal{A}$, Bob some $b \in \mathcal{B}$. Their goal is to evaluate $f\left(a, b\right)$, by sending the smallest number of bits. More precisely, we have different settings.
+    \begin{itemize}[left=0pt]
+        \item $D\left(f\right)$ is the smallest achievable communication complexity of a deterministic protocol for computing $f$.
+        \item $R_{\delta}^{pub}\left(f\right)$ is the smallest achievable communication complexity of a randomised communication protocol for computing $f$ with error probability at most $\delta$ on every input, and where Alice and Bob are allowed to use a shared source of randomness.
+        \item $R_{\delta}^{pri}\left(f\right)$ is the same as $R_{\delta}^{pub}\left(f\right)$, except that Alice and Bob only have access to a private source of randomness.
+        \item $D_{\mu, \delta}\left(f\right)$ is the smallest achievable communication complexity of a deterministic protocol for computing $f$, that fails with probability at most $\delta$, over an input distribution $\left(a, b\right) \followsdistr \mu$.
+    \end{itemize}
+    
+    The one we will mostly focus on is however \important{one-way public communication complexity}, $R_{\delta}^{pub, \to}\left(f\right)$. This is similar to $R_{\delta}^{pub}\left(f\right)$, except that we only allow Alice to send bits to Bob, he is not allowed to send anything to Alice.
+\end{parag}
+ 
+
+\begin{parag}{Remark}
+    Communication complexity heavily depends on information theory. So, before diving into this, let us state the useful information theoretic tools.
+\end{parag}
+
+\subsection{Information theory crash course}
+
+\begin{parag}{Definition: Entropy}
+    Let $X$ be a discrete random variable of PMF $p\left(x\right)$. Its \important{entropy} is: 
+    \[H\left(X\right) = \exval_X\left(\log_2\left(\frac{1}{p\left(x\right)}\right)\right) = \sum_{x \in \supp X} p\left(x\right) \log_2\left(\frac{1}{p\left(x\right)}\right).\]
+
+    \begin{subparag}{Intuition}
+        This represents the amount of information we get by learning the value of $X$. If there is no entropy, this means that we do not get any new information when learning the value of $X$, it was deterministic. If entropy is high, it means that $X$ could have been many values, and thus measuring it tells us a lot of information.
+    \end{subparag}
+
+    \begin{subparag}{Properties}
+        Let $X$ be a discrete random variable. Then:
+        \begin{itemize}
+            \item $0 \leq H\left(X\right) \leq \log_2\left(\left|\supp X\right|\right)$.
+            \item \textit{(Data-processing inequality)} For all deterministic functions $f: \supp X \mapsto \mathbb{R}$, $H\left(f\left(X\right)\right) \leq H\left(X\right)$.
+        \end{itemize}
+        
+        The second inequality states that we cannot find any deterministic function such that we know less about $Y = f\left(X\right)$ than $X$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Multivariate entropy}
+    Let $X, Y$ be discrete random variables. Their \important{joint entropy} is: 
+    \[H\left(X, Y\right) = \exval_{X, Y}\left(\log_2\left(\frac{1}{p\left(x, y\right)}\right)\right) = \sum_{x, y} p\left(x, y\right)\log_2\left(\frac{1}{p\left(x, y\right)}\right).\]
+
+    The \important{conditional entropy} of $X$ knowing $Y$ is: 
+    \[H\left(X \suchthat Y\right) = \sum_{y} p\left(y\right) H\left(X \suchthat Y = y\right) = \exval_Y\left(H\left(X \suchthat Y = y\right)\right).\]
+
+    \begin{subparag}{Properties}
+        Let $X, Y$ be discrete random variables. Then:
+        \begin{itemize}
+            \item \textit{(Chain rule)} $H\left(X_1, \ldots, X_n\right) = \sum_{i=1}^{n} H\left(X_i \suchthat X_1, \ldots, X_{i-1}\right) $.
+            \item \textit{(Chain rule for $n = 2$)} $H\left(X, Y\right) = H\left(X\right) + H\left(Y \suchthat X\right) = H\left(Y\right) + H\left(X \suchthat Y\right)$.
+            \item \textit{(Subadditivity)} $H\left(X, Y\right) \leq H\left(X\right) + H\left(Y\right)$.
+            \item \textit{(Conditioning does not increase entropy)} $H\left(X \suchthat Y\right) \leq H\left(X\right)$.
+        \end{itemize}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Mutual information}
+    Let $X, Y$ be discrete random variables. Their \important{mutual information} is defined to be: 
+    \[I\left(X; Y\right) = H\left(X\right) - H\left(X \suchthat Y\right) = H\left(Y\right) - H\left(Y \suchthat X\right) = H\left(X\right) + H\left(Y\right) - H\left(X, Y\right).\]
+
+    \begin{subparag}{Intuition}
+        This represents the amount of information that we learn on $Y$ when measuring $X$, and inversely. 
+
+        For instance, if $I\left(X; Y\right) = 0$, this means that measuring one variable does not tell us any information on the other: $H\left(X\right) = H\left(X \suchthat Y\right)$. On the other hand, if $I\left(X; Y\right) = \min\left(H\left(X\right), H\left(Y\right)\right)$ is maximal (say $I\left(X; Y\right) = H\left(X\right)$ without loss of generality), then $H\left(X \suchthat Y\right) = 0$ and hence learning $Y$ tells us everything there is to know about $X$.
+    \end{subparag}
+
+    \begin{subparag}{Notations}
+        Suppose that we have random variables $X, Y, Z$. Then, to simplify notation, we may note: 
+        \[I\left(X; \left(Y,  Z\right)\right) = I\left(X; Y, Z\right).\]
+
+        Note however that, in the general case: 
+        \[I\left(X, Y; Z\right) \neq I\left(X; Y, Z\right).\]
+        
+        Hence, the position of the semicolon is important.
+    \end{subparag}
+
+    \begin{subparag}{Properties}
+        Let $X, Y, Z$ be discrete random variables. Then:
+        \begin{itemize}
+            \item $0 \leq I\left(X; Y\right) \leq \min\left\{H\left(X\right), H\left(Y\right)\right\}$.
+            \item $I\left(X; X\right) = H\left(X\right)$.
+            \item If $X$ and $Y$ are independent, $I\left(X; Y\right) = 0$.
+            \item \textit{(Chain rule)} $I\left(X; Y_1, \ldots, Y_n\right) = \sum_{i=1}^{n} I\left(X; Y_i \suchthat Y_1, \ldots, Y_{i-1}\right)$.
+            \item \textit{(Chain rule for $n=2$)} $I\left(X; Y, Z\right) = I\left(X; Z\right) + I\left(X; Y \suchthat Z\right)$.
+        \end{itemize}
+
+        The idea behind the chain rule is that the information gained on $X$ by measuring $\left(Y, Z\right)$ is equal to the sum of the information gained on $X$ be measuring $Z$ and the information gained on $X$ by measuring $Y$ with $Z$ known.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Binary entropy}
+    We define the \important{binary entropy function} $H_2: \left[0, 1\right] \mapsto \left[0, 1\right]$ such that: 
+    \[H_2\left(p\right) = p \log_2\left(\frac{1}{p}\right) + \left(1-p\right) \log_2\left(\frac{1}{1-p}\right).\]
+    
+    \begin{subparag}{Intuition}
+        Let $X$ be a Bernoulli random variable such that $\prob\left(X = 1\right) = p$. Then: 
+        \[H\left(X\right) = H_2\left(p\right).\]
+
+        This is the idea behind this definition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Fano's inequality}
+    Let $X, Y$ be discrete random variables, and $g$ be an estimator of $X$ based on $Y$ such that: 
+    \[\prob_{X, Y}\left(g\left(Y\right) \neq X\right) \leq \delta.\]
+    
+    Then: 
+    \[H\left(X \suchthat Y\right) \leq H_2\left(\delta\right) + \delta \log_2\left(\left|\supp X\right| - 1\right).\]
+
+    \begin{subparag}{Intuition}
+        If it is possible to find a function $g\left(Y\right)$ such that $g\left(Y\right) = X$ with high probability, this means that learning $Y$ is almost always sufficient to know the exact value of $X$. Hence, in that case, $H\left(X \suchthat Y\right)$ must be small.
+
+        Fano's inequality is then just a quantitative bound on this idea.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        If $X \in \left\{0, 1\right\}$ is a Bernoulli random variable, then the inequality becomes: 
+        \[H\left(X \suchthat Y\right) \leq H_2\left(\delta\right).\]
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

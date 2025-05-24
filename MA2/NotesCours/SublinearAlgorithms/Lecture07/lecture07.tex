@@ -1,0 +1,252 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-04-02 at 13:18:22.
+
+\usepackage{../../style}
+
+\title{Sublinear algorithms}
+\author{Joachim Favre}
+\date{Mercredi 02 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2025-04-02}{Sketching connectivity}{
+\begin{itemize}[left=0pt]
+    \item Introduction to graph streaming.
+    \item Explanation of a graph streaming algorithm for finding spanning forests, for a stream with deletions.
+    \item Introduction to $\ell_p$ samplers.
+\end{itemize}
+    
+}
+
+\section{Graph sketching}
+
+\begin{parag}{Definition: Sketching}
+    \important{Sketching} is designing small space algorithms that maintain linear measurements. In other words, we compress a vector representation of the stream $\sigma$ to a smaller vector through a matrix. The memory cost is the number of rows of the matrix.
+
+    Our goal is to make graph sketching algorithms.
+\end{parag}
+
+\begin{parag}{Definition: Graph streaming}
+    Let $G = \left(V, E\right)$ be a graph, with $\left|V\right| = n$. We consider a model where the graph is presented as a stream of edge updates (insertion and deletion).
+
+    \begin{subparag}{Example}
+        For instance, the stream may look like: 
+        \[\sigma = \left\langle \left\{1, 2\right\}, \left\{2, 3\right\}, \left\{3, 1\right\}, -\left\{1, 2\right\} \right\rangle.\]
+
+        This ends up as a stream looking like:
+        \svghere[0.2]{ExampleGraphStreaming.svg}
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        Just like for turnstile streams, we never delete an edge which never arrived.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        So far, we made polylog, i.e. $\log^{O\left(1\right)}\left(n\right)$, algorithms. This is however typically not doable for graphs. We hence consider the semi-streaming model of computation, where we allow $n \log^{O\left(1\right)}\left(n\right)$ space. Note that this is sublinear in the graph size, since $\left|E\right| \in O\left(n^2\right)$.
+    \end{subparag}
+\end{parag}
+
+\subsection{Connectivity}
+
+\begin{parag}{Lemma}
+    Any randomised algorithm succeeding with probability at least $\frac{9}{10}$ on any arbitrary graph to test connectivity must use $\Omega\left(n\right)$ space.
+
+    \begin{subparag}{Remark}
+        This justifies the semi-streaming model of computation.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        It is a good exercise to try and prove this lower bound for deterministic algorithms. The case for randomised algorithms can be done with tools that will be presented later in the course.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Spanning forest}
+    Let $G = \left(V, E\right)$ be a graph. 
+
+    A spanning forest $T \subseteq E$ is a set of edges that have no cycle such that, if we add some more edge, then we have some cycle.
+
+    \begin{subparag}{Remark}
+        On a connected graph, a spanning forest becomes a spanning tree.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Spanning forest problem}
+    Given a graph stream, we want to find a spanning forest in $n\cdot\lang{poly}\left(\log\left(n\right)\right)$ time.
+
+    \begin{subparag}{Remark}
+        Solving this problem also tells us if the graph is connected or not.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm}
+    To start with, let us assume there is no edge deletion. We want to design an algorithm that solves the spanning forest problem.
+    
+    The idea is simple: at any point, we maintain a subgraph. At the beginning, it is the empty graph. Once we receive an edge, we consider two possibilities. If the edge is within a connected component, we throw it away. If it connects two different connected components, we add it to our subgraph.
+
+    This takes a total $O\left(n \log\left(n\right)\right)$ space, because we need to store $O\left(n\right)$ edges, each taking space $O\left(\log\left(n\right)\right)$ 
+
+    \begin{subparag}{Remark}
+        This algorithm is not really that interesting. Edge deletion makes it a lot more interesting: there may be a point where all the edges were added to the graph. It is not clear what should be stored at this point by the algorithm, given that some edges might be deleted later.  
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Distributed connectivity problem}
+    We suppose that we have $n$ players, and a coordinator $C$. Players are represented as vertices on a graph. Any player $j \in \left\{1, \ldots, n\right\}$ knows all edges incidents on $j$, $\delta\left(j\right)$. 
+
+    For every $j \in \left\{1, \ldots, n\right\}$, the $j$\Th player sends a message to $C$, which must be at most $s$ bits. The coordinator must then announce whether the graph is connected, or disconnected.
+
+    \begin{subparag}{Remark}
+        Crucially, each edge is known by two vertices. We want each vertex to highly compress their edge set, in such a way $s \in O\left(\lang{poly}\left(\log\left(n\right)\right)\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        We construct a graph $G$ as follows. The first $\frac{n}{2}$ vertices makes a very dense graph, and the other $\frac{n}{2}$ vertices also make a very dense graph. We then link the two clusters by a single edge $e = \left\{a, b\right\}$.
+        \svghere[0.85]{ExampleDistributedConnectivityProblem.svg}
+
+        Consider the vertex $a$. It has no way to know which of the edges is $e$. In fact, any vertex has no way of knowing it is special, and in particular no way to know which edge is $e$. However, shared randomness will make it work.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm}
+    We consider an algorithm to solve the connectivity problem.
+
+    Initialise $C_0 = \bigcup_{u \in V} \left\{u\right\}$, and let $T = \log_{2}\left(n\right)$. For $t = 1, \ldots, T$:
+    \begin{enumerate}
+        \item Set $E' \leftarrow \o$.
+        \item Each component in $C_{t-1}$ selects an outgoing edge, which it adds to $E'$.
+        \item $C_t$ becomes the new connected components.
+    \end{enumerate}
+
+    We finally output $C_T$.
+
+    \begin{subparag}{Intuition}
+        We start with each vertex being in their own connected component, with no edge. The intuition is that each vertex first picks an arbitrary outgoing edge. Then, looking at the full graph, this creates some number of connected components. In fact, the number of connected components is divided by at least a factor $2$, since in the worst case they made a matching. Then, considering those new connected components as some form of super-nodes, we let each of them sample some outgoing edge. The reasoning continues $\log_{2}\left(n\right)$ times, after which we have a random forest. 
+
+        Note that this algorithm is not fast, but it works. The goal is to apply it to modify it to solve the distributed connectivity problem, and we are only interested in space complexity.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Consider for instance the following graph. In grey, the ellipses show the connected components. In blue, we show which edge the connected component chooses. The transition between $t = 0$ and $t = 1$ is shown.
+
+        \svghere[0.8]{DistributedConnectivityProblem.svg}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Signed edge-vertex incidence matrix}
+    Let $G = \left(V, E\right)$ be a graph.
+
+    We define $B \in \mathbb{R}^{\binom{n}{2} \times n}$ to be the \important{signed edge-vertex incidence matrix} of $G$ if, for all edge $e \in \left\{1, \ldots, \binom{n}{2}\right\}$, such that, defining $b_e \in \mathbb{R}^n$ to be the $e$\Th row of $B$:
+    \[B = \begin{pmatrix}  & b_1^T &  \\  & \vdots &  \\  & b_{\binom{n}{2}}^T &  \end{pmatrix}, \mathspace b_{e} = \begin{systemofequations} 0, & \text{if } e \not\in E, \\ \text{\parbox{5.3cm}{a vector with zeroes everywhere, \\ except for a $1$ at $u$ and a $-1$ at $v$,}} & \text{if } e = \left\{u, v\right\} \in E. \end{systemofequations}\]
+
+    \begin{subparag}{Remark}
+        For any edge $\left\{u, v\right\} \in E$, the choice of which vertex is $+1$ and which is $-1$ in the matrix can be done completely arbitrarily. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $G = \left(V, E\right)$ be a graph, and let $S \subseteq  V$ be arbitrary.
+
+    We define the vector $1_S \in \mathbb{R}^n$ such that:
+    \[1_S\left(u\right) = \begin{systemofequations} 1, & \text{if $u \in S$}, \\0, & \text{otherwise.} \end{systemofequations}\]
+    
+    Then, the vector $x = B \cdot 1_S \in \mathbb{R}^{\binom{n}{2}}$ is a signed indicator of the cut $\left(S, V \setminus S\right)$ in $G$. In other words, $x_e \in \left\{-1, 1\right\}$ for edges $e$ that cross the cut, and $x_e = 0$ for all other edges.
+
+    \begin{subparag}{Proof}
+        Suppose towards simplicity that the elements of $S$ represent the first columns of $B$ (this can be done without loss of generality by relabelling the vertices).
+
+        So, multiplying by $1_S$ means that we add the corresponding columns. Consider some edge $e = \left\{u, v\right\} \in E$. If $u, v \in S$, we will add the corresponding $+1$ and $-1$, resulting in $0$. If $u, v \not\in S$, we only add zeroes. If $u \in S$ and $v \not \in S$, then we add the value of $u$ (which is $\pm 1$) and we do not add the value of $v$, leading to $\pm 1$. The first two cases are edges that do not cross the cut, the third one is an edge crossing the cut. This is thus exactly what we wanted to prove.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        As mentioned earlier, we want to adapt the algorithm for the connectivity problem to get one for the distributed case. Now,to make it work, the coordinator only requires to be able to sample random edges that cross a cut. 
+
+        However, this theorem states that sampling an edge in some cut $\left(S, V \setminus S\right)$ is equivalent to sampling an element $u \in \left\{1, \ldots, n\right\}$ such that $x_u \neq 0$, where $x = B 1_S$. We thus want to make a linear sketch $A$ such that, for all $x \in \mathbb{R}^{\binom{n}{2}}$, we can decode a non-zero element of $x$ from $A x$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\ell_p$-norm}
+    The \important{$\ell_p$-norm} of a vector $x \in \mathbb{R}^n$ is given by: 
+    \[\left\|x\right\|_p = \left(\sum_{i=1}^{n} \left|x_i\right|^p\right)^{\frac{1}{p}}.\]
+\end{parag}
+
+\begin{parag}{Definition: $\ell_p$ sampler}
+    An \important{$\left(\epsilon, \delta_1, \delta_2\right)$ $\ell_p$-sampler} is a matrix distribution $A \in \mathbb{R}^{m \times n}$ and a decoder $D : \mathbb{R}^m \mapsto \left\{1, \ldots, n\right\} \cup \left\{\bot\right\}$ depending on $A$ such that for all $x \in \mathbb{R}^n \setminus \left\{0\right\}$, then:
+    \begin{enumerate}
+        \item $\prob\left(D\left(A x\right) = \bot\right) \leq \delta_1$.
+        \item $\prob\left(D\left(Ax\right) \text{ fails}\right) \leq \delta_2$.
+        \item Conditioned on not failing and not outputting $\bot$, then, for all $i \in \supp x$: 
+        \[\left(1 - \epsilon\right) \frac{\left|x_i\right|^p}{\left\|x\right\|_p^p} \leq \prob_A\left(D\left(Ax\right) = i\right) \leq \left(1+\epsilon\right) \frac{\left|x_i\right|^p}{\left\|x\right\|_p^p}.\]
+    \end{enumerate}
+
+    \begin{subparag}{Intuition}
+        The idea is that we compress $x$ by considering $Ax$. Then, running some decoder $D$ on it, it outputs some element $i$, with a probability proportional to the $\ell_p$ norm.
+
+        The decoder can fail in two different ways. It can output $\bot$, meaning that it does not know; or it can output some value $i$ which is incorrect, without telling us so.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        $n$ is the input dimension. In our case, we will take it to be $\binom{n}{2}$.
+
+        Moreover, we will consider the $\ell_0$ norm in our case, meaning that we want the decoder to output some index uniformly at random amongst the non-zero elements of $x$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    There exists an $\ell_0$-sampler with $\epsilon = 0$, $\delta_1 = \delta$, $\delta_2 = \frac{1}{n^{10}}$ and $m \in O\left(\log\left(n\right)^2 \log\left(\frac{1}{\delta}\right)\right)$.
+
+    Overall, this means that $A x$ takes $O\left(\log\left(n\right) \log\left(\frac{1}{\delta}\right)\right)$ space.
+
+    \begin{subparag}{Proof}
+        We will prove this right after stating the full algorithm below.
+    \end{subparag}
+
+    \begin{subparag}{Summary}
+        Overall, this means that there exists a random matrix $A \in \mathbb{R}^{m \times \binom{n}{2}}$ with $m\in O\left(\log\left(n\right)^2 \log\left(\frac{1}{\delta}\right)\right)$ such that, for all $S \subseteq V$, $D\left(A B 1_S\right)$ outputs an edge crossing the cut with probability at least $1 - \delta$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm}
+    We consider an algorithm to solve the spanning forest problem for the distributed case and graph streaming. 
+
+    Initialise $C_0 = \bigcup_{u \in V} \left\{u\right\}$, and let $T = \log_{2}\left(n\right)$. For $t = 1, \ldots, T$, where $T = O\left(\log\left(n\right)\right)$:
+    \begin{enumerate}
+        \item Set $E' \leftarrow \o$.
+        \item Each component $S$ in $C_{t-1}$ runs $D\left(A_t B 1_S\right)$, which it adds to $E'$, where $A_t$ is sampled using the $\ell_0$ sampler stated in the theorem above.
+        \item $C_t$ becomes the new connected components.
+    \end{enumerate}
+
+    We finally output $C_T$.
+
+    \begin{subparag}{Justification}
+        Note this this algorithm works for both the distributed case and the graph streaming case.
+        \begin{itemize}[left=0pt]
+            \item \textit{(Distributed)} Note that each vertex $u \in V$ knows a column of $B$. Hence, every vertex can compute a column of $A_t B$, i.e. $A_t B 1_u \in \mathbb{R}^m$. They can then send this to the coordinator. The coordinator thus knows $AB$, which can indeed run this algorithm.
+            \item \textit{(Streaming)} Note that, while analysing the stream, the algorithm only needs to store $A_t B \in \mathbb{R}^{m \times n}$ for all $t \in \left\{1, \ldots, t\right\}$. This is a linear sketch, so both additions and deletions can be taken into account easily.
+        \end{itemize}
+    \end{subparag}
+
+    \begin{subparag}{Memory complexity}
+        The space complexity is storing $A_tB \in \mathbb{R}^{m \times n}$ for all $t \in \left\{1, \ldots, T\right\}$. Since $m = O\left(\log\left(n\right)^2\right)$ for a constant success probability constant, this requires $O\left(n \log\left(n\right)^3\right)$ bits of storage.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        Note that we use the decoder $O\left(n\right)$ times. Hence, since it has a probability $O\left(\frac{1}{n^{10}}\right)$ of outputting garbage, the probability of not outputting garbage any of the time is of order $1 - O\left(\frac{1}{n^9}\right)$ by the union bound.
+
+        However, it may fail by outputting $\bot$ many times. If that happens, we simply ignore this component $S$ for this iteration $t$, and we try again the next iteration. It is possible to show that, at each iteration and with constant probability, the number of connected components is multiplied by $\frac{2}{3}$. We only need $\log_{3/2}\left(n\right)$ of these ``big'' iterations to reach the minimum number of connected components, which we know to happen with very high probability $1 - O\left(\frac{1}{\lang{poly}\left(n\right)}\right)$ thanks to the Chernoff bounds.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        In the definitions of $\ell_p$-sampler, it is crucial that we must select $x$ first, and then that we sample $A$ at random. For each component, this sketch will work. However, if we use the sketch $A$ in the first iteration, the resulting connected components depend on $A$. But then, $x = B 1_S$ depends on $A$, and hence we can no longer use the guarantees of the $\ell_p$ sampler.
+
+        This is exactly why we have to use a different $A$ for every iteration.
+    \end{subparag}
+ \end{parag}
+
+\end{document}
