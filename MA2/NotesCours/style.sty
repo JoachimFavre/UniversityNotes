@@ -357,6 +357,44 @@
 %\newcommand{\ket}[1]{\left| #1 \right\rangle}
 %\newcommand{\braket}[2]{\left\langle #1 \middle| #2 \right\rangle}
 
+% Vectorised notations
+% The following is a hacky way to extract only the \rrangle and  \lleft symbols from MnSymbols
+% Source: https://tex.stackexchange.com/a/79701
+\DeclareFontFamily{OMX}{MnSymbolE}{}
+\DeclareSymbolFont{MnLargeSymbols}{OMX}{MnSymbolE}{m}{n}
+\SetSymbolFont{MnLargeSymbols}{bold}{OMX}{MnSymbolE}{b}{n}
+\DeclareFontShape{OMX}{MnSymbolE}{m}{n}{
+    <-6>  MnSymbolE5
+   <6-7>  MnSymbolE6
+   <7-8>  MnSymbolE7
+   <8-9>  MnSymbolE8
+   <9-10> MnSymbolE9
+  <10-12> MnSymbolE10
+  <12->   MnSymbolE12
+}{}
+\DeclareFontShape{OMX}{MnSymbolE}{b}{n}{
+    <-6>  MnSymbolE-Bold5
+   <6-7>  MnSymbolE-Bold6
+   <7-8>  MnSymbolE-Bold7
+   <8-9>  MnSymbolE-Bold8
+   <9-10> MnSymbolE-Bold9
+  <10-12> MnSymbolE-Bold10
+  <12->   MnSymbolE-Bold12
+}{}
+
+\let\llangle\@undefined
+\let\rrangle\@undefined
+\DeclareMathDelimiter{\llangle}{\mathopen}%
+                     {MnLargeSymbols}{'164}{MnLargeSymbols}{'164}
+\DeclareMathDelimiter{\rrangle}{\mathclose}%
+                     {MnLargeSymbols}{'171}{MnLargeSymbols}{'171}
+
+\newcommand{\bbra}[1]{\left\llangle #1 \right|}
+\newcommand{\kket}[1]{\left| #1 \right\rrangle}
+\newcommand{\bbrakket}[2]{\left\llangle #1 \middle| #2 \right\rrangle}
+\newcommand{\bbraket}[2]{\left\llangle #1 \middle| #2 \right\rangle}
+\newcommand{\brakket}[2]{\left\langle #1 \middle| #2 \right\rrangle}
+
 % Theoretical computer science
 \newcommand{\lang}[1]{\ensuremath{\mathchoice %Help from ChatGPT. Different size depending on the context.
   {\text{\small\textsf{#1}}} % Display style

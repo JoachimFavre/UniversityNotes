@@ -71,7 +71,8 @@ courses: List[Course] = [
     #CourseList.QUANTUM_PHYSICS_2,
     
     # MA2
-    CourseList.SUBLINEAR_ALGORITHMS,
+    #CourseList.SUBLINEAR_ALGORITHMS,
+    CourseList.QUANTUM_INFORMATION_THEORY,
 ]
 
 tag = Tags.NONE

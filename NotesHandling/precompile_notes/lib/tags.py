@@ -2,6 +2,7 @@ from enum import Enum
 
 class Tags(Enum):
     NONE = (None, "outputs/NoTag")
+    WORK_IN_PROGRESS = ("wip", "outputs/WorkInProgress")
     PRINTED = ("printed", "outputs/Printed")
     OFFICIAL = ("official", "outputs/Official")
 
