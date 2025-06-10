@@ -40,6 +40,7 @@
 - [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/QuantumPhysics-2.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/QuantumPhysics-2.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA1/QuantumPhysics-2.zip) · Quantum physics II — Prof. Zoë Holmes
 
 #### Master semester 2 (Spring 2025)
+- [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2-during-semester/QuantumInformationTheory.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2-during-semester/QuantumInformationTheory.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2-during-semester/QuantumInformationTheory.zip) · (WIP) Quantum information theory — Prof. Zoë Holmes
 - [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2-during-semester/SublinearAlgorithms.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2-during-semester/SublinearAlgorithms.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2-during-semester/SublinearAlgorithms.zip) · Sublinear algorithms for big data analysis — Prof. Michael Kapralov
 
 ---
