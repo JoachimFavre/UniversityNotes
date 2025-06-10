@@ -1,0 +1,245 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-02-25 at 10:16:28.
+
+\usepackage{../../style}
+
+\title{Quantum information theory }
+\author{Joachim Favre}
+\date{Mardi 25 février 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2025-02-25}{Drawing this sphere probably wasn't necessary}{
+\begin{itemize}[left=0pt]
+    \item Proof that a 2-level system can be represented on the Bloch sphere.
+    \item Proof of the linearity of the Bloch vector.
+    \item Definition of entangled state.
+    \item Definition of reduced state, and justification of the partial trace.
+\end{itemize}
+}
+
+\subsection{State space}
+
+\begin{parag}{Definition: Pauli matrices}
+    The \important{Pauli matrices} are defined as: 
+    \[I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}, \mathspace \sigma_X = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \mathspace \sigma_Y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \mathspace \sigma_Z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.\]
+
+    We moreover sometimes define the pseudo-vector $\bvec{\sigma} = \begin{pmatrix} \sigma_x & \sigma_Y & \sigma_Z \end{pmatrix}^T$.
+    
+    \begin{subparag}{Property}
+        The matrices $\left(I, \sigma_X, \sigma_Y, \sigma_Z\right)$ form a basis for $2 \times 2$ matrices.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: State space of a qubit}
+    Let $\rho$ be an arbitrary 2-level quantum state. It can be written using some $\bvec{r} = \begin{pmatrix} x & y & z \end{pmatrix}^T$ with $\left\|\bvec{r}\right\| \leq 1$ such that: 
+    \[\rho = \frac{1}{2}\left(I + x \sigma_X + y \sigma_Y + z \sigma_Z\right) = \frac{1}{2}\left(I + \bvec{r} \dotprod \bvec{\sigma}\right).\]
+
+    Conversely, each $\bvec{r}$ with $\left\|\bvec{r}\right\| \leq 1$ specifies a unique quantum state.
+    
+    \begin{subparag}{Implication}
+        In other words, the state space of a 2-level quantum system is a ball of unit radius.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, for $\bvec{r} = \begin{pmatrix} 0 & 0 & \pm1 \end{pmatrix}^T$, we get: 
+        \[\rho_{\pm} = \frac{1}{2} \left(\begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} \pm \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}\right).\]
+
+        So: 
+        \[\rho_+ = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix} = \ket{0}\bra{0}, \mathspace \rho_- = \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix} = \ket{1}\bra{1}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The state space of a 2-level classical state is a line. It is the z-axis of this sphere. Equivalently: 
+        \[\rho_p^{classical} = p \ket{0}\bra{0} + \left(1 -p\right)\ket{1}\bra{1} = \begin{pmatrix} p & 0 \\ 0 & 1-p \end{pmatrix}.\]
+
+        This is thus a diagonal matrix, as we saw before. 
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Let $\rho$ be an arbitrary qubit state. Recall that it is Hermitian, positive semi-definite and traces to $1$. As any matrix, we can expand it in the Pauli basis: 
+        \[\rho = a_0 \left(I + x \sigma_x + y \sigma_y + z \sigma_z\right).\]
+        
+        Since it is Hermitian, $a_0, x, y, z \in \mathbb{R}$. Moreover, since it traces to 1: 
+        \[1 = \Tr\left(\rho\right) = a_0\left(2 + x\cdot 0+y\cdot 0 + z\cdot 0\right) = 2a_0 \iff a_0 = \frac{1}{2}.\]
+        
+        So far, this means we can write: 
+        \[\rho = \frac{1}{2} \begin{pmatrix} 1 + z & x - iy \\ x+ iy & 1 - z \end{pmatrix}.\]
+        
+        Using the general formula for finding the eigenvalues of a $2\times2$ matrix, we find that its eigevalues are: 
+        \autoeq{\lambda_{\pm} = \frac{\Tr\left(\rho\right) \pm \sqrt{\Tr\left(\rho\right)^2 - 4 \det\left(\rho\right)}}{2} = \frac{1}{2}\left(1 \pm \sqrt{x^2 + y^2 + z^2}\right) = \frac{1}{2} \left(1 \pm \left\|\bvec{r}\right\|\right),}
+        for the vector $\bvec{r} = \begin{pmatrix} x & y & z \end{pmatrix}^T$. Since we know $\lambda_{-} \geq 0$, this does require that: 
+        \[\left\|\bvec{r}\right\| \leq 1.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Ensemble decomposition}
+    Let $\sigma_a$ and $\sigma_b$, of Bloch vector representation $\bvec{r}_a$ and $\bvec{r}_b$ respectively. Moreover, let $p \in \left[0, 1\right]$ be some probability.
+
+    We can consider the state obtained by taking $\sigma_a$ with probability $p$ and $\sigma_b$ with probability $1-p$: 
+    \[\rho = p \sigma_a + \left(1-p\right) \sigma_b.\]
+    
+    This is called an \important{ensemble decomposition}. Its associated Bloch vector is: 
+    \[\bvec{r} = p \bvec{r}_a + \left(1-p\right) \bvec{r}_b = \bvec{r}_b + p \left(\bvec{r}_a - \bvec{r}_b\right).\]
+    
+    \begin{subparag}{Intuition}
+        Intuitively, this means that $\rho$ is on the line connecting $\sigma_a$ to $\sigma_b$, at a fraction $p$ from $\sigma_a$ and $\left(1-p\right)$ from $\sigma_b$. 
+        \svghere[0.8]{ExampleEnsembleDecomposition.svg}
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We know that: 
+        \[\sigma_a = \frac{1}{2}\left(I + \bvec{r}_a \dotprod \bvec{\sigma}\right), \mathspace \sigma_b = \frac{1}{2} \left(I + \bvec{r}_b \dotprod \bvec{\sigma}_b\right).\]
+
+        Thus: 
+        \[\rho = \frac{1}{2}\left(pI + \left(1-p\right)I + \left(p \bvec{r}_a + \left(1-p\right)\bvec{r}_b\right)\dotprod \bvec{\sigma}\right) = \frac{1}{2}\left(I + \bvec{r} \dotprod \bvec{\sigma}\right),\]
+        with $\bvec{r} = p \bvec{r}_a + \left(1-p\right)\bvec{r}_b$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Pure state}
+    We say that $\rho$ is a \important{pure state} if and only if there does not exist states $\sigma_a$ and $\sigma_b$, with $\sigma_a \neq \sigma_b$, and some $0 < p < 1$, such that $\rho = p \sigma_a + \left(1 - p\right) \sigma_b$.
+
+    Any state that is not pure is moreover called \important{mixed}.
+
+    \begin{subparag}{Implication}
+        This yields that 2-level state $\rho$ is a pure state if and only if it is on the surface of the Bloch sphere, i.e. $\bvec{r} = 1$. In other words, a mixed state is such that $\left\|\bvec{r}\right\| < 1$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Proposition}
+    Let $\rho$ be some quantum state. 
+
+    $\rho$ is a pure state if and only if there exists a $\ket{\psi}$ such that $\rho = \ket{\psi}\bra{\psi}$.
+
+    \begin{subparag}{Proof}
+        This proof is left as an exercise to the reader.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Ensemble ambiguity paradox}
+    Let $\bvec{r}$ be an arbitrary vector such that $\left\|\bvec{r}\right\| \leq 1$. Consider the two following states: 
+    \[\rho_+ = \frac{1}{2}\left(I + \bvec{r} \dotprod \bvec{\sigma}\right), \mathspace \rho_- = \frac{1}{2}\left(I - \bvec{r} \dotprod \bvec{\sigma}\right).\]
+    
+    Then, their average is just the middle of the sphere: 
+    \[\rho = \frac{1}{2} \rho_+ + \frac{1}{2}\rho_- = \frac{1}{2} I.\]
+
+    However, this result is independent of $\bvec{r}$, for instance: 
+    \[\rho = \frac{1}{2} I = \frac{\ket{0}\bra{0} + \ket{1}\bra{1}}{2} = \frac{\ket{+}\bra{+} + \ket{-}\bra{-}}{2}.\]
+    
+    Let us for instance consider that $\ket{0}$ means the cat is alive, and $\ket{1}$ means the cat is \textit{dead}. Then, $\ket{+} = \frac{1}{\sqrt{2}}\left(\ket{0} + \ket{1}\right)$ and $\ket{-} = \frac{1}{\sqrt{2}}\left(\ket{0} - \ket{1}\right)$ are the quantum superposition of an alive and a dead cat. 
+    
+    What the result above tells us is that the state where we consider $\ket{0}$ and $\ket{1}$ with uniform probability, and the state where we consider $\ket{+}$ and $\ket{-}$ with uniform probability, then there is no measurement we can perform that will give us a different outcome. This is named the \important{ensemble ambiguity paradox} since we may expect those two to be distinguishable, since they are prepared differently.
+\end{parag}
+
+\begin{parag}{Proposition: State space of larger systems}
+    The state space of an $n$-qubit system has dimension $d^2 - 1$, where $d = 2^n$.
+
+    \begin{subparag}{Remark}
+        This state space is highly non-trivial. Finding a good way to visualise this, even for just $n = 2$ qubits, is still an ongoing area of research.
+    \end{subparag}
+
+    \begin{subparag}{Sanity check}
+        When $n = 1$, and hence $d = 2$, this proposition states that the state space has dimension $2^2 - 1 = 3$. The Bloch sphere has 3 dimensions, so this specific case checks out.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        An arbitrary $d \times d$ complex matrix contains $2 d^2$ parameters: there are $d^2$ components in the matrix, each with a real and a complex part. However, an arbitrary $d \times d$ Hermitian matrix has $2\cdot \left(\frac{d^2 - d}{2}\right) + d = d^2$ parameters, since it is determined by its upper triangular part (which contains $\frac{d^2 - d}{2}$ complex components), and its real diagonal (which contains $d$ real components). Since we moreover ask for $\Tr\left(\rho\right) = 1$, this means that $\rho$ has $d^2 - 1$ degrees of freedom. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Joint systems}
+
+\begin{parag}{Joint systems}
+    Often, it is helpful to think of a higher dimensional system as composed of lower dimensional ones, relabelling $\rho$ by $\rho_{AB}$.
+
+    If $\rho$ is $d = 2^n$ dimensional, $A$ is $d_a = 2^{n_a}$ dimensional and $B$ is $d_b = 2^{n_b}$ dimensional, then we must have $d_a d_b = d$ and $n_a + n_b = n$.
+
+    In fact the story often goes the other way, we identify subsystems $\rho_A, \rho_B$, and then consider the joint system $\rho_{AB} = \rho_A \otimes \rho_B$, where $\otimes$ is a tensor product.
+\end{parag}
+
+\begin{parag}{Definition: Entangled state}
+    Let $\rho_{AB}$ be a quantum state. We say that it is \important{entangled}, if there does not exist $\rho_{A,i}, \rho_{B,i}$ and $p_i \in \left[0,1\right]$ such that $\rho_{AB} = \sum_{i} p_i \rho_A^i \otimes \rho_B^i$.
+
+    \begin{subparag}{Remark}
+        Product states, i.e. states that are not entangled, can thus be written in the form:
+        \[\rho_{AB} = \sum_{i} p_i \rho_{A,i} \otimes \rho_{B,i}.\]
+
+        In other words, with probability $p_i$ we prepare $A$ in state $\rho_{A,i}$ and $B$ in state $\rho_{B_i}$. This captures classical correlation.
+    \end{subparag}
+    
+    \begin{subparag}{Example}
+        For instance, we may have the following product states: 
+        \[\rho_1 = p \ket{00} \bra{00} + \left(1-p\right) \ket{11}\bra{11},\]
+        \[\rho_2 = p \ket{++}\bra{++} + \left(1-p\right) \ket{--}\bra{--}.\]
+
+        On the other hand, considering $\ket{\Phi^+} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}$, the following state is entangled: 
+        \[\rho_{AB} = \ket{\Phi^+} \bra{\Phi^+}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Reduced state}
+    Let $\rho_{AB}$ be a quantum state. 
+
+    Its \important{reduced state} $\rho_A$ is defined to be the operator found by taking the partial trace on $B$
+    \[\rho_A = \Tr_B\left(\rho_{AB}\right) = \sum_{k} \left(I_A \otimes \bra{k}_B\right) \rho_{AB} \left(I_A \otimes \ket{k}_B\right).\]
+
+    \begin{subparag}{Intuition 1}
+        Let's say that we have a state $\rho_{AB}$, and want to understand the properties of $A$ and $B$ separately. In other words, we want an object that quantifies all measurement and outcomes on $A$.
+
+        More specifically, when measuring $A$, our measurements are $\widetilde{M}_{AB} = M_A \otimes I_B$, and we want $\rho_A$ such that: 
+        \[\Tr\left(M_A \rho_A\right) = \Tr\left(\widetilde{M}_{AB} \rho_B\right).\]
+
+        According to the following lemma, the partial trace is the only mathematical entity which satisfies this entity.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Lemma: Reduced state}
+    Let $f: \mathcal{H}_{A} \otimes \mathcal{H}_B \mapsto \mathcal{H}_A$ be some map such that, for all $\widetilde{M}_{AB} = M_A \otimes I_B$ and all $\rho_{AB}$, the state $\rho_A = f\left(\rho_{AB}\right)$ is such that: 
+    \[\Tr\left(M_A \rho_A\right) = \Tr\left(\widetilde{M}_{AB} \rho_{AB}\right).\]
+
+    The unique mathematical entity that satisfies this property is the partial trace $f = \Tr_B$, i.e. $\rho_A = \Tr_B\left(\rho_{AB}\right)$.
+
+    \begin{subparag}{Proof of validity 1}
+        We want to prove that the partial trace does fulfil this property. We notice that: 
+        \autoeq{\Tr\left(M_A \rho_A\right) = \Tr\left(M_A \sum_{k} \left(I \otimes \bra{k}\right) \rho_{AB} \left(I \otimes \ket{k}\right)\right) = \sum_{k} \Tr\left(\left(M_A \otimes \bra{k}\right) \rho_{AB} \left(I \otimes \ket{k}\right)\right).}
+
+        Now, $\Tr\left(A\right) = \sum_{i} \bra{i} A \ket{i}$, so we can use the fact that the space of $B$ has already been traced out to simplify our result to: 
+        \autoeq{\Tr\left(M_A \rho_A\right) = \sum_{k, k'} \bra{k' k} \left(M_A \otimes I\right) \rho_{AB} \ket{k' k} = \Tr\left(\left(M_A \otimes I\right) \rho_{AB}\right) = \Tr\left(\widetilde{M}_{AB} \rho_{AB}\right).}
+    \end{subparag}
+
+    \begin{subparag}{Proof of validity 2}
+        Let us now make another proof that the partial trace does fulfil this property, but this time making a constructive proof. 
+
+        We know that, writing $M_A = \sum_{i} \lambda_i \ket{\lambda_i}\bra{\lambda_i}$ and letting $\prob\left(A = \lambda_i\right)$ represent the probability of finding system $A$ to be in eigenstate $\lambda_i$, we have:
+        \[\left\langle M_A \right\rangle = \sum_{i=1}^{d_A} \lambda_i \prob\left(A = \lambda_i\right) = \sum_{i=1}^{d_A} \lambda_i \sum_{j=1}^{d_B} \prob\left(A = \lambda_i, B = j\right).\]
+        
+        Now, we know that the probability of finding system $A$ in eigenstate $\lambda_i$ and system $B$ in state $j$ is 
+        \[\prob\left(A = \lambda_i, B = j\right) = \left(\bra{\lambda_i}_A \otimes \bra{\lambda_j}_B\right) \rho_{AB} \left(\ket{\lambda_i}_A \otimes \ket{j}_B\right).\]
+
+        This finally give us that: 
+        \autoeq{\left\langle M_A \right\rangle = \sum_{i=1}^{d_A} \lambda_i \sum_{j=1}^{d_B} \left(\bra{\lambda_i} \otimes \bra{j}\right) \rho_{AB} \left(\ket{\lambda_i}_A \otimes \ket{j}_B\right) = \sum_{i=1}^{d_A} \lambda_i \bra{\lambda_i}_A \underbrace{\sum_{j=1}^{d_B} \left(I_A \otimes \bra{j}_B\right) \rho_{AB} \left(I_A \otimes \ket{j}_B\right)}_{= \Tr_B\left(\rho_{AB}\right) = \rho_A} \ket{\lambda_i}_A = \sum_{i=1}^{d_A} \lambda_i \bra{\lambda_i}_A \rho_A \ket{\lambda_i}_A = \Tr\left(M_A \rho_A\right).}
+
+        Notice that the partial trace appears naturally.
+    \end{subparag}
+
+    \begin{subparag}{Proof of uniqueness}
+        A proof that the partial trace is the unique object for which this property holds can be found in Nielsen and Chuang's \textit{Quantum Computation and Quantum Information} (2010), page 107.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

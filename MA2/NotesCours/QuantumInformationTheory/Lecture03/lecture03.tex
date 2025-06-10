@@ -1,0 +1,261 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-04 at 10:16:17.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mardi 04 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2025-03-04}{Some more theorems for fun}{
+\begin{itemize}[left=0pt]
+    \item Definition of purification.
+    \item Proof of an algorithm to always find a purification.
+    \item Proof that the algorithm is optimal.
+    \item Proof of the Schmidt decomposition.
+    \item Recall of POVMs, and examples.
+\end{itemize}
+    
+}
+
+\begin{parag}{Example}
+    Let us consider $\ket{\Phi_+} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}$ and: 
+    \[\rho = \ket{\Phi^+} \bra{\Phi^+} = \frac{\ket{00}\bra{00} + \ket{00}\bra{11} + \ket{11}\bra{00} + \ket{11}\bra{11}}{2}.\]
+
+    Using the linearity of the partial trace, and the fact $\Tr_B\left(\ket{ij}\bra{i'j'}\right) = \ket{i}\bra{i'} \Tr\left(\ket{j}\bra{j'}\right) = \braket{j'}{j} \ket{i}\bra{i'}$: 
+    \autoeq{\rho_A = \Tr_B\left(\ket{\Phi^+}\bra{\Phi^+}\right) = \frac{\ket{0}\bra{0} \braket{0}{0} + \ket{1}\bra{0} \braket{0}{1} + \ket{0}\bra{1} \braket{1}{0} + \ket{1}\bra{1} \braket{1}{1}}{2} = \frac{\ket{0}\bra{0} + \ket{1}\bra{1}}{2} = \frac{I}{2}.}
+
+    Similarly, if $\rho_{AB} = \frac{I}{4}$ instead, then: 
+    \[\rho_{AB} = \frac{\ket{00}\bra{00} + \ket{01}\bra{01} + \ket{10}\bra{10} + \ket{11}\bra{11}}{4} \implies \rho_A = \frac{2\ket{0}\bra{0} + 2\ket{1}\bra{1}}{4} = \frac{I}{2}.\]
+
+    Interestingly, this example shows that there are many global systems on $AB$ that are consistent with some reduced state on $A$.
+\end{parag}
+
+\begin{parag}{Definition: Purification}
+    Let $\rho_{A}$ be a mixed state.
+
+    We call $\rho_{AB}$ a \important{purification} of $\rho_A$ if $\rho_{AB} = \ket{\Psi_{AB}}\bra{\Psi_{AB}}$ is pure and $\Tr_B\left(\rho_{AB}\right) = \rho_A$.
+
+    \begin{subparag}{Intuition}
+        This means that a mixed state can be understood as mixed state in a larger Hilbert state.
+
+        Considering a larger Hilbert space is an idea that will come back often in the course, to which we will refer as the church of the larger Hilbert space.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, if $\rho_A = \frac{\ket{0}\bra{0} + \ket{1}\bra{1}}{2} = \frac{I}{2}$, we can take:
+        \[\rho_{AB} = \ket{\Phi^+}\bra{\Phi^+},\]
+        where $\ket{\Phi^+} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}$, as seen in the previous example.
+
+        Similarly, if $\rho_A = \frac{1}{4} \ket{0}\bra{0} + \frac{3}{4} \ket{1}\bra{1}$, then can take: 
+        \[\rho_{AB} = \left(\sqrt{\frac{1}{4}}\ket{00} + \sqrt{\frac{3}{4}} \ket{11}\right)\left(\sqrt{\frac{1}{4}} \bra{00} + \sqrt{\frac{3}{4}} \bra{11}\right).\]
+
+        Again, if $\rho_{A} = \frac{1}{4} \ket{+}\bra{+} + \frac{3}{4} \ket{-}\bra{-}$, we can use: 
+        \[\rho_{AB} = \left(\sqrt{\frac{1}{4}} \ket{++} + \sqrt{\frac{3}{4}} \ket{--}\right)\left(\sqrt{\frac{1}{4}} \bra{++} + \sqrt{\frac{3}{4}} \bra{--}\right).\]
+        
+        In fact, still for $\rho_{A} = \frac{1}{4} \ket{+}\bra{+} + \frac{3}{4} \ket{-}\bra{-}$, we could have used any $\rho_{AB} = \ket{\Psi}_{AB}$, with: 
+        \[\ket{\Psi}_AB = \sqrt{\frac{1}{4}} \ket{+ \psi} + \sqrt{\frac{3}{4}} \ket{- \phi}, \mathspace \text{where } \braket{\psi}{\phi} = 0.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $\rho_A$ be a mixed state, of dimension $d_A$ and rank $r$.
+
+    Then, there exists some purification $\rho_{AB}$ of $\rho_A$ living in a larger Hilbert space. This purification is moreover not unique.  
+
+    It suffices for the dimension of the larger system to be of size $d_A\cdot r$.
+
+    \begin{subparag}{Proof}
+        We prove this result by making an algorithm to construct $\rho_{AB}$ given $\rho_A$.
+
+        We can always diagonalise $\rho_A$, using its $r = \rank\left(\rho_A\right)$ non-zero eigenvalues: 
+        \[\rho_A = \sum_{j=1}^{r} \lambda_j \ket{\lambda_j} \bra{\lambda_j}.\]
+
+        We can then simply take $\rho_{AB} = \ket{\Psi_{AB}}\bra{\Psi_{AB}}$, with:
+        \[\ket{\Psi_{AB}} = \sum_{j=1}^{r} \sqrt{\lambda_j} \ket{\lambda_j} \otimes \ket{\phi_j},\]
+        where the $\ket{\phi_j}$ is an arbitrary orthonormal basis.
+
+        We then directly have: 
+        \autoeq{\Tr_B\left(\ket{\Psi_{AB}}\bra{\Psi_{AB}}\right) = \sum_{k, k'} \sqrt{\lambda_k} \sqrt{\lambda_{k'}} \Tr_B\left(\ket{\lambda_k \phi_k}\bra{\lambda_{k'} \phi_{k'}}\right) = \sum_{k, k'} \sqrt{\lambda_k} \sqrt{\lambda_{k'}} \ket{\lambda_k}\bra{\lambda_{k'}} \braket{\phi_k}{\phi_{k'}} = \sum_{k} \lambda_k \ket{\lambda_k}\bra{\lambda_k} = \rho_A.}
+
+        Note that, for the $\ket{\phi_j}$ to be an orthonormal basis with $r$ different elements, we need it to live in a space of dimension $r$. The whole space thus has dimension $d_A\cdot r$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Consider the following mixed state: 
+    \[\rho_A = \frac{1}{3}\ket{0}\bra{0} + \frac{1}{3} \ket{1}\bra{1} + \frac{1}{3} \ket{+}\bra{+}.\]
+
+    We can purify it easily by considering: 
+    \[\ket{\Psi_{AB}} = \frac{1}{\sqrt{3}} \ket{00} + \frac{1}{\sqrt{3}} \ket{11} + \frac{1}{\sqrt{3}} \ket{+2}.\]
+
+    This lives in a space of dimension $6$. However, this is definitely not the minimal purification. Diagonalising $\rho_A$, it is possible to write it as: 
+    \[\rho_A = \lambda_1 \ket{\lambda_1} + \lambda_2 \ket{\lambda_2}.\]
+
+    Applying our algorithm on it, we get a purification in a space of dimension only 4.
+\end{parag}
+
+\begin{parag}{Theorem: Schmidt decomposition (personal remark)}
+    Let $\ket{\psi} \in \mathcal{H}_A \otimes \mathcal{H}_B$ be a pure state. 
+
+    There exists some $r \leq \min\left\{\dim \mathcal{H}_A, \dim \mathcal{H}_B\right\}$, non-negative scalars $\lambda_1, \ldots, \lambda_r \geq 0$, and orthonormal families $\left(\ket{u_i}\right) \subseteq \mathcal{H}_A$ and $\left(\ket{v_i}\right) \subseteq \mathcal{H}_B$ (i.e. $\braket{u_i}{u_j} = \delta_{ij}$ and $\braket{v_i}{v_j} = \delta_{ij}$) such that: 
+    \[\ket{\psi} = \sum_{i=1}^{r} \lambda_i \ket{u_i} \otimes \ket{v_i}.\]
+
+    This is known as the \important{Schmidt decomposition}.
+
+    \begin{subparag}{Remark}
+        This is a usual result in linear algebra, this is often useful in quantum information.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $\ket{e_i} \in \mathcal{H}_A, \ket{f_j} \in \mathcal{H}_B$ be orthonormal bases. We can express $\ket{\psi}$ in their joint basis, i.e. we can find some coefficients $C_{ij}$ such that: 
+        \[\ket{\psi} = \sum_{i=1}^{d_A} \sum_{j=1}^{d_B} C_{ij} \ket{e_i} \otimes \ket{f_j}.\]
+        
+        Now, we can consider $C \in \mathbb{C}^{d_A \times d_B}$ to be a matrix. In particular, we can find its SVD decomposition: 
+        \[C = U \Sigma V^{\dagger} = \sum_{k=1}^{r} \sigma_k \ket{u_k}\bra{v_k},\]
+        for some $r \leq \min\left\{d_A, d_B\right\}$ and orthogonal families $\left(\ket{u_k}\right) \subseteq \mathcal{H}_A$ and $\left(\ket{v_k}\right) \subseteq \mathcal{H}_B$. Hence: 
+        \autoeq{\ket{\psi} = \sum_{i=1}^{d_A} \sum_{j=1}^{d_B} \bra{e_i} C \ket{f_j} \left(\ket{e_i} \otimes \ket{f_j}\right) = \sum_{i=1}^{d_A} \sum_{j=1}^{d_B} \sum_{k=1}^{r} \sigma_k \braket{e_i}{u_k} \braket{v_k}{f_j} \left(\ket{e_i} \otimes \ket{f_j}\right) = \sum_{k=1}^{r} \sigma_k \left(\sum_{i=1}^{d_A} \ket{e_i}\braket{e_i}{u_k}\right) \otimes \left(\sum_{j=1}^{d_B} \ket{f_j} \braket{f_j}{v_k^*}\right) = \sum_{k=1}^{r} \sigma_k \ket{u_k} \otimes \ket{v_k^*}.}
+
+        Intuitively, this means that the Schmidt decomposition is just the SVD decomposition on a bipartite state.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary (Personal remark)}
+    Let $\ket{\psi}_{AB}$ be a pure state, of density matrix $\rho_{AB}$. Then, $\rho_A = \Tr_B\left(\rho_{AB}\right)$ and $\rho_B = \Tr_A\left(\rho_{AB}\right)$ have the same non-zero eigenvalues with same multiplicity.
+
+    \begin{subparag}{Remark}
+        This theorem may be surprising: $\rho_A$ and $\rho_B$ may not even live in spaces of the same number of dimensions, so having the same non-zero eigenvalues with same multiplicity is definitely not something trivial. This is moreover very powerful, since eigenvalues tell us many information about a matrix, such as its rank, the dimension of its kernel and its similarity to other matrices.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        By the Schmidt decomposition: 
+        \autoeq{\rho_{AB} = \ket{\psi}_{AB}\bra{\psi}_{AB} = \sum_{i, j} \lambda_i \lambda_j \left(\ket{u_i} \otimes \ket{v_i}\right)\left(\bra{u_j} \otimes \bra{v_j}\right) = \sum_{i, j} \lambda_i \lambda_j \ket{u_i}\bra{u_j} \otimes \ket{v_i}\bra{v_j}.}
+
+        Hence: 
+        \[\rho_A = \Tr_B\left(\rho_{AB}\right) = \sum_{i, j} \lambda_i \lambda_j \ket{u_i}\bra{u_j} \delta_{ij} = \sum_{i=1}^{r} \lambda_i^2 \ket{u_i}\bra{u_i}.\]
+        
+        Similarly: 
+        \[\rho_B = \Tr_A\left(\rho_{AB}\right) = \sum_{j=1}^r \lambda_j^2 \ket{v_j}\bra{v_j}.\]
+        
+        Their non-zero eigenvalues are $\left(\lambda_i^2\right)_{i=1}^r$ in both cases, proving our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem (personal remark)}
+    Let $\rho_A \in \mathcal{H}_A$ be some mixed state, and $\ket{\Psi}_{AB} \in \mathcal{H}_A \otimes \mathcal{H}_B$ be a purification of $\rho_A$.
+
+    Then: 
+    \[\dim \mathcal{H}_B \geq \rank \rho_A.\]
+
+    \begin{subparag}{Remark}
+        This shows that the theorem above, that uses a space of dimension $d_A \cdot r$, is optimal (where $r = \rank \rho_A$). In other words, we cannot find a purification in a space of dimension less than $d_A \cdot r$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We define: 
+        \[\rho_{AB} = \ket{\Psi}\bra{\Psi}_{AB}, \mathspace \rho_B = \Tr_A\left(\rho_{AB}\right).\]
+
+        By Schmidt's theorem, we know that $\rho_A$ and $\rho_B$ have the same non-zero eigenvalues with same multiplicities. Hence: 
+        \[\rank \rho_A = \rank \rho_B.\]
+
+        We necessarily have that $\rank \rho_B \leq \dim \mathcal{H}_B$ for any operator $\rho_B \in \mathcal{H}_B$, giving the result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $\rho_A$ be some state, and $\ket{\Psi_{AB}}$ be some purification.
+
+    Then, for any unitary $U$, the following is also a purification: 
+    \[\ket{\Phi_{AB}} = \left(I_A \otimes U_B\right) \ket{\Psi}_{AB}\]
+
+    \begin{subparag}{Remark}
+        This is another way to see that, again, purifications are not unique.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The idea is that the trace is unitary invariant, so $\rho_A$ remains unchanged. More intuitively, it does not matter what state $B$ is in.
+    \end{subparag}
+\end{parag}
+
+\subsection{Philosophical observation}
+
+\begin{parag}{Observation}
+    Contrary to usual quantum physics classes, where we start by pure states and then introduce mixed states, we started from mixed states here and purified them. This thus raises the question of which of the two is more fundamental. 
+
+    This is a question with a lot of disagreement, and boils down to proper and improper mixtures.
+\end{parag}
+
+\begin{parag}{Proper and improper mixtures}
+    We can get the maximally mixed state $\rho = \frac{I}{2}$ in two ways:
+    \begin{enumerate}
+        \item Tossing a coin, and preparing $\ket{0}$ or $\ket{1}$ each with probability $\frac{1}{2}$.
+        \item Prepare a Bell state $\ket{\Phi^+} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}$, and throw the $B$ part away.
+    \end{enumerate}
+
+    They are operationally indistinguishable. However, they are conceptually different: the first is a \important{proper mixture} (it is a mixture of pure states), whereas the second is a \important{improper mixture} (it is a description of a subsystem of a composite system).
+
+    This distinction will come back with the measurement problem later in the course.
+\end{parag}
+
+\section{Measurement}
+
+\begin{parag}{Recall: POVMs}
+    We consider matrices $\mathcal{M} = \left(M_1, \ldots, M_L\right)$ such that: 
+    \begin{itemize}
+        \item \textit{(Normalisation)} $\sum_{k} M_k = I$.
+        \item \textit{(Non-negativity)} $M_k$ are positive semi-definite.
+    \end{itemize}
+
+    The probability to get outcome $k$ is $\Tr\left(M_k \rho\right)$.
+
+    \begin{subparag}{Remark}
+        It does not tell us anything about the post measurement state, nor on the way we actually realise the measurement. Moreover, it doesn't necessarily associate the outcome with a number (it may output left/right for instance).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: Projective measurements}
+    Consider the following measurement, which is one we may typically have in quantum physics:
+    \[\mathcal{M} = \left\{\ket{+}\bra{+}, \ket{-}\bra{-}\right\}.\]
+
+    This is indeed a POVM measurement. However, it also has the property that $M_i M_j = \delta_{ij} M_i$. Any POVM that has this same property is called a projective measurement. This property necessarily requires that we have $d$ projectors in $\mathcal{M}$. 
+
+    If we further associate each outcome with a numerical value $\lambda_i$, then we can associate the measurement with a Hermitian operator: 
+    \[O = \sum_{i} \lambda_i M_i.\]
+    
+    This does yield the standard quantum mechanics measurement: 
+    \[\left\langle O \right\rangle = \Tr\left(\rho O\right) = \sum_{i} \Tr\left(\rho M_i\right) \lambda_i = \sum_{i} p_i \lambda_i.\]
+\end{parag}
+
+\begin{parag}{Example 2: State discrimination}
+    Alice gives Bob a state $\ket{0}$ or $\ket{+}$, and Bob wants to do a measurement to determine which. We are thus looking for a measurement he can do, that gives the answer with highest probability. We consider the POVM $\mathcal{M} = \left\{M_1, M_2, M_3\right\}$, where:
+    \[M_1 = \frac{\sqrt{2}}{1 + \sqrt{2}} \ket{1}\bra{1}, \mathspace M_2 = \frac{\sqrt{2}}{1 + \sqrt{2}} \ket{-}\bra{-}, \mathspace M_3 = I - M_1 - M_2.\]
+
+    We will figure out why those coefficients specifically in the third exercise series, the idea being to maximise the success probability while keeping $M_3$ positive semi definite. It is possible to show that this is indeed a valid POVM.
+
+    If we get answer $1$, we know we are not in state $\ket{0}$, and thus we are in the state $\ket{+}$. If we get answer $2$, we know we are not in state $\ket{+}$, and hence we are in state $\ket{0}$. If we get answer $3$, then this test is inconclusive and thus fails.
+\end{parag}
+
+\begin{parag}{Example 3: Non-rank 1 POVM}
+    Consider the POVM $\mathcal{M} = \left\{M_0, M_1\right\}$, where:
+    \[M_0 = \ket{\Phi^-}\bra{\Phi^-}, \mathspace M_1 = \ket{\Phi^+}\bra{\Phi^+} + \ket{\Phi^-}\bra{\Phi^-} + \ket{\Psi^+}\bra{\Psi^+}.\]
+
+    Notice that $M_1$ is rank $3$. This answers the question ``Is the system in the singlet $\ket{\Psi^-}$ state?''. Note that there are only 2 measurements in this POVM, which is less than the dimension of the system, $4$.
+\end{parag}
+
+\end{document}
+

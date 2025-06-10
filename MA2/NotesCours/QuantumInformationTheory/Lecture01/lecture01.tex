@@ -1,0 +1,212 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-02-18 at 10:08:36.
+
+\usepackage{../../style}
+
+\title{Quantum information theory}
+\author{Joachim Favre}
+\date{Mardi 18 février 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2025-02-18}{QIT is just classical information theory}{
+\begin{itemize}[left=0pt]
+    \item Intuitive explanation of how a classical state should be represented, how they are transformed one to another, and what a measure means.
+    \item Usage of the classical analogy to motivate the definition of quantum states, quantum channels, and quantum measurements.
+\end{itemize}
+
+}
+
+\section{Motivational intuition and definitions}
+\subsection{General definitions}
+
+\begin{parag}{Definition: Physical system}
+    A physical system $S$ is any collection of physical degrees of freedom that allow a closed, consistent description.
+
+    \begin{subparag}{Remark}
+        This definition is a bit fiddly, and not perfect. The intuitive notion of physical systems is probably better.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: State}
+    A state of a system $S$ is an equivalence class of experimental procedures such that each experimental procedure that lie in any given class gives the same empirical results for all possible measurements or physical actions on $S$.
+
+    \begin{subparag}{Intuition}
+        The idea is that a state can be prepared in many different ways, but they all lead to the same physical thing, since the same measurements will give the same results.
+    \end{subparag}
+\end{parag}
+
+\subsection{Classical systems}
+
+\begin{parag}{Definition: Convex combination}
+    Let $\bvec{v}_1, \ldots, \bvec{v}_m \in \mathbb{C}^n$ be vectors.
+
+    The vector $\bvec{w}$ is a \important{convex combination} of $\bvec{v}_1, \ldots, \bvec{v}_m$ if there exists $p_1, \ldots, p_m \in \left[0, 1\right]$ such that $\sum_{i} p_i = 1$ and: 
+    \[\bvec{w} = \sum_{i} p_i \bvec{v}_i.\]
+\end{parag}
+
+\begin{parag}{State space of classical systems}
+    Consider a system $S$ with property $P$. For instance, $S$ may be a ball, and $P = \left\{\text{red}, \text{blue}, \text{green}\right\}$ may be its colour. The state of the system is a description of the colour. If its colour is not known with certainty, the state is instead a description of the probabilities of the different colours: 
+    \[\bvec{r} = \left(\prob\left(\text{red}\right), \prob\left(\text{blue}\right), \prob\left(\text{green}\right)\right).\]
+    
+    For example, $\bvec{r} = \left(1, 0, 0\right)$ is the state of a ball that is red with certainty. Similarly, $\bvec{r} = \left(1/3, 1/3, 1/3\right)$ means that all colours have the same probability, i.e. we have maximum uncertainty.
+
+    The states of perfect knowledge (zero uncertainty) are called pure states. We label them $\bvec{e}_0 = \left(1, 0, 0\right)$, $\bvec{e}_1 = \left(0, 1, 0\right)$ and $\bvec{e}_2 = \left(0, 0, 1\right)$. Any state can be written as a convex combination of these basis vectors: 
+    \[\bvec{r} = \left(r_0, r_1, r_2\right) =  r_0 \bvec{e}_0 + r_1 \bvec{e}_1 + r_2 \bvec{e}_2.\]
+
+    Since $\left(r_0, r_1, r_2\right)$ are probabilities, they are positive and sum to $1$, so this is indeed a convex combination. Plotting all possible vectors $\bvec{r}$, this means that they all lay on the triangle which vertices are the basis state. In other words, in our case with three properties, the state space of the system $S$ is a triangle.
+    \svghere[0.4]{StateSpaceClassicalSystem3Parameters.svg}
+
+    For instance, $\bvec{r}_{max\ mixed} = \left(\frac{1}{3}, \frac{1}{3}, \frac{1}{3}\right)$ is at the middle of the triangle as shown on the picture.
+
+    \begin{subparag}{Remark}
+        The state space of a 2 property system would have been a line, and the one of a 4 property system would have been a tetrahedron. More generally, in $n$ dimension, it will be a generalised $n$-dimensional triangle, which we call an $n$-dimensional simplex.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Transformations}
+    We may want to transform some classical systems $\bvec{r}$ to other classical systems $\bvec{s}$: 
+    \[L \bvec{r} = \bvec{s}.\]
+
+    Then, $L$ must be linear, i.e.: 
+    \[L \left(p \bvec{x} + \left(1 - p\right)\bvec{y}\right) = p L \bvec{x} + \left(1-p\right) L \bvec{y}.\]
+
+    \begin{subparag}{Intuition}
+        This expression states that adding randomness (putting the balls in a bag for instance), and transforming the states (painting the balls) must commute. 
+
+        Intuitively, in our example above, taking a random ball $\bvec{r} = r_0 \bvec{e}_0 + r_1 \bvec{e}_2 + r_2 \bvec{e}_2$ and then painting it according some rule $\bvec{r}' = L \bvec{r}$ (mapping red to blue, blue to red, green to red, and so on) is the same as painting all balls according the same rule $\bvec{e}_j' = L \bvec{e}_j$ and then taking a random one $\bvec{r}' = r_0 \bvec{e}_0' + r_1 \bvec{e}_1' + r_2 \bvec{e}_2'$. This states exactly that $L$ must be linear.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Measurement}
+    Every measurement can be seen as a question we can ask on the system. For instance:
+    \begin{itemize}
+        \item What is the colour of $S$? 
+        \item Is $S$ blue?
+    \end{itemize}
+
+    The first question has three outcomes (red, blue and green) whereas the second one only has two (yes and no). Since $\bvec{r} = \left(\prob\left(\text{red}\right), \prob\left(\text{blue}\right), \prob\left(\text{green}\right)\right)$, we have, for the first question: 
+    \[\prob\left(\text{red}\right) = \left(1, 0, 0\right) \dotprod \left(r_0, r_1, r_2\right) = r_0, \mathspace \prob\left(\text{blue}\right) = \left(0, 1, 0\right) \dotprod \bvec{r} = r_1,\]
+    \[ \prob\left(\text{green}\right) = \left(0, 0, 1\right) \dotprod \bvec{r} = r_2.\]
+    
+    For the second question, we have: 
+    \[\prob\left(\text{yes}\right) = \left(0, 1, 0\right) \dotprod \bvec{r} = r_1, \mathspace \prob\left(\text{no}\right) = \left(1, 0, 1\right) \dotprod \bvec{r} = r_0 + r_2.\]
+    
+    We thus notice that the probability of the measurement is entirely described by a vector which we dot-product with the state $\bvec{r}$. The first question is thus represented by $M_1 = \left\{\bvec{e}_0, \bvec{e}_1, \bvec{e}_2\right\}$ whereas the second one is $M_2 = \left\{\bvec{e}_1, \bvec{e}_0 + \bvec{e}_2\right\}$. 
+
+    More generally, any measurement $M$ of a system $S$ with $n$ properties, with $d$ outcomes can be described by a set of $d$ vectors of dimension $n$ $\left\{\bvec{m}_0, \ldots, \bvec{m}_{d-1}\right\} \subseteq \mathbb{R}^{n}$. For those to yield valid probabilities, we need:
+    \begin{itemize}
+        \item \textit{(Normalisation)} $\sum_{i} \bvec{m}_i \dotprod \bvec{r} = 1$, i.e. $\sum_{i} \bvec{m}_i = \left(1, 1, \ldots, 1\right)$.
+        \item \textit{(Non-negativity)} $\bvec{m}_i \dotprod \bvec{r} \geq 0$ for all $i$, i.e. $m_i^{\left(j\right)} \geq 0$ for all $i, j$.
+    \end{itemize}
+
+    Then, the probability to get answer $i$ is simply $\bvec{m}_i \dotprod \bvec{r}$.
+\end{parag}
+
+\subsection{Quantum systems}
+
+\begin{parag}{Intuition}
+    We define quantum states, quantum transformations and quantum measurements. The idea is that they should be completely analogous to the classical case, except that we replace vectors by matrices. More intuition about these objects, such that how they naturally appear mathematically, will come in the following lectures.
+\end{parag}
+
+\begin{parag}{Definition: Positive semi-definite operator}
+    Let $A$ be an operator.
+
+    We say it is positive semi-definite, written $A \geq 0$ if, for all vectors $\ket{\psi}$: 
+    \[\bra{\psi} A \ket{\psi} \geq 0.\]
+\end{parag}
+
+\begin{parag}{Quantum states}
+    To make things quantum, we take the probability vector $\bvec{r}$, which we convert to some matrix $\rho$. The constraints become:
+    \begin{itemize}
+        \item \textit{(Non-negativity)} $\rho$ is positive semi-definite.
+        \item \textit{(Normalisation)} $\Tr\left(\rho\right) = 1$ (i.e. its eigenvalues sum to $1$). 
+    \end{itemize}
+\end{parag}
+
+\begin{parag}{Personal remark: Theorem}
+    Let $A$ be a matrix.
+
+    $A$ is positive semi-definite if and only if $A$ is Hermitian and has non-negative eigenvalues.
+
+    \begin{subparag}{Intuition}
+        This shows that an equivalent definition of quantum states is to requires that $\rho$ is Hermitian and has non-negative eigenvalues $\text{eigs}\left(\rho\right) \geq 0$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\implies$}
+        By definition of positive semi-definiteness, for all vector $\ket{x}$: 
+        \[\bra{x} A \ket{x} \geq 0.\]
+
+        We can write $A = H + iK$ where $H, K$ are Hermitian operators defined by: 
+        \[H = \frac{A + A^{\dagger}}{2}, \mathspace K = \frac{A - A^{\dagger}}{2i}.\]
+
+        To show that $A$ is Hermitian, we can prove that $K = 0$. Suppose towards contradiction that $K \neq 0$. Then, there must exist a vector $\ket{x}$ such that $\bra{x} K \ket{x} \neq 0$. Notice that $\bra{x} H \ket{x} \in \mathbb{R}$ and $\bra{x} K \ket{x} \in \mathbb{R}$, because the eigenvalues of any Hermitian matrix are real by the spectral theorem. But then: 
+        \[\cim\left(\bra{x} A \ket{x}\right) = \cim\left(\bra{x} H \ket{x} + i \bra{x} K \ket{x}\right) = i \bra{x} K \ket{x} \neq 0.\]
+        
+        This shows in particular that $\bra{x} A \ket{x} \in \mathbb{C} \setminus \mathbb{R}$, and hence we cannot have $\bra{x} A \ket{x} \geq 0$. This is our contradiction, we must have $K = 0$, and hence $A = H$ is Hermitian.
+
+        Now, suppose towards contradiction that $A$ has an eigenvector $\ket{v}$ with negative eigenvalue $\lambda < 0$. However, then: 
+        \[\bra{v} A \ket{v} = \lambda \braket{v}{v} = \lambda < 0,\]
+        which is another contradiction.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        It is a well-known fact that since $A$ is Hermitian, then for all vector $\ket{x}$: 
+        \[\bra{x} A \ket{x} \geq \lambda_{min}\left(A\right) \braket{x}{x}.\]
+        
+        This is exactly what the variational principle states in quantum mechanics for instance. Proving this is left as an exercise to the reader. This gives exactly our result, since $\lambda_{min}\left(A\right) \geq 0$ by hypothesis.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Transformations}
+    Transformations $\mathcal{E}$ again need to be linear, i.e. $\sigma = \mathcal{E}\left(\rho\right)$ must be such that: 
+    \[\mathcal{E}\left(\alpha_1 \rho_1 + \alpha_2 \rho_2\right) = \alpha_1 \mathcal{E}\left(\rho_1\right) + \alpha_2 \mathcal{E \left(\rho_2\right)}.\]
+
+    Naturally, $\mathcal{E}\left(\rho\right)$ must output a valid quantum state. This constraint is however non-trivial, and we will see more details about this when we will consider quantum channels.
+
+    \begin{subparag}{Remark}
+        This is more general than just time evolutions, we are not forced to pick $\mathcal{E}\left(\rho\right) = U \rho U^{\dagger}$ for some unitary $U$.
+
+        For instance, getting rid of our state and replacing it by $\ket{0}\bra{0}$ is a valid physical transformation; which is however not unitary.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{POVM measurements}
+    Similarly to how we handled states, we convert the classical $\bvec{m}_k$ to a matrix $M_k$. The probability to get outcome $k$ is still an inner product, more precisely the Hilbert-Schmidt inner product of $M_k$ and $\rho$: 
+    \[\prob\left(\text{outcome $k$}\right) = \Tr\left(M_k \rho\right).\]
+    
+    The constraints on the matrices $M_k$ are:
+    \begin{itemize}
+        \item \textit{(Normalisation)} $\sum_{k} \Tr\left(M_k \rho\right) = 1$, i.e. $\sum_{k} M_k = I$.
+        \item \textit{(Non-negativity)} $M_k$ is positive semi-definite. 
+    \end{itemize}
+
+    \begin{subparag}{Remark 1}
+        Again, an equivalent property to non-negativity is to ask for $M_k$ to be Hermitian and have non-negative eigenvalues.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        This formalism is the most general way to describe measurements in quantum mechanics. This is named \important{POVM measurements} (Positive Operator Value Measurements). We will again develop this idea later.
+
+        Moreover, it does not tell us anything about the post measurement state, nor on the way we actually realise the measurement, although we will see a way to implement those measurements physically later in the course.
+
+        Finally, it doesn't necessarily associate the outcome with a number, it may only output ``left'' or ``right'' for instance. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    Note that classical theory is a subset of quantum theory. Indeed, we can always embed a classical state as the diagonal of a quantum state, and a classical measurement as the diagonal of a quantum state: 
+    \[\bvec{r} \mapsto \rho = \text{diag}\left(\bvec{r}\right) = \begin{pmatrix} r_0 &  &  \\  & \ddots &  \\  &  & r_{n-1} \end{pmatrix}, \mathspace \bvec{m}_k \mapsto M_k = \begin{pmatrix} m_k^{\left(0\right)} &  &  \\  & \ddots &  \\  &  & m_k^{\left(n-1\right)} \end{pmatrix}.\]
+
+    Then, we do have that measurement is consistent: 
+    \[\Tr\left(M_k \rho\right) = r_0 m_k^{\left(0\right)} + \ldots + r_{n-1} m_k^{\left(n-1\right)} = \bvec{r} \dotprod \bvec{m}_k.\]
+\end{parag}
+
+\end{document}

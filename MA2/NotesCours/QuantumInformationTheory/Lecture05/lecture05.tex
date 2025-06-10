@@ -1,0 +1,232 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-18 at 10:20:28.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mardi 18 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2025-03-18}{A Choi-ce in the representation}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of the Stinespring dilation of a quantum channel.
+    \item Introduction to vectorisation.
+    \item Definition of the Choi state, and proof of properties.
+    \item Explanation of a general algorithm to find Kraus operators from a Choi state.
+\end{itemize}
+}
+
+\subsection{Stinespring dilation}
+
+\begin{parag}{Observation}
+    We can make a non-unitary channel by considering a system that interacts unitarily with an environment, and then just ignore the environment.
+
+    For instance, let us consider the state $\rho \otimes \ket{0}\bra{0}$ and unitary: 
+    \[U = \ket{0}\bra{0} \otimes U_0 + \ket{1}\bra{1} \otimes U_1.\]
+
+    Then: 
+    \autoeq[s]{U \left(\rho \otimes \ket{0}\bra{0}\right) U^{\dagger} = U\left(\rho_{00} \ket{0}\bra{0} \otimes \ket{0}\bra{0} + \rho_{01} \ket{0}\bra{1} \otimes \ket{0}\bra{0} + \rho_{10} \ket{1}\bra{0} \otimes \ket{0}\bra{0} + \rho_{11} \ket{1}\bra{1} \otimes \ket{0}\bra{0}\right) U^{\dagger} = \rho_{00} \ket{0}\bra{0} \otimes U_0 \ket{0}\bra{0} U_0^{\dagger} + \rho_{01} \ket{0}\bra{1} \ket{0}\bra{1} \otimes U_0 \ket{0}\bra{0} U_1^{\dagger} \fakeequal + \rho_{10} \ket{1}\bra{0} \otimes U_1 \ket{0}\bra{0} U_0^{\dagger} + \rho_{11} \ket{1}\bra{1} \otimes U_1 \ket{0}\bra{0}U_1^{\dagger}.}
+
+    Taking a partial trace to get rid of the environment, this gives: 
+    \[\sigma = \Tr_E\left(U \left(\rho \otimes \ket{0}\bra{0}\right)U^{\dagger}\right) = p_{00} \ket{0}\bra{0} + \rho_{11} \ket{1}\bra{1} + \rho_{01} \ket{0}\bra{1} C + \rho_{10} \ket{1}\bra{0} C^*,\]
+    where $C = \bra{0} U_1^{\dagger} U_0 \ket{0}$.
+    
+    We claim that $\sigma = p \rho + \left(1-p\right) Z \rho Z$, for some $p$. Indeed: 
+    \[Z \rho Z = \rho_{00} \ket{0}\bra{0} - \rho_{01} \ket{0}\bra{1} - \rho_{10} \ket{1}\bra{0} + \left(-1\right)^2 \rho_{11} \ket{1}\bra{1}.\]
+
+    So: 
+    \[p \rho + \left(1 - p\right) Z \rho Z = \rho_{00} \ket{0}\bra{0} + \rho_{11} \ket{1}\bra{1} + \left(2p - 1\right)\left(\rho_{01} \ket{0}\bra{1} + \rho_{10}\ket{1}\bra{0}\right),\]
+    
+    To have $\sigma = p \rho + \left(1 -p \right) Z \rho Z$, we can pick $C = 2p-1 \in \mathbb{R}$.
+
+    \begin{subparag}{Remark}
+        Overall, we this means that this system-environment interaction induces the partial dephasing channel, i.e. the channel that suppresses off-diagonal coherence terms. This is very interesting, since it gives us another way of understanding this channel.
+
+        As a matter of fact, we can also go the other way, and write the channel as a unitary interaction on a larger system, followed by ignoring the environnent as we will see with the following theorem.
+        
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Stinespring Dilation Theorem}
+    Any quantum channel can be written in the following form, named \important{Stinespring dilation}: 
+    \[\mathcal{E}\left(\rho\right) = \Tr_E\left(U \left(\rho \otimes \ket{0}\bra{0}\right) U^{\dagger}\right).\]
+
+    \begin{subparag}{Remark 1}
+        We take the initial state of the environment to be $\ket{0}\bra{0}$ without loss of generality, because any other state could be encoded in $U$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+
+        This is a nice way to understand how to implement quantum channels physically, and understand them better: a quantum channel can be seen as unitary evolution in a larger system, from which we ignore a part. This is yet another instance of the church of the larger Hilbert space.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        We know that we can write any quantum channel in Kraus form: 
+        \[\mathcal{E}\left(\rho\right) = \sum_{i} A_i \rho A_i^{\dagger}, \mathspace \sum_{i} A_i^{\dagger} A_i = I.\]
+
+        We can find some $U$ such that:
+        \[U \left(\ket{0} \otimes \ket{\psi}\right) = \sum_{i} \ket{i} \otimes A_i \ket{\psi}.\]
+
+        Indeed, in array form, these two terms look like: 
+        \[\ket{0} \otimes \ket{\psi} = \begin{pmatrix} \ket{\psi} \\ 0 \\ \vdots \end{pmatrix}, \mathspace \sum_{i} \ket{i} \otimes A_i \ket{\psi} = \begin{pmatrix} A_0 \ket{\psi} \\ A_1 \ket{\psi} \\ \vdots \end{pmatrix}.\]
+
+        Hence, we can just take $U$ of the following form:
+        \[U \left(\ket{0} \otimes \ket{\psi}\right) = \underbrace{\begin{pmatrix} A_0 & c_{00} & c_{01} & \cdots \\ A_1 & c_{10} & c_{11} & \cdots \\ \vdots & \vdots & \vdots & \ddots \end{pmatrix}}_{= U} \begin{pmatrix} \ket{\psi} \\ 0 \\ \vdots \end{pmatrix} = \begin{pmatrix} A_0 \ket{\psi} \\ A_1 \ket{\psi} \\ \vdots \end{pmatrix},\]
+        where the coefficients $c_{ij}$ are just here to make the matrix $U$ a square matrix, in such a way that $U$ is unitary. Note that these coefficients can be found using the Gram-Schmidt algorithm, since the first few columns are already orthonormal.
+
+        Then, the claim holds for any pure state: 
+        \autoeq{\Tr_E\left(U \left(\ket{0}\bra{0} \otimes \ket{\psi}\bra{\psi}\right)U^{\dagger}\right) = \sum_{i, j} \Tr_E\left(\ket{i}\bra{j} \otimes A_i \ket{\psi} \bra{\psi} A_j^{\dagger}\right) = \sum_{i} A_i \ket{\psi}\bra{\psi} A_i^{\dagger} = \mathcal{E}\left(\ket{\psi}\bra{\psi}\right).}
+
+        However, it must then also hold for any state by linearity, using the fact $\rho = \sum_{i} p_i \ket{\psi_i}\bra{\psi_i}$. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Choi representation}
+
+\begin{parag}{Definition: Vectorisation}
+    Let $A = \sum_{i, j} a_{ij}\ket{i}\bra{j}$ be some operator. We define its vectorisation to be: 
+    \[\kket{A} = \ket{\text{vec}\left(A\right)} = \sum_{i, j} a_{ij} \ket{i} \otimes \ket{j}.\]
+
+    \begin{subparag}{Intuition}
+        Basically, we turn an operator into a vector: 
+        \[\text{vec} \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} = \text{vec}\left(\ket{0}\bra{0} + \ket{1}\bra{1}\right) = \ket{00} + \ket{11} = \begin{pmatrix} 1 \\ 0 \\ 0 \\ 1 \end{pmatrix}. \]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property 1}
+    Let $A, X, B$ be operators. Then: 
+    \[\kket{A X B} = \left(A \otimes B^T\right) \kket{X}.\]
+
+    \begin{subparag}{Proof}
+        We write our operators in the computation basis: 
+        \autoeq{\left(A \otimes B^T\right) \kket{X} = \sum_{i, j, i', j', j, k'} \left(A_{ij} \ket{i}\bra{j}\right) \otimes \left(B_{i' j'} \ket{i'}\bra{j'}\right)^T X_{k k'} \ket{k k'} = \sum_{i, j, i', j', j, k'} \left(A_{ij} \ket{i}\braket{j}{k}\right) \otimes \left(B_{i' j'} \ket{j'}\braket{i'}{k'}\right) X_{k k'} = \sum_{i, i', j, j', k, k'} A_{ij} B_{i' j'} X_{k k'} \ket{i j'} \delta_{jk} \delta_{i' k'} = \sum_{i, k, i', j'} A_{ik} X_{ki'} B_{i' j'} \ket{i j'} = \sum_{i, j'} C_{ij'} \ket{ij'} = \kket{C},}
+        where $C = A X B$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property 2}
+    We consider the maximally mixed state: 
+    \[\ket{\phi^+} = \frac{1}{\sqrt{d}} \sum_{i} \ket{ii} = \frac{1}{\sqrt{d}} \kket{I}.\]
+    
+    Then, for any unitary $U$: 
+    \[\left(U^{\dagger} \otimes I\right) \ket{\phi^+} = \left(I \otimes U^*\right) \ket{\phi^+}.\]
+    
+    \begin{subparag}{Intuition}
+        $\ket{\phi^+}$ can be seen as a generalisation of the Bell state $\frac{\ket{00} + \ket{11}}{\sqrt{2}}$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        We can use this to reduce the depth of quantum circuits: 
+        \[\left(U V^{\dagger} \otimes I\right) \ket{\phi^+} = \left(U \otimes V^*\right) \ket{\phi^+}.\]
+
+        Using quantum circuit notation, this can be written equivalently as:
+        \begin{center}
+        \begin{quantikz}
+            \lstick[wires=2]{\ket{\phi^+}} & \gate{V^{\dagger}} & \gate{U} & \\
+                                           &                          & &
+        \end{quantikz}
+        $\mathspace = \mathspace$
+        \begin{quantikz}
+            \lstick[wires=2]{\ket{\phi^+}} &  \gate{U} & \\
+                                    &  \gate{V^*} &
+        \end{quantikz}
+        \end{center}
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We have, using the property we just proved that $\kket{C} = \left(C \otimes I\right) \kket{I} = \left(I \otimes C^T\right) \kket{I}$: 
+        \autoeq{\left(U^{\dagger} \otimes I\right) \ket{\phi^+} = \frac{1}{\sqrt{d}} \left(U^{\dagger} \otimes I\right) \kket{I} = \frac{1}{\sqrt{d}} \kket{U^{\dagger}} = \frac{1}{\sqrt{d}} \left(I \otimes \left(U^{\dagger}\right)^T\right) \kket{I} = \left(I \otimes U^*\right) \ket{\phi^+}.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Choi–Jamiołkowski representation}
+    For any quantum channel $\mathcal{E}$, we define the \important{Choi state} (or Choi–Jamiołkowski isomorphism) of that channel as: 
+    \[J\left(\mathcal{E}\right) = \left(\mathcal{E} \otimes I\right)\left(\kket{I}\bbra{I}\right).\]
+
+    \begin{subparag}{Intuition}
+        By definition, this means that: 
+        \[J\left(\mathcal{E}\right) = \sum_{i, j} \left(\mathcal{E} \otimes I\right) \ket{ii}\bra{jj} = \sum_{i, j} \mathcal{E}\left(\ket{i}\bra{j}\right) \otimes \ket{i}\bra{j}.\]
+
+        Hence, in array form (under some choice of ordering of the basis):
+        \[J\left(\mathcal{E}\right) = \begin{pmatrix} \mathcal{E}\left(\ket{0}\bra{0}\right) & \mathcal{E}\left(\ket{0}\bra{1}\right) & \cdots \\ \mathcal{E}\left(\ket{1}\bra{0}\right) & \mathcal{E}\left(\ket{1}\bra{1}\right) & \cdots \\ \vdots & \vdots & \ddots \end{pmatrix}.\]
+
+        By linearity of a quantum channel, this shows that the Choi state completely describes the quantum channel: given $\rho = \sum_{i, j} \rho_{ij} \ket{i}\bra{j}$, we can indeed compute $\mathcal{E}\left(\rho\right) = \sum_{i, j} \rho_{ij} \mathcal{E}\left(\ket{i}\bra{j}\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that $\mathcal{E}$ is a super-operator: it is a linear map from operators to operators. In the vectorised formalism, since operators become vectors, super-operators become simple operators.
+
+        In other words, this shows that a channel can be represented by a (non-normalised) state, i.e. a matrix. This is mathematically easier to handle.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Consider the completely dephasing channel on a single qubit, $\mathcal{E}\left(\rho\right) = \rho_{00} \ket{0}\bra{0} + \rho_{11} \ket{1}\bra{1}$. As we found earlier in the class, it is given by the represented by the following Kraus operators: 
+    \[A_0 = \ket{0}\bra{0}, \mathspace A_1 = \ket{1}\bra{1}.\]
+
+    We notice that $\kket{I} = \ket{00} + \ket{11}$ since $d = 2$, so: 
+    \autoeq{J\left(\mathcal{E}\right) = \left(\mathcal{E} \otimes I\right)\left(\ket{00}\bra{00} + \ket{11}\bra{11} + \ket{00}\bra{11} + \ket{11}\bra{11}\right) = \mathcal{E}\left(\ket{0}\bra{0}\right) \ket{0}\bra{0} + \mathcal{E}\left(\ket{1}\bra{1}\right) \ket{1}\bra{1} + \mathcal{E}\left(\ket{0}\bra{1}\right) \ket{0}\bra{1} + \mathcal{E}\left(\ket{1}\bra{0}\right) \ket{1}\bra{0} = \ket{00}\bra{00} + \ket{11}\bra{11} = \ket{\text{vec}\left(\ket{0}\bra{0}\right)}\bra{\text{vec}\left(\ket{0}\bra{0}\right)} + \ket{\text{vec}\left(\ket{1}\bra{1}\right)}\bra{\text{vec}\left(\ket{1}\bra{1}\right)} = \kket{A_0}\bbra{A_0} + \kket{A_1}\bbra{A_1}.}
+
+    This is not a coincidence, as we will see.
+\end{parag}
+
+\begin{parag}{Property (Personal remark)}
+    Let $\mathcal{E}$ be a quantum channel of Choi state $J\left(\mathcal{E}\right)$. Then, for any operator $\rho$: 
+    \[\mathcal{E}\left(\rho\right) = \Tr_B\left(\left(I \otimes \rho^T\right) J\left(\mathcal{E}\right)\right).\]
+    
+    \begin{subparag}{Remark}
+        This is another way to see that a quantum channel $\mathcal{E}$ is completely described by its Choi state $J\left(\mathcal{E}\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We notice that, by definition of Choi state and thanks to properties of the partial transpose: 
+        \autoeq{\Tr_B\left(\left(I \otimes \rho^T\right) J\left(\mathcal{E}\right)\right) = \sum_{i, j} \Tr_B\left(\left(I \otimes \rho^T\right) \left(\mathcal{E}\left(\ket{i}\bra{j}\right) \otimes \ket{i}\bra{j}\right)\right) = \sum_{i, j} \Tr_B\left(\mathcal{E}\left(\ket{i}\bra{j} \otimes \left(\rho^T \ket{i}\bra{j}\right)\right)\right) = \sum_{i, j} \mathcal{E}\left(\ket{i}\bra{j}\right) \bra{j} \rho^T \ket{i} = \sum_{i, j} \mathcal{E}\left(\ket{i}\bra{j}\right) \bra{i} \rho \ket{j} = \sum_{i, j} \mathcal{E}\left(\ket{i} \bra{i} \rho \ket{j}\bra{j}\right) = \mathcal{E}\left(\rho\right),}
+        using the completeness relation $I = \sum_{i} \ket{i}\bra{i}$
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $\mathcal{E}$ be a quantum channel, of Choi state $J\left(\mathcal{E}\right)$. Then:
+    \begin{itemize}[left=0pt]
+        \item Let $\mathcal{E}\left(\rho\right) = \sum_{k} A_k \rho A_k^{\dagger}$ be the Kraus form of the channel. Then, $J\left(\mathcal{E}\right) = \sum_{k} \kket{A_k}\bbra{A_k}$.
+        \item Let $J\left(\mathcal{E}\right) = \sum_{k} \lambda_k \ket{\lambda_k}\bra{\lambda_k}$ be the diagonalisation of the Choi state. Then, the operators $A_k$ such that $\kket{A_k} = \sqrt{\lambda_k} \ket{\lambda_k}$ are Kraus operators for $\mathcal{E}$.
+    \end{itemize}
+
+    \begin{subparag}{Remark 1}
+        The two affirmations are essentially converses of one another: Kraus operators are in one-to-one correspondance with the eigendecomposition of the Choi state $J\left(\mathcal{E}\right)$. This is yet another way to see that the Choi state completely specifies a quantum channel.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This theorem is what justifies Choi states: it gives us an algorithmic way of computing Kraus operators. Indeed, given a quantum channel $\mathcal{E}$, we can always find its Choi state $J\left(\mathcal{E}\right)$, and diagonalise it to get its Kraus operators. We will develop this idea in the following paragraphs.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 1}
+        Let $\mathcal{E}\left(\rho\right) = \sum_{k} A_k \rho A_k^{\dagger}$. Then, this is direct: 
+        \[J\left(\mathcal{E}\right) = \sum_{i} \left(A_i \otimes I\right) \kket{I}\bbra{I} \left(A_i^{\dagger} \otimes I\right) = \sum_{i} \kket{A_i}\bbra{A_i}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 2 (Personal remark)}
+        We will not prove the second affirmation in this class, since intuition for this statement really comes from the first proof. However, if one wants to prove it, it comes from the fact $\mathcal{E}\left(\rho\right) = \Tr_B\left(\left(I \otimes \rho^T\right) J\left(\mathcal{E}\right)\right)$.
+
+        Note that by complete positivity of $\mathcal{E}$, $J\left(\mathcal{E}\right) = \left(\mathcal{E} \otimes I\right) \kket{I}\bbra{I}$ is positive semi-definite and hence its eigenvalues are non-negative. This shows that we can take their square root. Hence, we can indeed define operators $A_k$ such that $\kket{A_k} = \sqrt{\lambda_k} \ket{\lambda_k}$. 
+    
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

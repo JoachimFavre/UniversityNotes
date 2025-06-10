@@ -1,0 +1,251 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-11 at 10:17:38.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mardi 11 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2025-03-11}{Everything is a quantum channel}{
+\begin{itemize}[left=0pt]
+    \item Definition of quantum channel.
+    \item Explanation of the Kraus representation theorem.
+    \item Many examples of channel, including the completely dephasing channel, the completely depolarising channel, the partial trace channel, state preparation and the measure-record-and-update channel.
+    \item Proof of Naimark's dilation theorem.
+\end{itemize}
+
+}
+
+\section{Quantum channels}
+
+\begin{parag}{Definition: Quantum channel}
+    A quantum channel is a mathematical super-operator $\mathcal{E}$ (mapping operators to operators) such that:
+    \begin{enumerate}
+        \item \textit{(Linearity)} $\mathcal{E}\left(p \rho + \left(1 - p\right) \sigma\right) = p \mathcal{E}\left(\rho\right) + \left(1-p\right) \mathcal{E}\left(\sigma\right)$.
+        \item \textit{(Outputs a genuine state)} $\Tr\left(\mathcal{E}\left(\rho\right)\right) = 1$ and $\mathcal{E}\left(\rho\right)$ is positive semi-definite.
+        \item \textit{(Complete positivity)} $\left(\mathcal{E} \otimes I_B\right) \rho_{AB}$ is positive semi-definite, for any Hilbert space $\mathcal{H}_B$ and bipartite state $\rho_{AB}$.
+    \end{enumerate}
+
+    \begin{subparag}{Remark 1}
+        We will see different, easier way, to express a quantum channel.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Complete positivity is a very important property of quantum channels, it states that we can apply it on part of a qubit (for instance if Alice does it in her lab, leaving the part in Bob's lab untouched), while still getting a valid quantum state. 
+
+        Any completely positive operator is also positive, but the reciprocal is not true. For instance, consider the typical example: 
+        \[\mathcal{E}\left(\rho\right) = \rho^T\]
+
+        This operator is positive. It is easy to see for a single qubit $\rho = \frac{1}{2} \left(I + \bvec{r} \dotprod \bvec{\sigma}\right)$: 
+        \[\mathcal{E}\left(\rho\right) = \frac{1}{2}\left(I + \begin{pmatrix} r_x \\ r_y \\ r_z \end{pmatrix} \dotprod \begin{pmatrix} \sigma_x \\ -\sigma_y \\ \sigma_z \end{pmatrix} \right) = \frac{1}{2}\left(I + \begin{pmatrix} r_x \\ -r_y \\ r_z \end{pmatrix} \dotprod \begin{pmatrix} \sigma_x \\ \sigma_y \\ \sigma_z \end{pmatrix} \right).\]
+        
+        The result is thus a valid quantum state, showing $\mathcal{E}$ is positive. Now, let us prove it is not completely positive. Consider: 
+        \autoeq{\left(\mathcal{E} \otimes I\right) \left(\ket{\Phi^+}\bra{\Phi^+}\right) = \left(\mathcal{E} \otimes I\right)\frac{\ket{00}\bra{00} + \ket{11}\bra{11} + \ket{00}\bra{11} + \ket{11}\bra{00}}{2} = \frac{\mathcal{E}\left(\ket{0}\bra{0}\right)\otimes\ket{0}\bra{0} + \mathcal{E}\left(\ket{1}\bra{1}\right) \otimes \ket{1}\bra{1}}{2} \fakeequal + \frac{\mathcal{E}\left(\ket{0}\bra{1}\right) \otimes \ket{0}\bra{1} + \mathcal{E}\left(\ket{1}\bra{0}\right)\otimes \ket{1}\bra{0}}{2} = \frac{\ket{00}\bra{00} + \ket{11}\bra{11} + \ket{01}\bra{10} + \ket{10}\bra{01}}{2} = \frac{\ket{00}\bra{00} + \ket{11}\bra{11} + SWAP}{2}.}
+
+        However, this is not positive: $\ket{\Psi^-} = \frac{\ket{01} - \ket{10}}{\sqrt{2}}$ is an eigenvector of this operator with a negative eigenvalue. Hence, $\mathcal{E}$ is not completely positive and thus not a valid quantum channel.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Kraus representation}
+    Let $\mathcal{E}$ be a super-operator.
+
+    $\mathcal{E}$ is a valid quantum channel if and only if there exists operators $\left(A_i\right)$ such that $\sum_{i} A_i^{\dagger} A_i = I$ and $\mathcal{E}\left(\rho\right) = \sum_{i} A_i \rho A_i^{\dagger}$ .
+
+    This is named the \important{Kraus representation} of $\mathcal{E}$, and the $\left(A_i\right)$ are named \important{Kraus operators}.
+
+    \begin{subparag}{Proof $\implies$}
+        We will not prove that any quantum channel admits a Kraus form in this class.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        Let us prove that any super-operator written in Kraus form is a valid quantum channel. We do not prove the complete positivity property.
+
+        \begin{itemize}[left=0pt]
+            \item We first verify it outputs a valid quantum state. The trace is indeed preserved, using cyclicity of the trace and the hypothesis that $\sum_{i} A_i^{\dagger} A_i = I$: 
+                \autoeq{\Tr\left(\mathcal{E}\left(\rho\right)\right) = \Tr\left(\sum_{i} A_i \rho A_i^{\dagger}\right) = \sum_{i} \Tr\left(A_i^{\dagger} A_i \rho\right) = \Tr\left(\sum_{i} A_i^{\dagger} A_i \rho\right) = \Tr\left(I \rho\right) = 1.}
+
+            We now prove that $\sigma = \mathcal{E}\left(\rho\right)$ is positive semi-definite. To see this, we diagonalise $\rho = \sum_{\lambda} \lambda \ket{\lambda}\bra{\lambda}$, giving: 
+            \autoeq{\bra{\phi} \sigma \ket{\phi} = \bra{\phi} \sum_{i} A_i \rho A_i^{\dagger} \ket{\phi} = \sum_{i, \lambda} \lambda \bra{\phi} A_i \ket{\lambda} \bra{\lambda} A_i^{\dagger} \ket{\phi} = \sum_{i, \lambda} \lambda \left|\bra{\phi} A_i \ket{\lambda}\right|^2.}
+            
+            We know that all eigenvalues are non-negative, $\lambda \geq 0$, since $\rho$ is a valid quantum state, so $\bra{\phi} \sigma \ket{\phi} \geq 0$, showing positive semi-definiteness.
+            
+            \item We now verify linearity: 
+            \autoeq{\mathcal{E}\left(p \rho + \left(1-p\right)\sigma\right) = \sum_{i} A_i \left(p \rho + \left(1 - p\right)\sigma\right) A_i^{\dagger} = p \sum_{i} A_i \rho A_i^{\dagger} + \left(1-p\right) \sum_{i} A_i \sigma A_i^{\dagger} = p \mathcal{E}\left(\rho\right) + \left(1-p\right) \mathcal{E}\left(\sigma\right).}
+        \end{itemize}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    Let $U$ be some unitary. $\mathcal{E}\left(\rho\right) = U \rho U^{\dagger}$ is a valid Kraus representation.
+
+    This is the usual unitary evolution of a state in quantum physics.
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let $\left(U_i\right)$ be a family of unitaries, and $p_i$ be a probability distribution, i.e. $0 \leq p_i \leq 1$ and $\sum_{i} p_i = 1$. Then, the following is a valid Kraus representation: 
+    \[\mathcal{E}\left(\rho\right) = \sum_{i} p_i U_i \rho U_i^{\dagger}.\]
+
+    Intuitively, this means that we apply the unitary $U_i$ with probability $p_i$. In this case, the Kraus operators are $A_i = \sqrt{p_i} U_i$, and we do have: 
+    \[\sum_{i} A_i^{\dagger} A_i = \sum_{i} p_i U_i^{\dagger} U_i = \sum_{i} p_i I = I.\]
+\end{parag}
+
+\begin{parag}{Example 3: Completely dephasing channel}
+    Consider the following Kraus operators: 
+    \[A_0 = \ket{0}\bra{0}, \mathspace A_1 = \ket{1}\bra{1}.\]
+
+    They are valid Kraus operators, since:
+    \[\sum_{i} A_i^{\dagger} A_i = \ket{0} \braket{0}{0} \bra{0} + \ket{1} \braket{1}{1} \bra{1} = \ket{0}\bra{0} + \ket{1}\bra{1} = I.\]
+
+    This yields that $\mathcal{E}$ is a valid quantum channel. We find that: 
+    \[\mathcal{E}\left(\rho\right) = \ket{0} \bra{0} \rho \ket{0}\bra{0} + \ket{1}\bra{1} \rho \ket{1}\bra{1} = \bra{0} \rho \ket{0} \ket{0}\bra{0} + \bra{1} \rho \ket{1} \ket{1}\bra{1}.\]
+
+    In other words: 
+    \[\rho = \begin{pmatrix} \bra{0} \rho \ket{0} & \bra{0} \rho \ket{1} \\ \bra{1} \rho \ket{0} & \bra{1} \rho \ket{1} \end{pmatrix} \mapsto \mathcal{E}\left(\rho\right) = \begin{pmatrix} \bra{0} \rho \ket{0} & 0 \\ 0 & \bra{1} \rho \ket{1} \end{pmatrix}.\]
+
+    This is named a \important{completely dephasing channel}, because it kills off diagonal components.
+\end{parag}
+
+\begin{parag}{Example 4: Completely depolarising channel}
+    Let $\tau$ be some quantum state. We consider the following channel, which gets rid of the state and just outputs $\tau$: 
+    \[\mathcal{E}\left(\rho\right) = \tau, \mathspace \forall \rho.\]
+
+    This is a genuine channel, named the \important{completely depolarising channel}. We want to express it in Kraus form. First, we diagonalise $\tau = \sum_{i} \lambda_i \ket{\lambda_i}\bra{\lambda_i}$. The idea is then to exploit the fact that $1 = \Tr\left(\rho\right) = \sum_{j} \bra{j} \rho \ket{j}$, so we get consider the following family of Kraus operators $\left(A_{i, j}\right)_{i, j}$: 
+    \[A_{i,j} = \sqrt{\lambda_i} \ket{\lambda_i}\bra{j}.\]
+    
+    Then, we do have that: 
+    \autoeq{\mathcal{E}\left(\rho\right) = \sum_{i, j} A_{i, j} \rho A_{i, j}^{\dagger} = \sum_{i, j} \lambda_i  \ket{\lambda_i}\bra{j} \rho \ket{j}\bra{\lambda_i} = \sum_{i} \lambda_i  \ket{\lambda_i} \left(\sum_{j} \bra{j}\rho \ket{j}\right) \bra{\lambda_i} = \sum_{i} \lambda_i \ket{\lambda_i}\bra{\lambda_i} = \tau.}
+
+    Moreover, they are valid Kraus operators: 
+    \[\sum_{i, j} A_{ij}^{\dagger} A_{ij} = \sum_{i, j} \lambda_i \ket{j} \braket{\lambda_i}{\lambda_i} \bra{j} = \sum_{i} \lambda_i \sum_{j} \ket{j}\bra{j} = I,\]
+    where we used the fact $\sum_{i} \lambda_i = \Tr\left(\rho\right) = 1$.
+\end{parag}
+
+\begin{parag}{Example 5: Partial trace}
+    Consider the following quantum channel, that takes a partial trace: 
+    \[\mathcal{E}\left(\rho_{AB}\right) = \Tr_B\left(\rho_{AB}\right) = \rho_A.\]
+    
+    Recall that we can write: 
+    \[\Tr_B\left(\rho\right) = \sum_{k} \left(I \otimes \bra{k}\right) \rho \left(I \otimes \ket{k}\right).\]
+
+    So, we read that we can take $A_k = I \otimes \bra{k}$. Note that this is not a square matrix in the general case. We can moreover check that: 
+    \[\sum_{k} A_k^{\dagger} A_k = \sum_{k} \left(I \otimes \ket{k}\right)\left(I \otimes \bra{k}\right) = I \otimes \sum_{k} \ket{k}\bra{k} = I \otimes I = I.\]
+\end{parag}
+
+\begin{parag}{Example 6: State preparation}
+    Consider the channel that does not take input, and outputs some state $\rho$: 
+    \[\mathcal{E}\left(1\right) = \rho.\]
+
+    Basically, $\mathcal{E}$ consists in preparing a new state $\rho$. Diagonalising $\rho = \sum_{i} \lambda_i \ket{\lambda_i}\bra{\lambda_i}$, we can take: 
+    \[A_k = \sqrt{\lambda_k} \ket{\lambda_k}.\]
+    
+    Then, we do have that: 
+    \[\sum_{k} A_k^{\dagger} A_k = \sum_{k} \lambda_k \braket{k}{k} = \sum_{k} \lambda_k = \Tr\left(\rho\right) = 1,\]
+    \[\mathcal{E}\left(1\right) = \sum_{k} A_k A_k^{\dagger} = \sum_k \lambda_k \ket{\lambda_k}\bra{\lambda_k} = \rho.\]
+
+    Again, the Kraus operators are not square matrices in this case. In fact, they are just column vectors.
+\end{parag}
+
+\begin{parag}{Example 7: Isometric dynamics}
+    Consider some operator $U$ such that $U^{\dagger} U = I$, but $U U^{\dagger} \neq I$ (note that this requires that $U$ is not rectangular). We then define: 
+    \[\mathcal{E}\left(\rho\right) = U \rho U^{\dagger}.\]
+
+    This is a valid channel in Kraus form. For instance, we may have $U \in \mathbb{C}^{4 \times 2}$ defined such that: 
+    \[U \ket{0} = \frac{\ket{0} + \ket{2}}{\sqrt{2}}, \mathspace U \ket{1} = \frac{\ket{1} + \ket{3}}{\sqrt{2}}.\]
+
+    Note that it is indeed a map that preserves scalar products:
+    \[\bra{0} U^{\dagger} U \ket{0} = \bra{1} U^{\dagger} U \ket{1} = 1, \mathspace \bra{0} U^{\dagger} U \ket{1} = \bra{1} U^{\dagger} U \ket{0} = 0.\]
+
+    However, since it maps a 2D space to a 4D space, it is not invertible.
+\end{parag}
+
+\begin{parag}{Example 8: Measure-record-and-update channel}
+    Let $B_k$ be Kraus operators. We consider the following very important channel, named the \important{measure-record-and-update channel}:
+    \[\mathcal{E}\left(\rho\right) = \sum_{k} \ket{k}\bra{k} \otimes B_k \rho B_k^{\dagger}.\]
+
+    The idea is that $\rho$ is the system being measured, $\ket{k}\bra{k}$ is a classical registrer that captures the measurement outcome, and $B_k \rho B_k^{\dagger}$ gives the state update rule. 
+
+    We will prove the following:
+    \begin{enumerate}[left=0pt]
+        \item Its Kraus operators are $A_k = \ket{k} \otimes B_k$.
+        \item It corresponds to measuring the POVM $\left(M_k\right)$, where $M_k = B_k^{\dagger} B_k$.
+        \item Conditional on measuring outcome $\ket{x}\bra{x}$, that happens with probability $\Tr\left(M_x \rho\right)$, the state collapses to $\ket{x}\bra{x} \otimes B_x \rho B_x^{\dagger}$.
+    \end{enumerate}
+
+    \begin{subparag}{Kraus operators}
+        By hypothesis, the $B_k$ are Kraus operators. Hence, $A_k = \ket{k} \otimes B_k$ are also Kraus operators:
+        \[\sum_{k} A_k^{\dagger} A_k = \sum_{k} \braket{k}{k} B_k^{\dagger} B_k = \sum_{k} B_k^{\dagger} B_k = I.\]
+    \end{subparag}
+
+    \begin{subparag}{Correspondance to POVM}
+        The output state on the classical register is: 
+        \autoeq{\Tr_S\left(\mathcal{E}\left(\rho\right)\right) = \Tr_S\left(\sum_{k} \ket{k}\bra{k} \otimes B_k \rho B_k\right) = \sum_{k} \ket{k}\bra{k} \Tr\left(B_k \rho B_k^{\dagger}\right) = \sum_{k} \Tr\left(M_k \rho\right) \ket{k}\bra{k},}
+        where $M_k = B_k^{\dagger} B_k$. This looks like the POVM formula, that $p_k = \Tr\left(M_k \rho\right)$ tells us the probability to measure outcome $k$: 
+        \[\Tr_S\left(\mathcal{E}\left(\rho\right)\right) = \sum_{k} p_k \ket{k} \bra{k}.\]
+        
+        Moreover, we can prove that these $\left(M_k\right)$ are indeed legit POVM, using the fact the $B_k$ are Kraus operators: 
+        \begin{itemize}[left=0pt]
+            \item \textit{(Normalisation)} $\sum_{k} M_k = \sum_{k} B_k^{\dagger} B_k = I,$
+            \item \textit{(Positivity)} $\bra{\phi} M_k \ket{\phi} = \bra{\phi} B_k^{\dagger} B_k \ket{\phi} = \left\|B_k \ket{\phi}\right\|_2^2 \geq 0$, for all $\ket{\phi}.$
+        \end{itemize}
+    \end{subparag}
+
+    \begin{subparag}{Update rule}
+        If we instead trace out the classical register, we have: 
+        \autoeq{\Tr_x\left(\mathcal{E}\left(\rho\right)\right) = \Tr_x\left(\sum_{k} \ket{k}\bra{k} \otimes B_k \rho B_k^{\dagger}\right) = \sum_{k} \Tr\left(\ket{k}\bra{k}\right) B_k \rho B_k^{\dagger} = \sum_{k} B_k \rho B_k^{\dagger}.}
+        
+        In other words, if we look at the state of a system conditional on obtaining outcome $\ket{x}\bra{x}$, we have: 
+        \[\rho \mapsto \mathcal{E}\left(\rho\right) \over{\mapsto}{get $x$} \ket{x}\bra{x} \otimes B_x \rho B_x^{\dagger},\]
+        with probability $\Tr\left(M_x \rho\right) = \Tr\left(B_x^{\dagger} B_x \rho\right)$. Note that $B_x \rho B_x^{\dagger}$ is not normalised, the normalised output is instead $\rho_x = \frac{B_x \rho B_x^{\dagger}}{\Tr\left(M_x \rho\right)}$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        It is possible to introduce POVM measurements by starting from this channel. However, note that it is not necessary, since we manage developing this theory very well without an update rule.
+
+        In fact, we can consider $B_k' = U B_k$ for some unitary $U$. This gives us some valid Kraus operators associated to the same POVM, since $M_k' = \left(B_k'\right)^{\dagger} B_k' = B_k^{\dagger} U^{\dagger} U B_k = B_k^{\dagger} B_k = M_k$. However, these have a different update rules to the state. This shows that the update rule is not unique given a POVM.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    All these examples show that basically any operation we can take on a state---preparation, evolution, partial trace, measurement, and so on---can be seen as a channel.
+\end{parag}
+
+\begin{parag}{Naimark's dilation theorem}
+    Let $\left\{M_i\right\}_{i=1}^N$ be a POVM acting on a Hilbert space of dimension $d_A$.
+
+    Then, there exists a projective measurement $\left\{\Pi_i\right\}_{i=1}^N$ acting on a space of dimension $d_A'$, and an isometry $V: \mathcal{H}_A \mapsto \mathcal{H}_A'$ such that, for all $i$: 
+    \[M_i = V^{\dagger} \Pi_i V.\]
+    
+    \begin{subparag}{Intuition}
+        This theorem intuitively states that any POVM can be understood as some projective measurement (the usual Quantum physics I measurements) on a larger system.
+
+        This is another instance of the church of the larger Hilbert space. This can moreover be used to realise POVMs physically.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The idea is to use the measure-record-and-update channel: it suffices to introduce classical registers that records the outcome, and then perform a projective measurement on that register. 
+
+        More formally, let $B_k = \sqrt{M_k}$ be the operator such that $B_k^{\dagger} B_k = M_k$. This operator always exists since $M_k$ is positive semi-definite. Indeed, let $M_k = \sum_{i} \lambda_i \ket{\lambda_i}\bra{\lambda_i}$ be its eigen-decomposition. Then, we can simply take $B_k = \sum_{i} \sqrt{\lambda_i} \ket{\lambda_i}\bra{\lambda_i}$, since $\lambda_i \geq 0$ for all $i$ by positive semi-definiteness.
+
+        Then, we can use these to construct:
+        \[V = \sum_{k} \ket{k} \otimes B_k, \mathspace \Pi_k = \ket{k}\bra{k} \otimes I.\]
+
+        Then, we do have: 
+        \autoeq{V^{\dagger} \Pi_i V = \sum_{j, k} \left(\bra{k} \otimes B_k^{\dagger}\right) \left(\ket{i}\bra{i} \otimes I\right) \left(\ket{j} \otimes B_j\right) = \sum_{j, k} \braket{k}{i} \braket{i}{j} B_k^{\dagger} B_j = B_i^{\dagger} B_i = M_i.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+
+\end{document}
