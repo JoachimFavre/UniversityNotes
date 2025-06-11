@@ -1,0 +1,196 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-04-01 at 10:20:39.
+
+\usepackage{../../style}
+
+\title{GIT}
+\author{Joachim Favre}
+\date{Mardi 01 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2025-04-01}{Committing crimes with both direction and magnitude}{
+\begin{itemize}[left=0pt]
+    \item Yes I'm making a Despicable Me reference (Vector is amazing).
+    \item Recall of the definition of vectorisation.
+    \item Many examples of the interest of vectorisation.
+    \item Explanation of the Pauli transfer matrix formalism, and how it relates to vectorisation.
+\end{itemize}
+}
+
+\section{Vectorisation}
+
+\begin{parag}{Recall: Vectorisation}
+    Given $A = \sum_{i, j} a_{ij} \ket{i}\bra{j}$, we define: 
+    \[\kket{A} = \sum_{i, j} a_{ij} \ket{ij}.\]
+
+    \begin{subparag}{Remark}
+        This is super useful in quantum information \textit{(personal remark: this is probably the definition I used most in my TP4, so I can only agree)}, so let us dedicate this lecture to examples.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Ricochet identity}
+    Let $A, X, B$ be operators. Then:
+    \[\kket{AXB} = \left(A \otimes B^T\right) \kket{X}.\]
+
+    \begin{subparag}{Proof}
+        We have already proven this in a previous lecture.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $A, B$ be operators. The trace inner product (i.e. the Hilbert-Schmidt inner product) becomes the vector inner product: 
+    \[\Tr\left(A^{\dagger} B\right) = \bbrakket{A}{B}.\]
+    
+    \begin{subparag}{Proof}
+        Let $A = \sum_{i, j} a_{ij} \ket{i}\bra{j}$ and $B = \sum_{k, l} b_{kl} \ket{k} \bra{l}$ be their representation in the computation basis. Then: 
+        \autoeq{\Tr\left(A^{\dagger} B\right) = \Tr\left(\sum_{ijkl} a_{ij}^* b_{kl} \ket{j} \braket{i}{k} \bra{l}\right) = \Tr\left(\sum_{ijl} a_{ij}^* b_{il} \ket{j}\bra{l}\right) = \sum_{i, j} a_{ij}^* b_{ij}.}
+        
+        Similarly $\kket{A} = \sum_{i, j} a_{ij} \ket{ij}$ and $\kket{B} = \sum_{k, l} b_{kl} \ket{kl}$, hence:
+        \[\bbrakket{A}{B} = \sum_{i j} a_{ij}^* b_{ij}\]
+
+        This does show that $\Tr\left(A^{\dagger} B\right) = \bbrakket{A}{B}$.
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: Expectation value}
+    For any observable $O$ and quantum channel $\mathcal{E}$, we can write the expectation value as: 
+    \[\Tr\left(\mathcal{E}\left(\rho\right) O\right) = \bbrakket{O}{\mathcal{E}\left(\rho\right)}.\]
+\end{parag}
+
+\begin{parag}{Example 2: Unitary evolution}
+    Suppose that $\mathcal{E}\left(\rho\right) = U \rho U^{\dagger}$ is a unitary evolution. Then, by the ricochet identity: 
+    \[\kket{\mathcal{E}\left(\rho\right)} = \kket{U \rho U^{\dagger}} = \left(U \otimes U^*\right) \kket{\rho}.\]
+    
+    In particular, the expectation value can be rewritten as:
+    \[\Tr\left(U \rho U^{\dagger} O\right) = \bbrakket{O}{U \rho U^{\dagger}} = \bbra{O}U \otimes U^* \kket{\rho}.\]
+\end{parag}
+
+\begin{parag}{Example 3: Kraus form}
+    Suppose we have an arbitrary channel in Kraus form, $\mathcal{E}\left(\rho\right) = \sum_{K} K \rho K^{\dagger}$. Then: 
+    \[\kket{\mathcal{E}\left(\rho\right)} = \sum_{K} \kket{K \rho K^{\dagger}} = \left(\sum_{K} K \otimes K^*\right) \kket{\rho}.\]
+
+    In other words, this gives us a super-operator $M_E = \sum_{K} K \otimes K^*$ that acts on vectorised operators, such that $\kket{\mathcal{E}\left(\rho\right)} = M_E \kket{\rho}$.
+\end{parag}
+
+\begin{parag}{Example 4: Product of unitaries}
+    Consider now that we have a product of unitaires $U = U_L \cdots U_1$. This yields: 
+    \[\kket{U \rho U^{\dagger}} = \left(U \otimes U^*\right) \kket{\rho} = \left(U_L \cdots U_1\right) \otimes \left(U_L^* \cdots U_1\right) \kket{\rho} = \left(U_L \otimes U_L^*\right) \cdots \left(U_1 \otimes U_1^*\right) \kket{\rho}.\]
+\end{parag}
+
+\begin{parag}{Example 5: Channel concatenation}
+    Suppose now that we concatenate two channels $\mathcal{E}^{\left(1\right)}\left(\rho\right) = \sum_{j} K_j^{\left(1\right)} \rho \left(K_j^{\left(1\right)}\right)^{\dagger}$ and $\mathcal{E}^{\left(2\right)}\left(\rho\right) = \sum_{k} K_k^{\left(2\right)} \rho \left(K_k^{\left(2\right)}\right)^{\dagger}$, their concatenation looks like, using example 3: 
+    \[\kket{\mathcal{E}_2\left(\mathcal{E}_1\left(\rho\right)\right)} = \sum_{kj} \left(K_k^{\left(2\right)} \otimes K_k^{\left(2\right) *}\right)\left(K_j^{\left(1\right)} \otimes K_j^{\left(1\right) *}\right) \kket{\rho}.\]
+\end{parag}
+
+\begin{parag}{Example 6: Averaging over unitaries}
+    Consider some circuit $U\left(\theta\right)$ parameterised by some vector of parameters $\theta$. We aim to evaluate: 
+    \[\exval_{\theta}\left(\Tr\left(U\left(\theta\right) \rho U\left(\theta\right)^{\dagger} O\right)\right) = \exval_{\theta}\left(\bbra{O} U\left(\theta\right) \otimes U\left(\theta\right)^* \kket{\rho}\right) = \bbra{O} M^{\left(1\right)} \ket{\rho},\]
+    where $M^{\left(1\right)} = \exval_{\theta}\left(U_{\theta} \otimes U_{\theta}^*\right)$ is a matrix we call the first order moment operator. We can compute it, but typically we can look it up since it has already been computed by someone else. We can then use it to calculate the average expectation value for any initial state and observable using this formula.
+
+    \begin{subparag}{Example}
+        For instance, consider: 
+        \[U\left(\theta\right) = R_Z\left(\theta\right) = \exp\left(-i \frac{\theta}{2} Z\right).\]
+        
+        For a $\theta$ picked uniformly at random over $\left[0, 2\pi\right]$, we have: 
+        \autoeq{M^{\left(1\right)} = \exval_{\theta}\left(e^{-i \frac{\theta}{2} Z} \otimes e^{i \frac{\theta}{2} Z}\right) = \exval_{\theta} \left[\begin{pmatrix} \exp\left(-i\frac{\theta}{2}\right) & \\  & \exp\left(i \frac{\theta}{2}\right) \end{pmatrix} \otimes \begin{pmatrix} \exp\left(i\frac{\theta}{2}\right) &  \\  & \exp\left(-i\frac{\theta}{2}\right)  \end{pmatrix}\right]  = \exval_{\theta} \begin{pmatrix} 1 &  &  &  \\  & \exp\left(-i\theta\right) &  &  \\  &  & \exp\left(i \theta\right) &  \\  &  &  & 1 \end{pmatrix} = \begin{pmatrix} 1 &  &  &  \\  & 0 &  &  \\  &  & 0 &  \\  &  &  & 1 \end{pmatrix} = \ket{00}\bra{00} + \ket{11}\bra{11}.}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 7: Higher order moments}
+    It is possible to show that $\Tr\left(A \otimes B\right) = \Tr\left(A\right)\Tr\left(B\right)$. More generally, $\Tr\left(A^{\otimes k}\right) = \Tr\left(A\right)^k$. Hence, we can compute higher order quantum moments: 
+    \autoeq{\exval_{\theta}\left(\Tr\left(U_{\theta} \rho U_{\theta}^{\dagger} O\right)^k\right) = \exval_{\theta}\left[\Tr\left(\left(U_{\theta} \rho U_{\theta}^{\dagger} O\right)^{\otimes k}\right)\right] = \exval_{\theta}\left[\Tr\left(\left(U_{\theta} \rho U_{\theta}^{\dagger}\right)^{\otimes k} O^{\otimes k}\right)\right] = \exval_{\theta}\left[\bbra{O^{\otimes k}} \kket{U_{\theta}^{\otimes k} \rho^{\otimes k} \left(U_{\theta}^{\dagger}\right)^{\otimes k}}\right] = \exval_{\theta}\left[\bbra{O^{\otimes k}} U_{\theta}^{\otimes k} \otimes \left(U_{\theta}^{\otimes k}\right)^* \kket{\rho^{\otimes k}}\right] = \bbra{O^{\otimes k}} M^{\left(k\right)} \kket{\rho^{\otimes k}},}
+    where we defined $M^{\left(k\right)} = \exval_{\theta}\left(U_{\theta}^{\otimes k} \otimes \left(U_{\theta}^{\otimes k}\right)^*\right)$ to be the order-$k$ moment operator.
+
+    \begin{subparag}{Example}
+        For instance, the variance in the result due to $\theta$ is given by:
+        \autoeq{\Var_{\theta}\left(\Tr\left(U_{\theta} \rho U_{\theta}^{\dagger} O\right)\right) = \exval_{\theta}\left[\Tr\left(U_{\theta} \rho U_{\theta}^{\dagger} O\right)^2\right] - \exval_{\theta}\left[\Tr\left(U_{\theta} \rho U_{\theta}^{\dagger}O\right)\right]^2 = \bbra{O^{\otimes 2}} M^{\left(2\right)} \kket{\rho^{\otimes 2}} - \left(\bbra{O} M^{\left(1\right)} \kket{\rho}\right)^2.}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 8: Tensor product of operators}
+    In general: 
+    \[\kket{A \otimes B} \neq \kket{A} \otimes \kket{B}.\]
+
+    To see why this is the case, let us write $A$ and $B$ in the computational basis:
+    \[A = \sum_{i, j} a_{ij} \ket{i}\bra{j} \implies \kket{A} = \sum_{i, j} a_{ij} \ket{ij}, \mathspace .\]
+    \[B = \sum_{kl} b_{kl} \ket{k}\bra{l} \implies \kket{B} = \sum_{k, l} b_{kl} \ket{kl}\]
+
+    Therefore: 
+    \[\kket{A} \otimes \kket{B} = \sum_{i, j} a_{ij} b_{kl} \ket{ij} \otimes \ket{kl}.\]
+    
+    However: 
+    \[A \otimes B = \sum_{ijkl} a_{ij} b_{kl} \ket{i}\bra{j} \otimes \ket{k}\bra{l} = \sum_{i jk l} a_{ij} b_{kl} \ket{ik}\bra{jl} \implies \kket{A \otimes B} = \sum_{ijk l} a_{ij} b_{kl} \ket{ikjl}.\]
+    
+
+    We notice that $\kket{A \otimes B}$ and $\kket{A} \otimes \kket{B}$ are not equal, but that there exists a permutation matrix $P$ such that $\kket{A \otimes B} = P \left(\kket{A} \otimes \kket{B}\right)$ for any $A, B$.
+\end{parag}
+
+\begin{parag}{Example 9: Generic map defined by computation basis action}
+    Suppose we have a description of our channel in the computation basis: 
+    \[\mathcal{E}\left(\ket{i}\bra{j}\right) = \sum_{kl} c_{kl}^{\left(ij\right)} \ket{k}\bra{l}.\]
+
+    This is a full description of the channel (just like $A \ket{i} = \sum_{j} a_j^{\left(i\right)} \ket{j}$ is a full description of a matrix). Moreover, considering an arbitrary state $\rho = \sum_{i, j} \rho_{ij} \ket{i}\bra{j}$:
+    \[\mathcal{E}\left(\rho\right) = \sum_{ij} \rho_{ij} \mathcal{E}\left(\ket{i}\bra{j}\right) = \sum_{ijk l} \rho_{ij} c_{kl}^{\left(ij\right)} \ket{k}\bra{l} \implies \kket{\mathcal{E}\left(\rho\right)} = \sum_{i j kl} \rho_{ij} c_{kl}^{\left(ij\right)} \ket{kl} = M_{\mathcal{E}} \kket{\rho},\]
+    where $M_{\mathcal{E}} = \sum_{ijk l} c_{kl}^{\left(ij\right)} \ket{kl}\bra{ij}$. In other words, our super operator $\mathcal{E}\left(\rho\right)$ was turned into an operator $M_{\mathcal{E}}$: vectorisation turns matrices to vectors, and hence super-operators to matrices.
+
+    This yields for instance that: 
+    \[\Tr\left(\mathcal{E}\left(\rho\right) O\right) = \bbra{O} M_{\mathcal{E}} \kket{\rho}.\]
+        
+    \begin{subparag}{Example}
+        As an example, we may consider $\mathcal{E}\left(\rho\right) = \rho^T$. We have: 
+        \[\mathcal{E}\left(\ket{i}\bra{j}\right) = \ket{j}\bra{i} \implies M_{\mathcal{E}} = \sum_{i, j} \ket{ji}\bra{ij} = SWAP.\]
+
+        In particular, this shows that: 
+        \[\kket{\rho^T} = SWAP \kket{\rho}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 10: Pauli transfer matrix formalism}
+    We have worked in the computation basis $\ket{0} = \ket{00}, \ket{1} = \ket{01}, \ket{2} = \ket{10}, \ket{3} = \ket{11}$ above, but often the Pauli basis is better. In other words, we want to consider $I \equiv \ket{0}, X \equiv \ket{1}, Y \equiv \ket{2}, Z \equiv \ket{3}$. We wish to formalise exactly what this means.
+
+    Let's say that we know the action of our operator in terms of what it does to Paulis: 
+    \[\mathcal{E}\left(P_i\right) = \sum_{j} c_{j}^{\left(i\right)} P_j.\]
+    
+    We define the coefficients $c_j^{\left(i\right)}$ to be the coefficients of a matrix, which we call the \important{Pauli transfer matrix}.
+
+    For instance, consider the Hadamard gate: 
+    \[H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}, \mathspace \mathcal{E}\left(\rho\right) = H \rho H^{\dagger}.\]
+
+    It is possible to show that: 
+    \[H I H = I, \mathspace H X H = Z, \mathspace H Y H = -Y, \mathspace H Z H = X.\]
+    
+    Hence, our Pauli transfer matrix looks like: 
+    \[M_H^{PT} = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & -1 & 0 \\ 0 & 1 & 0 & 0 \end{pmatrix}.\]
+
+    For instance, $Y \equiv \ket{3}$ and we do have $M_H^{PT} \ket{3} = -\ket{3}$, which does mean $H Y H = -Y$.
+
+    \begin{subparag}{Remark}
+        More formally, the Pauli transfer matrix formalism is just a change of basis: this is the vectorised picture, put in the Pauli (or Bell) basis. Let us justify this.
+
+        Consider again the same example:
+        \[M_H = \kket{H \rho H} = \left(H \otimes H\right) \kket{\rho} = \frac{1}{2} \begin{pmatrix} 1 & 1 & 1 & 1 \\ 1 & -1 & 1 & -1 \\ 1 & 1 & -1 & -1 \\ 1 & -1 & -1 & 1 \end{pmatrix} \kket{\rho}.\]
+
+        It is possible to check that vectorising the Pauli operators, we get the Bell states (up to normalisation and global phase): 
+        \[\frac{1}{\sqrt{2}} \kket{I} \equiv \ket{\phi^+}, \mathspace \frac{1}{\sqrt{2}} \kket{X} \equiv \ket{\psi^+}, \mathspace \frac{1}{\sqrt{2}} \kket{Y} \equiv \ket{\psi^-}, \mathspace \frac{1}{\sqrt{2}} \kket{Z} \equiv \ket{\phi^-}.\]
+
+        So, our claim states that $M_H$ and $M_{H}^{PT}$ are equal up to a change of basis from the computation basis to the Bell basis. Leaving $\ket{b_0} = \ket{\phi^+}, \ket{b_1} = \ket{\psi^+}, \ket{b_2} = \ket{\psi^-}, \ket{b_3} = \ket{\phi^-}$, we can consider the change of basis matrix $S_{bell}$: 
+        \[\frac{1}{\sqrt{2}} \kket{P_i} = S_{bell} \ket{b_i}.\]
+
+        It is then possible to prove that, indeed:
+        \[M_H^{PT} = S_{bell}\left(H \otimes H\right) S_{bell}^{\dagger}.\]
+
+        In this case, we can again find that $HYH = -Y$, since: 
+        \[M_H \frac{\kket{Y}}{\sqrt{2}} = \frac{1}{2} \begin{pmatrix} 1 & 1 & 1 & 1 \\ 1 & -1 & 1 & -1 \\ 1 & 1 & -1 & -1 \\ 1 & -1 & -1 & 1 \end{pmatrix}\cdot \frac{1}{\sqrt{2}} \begin{pmatrix} 0 \\ i \\ -i \\ 0 \end{pmatrix}  = \frac{\kket{-Y}}{\sqrt{2}}.\]
+
+        This is indeed very similar to the equality $M_H^{PT} \ket{3} = -\ket{3}$ we found earlier.
+    \end{subparag}
+\end{parag}
+
+\end{document}

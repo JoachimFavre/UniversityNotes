@@ -1,0 +1,156 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-25 at 10:16:06.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mardi 25 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2025-03-25}{Isometric invariance}{
+\begin{itemize}[left=0pt]
+    \item Example on how to find the Kraus operators using the Choi state, and formalisation of the technique to an algorithm.
+    \item Proof that ensemble decompositions are linked through isometries.
+    \item Proof that Kraus operators are linked through isometries.
+    \item Summary of quantum channel representation, and parallel with quantum states.
+\end{itemize}
+    
+}
+
+\begin{parag}{Example}
+    We want to explore more deeply how Choi representation can help us Kraus operators. Consider for instance the following channel: 
+    \[\mathcal{E}\left(X\right) = \frac{1}{3} \left(\Tr\left(X\right) I + X^T\right).\]
+
+    We first compute the Choi state: 
+    \autoeq{J\left(\mathcal{E}\right) = \sum_{i, j} \mathcal{E}\left(\ket{i}\bra{j}\right) \otimes \ket{i}\bra{j}= \sum_{i, j} \frac{1}{3} \left(\underbrace{\Tr\left(\ket{i}\bra{j}\right)}_{= \delta_{ij}} I + \left(\ket{i}\bra{j}\right)^T\right) \otimes \ket{i}\bra{j} = \frac{1}{3} \left(\sum_{i} I \otimes \ket{i}\bra{i} + \sum_{i, j} \ket{j}\bra{i} \otimes \ket{i}\bra{j}\right) = \frac{1}{3}\left(I \otimes I + SWAP\right).}
+    where we used the fact $SWAP \ket{ij} = \ket{ji}$ is the basis representation of SWAP.
+    
+    Now, we know that that diagonalising $J\left(\mathcal{E}\right)$ will give us the $A_i$. We can use the fact both $I \otimes I$ and $SWAP$ are diagonal in the Bell basis: 
+    \autoeq{J\left(\mathcal{E}\right) = \frac{1}{3} \left(I + \ket{\phi^+}\bra{\phi^+} + \ket{\phi^-}\bra{\phi^-} + \ket{\psi^+}\bra{\psi^+} - \ket{\psi^-}\bra{\psi^-}\right) = \frac{2}{3} \ket{\phi^+}\bra{\phi^+} + \frac{2}{3} \ket{\phi^-}\bra{\phi^-} + \frac{2}{3} \ket{\psi^+}\bra{\psi^+}.}
+    
+    This is of the form $J\left(\mathcal{E}\right) = \sum_{i} \kket{A_i}\bbra{A_i}$ if we let: 
+    \[\kket{A_0} = \sqrt{\frac{2}{3}} \ket{\phi^+} = \frac{\ket{00}+ \ket{11}}{\sqrt{3}} \implies A_0 = \frac{\ket{0}\bra{0} + \ket{1}\bra{1}}{\sqrt{3}} = \frac{1}{\sqrt{3}}I,\]
+    \[\kket{A_1} = \sqrt{\frac{2}{3}} \ket{\phi^-} = \frac{\ket{00} - \ket{11}}{\sqrt{3}} \implies A_1 = \frac{\ket{0}\bra{0} - \ket{1}\bra{1}}{\sqrt{3}} = \frac{1}{\sqrt{3}} Z,\]
+    \[\kket{A_2} = \sqrt{\frac{2}{3}} \ket{\psi^+} = \frac{\ket{01} + \ket{10}}{\sqrt{3}} \implies A_2 = \frac{\ket{0}\bra{1} + \ket{1}\bra{0}}{\sqrt{3}} = \frac{1}{\sqrt{3}} X.\]
+
+    These are genuine Kraus operators:
+    \[\sum_{i} A_i^{\dagger} A_i = \frac{1}{3}\left(I^2 + Z^2 + X^2\right) = \frac{1}{3}\left(3I\right) = I.\]
+    
+    Note that these Kraus operators are not unique. We made a choice of basis for the eigenspace associated to the eigenvalue $+1$ of $SWAP$, but we could also have used the basis $\ket{00}, \ket{11}, \ket{\psi^+}, \ket{\psi^-}$, giving:  
+    \[J\left(\mathcal{E}\right) = \frac{2}{3}\ket{00}\bra{00} + \frac{2}{3} \ket{11}\bra{11} + \frac{2}{3} \ket{\psi^+}\bra{\psi^+}.\]
+
+    This would yield: 
+    \[A_0' = \sqrt{\frac{2}{3}}\ket{0}\bra{0}, \mathspace A_1' = \sqrt{\frac{2}{3}} \ket{1}\bra{1}, \mathspace A_2' = \frac{1}{\sqrt{3}} X.\]
+    
+    This same general recipe works for any quantum channel.
+\end{parag}
+
+\begin{parag}{General recipe for finding Kraus operators}
+    Let $\mathcal{E}$ be an arbitrary quantum channel. We describe a general recipe (i.e. an algorithm) for finding valid Kraus operators.
+    \begin{enumerate}
+        \item Compute its Choi state $J\left(\mathcal{E}\right)$.
+        \item Find the eigendecomposition $J\left(\mathcal{E}\right) = \sum_{k} \lambda_k \ket{\lambda_k}\bra{\lambda_k}$.
+        \item Find $A_k$ such that $\kket{A_k} = \sqrt{\lambda_k} \ket{\lambda_k}$.
+    \end{enumerate}
+
+    The $\left\{A_k\right\}$ is the smallest set of Kraus operators for $\mathcal{E}$.
+
+    \begin{subparag}{Remark}
+        We can have a less compact representation (i.e. with more Kraus operations) if we start with a non-minimal ensemble decomposition and unvectorise that. For instance, we may be able to write: 
+           \[J\left(\mathcal{E}\right) = \frac{\ket{00}\bra{00} + \ket{11}\bra{11} + \ket{01}\bra{01} + \ket{10}\bra{10} + \ket{++}\bra{++}}{5}.\]
+
+           This is a legit ensemble decomposition, and it can be used for this recipe to get valid Kraus operators. However, this is not a eigendecomposition of $J\left(\mathcal{E}\right)$; the latter would give a smaller ensemble decomposition.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        The fact this outputs valid Kraus operators for $\mathcal{E}$ is a direct consequence from the previous theorem. We will not prove that this is indeed the minimum set of Kraus operators for $\mathcal{E}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\rho$ be an arbitrary (not necessarily normalised) quantum state. We consider the eigendecomposition of $\rho$:
+    \[\rho = \sum_{k} \lambda_k \ket{\lambda_k}\bra{\lambda_k}.\]
+
+    Moreover, we consider some arbitrary ensemble decomposition of $\rho$: 
+    \[\rho = \sum_{i} p_i \ket{\phi_i}\bra{\phi_i}.\]
+
+    Then, they are related by an isometry $U$: 
+    \[\sqrt{p}_i \ket{\phi_i} = \sum_{k} U_{ik} \sqrt{\lambda_k} \ket{\lambda_k}.\]
+
+    \begin{subparag}{Proof}
+        We suppose by hypothesis that: 
+        \[\rho = \sum_{k=0}^{d-1} \lambda_k \ket{\lambda_k}\bra{\lambda_k} = \sum_{i=0}^{n-1} p_i \ket{\phi_i}\bra{\phi_i}.\]
+
+        We can use these to make purifications of $\rho$:
+        \[\ket{\psi} = \sum_{k} \sqrt{\lambda_k} \ket{\lambda_k} \otimes \ket{k}, \mathspace \ket{\phi} = \sum_{i} \sqrt{p_i} \ket{\phi_i} \otimes \ket{i}.\]
+        
+        However, since $\ket{\psi}$ and $\ket{\phi}$ are both purifications of the same state $\rho$, and since $\ket{\Psi}$ is obtained through the eigendecomposition of $\rho$ and is hence minimal, we know that there exists an isometry $U$ such that: 
+        \[\ket{\phi} = \left(I \otimes U\right) \ket{\psi}.\]
+
+        Now, we also notice that: 
+        \[\sqrt{p_i} \ket{\phi_i} = \left(I \otimes \bra{i}\right) \sum_{j} \sqrt{p_j} \ket{\phi_j} \otimes \ket{j} = \left(I \otimes \bra{i}\right) \ket{\phi}.\]
+
+        But then, using the fact $\ket{\phi} = \left(I \otimes U\right) \ket{\psi}$:
+        \autoeq{\sqrt{p_i} \ket{\phi_i} = \left(I \otimes \bra{i}\right) \left(I \otimes U\right) \ket{\psi} = \sum_{k} \sqrt{\lambda_k} \left(I \otimes \bra{i} U\right) \left(\ket{\lambda_k} \otimes \ket{k}\right) = \sum_{k} \sqrt{\lambda_k} \ket{\lambda_k} \cdot \left(\bra{i} U \ket{k}\right) = \sum_{k} \sqrt{\lambda_k} U_{ik} \ket{\lambda_k}.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Unitary mixing freedom in Kraus representation}
+    Let $\mathcal{E}$ be a quantum channel. Let $\left(A_k\right)$ be the Kraus operators obtained by diagonalising $J\left(\mathcal{E}\right)$, and let $\left(B_k\right)$ be an arbitrary set of Kraus operators of $\mathcal{E}$.
+
+    Then, there exists some isometry $U$ such that, for all $i$: 
+    \[B_i = \sum_{k} U_{ik} A_k.\]
+
+    \begin{subparag}{Intuition}
+        In other words, there is an isometry freedom in the choice of the Kraus operators of a channel.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Considering the Choi state of $\mathcal{E}$, we know that: 
+        \[J\left(\mathcal{E}\right) = \sum_{k} \kket{B_k}\bbra{B_k} = \sum_{k} \kket{A_k}\bbra{A_k}.\]
+
+        Since the $\left(A_k\right)$ are obtained by diagonalising $J\left(\mathcal{E}\right)$, $\sum_{k} \kket{A_k}\bbra{A_k}$ is an eigendecomposition of $J\left(\mathcal{E}\right)$ and hence we can apply our previous lemma. These are two ensemble decompositions of the same (not normalised) state, hence, there exists an isometry $U$ such that, for all $i$: 
+        \[\kket{B_i} = \sum_{k} U_{ik} \kket{A_k}.\]
+
+        By the linearity of the vectorised notation (since $U_{ik} \in \mathbb{C}$ are scalars), this means that: 
+        \[\kket{B_i} = \kket{\sum_{k} U_{ik} A_k}.\] 
+        
+        Moreover, since the vectorised notation is bijective, this does give our result: 
+        \[B_i = \sum_{k} U_{ik} A_k.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Summaries}
+
+\begin{parag}{Channel representation summary}
+    We found three ways of completely describing a channel: its Kraus form, the Stinespring dilation and the Choi state. They are strongly linked between one another, and one may be simpler to work with than another depending on the situation.
+\end{parag}
+
+\begin{parag}{Representation summary}
+    We can make the following interesting parallel between states and channels.
+    \svghere{RepresentationSummary.svg}
+
+    On this table, we also show how different ensemble decompositions $\left(p_i, \ket{\phi_i}\right), \left(\lambda_i, \ket{\lambda_i}\right)$, different Kraus representations $\left(A_i\right), \left(B_i\right)$ and different purifications $\ket{\Psi}, \ket{\Phi}$ are linked through isometries $V$. It is in fact also possible to show that Stinespring dilation are unique up to an isometry on the system $\mathcal{H}_E$.
+
+    \begin{subparag}{Remark}
+        POVMs also have an interpretation through the church of the larger Hilbert space, thanks to the measure-register-and-update channel.
+    \end{subparag}
+\end{parag}
+
+
+
+
+\end{document}

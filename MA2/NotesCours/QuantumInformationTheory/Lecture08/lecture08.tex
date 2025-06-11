@@ -1,0 +1,229 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-04-15 at 10:14:14.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mardi 15 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2025-04-15}{Omg this is Algorithms 2}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the shot noise question, and examples.
+    \item Proof of Chebyshev's inequality and explanation of its implication.
+    \item Explanation of Hoeffding's inequality.
+\end{itemize}
+
+}
+
+\section{Shot noise question}
+
+\subsection{Esimators}
+
+\begin{parag}{Theorem}
+    Let $M = \sum_{m=1}^{\alpha} \lambda_m \ket{\lambda_m}\bra{\lambda_m}$ be an observable, $\rho$ be a state and $N$ be an arbitrary integer. 
+
+    We construct an estimator of the expected value $\bar{M} = \Tr\left(M \rho\right)$, by producing $N$ times the state $\rho$, measuring it each time in the eigenbasis of $M$ to get some eigenvalue and averaging the results. In other words, we define:
+    \[\hat{M}_N = \frac{1}{N}\sum_{s=1}^{N} \lambda_{m\left(s\right)},\]
+    where $\lambda_{m\left(s\right)}$ is the eigenvalue we get at the $s$\Th sample.
+    
+    Then, this is an unbiased estimator:
+    \[\exval\left(\hat{M}_N\right) = \Tr\left(M \rho\right).\]
+    
+    Moreover, leaving $\Var_{\rho}\left(M\right) = \Tr\left(\rho M^2\right) - \Tr\left(\rho M\right)^2$ to be the quantum variance, the variance of our estimator is given by:
+    \[\Var\left(\hat{M}_N\right) = \frac{\Var_{\rho}\left(M\right)}{N}.\]
+    
+    \begin{subparag}{Intuition}
+        We will formalise this idea later but, roughly, $\epsilon = \sqrt{\Var\left(\hat{M}_N\right)}$ is a measure of the absolute error. Hence, to have an arbitrary precision, this requires: 
+        \[\epsilon = \sqrt{\frac{\Var_{\rho}\left(M\right)}{N}} \implies N = \frac{\Var_{\rho}\left(M\right)}{\epsilon^2}.\]
+
+        This shows that the smaller $\Var_{\rho}\left(M\right)$ the better.
+    \end{subparag}
+
+    \begin{subparag}{Proof expectation}
+        Let us first find the expectation of a single shot. By definition of expectation:
+        \[\exval\left(\lambda_{m\left(s\right)}\right) = \sum_{m\left(s\right)} \lambda_{m\left(s\right)}\prob\left(m\left(s\right)\right).\]
+
+        By standard quantum mechanics, $\prob\left(\lambda_{m\left(s\right)}\right) = \bra{\lambda_{m\left(s\right)}} \rho \ket{\lambda_{m\left(s\right)}}$, hence: 
+        \autoeq{\exval\left(\lambda_{m\left(s\right)}\right) = \sum_{m\left(s\right)} \lambda_{m\left(s\right)} \bra{\lambda_{m\left(s\right)}} \rho \ket{\lambda_{m\left(s\right)}} = \Tr\left(\rho \sum_{m\left(s\right)} \lambda_{m\left(s\right)} \ket{\lambda_{m\left(s\right)}}\bra{\lambda_{m\left(s\right)}}\right) = \Tr\left(\rho M\right).}
+
+        We can now use the linearity of the expectation to get our result: 
+        \[\exval\left(\hat{M}_N\right) = \frac{1}{N} \sum_{s=1}^{N} \exval\left(\lambda_{m\left(s\right)}\right) = \frac{1}{N} \sum_{s=1}^{N} \Tr\left(\rho M\right) = \Tr\left(\rho M\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Proof variance}
+        Let us again first evaluate the variance of a single shot. To do that, we first compute the second moment: 
+        \[\exval\left(\lambda_{m\left(s\right)}^2\right) = \sum_{m\left(s\right)} \lambda_{m\left(s\right)}^2 \prob\left(m\left(s\right)\right) = \sum_{m\left(s\right)} \lambda_{m\left(s\right)}^2 \bra{\lambda_{m\left(s\right)}} \rho \ket{\lambda_{m\left(s\right)}} = \Tr\left(\rho M^2\right).\]
+
+        Hence, using the fact $\exval\left(\lambda_{m\left(s\right)}\right) = \Tr\left(\rho M\right)$ we proved in the previous subparagraph, the variance of a single shot is given by: 
+        \[\Var\left(\lambda_{m\left(s\right)}\right) = \exval\left(\lambda_{m\left(s\right)}^2\right) - \exval\left(\lambda_{m\left(s\right)}\right)^2 = \Tr\left(\rho M^2\right) - \Tr\left(\rho M\right)^2 = \Var_{\rho}\left(M\right).\]
+       
+        Now, it is well known that $\Var\left(X + Y\right) = \Var\left(X\right) + \Var\left(Y\right)$ for independent random variables $X, Y$. This thus gives our result: 
+        \[\Var\left(\hat{M}_N\right) = \frac{1}{N^2} \sum_{s=1}^{N} \Var\left(\lambda_{m\left(s\right)}\right) = \frac{1}{N^2} \sum_{s=1}^{N} \Var_{\rho}\left(M\right) = \frac{\Var_{\rho}\left(M\right)}{N}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    Consider two ways of estimating fidelity (i.e. overlaps) between two states, $\left|\braket{\psi}{\phi}\right|^2$. 
+    \begin{enumerate}[left=0pt]
+        \item For the first one, we start by considering the unitary matrices $U_{\psi}$ and $U_{\phi}$ that prepare the states $\ket{\psi}$ and $\ket{\phi}$, respectively:
+        \[\ket{\psi} = U_{\psi}\ket{0}, \mathspace \ket{\phi} = U_{\phi} \ket{0}.\]
+
+        Then, the fidelity becomes: 
+        \autoeq{\left|\braket{\psi}{\phi}\right|^2 = \left|\bra{0} U_{\psi}^{\dagger} U_{\phi} \ket{0}\right|^2 = \bra{0} U_{\psi}^{\dagger} U_{\phi} \ket{0} \bra{0} U_{\phi}^{\dagger} U_{\psi} \ket{0} = \bra{\psi} U_{\phi} \ket{0}\bra{0} U_{\phi}^{\dagger} \ket{\psi} = \Tr\left(\ket{0}\bra{0} U_{\phi^{\dagger}} \ket{\psi}\bra{\psi} U_{\phi}\right) = \Tr\left(M \rho\right),}
+        where $M = \ket{0}\bra{0}$ is the observable and $\rho = U_{\phi}^{\dagger} \ket{\psi}\bra{\psi} U_{\phi}$ is a state (prepared for instance using a quantum computer). This shows that we can measure $\rho$ in the $M$ basis.
+        
+        \item The second approach uses a SWAP. So, leaving $\rho = \ket{\psi}\bra{\psi} \otimes \ket{\phi}\bra{\phi}$:
+        \[\Tr\left(SWAP \rho\right) = \left(\bra{\psi}\otimes \bra{\phi}\right) SWAP \left(\ket{\psi} \otimes \ket{\phi}\right) = \left(\bra{\psi} \otimes \bra{\phi}\right)\left(\ket{\phi} \otimes \ket{\psi}\right) = \left|\braket{\psi}{\phi}\right|^2.\]
+
+        This shows that we can just measure $\rho$ in the $M = SWAP$ basis (which is, in fact, just the Bell basis).
+    \end{enumerate}
+
+    These two methods are valid, but we want to know which is better. To do that, we need to compute their variance.
+    \begin{enumerate}[left=0pt]
+        \item In the first case, $M = \ket{0}\bra{0}$ and $\rho = U_{\phi}^{\dagger} \ket{\psi}\bra{\psi} U_{\phi}$, hence:
+        \autoeq{\Var_{\rho}\left(M\right) = \Tr\left(M^2 \rho\right) - \Tr\left(\rho M\right)^2 = \Tr\left(\ket{0}\bra{0} \rho\right) - \Tr\left(\ket{0}\bra{0} \rho\right)^2 = \bra{0} U_{\phi}^{\dagger} \ket{\psi}\bra{\psi} U_{\phi} \ket{0} - \left(\bra{0} U_{\phi}^{\dagger} \ket{\psi}\bra{\psi} U_{\phi} \ket{0}\right)^2 = \left|\braket{\phi}{\psi}\right|^2 - \left|\braket{\phi}{\psi}\right|^4.}
+        
+        \item In the second case, $M = SWAP$ and $\rho = \ket{\psi}\bra{\psi} \otimes \ket{\phi}\bra{\phi}$, hence: 
+        \[\Var_{\rho}\left(M\right) = \Tr\left(\rho M^2\right) - \Tr\left(\rho M\right)^2 = \Tr\left(\rho\right) - \left(\left|\braket{\phi}{\psi}\right|^2\right)^2 = 1 - \left|\braket{\phi}{\psi}\right|^4.\]
+    \end{enumerate}
+    
+    Hence, in the first case, there is a smaller variance. This shows that we will need less samples for the first case to converge. This result may appear counter-intuitive, showing variance should generally be computed instead of using intuition.
+
+    \begin{subparag}{Remark}
+        Note that, in practice the second case may be simpler to use since we may not be able to find $U_{\phi}$ and $U_{\psi}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2: Marco Cerezo's problem}
+    Let us see a more real example, through a problem a colleague of Prof. Holmes met in their research.
+
+    Our goal is to compute $\left\langle Z^{\otimes n} \right\rangle$, for some fixed state $\rho$. We see the two following methods, where all measures are done in the $Z$ basis (i.e. the computation basis).
+    \begin{center}
+    \begin{quantikz}
+        \lstick[wires=4]{\rho} &          &          &          & \meter{} \\
+                               &          &          &          & \meter{} \\
+                               &          &          &          & \meter{} \\
+                               &          &          &          & \meter{} 
+    \end{quantikz}
+    \hspace{3em}
+    \begin{quantikz}
+        \lstick[wires=4]{\rho} & \ctrl{1} &          &                    &  \\
+                               & \targ{}  & \ctrl{1} &                    & \\
+                               &          & \targ{}  & \ctrl{1}\slice{$\rho'$} & \\
+                               &          &          & \targ{}            & \meter{} 
+    \end{quantikz}
+    \end{center}
+
+    \begin{subparag}{Expectation}
+        We first want to verify they both measure $\left\langle Z^{\otimes n} \right\rangle = \Tr\left(\rho Z^{\otimes n}\right)$. The first one does it trivially, so let us consider the second one.
+
+        Let's suppose $\rho = \ket{i_1, \ldots, i_n}\bra{i_1, \ldots, i_n}$ is a pure state in the computation basis state. Note that $\left\langle Z^{\otimes n} \right\rangle$ is $1$ if there is an even number of ones in $\left(i_1, \ldots, i_n\right)$, and $-1$ otherwise. Applying the chain of $CNOT$ on our state, the state $\rho'$ before the measurement is:
+        \[\ket{i_1, i_1 \oplus i_2, i_1 \oplus i_2 \oplus i_3, \ldots, i_1 \oplus \ldots \oplus i_N}.\]
+         
+        Hence, the last qubit is $\ket{0}$ if there is an even number of $1$, and $\ket{1}$ if there is an odd number. Hence, $\Tr\left(Z_n \rho'\right)$ is $1$ if there is an even number of $1$, and $-1$ otherwise.
+
+        This does show that $\Tr\left(\rho Z^{\otimes n}\right) = \Tr\left(\rho' Z_n\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Variance}
+        To be able to know which method is best, we again compute the variance. These are easy since our measurements $M = Z^{\otimes n}$ and $M = Z_n$ are such that $M^2 = I$, so:
+        \begin{enumerate}[left=0pt]
+            \item $\Var_{\rho}\left(M\right) = \Tr\left(\rho M^2\right) - \Tr\left(\rho M\right)^2 = 1 - \Tr\left(\rho Z^{\otimes n}\right)^2$.
+            \item $\Var_{\rho'}\left(M'\right) = \Tr\left(\rho' M'^2\right) - \Tr\left(\rho' M'\right)^2 = 1 - \Tr\left(\rho' Z_n\right)^2$. 
+        \end{enumerate}
+
+        We found above that $\Tr\left(\rho Z^{\otimes n}\right) = \Tr\left(\rho' Z_n\right)$. Hence, the two variances are the same. This shows that there isn't a method which is better than the other.
+
+        In fact, another way to see this is because, in the Heisenberg picture, applying the $CNOT$ on the observable $Z_n$ results in the observable $Z^{\otimes n}$. Hence, the two circuits must be equivalent.
+    \end{subparag}
+\end{parag}
+
+\subsection{Probability bound}
+
+\begin{parag}{Probability bounds}
+    We are given a random variable $Z$ with expectation $\exval\left(Z\right)$, and we wonder how likely it is that $Z$ is close to $\exval\left(Z\right)$.
+
+    This allows to formalise the expected error.
+\end{parag}
+
+\begin{parag}{Markov's inequality}
+    Let $Z$ be a non-negative random variable, i.e. $\prob\left(Z \geq 0\right) = 1$. Then, for all $t > 0$: 
+    \[\prob\left(Z \geq t\right) \leq \frac{\exval\left(Z\right)}{t}.\]
+
+    \begin{subparag}{Proof}
+        Using the law of total expectation, and the fact that $Z \geq 0$ means $\exval\left(Z \suchthat Z < t\right) \geq 0$:
+        \autoeq{\exval\left(Z\right) = \exval\left(Z \suchthat Z \geq t\right)\prob\left(Z \geq t\right)+ \exval\left(Z \suchthat Z < t\right)\prob\left(Z < t\right) \geq \exval\left(Z \suchthat Z \geq t\right) \prob\left(Z \geq t\right) \geq t \prob\left(Z \geq t\right).}
+        
+        We get our result by dividing both sides by $t$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Chebyshev's inequality}
+    Let $Z$ be an arbitrary random variable. Then, for all $t > 0$: 
+    \[\prob\left(\left|Z - \exval\left(Z\right)\right| \geq t\right) \leq \frac{\Var\left(Z\right)}{t^2}.\]
+
+    \begin{subparag}{Intuition}
+        This is a more rigorous way to show why the variance of an estimator matters, and why the variance shows how quickly an estimator converge.
+
+        Indeed, let's consider again the case where we have an estimator $\hat{M}_N$ such that $\exval\left(\hat{M}_N\right) = \Tr\left(M \rho\right)$ and $\Var\left(\hat{M}_N\right) = \frac{\Var_{\rho}\left(M\right)}{N}$. Then:
+        \[\prob\left(\left|\hat{M}_n - \Tr\left(M \rho\right)\right| \geq t\right) \leq \frac{\Var\left(\hat{M}_N\right)}{t^2} = \frac{\Var_{\rho}\left(M\right)}{N t^2}.\]
+
+        We may want that $\hat{M}_N = \Tr\left(M \rho\right) \pm \epsilon$ with some probability at least $1 - \delta$, i.e.: 
+        \[\prob\left(\left|\hat{M}_n - \Tr\left(M \rho\right)\right| \geq \epsilon\right) \leq \delta.\]
+
+        By our inequality above, this is guaranteed if:
+        \[\frac{\Var_{\rho}\left(M\right)}{N \epsilon^2} \leq \delta \implies N \geq \frac{\Var_{\rho}\left(M\right)}{\delta \epsilon^2}\]
+
+        This does show the importance of having a small quantum variance $\Var_{\rho}\left(M\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+       Consider the random variable $Y = \left(Z - \exval\left(Z\right)\right)^2$. It is positive, so we can use Markov's inequality: 
+       \autoeq{\prob\left(\left|Z - \exval\left(Z\right)\right| \geq t\right) = \prob\left(\left(Z - \exval\left(Z\right)\right)^2 \geq t^2\right) = \prob\left(Y \geq t^2\right) \leq \frac{\exval\left(Y\right)}{t^2} = \frac{\exval\left(\left(Z - \exval\left(Z\right)\right)^2\right)}{t^2} = \frac{\Var\left(Z\right)}{t^2}.}
+
+       \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Hoeffding's inequality}
+    Let $X_1, \ldots, X_N$ be independent random variables, such that $a_i \leq X_i \leq b_i$ for some $a_i, b_i \in \mathbb{R}$. Also, let $S_N = \sum_{i} X_i .$. Then: 
+    \[\prob\left(\left|S_n - \exval\left(S_n\right)\right| \geq t\right) \leq 2 \exp\left(-\frac{2 t^2}{\sum_{i} \left(b_i - a_i\right)^2}\right).\]
+
+    \begin{subparag}{Example}
+        Consider for instance: 
+        \[\hat{M}_N = \frac{1}{N} \sum_{s=1}^{N} \lambda_{m\left(s\right)} = \sum_{s=1}^{N} \frac{\lambda_{m\left(s\right)}}{N}.\]
+
+        Hence, we can consider $X_i$ to be $\frac{\lambda_{m\left(s\right)}}{N}$. By construction, this is such that $S_N = \hat{M}_N$. Note that: 
+        \[\frac{\lambda_{min}}{N} \leq \frac{\lambda_{m\left(s\right)}}{N} \leq \frac{\lambda_{max}}{N}.\]
+        
+        Hence: 
+        \[\sum_{i} \left(b_i - a_i\right)^2 = \sum_{s=1}^{N} \left(\frac{\lambda_{max} - \lambda_{min}}{N}\right)^2 = \frac{\Delta \lambda^2}{N}.\]
+
+        So: 
+        \[\prob\left(\left|\hat{M}_N - \Tr\left(\rho M\right)\right| \geq t\right) \leq 2 \exp\left(-\frac{2 N t^2}{\Delta \lambda^2}\right).\]
+        
+        We are able to guarantee that $\hat{M}_N$ is in range $\Tr\left(\rho M\right) \pm \epsilon$ with probability $1 - \delta$ when:
+        \[2 \exp\left(-\frac{2 N \epsilon^2}{\Delta \lambda^2}\right) \leq \delta \implies N \geq \frac{\Delta \lambda^2}{2 \epsilon^2} \ln\left(\frac{2}{\delta}\right).\]
+
+        This gives us another interpretation of convergence speed, through the size of the eigenspectrum $\Delta \lambda = \lambda_{max} - \lambda_{min}$.
+
+        For instance, for Marco's problem, we had $M_A = Z^{\otimes n}$ and $M_B = Z_n$. In both cases, $\Delta \lambda = \lambda_{max} - \lambda_{min} = 1 - \left(-1\right) = 2$. Since this is the only object that depends on the measurement, we have the same bound for the two.
+
+        On the other hand, for the fidelity problem, $M_A = \ket{0}\bra{0}$ and $M_B = SWAP$, so $\Delta \lambda_A = 1$ and $\Delta \lambda_B = 2$. We get a better bound in the first case.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

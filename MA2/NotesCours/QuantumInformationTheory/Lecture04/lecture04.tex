@@ -17,7 +17,7 @@
 \lecture{4}{2025-03-11}{Everything is a quantum channel}{
 \begin{itemize}[left=0pt]
     \item Definition of quantum channel.
-    \item Explanation of the Kraus representation theorem.
+    \item Explanation of the (Kraus) representer theorem.
     \item Many examples of channel, including the completely dephasing channel, the completely depolarising channel, the partial trace channel, state preparation and the measure-record-and-update channel.
     \item Proof of Naimark's dilation theorem.
 \end{itemize}
@@ -54,12 +54,16 @@
     \end{subparag}
 \end{parag}
 
-\begin{parag}{Theorem: Kraus representation}
+\begin{parag}{Theorem: Representer theorem}
     Let $\mathcal{E}$ be a super-operator.
 
     $\mathcal{E}$ is a valid quantum channel if and only if there exists operators $\left(A_i\right)$ such that $\sum_{i} A_i^{\dagger} A_i = I$ and $\mathcal{E}\left(\rho\right) = \sum_{i} A_i \rho A_i^{\dagger}$ .
 
     This is named the \important{Kraus representation} of $\mathcal{E}$, and the $\left(A_i\right)$ are named \important{Kraus operators}.
+
+    \begin{subparag}{Remark}
+        This gives a way of proving that a super-operator $\mathcal{E}$ is a valid quantum channel: if we find Kraus operators, then we know it is a quantum channel. In particular, this gives us a way to prove a super-operator is completely positive.
+    \end{subparag}
 
     \begin{subparag}{Proof $\implies$}
         We will not prove that any quantum channel admits a Kraus form in this class.
@@ -155,8 +159,23 @@
     Again, the Kraus operators are not square matrices in this case. In fact, they are just column vectors.
 \end{parag}
 
+\begin{parag}{Definition: Isometry operator}
+    An operator $U \in \mathbb{C}^{m \times n}$ is called an \important{isometry} if $U^{\dagger} U = I_m$.
+
+    \begin{subparag}{Intuition}
+        This generalises the concept of unitary operators to non-square matrices: any unitary is also an isometry. This states that the $n$ columns of $U$   are $m$-dimensional orthonormal vectors. Hence, in particular, this necessarily implies that $m \geq n$ (i.e. $U$ must be a tall matrix).
+
+        The intuition behind this definition is that this essentially just asks for $U$ to preserve vector 2-norms:
+        \[\left\|U \ket{x}\right\|_2^2 = \bra{x} U^{\dagger} U \ket{x} = \braket{x}{x} = \left\|\ket{x}\right\|_2^2.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        When $m = n$, then $U^{-1} = U^{\dagger}$ and hence we also have $U U^{\dagger} = I_n$. However, if $m \neq n$, then $U U^{\dagger} \neq I_n$.
+    \end{subparag}
+\end{parag}
+
 \begin{parag}{Example 7: Isometric dynamics}
-    Consider some operator $U$ such that $U^{\dagger} U = I$, but $U U^{\dagger} \neq I$ (note that this requires that $U$ is not rectangular). We then define: 
+    Consider some isometry $U$. We then define: 
     \[\mathcal{E}\left(\rho\right) = U \rho U^{\dagger}.\]
 
     This is a valid channel in Kraus form. For instance, we may have $U \in \mathbb{C}^{4 \times 2}$ defined such that: 
