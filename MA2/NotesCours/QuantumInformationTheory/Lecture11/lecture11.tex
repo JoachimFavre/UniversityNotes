@@ -1,0 +1,331 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-06 at 10:15:59.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mardi 06 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2025-05-06}{A class about entropy is a good class}{
+    \begin{itemize}[left=0pt]
+        \item Definition of classical Shannon entropy.
+        \item Explanation of the intuition behind Shannon's noiseless coding theorem.
+        \item Definition of joint, conditional, mutual and relative classical entropies.
+        \item Explanation of how to use Venn diagrams to find properties of classical entropies.
+        \item Definition of Von Neumann quantum entropy.
+        \item Definition of joint, conditional, mutual and relative quantum entropy.
+    \end{itemize}
+    
+}
+
+\section{Entropies and information}
+
+\begin{parag}{Remark}
+    Some other classes about quantum information would spend a lot more time explaining quantum entropies. This is however mostly useful when we start considering quantum communication, which is not really done by any lab at EPFL.
+\end{parag}
+
+\subsection{Classical entropy}
+
+\begin{parag}{Definition: Shannon entropy}
+    Let $X$ be a random variable, that takes value $x$ with probability $p_x$. We define its \important{Shannon entropy} to be: 
+    \[H_b\left(X\right) = - \sum_{x} p_x \log_{b}\left(p_x\right).\]
+
+    \begin{subparag}{Intuition}
+        This represents the amount of uncertainty $X$ before learning its value. Equivalently, it represents the amount of information we gain when learning it.
+
+        A more intuitive way to see this is to call $-\log_{2}\left(p_x\right) = \log_2\left(\frac{1}{p_x}\right)$ the surprise of $x$. The logarithm is here such that, if we have a surprise associated to $a$ of $\log_{2}\left(\frac{1}{p_a}\right)$ and a surprise associated to $b$ of $\log_{2}\left(\frac{1}{p_b}\right)$, and if we assume that $a$ and $b$ are independent, then the surprise associated to $a$ and $b$ is the sum of their surprises:
+        \[\log_2\left(\frac{1}{p_{ab}}\right) = \log_2\left(\frac{1}{p_a}\cdot \frac{1}{p_b}\right) = \log_{2}\left(\frac{1}{p_a}\right) + \log_{2}\left(\frac{1}{p_b}\right).\]
+
+        Then, the Shannon entropy is just a weighted average of these surprise, i.e. the expected surprise.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 1}
+        Note that we define $0 \log_{b}\left(0\right) = 0$, by continuous extension (using the fact $\lim_{p_x \to 0} p_x \log_{b}\left(p_x\right) = 0$).
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We will mostly consider binary entropies, taking $b = 2$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Consider a source that outputs $1, 2, 3, 4$ with probability $\frac{1}{2}, \frac{1}{4}, \frac{1}{8}, \frac{1}{8}$, respectively. 
+    \begin{center}
+    \begin{tabular}{c|cccc}
+        $X$ & $1$ & $2$ & $3$ & $4$ \\ \hline
+        $p_x$ & $\frac{1}{2}$ & $\frac{1}{4}$ & $\frac{1}{8}$ & $\frac{1}{8}$
+    \end{tabular}
+    \end{center}
+
+    Suppose that we have a sequence of $n$ of these symbols:
+    \[\left(X_1, \ldots, X_n\right) = 112123211\cdots1.\]
+    
+    \begin{subparag}{Representation 1}
+        We can encode each value using a 2-bit symbol:
+        \begin{center}
+        \begin{tabular}{c|cccc}
+            $X$ & $1$ & $2$ & $3$ & $4$ \\
+            \hline
+            $p_x$ & $\frac{1}{2}$ & $\frac{1}{4}$ & $\frac{1}{8}$ & $\frac{1}{8}$ \\
+            Representation & $00$ & $01$ & $10$ & $11$
+        \end{tabular}
+        \end{center}
+        
+        Then, on an average, we have to use $2n$ bits to store $\left(X_1, \ldots, X_n\right)$ 
+        \[\left(\frac{1}{2} 2 + \frac{1}{4} 2 + \frac{1}{8}2 + \frac{1}{8} 2\right) n = 2n,\]
+        since we have to use $2$ bits with probability $\frac{1}{2}$ for $X = 1$, 2 bits with probability $\frac{1}{4}$ to store $X = 2$, and so on.
+
+        However, we can do better.
+    \end{subparag}
+
+    \begin{subparag}{Representation 2}
+        Let's represent the symbols as follows:
+        \begin{center}
+        \begin{tabular}{c|cccc}
+            $X$ & $1$ & $2$ & $3$ & $4$ \\
+            \hline
+            $p_x$ & $\frac{1}{2}$ & $\frac{1}{4}$ & $\frac{1}{8}$ & $\frac{1}{8}$ \\
+            Representation & $0$ & $10$ & $110$ & $111$
+        \end{tabular}
+        \end{center}
+        
+        This is prefix-free, i.e. we can decode any bitstring without any ambiguity. For instance, if we are given a chain of bits $011110$ we are able to decode it to $1, 4, 2$ easily. This yields an average of length of: 
+        \[\left(\frac{1}{2}\cdot 1 + \frac{1}{4}\cdot 2 + \frac{1}{8}\cdot 3 + \frac{1}{8}\cdot 3\right) n = \frac{7}{4}n < 2n.\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Shannon's noiseless coding theorem}
+    Let $X$ be a random variable, taking value $x_k$ with probability $p_k$.
+
+    Then, storing an $n$-symbol string $\left(X_1, \ldots, X_n\right)$ is doable using an average of at most $n\cdot  H\left(X\right) + 1$ bits.
+
+    \begin{subparag}{Intuition}
+        The idea is that we are given a representation of the string $\left(x_{k_1}, \ldots, x_{k_n}\right)$ with probability $p_{k_1} \cdots p_{k_n}$, and we aim to store it with the least average number of bits possible. This theorem then states that this average can always be below $n \cdot H\left(X\right) + 1$ bits, i.e. $H\left(X\right) + \frac{1}{n}$ bits per symbol.
+    \end{subparag}
+
+    \begin{subparag}{Proof sketch}
+        For simplicity, consider a binary case, where $X = 1$ with probability $p$, and $X = 0$ with probability $1-p$, and different symbols of the string are independent.
+
+        Consider a string of length $n$, where $n$ is very large. We suppose it to be a ``typical'' stream, such that it contains $np$ ones and $n\left(1-p\right)$ zeroes. There are $\binom{n}{np} = \frac{n!}{\left(np\right)! \left(n\left(1-p\right)\right)!}$ such typical streams. We want to use Stirling's approximation $\log\left(n!\right) \approx n\log\left(n\right) - n$, so let us consider the logarithm of the number of such streams: 
+        \autoeq[s]{\log\left(\binom{n}{np}\right) = \log\left(n!\right) - \log\left(\left(np\right)!\right) - \log\left(\left(n\left(1-p\right)\right)!\right) \approx n \log\left(n\right) - n - \left(np \log\left(np\right) - np\right) - \left(n\left(1-p\right) \log\left(n\left(1-p\right)\right) - n\left(1-p\right)\right) = -np \log\left(p\right) - n\left(1-p\right)\log\left(1-p\right) = n H\left(p\right),}
+        where $H\left(p\right) = H\left(X\right)$.
+
+        This thus overall implies that the number of typical streams is: 
+        \[\binom{n}{n\left(1-p\right)} \approx 2^{n H\left(p\right)}.\]
+
+        We can use a very simple encoding scheme, using a character for each of the typical streams. We need $2^{n H\left(p\right)}$ letters, so each of them can be encoded with $nH\left(p\right)$ bits.
+    \end{subparag}
+
+    \begin{subparag}{Proof generalisation sketch}
+        To generalise this beyond the binary case, we can consider the following. A typical string has $n p_k$ numbers of $x_k$, so the number of typical strings is $\frac{n!}{\prod_{j} \left(np_j\right)!} \approx 2^{n H\left(X\right)}$.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        The encoding presented in the proof above is interesting, but definitely not used in practice. The optimal encoding is well-known, and is the Huffman code.
+
+        Now, in practice, to prove this result, is is easier to prove on a simpler (although non-optimal) code, the Shannon-Fano code. Indeed, it is possible to convince ourselves that, given the probability distribution $\left(p_x\right)$, then we can make a non-ambiguous code where $x$ is encoded using a codeword that has a length of $\left\lceil \log_2\left(\frac{1}{p_x}\right) \right\rceil $ bits. 
+
+        Using a completely similar reasoning, we can convince ourselves that we can encode some instance $\left(X_1, \ldots, X_n\right) = \left(x_{k_1}, \ldots, x_{k_n}\right)$ using a codeword of length $\left\lceil \log_2\left(\frac{1}{p_{k_1, \ldots, k_n}}\right)  \right\rceil$. But then, the average codeword length is, assuming independence of $X_1, \ldots, X_n$: 
+        \autoeq[s]{\sum_{k_1, \ldots, k_n} p_{k_1, \ldots, k_n}\left\lceil \log_2\left(\frac{1}{p_{k_1, \ldots, k_n}}\right)  \right\rceil \leq \sum_{k_1, \ldots, k_n} p_{k_1, \ldots, k_n} \left(\log_2\left(\frac{1}{p_{k_1, \ldots, k_n}}\right) + 1\right) =  \sum_{k_1, \ldots, k_n} p_{k_1, \ldots, k_n} \log_2\left(\frac{1}{p_{k_1, \ldots, k_n}}\right) + \sum_{k_1, \ldots, k_n} p_{k_1, \ldots, k_n} = H\left(X_1, \ldots, X_n\right) + 1 = n\cdot H\left(X\right) + 1,}
+        where $H\left(X_1, \ldots, X_n\right)$ is the joint entropy, defined below.
+        
+        In fact, it is also possible to show that the minimum average codeword length achievable for any non-ambiguous code is $H\left(X_1, \ldots, X_n\right)$, i.e. $n\cdot H\left(X\right)$ if the different symbols are independent. This does show a very strong link between entropy and source coding.
+
+        I invite anyone interested in learning more about this subject to read chapter 3 of my notes of \textit{Advanced information, computation, communication II}, available at:
+        \begin{center}
+            \url{https://github.com/JoachimFavre/UniversityNotes}
+        \end{center}
+    \end{subparag}
+\end{parag}
+
+\subsection{Conditional entropy and mutual information}
+
+\begin{parag}{Definition: Joint entropy}
+    Let $X, Y$ be random variables. Their \important{joint entropy} is: 
+    \[H\left(X, Y\right) = p_{\left(x, y\right)} \log_{2}\left(p_{\left(x, y\right)}\right).\]
+\end{parag}
+
+\begin{parag}{Definition: Conditional entropy}
+    Let $X, Y$ be random variables. Their \important{conditional entropy} is: 
+    \[H\left(X \suchthat Y\right) = H\left(X, Y\right) - H\left(Y\right).\]
+
+    Essentially, this is the remaining uncertainty in $X$ after learning $Y$.
+
+    \begin{subparag}{Personal remark}
+        Equivalently, we can define: 
+        \[H\left(X \suchthat Y = y\right) = p_{x | y} \log_{2}\left(p_{x|y }\right).\]
+        
+        Then, we have: 
+        \[H\left(X \suchthat Y\right) = \sum_{y} p_y H\left(X \suchthat Y = y\right).\]
+
+        This shows that, essentially, $H\left(X \suchthat Y\right)$ is the entropy of the conditional probability distribution; maybe giving more intuition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Mutual information}
+    Let $X, Y$ be random variables. Their \important{mutual information} is: 
+    \[H\left(X : Y\right) = H\left(X\right) + H\left(Y\right) - H\left(X, Y\right).\]
+
+    This is essentially the information contained in correlations.
+
+    \begin{subparag}{Personal remark}
+        One may also write $H\left(X: Y\right) = I\left(X; Y\right)$.
+
+        Intuitively, this represents the amount of information one learns about $X$ when learning the value of $Y$. For instance, if $X$ and $Y$ are independent, then $H\left(X: Y\right) = 0$; but if $X = Y$, then $H\left(X: Y\right) = H\left(X\right)$ (i.e. when we learn the value of $X$, we learn $H\left(X\right)$ about $Y = X$).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Venn diagrams}
+    A Venn diagram is a helpful tool to read those properties.
+    \svghere[0.6]{VennDiagramEntropy.svg}
+
+    $H\left(X\right)$ represents all the uncertainty due to $X$. Hence, for instance when we learn the vale of $X$, we are only left with the uncertainty $H\left(Y \suchthat X\right)$.
+
+    On this Venn diagram, we can also read that:
+    \begin{itemize}
+        \item $0 \leq H\left(X \suchthat Y\right) \leq H\left(X\right)$;
+        \item $H\left(X \suchthat Y\right) \neq H\left(Y \suchthat X\right)$ isn't symmetrical;
+        \item $0 \leq H\left(X : Y\right) \leq \min\left\{H\left(X\right), H\left(Y\right)\right\}$.
+    \end{itemize}
+
+    \begin{subparag}{Remark 1}
+        In an exam, the Venn diagram is not a valid proof for a property. Making one may however be a good idea to get convinced of what we are trying to prove.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        When it comes to quantum entropies, Venn diagram no longer work.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Relative entropy}
+    Let $X$ be a random variable of random distribution $p\left(x\right)$, and let $q\left(x\right)$ be another distribution. We define the \important{relative entropy} to be: 
+    \[H\left(p\left(x\right) \middle|\middle| q\left(x\right)\right) = \sum_{x} p\left(x\right) \log_{2}\left(\frac{p\left(x\right)}{q\left(x\right)}\right) = -\sum_{x} p\left(x\right) \log_{2}\left(q\left(x\right)\right) - H\left(X\right).\]
+
+    This is essentially  the measure of similarity between the two distributions $p\left(x\right)$ and $q\left(x\right)$.
+
+    \begin{subparag}{Properties}
+        This is always positive: 
+        \[H\left(p\left(x\right) \middle|\middle| q\left(x\right)\right) \geq 0.\]
+        
+        Moreover, considering $q\left(x\right)$ to be the uniform distribution over the same support as $X$, writing $d$ to be the size of this support: 
+        \[H\left(p\left(x\right) \middle|\middle| \frac{1}{d}\right) = -\sum_{x} p_x \log_{2}\left(\frac{1}{d}\right) - H\left(X\right) = \log_{2}\left(d\right) - H\left(X\right).\]
+
+        This gives another interpretation to Shannon entropy: we can understand it as measuring how far we are from the uniform distribution.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        In the general case, this is not symmetric: 
+        \[H\left(p\left(x\right) \middle|\middle| q\left(x\right)\right) \neq H\left(q\left(x\right) \middle|\middle| p\left(x\right)\right).\]
+    \end{subparag}
+\end{parag}
+
+\subsection{Quantum entropies}
+
+\begin{parag}{Von Neumann entropy}
+    Let $\rho$ be a quantum state, of eigenvalues $\lambda_i$. We define its \important{Von Neumann entropy} as: 
+    \[S\left(\rho\right) = -\Tr\left(\rho \log_{2}\left(\rho\right)\right) = -\sum_{i} \lambda_i \log_2\left(\lambda_i\right).\]
+    
+    This is the Shannon entropy of to the probability distribution associated to the eigenvalues.
+
+    \begin{subparag}{Intuition}
+        This quantifies the compressibility of quantum data. In other words, $\rho^{\otimes n}$ can be compressed to a state $\sigma$ that lives in a Hilbert space $\mathcal{H}_c$ where $\dim \mathcal{H}_c = 2^{n S\left(\rho\right)}$.
+
+        Proving this is completely similar to the classical case.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        $S\left(\psi\right)$ may instead represent the entanglement entropy, which we will see later, although this is a very bad notation.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Properties}
+    Let $\rho$ be quantum state. Then, its Von Neumann entropy has the following properties.
+    \begin{enumerate}
+        \item Pure states have entropy zero.
+        \item For all unitaries $U$, $S\left(U \rho U^{\dagger}\right) = S\left(\rho\right)$.
+        \item The maximum entropy is $\log_2\left(d\right)$, reached by the maximally mixed state $\rho = \frac{I}{d}$.
+        \item Consider some measurement $M = \sum_{j} m_j \ket{m_j}\bra{m_j}$, and consider the entropy $H\left(Y\right)$ associated to the distribution $p\left(m_j\right) = \bra{m_j} \rho \ket{m_j}$ of outputs. Then: 
+        \[H\left(Y\right) \geq S\left(\rho\right).\]
+
+        This is equivalent to the statement that decohering (i.e. killing off-diagonal terms) in any basis increases the Von Neumann entropy. This makes sense: decoherence brings a state to something more mixed.
+        \item \textit{(Additivity)} $S\left(\rho_A \otimes \rho_B\right) = S\left(\rho_A\right) + S\left(\rho_B\right)$.
+        \item \textit{(Triangle inequality)} $\left|S\left(\rho_A\right) - S\left(\rho_B\right)\right| \leq S\left(\rho_{AB}\right) \leq S\left(\rho_A\right) + S\left(\rho_B\right)$. This is not trivial to prove, and hence is a good exercise.
+        \item \textit{(Concavity)} $S\left(\sum_{i} p_i \rho_i\right) \geq \sum_{i} p_i S\left(\rho_i\right)$, for some $p_i$ such that $\sum_{i} p_i = 1$. In other words, mixing quantum states cannot have smaller uncertainty than the average uncertainty.
+    \end{enumerate}
+    
+    \begin{subparag}{Proof 1}
+        Let $\rho = \ket{\psi}\bra{\psi}$ be an arbitrary pure state. Then, $\lambda_1 = 1$, and the other are 0. Hence: 
+        \[S\left(\rho\right) = -1 \log_2\left(1\right) = 0.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        This directly comes from the fact $U \rho U^{\dagger}$ and $\rho$ have the same eigenvalues.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Bipartite quantum entropy}
+    Let $\rho_{AB}$ be a bipartite quantum state, of reduced state $\rho_A, \rho_B$. We define its \important{joint entropy} top be:
+    \[S\left(\rho_{AB}\right) = -\Tr\left(\rho_{AB} \log_2\left(\rho_{AB}\right)\right).\]
+
+    We define its \important{conditional entropy} to be: 
+    \[S\left(A \suchthat B\right) = S\left(\rho_{AB}\right)-  S\left(\rho_B\right).\]
+    
+    We define its \important{mutual information} to be:
+    \[S\left(A : B\right) = S\left(\rho_A\right) + S\left(\rho_B\right) - S\left(\rho_{AB}\right).\]
+\end{parag}
+
+\begin{parag}{Example}
+    Consider a Bell state: 
+    \[\rho_{AB} = \ket{\Psi^-}\bra{\Psi^-}.\]
+
+    Since this is a pure state, $S\left(\rho_{AB}\right) = 0$. Tracing out part of it, we get the maximally mixed state: 
+    \[\rho_B = \frac{I}{2} \implies S\left(\rho_B\right) = \log_2\left(2\right) = 1.\]
+
+    Hence, the conditional entropy is: 
+    \[S\left(A | B\right) = -1.\]
+
+    This makes sense, by measuring $B$, the state becomes more mixed and we thus lose information. In particular, since this value can be negative, his shows Venn diagram break down for quantum, and that quantum entropies are funkier than classical ones.
+\end{parag}
+
+\begin{parag}{Definition: Relative entropy}
+    Let $\rho, \sigma$ be two states. We define their \important{relative entropy} to be:
+    \[S\left(\rho || \sigma\right) = \Tr\left(\rho \log_2\left(\rho\right) - \rho \log_2\left(\sigma\right)\right).\]
+
+    This is a measure of distinguishability of the two states.
+
+    \begin{subparag}{Remark}
+        Let $\rho = \sum_{i} \lambda_i \ket{\lambda_i}\bra{\lambda_i}$ and $\sigma = \sum_{i} \mu_i \ket{\mu_i}\bra{\mu_i}$. Then: 
+        \[S\left(\rho || \sigma\right) = \sum_{i} \lambda_i\left(\log_2\left(\lambda_i\right) - \sum_{j} \left|\braket{\mu_j}{\lambda_i}\right|^2 \log_2\left(\mu_j\right)\right)\]
+        
+
+        If $\rho$ and $\sigma$ are diagonalisable in the same basis, then $\braket{\mu_j}{\lambda_i} = \delta_{ij}$, and thus this is exactly what we had for the classical case. Otherwise, we have an overlap term.
+    \end{subparag}
+
+    \begin{subparag}{Properties}
+        We have: 
+        \begin{enumerate}[left=0pt]
+            \item \textit{(Positivity)} $S\left(\rho || \sigma\right) \geq 0$.
+            \item \textit{(Faithful)} $S\left(\rho || \sigma\right) = 0$ if and only if $\rho = \sigma$.
+            \item \textit{(Asymmetry)} $S\left(\rho || \sigma\right) \neq S\left(\sigma || \rho\right)$.
+            \item \textit{(Unitary invariance)} $S\left(U \rho U^{\dagger} || U \sigma U^{\dagger}\right) = S\left(\rho || \sigma\right)$.
+            \item \textit{(Data processing inequality)} $S\left(\mathcal{E}\left(\rho\right) || \mathcal{E}\left(\sigma\right)\right) \leq S\left(\rho || \sigma\right)$. In other words, there is no channel we can apply to both states in the hope to make them more distinguishable.
+        \end{enumerate}
+        
+        This last inequality is very useful. Note that the 1-norm also has this inequality: 
+        \[\left\|\mathcal{E}\left(\rho\right) - \mathcal{E}\left(\sigma\right)\right\|_1 \leq \left\|\rho - \sigma\right\|_1.\]
+
+        The 2-norm however does not have a similar inequality.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

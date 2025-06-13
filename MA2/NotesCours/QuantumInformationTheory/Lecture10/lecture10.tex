@@ -1,0 +1,280 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-04-29 at 10:16:57.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mardi 29 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2025-04-29}{Frank Castle's norm}{
+\begin{itemize}[left=0pt]
+    \item \textit{Schatten is similar to ``château'' in French, which means castle in English. Yeah ok this might be going a bit far.}
+    \item Proof of the optimal POVM and success probability to distinguish to quantum states.
+    \item Definition of Schatten $p$-norm.
+    \item Intuitive explanation of the $1$-norm, the $2$-norm and the $\infty$-norm.
+\end{itemize}
+    
+}
+
+\section{Matrix norms}
+\subsection{Distinguishing quantum states}
+
+\begin{parag}{Goal}
+    Let's suppose that we are given two state $\rho_0, \rho_1$. We wonder what is the optimum POVM to distinguish them. In other words, we are given some $\rho$, which we are told to be $\rho = \rho_0$ or $\rho = \rho_1$, and we want to distinguish in which case we are in. As ou prior, we assume that $\rho$ is equally likely to be either. 
+
+    For simplicity, we assume that we solve this using a POVM of the form $\left\{M_0, M_1\right\}$, where $M_i$ answers the question ``Is the state $\rho_i$?''. In fact, this can always be done without loss of generality, since we could merge larger POVMs without decreasing success probability.
+\end{parag}
+
+\begin{parag}{Lemma}
+    Given some POVM $\left\{M_0, M_1\right\}$, the success probability $p$ is:
+    \[p = \prob\left(\text{success}\right) = \frac{1 + \Tr\left(M_0 \left(\rho_0 - \rho_1\right)\right)}{2}.\]
+
+    \begin{subparag}{Implication}
+        Our goal being to maximise the success probability, we want to pick a $M_0$ and $M_1 = I - M_0$ that maximises $\Tr\left(M_0 \left(\rho_0 - \rho_1\right)\right)$. More mathematically, the optimal success probability is:
+        \autoeq{p_{opt} = \max_{0 \leq M_0 \leq I} \frac{1 + \Tr\left(M_0\left(\rho_0 - \rho_1\right)\right)}{2} = \frac{1 + \max_{0 \leq M_0 \leq I} \Tr\left(M_0\left(\rho_0 - \rho_1\right)\right)}{2}.}
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        By the law of total probability:
+        \autoeq{p = \prob\left(\text{succes}\right) = \prob\left(\rho = \rho_0\right)\prob\left(\text{measure $0$} \suchthat \rho = \rho_0\right) + \prob\left(\rho = \rho_1\right)\prob\left(\text{measure $1$} \suchthat \rho = \rho_1\right) = \frac{1}{2} \Tr\left(M_0 \rho_0\right) + \frac{1}{2} \Tr\left(M_1 \rho_1\right).}
+
+        Using the fact that $M_0 + M_1 = I$, this yields: 
+        \[p = \frac{1}{2} \Tr\left(M_0 \rho_0\right) + \frac{1}{2} \Tr\left(I \rho_1\right) - \frac{1}{2} \Tr\left(M_0 \rho_1\right) = \frac{1 + \Tr\left(M_0 \left(\rho_0 - \rho_1\right)\right)}{2}.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: Simplest case}
+    Consider the simplest case: 
+    \[\rho_0 = \ket{0}\bra{0}, \mathspace \rho_1 = \ket{1}\bra{1}.\]
+    
+    We can just pick $M_0 = \ket{0}\bra{0}$, yielding: 
+    \[p = \frac{1 + \Tr\left(M_0 \left(\rho_0 - \rho_1\right)\right)}{2} = \frac{1 + 1}{2} = 1.\]
+    
+    In other words, we succeed with 100\% probability. This makes sense: measuring in the $Z$-basis, we will know exactly if we have $\rho_0$ or $\rho_1$. 
+\end{parag}
+
+\begin{parag}{Lemma (Personal remark)}
+    $\left\{M_0, M_1\right\}$ is a single qubit POVM if and only if there exists $\bvec{x} \in \mathbb{R}^3$ such that $\left\|\bvec{x}\right\| \leq 1$ and $a \in \left[0, \frac{1}{2}\right]$ such that: 
+    \[M_0 = a \left(I + \bvec{x} \dotprod \bvec{\sigma}\right), \mathspace M_1 = I - M_0.\]
+    
+    \begin{subparag}{Proof $\implies$}
+        Let $\left\{M_0, M_1\right\}$ be a valid POVM. We know that $M_1 = I - M_0$ by definition of POVM. Moreover, $M_0$ is Hermitian, so we can find $\bvec{x} \in \mathbb{R}^3$ and a $a \in \mathbb{R}$ so that, in the Pauli basis: 
+        \[M_0 = a \left(I + \bvec{x} \dotprod \bvec{\sigma}\right) = a\left(I + x \sigma_x + y \sigma_y + z \sigma_z\right) = a \begin{pmatrix} 1 + z & x - iy \\ x + iy & 1- z \end{pmatrix}.\]
+        
+        We can now use the general formula to find the eigenvalues of a $2\times 2$ matrix: 
+        \autoeq{\lambda_{\pm}\left(M_0\right) = \frac{\Tr\left(M_0\right) \pm \sqrt{\Tr\left(M_0\right)^2 - 4\det\left(M_0\right)}}{2} = \frac{2a \pm \sqrt{4a^2 - 4 a^2 \left(1 - x^2 - y^2 - z^2\right)}}{2} = a\left(1 \pm \sqrt{x^2 + y^2 + z^2}\right) = a\left(1 \pm \left\|\bvec{x}\right\|^2\right).}
+
+        We know that $M_0$ has non-negative eigenvalues. In particular $\lambda_+\left(M_0\right) \geq 0$ necessarily requires $a \geq 0$. The other eigenvalue being non-negative requires:
+        \[\lambda_{-}\left(M_0\right) \geq 0 \implies 1 - \left\|\bvec{x}\right\|^2 \geq 0 \implies \left\|x\right\| \leq 1.\]
+
+        Moreover, since $M_1 = I - M_0$, we know that: 
+        \[\lambda_{\pm}\left(M_1\right) = 1 - \lambda_{\pm}\left(M_0\right) = 1 - \left(a \pm \left\|x\right\|^2\right).\]
+        
+        But then, since $M_1$ also has non-negative eigenvalues, using the fact $\left\|x\right\|^2 \leq 1$: 
+        \autoeq{\lambda_{+}\left(M_1\right) \geq 0 \implies 1 - a - a\left\|x\right\|^2 \geq 0 \implies a\left(1 + \left\|x\right\|^2\right) \leq 1 \implies a \leq \frac{1}{1 + \left\|x\right\|^2} \leq \frac{1}{2}.}
+        
+        We have thus indeed shown that, since $\left\{M_0, M_1\right\}$ is a valid POVM, then $\left\|x\right\|^2 \leq 1$ and $0 \leq a \leq \frac{1}{2}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        We do have that $M_0, M_1$ are Hermitian, and that $M_0 + M_1 = I$. Moreover, looking again at the expression found in the previous proof for eigenvalues, $0 \leq a \leq \frac{1}{2}$ and $\left\|\bvec{x}\right\| \leq 1$ does mean that all eigenvalues are non-negative.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example 2: Arbitrary single qubit states}
+    Let us now consider some arbitrary single qubit states, in their Bloch representation: 
+    \[\rho_0 = \frac{1}{2}\left(I + \bvec{r}_0 \dotprod \bvec{\sigma}\right), \mathspace \rho_1 = \frac{1}{2}\left(I + \bvec{r}_1 \dotprod \bvec{\sigma}\right).\]
+
+    By our previous lemma, we can also write $M_0$ in the Pauli basis: we know there exists some $\bvec{x} \in \mathbb{R}^3$ such that $\left\|x\right\| \leq 1$, and some $a \in \left[0, \frac{1}{2}\right]$ such that: 
+    \[M_0 = a\left(I + \bvec{x} \dotprod \bvec{\sigma}\right).\]
+    
+    This gives: 
+    \autoeq{p = \frac{1}{2} + \frac{1}{2} \Tr\left(M_0 \left(\rho_0 - \rho_1\right)\right) = \frac{1}{2} + \frac{1}{4} \Tr\left(M_0\left(\bvec{r}_0 - \bvec{r}_1\right)\dotprod \bvec{\sigma}\right)= \frac{1}{2} + \frac{a}{4} \Tr\left(\left(I + \bvec{x} \dotprod \bvec{\sigma}\right)\left(\left(\bvec{r}_0 - \bvec{r}_1\right) \dotprod \bvec{\sigma}\right)\right) = \frac{1}{2} + \frac{a}{4} \Tr\left(\left(\bvec{x} \dotprod \bvec{\sigma}\right)\left(\left(\bvec{r}_0 - \bvec{r}_1\right) \dotprod \bvec{\sigma}\right)\right).}
+    
+    Using the fact $\Tr\left(\sigma_i \sigma_j\right) = 2 \delta_{ij}$, this means: 
+    \[p = \frac{1}{2} + \frac{a}{4}\left(2\cdot \bvec{x} \dotprod \left(\bvec{r}_0 - \bvec{r}_1\right)\right).\]
+
+    We aim to maximise this probability of success. Since $\bvec{a} \dotprod \bvec{b} = \left\|\bvec{a}\right\| \left\|\bvec{b}\right\| \cos\left(\bvec{a}; \bvec{b}\right)$, we know that $\bvec{a} \dotprod \bvec{b}$ is maximal when the two vectors have largest norm and are collinear. We thus want to pick $\bvec{x} \propto \left(\bvec{r}_0 - \bvec{r}_1\right)$ to be collinear, such that $\left\|\bvec{x}\right\| = 1$ is maximal and $a = \frac{1}{2}$ is maximal as well. In other words:
+    \[\bvec{x}_{opt} = \frac{\bvec{r}_0 - \bvec{r}_1}{\left\|\bvec{r}_0 - \bvec{r}_1\right\|}, \mathspace M_{0, opt} = \frac{1}{2}\left(I + \bvec{x}_{opt} \dotprod \bvec{\sigma}\right).\]
+    
+    Substituting it back, this gives our optimal success probability: 
+    \[p_{opt} = \frac{1}{2} + \frac{1}{4} \left(\frac{\left(\bvec{r}_0 - \bvec{r}_1\right) \dotprod \left(\bvec{r}_0 - \bvec{r}_1\right)}{\left\|\bvec{r}_0 - \bvec{r}_1\right\|}\right) = \frac{1}{2} + \frac{1}{4} \left\|\bvec{r}_0 - \bvec{r}_1\right\|.\]
+    
+    This makes intuitive sense. If our two states are the same but are given some different labels, then $\bvec{r}_0 = \bvec{r}_1$ and hence we cannot do anything to distinguish them. If $\bvec{r}_0 = -\bvec{r}_1$, meaning that the Bloch vectors are opposites and hence that the states are orthogonal just like the previous example, then we have a probability of success $1$.
+\end{parag}
+
+\begin{parag}{Definition: 1-norm}
+    Let $X$ be a Hermitian operator. We define its \important{1-norm} to be equivalently: 
+    \[\left\|X\right\|_1 = \Tr\left(\sqrt{X^{\dagger} X}\right) = \sum_{i} \sqrt{\lambda_i\left(X^{\dagger} X\right)},\]
+    where $M = \sqrt{X^{\dagger} X}$ is the matrix with the same eigenvectors as $X^{\dagger} X$ but which eigenvalues are the square root of the one of $X^{\dagger} X$. 
+
+    If $X$ is normal (for instance if $X$ is Hermitian or unitary, we will come back to this below), this is also equal to:
+    \[\left\|X\right\|_1 = \sum_{i} \left|\lambda_i\left(X\right)\right|.\]
+
+    \begin{subparag}{Personal remark}
+        The fact that $\sqrt{\lambda_i\left(X^{\dagger} X\right)} \in \mathbb{R}_+$ for all $i$ is proven by the SVD decomposition: these are in fact the singular values of $X$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: General case}
+    Let $\rho_0$ and $\rho_1$ be arbitrary quantum states.
+
+    Then, the optimal probability of success is: 
+    \[p_{opt} = \frac{1}{2}\left(1 + \max_{0 \leq M \leq I} \Tr\left(M\left(\rho_0 - \rho_1\right)\right)\right) = \frac{1 + \frac{1}{2} \left\|\rho_0 - \rho_1\right\|_1}{2}.\]
+
+    \begin{subparag}{Intuition}
+        This gives us an operation interpretation to the 1-norm, i.e. 
+        \[\frac{1}{2} \left\|\rho_0 - \rho_1\right\|_1 = \max_{0 \leq M \leq I} \Tr\left(M \left(\rho_0 - \rho_1\right)\right).\]
+
+        We can use this to estimate the 1-norm. However, this is very hard to do in practice. This thus only an operational understanding.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let's start by letting $\rho_0 - \rho_1 = \sum_{i} \lambda_i \ket{\lambda_i}\bra{\lambda_i}$ to be its eigendecomposition. We group positive and negative terms: 
+        \[\rho_0 - \rho_1 = \underbrace{\sum_{i: \lambda_i > 0} \lambda_i \ket{\lambda_i}\bra{\lambda_i}}_{= P_+} + \underbrace{\sum_{i: \lambda_i \leq 0} \lambda_i \ket{\lambda_i}\bra{\lambda_i}}_{= -P_-} = P_+ - P_-.\]
+
+        Note that both $P_-$ and $P_+$ are positive semi-definite. Moreover, we have that: 
+        \[p = \frac{1 + \Tr\left(M \left(\rho_0 - \rho_1\right)\right)}{2} = \frac{1}{2} + \frac{1}{2} \Tr\left(M\left(P_+ - P_-\right)\right).\]
+        
+        Since $P_+$ and $P_-$ are positive semi-definite, $\Tr\left(M P_+\right) > 0$ and $-\Tr\left(M P_-\right) < 0$. We thus want the first term to be as large as possible, and the second one to be 0. This is achieved when $M = \Pi_+ = \sum_{i: \lambda_i > 0} \ket{\lambda_i}\bra{\lambda_i}$, since $\Tr\left(\Pi_+ P_-\right) = 0$. Then:
+        \[p = \frac{1}{2} = \frac{1}{2} + \frac{1}{2} \Tr\left(\Pi_+ \left(P_+ - P_-\right)\right) = \frac{1}{2}\left(1 + \Tr\left(P_+\right)\right).\]
+        
+        We finally want to relate this to the 1-norm. We know that: 
+        \[\left\|\rho_0 - \rho_1\right\|_1 = \sum_{i} \left|\lambda_i\right| = \sum_{i: \lambda_i > 0} \lambda_i + \sum_{i: \lambda_i < 0} \left(-\lambda_i\right) = \Tr\left(P_+\right) + \Tr\left(P_-\right).\]
+
+        Now, by construction, we know that $\rho_0 - \rho_1= P_+ - P_-$. Hence:  
+        \autoeq{\rho_0 - \rho_1 = P_+ - P_- \implies \Tr\left(\rho_0 - \rho_1\right) = \Tr\left(P_+ - P_-\right) \iff 0 = \Tr\left(P_+\right) - \Tr\left(P_-\right) \iff \Tr\left(P_+\right) = \Tr\left(P_-\right).}
+        
+        But then, using the expression we found before:
+        \[\left\|\rho_0 - \rho_1\right\|_1 = \Tr\left(P_+\right) + \Tr\left(P_-\right) = 2\Tr\left(P_+\right).\]
+
+        This finally gives our answer 
+        \[p = \frac{1}{2}\left(1 + \Tr\left(P_+\right)\right) = \frac{1}{2} + \frac{1}{4} \left\|\rho_0 - \rho_1\right\|_1.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Other matrix norms}
+
+\begin{parag}{Definition: Matrix norm}
+    A matrix norm is a function $\left\|.\right\|: K^{m \times n} \mapsto \mathbb{R}$ that satisfies the following properties:
+    \begin{itemize}
+        \item $\left\|A\right\| \geq 0$.
+        \item $\left\|A\right\| = 0 \iff A = 0$.
+        \item (Triangle inequality) $\left\|A + B\right\| \leq \left\|A\right\| + \left\|B\right\|.$
+        \item (Multiplication by a scalar) For all $\alpha \in K$, $\left\|\alpha A\right\| = \left|\alpha\right| A$.
+    \end{itemize}
+     
+\end{parag}
+
+\begin{parag}{Definition: Normal matrix}
+    Let $A \in \mathbb{C}^{n \times n}$ be a matrix. We say it is \important{normal} if it commutes with its Hermitian transpose, i.e. if $A^{\dagger} A = A A ^{\dagger}$.
+     
+    \begin{subparag}{Remark}
+        Unitary and Hermitian matrices are normal.
+    \end{subparag}
+
+    \begin{subparag}{Property}
+        All normal matrices are diagonalisable in an orthonormal basis (but not necessarily with real eigenvalues). Moreover, they are such that:  
+        \[\sqrt{\lambda_i\left(A^{\dagger} A\right)} = \left|\lambda_i\left(A\right)\right|.\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Definition: Schatten $p$-norms}
+    Let $p \geq 1$ be arbitrary. We define the \important{Schatten $p$-norm} to be: 
+    \[\left\|A\right\|_p = \left(\sum_{i=1}^{d} \left|\sqrt{\lambda_i\left(A^{\dagger} A\right)}\right|^p\right)^{1/p}.\]
+
+    \begin{subparag}{Remark}
+        If $A$ is normal: 
+        \[\left\|A\right\|_p = \left(\sum_{i=1}^{d} \left|\lambda_i\left(A\right)\right|^p\right)^{1/p}.\]
+
+        This equivalent formula works for basically all cases we consider in quantum information theory, since states and POVMs are Hermitian, and we typically consider unitary evolution.
+    \end{subparag}
+
+    \begin{subparag}{Warning}
+        We can also define the induced $p$-norm. In quantum information, when an article says $p$-norm, it is typically Schatten $p$-norm. However, in the general case, ``$p$-norm'' is ambiguous, and we have to be careful about that. For example, when using python libraries for a ``$p$-norm'', we have to make sure that it is providing the good one.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: $1$-norm}
+    If $A$ is normal and $p = 1$, then we have, as we have already seen: 
+    \[\left\|A\right\|_1 = \sum_{i} \left|\lambda_i\right|.\]
+
+    \begin{subparag}{Personal remark}
+        This is operationally meaningful in terms of maximum distinguishability as we saw before, but it can be hard to measure on a quantum computer in practice. 
+    \end{subparag} 
+\end{parag}
+
+\begin{parag}{Example 2: 2-norm}
+    If $A$ is normal and $p = 2$, then: 
+    \[\left\|A\right\|_2 = \sqrt{\sum_{i} \left|\lambda_i\right|^2} = \sqrt{\Tr\left(A^{\dagger} A\right)}.\]
+
+    \begin{subparag}{Proof}
+        This is a direct proof, diagonalising $A = U D U ^{\dagger}$: 
+        \[\sqrt{\Tr\left(A^{\dagger} A\right)} = \sqrt{\Tr\left(U D^{\dagger} U^{\dagger} U D U^{\dagger}\right)} = \sqrt{\Tr\left(D^{\dagger} D\right)} = \sqrt{\sum_{i} \left|\lambda_i\right|^2}.\]
+
+        \qed
+    \end{subparag}
+    
+    \begin{subparag}{Personal remark}
+        Equivalently, we also have that: 
+        \autoeq{\left\|A\right\|_2^2 = \Tr\left(A^{\dagger} A\right) = \sum_{i, j} \bra{i} A^{\dagger} \ket{j}\bra{j} A \ket{i} = \sum_{i, j} \left|\bra{j} A \ket{i}\right|^2 = \sqrt{\sum_{i, j} \left|A_{ij}\right|^2}.}
+        
+        Hence, the Schatten 2-norm is also the Frobenius norm.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 1}
+        This does not have a nice operational interpretation. However, it is easy enough to measure $\left\|\rho_0 - \rho_1\right\|_2$ using a quantum computer. Indeed: 
+        \autoeq{\left\|\rho_0 - \rho_1\right\|_2 = \sqrt{\Tr\left(\left(\rho_0 - \rho_1\right)\left(\rho_0 - \rho_1\right)\right)} = \sqrt{\Tr\left(\rho_0^2\right) + \Tr\left(\rho_1^2\right)- 2\Tr\left(\rho_0 \rho_1\right)}.}
+
+        We can measure these using $SWAP$: 
+        \[\Tr\left(\rho_i^2\right) = \Tr\left(\left(\rho_i \otimes \rho_i\right) SWAP\right), \mathspace \Tr\left(\rho_1 \rho_2\right) = \Tr\left(\left(\rho_1 \otimes \rho_2\right) SWAP\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Some people define $\left\|A\right\|_2 = \Tr\left(A^{\dagger} A\right)$. This is not a valid norm since it does not respect the triangle inequality, but may simplify notation. When using an inequality from a paper, we thus have to be careful that they use the correct definition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 3: $\infty$-norm}
+    If $A$ is normal and $p = \infty$, then: 
+    \[\left\|A\right\|_{\infty} = \lim_{p \to \infty} \left(\sum_{i} \left|\lambda_i\right|^p\right)^{1/p}= \max_i \left\{\left|\lambda_i\right|\right\}.\]
+
+    \begin{subparag}{Proof}
+        This is a direct proof, ordering $\left|\lambda_1\right| \geq \left|\lambda_2\right| \geq \ldots \geq \left|\lambda_d\right|$ and supposing there are $k$ eigenvalues that have the same maximum absolute value $\left|\lambda_1\right|$ (i.e. $\left|\lambda_1\right| = \left|\lambda_2\right| = \ldots = \left|\lambda_k\right| > \left|\lambda_{k+1}\right|$): 
+        \autoeq{\left\|A\right\|_{\infty} = \lim_{p \to \infty} \left(\sum_{i} \left|\lambda_i\right|^p\right)^{1/p} = \lim_{p \to \infty} \left|\lambda_1\right|\underbrace{\left(k + \underbrace{\left|\frac{\lambda_{k+1}}{\lambda_1}\right|^p}_{\to 0} + \ldots + \underbrace{\left|\frac{\lambda_d}{\lambda_1}\right|^p}_{\to 0}\right)^{1/p}}_{\to 1} = \left|\lambda_1\right|.}
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        The infinity norm may also be called the operator norm or the spectral norm.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This is operationally meaningful in terms of expected values: 
+        \[\left|\Tr\left(M \rho\right)\right| \leq \left|\lambda_{max}\right| = \left\|M\right\|_{\infty}.\]
+
+        In other words, the absolute expected value of some operator $M$ is at most its infinity norm.
+
+        However, this is hard to measure using a quantum computer in practice: finding the energy of the most excited state is non-trivial.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

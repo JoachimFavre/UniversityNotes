@@ -1,0 +1,220 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-20 at 10:17:16.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mardi 20 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2025-05-20}{Being resourceful}{
+\begin{itemize}[left=0pt]
+    \item Definition of the resource theory for entanglement through LOCCs.
+    \item Definition of majorization.
+    \item Explanation of Nielson's majorization theorem.
+    \item Explanation and proof of the asymptotic conversion rates theorem.
+\end{itemize}
+
+}
+
+\section{Resource theory and entanglement}
+
+\begin{parag}{Introduction}
+    We wonder how to define what is a quantum property. One may think of what can be measured through a Hermitian observable, such as energy, spin, etc. We can be more general by defining a property as being anything that can be detected via a POVM.
+
+    However, more illusive properties such as coherence, entanglement or non-classicality cannot be expressed that way. To capture these more abstract but valid properties, we consider resource theory.  
+\end{parag}
+
+\begin{parag}{Definition: Resource theory}
+    A resource theory is constructed using a set of operations $\left\{F\right\}$, which we call \important{free operations}. This set must be closed under composition, and contain the tracing out operation $\Tr_B\left(.\right)$.
+
+    There are states that can be prepared using free operations (recall that states preparation is a valid channel), which we call \important{free state}. All the other states are called \important{resources states}.
+
+    Then, we write $\rho_1 \to \rho_2$, or $\rho_1 \prec \rho_2$, if we can transform $\rho_1$ to $\rho_2$ using free operations. This is named interconversion.
+
+    \begin{subparag}{Intuition}
+        A resource theory defines a property by what it's not. We call resource states the states with this property, and free states the ones without.   
+
+        In our case, we will take separable states to be our free states, and entangled states to be our resource states.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        Note that transitivity holds: 
+        \[\rho_1 \prec \rho_2 \text{ and } \rho_2 \prec \rho_3 \implies \rho_1 \prec \rho_3.\]
+
+        Hence, resource theory induces a partial order between the states.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We can introduce a measure $M$ of some resource. This is valid if applying free operators only decrease the resource, i.e.~if for all free operator $F$: 
+        \[M\left(\rho\right) \geq M\left(F\left(\rho\right)\right).\]
+
+        In our case, this means that applying operators that can only create separable states to some state should not be able to add entanglement.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Resource theory of entanglement}
+    For the resource theory of entanglement, we consider the following free operators (i.e. the operators that allow to create separable states):
+    \begin{itemize}
+        \item \textit{(Local operators)} $\mathcal{E}\left(\rho\right) = \mathcal{E}_A\left(\rho\right) \otimes \mathcal{E}_B\left(\rho\right)$.
+        \item \textit{(Classical communication)} $C\left(\rho\right) = \sum_{n} \ket{n}\bra{n}_B \bra{n}\rho \ket{n}_A$. This is such that $C\left(\ket{k}\bra{k}_A\right) = \ket{k}\bra{k}_B$. This is essentially a relabelling of who owns classical information, allowing Bob to do something locally conditional on the outcome of Alice's measurement.
+        \item \textit{(Partial trace)} $\mathcal{E}\left(\rho_{RS}\right) = \Tr_R\left(\rho_{RS}\right)$.
+    \end{itemize}
+    
+    The first two properties are often simplified to \important{LOCC} (local operators, classical communication).
+
+    \begin{subparag}{Free states}
+        It is possible to show that the free states of this theory (i.e. the ones that can be created via LOCC) are:
+        \[\rho_{AB} = \sum_{k} p_k \sigma_A^{\left(k\right)} \otimes \sigma_B^{\left(k\right)},\]
+        where $p_k$ is an arbitrary probability distribution.
+        
+        These are called \important{separable states}. States that cannot be written in this form are the resource states.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, considering $\ket{\phi^+} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}$ yields a resource (entangled) state $\rho = \ket{\phi^+}\bra{\phi^+}$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        So far, there isn't much new knowledge: we made the definition of entangled states more complex, but we still have to see the benefits. The point is that, now, we can look at interconvertibility to be able to make a measure.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Interconvertibility}
+    We wonder when it is possible to transform $\ket{\psi}_{AB} \over{\longmapsto}{LOCC}  \ket{\phi}_{AB}$ with probability $1$ using LOCC. Let us consider an example first: 
+    \[\ket{\phi^+} = \frac{1}{\sqrt{2}}\left(\ket{00} + \ket{11}\right), \mathspace \ket{\theta} = \cos\left(\theta\right) \ket{00} + \sin\left(\theta\right) \ket{11}.\]
+
+    We want to show we can always convert $\ket{\phi^+} \longmapsto^{LOCC} \ket{\theta}$. To do that, Alice uses the measure-record-and-update channel. In other words, she measures her qubit using the POVM $M_A = \left\{A_1^{\dagger} A_1, A_2^{\dagger} A_2\right\}$, where: 
+    \[A_1 = \begin{pmatrix} \cos\left(\theta\right) &  \\  & \sin\left(\theta\right) \end{pmatrix}, \mathspace A_2 = \begin{pmatrix} \sin\left(\theta\right) &  \\  & \cos\left(\theta\right) \end{pmatrix}.\]
+
+    When she gets outcome $1$, the state collapses to: 
+    \[\left(A_1 \otimes I\right) \ket{\phi^+} = \frac{1}{\sqrt{2}} \left(\cos\left(\theta\right) \ket{00} + \sin\left(\theta\right) \ket{11}\right) = \frac{1}{\sqrt{2}} \ket{\theta},\]
+    which is perfect. When she gets outcome $2$, the state instead collapses to:
+    \[\left(A_2 \otimes I\right) \ket{\phi^+} = \frac{1}{\sqrt{2}}\left(\sin\left(\theta\right) \ket{00} + \cos\left(\theta\right) \ket{11}\right) = \frac{1}{\sqrt{2}} \left(X \otimes X\right) \ket{\theta}.\]
+
+    In that case, Alice can communicate classically to Bob to apply $X$ on his qubit, and apply $X$ on hers.
+
+    \begin{subparag}{Remark}
+        Note that we can convert $\ket{\phi^+}_{AB} \mapsto \ket{\psi}_{AB}$ for any $\ket{\psi}_{AB}$ using LOCC. Indeed, we can use LOCCs to map:
+        \[\ket{\psi^+}_{AB} \over{\longmapsto}{LOCC} \underbrace{\cos\left(\theta\right) \ket{00} + e^{i\phi} \sin\left(\theta\right)}_{= \ket{\theta}} \ket{11} \over{\longmapsto}{LOCC}  \cos\left(\theta\right) \ket{uv} + e^{i \phi} \sin\left(\theta\right) \ket{\bar{u} \bar{v}},\]
+        where $\ket{\psi}_{AB} = \cos\left(\theta\right) \ket{uv} + e^{i \phi} \sin\left(\theta\right) \ket{\bar{u} \bar{v}}$ is its Schmidt decomposition. The opposite direction is however not possible in general. 
+
+        This may be hard to see like this, but this will become clearer when we consider the general case.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Majorization theory}
+    Let $\bvec{x}, \bvec{y}$ be vectors. We write $\bvec{x}^{\downarrow}$ to be $\bvec{x}$ but with its element in decreasing order.
+
+    We say that $\bvec{x}$ is \important{majorized} by $\bvec{y}$, written $\bvec{x} \prec \bvec{y}$ if and only if:
+    \begin{enumerate}
+        \item $\sum_{i} x_i = \sum_{i} y_i$.
+        \item $\sum_{j=1}^{k} x_j^{\downarrow} \leq \sum_{j=1}^{k} y_j^{\downarrow}$ for all $k$.
+    \end{enumerate}
+
+    Majorization theory gives a partial ordering relation between vectors $\bvec{x}$ and $\bvec{y}$.
+
+    \begin{subparag}{Example}
+        Consider: 
+        \[\bvec{a} = \begin{pmatrix} 1/3 \\ 1/3 \\ 1/3 \end{pmatrix}, \mathspace \bvec{b} = \begin{pmatrix} 1/6 \\ 2/3 \\ 1/6 \end{pmatrix}, \mathspace \bvec{c} = \begin{pmatrix} 1 \\ 0 \\ 0 \end{pmatrix}, \mathspace \bvec{d} = \begin{pmatrix} 1/2 \\ 1/2 \\ 1 \end{pmatrix}, \mathspace \bvec{e} = \begin{pmatrix} 1/2 \\ 1/2 \\ 0 \end{pmatrix}.\]
+
+        We notice they all sum to $1$, except for $\bvec{d}$. Hence, $\bvec{d}$ does not majorize any other, and isn't majorized by any other. Then, we need to reorder our vectors to be able to analyse them: 
+        \[\bvec{a}^{\downarrow} = \begin{pmatrix} 1/3 \\ 1/3 \\ 1/3 \end{pmatrix}, \mathspace \bvec{b}^{\downarrow} = \begin{pmatrix} 2/3 \\ 1/6 \\ 1/6 \end{pmatrix}, \mathspace \bvec{c}^{\downarrow} = \begin{pmatrix} 1 \\ 0 \\ 0 \end{pmatrix}, \mathspace \bvec{e}^{\downarrow} = \begin{pmatrix} 1/2 \\ 1/2 \\ 0 \end{pmatrix}.\]
+        
+        We notice tat $\sum_{j=1}^{1} c_1^{\downarrow} = 1$ and $\sum_{i=1}^{k} v_i^{\downarrow} \leq 1$ for all $k \in \left\{1, 2, 3\right\}$ and $\bvec{v} \in \left\{\bvec{a}, \bvec{b}, \bvec{e}\right\}$, so $\bvec{c}$ majorizes everything (except for $\bvec{d}$ as mentioned earlier).
+
+        Doing all the computations, we find: 
+        \[\bvec{a} \prec \bvec{b} \prec \bvec{c}, \mathspace \bvec{a} \prec \bvec{e} \prec \bvec{c}.\]
+
+        Moreover, notice that neither $\bvec{b}$ majorizes $\bvec{e}$, nor the inverse. So, we can make the following diagram, writing $\bvec{x} \to \bvec{y}$ when $\bvec{x} \prec \bvec{y}$:
+        \svghere[0.5]{MajorizationExample.svg}
+
+        Note that, since this is transitive, the fact $\bvec{a} \prec \bvec{b}$ and $\bvec{b} \prec \bvec{e}$ imply $\bvec{a} \prec \bvec{e}$.
+    \end{subparag}
+
+    \begin{subparag}{Property}
+        We always have, for any probability distribution $\bvec{p}$: 
+        \[\begin{pmatrix} \frac{1}{N} & \frac{1}{N} & \cdots & \frac{1}{N} \end{pmatrix} \prec \bvec{p} \prec \begin{pmatrix} 1 & 0 & \cdots & 0 \end{pmatrix}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Nielson's majorization theorem}
+    Let $\ket{\phi}_{AB}, \ket{\psi}_{AB}$ be arbitrary. We define $\lambda\left(\phi\right)$ to be the eigenvalues of $\rho_A = \Tr_B\left(\ket{\phi}\bra{\phi}_{AB}\right)$. 
+
+    Then: 
+    \[\left(\ket{\phi}_{AB} \over{\longmapsto}{LOCC} \ket{\psi}_{AB}\right) \iff \lambda\left(\phi\right) \prec \lambda\left(\psi\right).\]
+    
+    This gives us a necessary and sufficient condition to be able to map $\ket{\phi}$ to $\ket{\psi}$ using LOCCs (with probability 1).
+
+    \begin{subparag}{Remark 1}
+        $\lambda\left(\phi\right)$ can be equivalently defined to be the eigenvalues of $\rho_B$, by the Schmidt decomposition.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This is consistent with the observation we made earlier that the Bell state $\ket{\phi^+}$ can be mapped to any state using LOCC. Indeed, the maximally entangled state $\Omega_{AB} = \frac{1}{\sqrt{d}} \sum_{i=1}^{d} \ket{ii}_{AB}$ sis such that $\lambda\left(\Omega\right) = \begin{pmatrix} \frac{1}{d} & \cdots & \frac{1}{d} \end{pmatrix} $, which is the uniform distribution. We know this majorizes any distribution, so $\ket{\Omega}_{AB} \mapsto \ket{\psi}_{AB}$ using LOCC for all state $\ket{\psi}$. This shows that $\ket{\Omega}$ is at the top of the partial order of LOCC, and hence justifies the name ``maximally entangled state''.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Asymptotic conversion rates}
+    Given $N \to \infty$ copies of a state $\ket{\phi}_{AB}$, there exists a reversible interconversion: 
+    \[\ket{\phi}\bra{\phi}^{\otimes N} \over{\longleftrightarrow}{LOCC} \ket{\psi^-}\bra{\psi^-}^{\otimes \left(S\left(\rho_{\phi_A}\right) N\right)},\]
+    where $\rho_{\phi_A} = \Tr_B\left(\ket{\phi}\bra{\phi}_{AB}\right)$.
+    
+    \begin{subparag}{Intuition}
+        Given $N$ copies of any state, we can distil it to fewer $S\left(\rho_{\phi_A}\right) N$ highly entangled states. On the other hand, given $S\left(\rho_{\phi_A}\right)N$ copies of a highly entangled state $\ket{\psi^-}$, we can dilute it to $N$ copies of $\ket{\phi}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\to$}
+        Let $\ket{\phi}$ be arbitrary. We want to map $\ket{\phi}^{\otimes n} \mapsto \ket{\psi^-}^{\otimes k}$ for some $k$. We can always write $\ket{\phi}$ in its Schmidt decomposition, do a local change of basis and remove the local phase using LOCC, allowing us to assume without loss of generality: 
+        \[\ket{\phi} = \sqrt{1 - \lambda} \ket{00} + \sqrt{\lambda} \ket{11}.\]
+        
+        Hence: 
+        \[\ket{\phi}^{\otimes N} = \left(\sqrt{1- \lambda}\ket{00}_{AB} + \sqrt{\lambda} \ket{11}_{AB}\right)^{\otimes N}.\]
+
+        This looks a lot like a binomial of the form $\left(x + y\right)^{n}$. Hence, ordering the qubits such that all Alice's qubits are first: 
+        \autoeq[s]{\ket{\phi}^{\otimes N} = \left(\sqrt{1 - \lambda}\right)^N \ket{0}^{\otimes N}_A \ket{0}^{\otimes n}_B \fakeequal + \left(\sqrt{1 - \lambda}\right)^{N-1} \sqrt{\lambda}\left(\ket{10\cdots 0}_A \ket{1 0 \cdots 0}  + \ket{010\cdots0}_A \ket{010\cdots0}_B + \ldots\right) \fakeequal + \ldots}
+        
+        This shows that the general form this can take is, taking $\pi$ to be an arbitrary permutation: 
+        \autoeq[s]{\ket{\phi}^{\otimes N} = \sum_{k} \left(\sqrt{1 - \lambda}\right)^{N - k} \left(\sqrt{\lambda}\right)^{k} \sum_{\pi} \ket{\pi \left(\underbrace{1\cdots 1}_{k} \underbrace{0 \cdots 0}_{N - k}\right)}_A \ket{\pi \left(\underbrace{1\cdots 1}_{k} \underbrace{0 \cdots 0}_{N - k}\right)}_B.}
+        
+        Note that, fixing a $k$, there are $\binom{N}{k}$ terms in the sum. We can now consider the following protocol:
+        \begin{itemize}
+            \item Perform a local measurement to system $A$, counting the number of ones. This will give some value of $k$. For large $n$, the binomial distribution is sharply peaked at $k = \lambda N$. So, with high probability, we obtain $k = \lambda N$, in which case: 
+            \[\ket{\phi}^{\otimes N} \to \frac{1}{\binom{N}{\lambda N}} \sum_{\pi} \ket{\pi \left(\underbrace{1\cdots 1}_{\lambda n} 0 \cdots 0\right)}_A \ket{\pi \left(\underbrace{1\cdots 1}_{\lambda N} 0 \cdots 0\right)}_B.\]
+
+            Now, by Stirling's approximation, using the fact $\lambda = S\left(\phi_A\right)$: 
+            \[\binom{N}{\lambda N} \approx 2^{\left(-\lambda \log\left(\lambda\right) - \left(1 - \lambda\right)\log\left(1 - \lambda\right)\right) N} = 2^{S\left(\phi_A\right)N}.\]
+
+            This shows that, so far, we obtained an equal superposition of $2^{S\left(\phi_A\right) N}$  orthogonal product vectors. 
+            \item Alice sends to Bob the exact value of $k$ she measured.
+            \item They each apply the same unitary on their part of the state, to add structure to their $\binom{N}{\lambda N} \approx 2^{S\left(\phi_A\right)N}$ orthogonal vectors, in such a way that the $j$\Th vector $\ket{\pi_j\left(1\cdots 1 0 \cdots 0\right)}$ is mapped to $\ket{j} \otimes \ket{0}^{\otimes \left(1 - \lambda\right)N}$:
+                \[\begin{systemofequations} \ket{1 \cdots 1 0 \cdots 0}_A \mapsto \ket{\underbrace{0\cdots0}_{\lambda N}}_A \ket{\underbrace{0 \cdots 0}_{\left(1 - \lambda\right)N}}_A, \\ \ket{1\cdots1010\cdots0}_A \mapsto \ket{\underbrace{0 \cdots 01}_{\lambda N}}_A \ket{\underbrace{00\cdots0}_{\left(1 - \lambda\right)N}}_A, \\ \text{\hphantom{prob. a bad sol.}} \vdots\end{systemofequations}\]
+
+            Since we had before:
+            \[\frac{1}{\binom{N}{\lambda N}} \sum_{\pi} \ket{\pi \left(\underbrace{1\cdots 1}_{\lambda n} 0 \cdots 0\right)}_A \ket{\pi \left(\underbrace{1\cdots 1}_{\lambda N} 0 \cdots 0\right)}_B,\]
+            this gets mapped to:
+            \autoeq[s]{\frac{1}{\binom{N}{\lambda N}} \sum_{j=1}^{\binom{N}{\lambda N}} \ket{j}_A \otimes \ket{0}^{\otimes \left(1 - \lambda\right)N}_A \otimes \ket{j}_B \otimes \ket{0}^{\otimes \left(1 - \lambda\right)N}_B = \frac{1}{\binom{N}{\lambda N}} \sum_{j=1}^{\binom{N}{\lambda N}} \ket{jj}_{AB} \otimes \ket{00}_{AB}^{\otimes \left(1 - \lambda\right)N} \approx \frac{1}{2^{S\left(\rho_A\right) N}} \sum_{j=1}^{2^{S\left(\rho\right) N}} \ket{jj}_{AB} \otimes \ket{00}_{AB}^{\otimes \left(1 - S\left(\rho_A\right)\right)N} = \ket{\phi^+}_{AB}^{\otimes S\left(\rho_A\right) N} \otimes \ket{00}_{AB}^{\otimes \left(1 - S\left(\rho_A\right)\right)N}.}
+            \item Alice and Bob can finally each use a partial trace (effectively by simply ignoring the $\ket{0}$ junk bits) to only get $\ket{\phi^+}_{AB}^{\otimes S\left(\rho_A\right) N}$.
+        \end{itemize}
+
+        Overall, we successfully made a protocol that maps $\ket{\phi}^{\otimes N}$ to $\ket{\phi^+}^{\otimes S\left(\rho_A\right)N}$ using LOCCs. 
+    \end{subparag}
+
+    \begin{subparag}{Proof $\leftarrow$}
+        We will not prove that we can make a protocol using LOCCs that mpas $\ket{\phi^+}^{\otimes S\left(\rho_A\right)N}$ to an arbitrary $\ket{\phi}$ in this class.
+
+        \qed
+    \end{subparag}
+\end{parag}
+ 
+
+
+
+\end{document}

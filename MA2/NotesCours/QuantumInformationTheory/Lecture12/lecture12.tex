@@ -1,0 +1,155 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-13 at 10:24:46.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mardi 13 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2025-05-13}{Debate time}{
+\begin{itemize}[left=0pt]
+    \item Definition of classical fidelity.
+    \item Definition of quantum fidelity.
+    \item Proof of simpler formulas for for quantum fidelity in specific cases.
+    \item Explanation of Uhlmann's theorem.
+    \item Explanation of the data-processing inequality for quantum fidelity.
+\end{itemize}
+
+}
+
+\section{Fidelity}
+
+\begin{parag}{Definition: Classical fidelity}
+    Let $p, q$ be probability distributions. We define their \important{classical fidelity} to be a measure of similarity between the two: 
+    \[F\left(p, q\right) = \sum_{i} \sqrt{p_i q_i}.\]
+
+    This is also sometimes called the \important{Bhattacharyya coefficient}.
+
+    \begin{subparag}{Intuition}
+        Consider the following two vectors: 
+        \[p' = \left(\sqrt{p_0}, \sqrt{p_1}, \ldots\right), \mathspace q' = \left(\sqrt{q_0}, \sqrt{q_1}, \ldots\right).\]
+        
+        Then, the fidelity is just an inner product: 
+        \[F\left(p, q\right) = p' \dotprod q'.\]
+
+        The square root is here so that: 
+        \[F\left(p, p\right) = p' \dotprod p' = \sum_{i} p_i = 1.\]
+    \end{subparag}
+
+    \begin{subparag}{Properties}
+        It has the following properties:
+        \begin{itemize}
+            \item $F\left(p, p\right) = 1$.
+            \item $F\left(p, q\right) = 0$ if and only if $p$ and $q$ have no overlapping support.
+            \item $F\left(p, q\right) \geq 0$.
+            \item This is not a distance measure, because it does not respect the triangle inequality.
+        \end{itemize}
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This is not a very common value in classical cases, even though it does appear some times. The quantum is much more common.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Mixed state quantum fidelity}
+    Let $\rho, \sigma$ be mixed states. The \important{mixed state quantum fidelity} is a measure of similarity: 
+    \[F\left(\rho, \sigma\right) = \min_{\left\{M_i\right\}} \sum_{i} \sqrt{\Tr\left(M_i \rho\right) \Tr\left(\sigma M_i\right)},\]
+    where the minimisation is done over POVMs.
+
+    \begin{subparag}{Intuition}
+        This can be seen as the minimum classical fidelity of output distribution from performing the same POVM on $\rho$ and $\sigma$.
+    \end{subparag}
+
+    \begin{subparag}{Property}
+        It is possible to prove that: 
+        \[F\left(\rho, \sigma\right) = \Tr\left(\sqrt{\rho^{1/2} \sigma \rho^{1/2}}\right).\]
+
+        This was proven by Fuchs in 1994, and we will prove it in the twelfth exercise series. However, neither of these two expressions are nice to work with. We have some bunch of special case that we can use; they are described in the following lemmas.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\rho, \sigma$ diagonalisable in the same basis: 
+    \[\rho = \sum_{i} r_i \ket{i}\bra{i}, \mathspace \sigma = \sum_{i} s_i \ket{i}\bra{i}.\]
+    
+    Then: 
+    \[F\left(\rho, \sigma\right) = \sum_{i} \sqrt{r_i s_i}.\]
+
+    \begin{subparag}{Observation}
+        We notice that this is the classical fidelity between the eigenvalues.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        This is direct, using the definition of square root of a matrix:
+        \[F\left(\rho, \sigma\right) = \Tr\left(\sqrt{\sum_{i} r_i s_i \ket{i}\bra{i}}\right) = \Tr\left(\sum_{i} \sqrt{r_i s_i} \ket{i}\bra{i}\right) = \sum_{i} \sqrt{r_i s_i}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma 2}
+    Let $\sigma$ be arbitrary, and $\rho = \ket{\psi}\bra{\psi}$ be pure. Then: 
+    \[F\left(\sigma, \rho\right) = \sqrt{\bra{\psi} \sigma \ket{\psi}}.\]
+
+    \begin{subparag}{Proof}
+        Using the fact $\sqrt{\ket{\psi}\bra{\psi}} = \ket{\psi}\bra{\psi}$ since $\left(\ket{\psi}\bra{\psi}\right)^2 = \ket{\psi}\bra{\psi}$: 
+        \autoeq{F\left(\sigma, \rho\right) = \Tr\left(\sqrt{\ket{\psi}\bra{\psi} \sigma \ket{\psi}\bra{\psi}}\right) = \sqrt{\bra{\psi} \sigma \ket{\psi}} \Tr\left(\sqrt{\ket{\psi}\bra{\psi}}\right) = \sqrt{\bra{\psi} \sigma \ket{\psi}} \Tr\left(\ket{\psi}\bra{\psi}\right) = \sqrt{\bra{\psi} \sigma \ket{\psi}}.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma 3}
+    Let $\sigma = \ket{\phi}\bra{\phi}$ and $\rho = \ket{\psi}\bra{\psi}$ be pure states. Then: 
+    \[F\left(\rho, \sigma\right) = \left|\braket{\phi}{\psi}\right|.\]
+
+    \begin{subparag}{Remark}
+        When we only speak of pure states, an alternative definition of fidelity is $F\left(\phi, \psi\right) = \left|\braket{\phi}{\psi}\right|^2$, which is easier to work with. In fact, some people add the square even for mixed state.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is direct, using our previous lemma:
+        \[F\left(\rho, \sigma\right) = \sqrt{\braket{\psi}{\phi} \braket{\phi}{\psi}} = \left|\braket{\phi}{\psi}\right|.\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Uhlmann's theorem}
+    Let $\rho, \sigma$ be quantum states. Moreover, let $P$ be the set of purification of $\rho_S$ and $\Sigma$ be the set of purifications of $\sigma_S$:
+    \[P = \left\{\ket{\psi}_{RS} \suchthat \Tr_R\left(\ket{\psi}\bra{\psi}_{RS}\right) = \rho_S\right\}, \mathspace \Sigma = \left\{\ket{\phi}_{RS} \suchthat \Tr_R\left(\ket{\psi}\bra{\psi}_{RS}\right) = \sigma_S\right\}\]
+
+    Then:
+    \[F\left(\rho, \sigma\right) = \max_{\substack{\ket{\psi} \in P \\ \ket{\phi} \in \Sigma}} \left|\braket{\psi}{\phi}\right|.\]
+    
+    \begin{subparag}{Intuition}
+        This tels us that the fidelity between two mixed states $\rho, \sigma$ is the maximal pure state fidelity between purifications of $\rho$ and $\sigma$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This will be proven in the twelfth exercise series.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Data-processing inequality}
+    Let $\rho, \sigma$ be quantum states. Then: 
+    \[F\left(\mathcal{E}\left(\rho\right), \mathcal{E}\left(\sigma\right)\right) \geq F\left(\rho, \sigma\right).\]
+     
+    \begin{subparag}{Intuition}
+        In other words, we cannot make any quantum channels to make the quantum states more distinguishable. 
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This will be proven in the twelfth exercise series.
+    \end{subparag}
+\end{parag}
+
+\end{document}
+ 

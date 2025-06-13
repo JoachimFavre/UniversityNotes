@@ -1,0 +1,205 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-27 at 10:16:45.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mardi 27 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2025-05-27}{Ham-banana}{
+\begin{itemize}[left=0pt]
+    \item Proof of a measure of entanglement for pure states.
+    \item Explanation of the Hahn-Banach corollary, and how it implies entanglement witnesses.
+    \item Explanation of the link between entanglement witnesses and super-operators.
+    \item Explanation of the Peres-Horodeeki criterion.
+    \item Definition of state negativity.
+\end{itemize}
+    
+}
+
+\begin{parag}{Theorem: Measure of entanglement for pure states}
+    We want the measure of entanglement $E$ to respect the following three properties:
+    \begin{enumerate}
+        \item It must be LOCC-monotone. In other words, if $\ket{\phi_1} \over{\mapsto}{LOCC} \ket{\phi_2}$, then $E\left(\ket{\phi}_1\right) \geq E\left(\ket{\phi_2}\right)$.
+        \item It must be extensive, $E\left(\ket{\phi}^{\otimes k}\right) = k E\left(\ket{\phi}\right)$.
+        \item We can take the singlet (the maximum entangled state) as the golden standard and set $E\left(\ket{\phi^+}\right) = 1$.
+    \end{enumerate}
+
+    The unique function $E$ that respects these three properties is:
+    \[E\left(\ket{\phi}\right) = S\left(\phi_A\right).\]
+
+    This is named \important{entanglement entropy for bipartite pure states}.
+
+    \begin{subparag}{Proof uniqueness}
+        Let $E\left(\ket{\phi}\right)$ be an arbitrary function that respects the three properties. 
+
+        We know that $\ket{\phi}^{\otimes N} \over{\longleftrightarrow}{LOCC} \ket{\phi^+}^{\otimes NS\left(\phi_A\right)}$, where $S\left(\phi_A\right)$ is the entropy of the eigenvalues of $\rho_A = \Tr_B\left(\ket{\phi}\bra{\phi}\right)$. Hence, by the first property, we have:
+        \[E\left(\ket{\phi}^{\otimes N}\right) = E\left(\ket{\phi^+}^{\otimes N S\left(\phi_A\right)}\right).\]
+
+        Then, by the second property, this implies that: 
+        \[N\cdot  E\left(\ket{\phi}\right) = N\cdot  S\left(\phi_A\right) E\left(\ket{\phi^+}\right).\]
+
+        Finally, from the third property: 
+        \[E\left(\ket{\phi}\right) = S\left(\phi_A\right) E\left(\ket{\phi^+}\right) = S\left(\phi_A\right).\]
+
+        This does show that, if a function $E\left(\ket{\phi}\right)$ respects all three properties, then $E\left(\ket{\phi}\right) = S\left(\phi_A\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof validity}
+        It is possible to prove that $E\left(\ket{\phi}\right) = S\left(\phi_A\right)$ does fulfil the three properties.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Mixed states}
+
+\begin{parag}{Remark}
+    We now want to move to mixed states, where it's a lot more messy. Indeed, entanglement entropy is no longer a valid measure.
+
+    Consider for instance: 
+    \[\rho = \frac{I_{AB}}{d_{AB}} = \frac{I_A}{d_A} \otimes \frac{I_B}{d_B}.\]
+
+    This is the maximally mixed state and hence is separable (i.e.~unentangled). However, the pure state definition yields maximum entanglement entropy: 
+    \[\rho_A = \Tr_B\left(\frac{I_{AB}}{d_{AB}}\right) = \frac{I_A}{d_A} \implies E = \log_2\left(d_A\right).\]
+\end{parag}
+
+\begin{parag}{Hahn-Banach corollary}
+    Let $C$ be a convex set, and $\bvec{x} \not\in C$ be a point outside $C$.
+
+    Then, there exists a hyperplane $P$ that separates $\bvec{x}$ from $C$.
+
+    \begin{subparag}{Remark}
+        Recall that a hyperplane can be defined by some point $\bvec{a}$ belonging to the hyperplane and a vector $\bvec{v}$ which is orthogonal to the hyperplane. This is then such that:
+        \[P = \left\{\bvec{p} \suchthat \left(\bvec{p} - \bvec{a}\right) \dotprod \bvec{v} = 0\right\}.\]
+
+        We can moreover consider the two sides of the plane, one where we have points $\bvec{p}$ such that $\left(\bvec{p} - \bvec{a}\right) \dotprod \bvec{v} > 0$ and the other where we have $\left(\bvec{p} - \bvec{a}\right) \dotprod \bvec{v} < 0$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We will not prove this result formally. However, making a picture, this can be understood intuitively:
+        \svghere[0.5]{HahnBanachCorollary.svg}
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Theorem: Entanglement witness}
+    Consider the set of bipartite separable quantum states:
+    \[D_{sep} = \left\{\rho_{AB} \suchthat \rho_{AB} = \sum_{k} p_k \sigma_{A, k} \otimes \tau_{B, k} \text{ and $p_k$ is a probability distribution}\right\}\].
+
+    Let $\sigma$ be an arbitrary state. $\sigma$ is entangled if and only if there exists a $W$ such that $\Tr\left(\rho_{AB} W\right) > 0$ for all $\rho_{AB} \in D_{sep}$ and $\Tr\left(\sigma W\right) < 0$.
+
+    More generally, any $W$ such that $\Tr\left(\rho_{AB} W\right) \geq 0$ for all $\rho_{AB} \in D_{sep}$ is called a \important{entanglement witness}.
+
+    \begin{subparag}{Intuition}
+        Geometrically, an entanglement witness $W$ represents a hyperplane (going through the origin) of normal $W$, which separates $D_{sep}$ from some entangled states.
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        If we find some entanglement witness $W$ such that $\Tr\left(W \rho\right) < 0$ for some state $\rho$, then we know that $\rho$ is entangled. However, if $\Tr\left(W \rho\right) \geq 0$, then we cannot conclude.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\implies$}
+        $D_{sep}$ forms a convex set, i.e. if $\rho, \sigma \in D_{sep}$, then $p  \rho + \left(1-p\right)\sigma \in D_{sep}$ for any $p \in \left[0, 1\right]$. Hence, the Hahn-Banach corollary applies to $D_{sep}$. Here, our relevant vector space is Hermitian bipartite operators, where both bipartition act on a $d$-dimensional vector space. More precisely, it is the $d^2 \times d^2$ Hermitian matrices, and the inner product is the Hilbert-Schmidt inner product $\left\langle X, Y \right\rangle = \Tr\left(X^{\dagger} Y\right)$. 
+
+        Let $\sigma \not\in D_{sep}$ be arbitrary entangled state. The Hahn-Banach corollary tells us there exists some plane $P$ in the space of Hermitian operators that separates $\sigma$ from $D_{sep}$. This plane is defined by some matrices $A, V$, in such a way:
+        \[\left\langle \sigma - A, V \right\rangle < 0, \mathspace \left\langle \rho_{AB}- A, V \right\rangle > 0,\  \forall \rho_{AB} \in D_{sep}.\]
+
+        However, we notice that, for any quantum state $\rho$:
+        \autoeq{\left\langle \rho - A, V \right\rangle = \Tr\left(\left(\rho - A\right)^{\dagger} V\right) = \Tr\left(\rho V\right) - \Tr\left(A^{\dagger} V\right) = \Tr\left(\rho \left(V - I \Tr\left(A^{\dagger} V\right)\right)\right) = \Tr\left(\rho W\right),} 
+        where $W = V - I \Tr\left(A^{\dagger} V\right)$. This does show that:
+        \[\Tr\left(\rho W\right) < 0, \mathspace \Tr\left(\rho_{AB} W\right) > 0,\  \forall \rho_{AB} \in D_{sep}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        Since $\Tr\left(W \rho_{AB}\right) \geq 0$ for all $\rho_{AB} \in D_{sep}$, the fact $\Tr\left(W \sigma\right) < 0$ necessarily means $\sigma \not\in D_{sep}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Theorem}
+    A state $\sigma_{AB}$ is entangled if and only if there exists a positive super-operator $\Phi$ such that $\left(\Phi \otimes I\right) \sigma_{AB}$ has a negative eigenvalue.
+
+    \begin{subparag}{Intuition}
+        Recall that we have a bijection between the Choi–Jamiołkowski representation and super-operators: 
+        \[J\left(\Phi\right) = \left(\Phi \otimes I\right) \kket{I}\bbra{I} \iff \Phi\left(\rho\right) = \Tr_2\left(\left(I \otimes \rho^T\right)J\right),\]
+        
+        This result is completely analogous, stating that we have a bijection between entanglement witnesses $W$ and super-operators $\Phi$ (such that $\left(\Phi \otimes I\right) \sigma_{AB}$ has a negative eigenvalue).
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        Note that the super-operator $\Phi$ does not have to be completely positive. In fact, any completely positive super-operator $\Phi$ is such that $\left(\Phi \otimes I\right) \sigma_{AB}$ has non-negative eigenvalues by definition. In particular, it cannot be a valid channel.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We have already seen an example of a super-operator which is positive but not completely positive in this class: $\mathcal{E}\left(\rho\right) = \rho^T$. This gives rise to the following criterion.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Partial transpose}
+    Let $\rho_{AB}$ be a bipartite state. We define to be its \important{partial transpose} to be the transpose of the $B$ system. More precisely, leaving $\mathcal{E}\left(\rho\right) = \rho^T$: 
+    \[\rho_{AB}^{T_B} = \left(I \otimes \mathcal{E}\right) \rho_{AB}.\]
+\end{parag}
+
+\begin{parag}{Lemma: Peres-Horodeeki criterion}
+    Let $\rho_{AB}$ be a bipartite state. Then:
+    \begin{enumerate}
+        \item If $\rho_{AB}^{T_B}$ has a negative eigenvalue, then $\rho_{AB}$ is entangled.
+        \item If we suppose moreover that $\rho_{AB}$ is a two qubit state, then $\rho_{AB}^{T_B}$ has a negative eigenvalue if and only if $\rho_{AB}$ is entangled.
+    \end{enumerate}
+
+    \begin{subparag}{Example}
+        As we have already found previous in the course: 
+        \[\left(\ket{\phi^+}\bra{\phi^+}_{AB}\right)^{T_B} = SWAP.\]
+        
+        This has a negative eigenvalue, so $\rho = \ket{\phi^+}\bra{\phi^+}$ is entangled (as we indeed already know) 
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        In the case where $\rho_{AB}$ is not a two qubit state, if we only find non-negative eigenvalues, then we cannot conclude anything; just like for entanglement witnesses.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 1}
+        We do this proof by the contrapositive. Let $\rho_{AB} = \sum_{i} p_i \rho_{A, i} \otimes \sigma_{B, i}$ be an arbitrary separable state. Then:
+        \[\rho_{AB}^{T_B} = \left(\sum_{i} p_i \rho_{A, i} \otimes \sigma_{B, i}\right)^{T_B} = \sum_{i} p_i \rho_{A, i} \otimes \sigma_{B, i}^T.\]
+
+        However, notice that:
+        \[\left(\ket{\psi}\bra{\psi}\right)^T = \left(\left(\ket{\psi}\bra{\psi}\right)^{\dagger}\right)^* = \ket{\psi^*}\bra{\psi^*}.\]
+
+        This is a valid state. Hence, $\sigma_{B, i}^{T}$ is also a valid state, and $\rho_{AB}^{T_B}$ is valid as well. This shows that $\rho_{AB}^{T_B}$ is positive semi-definite and hence does not have any negative eigenvalue.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        We will not prove the case for a two qubit state in this class. However, it comes from the fact any two-qubit positive super-operator $\Phi$ can be written as:
+        \[\Phi\left(\rho\right) = \mathcal{E}_1\left(\rho\right) + \mathcal{E}_2\left(\rho^T\right),\]
+        for some quantum channels $\mathcal{E}_1, \mathcal{E}_2$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Negativity}
+    Let $\rho_{AB}$ be a bipartite state. Let $\lambda_k$ be the eigenvalues of $\rho_{AB}^{T_B}$. We define the \important{negativity} of $\rho_{AB}$ to be:
+    \[N\left(\rho_{AB}\right) = \frac{1}{2} \sum_{k : \lambda_k < 0} \left|\lambda_k\right| = -\frac{1}{2} \sum_{k: \lambda_k < 0} \lambda_k.\]
+
+    \begin{subparag}{Remark 1}
+        By the Peres-Horodeeki criterion, any $\rho_{AB} \in D_{sep}$ is such that: 
+        \[N\left(\rho_{AB}\right) = 0.\]
+        
+        Now, there does exist entangled states $\rho_{AB}$ such that $N\left(\rho_{AB}\right) = 0$, so we can only conclude anything about the entangled nature of $\rho_{AB}$ if $N\left(\rho_{AB}\right) > 0$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This is LOCC-monotone, so this is a valid measure of entanglement.
+    \end{subparag}
+\end{parag}
+
+\end{document}

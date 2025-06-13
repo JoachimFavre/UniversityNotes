@@ -1,0 +1,179 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-04-16 at 13:22:48.
+
+\usepackage{../../style}
+
+\title{QIT}
+\author{Joachim Favre}
+\date{Mercredi 16 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2025-04-16}{The measurement problem}{
+\begin{itemize}[left=0pt]
+    \item As we say in French: \textit{flemme}.
+\end{itemize}
+
+}
+
+\begin{comment}
+\section{Measurement problem}
+
+\begin{parag}{Measurement problem}
+    We notice the following three affirmations cannot all be true at the same time.
+    \begin{enumerate}[left=0pt]
+        \item A good measuring device is accurate. A measuring device is something that can extract information from a quantum system, say a device that measures teh spin state of an electron. We want it to be such that: 
+        \[\ket{\text{read}} \ket{\uparrow} \mapsto \ket{\text{up}} \ket{\uparrow},\]
+        \[\ket{\text{read}} \ket{\downarrow} \mapsto \ket{\text{down}} \ket{\downarrow}.\]
+        
+        \item Quantum mechanics is a universal and fundamental theory. Universal means that it applies to all phenomena, fundamental means that it is well-defined and consistent.
+        \item (Weak physicalist postulate) The descirption of the behaviour of large objects must be consistent with the laws governing the behaviour of the smaller objects of which they consist. This is violated if there is inconsistencies between the behaviour of large things and small things.
+    \end{enumerate}
+
+    Combining the second and third things mean that a measurement device must be consistent with the laws of quantum mechanics.
+
+    The postulates of quantum mechanics are:
+    \begin{itemize}[left=0pt]
+        \item Any phsical quantity is represented by an operator $Q$, and every state of a physical system by a state vector.
+        \item If a quantity $Q$ is measured, the post measurement state of the system will be the eigenstate corresponding to the eigenvalue measured.
+        \item Time evolution is a linear map from state to state.
+    \end{itemize}
+
+    According to the assumptions from the previous paragraphs, we should be able to make an accurate measurement device using these rules.
+  
+    Feeding a superposition to our measurement device, we get, using linearity in time evolution: 
+    \[\ket{\text{ready}} \frac{\ket{\uparrow} + \ket{\downarrow}}{\sqrt{2}} \mapsto \frac{1}{\sqrt{2}} \ket{\text{up}}\ket{\uparrow} + \frac{1}{\sqrt{2}} \ket{\text{down}}\ket{\downarrow}.\]
+   
+    This shows that the quantum device would be in a superposition after measurement. It however feels a bit weird that a macroscopic object can be in this type of superposition. In practice, we do not see these type of superpositions. This is in fact a contradiction to the state being an eigenstate after measurement, i.e. it contradicts to the quantum measurement postulate.
+
+    This example is very broad, it applies to any superposition of states.
+
+    We need to get rid of some assumption. We however do not need the measurement kinematic postulate: in this class, we introduced POVMs without telling to what state the measured state collapses. This however does not solve the problem, because we still have the macroscopic superposition, so it still seems like it's contradicting the world around us. Moreover, it still contradicts the quantum formalism, in particular the Born rule (i.e. the probability to measure some value). 
+
+    More formally, after the time evolution above, the state is: 
+    \[\rho_{MS}^{output} = \frac{1}{2}\left(\ket{\text{up}\uparrow}\bra{\text{up}\uparrow} + \ket{\text{down}\downarrow}\bra{\text{up}\uparrow} + \ket{\text{up}\uparrow}\bra{\text{down}\downarrow} + \ket{\text{down}\downarrow}\bra{\text{down}\downarrow}\right).\]
+
+    However, from the Born rule, we expect: 
+    \[\rho_{MS}^{Born} = \frac{1}{2} \left(\ket{\text{up}\uparrow}\bra{\text{up}\uparrow} + \ket{\text{down}\downarrow}\bra{\text{down}\downarrow}\right).\]
+
+    We do not have the same result, so this is a contradiction.
+\end{parag}
+
+\begin{parag}{Easy solution 1}
+    The first easy solution is Von Neumann's solution. There must be two fundamental laws about how states evolve:
+    \begin{itemize}[left=0pt]
+        \item When no measurements are going on, the states of all physical systems evolve linearly, in accordance with the dynamical postulate
+        \item When there are measurements, the systems do not evolve in accordance with the dynamical equations of motions. Instead, they evolve in accordance with the postulate of collapse.
+    \end{itemize}
+
+    This is basically how we have been thinking about measurements in Quantum physics I.
+
+    \begin{subparag}{Problem}
+        The big question is what is a measurement. Many actions not conventionally associated with measurement extract information from a system. Photons are continuously bouncing off gas molecule, and where the photon ends up can be used as a measurement. 
+
+        Essentially, we always have photons bouncing off everything, which would mean that we would never have time evolution, only measurements. This however does not work.
+
+        Measurements requires a divide between the system being measured and the part doing the measurement and there is no definite prescription for how this division is to be made. It is not clear where the measurement device ends and the quantum system starts. It's ambiguous when one of the rule stops and when the other rule kicks in.
+
+        Basically, the word ``measurement'' does not have a precise enough meaning to play such a fundamental role in the laws of physics, so quantum mechanics cannot be a universal and fundamental theory.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Easy solution 2: Decoherence}
+    We can consider that the environement acts as a good measurement device: 
+    \[\ket{\text{Initial environment}}\ket{\text{ready}}\ket{\uparrow} \mapsto \ket{\text{total environment given $\uparrow$}}\ket{\text{up}}\ket{\uparrow}.\]
+    \[\ket{\text{Initial environment}}\ket{\text{ready}}\ket{\downarrow} \mapsto \ket{\text{total environment given $\downarrow$}}\ket{\text{down}}\ket{\downarrow}.\]
+    
+    If we again consider the output state after trying to measure $\frac{\ket{\uparrow} + \ket{\downarrow}}{\sqrt{2}}$, we have: 
+    \[\ket{\psi^{out}} = \frac{1}{\sqrt{2}}\ket{\text{Total environment given $\uparrow$}}\ket{\text{up}}\ket{\uparrow} + \frac{1}{\sqrt{2}}\ket{\text{Total environment given $\downarrow$}}\ket{\text{down}}\ket{\downarrow}.\]
+    
+    Like this, it looks like we made the problem worse. However, if we consider the density matrix of this state and trace out the environment, leaving $r = \braket{\text{total environment given $\uparrow$}}{\text{total environemtn given $\downarrow$}}$, this yields: 
+    \[\rho_{MS}^{decoh} = \Tr_E\left(\ket{\psi^{out}}\bra{\psi^{out}}\right) = \frac{1}{2}\left(\ket{\text{up}\uparrow}\bra{\text{up}\uparrow} + \ket{\text{down}\downarrow}\bra{\text{down}\downarrow} + r \ket{\text{up}\uparrow}\bra{\text{down}\downarrow} + r^* \ket{\text{down}\downarrow}\bra{\text{up}\uparrow}\right).\]
+
+    So, if $r \to 0$, then we do have $\rho^{decoh} \to \rho^{born}$. For massive environments, $r \to 0$ is a reasonable assumption.
+
+    \begin{subparag}{Problem}
+        Mathematically, we do have $\rho^{decoh} \to \rho^{born}$. However, conceptually, they are very different. This can be framed formally using the following distinction:
+        \begin{itemize}[left=0pt]
+            \item A proper mixture is a mixed state that can be interpreted as arising from ignorence of the underlying pure state.
+            \item An improper mixture is a mixture that arise when we examine a subsystem of a larger pure state.
+        \end{itemize}
+
+        $\rho^{decoh}$ is an improper mixture, and $\rho^{born}$ is a proper mixture. 
+
+        We could still claim that decoherence is the fundamental thing, and that the Born rule is in fact just a way to mathematically describe it.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Instrumentalism}
+    We don't care that it's not fundamental or not universal, scientific theory is just a tool where we try to predict observations, but the theories themselves do not reveal supposedly hidden aspect of nature that somehow explain these laws.
+
+    \later{add what was missed}
+
+    \begin{subparag}{Problem}
+        The question is then where instrumentalism stops. If instrumentalism is limited just to the wave function, then why are we treating it differently from the rest of physics. If it is universal, all the usual reasons for thinking instrumentalism is an untenable philosophical position apply, for instance the no miracles argument: how could theories predict mayn things that are true \later{verify}. 
+
+        We could still consider that there is some underlying reality that physics is describing.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{John Bell's alternative statement of the measurement problem}
+    \later{pas compris}
+\end{parag}
+
+\begin{parag}{Alternative solution: Many worlds}
+    We consider some superposition $\frac{1}{\sqrt{2}}\left(\ket{\uparrow} + \ket{\downarrow}\right)$, whatever a superposition is. After measurement, then:
+    \[\ket{\psi^{out}} = \frac{1}{\sqrt{2}}\ket{\text{Total environment given $\uparrow$}}\ket{\text{up}}\ket{\uparrow} + \frac{1}{\sqrt{2}}\ket{\text{Total environment given $\downarrow$}}\ket{\text{down}}\ket{\downarrow}.\]
+    
+
+    We then state that this is a superposition of a world in $\uparrow$ and a world in $\downarrow$.
+
+    \begin{subparag}{Problem}
+        This is consistent, but this is quite crazy. 
+
+        It may seem to contradict the world we see around us, but this is actually solved by stating that we are in fact in superposition as well so we can't see it. It is up to debate if this contradicts the Born rule.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Alternative solution: Dynamical collapse}
+    We can add an additional non-linear stochastic term to Schrödinger's equation, which kicks in when we start looking at larger systems. 
+
+    \begin{subparag}{Problem}
+        This is empirically testable. However, we mostly found evidence against it.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Alternative solution: Bohmian mechanics}
+    We suppose that all particles have some well-defined position.  \later{finish}
+
+    \begin{subparag}{Problem}
+        This is hard to work with. Moreover, people who believe in many-world basically say that Bohmian mechanics is doing many worlds, but that they are adding corpuscules that make it less scary, hence they are cheating a bit.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Alternative solution: Quantum relationalism}
+    Quantum mechanics is a theory about the physical description systems relative to other systems and this is a complete description of the world. (Carlo Rovelli).
+
+    This is basically Copenhagen interpretation done right.
+
+    \begin{subparag}{Problem}
+        This may work, but measurement isn't well defined. \later{remove?}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Deciding the best respsonse}
+    When choosing the answer that suits us best, we should consider:
+    \begin{itemize}[left=0pt]
+        \item Is the theory consistent?
+        \item Does it actually solve the measurement problem?
+        \item Ockam's razor.
+    \end{itemize}
+\end{parag}
+\end{comment}
+
+\end{document}
