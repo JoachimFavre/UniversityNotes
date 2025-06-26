@@ -64,7 +64,7 @@
 \end{parag}
 
 \begin{parag}{Lemma (Personal remark)}
-    $\left\{M_0, M_1\right\}$ is a single qubit POVM if and only if there exists $\bvec{x} \in \mathbb{R}^3$ such that $\left\|\bvec{x}\right\| \leq 1$ and $a \in \left[0, \frac{1}{2}\right]$ such that: 
+    $\left\{M_0, M_1\right\}$ is a single qubit POVM if and only if there exists $\bvec{x} \in \mathbb{R}^3$ such that $\left\|\bvec{x}\right\| \leq 1$ and $a \in \left[0, 1/\left(1 + \left\|\bvec{x}\right\|^2\right)\right]$ such that: 
     \[M_0 = a \left(I + \bvec{x} \dotprod \bvec{\sigma}\right), \mathspace M_1 = I - M_0.\]
     
     \begin{subparag}{Proof $\implies$}
@@ -75,19 +75,19 @@
         \autoeq{\lambda_{\pm}\left(M_0\right) = \frac{\Tr\left(M_0\right) \pm \sqrt{\Tr\left(M_0\right)^2 - 4\det\left(M_0\right)}}{2} = \frac{2a \pm \sqrt{4a^2 - 4 a^2 \left(1 - x^2 - y^2 - z^2\right)}}{2} = a\left(1 \pm \sqrt{x^2 + y^2 + z^2}\right) = a\left(1 \pm \left\|\bvec{x}\right\|^2\right).}
 
         We know that $M_0$ has non-negative eigenvalues. In particular $\lambda_+\left(M_0\right) \geq 0$ necessarily requires $a \geq 0$. The other eigenvalue being non-negative requires:
-        \[\lambda_{-}\left(M_0\right) \geq 0 \implies 1 - \left\|\bvec{x}\right\|^2 \geq 0 \implies \left\|x\right\| \leq 1.\]
+        \[\lambda_{-}\left(M_0\right) \geq 0 \implies 1 - \left\|\bvec{x}\right\|^2 \geq 0 \implies \left\|\bvec{x}\right\| \leq 1.\]
 
         Moreover, since $M_1 = I - M_0$, we know that: 
-        \[\lambda_{\pm}\left(M_1\right) = 1 - \lambda_{\pm}\left(M_0\right) = 1 - \left(a \pm \left\|x\right\|^2\right).\]
+        \[\lambda_{\pm}\left(M_1\right) = 1 - \lambda_{\pm}\left(M_0\right) = 1 - \left(a \pm \left\|\bvec{x}\right\|^2\right).\]
         
-        But then, since $M_1$ also has non-negative eigenvalues, using the fact $\left\|x\right\|^2 \leq 1$: 
-        \autoeq{\lambda_{+}\left(M_1\right) \geq 0 \implies 1 - a - a\left\|x\right\|^2 \geq 0 \implies a\left(1 + \left\|x\right\|^2\right) \leq 1 \implies a \leq \frac{1}{1 + \left\|x\right\|^2} \leq \frac{1}{2}.}
+        But then, since $M_1$ also has non-negative eigenvalues: 
+        \autoeq{\lambda_{+}\left(M_1\right) \geq 0 \implies 1 - a - a\left\|\bvec{x}\right\|^2 \geq 0 \implies a\left(1 + \left\|\bvec{x}\right\|^2\right) \leq 1 \implies a \leq \frac{1}{1 + \left\|\bvec{x}\right\|^2}.}
         
-        We have thus indeed shown that, since $\left\{M_0, M_1\right\}$ is a valid POVM, then $\left\|x\right\|^2 \leq 1$ and $0 \leq a \leq \frac{1}{2}$.
+        We have thus indeed shown that, since $\left\{M_0, M_1\right\}$ is a valid POVM, then $\left\|\bvec{x}\right\|^2 \leq 1$ and $0 \leq a \leq 1/\left(1 + \left\|\bvec{x}\right\|^2\right)$.
     \end{subparag}
 
     \begin{subparag}{Proof $\impliedby$}
-        We do have that $M_0, M_1$ are Hermitian, and that $M_0 + M_1 = I$. Moreover, looking again at the expression found in the previous proof for eigenvalues, $0 \leq a \leq \frac{1}{2}$ and $\left\|\bvec{x}\right\| \leq 1$ does mean that all eigenvalues are non-negative.
+        We do have that $M_0, M_1$ are Hermitian, and that $M_0 + M_1 = I$. Moreover, looking again at the expression found in the previous proof for eigenvalues, $0 \leq a \leq 1/\left(1 + \left\|\bvec{x}\right\|^2\right)$ and $\left\|\bvec{x}\right\| \leq 1$ does mean that all eigenvalues are non-negative.
 
         \qed
     \end{subparag}
@@ -98,7 +98,7 @@
     Let us now consider some arbitrary single qubit states, in their Bloch representation: 
     \[\rho_0 = \frac{1}{2}\left(I + \bvec{r}_0 \dotprod \bvec{\sigma}\right), \mathspace \rho_1 = \frac{1}{2}\left(I + \bvec{r}_1 \dotprod \bvec{\sigma}\right).\]
 
-    By our previous lemma, we can also write $M_0$ in the Pauli basis: we know there exists some $\bvec{x} \in \mathbb{R}^3$ such that $\left\|x\right\| \leq 1$, and some $a \in \left[0, \frac{1}{2}\right]$ such that: 
+    By our previous lemma, we can also write $M_0$ in the Pauli basis: we know there exists some $\bvec{x} \in \mathbb{R}^3$ such that $\left\|\bvec{x}\right\| \leq 1$, and some $a \in \left[0, 1/\left(1 + \left\|x\right\|^2\right)\right]$ such that: 
     \[M_0 = a\left(I + \bvec{x} \dotprod \bvec{\sigma}\right).\]
     
     This gives: 
@@ -107,7 +107,10 @@
     Using the fact $\Tr\left(\sigma_i \sigma_j\right) = 2 \delta_{ij}$, this means: 
     \[p = \frac{1}{2} + \frac{a}{4}\left(2\cdot \bvec{x} \dotprod \left(\bvec{r}_0 - \bvec{r}_1\right)\right).\]
 
-    We aim to maximise this probability of success. Since $\bvec{a} \dotprod \bvec{b} = \left\|\bvec{a}\right\| \left\|\bvec{b}\right\| \cos\left(\bvec{a}; \bvec{b}\right)$, we know that $\bvec{a} \dotprod \bvec{b}$ is maximal when the two vectors have largest norm and are collinear. We thus want to pick $\bvec{x} \propto \left(\bvec{r}_0 - \bvec{r}_1\right)$ to be collinear, such that $\left\|\bvec{x}\right\| = 1$ is maximal and $a = \frac{1}{2}$ is maximal as well. In other words:
+    We aim to maximise this probability of success. This is maximal when $a = 1/\left(1 + \left\|\bvec{x}\right\|^2\right)$ is largest, so, using the fact $\bvec{a} \dotprod \bvec{b} = \left\|\bvec{a}\right\| \left\|\bvec{b}\right\| \cos\left(\bvec{a}; \bvec{b}\right)$, this simplifies to: 
+    \[p = \frac{1}{2} + \frac{1}{2} \cdot \frac{1}{1 + \left\|\bvec{x}\right\|^2} \left\|\bvec{x}\right\| \left\|\bvec{r}_0 - \bvec{r}_1\right\| \cos\left(\bvec{x}; \bvec{r}_0 - \bvec{r}_1\right).\]
+    
+    It is possible to find that $f\left(t\right) = \frac{t}{1 + t^2}$ is maximal when $t = 1$, where $f\left(1\right) = \frac{1}{2}$; so $\left\|\bvec{x}\right\| / \left(1 + \left\|\bvec{x}\right\|^2\right)$ is maximal when $\left\|\bvec{x}\right\| = 1$. Moreover, the cosine term is maximal when $\bvec{x} \propto \left(\bvec{r}_0 - \bvec{r}_1\right)$ are collinear. Putting both together, this gives us:
     \[\bvec{x}_{opt} = \frac{\bvec{r}_0 - \bvec{r}_1}{\left\|\bvec{r}_0 - \bvec{r}_1\right\|}, \mathspace M_{0, opt} = \frac{1}{2}\left(I + \bvec{x}_{opt} \dotprod \bvec{\sigma}\right).\]
     
     Substituting it back, this gives our optimal success probability: 
