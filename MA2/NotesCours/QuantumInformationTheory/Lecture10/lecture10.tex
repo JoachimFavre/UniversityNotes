@@ -28,7 +28,7 @@
 \subsubsection{Distinguishing quantum states}
 
 \begin{parag}{Goal}
-    Let's suppose that we are given two state $\rho_0, \rho_1$. We wonder what is the optimum POVM to distinguish them. In other words, we are given some $\rho$, which we are told to be $\rho = \rho_0$ or $\rho = \rho_1$, and we want to distinguish in which case we are in. As ou prior, we assume that $\rho$ is equally likely to be either. 
+    Let's suppose that we are given two states $\rho_0, \rho_1$. We wonder what is the optimum POVM to distinguish them. In other words, we are given some $\rho$, which we are told to be $\rho = \rho_0$ or $\rho = \rho_1$, and we want to distinguish in which case we are in. As our prior, we assume that $\rho$ is equally likely to be either. 
 
     For simplicity, we assume that we solve this using a POVM of the form $\left\{M_0, M_1\right\}$, where $M_i$ answers the question ``Is the state $\rho_i$?''. In fact, this can always be done without loss of generality, since we could merge larger POVMs without decreasing success probability.
 \end{parag}
@@ -43,7 +43,7 @@
     \end{subparag}
 
     \begin{subparag}{Proof}
-        By the law of total probability:
+        By the law of total probability, and using our uniform prior:
         \autoeq{p = \prob\left(\text{succes}\right) = \prob\left(\rho = \rho_0\right)\prob\left(\text{measure $0$} \suchthat \rho = \rho_0\right) + \prob\left(\rho = \rho_1\right)\prob\left(\text{measure $1$} \suchthat \rho = \rho_1\right) = \frac{1}{2} \Tr\left(M_0 \rho_0\right) + \frac{1}{2} \Tr\left(M_1 \rho_1\right).}
 
         Using the fact that $M_0 + M_1 = I$, this yields: 
@@ -98,7 +98,7 @@
     Let us now consider some arbitrary single qubit states, in their Bloch representation: 
     \[\rho_0 = \frac{1}{2}\left(I + \bvec{r}_0 \dotprod \bvec{\sigma}\right), \mathspace \rho_1 = \frac{1}{2}\left(I + \bvec{r}_1 \dotprod \bvec{\sigma}\right).\]
 
-    By our previous lemma, we can also write $M_0$ in the Pauli basis: we know there exists some $\bvec{x} \in \mathbb{R}^3$ such that $\left\|\bvec{x}\right\| \leq 1$, and some $a \in \left[0, 1/\left(1 + \left\|x\right\|^2\right)\right]$ such that: 
+    By our previous lemma, we can also write $M_0$ in the Pauli basis: we know there exists some $\bvec{x} \in \mathbb{R}^3$ such that $\left\|\bvec{x}\right\| \leq 1$, and some $a \in \left[0, 1/\left(1 + \left\|\bvec{x}\right\|^2\right)\right]$ such that: 
     \[M_0 = a\left(I + \bvec{x} \dotprod \bvec{\sigma}\right).\]
     
     This gives: 
@@ -179,7 +179,7 @@
         \item $\left\|A\right\| \geq 0$.
         \item $\left\|A\right\| = 0 \iff A = 0$.
         \item (Triangle inequality) $\left\|A + B\right\| \leq \left\|A\right\| + \left\|B\right\|.$
-        \item (Multiplication by a scalar) For all $\alpha \in K$, $\left\|\alpha A\right\| = \left|\alpha\right| A$.
+        \item (Multiplication by a scalar) For all $\alpha \in K$, $\left\|\alpha A\right\| = \left|\alpha\right| \left\|A\right\|$.
     \end{itemize}
      
 \end{parag}
@@ -210,7 +210,7 @@
     \end{subparag}
 
     \begin{subparag}{Warning}
-        We can also define the induced $p$-norm. In quantum information, when an article says $p$-norm, it is typically Schatten $p$-norm. However, in the general case, ``$p$-norm'' is ambiguous, and we have to be careful about that. For example, when using python libraries for a ``$p$-norm'', we have to make sure that it is providing the good one.
+        We can also define the induced $p$-norm. In quantum information, when an article says $p$-norm, it is typically the Schatten $p$-norm. However, in the general case, ``$p$-norm'' is ambiguous, and we have to be careful about that. For example, when using python libraries for a ``$p$-norm'', we have to make sure that it is providing the good one.
     \end{subparag}
 \end{parag}
 
@@ -228,7 +228,7 @@
     \[\left\|A\right\|_2 = \sqrt{\sum_{i} \left|\lambda_i\right|^2} = \sqrt{\Tr\left(A^{\dagger} A\right)}.\]
 
     \begin{subparag}{Proof}
-        This is a direct proof, diagonalising $A = U D U ^{\dagger}$: 
+        This is a direct proof, diagonalising $A = U D U ^{\dagger}$ (the existence of which is given by the fact $A$ is normal): 
         \[\sqrt{\Tr\left(A^{\dagger} A\right)} = \sqrt{\Tr\left(U D^{\dagger} U^{\dagger} U D U^{\dagger}\right)} = \sqrt{\Tr\left(D^{\dagger} D\right)} = \sqrt{\sum_{i} \left|\lambda_i\right|^2}.\]
 
         \qed

@@ -49,7 +49,7 @@
 
     \begin{subparag}{Proof expectation}
         Let us first find the expectation of a single shot. By definition of expectation:
-        \[\exval\left(\lambda_{m\left(s\right)}\right) = \sum_{m\left(s\right)} \lambda_{m\left(s\right)}\prob\left(m\left(s\right)\right).\]
+        \[\exval\left(\lambda_{m\left(s\right)}\right) = \sum_{m\left(s\right)} \lambda_{m\left(s\right)}\prob\left(\lambda_{m\left(s\right)}\right).\]
 
         By standard quantum mechanics, $\prob\left(\lambda_{m\left(s\right)}\right) = \bra{\lambda_{m\left(s\right)}} \rho \ket{\lambda_{m\left(s\right)}}$, hence: 
         \autoeq{\exval\left(\lambda_{m\left(s\right)}\right) = \sum_{m\left(s\right)} \lambda_{m\left(s\right)} \bra{\lambda_{m\left(s\right)}} \rho \ket{\lambda_{m\left(s\right)}} = \Tr\left(\rho \sum_{m\left(s\right)} \lambda_{m\left(s\right)} \ket{\lambda_{m\left(s\right)}}\bra{\lambda_{m\left(s\right)}}\right) = \Tr\left(\rho M\right).}
@@ -100,7 +100,7 @@
     Hence, in the first case, there is a smaller variance. This shows that we will need less samples for the first case to converge. This result may appear counter-intuitive, showing variance should generally be computed instead of using intuition.
 
     \begin{subparag}{Remark}
-        Note that, in practice the second case may be simpler to use since we may not be able to find $U_{\phi}$ and $U_{\psi}$.
+        Note that, in practice, the second case may be simpler to use since we may not be able to find $U_{\phi}$ and $U_{\psi}$.
     \end{subparag}
 \end{parag}
 
@@ -110,10 +110,10 @@
     Our goal is to compute $\left\langle Z^{\otimes n} \right\rangle$, for some fixed state $\rho$. We see the two following methods, where all measures are done in the $Z$ basis (i.e. the computation basis).
     \begin{center}
     \begin{quantikz}
-        \lstick[wires=4]{\rho} &          &          &          & \meter{} \\
-                               &          &          &          & \meter{} \\
-                               &          &          &          & \meter{} \\
-                               &          &          &          & \meter{} 
+        \lstick[wires=4]{\rho} &          &          &          & \meter[wires=4]{} \\
+                               &          &          &          &  \\
+                               &          &          &          &  \\
+                               &          &          &          &  
     \end{quantikz}
     \hspace{3em}
     \begin{quantikz}
@@ -132,7 +132,7 @@
          
         Hence, the last qubit is $\ket{0}$ if there is an even number of $1$, and $\ket{1}$ if there is an odd number. Hence, $\Tr\left(Z_n \rho'\right)$ is $1$ if there is an even number of $1$, and $-1$ otherwise.
 
-        This does show that $\Tr\left(\rho Z^{\otimes n}\right) = \Tr\left(\rho' Z_n\right)$.
+        This does show that $\Tr\left(\rho Z^{\otimes n}\right) = \Tr\left(\rho' Z_n\right)$ in this case.
     \end{subparag}
 
     \begin{subparag}{Variance}
@@ -142,7 +142,7 @@
             \item $\Var_{\rho'}\left(M'\right) = \Tr\left(\rho' M'^2\right) - \Tr\left(\rho' M'\right)^2 = 1 - \Tr\left(\rho' Z_n\right)^2$. 
         \end{enumerate}
 
-        We found above that $\Tr\left(\rho Z^{\otimes n}\right) = \Tr\left(\rho' Z_n\right)$. Hence, the two variances are the same. This shows that there isn't a method which is better than the other.
+        We found above that $\Tr\left(\rho Z^{\otimes n}\right) = \Tr\left(\rho' Z_n\right)$, since both circuits compute the same value. Hence, the two variances are the same. This shows that there isn't a method which is better than the other.
 
         In fact, another way to see this is because, in the Heisenberg picture, applying the $CNOT$ on the observable $Z_n$ results in the observable $Z^{\otimes n}$. Hence, the two circuits must be equivalent.
     \end{subparag}
@@ -190,7 +190,7 @@
     \end{subparag}
 
     \begin{subparag}{Proof}
-       Consider the random variable $Y = \left(Z - \exval\left(Z\right)\right)^2$. It is positive, so we can use Markov's inequality: 
+       Consider the random variable $Y = \left(Z - \exval\left(Z\right)\right)^2$. It is non-negative, so we can use Markov's inequality: 
        \autoeq{\prob\left(\left|Z - \exval\left(Z\right)\right| \geq t\right) = \prob\left(\left(Z - \exval\left(Z\right)\right)^2 \geq t^2\right) = \prob\left(Y \geq t^2\right) \leq \frac{\exval\left(Y\right)}{t^2} = \frac{\exval\left(\left(Z - \exval\left(Z\right)\right)^2\right)}{t^2} = \frac{\Var\left(Z\right)}{t^2}.}
 
        \qed

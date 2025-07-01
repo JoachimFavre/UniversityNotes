@@ -36,11 +36,11 @@
 \end{parag}
 
 \begin{parag}{Definition: Shannon entropy}
-    Let $X$ be a random variable, that takes value $x$ with probability $p_x$. We define its \important{Shannon entropy} to be: 
+    Let $X$ be a random variable that takes value $x$ with probability $p_x$. We define its \important{Shannon entropy} to be: 
     \[H_b\left(X\right) = - \sum_{x} p_x \log_{b}\left(p_x\right).\]
 
     \begin{subparag}{Intuition}
-        This represents the amount of uncertainty $X$ before learning its value. Equivalently, it represents the amount of information we gain when learning it.
+        This represents the amount of uncertainty about $X$ before learning its value. Equivalently, it represents the amount of information we gain when learning it.
 
         A more intuitive way to see this is to call $-\log_{2}\left(p_x\right) = \log_2\left(\frac{1}{p_x}\right)$ the surprise of $x$. The logarithm is here such that, if we have a surprise associated to $a$ of $\log_{2}\left(\frac{1}{p_a}\right)$ and a surprise associated to $b$ of $\log_{2}\left(\frac{1}{p_b}\right)$, and if we assume that $a$ and $b$ are independent, then the surprise associated to $a$ and $b$ is the sum of their surprises:
         \[\log_2\left(\frac{1}{p_{ab}}\right) = \log_2\left(\frac{1}{p_a}\cdot \frac{1}{p_b}\right) = \log_{2}\left(\frac{1}{p_a}\right) + \log_{2}\left(\frac{1}{p_b}\right).\]
@@ -53,7 +53,7 @@
     \end{subparag}
 
     \begin{subparag}{Remark 2}
-        We will mostly consider binary entropies, taking $b = 2$.
+        We will only consider binary entropies, taking $b = 2$.
     \end{subparag}
 \end{parag}
 
@@ -98,7 +98,7 @@
         \end{tabular}
         \end{center}
         
-        This is prefix-free, i.e. we can decode any bitstring without any ambiguity. For instance, if we are given a chain of bits $011110$ we are able to decode it to $1, 4, 2$ easily. This yields an average of length of: 
+        This is prefix-free, i.e. we can decode any bitstring without any ambiguity. For instance, if we are given a chain of bits $011110$ we are able to decode it to $1, 4, 2$ easily. This yields an average length of: 
         \[\left(\frac{1}{2}\cdot 1 + \frac{1}{4}\cdot 2 + \frac{1}{8}\cdot 3 + \frac{1}{8}\cdot 3\right) n = \frac{7}{4}n < 2n.\]
     \end{subparag}
 \end{parag}
@@ -163,7 +163,7 @@
 
     \begin{subparag}{Personal remark}
         Equivalently, we can define: 
-        \[H\left(X \suchthat Y = y\right) = p_{x | y} \log_{2}\left(p_{x|y }\right).\]
+        \[H\left(X \suchthat Y = y\right) = \sum_{x} p_{x | y} \log_{2}\left(p_{x|y }\right).\]
         
         Then, we have: 
         \[H\left(X \suchthat Y\right) = \sum_{y} p_y H\left(X \suchthat Y = y\right).\]
@@ -181,7 +181,7 @@
     \begin{subparag}{Personal remark}
         One may also write $H\left(X: Y\right) = I\left(X; Y\right)$.
 
-        Intuitively, this represents the amount of information one learns about $X$ when learning the value of $Y$. For instance, if $X$ and $Y$ are independent, then $H\left(X: Y\right) = 0$; but if $X = Y$, then $H\left(X: Y\right) = H\left(X\right)$ (i.e. when we learn the value of $X$, we learn $H\left(X\right)$ about $Y = X$).
+        Intuitively, this represents the amount of information one learns about $X$ when learning the value of $Y$. For instance, if $X$ and $Y$ are independent, then $H\left(X: Y\right) = 0$; but if $X = Y$, then $H\left(X: Y\right) = H\left(X\right)$ (i.e. when we learn the value of $X$, we learn $H\left(X\right)$ bits of information about $Y = X$).
     \end{subparag}
 \end{parag}
 
@@ -189,7 +189,7 @@
     A Venn diagram is a helpful tool to read those properties.
     \svghere[0.6]{VennDiagramEntropy.svg}
 
-    $H\left(X\right)$ represents all the uncertainty due to $X$. Hence, for instance when we learn the vale of $X$, we are only left with the uncertainty $H\left(Y \suchthat X\right)$.
+    $H\left(X\right)$ represents all the uncertainty due to $X$. Hence, for instance when we learn the value of $X$, we are only left with the uncertainty $H\left(Y \suchthat X\right)$.
 
     On this Venn diagram, we can also read that:
     \begin{itemize}
@@ -294,7 +294,7 @@
     Hence, the conditional entropy is: 
     \[S\left(A | B\right) = -1.\]
 
-    This makes sense, by measuring $B$, the state becomes more mixed and we thus lose information. In particular, since this value can be negative, his shows Venn diagram break down for quantum, and that quantum entropies are funkier than classical ones.
+    This makes sense, by measuring $B$, the state becomes more mixed and we thus lose information. In particular, since this value can be negative, this shows Venn diagram break down for quantum, and that quantum entropies are funkier than classical ones.
 \end{parag}
 
 \begin{parag}{Definition: Relative entropy}
