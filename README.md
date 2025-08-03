@@ -48,11 +48,12 @@
 The "Open in Overleaf" button will create a new project on your account with the given lecture notes, using [Overleaf's API](https://www.overleaf.com/devs). Due to long compilation time, this may require an Overleaf pro account—which is free for many students, [including EPFL's](https://www.overleaf.com/edu/epfl). You may also download the LaTeX project and compile it locally on your computer using LuaLaTeX (this is important), or simply directly download the PDF.
 
 ## Remarks
-I made this document for my own use, but I thought that typed notes might be of interest to others. There are mistakes, it is impossible not to make any. If you find some, please feel free to share them with me (grammatical and vocabulary errors are of course also welcome). You can contact me on Telegram.
+I wrote these documents for my own use, but I thought that typed notes might be of interest to others. There are mistakes, it is impossible not to make any. If you find some, please feel free to share them with me (grammatical and vocabulary errors are of course also welcome). You can contact me on Telegram.
 
 Please note that the content does not belong to me. I have made some structural changes, reworded some parts, and added some personal notes; but the wording and explanations come mainly from the Professors, and from the books on which they based their course.
 
 I think it is worth mentioning that in order to get these notes typed up, I took my notes in LaTeX during the course, and then made some corrections. I do not think typing handwritten notes is doable in terms of the amount of work. To take notes in LaTeX, I took my inspiration from [a blog post written by Gilles Castel](https://castel.dev/post/lecture-notes-1/). If you want more details, feel free to contact me.
 
 ## Note
-Note that I have done some weird things with this GitHub repository forcing me to do a *git push --force* using a new Git repository with only the latest changes (I, for example, had done some things stopping git from doing version control on my .pdf files, but it did not work well). This may lead to some bug on this GitHub repository. Anyhow, I want to thank [Alberts Reisons](https://github.com/Aderfish) and [Vlad Dancau](https://github.com/vladdancau) who made push requests with small modifications to my BA1 notes; the *git push --force* removed their name.
+
+Thank you to [Alberts Reisons](https://github.com/Aderfish) and [Vlad Dancau](https://github.com/vladdancau) who made push requests with small modifications to my BA1 notes and whose contribution was erased by an early reset of the repository.
