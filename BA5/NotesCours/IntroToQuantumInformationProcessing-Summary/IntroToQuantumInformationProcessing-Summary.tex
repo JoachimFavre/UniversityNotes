@@ -205,9 +205,13 @@
     \end{subparag}
 \end{parag}
 
-\begin{parag}{Semi-positive definite operator}
-    An operator $\hat{A}$ is \important{semi-postive definite} if all its eigenvalues are nonnegative. Equivalently: 
-    \[\bra{\psi} A \ket{\psi} \geq 0, \mathspace \forall \ket{\psi}\]
+\begin{parag}{Positive semi-definite operator}
+    An operator $\hat{A}$ is \important{positive semi-definite} if it is Hermitian and all its eigenvalues are non-negative.
+
+    \begin{subparag}{Remark}
+        An equivalent definition is that:
+        \[\bra{\psi} A \ket{\psi} \geq 0, \mathspace \forall \ket{\psi}\]
+    \end{subparag}
 \end{parag}
 
 \begin{parag}{Operator exponential}
@@ -241,7 +245,7 @@
 \end{parag}
 
 \begin{parag}{Operator logarithm}
-    Let $\hat{A}$ be a semi-positive definite hermitian operator. We know we can find eigenvectors $\ket{A_j}$ with non-negative real eigenvalues $a_j \geq 0$, yielding that it can be written as: 
+    Let $\hat{A}$ be a positive semi-definite Hermitian operator. We know we can find eigenvectors $\ket{A_j}$ with non-negative real eigenvalues $a_j \geq 0$, yielding that it can be written as: 
     \[\hat{A} = \sum_{j}^{} a_j \ket{A_j} \bra{A_j}\]
     
     Its logarithm is defined as: 
@@ -359,7 +363,7 @@
         \[\left|\braket{\phi}{\psi}\right|^2 = \braket{\phi}{\psi}^* \braket{\phi}{\psi} = \braket{\psi}{\phi}\braket{\phi}{\psi}\]
         
         More generally, computing norms using the complex conjugates often helps to compute those values much more easily. For instance: 
-        \[\left|1 + e^{i\theta}\right| = \left(1 + e^{-i\theta}\right)\left(1 + e^{i\theta}\right) = 1 + e^{i\theta - i\theta} + e^{i\theta} + e^{-i\theta} = 2 + 2\cos\left(\theta\right)\]
+        \[\left|1 + e^{i\theta}\right|^2 = \left(1 + e^{-i\theta}\right)\left(1 + e^{i\theta}\right) = 1 + e^{i\theta - i\theta} + e^{i\theta} + e^{-i\theta} = 2 + 2\cos\left(\theta\right)\]
     \end{subparag}
 \end{parag}
 
@@ -752,9 +756,9 @@
     This goes in four phases:
     \begin{enumerate}
         \item Alice generates two IID strings uniformly at random of classical bits: $e_1, \ldots, e_n$ and $x_1, \ldots, x_n$. She sends $n$ photons to Bob, in states: 
-        \[\ket{\psi_i} = \hat{H}^{x_i} \ket{e_i}, \mathspace \hat{H} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} \]
+        \[\ket{\psi_i} = \hat{H}^{e_i} \ket{x_i}, \mathspace \hat{H} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} \]
         where $\hat{H}$ is the Hadamard matrix.
-        \item Bob generates a IID string uniformly at random of classical bits $d_1, \ldots, d_n$. If $d_i = 0$, he measures the corresponding photo $\ket{\psi_i}$ in the basis of $\sigma_z$, $\left\{\ket{0}, \ket{1}\right\}$; if $d_i = 1$, he measures it in the basis of $\sigma_x$, $\left\{\frac{1}{\sqrt{2}}\left(\ket{0} + \ket{1}\right), \frac{1}{\sqrt{2}}\left(\ket{0} - \ket{1}\right)\right\}$. This gives him a sequence of classical bits $y_1, \ldots, y_n$.
+        \item Bob generates a IID string uniformly at random of classical bits $d_1, \ldots, d_n$. If $d_i = 0$, he measures the corresponding photon $\ket{\psi_i}$ in the basis of $\sigma_z$, $\left\{\ket{0}, \ket{1}\right\}$; if $d_i = 1$, he measures it in the basis of $\sigma_x$, $\left\{\frac{1}{\sqrt{2}}\left(\ket{0} + \ket{1}\right), \frac{1}{\sqrt{2}}\left(\ket{0} - \ket{1}\right)\right\}$. This gives him a sequence of classical bits $y_1, \ldots, y_n$.
         \item Alice and Bob reveal the choices of encoding and decoding basis $e_1, \ldots, e_n$ and $d_1, \ldots, d_n$; while keeping $x_1, \ldots, x_n$ and $y_1, \ldots, y_n$ secret. They get rid of all $\left(x_i, y_i\right)$ where $e_i \neq d_i$, and keep all the others. Those bits are the same for Alice and Bob, i.e. $\prob\left(x_i = y_i \suchthat e_i = d_i\right) = 1$; this is a shared secret of expected size $\frac{n}{2}$ that can for instance be used as one-time pad.
         \item Alice and Bob finally need to do a security check. They sacrifice a small part of their shared secret, $s = \epsilon \frac{n}{2}$ where $\epsilon \ll 1$ is very small. They verify that the number of bits that are equal is approximately $s$. Otherwise, there was a lot of noise or an eavesdropper.
     \end{enumerate}
@@ -771,7 +775,7 @@
         \[\prob\left(x_i = y_i \suchthat e_i = d_i\right) = \left|\braket{y_i}{x_i}\right|^2 = \begin{systemofequations} 1, & \text{if } x_i = y_i \\ 0, & \text{otherwise} \end{systemofequations}\]
         
         Now, when $e_i \neq d_i$, we always have $\hat{H}^{e_i + d_i} = \hat{H}$. This gives us: 
-        \[\prob\left(x_i = y_i \suchthat e_i \neq d_i\right) = \left|\ket{y_i}\hat{H}\ket{x_i}\right|^2 = \left|\bra{y_i} \frac{1}{\sqrt{2}}\left(\ket{0} + \left(-1\right)^{x_i}\right)\ket{1}\right|^2 = \frac{1}{2}\]
+        \[\prob\left(x_i = y_i \suchthat e_i \neq d_i\right) = \left|\bra{y_i}\hat{H}\ket{x_i}\right|^2 = \left|\bra{y_i} \frac{1}{\sqrt{2}}\left(\ket{0} + \left(-1\right)^{x_i}\right)\ket{1}\right|^2 = \frac{1}{2}\]
         as required.
     \end{subparag}
 
@@ -982,7 +986,7 @@
         \[\hat{\rho} = \frac{1}{2}\left(\hat{I} + a_x \hat{\sigma}_x + a_y \hat{\sigma}_y + a_z \hat{\sigma}_z\right)\]
         
         We only need to show that $\left\|\bvec{a}\right\| \leq 1$. To do so, we can compute the determinant. We know that it is positive: it is equal to the product of the eigenvalues, which are positive since density matrices are positive semi-definite. This gives us:
-        \autoeq{0 \leq \det\left(\hat{\rho}\right) = \frac{1}{4} \left(\det\left(\hat{I}\right) + a_x^2 \det\left(\hat{\sigma}_x\right) + a_y^2 \det\left(\hat{\sigma}_y\right) + a_z^2 \det\left(\hat{\sigma}_z\right)\right) = \frac{1}{4} \left(1 - a_x^2 - a_y^2 - a_z^2\right)= \frac{1}{4}\left(1 - \left\|\bvec{a}\right\|^2\right)}
+        \autoeq{0 \leq \det\left(\hat{\rho}\right) = \frac{1}{4} \det\begin{pmatrix} 1 + a_z & a_x - i a_y \\ a_x + i a_y & 1 - a_z \end{pmatrix}  = \frac{1}{4} \left(1 - a_x^2 - a_y^2 - a_z^2\right)= \frac{1}{4}\left(1 - \left\|\bvec{a}\right\|^2\right)}
         
         We indeed get that $\left\|\bvec{a}\right\| \leq 1$.
 
