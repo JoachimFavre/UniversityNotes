@@ -54,6 +54,6 @@ Please note that the content does not belong to me. I have made some structural 
 
 I think it is worth mentioning that in order to get these notes typed up, I took my notes in LaTeX during the course, and then made some corrections. I do not think typing handwritten notes is doable in terms of the amount of work. To take notes in LaTeX, I took my inspiration from [a blog post written by Gilles Castel](https://castel.dev/post/lecture-notes-1/). If you want more details, feel free to contact me.
 
-## Note
+## Acknowledgement
 
-Thank you to [Alberts Reisons](https://github.com/Aderfish) and [Vlad Dancau](https://github.com/vladdancau) who made push requests with small modifications to my BA1 notes and whose contribution was erased by an early reset of the repository.
+Thank you to [Alberts Reisons](https://github.com/Aderfish) and [Vlad Dancau](https://github.com/vladdancau) who made push requests with small modifications to my BA1 notes and whose contribution was erased by an early reset of the repository. Thank you to [Paul Tissot-Daguette](https://github.com/paultisaw) for all his offline proofreading of the BA1 documents. Thank you to everyone who pointed out mistakes to me.
