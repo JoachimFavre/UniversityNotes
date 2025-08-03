@@ -108,8 +108,17 @@ class GenericPrecompiler:
         if latex.count("Chernhoff") > 0:
             Logger.warn("'Chernhoff' instead of 'Chernoff'.", file_path)
             
+        if latex.count("Shanon") > 0:
+            Logger.warn("'Shanon' instead of 'Shannon'.", file_path)
+            
         if latex.lower().count("rotationel") > 0:
             Logger.warn("'rotationel' instead of 'rotationnel'.", file_path)
+
+        #if latex.lower().count("transfer") > 0:
+        #    Logger.warn("Potentially 'transfer' instead of 'transverse' in transverse-field Ising model.", file_path)
+
+        if latex.lower().count("tranverse") > 0:
+            Logger.warn("Potentially 'tranverse' instead of 'transverse' in transverse-field Ising model.", file_path)
 
         for command in ["hat", "bvec", "bhat", "widetilde"]:
             if Parser.any_cmd_content_contains(latex, command, "_"):
