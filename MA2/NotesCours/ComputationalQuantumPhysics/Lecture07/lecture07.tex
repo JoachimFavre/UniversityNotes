@@ -1,0 +1,269 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-04-01 at 08:22:37.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 01 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2025-04-01}{Variational Monte-Carlo methods}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the variational method.
+    \item Proof of unbiased estimators for the gradient and the energy.
+    \item Explanation of the zero-variance property.
+    \item Explanation of Markov-chain Monte-Carlo (MCMC) and the Metropolis-Hasting method.
+    \item Example with the mean-field Ansatz and the Jastrow Ansatz.
+\end{itemize}
+
+}
+
+\section{Variational Monte-Calro methods}
+
+\subsection{Ground state}
+
+\begin{parag}{Goal}
+    Let's suppose that we have some parametrisation of non-normalised quantum states, $\ket{\psi\left(\theta_1, \ldots, \theta_n\right)}$, based on some parameters $\theta_1, \ldots, \theta_n \in \mathbb{R}$. The variational principle tells us that:
+    \[E_{min} \leq E\left(\theta_1, \ldots, \theta_n\right) = \frac{\bra{\psi\left(\theta_1, \ldots, \theta_n\right)} \hat{H} \ket{\psi\left(\theta_1, \ldots, \theta_n\right)}}{\braket{\psi\left(\theta_1,\ldots,\theta_n\right)}{\psi\left(\theta_1, \ldots, \theta_n\right)}}.\]
+
+    Hence, minimising $E\left(\theta_1, \ldots, \theta_n\right)$ gives us an approximation to the ground state energy. This is the idea we will explore here.
+
+    \begin{subparag}{Remark}
+        We suppose that the parameters $\theta_1, \ldots, \theta_n$ are real, to simplify the computation of the gradient. Note that we can still have complex parameters, by using two real parameters. This allows to compute the gradient for real-differentiable functions that are not holomorphic, at the price of more parameters.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\ket{x}$ be a basis of kets, and $\hat{O}$ be an observable. We moreover define the function $O_{loc}\left(x\right)$ (named local observable), and probability distribution $\Pi\left(x\right)$:
+    \[\mathspace O_{loc}\left(x\right) = \frac{\bra{x} \hat{O} \ket{\psi}}{\braket{x}{\psi}}, \mathspace \Pi\left(x\right) = \frac{\left|\braket{x}{\psi}\right|^2}{\sum_{y} \left|\braket{y}{\psi}\right|^2}.\]
+
+    Then, $O_{loc}\left(x\right)$ is an unbiased estimator of the expected value under the $\Pi\left(x\right)$ random distribution:
+    \[\left\langle \hat{O} \right\rangle = \exval_{x \followsdistr \Pi\left(x\right)}\left[O_{loc}\left(x\right)\right].\]
+
+    \begin{subparag}{Intuition}
+        $\Pi\left(x\right)$ can be interpreted as the born rule: when $\ket{\psi}$ is normalised, the probability to measure $\ket{x}$ is $\left|\braket{x}{\psi}\right|^2$. Now, we want this to be a probability distribution, which is not the case if $\ket{\psi}$ is not normalised, so we have to normalise it: 
+        \[\Pi\left(x\right) = \frac{\left|\braket{x}{\psi}\right|^2}{\sum_{y} \left|\braket{y}{\psi}\right|^2} = \frac{\left|\braket{x}{\psi}\right|^2}{\braket{\psi}{\psi}}.\]
+        
+        This intuition allows to remember the form of $\Pi\left(x\right)$ more easily.
+        
+        The term $O_{loc}\left(x\right)$ then represents that we value we measure under the observable $\hat{O}$, when $\ket{\psi}$ collapses to $\ket{x}$. But then, the average value of $O_{loc}\left(x\right)$ is exactly the quantum expected value $\left\langle \hat{O} \right\rangle$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The basis of kets $\ket{x}$ can be spins $\ket{x} = \ket{\sigma_1^z, \ldots, \sigma_n^z}$, particle numbers $\ket{x} = \ket{n_1, \ldots, n_L}$, or even positions $\ket{x} = \ket{r_1, \ldots, r_N}$. The first two are discrete, the last is continuous. It is possible to handle continuous bases, although we will focus on discrete ones in this class.
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        If we are able to sample elements from the distribution $\Pi\left(x\right)$, then we are able to compute $\left\langle \hat{O} \right\rangle$. Moreover, if $\hat{O}$ is very sparse in the basis $\ket{x}$---which is often the case, as we saw with exact diagonalisation methods---then computing $O_{loc}\left(x\right)$ can be done in polynomial time.
+
+        Note however that, while evaluating $O_{loc}\left(x\right) = \frac{\bra{x} \hat{O} \ket{\psi}}{\braket{x}{\psi}}$ can be done in polynomial time, evaluating $\braket{\psi}{\psi} = \sum_{y} \left|\braket{y}{\psi}\right|^2$ typically cannot (since there are typically exponentially many elements in the sum). We will thus need a strategy that does not require computing this normalisation factor.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        Note that if $\hat{O}$ is diagonal in the $\ket{x}$ basis, we can simplify: 
+        \[O_{loc}\left(x\right) = \frac{\bra{x} \hat{O} \ket{\psi}}{\braket{x}{\psi}} = O\left(x\right) \frac{\braket{x}{\psi}}{\braket{x}{\psi}} = O\left(x\right).\]
+
+        Hence, in that case, this reads: 
+        \[\left\langle \hat{O} \right\rangle = \exval_{x \followsdistr \Pi\left(x\right)}\left[O\left(x\right)\right].\]
+    \end{subparag}
+
+    \begin{subparag}{Special case}
+        In particular:
+        \[\left\langle \hat{H} \right\rangle = \exval_{x \followsdistr \Pi\left(x\right)}\left(E_{loc}\left(x\right)\right), \mathspace \text{where }E_{loc}\left(x\right) = \frac{\bra{x} \hat{H} \ket{\psi}}{\braket{x}{\psi}}.\]
+
+        Note that the distribution $\Pi\left(x\right)$ and $E_{loc}\left(x\right)$ (the local energy) are at the heart of the variational approach and will appear many times in this course.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is direct:
+        \autoeq{\frac{\bra{\psi} \hat{O} \ket{\psi}}{\braket{\psi}{\psi}} = \frac{\sum_{x} \braket{\psi}{x} \bra{x} \hat{O} \ket{\psi}}{\sum_{y} \braket{\psi}{y}\braket{y}{\psi}} = \sum_{x} \left(\frac{\braket{\psi}{x}\braket{x}{\psi}}{\sum_{y} \left|\braket{\psi}{y}\right|^2}\right)  \frac{\bra{x} O \ket{\psi}}{\braket{x}{\psi}} = \sum_{x} \Pi\left(x\right) O_{loc}\left(x\right).}
+
+        Moreover, $\Pi\left(x\right)$ is a valid probability distribution since it is non-negative and sums to $1$, so we can rewrite this as:
+        \[\frac{\bra{\psi} \hat{O} \ket{\psi}}{\braket{\psi}{\psi}} = \exval_{x \followsdistr \Pi\left(x\right)} \left[O_{loc}\left(x\right)\right].\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Consider again variational states $\ket{\psi} = \ket{\psi\left(\theta\right)}$. We write: 
+    \[D_k\left(x\right) = \frac{\partial_{\theta_k} \braket{x}{\psi}}{\braket{x}{\psi}}, \mathspace G_k\left(x\right) = 2\cre\left[\left(E_{loc}\left(x\right) - \left\langle \hat{H} \right\rangle\right) D_k^*\left(x\right)\right]\]
+
+    Then: 
+    \[\frac{\partial}{\partial \theta_k} E\left(\theta\right) = \frac{\partial}{\partial \theta_k} \left\langle \hat{H} \right\rangle =  2\cre\left[\Cov_{x \followsdistr \Pi\left(x\right)}\left(E_{loc}\left(x\right), D_k\left(x\right)\right)\right] = \exval_{x \followsdistr \Pi\left(x\right)}\left(G_k\left(x\right)\right).\]
+
+    \begin{subparag}{Remark}
+        We aim to minimise $E\left(\theta_1, \ldots, \theta_n\right)$, so being able to compute its gradient is important. Indeed, we are then able to minimise the energy using gradient descent.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        We notice that, using the chain rule:
+        \autoeq[s]{\frac{\partial}{\partial \theta_k} \left\langle \hat{H} \right\rangle = \frac{\partial}{\partial \theta_k} \frac{\bra{\psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} = \frac{\bra{\partial_{\theta_k} \psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} + \frac{\bra{\psi} \hat{H} \ket{\partial_{\theta_k} \psi}}{\braket{\psi}{\psi}} - \frac{\bra{\psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} \cdot \frac{\braket{\partial_{\theta_k}\psi}{\psi} + \braket{\psi}{\partial_{\theta_k} \psi}}{\braket{\psi}{\psi}} = 2\cre\left[\frac{\bra{\partial_{\theta_k} \psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}}  - \frac{\bra{\psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} \cdot \frac{\braket{\partial_{\theta_k}\psi}{\psi}}{\braket{\psi}{\psi}} \right],}
+        where we used the fact $z + z^* = 2\cre\left(z\right)$. We have two terms to simplify. Let us write: 
+        \[D_k\left(x\right) = \frac{\braket{x}{\partial_{\theta_k} \psi}}{\braket{x}{\psi}} = \frac{\partial_{\theta_k} \braket{x}{\psi}}{\braket{x}{\psi}}.\]
+        
+        The first term simplifies to:
+        \autoeq{\frac{\bra{\partial_{\theta_k} \psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} = \sum_{x} \frac{\braket{\partial_{\theta_k}\psi}{x} \bra{x} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} = \sum_{x} \frac{\partial_{\theta_k} \braket{\psi}{x}}{\braket{\psi}{x}} \cdot \frac{\braket{\psi}{x}\braket{x}{\psi}}{\braket{\psi}{\psi}} \cdot  \frac{\bra{x} \hat{H} \ket{\psi}}{\braket{x}{\psi}}= \sum_{x} D_k^*\left(x\right) \Pi\left(x\right) E_{loc}\left(x\right) = \exval_{x \followsdistr \Pi\left(x\right)}\left(D_k^*\left(x\right) E_{loc}\left(x\right)\right).}
+        
+        The second term simplifies to:
+        \autoeq{- \frac{\bra{\psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} \cdot \frac{\braket{\partial_{\theta_k}\psi}{\psi}}{\braket{\psi}{\psi}} = - \left\langle \hat{H} \right\rangle \sum_{x} \frac{\braket{\partial_{\theta_k}\psi}{x} \braket{x}{\psi}}{\braket{\psi}{\psi}} = - \left\langle \hat{H} \right\rangle \sum_{x} \frac{\braket{\partial_{\theta_k}}{x}}{\braket{\psi}{x}} \frac{\braket{\psi}{x}\braket{x}{\psi}}{\braket{\psi}{\psi}} = -\left\langle \hat{H} \right\rangle \sum_{x} D_k^*\left(x\right) \Pi\left(x\right) = -\left\langle \hat{H} \right\rangle \exval_{y \followsdistr \Pi\left(y\right)}\left(D_k^*\left(y\right)\right).}
+
+        Now, we know that $\left\langle \hat{H} \right\rangle = \exval_{x \followsdistr \Pi\left(x\right)}\left(E_{loc}\left(x\right)\right)$ as found in the previous lemma, so, overall, this simplifies to something that looks like a (complex) covariance: 
+        \autoeq[s]{\frac{\partial}{\partial \theta_k} \left\langle \hat{H} \right\rangle = 2 \cre\left[\exval_{x \followsdistr \Pi\left(x\right)}\left(D_k^*\left(x\right) E_{loc}\left(x\right)\right) - \exval_{x \followsdistr \Pi\left(x\right)}\left(E_{loc}\left(x\right)\right) \exval_{y \followsdistr \Pi\left(y\right)}\left(D_k^*\left(y\right)\right)\right] = 2\cre\left[\Cov_{x \followsdistr \Pi\left(x\right)}\left(E_{loc}\left(x\right), D_k\left(x\right)\right)\right].}
+
+        This looks nice, but we would prefer to have an expected value (to be able to make an unbiased estimator). Hence, using the fact $\cre$ is a linear operator:
+        \autoeq{\frac{\partial}{\partial \theta_k} \left\langle \hat{H} \right\rangle = 2 \cre\left[\exval_{x \followsdistr \Pi\left(x\right)}\left(D_k^*\left(x\right) E_{loc}\left(x\right)\right) - \left\langle \hat{H} \right\rangle \exval_{y \followsdistr \Pi\left(y\right)}\left(D_k^*\left(y\right)\right)\right] = 2 \cre\left[\exval_{x \followsdistr \Pi\left(x\right)}\left(D_k^*\left(x\right) E_{loc}\left(x\right) - \left\langle \hat{H} \right\rangle D_k^*\left(x\right)\right)\right] = \exval_{x \followsdistr \Pi\left(x\right)}\left[2\cre\left(D_k^*\left(x\right) E_{loc}\left(x\right) - \left\langle \hat{H} \right\rangle D_k^*\left(x\right)\right)\right] = \exval_{x \followsdistr \Pi\left(x\right)}\left(G_k\left(x\right)\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: Zero-variance property}
+    We have: 
+    \[\Var_{x \followsdistr \Pi\left(x\right)}\left(E_{loc}\left(x\right)\right) = \left\langle \hat{H}^2 \right\rangle - \left\langle \hat{H} \right\rangle^2.\]
+    
+    \begin{subparag}{Implication}
+        As we have seen, we can express:
+        \[\left\langle \hat{O} \right\rangle = \exval_{x \followsdistr \Pi\left(x\right)}\left(O_{loc}\left(x\right)\right).\]
+        
+        So, taking $N_S$ samples $x^{\left(1\right)}, \ldots, x^{\left(N_S\right)}$ from the distribution: 
+        \[\left\langle \hat{O} \right\rangle \approx \frac{1}{N_S} \sum_{i=1}^{N_S} O_{loc}\left(x^{\left(i\right)}\right).\]
+
+        More precisely, $\frac{1}{N_S} \sum_{i=1}^{N_S} O_{loc}\left(x^{\left(i\right)}\right)$ converges to a Gaussian distribution by the central limit theorem, of standard deviation $\sigma = \sigma_O/\sqrt{N_S}$, where $\sigma_O$ is the standard deviation of the estimator: 
+        \[\sigma_O^2 = \Var_{x \followsdistr \Pi\left(x\right)}\left(O_{loc}\left(x\right)\right) = \exval_{x \followsdistr \Pi\left(x\right)}\left(O_{loc}\left(x\right)^2\right) - \exval_{x \followsdistr \Pi\left(x\right)}\left(O_{loc}\left(x\right)\right)^2.\]
+
+        In other words, if we repeated the experiment $p$ times and made a histogram of the results, we would get a Gaussian distribution centered around $\left\langle \hat{O} \right\rangle$, of standard deviation $\sigma = \sigma_O/\sqrt{N_S}$. This is interesting, because it tells us that we can repeat increase $N_S$ to the value we want, to have an arbitrary precision. However, the speed of converge depends on the standard deviation $\sigma_O$.
+
+        This lemma now shows that, when estimating the energy, the variance of the estimator matches the quantum variance: $\sigma_H^2 = \left\langle \hat{H}^2 \right\rangle - \left\langle \hat{H} \right\rangle^2$. Now, note that, if $\ket{\psi}$ is an eigenstate of $\hat{H}$, then this quantum variance is $0$. Since we are trying to find the energy of the ground state, this shows that, as we converge to the ground state energy, we get smaller variance. In practice, this means that the variance is polynomially bounded, and hence that polynomially many samples are enough to get a good approximation.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        By definition of (complex) variance:
+        \[\Var_{x \followsdistr \Pi\left(x\right)}\left(E_{loc}\left(x\right)\right) = \exval_{x \followsdistr \Pi\left(x\right)}\left(\left|E_{loc}\left(x\right)\right|^2\right) - \left|\exval_{x \followsdistr \Pi\left(x\right)}\left(E_{loc}\left(x\right)\right)\right|^2.\]
+
+        Now, we know that $\exval_{x \followsdistr \Pi\left(x\right)}\left(E_{loc}\left(x\right)\right) = \left\langle \hat{H} \right\rangle$. The only question is the other term: 
+        \autoeq{\exval_{x \followsdistr \Pi\left(x\right)}\left(\left|E_{loc}\left(x\right)\right|^2\right) = \sum_{x} \Pi\left(x\right) \left|E_{loc}\left(x\right)\right|^2 = \sum_{x} \frac{\left|\braket{x}{\psi}\right|^2}{\braket{\psi}{\psi}} \frac{\left|\bra{x} \hat{H} \ket{\psi}\right|^2}{\left|\braket{x}{\psi}\right|^2} = \sum_{x} \frac{1}{\braket{\psi}{\psi}}\cdot \bra{\psi} H \ket{x}\bra{x} H \ket{\psi} = \frac{\bra{\psi} \hat{H}^2 \ket{\psi}}{\braket{\psi}{\psi}} = \left\langle \hat{H}^2 \right\rangle.} 
+        
+        Overall, we did find that:
+        \[\Var_{x \followsdistr \Pi\left(x\right)}\left(E_{loc}\left(x\right)\right) = \left\langle \hat{H}^2 \right\rangle - \left\langle \hat{H} \right\rangle^2.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Markov chain Monte-Carlo (MCMC)}
+    Consider a Markov chain of transition probability $\mathcal{T}\left(x' \suchthat x\right)$. In other words, we have points $x^{\left(1\right)}, x^{\left(2\right)}, \ldots$ such that $x^{\left(i+1\right)} \followsdistr \mathcal{T}\left(x^{\left(i+1\right)} \suchthat x^{\left(i\right)}\right)$.
+
+    Suppose that the transition probabilities respect the following equation, named the detailed balance equation, for all $x, x'$: 
+    \[\Pi\left(x\right) \mathcal{T}\left(x' \suchthat x\right) = \Pi\left(x'\right) \mathcal{T}\left(x \suchthat x'\right).\]
+    
+    Then, $\Pi\left(x\right)$ is the stationary distribution of the Markov chain. In other words, the probability distribution of $x^{\left(\infty\right)}$ is $\pi\left(x\right)$. This strategy is named \important{Markov Chain Monte Carlo}
+
+
+    \begin{subparag}{Personal remark}
+        In fact, we also need the Markov chain to be ``ergodic''. In practice, this is fine for any reasonable Markov chain. 
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        The idea is that the stationary distribution $\Pi\left(x\right)$ is such that, given any state $x$, we have the same probability to leave it at the next iteration as we have to reach it at the next iteration (i.e. there is the same probability flowing into $x$ as probability flowing out of $x$). In other words:
+        \[\sum_{x'} \Pi\left(x\right) \mathcal{T}\left(x' \suchthat x\right) = \sum_{x' \neq x} \Pi\left(x'\right) \mathcal{T}\left(x \suchthat x'\right).\]
+
+        Asking for $\Pi\left(x\right) \mathcal{T}\left(x' \suchthat x\right) = \Pi\left(x'\right) \mathcal{T}\left(x \suchthat x'\right)$ does imply this result.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Metropolis-Hasting method}
+    Let $T\left(x' \suchthat x\right)$ be an update proposal distribution. We consider the following algorithm, named the \important{Metropolis-Hasting method}, that generates points $x^{\left(2\right)}, x^{\left(3\right)}, \ldots$. For all $i \geq 2$:
+    \begin{enumerate}
+        \item Generate an update proposal $x'$ from $T\left(x' \suchthat x^{\left(i\right)}\right)$.
+        \item Compute $R = \frac{\Pi\left(x'\right)}{\Pi\left(x^{\left(i\right)}\right)}\cdot \frac{T\left(x^{\left(i\right)} \suchthat x'\right)}{T\left(x' \suchthat x^{\left(i\right)}\right)}$.
+        \item Generate a $\xi \followsdistr \text{Uniform}\left(\left[0, 1\right]\right)$.
+        \item If $\xi < R$, accept the update: $x^{\left(i+1\right)} = x'$. Otherwise, reject it: $x^{\left(i+1\right)} = x^{\left(i\right)}$.
+    \end{enumerate}
+
+    Asymptotically, $x^{\left(\infty\right)} \followsdistr \Pi\left(x\right)$.
+
+    \begin{subparag}{Intuition}
+        The idea is that we are doing a MCMC, with Ansatz $\mathcal{T}\left(x' \suchthat x\right) = T\left(x' \suchthat x\right) A\left(x' \suchthat x\right)$ for $x \neq x'$. In other words, $\mathcal{T}\left(x' \suchthat x\right)$ is given by some update proposal distribution $T$, and some acceptance distribution $A$. The detailed balance equation then becomes:
+        \autoeq{\Pi\left(x\right) T\left(x' \suchthat x\right) A\left(x' \suchthat x\right) = \Pi\left(x'\right) T\left(x \suchthat x'\right) A\left(x \suchthat x'\right) \iff \frac{A\left(x' \suchthat x\right)}{A\left(x \suchthat x'\right)} = \frac{\Pi\left(x'\right)}{\Pi\left(x\right)} \frac{T\left(x \suchthat x'\right)}{T\left(x' \suchthat x\right)}.}
+
+        Metropolis and Hasting propose the following acceptance distribution, which one can verify to indeed make this equation true:
+        \[A\left(x' \suchthat x\right) = \min\left(1, \frac{\Pi\left(x'\right)}{\Pi\left(x\right)}\cdot \frac{T\left(x \suchthat x'\right)}{T\left(x' \suchthat x\right)}\right).\]
+
+        This is exactly what is done here, $\prob\left(\xi < R\right) = A\left(x' \suchthat x\right)$. 
+
+        Note moreover that this is not the only acceptance distribution that works. However, this one has the huge advantage that we do not need to evaluate $\Pi\left(x\right)$, but instead its ratio $\Pi\left(x'\right)/\Pi\left(x\right)$. This is nice, because we were not able to evaluate the normalisation factor efficiently, and it cancels out: 
+        \[\frac{\Pi\left(x\right)}{\Pi\left(x'\right)} = \frac{\left|\braket{x}{\psi}\right|^2}{\braket{\psi}{\psi}} \frac{\braket{\psi}{\psi}}{\left|\braket{x'}{\psi}\right|^2} = \frac{\left|\braket{x}{\psi}\right|^2}{\left|\braket{x'}{\psi}\right|^2}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Having a symmetric update proposal distribution, $T\left(x' \suchthat x\right) = T\left(x \suchthat x'\right)$, simplifies the computation of the acceptance probability.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        The exact choice of the update proposal rule is completely free, and mostly just a heuristic choice. For instance, let's consider a case where we want to sample from a 1D real distribution $\Pi: \mathbb{R} \mapsto \mathbb{R}_+$. Moreover, suppose that the update rule is just a Gaussian displacement on the current position: $x' = x + \alpha$ for some Gaussian $\alpha$.
+
+        If the $\alpha$ is too small on average, then the Markov chain will take a lot of time to converge to the stationary distribution.
+
+        $\alpha$ must not be too large on average either. Indeed, it is reasonable to suppose that $\Pi$ has probability mass focused at some specific places. If we often propose $x'$ which is very far from $x$, it is reasonable to suppose that $\Pi\left(x'\right) / \Pi\left(x\right) \approx 0$ many of the times, and hence that this new sample is very often rejected.
+
+        Now, overall, all these strategies are valid. Some will just yield faster convergence than others.
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        We can suppose that all points that this algorithm generates are samples of our probability distribution $\Pi\left(x\right)$ as an approximation, skipping the first few for the MCMC to calibrate. The issue however is that, then, the samples are correlated. This thus introduces some error in this estimation.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: Mean-field Ansatz}
+    Consider $N$ particles with spin $\frac{1}{2}$ under the TFIM: 
+    \[\ket{x} = \ket{\sigma_1^z, \ldots, \sigma_N^z}, \mathspace \hat{H} = -J \sum_{i=1}^{N} \hat{\sigma}_i^z \hat{\sigma}_{i+1}^z - \Gamma \sum_{i=1}^{N} \hat{\sigma}_i^x.\]
+
+    We moreover suppose that the wavefunction factorises, $\ket{\psi} = \ket{\phi_1} \otimes \ldots \ket{\phi_N}$ and hence:
+    \[\braket{\sigma_1^z,\ldots,\sigma_N^z}{\psi} = \Phi_1\left(\sigma_1\right) \cdots \Phi_N\left(\sigma_N\right).\]
+    
+    This has the huge advantage of being mathematically very simple, but does not capture any of the correlations between different particles. Now, we can parameterise this with $M = N$ parameters such that:
+    \[\Phi_i\left(\uparrow\right) = \cos\left(\theta_i\right), \mathspace \Phi_i\left(\downarrow\right) = \sin\left(\theta_i\right).\]
+
+    Note that $\Phi_i\left(\sigma_j\right)$ are complex in general. However, in practice, it is possible to show the ground state is real, so supposing that the parameters are real is fine. Moreover, this is such that $\Phi_i\left(\uparrow\right)^2 + \Pi\left(\downarrow\right)^2 = 1$, which naturally enforces normalisation.
+
+    However, then, in our case:
+    \[\Pi\left(\sigma_1, \ldots, \sigma_N\right) = \frac{\braket{\sigma_1, \ldots, \sigma_N}{\psi}}{\bra{\psi}ke^{\sigma}} = \prod_{i=1}^{N} \Phi_i\left(\sigma_i\right)^2.\]
+
+    This probability distribution is very simple, since it factorises. This means that we do not even need a Markov chain to generate samples. Instead, we can generate $\sigma_1, \ldots, \sigma_N$ by doing:
+    \begin{enumerate}
+        \item Sample $\xi \in \left[0, 1\right]$ uniformly at random.
+        \item Define $P_i\left(\uparrow\right) = \frac{\Phi_i\left(\uparrow\right)^2}{\Phi_i\left(\uparrow\right)^2 + \Phi_i\left(\downarrow\right)^2}$.
+        \item If $P_i > \xi$, then $\sigma_i = \uparrow$. Otherwise, $\sigma_i = \downarrow$.
+    \end{enumerate}
+
+    Repeating this many times, this moreover has the advantage of MCMC of giving uncorrelated samples.
+
+    \begin{subparag}{Remark}
+         We could have enforced $\Phi_i\left(\uparrow\right)^2 + \Phi_i\left(\downarrow\right)^2 = 1$. We can for instance enforce this by taking $\Phi\left(\uparrow\right) = \cos\left(\theta\right)$ and $\Phi\left(\downarrow\right) = \sin\left(\theta\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2: Jastrow Answatz}
+    Consider $N$ particles with spin $\frac{1}{2}$ under the TFIM: 
+    \[\ket{x} = \ket{\sigma_1^z, \ldots, \sigma_N^z}, \mathspace \hat{H} = -J \sum_{i=1}^{N} \hat{\sigma}_i^z \hat{\sigma}_{i+1}^z - \Gamma \sum_{i=1}^{N} \hat{\sigma}_i^x.\]
+
+    This time, we consider the following parametrisation, that depends on some $p$:
+    \autoeq[s]{\braket{\sigma_1,\ldots,\sigma_N}{\psi} = \exp\left[\sum_{i} J_i^{\left(1\right)}\left(\sigma_i\right) + \sum_{i < j} J_{ij}^{\left(2\right)}\left(\sigma_i, \sigma_j\right) + \ldots + \frac{1}{p!} \sum_{i_1 \neq i_2 \neq \ldots \neq i_p} J_{i_1, \ldots, i_p}^{\left(p\right)}\left(s_{i_1}, \ldots, s_{i_p}\right)\right].}
+
+    The variational parameters are the functions $J^{\left(1\right)}, \ldots, J^{\left(p\right)}$. When $p = N$, we can describe any function that way. However, this requires exponentially many parameters. In fact, in most cases, it suffices to take $p = 2$.
+
+    Sampling according to $\Pi\left(x\right)$ now require the Metropolis method. As usual with the TFIM, we typically take $T\left(\sigma' \suchthat \sigma\right) = T\left(\sigma \suchthat \sigma'\right)$ so that we do not have to worry about the correction term. In that case:
+    \[A\left(\sigma' \suchthat \sigma\right) = \min\left(1, \frac{\braket{\sigma'}{\psi}^2}{\braket{\sigma}{\psi}^2}\right).\]
+
+    For instance, this can be done my the update proposal distribution that just flips a spin chosen uniformly at random.
+\end{parag}
+
+\end{document}

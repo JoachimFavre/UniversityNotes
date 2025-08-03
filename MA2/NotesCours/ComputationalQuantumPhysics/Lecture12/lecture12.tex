@@ -1,0 +1,230 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-13 at 08:23:18.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 13 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2025-05-13}{Path-integral for lattice models}{
+\begin{itemize}[left=0pt]
+    \item Application of path-integral Monte-Carlo to the transverse-field Ising model.
+    \item Proof that the 1D quantum TFIM can be converted to an effective 2D classical TFIM.
+    \item Explanation of Dyson series to do simulation without time-step error.
+    \item Explanation of stochastic series expansion to do simulation without time-step error.
+\end{itemize}
+
+}
+
+\subsection{Spin models}
+
+\begin{parag}{Lemma: Transverse-field Ising model short-time propagator}
+    We consider the following Hamiltonian, a specific instance of the transverse-field Ising model: 
+    \[\hat{H} = \underbrace{-\Gamma \sum_{i=1}^{N-1} \hat{\sigma}_i^x}_{= H_1} \underbrace{- J \sum_{i=0}^{N-1} \hat{\sigma}_i^z \hat{\sigma}_{i+1}^{z}}_{= \hat{H}_0} = \hat{H}_0 + \hat{H}_1,\]
+    where we let periodic boundary conditions $\hat{\sigma}_N^z = \hat{\sigma}_0^z$.
+    
+    We consider our basis states to be: 
+    \[\ket{x} = \ket{\sigma_0^z, \ldots, \sigma_{N-1}^z}, \mathspace \ket{y} = \ket{\sigma_0^{z'}, \ldots, \sigma_{n-1}^{z'}}.\]
+
+    Then, the short-time propagator of $\hat{H}_1$ is: 
+    \[G_1^{\Delta_{\tau}}\left(x, y\right) = \bra{x} e^{-\Delta_{\tau} \hat{H}_1} \ket{y}  = \prod_{i=0}^{N-1} \left[\cosh\left(\Gamma \Delta_{\tau}\right)\delta_{\sigma_i^z, \sigma_i^{z'}} + \left(1 - \delta_{\sigma_i^z, \sigma_i^{z'}}\right) \sinh\left(\Delta_{\tau} \Gamma\right)\right].\]
+    
+    \begin{subparag}{Consequence}
+        As usual, we can consider the second order Trotter approximation, since our Hamiltonian has a bounded eigenspectrum:
+        \[G^{\Delta_{\tau}}\left(x, y\right) = \bra{x} e^{-\Delta_{\tau} \hat{H}} \ket{y} = e^{-\frac{\Delta_{\tau}}{2} H_0\left(x\right)} G_1^{\Delta_{\tau}}\left(x, y\right) e^{- \frac{\Delta_{\tau}}{2} H_0\left(y\right)}.\]
+
+        We can now use all the results we developed in the last lecture. For instance:
+        \[Z = \sum_{x_0} \bra{x_0} e^{-\beta \hat{H}} \ket{x_0} = \sum_{x_0, \ldots, x_{p-1}} \prod_{j=0}^{p-1} G_1^{\Delta_{\tau}}\left(x_j, x_{j+1}\right) e^{-\Delta_{\tau} H_0\left(x_j\right)},\]
+        where we have a periodic bounding condition in imaginary time $x_0 = x_p$, and where: 
+        \[x_j = \left(\sigma_{0, j}^z, \sigma_{1, y}^z, \ldots, \sigma_{N-1, j}^z\right).\]
+        
+        This ranges for $j \in \left\{0, \ldots, p-1\right\}$, we thus have $N\cdot p$ total spins.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is direct:
+        \autoeq{G_1^{\Delta_{\tau}}\left(x, y\right) = \bra{x} e^{\Gamma \Delta_{\tau} \sum_i \hat{\sigma}_i^x} \ket{y} = \prod_{i} \bra{\sigma_i^z} e^{\Gamma \Delta_{\tau} \hat{\sigma}_i^x} \ket{\sigma_i^{z'}} = \prod_{i=0}^{N-1} \left[\cosh\left(\Gamma \Delta_{\tau}\right)\delta_{\sigma_i^z, \sigma_i^{z'}} + \left(1 - \delta_{\sigma_i^z, \sigma_i^{z'}} \sinh\left(\Delta_{\tau} \Gamma\right)\right)\right],}
+        where we used a formula similar to the generalised Euler property for Pauli operators.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Effective classical model}
+    We define:
+    \[J^{eff} = \frac{1}{2} \ln\left(\tanh\left(\Gamma \Delta_{\tau}\right)\right).\]
+
+    We also define the following effective classical energies, depending on spins $\sigma_{ij}^z \in \left\{+1, -1\right\}$:
+    \[E^{eff}\left(\left\{\sigma_{i j}^z\right\}\right) = \sum_{i, j} \left(-\Delta_{\tau} J \sigma_{i, j}^z \sigma_{i+1, j}^z + J^{eff} \sigma_{i, j}^z \sigma_{i, j+1}^z\right).\]
+
+    Then, we have:
+    \[Z = \sum_{\left\{\sigma^z_{i, j}\right\}} e^{-E^{eff}\left(\sigma_{i, j}^z\right)},\]
+    where we have periodic boundary conditions both on the $i$ and on the $j$ variables.
+
+    \begin{subparag}{Interpretation}
+        This can be interpreted as being a classical 2D transverse-field Ising model: instead of having operators represent our spins and hence having states that can be in a superposition of the two spin values, we have scalar values representing our spin. Then, we can interpret:
+        \begin{itemize}[left=0pt]
+            \item $E_{eff}$ is a classical Hamiltonian for a 2D TFI model, with periodic bounding condition both in lattice and imaginary time indices. The first terms couples the same particle at different imaginary time, the second one couples different particles at the same time. It is moreover anisotropic, since the couplings are not the same in both directions. 
+            \item This $Z$ is then the partition function of a classical model associated to these energies, with $\beta = 1$.
+        \end{itemize}
+
+        This can be visualised on the following picture.
+        \imagehere[1]{QuantumTFIMToClassicalTFIM.png}
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        We may be interested to take a thermodynamic limit, i.e. to take $N \to \infty$. However, we are also taking $\Delta_{\tau} \to 0$, so we have two limits to take.
+
+        An important thing to do in practice is to do one limit, and then the other. In other words, we should not modify both parameters at the same time to study convergence numerically.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Being able to convert quantum models to classical one is a general property of path integrals. However, in general, the effective energies are complex. In our context, they are real, making this really a classical model.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Using the result from the previous lemma, using the first-order Trotter decomposition: 
+        \autoeq{Z = \sum_{x_0} \bra{x_0} e^{-\beta \hat{H}} \ket{x_0} = \sum_{x_0, \ldots, x_{p-1}} \prod_{j=0}^{p-1} G^{\Delta_{\tau}}\left(x, y\right) = \sum_{x_0, \ldots, x_{p-1}} \prod_{j=0}^{p-1} e^{-\Delta_{\tau} H_0\left(x\right)} G_1\left(x, y\right) = \sum_{x_0, \ldots, x_{p-1}} \prod_{j=0}^{p-1} e^{-J \sum_{i=0}^{N} \sigma_i^z \sigma_{i+1}^z} \fakeequal\hspace{3em}\cdot \prod_{i=0}^{N-1} \left[\cosh\left(\Gamma \Delta_{\tau}\right)\delta_{\sigma_i^z, \sigma_i^{z'}} + \left(1 - \delta_{\sigma_i^z, \sigma_i^{z'}}\right) \sinh\left(\Delta_{\tau} \Gamma\right)\right].}
+
+        We can rewrite the term inside the square brackets, by taking $\exp\left(\ln\left(z\right)\right) = z$ and rewriting the Dirac delta $\delta_{\sigma_i^z, \sigma_i^{z'}} = \frac{1}{2}\left(1 + \sigma_i^z \sigma_i^{z'}\right)$ using the fact $\sigma_i^z \in \left\{+1, -1\right\}$: 
+        \autoeq[s]{\cosh\left(\Gamma \Delta_{\tau}\right) \delta_{\sigma_i^z, \sigma_i^{z'}} + \left(1 - \delta_{\sigma_i^z,\sigma_i^{z'}}\right)\sinh\left(\Gamma \Delta_{\tau}\right) = \exp\left(\frac{1}{2}\left(1 + \sigma_i^z \sigma_i^{z'}\right) \ln\left(\cosh\left(\Gamma \Delta_{\tau}\right)\right) + \frac{1}{2}\left(1 - \sigma_i^z \sigma_i^{z'}\right) \ln\left(\sin\left(\Gamma \Delta_{\tau}\right)\right)\right) = \exp\left[\sigma_i^z \sigma_i^{z'} \overbrace{\frac{1}{2}\cdot \left[\ln\left(\cosh\left(\Gamma \Delta_{\tau}\right)\right) - \ln\left(\sinh\left(\Gamma \Delta_{\tau}\right)\right)\right]}^{= -J_{eff}}\right] \fakeequal\hspace{3em}\cdot \exp\left[\frac{1}{2} \left[\ln\left(\cosh\left(\Gamma \Delta_{\tau}\right)\right) + \ln\left(\sinh\left(\Gamma \Delta_{\tau}\right)\right)\right]\right] = e^{- \sigma_i^z \sigma_i^{z'} J^{eff}} \cdot  \text{constant}.}
+
+        Now, $Z$ is just a product of Bolzmann-like terms (i.e. exponentials), so, ignoring irrelevant absolute constants: 
+        \autoeq{Z = \sum_{\left\{\sigma_{i, j}^z\right\}} \exp\left[-\sum_{i, j} \left(-\Delta_{\tau} J \sigma_{i, j}^z \sigma_{i+1, j}^z + J^{eff} \sigma_{i,j}^z \sigma_{i, j+1}^z\right)\right] = \sum_{\left\{\sigma^z_{i, j}\right\}} e^{-E^{eff}\left(\sigma_{i, j}^z\right)}.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Monte-Carlo moves}
+    We now present a Metropolis-Hasting move to sample from the partition function, i.e. from the probability distribution: 
+    \[\Pi\left(\bvec{x}\right) = \frac{\exp\left(-E^{eff}\left(\bvec{x}\right)\right)}{\sum_{\bvec{y}} \exp\left(-E^{eff}\left(\bvec{y}\right)\right)} = \frac{\exp\left(-E^{eff}\left(\bvec{x}\right)\right)}{Z}.\]
+    
+    The idea is to take a spin $k \in \left\{1, \ldots, Np\right\}$ uniformly at random, decomposing it into a spatial and time index $k = \left(i, j\right)$, and flip it:
+    \[\sigma_{i, j}' = - \sigma_{i, j}.\]
+
+    \begin{subparag}{Acceptance probability}
+        The update proposal distribution is symmetric. Hence, the acceptance probability is given by:
+        \autoeq[s]{A\left(x' \suchthat x\right) = \min\left(1, \frac{\Pi\left(x'\right)}{\Pi\left(x\right)}\right) = \min\left(1, \frac{\exp\left(-E^{eff}\left(x'\right)\right)}{\exp\left(-E^{eff}\left(x\right)\right)}\right) = \min\left(1, \right.\fakesymbol{)}\fakeequal\fakesymbol{(}\left. \frac{\exp\left(-\Delta_{\tau} J \left(\sigma_{i-1, j}^z \sigma_{i, j}^{z'} + \sigma_{i, j}^{z'} \sigma_{i+1, j}^z\right) + J^{eff} \left(\sigma_{i, j-1}^z \sigma_{i, j}^{z'} + \sigma_{i, j}^{z'} \sigma_{i, j+1}^z\right)\right)}{\exp\left(-\Delta_{\tau} J \left(\sigma_{i-1, j}^z \sigma_{i, j}^{z} + \sigma_{i, j}^{z} \sigma_{i+1, j}^z\right) + J^{eff} \left(\sigma_{i, j-1}^z \sigma_{i, j}^{z} + \sigma_{i, j}^{z} \sigma_{i, j+1}^z\right)\right)}\right).}
+
+        This only depends on the neighbours of $\left(i, j\right)$, so this is efficient.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    As usual, we can then make an estimator for observables that are diagonal in the basis. Moreover, to make an estimator for the energy, we can use the following property, which has already been presented in the previous lecture:
+    \autoeq{\left\langle \hat{H} \right\rangle = -\partial_{\beta} \ln\left(Z\right) = \frac{1}{Z} \frac{\partial Z}{\partial \beta}  = \frac{1}{Z} \sum_{\left\{\sigma_{ij}\right\}} e^{-E^{eff}\left(\sigma_{ij}\right)} \frac{\partial E^{eff}\left(\left\{\sigma_{ij}\right\}\right)}{\partial \beta} = \exval_{\left\{\sigma_{i, j}\right\} \followsdistr \Pi\left(\left\{\sigma_{i, j}\right\}\right)}\left[\frac{\partial E^{eff}\left(\left\{\sigma_{i, j}\right\}\right)}{\partial \beta} \right],}
+    where $\frac{\partial E^{eff}}{\partial \beta} $ can be computed analytically, noticing that the dependence on $\beta$ comes from the fact $\Delta_{\tau} = \frac{\beta}{p}$.
+\end{parag}
+
+\subsection{Simulation without time-step error}
+
+\begin{parag}{Goal}
+    We now consider two different approaches to solve spin models, by also converting the exponential to a series. Their advantage however is that they will work directly on continuous time, i.e. they have no time-step error.
+\end{parag}
+
+\subsubsection{Dyson series}
+
+\begin{parag}{Lemma: Dyson series}
+    We consider the interaction picture:
+    \[\hat{H}_1\left(\tau\right) = e^{\tau \hat{H}_0} \hat{H}_1 e^{-\tau \hat{H}_0}.\]
+
+    Then, the \important{Dyson series} of an exponential is:
+    \[e^{-\beta \left(\hat{H}_0 + \hat{H}_1\right)} = e^{-\beta \hat{H}_0} \sum_{n=0}^{\infty} \left(-1\right)^n \int d \tau_1 \cdots d\tau_n \hat{H}_1\left(\tau_n\right) \hat{H}_1\left(\tau_{n-1}\right) \cdots \hat{H}_1\left(\tau_1\right),\]
+    where integration variables are such that $0 \leq \tau_1 \leq \ldots \leq \tau_n \leq \beta$.
+\end{parag}
+
+\begin{parag}{Partition function}
+    Our partition function then becomes: 
+    \autoeq{Z = \sum_{x_0} \bra{x_0} e^{-\beta \hat{H}} \ket{x_0} = \sum_{x_0} \bra{x_0} e^{-\beta H_0\left(x_0\right)} \ket{x_0} + \left(-1\right) \sum_{x_0} \int_{0}^{\beta} \bra{x_0} e^{-\beta \hat{H}_0} \hat{H}_1\left(\tau_1\right) \ket{x_0} d \tau_1 \fakeequal + \sum_{x_0, x_1} \int_{0}^{\beta} d\tau_2 \int_{0}^{\tau_2} e^{-\beta H_0\left(x_0\right)} \bra{x_0} \hat{H}_1\left(\tau_2\right) \ket{x_1} \bra{x_1} \hat{H}_1\left(\tau_1\right) \ket{x_0} + \ldots,}
+
+    \begin{subparag}{Example}
+        For instance, one of the terms can be simplified to:
+        \autoeq[s]{\bra{x_0} \hat{H}_1\left(\tau_2\right) \ket{x_1} \bra{x_1} \hat{H}_1\left(\tau_1\right) \ket{x_0} = e^{\left(\tau_2 - \tau_1\right) H_0\left(x_1\right)} \bra{x_1} \hat{H}_1 \ket{x_0} e^{\left(\tau_1 - \tau_2\right) H_0\left(x_0\right)} \bra{x_0} \hat{H}_1 \ket{x_1}.}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Metropolis-Hastings move}
+    It is possible to make a Metropolos-Hasting update proposal to sample from the following non-normalised distribution:
+    \autoeq[s]{\bar{\Pi}_{ct}\left(x_1, \ldots, x_n, \tau_1, \ldots, \tau_n, n\right) = \frac{1}{Z} e^{-\beta H_0\left(x_n\right)} \left(-1\right)^n \bra{x_n}\hat{H}_1\left(\tau_n\right) \ket{x_{n-1}} \cdots \bra{x_1} \hat{H}\left(\tau_1\right) \ket{x_n} \delta\left(0 < \tau_1 \leq \ldots \leq \tau_n < \beta\right).}
+
+    This must contains moves to modify the path $x_1, \ldots, x_n$, the imaginary time slices $\tau_1, \ldots, \tau_n$, but also the number of time slices $n$.
+
+    \begin{subparag}{Remark 1}
+        This distribution is such that:
+        \[Z = \sum_{n=0}^{\infty} \sum_{x_1, \ldots, x_n} \int d\tau_1 \cdots d\tau_n \bar{\Pi}_{ct}\left(x_1, \ldots, x_n, \tau_1, \ldots, \tau_n, n\right).\]
+
+        Just like the path-integral formalism, we can then evaluate expected value of operators diagonal in the $\ket{x}$ basis, or of the Hamiltonian. For instance, it is indeed possible to show that:
+        \[\left\langle O \right\rangle = \int \sum_{x_0, x_1, \ldots, x_{n-1}} O\left(x_0\right) \Pi_{ct}\left(x_0, x_1, \ldots, x_n, \ldots\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        For this to make sense, we need $\Pi_{ct}$ to be a well-defined probability distribution, i.e. to be non-negative. This is the case for the transverse-field Ising model.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        As mentioned before, an interest of this method is that we do not have to discretise time, we are directly working in the continuous time model.
+    \end{subparag}
+\end{parag}
+
+
+\subsubsection{Stochastic series expansion}
+
+\begin{parag}{Lemma: Stochastic series expansion}
+    Another way to express an exponential as a series is the Taylor series: 
+    \[e^{-\beta \hat{H}} = \sum_{n=0}^{\infty} \frac{\left(-\beta \hat{H}\right)^n}{n!}.\]
+
+    We are then able to compute the partition function, adding completeness relations: 
+    \autoeq{Z = \sum_{x_1} \bra{x_1} e^{-\beta \hat{H}} \ket{x_1} = \sum_{x_1} \bra{x_1} I \ket{x_1} - \beta \sum_{x_1} \bra{x_1} \hat{H} \ket{x_1} + \frac{\beta^2}{2} \sum_{x_1, x_2} \bra{x_1} \hat{H} \ket{x_2}\bra{x_2} \hat{H} \ket{x_1} - \ldots}
+
+    This is named a \important{stochastic series expansion}.
+\end{parag}
+
+
+\begin{parag}{Metropolis-Hasting move}
+    We consider the following non-normalised random distribution:
+    \[\bar{\Pi}_{sse}\left(x_1, \ldots, x_n, n\right) = \frac{\beta^n}{n!} \bra{x_1} \left(-\hat{H}\right) \ket{x_2} \cdots \bra{x_n} \left(-\hat{H}\right) \ket{x_1}.\]
+
+    It is again possible to make Metropolis-Hasting moves to sample from this distribution.
+
+    \begin{subparag}{Remark 1}
+        Again, this is non-negative and hence a valid probability distribution for the transverse-field Ising model.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This distribution is again such that: 
+        \[Z = \sum_{n} \sum_{x_1, \ldots, x_n} \bar{\Pi}_{sse}\left(x_1, \ldots, x_n, n\right).\]
+    
+        We can then use this to make estimators for $\left\langle \hat{O}\left(x\right) \right\rangle$ and $\left\langle \hat{H} \right\rangle$. Note that there is also no time step error for this method.
+    \end{subparag}
+
+\end{parag}
+
+\begin{parag}{Lemma}
+    We have: 
+    \[\left\langle \hat{H} \right\rangle = -\frac{\left\langle n \right\rangle_{\Pi_{sse}}}{\beta}.\]
+
+    \begin{subparag}{Remark}
+        We will again have Monte-Carlo steps that change the size of $n$. It is however important to know its average size, because if it is of the order of a million, then we just couldn't store our model in memory. 
+
+        Now, since $\left\langle \hat{H} \right\rangle \propto N$, this lemma tells us that $\left\langle n \right\rangle \propto \beta N$; which is indeed storable in memory. It is moreover also possible to show that the variance of $n$ is also related to the variance of $\hat{H}$, and upper bound it in a similar way.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        This is direct, by doing a change of variable:
+        \autoeq{\left\langle \hat{H}  \right\rangle = \frac{1}{Z} \Tr\left(e^{-\beta \hat{H}} \hat{H}\right) = \frac{1}{Z} \sum_{n=0}^{\infty} \sum_{x_1} \frac{\beta^n}{n!} \bra{x_1} \left(-H\right)^{n} \hat{H} \ket{x_1} = -\frac{1}{Z} \sum_{n=0}^{\infty} \frac{\beta^n}{n!} \sum_{x_1} \bra{x_1}\left(-\hat{H}\right)^{n+1} \ket{x_1} = -\frac{1}{Z} \sum_{n=1}^{\infty} \frac{\beta^{n-1}}{\left(n-1\right)!} \sum_{x_1} \bra{x_1} \left(-\hat{H}\right)^n \ket{x_1} = - \frac{1}{Z \beta} \sum_{n=1}^{\infty} \sum_{x_1} \beta^n \frac{n}{n!} \bra{x_1} \left(-\hat{H}\right)^n \ket{x_1} = -\frac{1}{\beta}\cdot \frac{1}{Z} \sum_{n=0}^{\infty} \sum_{x_1, \ldots, x_n} \bar{\Pi}_{sse}\left(x_1, \ldots, x_n, n\right) n = -\frac{\left\langle n \right\rangle_{\Pi_{sse}}}{\beta},}
+        where we used the fact $\Pi_{sse}\left(x_1, \ldots, x_n, n\right) = \frac{1}{Z} \bar{\Pi}_{sse}\left(x_1, \ldots, x_n, n\right)$ since, as mentioned before, the non-normalised probability distribution sums to $Z$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

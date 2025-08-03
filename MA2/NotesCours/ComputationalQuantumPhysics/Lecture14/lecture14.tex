@@ -1,0 +1,246 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-27 at 08:33:15.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 27 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2025-05-27}{Variational quantum algorithms}{
+\begin{itemize}[left=0pt]
+    \item Explanation of how to find the ground energy and the first excited energy of a Hamiltonian using parametrised quantum circuits.
+    \item Explanation of the adiabatic state preparation theorem, and how it can be used to make variational circuit Ansätze, yielding the Hamiltonian variational Ansatz.
+    \item Explanation of the Jordan-Wigner mapping.
+    \item Summary of what has been seen in the class.
+\end{itemize}
+
+}
+
+\subsection{Variational quantum algorithms}
+
+\subsubsection{Ground energy}
+
+\begin{parag}{Parameterised quantum circuit}
+    We parameterise our evolution using single or 2-qubit unitaries $\hat{U}_k\left(\theta_k\right)$ such that: 
+    \[\ket{\psi\left(\theta\right)} = \hat{U}\left(\theta_1, \ldots, \theta_p\right) \ket{0} = \hat{U}_{\ell}\left(\theta_{\ell}\right) \cdots \hat{U}_1\left(\theta_1\right) \ket{0}.\]
+
+    This is a very general Ansatz, called a parameterised quantum circuit.
+\end{parag}
+
+\begin{parag}{Goal}
+    Using the variational principle, we know that: 
+    \[E\left(\theta_1, \ldots, \theta_p\right) = \bra{\psi\left(\theta\right)} \hat{H} \ket{\psi\left(\theta\right)} \geq E_0.\]
+
+    Hence, our goal is to minimise $E\left(\theta_1, \ldots, \theta_p\right)$, to get an approximation to the ground energy. To do that, we need to prove two things: we can evaluate the energy, and we can compute a gradient.
+\end{parag}
+
+\begin{parag}{Ground energy loss function}
+    To find the ground energy, our goal is to minimise: 
+    \[E\left(\theta_1, \ldots, \theta_p\right) = \bra{\psi\left(\theta\right)} \hat{H} \ket{\psi\left(\theta\right)}.\]
+
+    Let us first show it can be indeed evaluated, we will show how to find its gradient later. 
+
+    The idea is that we can always decompose our Hamiltonian in the Pauli basis:
+    \[\hat{\mathcal{H}} = \sum_{k} C_k \hat{A}_{k, 1} \cdots \hat{A}_{k, N}, \mathspace \hat{A}_{k, i} \in \left\{\hat{I}, \hat{X}, \hat{Y}, \hat{Z}\right\}, C_k \in \mathbb{R}.\]
+
+    Note that each $C_k \in \mathbb{R}$, since $\hat{H}$ is Hermitian. Then, the idea is to make a quantum circuit to evaluate $\left\langle \hat{A}_{k, 1} \cdots \hat{A}_{k, N} \right\rangle$.
+
+    \begin{subparag}{Example}
+        Let us consider the transverse-field Ising model:
+        \[\hat{\mathcal{H}} = - \Gamma \sum_{i} \hat{X}_i + \sum_{\left\langle \ell, m \right\rangle } J_{\ell m} \hat{Z}_{\ell} \hat{Z}_{m}.\]
+         
+        This is already written in the Pauli basis:
+        \[\hat{\mathcal{H}} = -\Gamma \hat{X}_1 \hat{I}_2 \cdots \hat{I}_n + \ldots - \Gamma \hat{I}_1 \cdots \hat{X}_n + J_{12} \hat{Z}_1 \hat{Z}_2 \hat{I}_3 \cdots \hat{I}_N + \ldots\]
+        
+        Then, we have, since $\hat{X} = \hat{H} \hat{Z} \hat{H}$ for the Hadamard gate $\hat{H}$, leaving $\ket{\phi} = \hat{H} \hat{U}\left(\theta\right) \ket{0}$: 
+        \autoeq{\left\langle \hat{X}_{\ell} \right\rangle = \bra{\psi\left(\theta\right)} \hat{X}_{\ell} \ket{\psi\left(\theta\right)} = \bra{0} \hat{U}\left(\theta\right)^{\dagger} \hat{H} \hat{Z}_{\ell} \hat{H} \hat{U}\left(\theta\right) \ket{0} = \bra{\phi} \hat{Z}_{\ell} \ket{\phi}.}
+
+        Since they commute, we can compute all $\bra{\phi} \hat{Z}_{\ell} \ket{\phi}$ at the same time, with the following circuit.
+        \begin{center}
+        \begin{quantikz}
+            \lstick{\ket{0}} & \gate[3]{U\left(\theta\right)} & \gate{H} & \meter{} \\
+            \lstick{\ket{0}} &                                     & \gate{H} & \meter{} \\
+            \lstick{\ket{0}} &                                     & \gate{H} & \meter{} 
+        \end{quantikz}
+        \end{center}
+        
+        This yields that, every time, we measure all $\hat{X}_{\ell}$ at the same time. Repeating the experiment $k$ times, supposing that we measure $b_{\ell}^i \in \left\{0, 1\right\}$ at the $i$\Th experiment, this then yields: 
+        \[\left\langle X_{\ell} \right\rangle = \frac{1}{k} \sum_{i=1}^{k} \left(-1\right)^{b_{\ell}^i}.\]
+
+        The variance is moreover $\sigma_{\ell}^2 = \frac{\Var\left(b_{\ell}^i\right)}{k} \leq \frac{1}{4k}$, since $b_{\ell}^i$ is a Bernoulli random variable and hence has at most variance $\frac{1}{4}$. Since the variance is polynomially bounded, this does show everything is under control.
+
+        Then, $\left\langle Z_{\ell} Z_m \right\rangle$ is even simpler since it is already diagonal in the computation basis (i.e. no need for the Hadamard gates), and can be computed completely similarly by evaluating all $\left\langle Z_{\ell} \right\rangle$:
+        \[\left\langle Z_{\ell} Z_m \right\rangle = \frac{1}{k} \sum_{i=1}^{k} \left(-1\right)^{\widetilde{b}_{\ell}^i} \left(-1\right)^{\widetilde{b}_m^i}.\]
+        
+        Note that, contrary to Markov chains, our estimators are uncorrelated, simplifying the analysis.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Excited states loss function}
+    Let us now suppose that we want to find the first excited state. Supposing that we know some $\theta_0$ such that $\ket{\psi\left(\theta_0\right)} \approx \ket{E_0}$, we can consider the following loss function:
+    \[E_1\left(\theta, \lambda\right) = \bra{\psi\left(\theta\right)} \hat{\mathcal{H}} \ket{\psi\left(\theta\right)} + \lambda \left(1 - \left|\braket{\psi\left(\theta\right)}{\psi\left(\theta_0\right)}\right|^2\right).\]
+
+    \begin{subparag}{Intuition}
+        The loss function is just a Lagrangian, i.e. we are doing a minimisation of the energy of the system $\bra{\psi\left(\theta\right)} \hat{\mathcal{H}} \ket{\psi\left(\theta\right)}$, under the constraint that $1 - \left|\braket{\psi\left(\theta\right)}{\psi\left(\theta_0\right)}\right|^2$ through Lagrange multipliers. Another way to see this is that
+    \[\frac{\partial}{\partial \lambda} E_1\left(\theta, \lambda\right) = - \left|\braket{\psi\left(\theta\right)}{\psi\left(\theta_0\right)}\right|^2\]
+    is zero if and only if $\ket{\psi\left(\theta\right)}$ and $\ket{\psi\left(\theta_0\right)}$ are orthogonal, indeed giving our minimisation constraint. 
+    \end{subparag}
+
+    \begin{subparag}{Measure}
+        We can again measure this loss function using a quantum computer. The first term of $E_1\left(\theta, \lambda\right)$ is the one we analysed in the previous paragraph, and it can indeed be computed using a quantum computer. The only question left is for the second term. 
+
+        We directly notice that, leaving the state $\ket{\Phi} = \hat{U}^{\dagger}\left(\theta_0\right) \hat{U}\left(\theta\right) \ket{0}^{\otimes n}$: 
+        \autoeq{\left|\braket{\psi\left(\theta_0\right)}{\psi\left(\theta\right)}\right|^2 = \left|\bra{0}^{\otimes n} \hat{U}\left(\theta_0\right)^{\dagger} \hat{U}\left(\theta\right) \ket{0}^{\otimes n}\right|^2 = \left|\bra{0}^{\otimes n} \ket{\Phi}\right|^2 = \prob_{\ket{\Phi}}\left(0, \ldots, 0\right).}
+        
+        Hence, we can consider the following circuit that prepares $\ket{\Phi}$ and measures it:
+        \begin{center}
+        \begin{quantikz}
+            \lstick{\ket{0}} & \gate[2]{U\left(\theta\right)} & \gate[2]{U^{\dagger}\left(\theta_0\right)}\slice{\ket{\Phi}} & \meter{} \\
+            \lstick{\ket{0}} &                             &                                                           & \meter{} \\
+            \lstick{\ket{0}} &                             &                                                           & \meter{}
+        \end{quantikz}
+        \end{center}
+        
+        This allows us to measure $\prob_{\ket{\Phi}}\left(0, \ldots, 0\right) = \left|\braket{\psi\left(\theta_0\right)}{\psi\left(\theta\right)}\right|^2$ with a polynomial precision, counting the percentage of the time we measure $0, \ldots, 0$.  We cannot measure exponentially small overlap, but at least we can make a polynomially-bounded error.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Parameter-shift rule}
+    Let $\hat{B}$ be an arbitrary observable.
+
+    We suppose that each parametrised quantum gate is of the form $\hat{U}_k\left(\theta_k\right) = \exp\left(-i \frac{\theta_k}{2} \hat{S}_k\right)$ where $\hat{S}_k^2 = \hat{I}$ (i.e. $\hat{S}_k$ is an involution).
+
+    Then:
+    \autoeq{\frac{\partial}{\partial \theta_k} \bra{\psi\left(\theta\right)} \hat{B} \ket{\psi\left(\theta\right)} = \frac{1}{2}\left[\bra{\psi\left(\theta_1, \ldots, \theta_k + \frac{\pi}{2}, \ldots, \theta_p\right)} \hat{B} \ket{\psi\left(\theta_1, \ldots, \theta_k + \frac{\pi}{2}, \ldots, \theta_p\right)} \right.\fakesymbol{]}\fakeequal\left.\fakesymbol{[}\mathspace - \bra{\psi\left(\theta_1, \ldots, \theta_k - \frac{\pi}{2}, \ldots, \theta_p\right)} \hat{B} \ket{\psi\left(\theta_1, \ldots, \theta_k - \frac{\pi}{2}, \ldots, \theta_p\right)}\right].}
+
+    This is known as the \important{parameter-shift rule}.
+
+    \begin{subparag}{Implication}
+        We just showed that we are able to compute $\bra{\psi\left(\theta\right)} \hat{H} \ket{\psi\left(\theta\right)}$, so it allows us to compute the gradient of our gradient energy $E_0\left(\theta\right)$. In fact, this also allows us to find the gradient of the first excited energy, since the other term is also of the form: 
+        \[\left|\braket{\psi\left(\theta\right)}{\psi\left(\theta_0\right)}\right|^2 = \bra{\psi\left(\theta\right)} \left(\ket{\psi\left(\theta_0\right)}\bra{\psi\left(\theta_0\right)}\right) \ket{\psi\left(\theta\right)} = \bra{\psi\left(\theta\right)} \hat{B} \ket{\psi\left(\theta\right)},\]
+        where $\hat{B} =\ket{\psi\left(\theta_0\right)}\bra{\psi\left(\theta_0\right)} = U\left(\theta_0\right) \ket{0}\bra{0} U^{\dagger}\left(\theta_0\right)$.
+
+        In other words, we are able to compute the gradient for both the ground energy and the excited energy. We can then use gradient descent:
+    \[\theta_k^{\left(s+1\right)} = \theta_k^{\left(s\right)} - \eta \frac{\partial \left\langle \mathcal{H} \right\rangle}{\partial \theta_k}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note for instance that any Pauli word $\hat{S}_k \in \left\{\hat{X}, \hat{X}\hat{X}, \hat{X} \hat{Z}, \ldots\right\}$ works as an involution. Moreover, it is well known that, then, we can use the generalised Euler identity:
+        \[\hat{U}_k\left(\theta_k\right) = \exp\left(-i\frac{\theta_k}{2} \hat{S}_k\right) = \cos\left(\frac{\theta_k}{2}\right) \hat{I} - i \sin\left(\frac{\theta_k}{2}\right) \hat{S}_k.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We note, for any operator $\hat{K}$: 
+        \[\hat{K}\left(\theta_k\right) = \hat{U}_k^{\dagger}\left(\theta_k\right) \hat{K} \hat{U}_k\left(\theta_k\right).\]
+
+        Doing some algebra, we can find some operator $\hat{A}, \hat{B}, \hat{C}$ that depend on $\hat{K}$ and $\hat{S}_k$ but not on $\theta_k$, such that:  
+        \[\hat{K}\left(\theta_k\right) = \hat{A} + \hat{B} \cos\left(\theta_k\right) + \hat{C} \sin\left(\theta_k\right).\]
+        
+        But then: 
+        \[\frac{\partial \hat{K}\left(\theta_k\right)}{\partial \theta_k} = - \hat{B} \sin\left(\theta_k\right) + \hat{C} \cos\left(\theta_k\right) = \frac{1}{2}\left(\hat{K}\left(\theta_k + \frac{\pi}{2}\right) - \hat{K}\left(\theta_k - \frac{\pi}{2}\right)\right).\]
+
+        To simplify notation, we now let: 
+        \[\hat{V}_k = \hat{U}_p\left(\theta_p\right) \cdots \hat{U}_{k+1}\left(\theta_{k+1}\right), \mathspace \hat{Q}_k = \hat{V}_k^{\dagger} \hat{B} \hat{V}_k^{\dagger},\]
+        \[\ket{\psi_k} = \hat{U}_{k-1}\left(\theta_{k-1}\right) \cdots \hat{U}_1\left(\theta_1\right) \ket{0}^{\otimes n}.\]
+        
+        Hence, we find that, writing $\hat{Q}_k\left(\theta_k\right) = \hat{U}_k^{\dagger}\left(\theta_k\right) \hat{Q}_k \hat{U}_k\left(\theta_k\right)$ as mentioned before:
+        \autoeq[s]{\frac{\partial}{\partial \theta_k} \bra{\psi\left(\theta\right)} \hat{B} \ket{\psi\left(\theta\right)} = \frac{\partial}{\partial \theta_k} \bra{0}^{\otimes n} \hat{U}_1^{\dagger} \cdots \hat{U}_p^{\dagger}\left(\theta_p\right) \hat{B} \hat{U}_p\left(\theta_p\right) \cdots \hat{U}_1\left(\theta_1\right) \ket{0}^{\otimes n} = \frac{\partial}{\partial \theta_k} \bra{\psi_k} \hat{U}_k^{\dagger} \underbrace{\hat{V}_k^{\dagger} \hat{B} \hat{V}_k \hat{U}_k}_{= \hat{Q}_k}  \ket{\psi_k} = \frac{\partial}{\partial \theta_k} \bra{\psi_k} \hat{Q}_k\left(\theta_k\right) \ket{\psi_k} = \frac{1}{2}\left[\bra{\psi_k} \hat{Q}_k\left(\theta_k + \frac{\pi}{2}\right)\ket{\psi_k} - \bra{\psi_k} \hat{Q}_k\left(\theta_k - \frac{\pi}{2}\right)\ket{\psi_k}\right]  = \frac{1}{2}\left[\bra{\psi\left(\theta_1, \ldots, \theta_k + \frac{\pi}{2}, \ldots, \theta_p\right)} \hat{B} \ket{\psi\left(\theta_1, \ldots, \theta_k + \frac{\pi}{2}, \ldots, \theta_p\right)} \right.\fakesymbol{]}\fakeequal\left.\fakesymbol{[}\mathspace - \bra{\psi\left(\theta_1, \ldots, \theta_k - \frac{\pi}{2}, \ldots, \theta_p\right)} \hat{B} \ket{\psi\left(\theta_1, \ldots, \theta_k - \frac{\pi}{2}, \ldots, \theta_p\right)}\right].}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Parameterised quantum circuit}
+
+\begin{parag}{Goal}
+    Now, let us see how we can actually construct meaningful parameterised circuits.
+\end{parag}
+
+\begin{parag}{Theorem: Adiabatic state preparation}
+    Let $\mathcal{H}_f$ be a Hamiltonian of which we want to know the ground state, and $\mathcal{H}_0$ be a Hamiltonian of which we know the ground state. We consider the following Hamiltonian for all $t \in \left[0, t_f\right]$, defined for some $t_f$:
+    \[\mathcal{H}\left(t\right) = \left(1 - \frac{t}{t_f}\right) \mathcal{H}_0 + \frac{t}{t_f} \mathcal{H}_f.\]
+
+    We let the ground state of $\mathcal{H}_0$, $\ket{E_0^0}$, evolve under this Hamiltonian for $t \in \left[0, t_f\right]$ to get $\ket{\psi\left(t\right)}$.
+
+    Let $\Delta_1\left(t\right) = E_1\left(t\right) - E_0\left(t\right)$. If $t_f \gg \max_t \Delta_1^{-2}\left(t\right)$, then for all $t$: 
+    \[\ket{\psi\left(t\right)} \approx \ket{E_0\left(t\right)}.\]
+    
+    \begin{subparag}{Intuition}
+        The idea is that if transition sufficiently slowly from $\mathcal{H}_0$ to $\mathcal{H}_f$, and that we start in the ground state, then we will stay in the ground state. Since $\mathcal{H}\left(t_f\right) = \mathcal{H}_f$, this means that this is a way to find the ground state of some arbitrary $\mathcal{H}_f$.
+        
+        However, in general, we need $t_f$ to be exponential in the number of particles. This is thus not really a practical way of finding a ground state. However, we can still use it as an inspiration to make a variational circuit.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Hamiltonian variational Ansatz}
+    For instance, let us suppose that we want to find the ground state of the transverse-field Ising model:
+    \[\hat{H}_f = -\Gamma \sum_{i} \hat{X}_i + \sum_{\ell, m} J_{\ell m} \hat{Z}_{\ell} \hat{Z}_m = \hat{\mathcal{H}}_x + \hat{\mathcal{H}}_{zz}.\]
+    
+    Then, we can let:
+    \[\hat{\mathcal{H}}\left(t\right) = \hat{\mathcal{H}}_x + \frac{t}{t_f} \hat{\mathcal{H}}_{zz}.\]
+
+    We know that, if $t_f$ is exponential large and we let a state $\left(H \ket{0}\right)^{\otimes n}$ evolve under this Hamiltonian, then we will end up with the ground state for $\mathcal{H}_f$. As mentioned before, all reasonable values of $t_f$ will not give any guarantee; but we can use it as inspiration. As usual, we can use a Trotter approximation: 
+    \[e^{-i \hat{\mathcal{H}} \Delta_t} = e^{-i \hat{H}_x \Delta_t} e^{-i \frac{t}{t_f} \hat{H}_{zz} \Delta_t} + O\left(\Delta_t^2\right).\]
+
+    This gives us a gate structure for the circuit. Now, instead of fixing the rotation angles to the one given by the adiabatic state preparation theorem, we can simply decide to let them be free variational parameters.
+    \begin{center}
+    \begin{quantikz}
+        \lstick{\ket{0}} & \gate{H} & \gate[2]{R_{zz}\left(\theta_1\right)} &                                       & \gate{R_X\left(\theta_2\right)} & \rstick{$\cdots$}\\
+        \lstick{\ket{0}} & \gate{H} &                                       & \gate[2]{R_{zz}\left(\theta_1\right)} & \gate{R_X\left(\theta_2\right)} & \rstick{$\cdots$}\\
+        \lstick{\ket{0}} & \gate{H} & \gate[2]{R_{zz}\left(\theta_1\right)} &                                       & \gate{R_X\left(\theta_2\right)} & \rstick{$\cdots$}\\
+        \lstick{\ket{0}} & \gate{H} &                                       &                                       & \gate{R_X\left(\theta_2\right)} & \rstick{$\cdots$}
+    \end{quantikz}
+    \end{center}
+    
+    \begin{subparag}{Remark}
+        This way of constructing this type of quantum circuits is named \important{Hamiltonian variational Ansatz}. Moreover, it works well in practice.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Jordan-Wigner mapping}
+    We are also interested in fermionic systems, such as the case of the electronic structure:
+    \[\hat{\mathcal{H}} = \sum_{\ell, m} t_{\ell m} \hat{c}_{\ell}^{\dagger} \hat{c}_m + \sum_{j \ell m k} \hat{c}_j^{\dagger} \hat{c}_k^{\dagger} \hat{c}_m \hat{c}_{\ell} V_{jk\ell m}.\]
+
+    The \important{Jordan-Wigner mapping} we have already seen states that we can encode $\ket{0} = \ket{\uparrow}$ and $\ket{1} = \ket{\downarrow}$, and map:
+    \[\hat{c}_{\ell} = \left(\prod_{j=1}^{\ell-1} \hat{Z}_{j}\right) \hat{\sigma}_{-}, \mathspace \hat{c}_{\ell}^{\dagger} = \left(\prod_{j=1}^{\ell - 1} \hat{Z}_{j}\right) \hat{\sigma}_{\ell}^{+}, \mathspace \text{where }\hat{\sigma}_{\ell}^{\pm} = \frac{\hat{X}_{\ell} \pm i \hat{Y}_{\ell}}{2}.\]
+
+    \begin{subparag}{Remark}
+        This turns our fermionic operators into Pauli operators. For instance:
+        \[\hat{c}_1^{\dagger} \hat{c}_2 = \hat{\sigma}_1^+ \hat{Z}_1 \hat{\sigma}_2^- = \frac{\left(\hat{X}_1 + i \hat{Y}_1\right)}{2} \hat{Z}_1 \frac{\hat{X}_2 - i \hat{Y}_2}{2} = \frac{1}{4}\left[X_1 Z_1 X_2 + \ldots\right].\]
+
+        Then, we are back to the Pauli basis, so we can do exactly the same as before.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        It is well known that $\left\{\hat{c}_{\ell}, \hat{c}_{m}\right\} = \delta_{\ell m} \hat{I}$. We thus want to show this does hold when $\ell = m$.
+
+        Using the fact $\left\{\hat{\sigma}_{\ell}^{\dagger}, \hat{\sigma}_{\ell}\right\} = \hat{I}$, and that $\hat{Z}_{\ell}$ anticommutes with both $\hat{\sigma}_{\ell}^+$ and $\hat{\sigma}_{\ell}^-$:
+        \[ \left\{\hat{c}_{\ell}^{\dagger}, \hat{c}_{\ell}\right\} = \left\{\prod_{j=1}^{\ell - 1} Z_{\ell} \hat{\sigma}_{\ell}^+, \prod_{j=1}^{\ell - 1} \hat{Z}_{\ell} \sigma^-_{\ell}\right\} = \left(\prod_{j=1}^{\ell - 1} \hat{Z}_{\ell}^2\right) \left\{\hat{\sigma}_{\ell}^+, \hat{\sigma}_{\ell}^-\right\} = 1.\]
+    \end{subparag}
+\end{parag}
+
+\section{Summary}
+    
+\begin{parag}{Summary}
+    In this class, we saw the following.
+    \begin{itemize}
+        \item Exact diagonalisation methods, but they are limited to small systems.
+        \item To analyse fermions, we had to introduce some approximate methods: Hartree-Fock and DFT.
+        \item We were able to do an exact treatment in the path integral approach, and showed that we can compute all properties exactly for spin and bosons.
+        \item For fermions we still had to do some approximations, for instance based on neural networks and variational methods.
+        \item Finally, we introduced quantum computing to solve these problems exactly, and in particular the problem of solving dynamics.
+    \end{itemize}
+    
+    Note that the ground state of Fermions is hard, and no technique is known yet to tackle this problem. We cannot solve it exactly classically because of the sign problem in Monte-Carlo, and not with quantum using adiabatic approaches because of the energy gap that is exponentially small. We thus still need approximate methods (there is no free lunch), such as the variational approach.
+\end{parag}
+
+
+\end{document}

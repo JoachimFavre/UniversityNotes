@@ -1,0 +1,225 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-02-25 at 08:18:15.
+
+\usepackage{../../style}
+
+\title{Computation quantum physics}
+\author{Joachim Favre}
+\date{Mardi 25 février 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2025-02-25}{The quantum one-body problem}{
+\begin{itemize}[left=0pt]
+    \item Explanation of an exact discretisation method for the quantum one-body 1D problem.
+    \item Application of the same idea for quantum one-body $n$D problems, with and without symmetries.
+    \item Explanation of three method for solving the time-dependent one-body problem: a spectral method, the Forward Euler method, and a unitary integration method.
+\end{itemize}
+
+}
+
+\section{Exact diagonalisation methods}
+\subsection{Quantum one-body problem}
+\subsubsection{One dimension}
+
+\begin{parag}{Quantum one-body 1D problem}
+    The Hamiltonian for a 1D particle is given by, assuming $\hbar = m = 1$: 
+    \[\hat{H} = -\frac{1}{2} \frac{\partial^2}{\partial x^2} + V\left(x\right).\]
+
+    Our goal is to find its eigenstates $\ket{\psi_E}$: 
+        \[\bra{x} \hat{H} \ket{\psi_E} = E \braket{x}{\psi_E}.\]
+
+    \begin{subparag}{Remark}
+        The problem here is that we cannot diagonalise an infinite-dimensional operator with a computer. We thus have to discretise it.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Second order finite difference}
+    Let $f$ be a function, and $\delta$ be some number. Then:
+    \[f''\left(x\right) = \frac{f\left(x + \delta\right) + f\left(x - \delta\right) - 2 f\left(x\right)}{\delta^2} + O\left(\delta\right).\]
+
+    \begin{subparag}{Proof}
+        Doing a Taylor expansion on our function, we find:
+        \[f\left(x + \delta\right) = f\left(x\right) + \delta f'\left(x\right) + \frac{\delta^2}{2} f''\left(x\right) + O\left(\delta^3\right),\]
+        \[f\left(x - \delta\right) = f\left(x\right) - \delta f'\left(x\right) + \frac{\delta^2}{2} f''\left(x\right) + O\left(\delta^3\right).\]
+
+        Hence:
+        \[f\left(x + \delta\right) + f\left(x - \delta\right)-  2 f\left(x\right) = \delta^2 f''\left(x\right) + O\left(\delta^3\right).\]
+
+        This gives our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Discretisation}
+    Suppose that there exists $x_0, x_p$ such that $V\left(x\right) = +\infty$ for any $x \not\in \left[x_0, x_p\right]$. In other words, this means taht $\ket{\psi_E}\left(x\right) = 0$ for any $x \not\in \left[x_0, x_p\right]$.
+
+    We discretise this interval for $n \in \left\{0, \ldots, p\right\}$: 
+    \[x_n = x_0 + n \delta, \mathspace \delta = \frac{x_p - x_0}{p},\]
+    where $\delta$ is such that $x_p = x_0 + p \delta$.
+
+    Let $\ket{\psi}$ be an arbitrary state, where we write $\psi_n = \psi\left(x_n\right) = \braket{x_n}{\psi}$. Then, discretising the Hamiltonian up to the zeroth order and leaving $V\left(x_n\right) = V_n$ we find: 
+    \[\bra{x_n} \hat{H}_{\delta} \ket{\psi} = -\frac{1}{2\delta^2} \left[\psi_{n-1} + \psi_{n+1} - 2 \psi_n\right] + V_n \psi_n.\]
+
+    Using the fact $\psi_{-1} = \psi_{p+1} = 0$ by hypothesis, in array form, this reads:
+    \[\hat{H}_{\delta} = \begin{pmatrix} V_0 + \frac{1}{\delta^2} & -\frac{1}{2\delta^2} &   &  &  &   &   &   &   \\ & \vdots & &  & & &  \\  & -\frac{1}{2\delta^2} & V_{n-1} + \frac{1}{\delta^2} & -\frac{1}{2\delta} &  \\ &  & -\frac{1}{2\delta^2} & V_n + \frac{1}{\delta^2} & -\frac{1}{2\delta} &  \\  & & & -\frac{1}{2\delta^2} & V_{n+1} + \frac{1}{\delta^2} & -\frac{1}{2\delta} &  \\  & & &  &  & \vdots &  \\  & & &  &  & -\frac{1}{2\delta^2} & V_p + \frac{1}{\delta^2} \end{pmatrix}.\]
+
+    \begin{subparag}{Remark}
+        $\hat{H}_{\delta}$ is called a \important{tridiagonal matrix}, because it essentially has three diagonals (it only has non-zero terms on its diagonal, directly below and directly above).
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        We can get the eigenkets of $\hat{H}$ by diagonalising this matrix exactly.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Recall that $\hat{H} = -\frac{1}{2} \frac{\partial^2}{\partial x^2} + V\left(x\right)$. We notice that $\bra{x_n} V\left(\hat{x}\right) \ket{x_m} = V\left(x_n\right) \delta_{nm}$ is simply diagonal. Moreover, using finite differences, we can also find the other term:
+        \autoeq{\bra{x_n} \hat{H}_{\delta} \ket{\psi} = -\frac{1}{2} \frac{\partial^2 \psi\left(x_n\right)}{\partial x^2} + V\left(x_n\right) \psi\left(x_n\right) = -\frac{1}{2 \delta^2} \left[\psi\left(x_{n-1}\right) + \psi\left(x_{n+1}\right) - 2 \psi\left(x_n\right)\right] + V\left(x_n\right) \psi\left(x_n\right) = -\frac{1}{2\delta^2} \left[\psi_{n-1} + \psi_{n+1} - 2 \psi_n\right] + V_n \psi_n}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Higher dimensions}
+
+\begin{parag}{Quantum one-body problem}
+    The Hamiltonian for an $n$D particle is given by:
+    \[\frac{-1}{2} \nabla^2 \psi\left(x, y\right) + V\left(x, y\right) \psi\left(x, y\right) = \hat{H} \psi\left(x, y\right).\]
+
+    Our goal is again to find its eigenstates $\ket{\psi_E}$.
+\end{parag}
+
+\begin{parag}{Symmetric potential}
+    We may have a spherically symmetric potential: 
+    \[V\left(x, y, z\right) = V\left(\left\|\bvec{r}\right\|\right).\]
+
+    \begin{subparag}{Solution}
+        As seen in quantum physics 1, its eigenstates are of the form: 
+        \[\psi_{\ell m}\left(\bvec{r}\right) = Y_{\ell m}\left(\theta, \phi\right) \frac{u\left(r\right)}{r}.\]
+
+        The $Y_{\ell m}$ are fixed spherical harmonics. The $u\left(r\right)$ respects the following equation:
+        \autoeq{\left[-\frac{1}{2} \frac{\partial^2}{\partial r^2} + \frac{\ell \left(\ell + 1\right)}{2r^2} + V\left(r\right)\right]u\left(r\right) = E u\left(r\right) \iff \left[-\frac{1}{2} \frac{\partial^2}{\partial r^2} + V_{eff}^{\ell}\left(r\right)\right]u\left(r\right) = E u\left(r\right).}
+        where $V_{eff}^{\ell}\left(r\right) = \frac{\ell\left(\ell + 1\right)}{2 r^2} + V\left(r\right)$. This thus reduces to solving the 1D problem, with $\hat{H} = V_{eff}^{\ell} - \frac{1}{2} \frac{\partial}{\partial r^2}$. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Split potential}
+    We may be able to factorise:
+    \[V\left(\bvec{r}\right) = V_x\left(x\right) + V_y\left(y\right) + V_z\left(z\right).\]
+
+    \begin{subparag}{Solution}
+        We can take the Ansatz $\psi\left(\bvec{r}\right) = \psi_x\left(x\right) \psi_y\left(y\right) \psi_z\left(z\right)$. This allows the Schrödinger equation to factorise, meaning that each $\psi_k\left(k\right)$ respects Schrödinger's equation with potential $V_k\left(k\right)$. This again reduces to the one dimensional case.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{No symmetry potential}
+    Suppose now that we have a potential with no symmetry: 
+    \[\frac{-1}{2} \nabla^2 \psi\left(x, y\right) + V\left(x, y\right) \psi\left(x, y\right) = \hat{H} \psi\left(x, y\right).\]
+    
+    \begin{subparag}{Solution}
+        We can take some grid $r_n = \left(x_m, y_{\ell}\right)$ that covers $\left[x_0, x_p\right] \times \left[y_0, y_p\right]$. Then again $V_n = V\left(r_n\right)$ is diagonal, and we directly find:
+        \autoeq[s]{-\frac{1}{2} \left[\frac{\partial^2}{\partial x^2} + \frac{\partial^2}{\partial y^2}\right] \psi\left(x_m, y_{\ell}\right) = -\frac{1}{2} \left[\psi\left(x_{m+1}, y_{\ell}\right) + \psi\left(x_{m-1}, y_{\ell}\right) - 2 \psi\left(x_m, y_{\ell}\right)\right]\fakeequal  - \frac{1}{2}\left[\psi\left(x_m, y_{\ell+1}\right) + \psi\left(x_m, y_{\ell-1}\right) - 2 \psi\left(x_m, y_{\ell}\right)\right]}
+        
+        This yields a Discretisation of the Hamiltonian that is more complex in array form. This will done in more details in the second exercise series.
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Time-dependence}
+
+\begin{parag}{Time-dependent one-body problem}
+    We are given some Hamiltonian $\hat{H}$ and initial condition $\psi\left(x, t_0\right)$, and we want to find $\psi\left(x, t\right)$ for all $t \geq t_0$.
+
+    We know that the time-dependent Schrödinger equation tells us this respects the following equation: 
+    \[i \frac{\partial}{\partial t} \psi\left(x, t\right) = -\frac{1}{2} \frac{\partial^2}{\partial x^2} \psi\left(x, t\right) + V\left(x\right) \psi\left(x, t\right),\]
+\end{parag}
+
+\begin{parag}{Spectral method}
+    Leaving $\hat{H} = \sum_{\ell} E_{\ell} \ket{\psi_{\ell}} \bra{\psi_{\ell}}$ to be its eigendecomposition, we know that we simply have:
+    \[\ket{\psi\left(t\right)} = \sum_{\ell} C_{\ell} \exp\left(-i E_{\ell}\left(t-  t_0\right)\right) \ket{\psi_{\ell}},\]
+    where: 
+    \[C_{\ell} = \braket{\phi_{\ell}}{\psi\left(t_0\right)} = \sum_{n} \phi_{\ell n}^* \psi_n\left(t_0\right).\]
+    
+    In that case, this simplifies to:
+    \[\psi\left(x_n, t\right) = \psi_n\left(t\right) = \sum_{\ell} C_{\ell} \exp\left(-i E_{\ell}\left(t- t_0\right)\right) \phi_{\ell n}.\]
+
+    \begin{subparag}{Remark}
+        This is a straight-forward way to do, but it is not the most efficient. As we will see in exercises, the eigenstates with high energy require smaller $\delta$ to converge. To get good dynamics at long time, we need to know very well higher energy eigenstates, which requires a very small $\delta$; much smaller than if we only want the ground state.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Forward Euler method}
+    Let us discretise time:
+    \[t_n = t_0 + n \delta_t.\]
+    
+    Then, up to the first order:
+    \[\ket{\psi\left(t_{n+1}\right)} = \ket{\psi\left(t_n\right)} - i \delta_t \hat{H} \ket{\psi\left(t_n\right)} + O\left(\delta_t^2\right).\]
+    
+    \begin{subparag}{Proof}
+        We know that:
+        \[\hat{H} \ket{\psi\left(t\right)} = i \frac{\partial}{\partial t} \ket{\psi\left(t\right)}.\]
+        
+        However, a Taylor expansion tells us that: 
+        \autoeq{\ket{\psi\left(t + \delta_t\right)} = \ket{\psi\left(t\right)} + \delta_t \frac{\partial}{\partial t} \ket{\psi\left(t\right)} + O\left(\delta_t^2\right) \iff  \frac{\partial}{\partial t} \ket{\psi}\left(t\right) = \frac{\ket{\psi\left(t + \delta_t\right)} - \ket{\psi\left(t\right)}}{\delta_t} + O\left(\delta_t\right).}
+
+        This allows us to rewrite: 
+        \autoeq{-i \hat{H} \ket{\psi\left(t\right)} = \frac{\partial}{\partial t} \ket{\psi\left(t\right)} = \frac{\ket{\psi\left(t + \delta_t\right)} - \ket{\psi\left(t\right)}}{\delta_t} + O\left(\delta_t\right) \iff \ket{\psi\left(t + \delta_t\right)} = \ket{\psi\left(t\right)} - i \delta_t \hat{H} \ket{\psi\left(t\right)} + O\left(\delta_t^2\right).}
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        This scheme for solving ordinary differential equations is in fact very general, and is named the \important{forward Euler method}.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that this is evolution is not unitary: 
+        \[\left(\hat{I} - i \delta_t \hat{H}\right)\left(\hat{I} - i \delta_t \hat{H}\right)^{\dagger} = \hat{I} + \delta_t^2 \hat{H} + O\left(\delta^3\right) \neq \hat{I}.\]
+
+        In particular, this means that $\braket{\psi\left(t_{n+1}\right)}{\psi\left(t_{n+1}\right)} \neq 1$ in the general case. Indeed, time evolution
+        \[\exp\left(-i \delta_t \hat{H}\right) \ket{\psi\left(t_n\right)} = \ket{\psi\left(t_{n+1}\right)}\]
+        should be unitary.
+
+        Let us thus instead make an integration method which is unitary.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Unitary integration method}
+    Up to the second order:
+    \[\ket{\psi\left(t_{n+1}\right)} = \left(\hat{I} + i \frac{\delta t}{2} \hat{H}\right)^{-1} \left(\hat{I} - i \frac{\delta_t}{2} \hat{H}\right) \ket{\psi\left(t_n\right)}.\]
+
+    \begin{subparag}{Remark 1}
+        We do not want to have to compute the inverse of a matrix, since this is very slow on a computer. We instead rewrite this as a linear system to solve to get $\ket{\psi\left(t_{n+1}\right)}$:
+        \[\left(1 + i\frac{\delta_t}{2} \hat{H}\right) \ket{\psi\left(t_{n+1}\right)} = \left(1 - i\frac{\delta_t}{2} \hat{H}\right) \ket{\psi\left(t_n\right)}.\]
+        
+        In other words, informatically, we compute $\ket{b} = \left(1 - i\frac{\delta_t}{2} \hat{H}\right) \ket{\psi\left(t_n\right)}$, and then we solve the system $\hat{A} \ket{\psi\left(t_{n+1}\right)} = \ket{b}$ for $\hat{A} = \left(1 + i\frac{\delta_t}{2} \hat{H}\right)$.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        This is correct up to one more order than Euler's method. However, much more interestingly, it is also unitary: 
+        \[\left[\left(1 + i \frac{\delta_t}{2} \hat{H}\right)^{-1} \left(1 - i \frac{\delta_t}{2} \hat{H}\right)\right]\left[\left(1 + i \frac{\delta_t}{2} \hat{H}\right)^{-1} \left(1 - i \frac{\delta_t}{2} \hat{H}\right)\right]^{\dagger} = \hat{I}.\]
+        
+        This means that the norm of $\ket{\psi\left(t_n\right)}$ is preserved, yielding increased stability.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We notice that: 
+        \autoeq{\exp\left(-i \delta_t \hat{H}\right) = \exp\left(-i\frac{\delta_t}{2} \hat{H}\right)\exp\left(-i \frac{\delta_t}{2} \hat{H}\right) = \exp\left(i \frac{\delta_t}{2} \hat{H}\right)^{-1} \exp\left(-i \frac{\delta_t}{2} \hat{H}\right) = \left(\hat{I} + i \frac{\delta_t}{2} \hat{H}\right)^{-1} \left(\hat{I} - i\frac{\delta_t}{2} \hat{H}\right) + O\left(\delta_t^3\right).}
+
+        The fact that this is $O\left(\delta_t^3\right)$ (and not $O\left(\delta_t^2\right)$ as one would think at first glance) can be found by comparing $\left(\hat{I} + i \frac{\delta_t}{2} \hat{H}\right)\exp\left(-i \delta_t \hat{H}\right)$ and $\hat{I} - i \frac{\delta_t}{2} \hat{H}$ by applying a Taylor expansion on the exponential.
+
+        We thus approximate, up to the second order: 
+        \[\ket{\psi\left(t_{n+1}\right)} = \exp\left(-i \delta_t \hat{H}\right) \ket{\psi\left(t\right)} = \left(\hat{I} + i \frac{\delta t}{2} \hat{H}\right)^{-1} \left(\hat{I} - i \frac{\delta_t}{2} \hat{H}\right) \ket{\psi\left(t_n\right)}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+
+\end{document}

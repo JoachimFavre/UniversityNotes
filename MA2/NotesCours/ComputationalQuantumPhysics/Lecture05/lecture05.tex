@@ -1,0 +1,195 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-18 at 08:29:59.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 18 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2025-03-18}{Electronic structure of atoms and molecules}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the electronic structure problem.
+    \item Proof of the Hartree-Fock method in the spinless case.
+    \item Explanation of the restricted Hartree-Fock method.
+    \item Explanation of the Roothaan-Hall equations.
+\end{itemize}
+
+}
+
+\section[Electronic structure]{Electronic structure of atoms and molecules}
+\subsection{Hartree-Fock}
+
+\begin{parag}{Electronic structure problem}
+    Let $\bvec{R}_1, \ldots, \bvec{R}_M$ be the positions of atom nuclei, of charge $Z_1 e, \ldots, Z_M e$. We suppose that they are much heavier than electrons, so they will not move much and we thus neglect their kinetic energy. This approximation is named the \important{Born-Oppenheimer approximation}.
+
+    Then, the positions of $N$ electrons, $\bvec{r}_1, \ldots, \bvec{r}_N$, are described by the following Hamiltonian:
+    \[\hat{H} = \sum_{i=1}^{N} \underbrace{\left(-\frac{\hbar^2}{2m} \hat{\nabla}_{\bvec{r}_i}^2 + V_{en}\left(\bvec{r}_i\right)\right)}_{\hat{v}_1\left(\bvec{r}_i\right)} + \sum_{i < j} \underbrace{\frac{e^2}{\left|\bvec{r}_i - \bvec{r}_j\right|}}_{v_2\left(\bvec{r}_i, \bvec{r}_j\right)} = \sum_{i} \hat{v}_1\left(\bvec{r}_i\right) + \sum_{i < j} \hat{v}_2\left(\bvec{r}_i, \bvec{r}_j\right),\]
+    where: 
+    \[V_{en}\left(\bvec{r}\right) = -e^2 \sum_{i=1}^{M} \frac{Z_i}{\left|\bvec{R}_i - \bvec{r}\right|}.\]
+
+    This is named the \important{electronic structure problem}. This is a very important Hamiltonian, that must be analysed to make predictions about materials.
+
+    \begin{subparag}{Intuition}
+        This Hamiltonian is composed, as usual, of a term representing the kinetic energy and a term representing the potential. In this case, the kinetic energy is the one of the electrons (since we ignore the one of the nuclei): 
+        \[\sum_{i=1}^{N} \left(-\frac{\hbar^2}{2m} \hat{\nabla}_{\bvec{r}_i}^2\right).\]
+        
+        The rest is the electric potential energy due to the nuclei and all the electrons:
+        \[\sum_{i=1}^{N} V_{en}\left(\bvec{r}_i\right) + \sum_{i < j} \frac{e^2}{\left|\bvec{r}_i - \bvec{r}_j\right|} = \sum_{i=1}^{N} \sum_{j=1}^{M} \frac{-e^2 Z_i}{\left|\bvec{R}_j - \bvec{r}_i\right|} + \sum_{i < j} \frac{e^2}{\left|\bvec{r}_i - \bvec{r}_j\right|}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The exact diagonalisation methods we developed so far are nice, but they are exponential in the number of particles. In our case, $N$ must be very large to learn information about macroscopic material behaviour, so they are not tractable. Hence, our goal is to make approximations that are much faster to run.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Second quantisation}
+    Let $\phi_i\left(\bvec{r}\right)$ be a basis of orbital wave functions. We can consider the matrix elements of our Hamiltonian:
+    \[t_{ij} = \int dr \phi_i^*\left(r\right) \hat{v}_1\left(r\right) \phi_j\left(r\right),\]
+    \[V_{ijkl} = \int dr \int dr' \phi_i^*\left(r\right) \phi_j^*\left(r'\right) \hat{v}_2\left(r, r'\right) \phi_k\left(r\right) \phi_{l} r'.\]
+    
+    Then, it is possible to prove that our Hamiltonian can be written in the second quantisation as:
+    \[\hat{H} = \sum_{i, j, \sigma} t_{ij} \hat{c}_{i \sigma}^{\dagger} \hat{c}_{j \sigma} + \frac{1}{2} \sum_{i, j, k, \ell, \sigma, \sigma'} V_{ijk l} \hat{c}_{i \sigma}^{\dagger} \hat{c}_{j \sigma'}^{\dagger} \hat{c}_{l \sigma'} \hat{c}_{k \sigma}.\]
+
+    \begin{subparag}{Remark 1}
+        Note that the ordering of the terms in the second sum is $i, j, l, k$ (for $\hat{c}_{i \sigma}^{\dagger} \hat{c}_{j \sigma'}^{\dagger} \hat{c}_{l \sigma'} \hat{c}_{k \sigma}$). We could write it as $i, j, k, l$, it would just add a negative sign.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+         We do not do the whole derivation here, which would take long.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: Electron gas}
+    Consider the case of an electron gas: 
+    \[\hat{H} = - \sum_{i=1}^{N} \frac{\hbar^2}{2} \nabla^2_{\bvec{r}_i} + \sum_{i < j} \frac{e^2}{\left|\bvec{r}_i - \bvec{r}_j\right|}.\]
+
+    Since the system is completely homogeneous, a good idea is to consider the Plank waves as our basis functions: 
+    \[\phi_{\bvec{k}}\left(\bvec{r}\right) = A \exp\left(-i \bvec{k}\dotprod \bvec{r}\right).\]
+\end{parag}
+
+\begin{parag}{Example 2: Atoms and molecules}
+    In a more general case, it is usual to pick $\phi_i\left(r\right) = \sum_{j} \alpha_{i j} f_j\left(r\right)$, where the $f_j\left(r\right)$ are atomic orbitals (centred on one of the nuclei). The first idea may be to pick the Slater-Type orbitals, which appear when solving the case of a single electron: 
+    \[f_{n l m}\left(r, \theta, \phi\right) \propto r^{n-1} e^{-\zeta r} Y_l^m\left(\theta, \phi\right),\]
+    where the $Y_l^m$ are the spherical harmonics. The issue however is that this leads to very awful integrals: $t_{ij}$ has to be computed numerically, which we do not want to do.
+
+    Instead, we thus consider Gaussian-Type orbitals: 
+    \[f_{l, m, n}\left(r\right) \propto x^\ell y^m z^n e^{-\zeta r^2}.\]
+
+    The big advantage is that $e^{-\zeta_i \left|r - R_1\right|^2} e^{-\zeta_j \left|r - R_j\right|^2} = K e^{- \bar{\zeta} \left|r - \bar{R}\right|}$, i.e. the product of two Gaussians is itself a Gaussian. We can moreover write: 
+    \[\frac{1}{\left|r - r'\right|} = \frac{2}{\sqrt{\pi}} \int_{0}^{\infty} dt e^{-t^2 \left|r - r'\right|^2}.\]
+
+    We can thus write everything in the expressions of $t_{ij}$ and $V_{ijkl}$ as Gaussian integrals, and then use integral tables to find their value explicitly.
+\end{parag}
+
+\begin{parag}{Theorem: Hartree-Fock method in the spinless case}
+    We first consider the spinless case. We suppose that the electrons are independent, i.e. that we can write the wavefunction as:
+    \[\Phi\left(r_1,, \ldots, r_N\right) = \frac{1}{\sqrt{N!}} \det \begin{pmatrix} \phi_1\left(r_1\right) & \cdots & \phi_n\left(r_1\right) \\ \vdots & \ddots & \vdots \\ \phi_1\left(r_N\right) & \cdots & \phi_N\left(r_N\right) \end{pmatrix}.\]
+
+    Moreover, we suppose that the second-quantised state is $\ket{\Phi} = c_1^{\dagger} c_2^{\dagger} \cdots c_N^{\dagger} \ket{0} = \ket{1 \cdots 1 0 \cdots 0} = \ket{1}^{\otimes N} \otimes \ket{0}^{\otimes \left(L-N\right)}$, i.e. that all electrons occupy the smaller energy orbitals.
+
+    Then, the average energy is given by:
+    \[\bra{\Phi} \hat{H} \ket{\Phi} = \sum_{a} t_{aa} + \frac{1}{2} \sum_{a b} \left(V_{abab} - V_{abba}\right).\]
+
+    \begin{subparag}{Intuition}
+        Let's try to get some intuition on this result. One of the terms, named the Hartree term, is: 
+        \autoeq{E_H = \frac{1}{2} \sum_{a, b} V_{abab} = \frac{1}{2} \sum_{a b} \int dr \int dr' \left|\phi_r\left(r\right)\right|^2 \frac{e^2}{\left|r - r'\right|} \left|\phi_b\left(r'\right)\right|^2 = \frac{1}{2} \int dr \int dr' \rho\left(r\right) \frac{e^2}{\left|r - r'\right|} \rho\left(r'\right).}
+
+        This is the classical electrostatic potential. The other potential term is purely quantum.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        In the spinless case: 
+        \[\hat{H} = \hat{H}_1 + \hat{H}_2, \mathspace \hat{H}_1 = \sum_{i, j} t_{i j} \hat{c}_i^{\dagger} \hat{c}_j, \mathspace \hat{H}_2 = \frac{1}{2}\sum_{i j k l} V_{ijkl} \hat{c}_i^{\dagger} \hat{c}_j^{\dagger} \hat{c}_l \hat{c}_k.\]
+        
+        We can now compute the first expectation value, using the fact $\ket{\Phi} = c_1^{\dagger} \cdots c_N^{\dagger} \ket{0}$: 
+        \[\bra{\Phi} \hat{H}_1 \ket{\Phi} = \sum_{i, j} t_{ij} \bra{0} \hat{c}_N \cdots \hat{c}_1 \hat{c}_i^{\dagger} \hat{c}_j \hat{c}_1^{\dagger} \cdots \hat{c}_n^{\dagger} \ket{0}.\]
+
+        Note that if $i \not\in \left\{1, \ldots, N\right\}$, then we have $\bra{0} \hat{c}_N \cdots \hat{c}_1 \hat{c}_i^{\dagger} = 0$, since $\hat{c}_i^{\dagger}$ tries to remove an electron from an orbital where there is no electron. Similarly, we must have $j \in \left\{1, \ldots, N\right\}$. Moreover, for $\bra{0} \left(\hat{c}_N \cdots \hat{c}_1 \hat{c}_i^{\dagger}\right)$ and $\left(\hat{c}_j \hat{c}_1^{\dagger} \cdots \hat{c}_n^{\dagger}\right) \ket{0}$ to have a non-zero overlap, we  need the two states to be the same and hence $i = j$. In that case, this inner product is equal to 1, and hence this reads: 
+        \[\bra{\Phi} \hat{H}_1 \ket{\Phi} = \sum_{i = 1}^N t_{i i} \cdot 1 = \sum_{a=1}^{N} t_{aa}.\]
+
+        Now, let us consider the second expectation value:.
+        \[\bra{\Phi} \hat{H}_2 \ket{\Phi} = \frac{1}{2} \sum_{ijkl} \bra{0} c_N \cdots c_1 c_i^{\dagger} c_j^{\dagger} c_l c_k c_1^{\dagger} \cdots c_N^{\dagger} \ket{0} V_{ikjl}.\]
+
+        We must again have $i, j, l,k \in \left\{1, \ldots, N\right\}$ for this to be non-zero. Moreover, we must also have $\ell \neq k$ and $i \neq j$ (we must not remove twice an electron from the same orbital). We then must again have $\bra{0} c_N \cdots c_1 c_i^{\dagger} c_j^{\dagger}$ and $c_l c_k c_1^{\dagger} \cdots c_N^{\dagger} \ket{0}$ to be proportional. This gives us two possibilities.
+        \begin{itemize}[left=0pt]
+            \item Suppose that $\left(i,j \right) = \left(k, l\right)$. This is called the \important{direct term}. In that case:
+            \[\left\langle \hat{c}_i^{\dagger} \hat{c}_l^{\dagger} \hat{c}_l \hat{c}_i \right\rangle = \left\langle \hat{n}_i \hat{n}_l \right\rangle = 1.\]
+            This shows that the direct term is $\frac{1}{2} \sum_{a \neq b} V_{abab}$.
+
+            \item Suppose now that $\left(i, j\right) = \left(l,k\right)$. This is called the \important{exchange term}.  Then:
+            \[\left\langle \hat{c}_i^{\dagger} \hat{c}_k^{\dagger} \hat{c}_i \hat{c}_k \right\rangle = -\left\langle \hat{n}_i \hat{n}_k \right\rangle = -1.\]
+
+            So, the exchange term is $-\frac{1}{2} \sum_{a \neq b} V_{abba}$.
+        \end{itemize}
+
+        Combining the two, this means that:
+        \[\bra{\Phi} H_2 \ket{\Phi} = \frac{1}{2} \sum_{a \neq b} \left(V_{abab} - V_{abba}\right) = \frac{1}{2} \sum_{a, b} \left(V_{abab} - V_{abba}\right),\]
+        where we used the fact $V_{abab} - V_{abba} = 0$ when $a = b$. 
+
+        Overall, this reads that the average energy is: 
+        \[\bra{\Phi} \hat{H} \ket{\Phi} = \bra{\Phi} \hat{H}_1 \ket{\Phi} + \bra{\Phi} \hat{H}_2 \ket{\Phi} = \sum_{a} t_{aa} + \frac{1}{2} \sum_{a b} \left(V_{abab} - V_{abba}\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Restricted Hartree Fock}
+    We now consider spins again. We again suppose that electrons are independent:
+    \[\Phi\left(r_1, \sigma_1, \ldots, r_N, \sigma_N\right) = \frac{1}{\sqrt{N!}} \det \begin{pmatrix} \phi_1\left(r_1, \sigma_1\right) & \cdots & \phi_n\left(r_1, \sigma_1\right) \\ \vdots & \ddots & \vdots \\ \phi_1\left(r_N, \sigma_N\right) & \cdots & \phi_N\left(r_N, \sigma_N\right) \end{pmatrix}.\]
+
+    Moreover, we suppose that each orbital is occupied by the same number of spin-up and spin-down particles; this is called the \important{closed-shell condition}. Finally, we suppose that the radial part is independent from the spin part (yielding ``restricted'' Hartree Fock):
+    \[\phi_k\left(\bvec{r}, \sigma\right) =  \begin{systemofequations} \phi_k\left(\bvec{r}\right)\alpha\left(\uparrow\right), \sigma = \uparrow \\ \phi_k\left(\bvec{r}\right)\beta\left(\downarrow\right), \sigma = \downarrow \end{systemofequations}\]
+
+    Then, the average energy becomes:
+    \[E_{RHF} = \sum_{a} 2t_{aa} + \frac{1}{2} \left(2 V_{abab} - V_{abba}\right).\]
+
+    \begin{subparag}{Intuition}
+        The derivation is very similar to the spinless case, which also justifies why their results are so close. For instance:
+        \autoeq{\left\langle \hat{H}_1 \right\rangle = \sum_{i, j, \sigma} \left\langle c_{i \sigma}^{\dagger} c_{i\sigma} \right\rangle t_{ij} = \sum_{i, j} \left(\left\langle c_{i \uparrow}^{\dagger} c_{i \uparrow} \right\rangle t_{ij} + \left\langle c_{i \downarrow}^{\dagger} c_{i \downarrow} \right\rangle t_{ij}\right) = \sum_{a} t_{aa}\cdot \left(1 + 1\right),}
+        using the fact the spin just factorises.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Roothaan-Hall equations}
+    We supposed that we could express $\ket{\phi_k} = \sum_{\beta=1}^L C_{\beta k} \ket{f_{\beta}}$, for some fixed orbitals $\ket{f_{\beta}}$. We however need to know the coefficients $C_{\beta k}$ to be able to compute $t_{ij}$ and $V_{ijkl}$. Note that, to be able to express this in a computer, $L$ has to be finite and hence an approximation has to be made here.
+
+    We define the matrix $\hat{P}$, named \important{density matrix}, such that: 
+    \[P_{\alpha \beta} = 2 \sum_{i} C_{\alpha i}^* C_{\beta i}.\]
+
+    We moreover define $\bar{t}_{\alpha \beta} = \bra{f_{\alpha}} \hat{v}_1 \ket{f_{\beta}}$ to be just a change of basis of $t_{ij}$, and similarly for $\bar{V}_{\alpha \beta \gamma \delta}$. We use these to define the matrices $\hat{F}$ and $\hat{S}$ such that:
+    \[F_{\alpha \beta} = \bar{t}_{\alpha \beta} + \sum_{\gamma \delta} P_{\gamma \delta} \left(\bar{V}_{\alpha \gamma \beta \delta} - \frac{1}{2} \bar{V}_{\alpha \gamma \delta \beta}\right), \mathspace S_{\alpha \beta} = \braket{f_{\alpha}}{f_{\beta}}.\]
+
+    Then, the $\ket{C_k}$ that minimise the ground energy (under the approximations made by the restricted Hartree-Fock method) respects the following generalised eigenvalue-eigenvector-like problem, with unknown $\epsilon_k$: 
+    \[\hat{F} \ket{C_k} = \epsilon_k \hat{S} \ket{C_k}.\]
+
+    \begin{subparag}{Remark}
+        Note that $\hat{F}$ depends on $\ket{C_k}$. Hence, this is not exactly a generalised eigenvalue-eigenvector problem. In practice, this can be solved iteratively, with this equation as an update rule to the $\ket{C_k}$, which we can use until we reach convergence.
+    \end{subparag}
+
+    \begin{subparag}{Proof idea}
+        We want to express $E_{RHF}$ as a function of the parameters $C_{\beta k}$. The kinetic term becomes:
+        \[2 \sum_{i} t_{ii} = 2 \sum_{i} \bra{\phi_i} \hat{v}_1 \ket{\phi_i} = 2 \sum_{\alpha \beta i} C_{\alpha i}^* C_{\beta i} \bra{f_{\alpha}} \hat{v}_1 \ket{f_{\beta}} = \sum_{\alpha \beta} P_{\alpha \beta} \bar{t}_{\alpha \beta},\]   
+        where we defined $\bar{t}_{\alpha \beta} = \bra{f_{\alpha}} \hat{v}_1 \ket{f_{\beta}}$ (which is just a change of basis on $t_{ij}$). 
+
+        Doing a completely similar reasoning for the other terms, we find:
+        \[E_{RHF} = \frac{1}{2} \sum_{\alpha \beta} \left(\bar{t}_{\alpha \beta} + F_{\alpha \beta}\right) P_{\alpha \beta},\]
+        
+        Now, we know the constraint that $\sum_{\alpha \beta} C_{\alpha k}^* C_{\beta l} \braket{f_{\alpha}}{f_{\beta}}  = \braket{\phi_k}{\phi_l} = \delta_{kl}$. We thus want to minimise $E_{RHF}$ under this constraint, which can be done with Lagrange multipliers (that introduce new variables, leading to the $\epsilon_k$ in the result). This results in:
+        \[\sum_{\beta} \left(F_{\alpha \beta} - \epsilon_k S_{\alpha \beta}\right) C_{\beta k} = 0.\]
+        
+        This does take the form of a generalised eigenvalue-like problem:
+        \[\hat{F} \ket{C_k} = \epsilon_k \hat{S} \ket{C_k}.\]
+    \end{subparag}
+\end{parag}
+
+\end{document}

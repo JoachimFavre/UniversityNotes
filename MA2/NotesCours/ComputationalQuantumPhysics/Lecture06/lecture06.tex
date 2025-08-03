@@ -1,0 +1,186 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-25 at 08:24:19.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 25 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2025-03-25}{Density functional theory}{
+\begin{itemize}[left=0pt]
+    \item Definition of electron density.
+    \item Application of the variational principle on densities.
+    \item Explanation of the Kohn-Scham scheme.
+    \item Explanation of the local density approximation.
+\end{itemize}
+    
+}
+
+\subsection{Density functional theory}
+
+\begin{parag}{Goal}
+    We want to see if we can do better than Hartree-Fock. To do so, we want to stay with the determinant form, but we will not keep the variational approximation. 
+
+    To do so, we will develop the density-functional theory (DFT). This is a very important branch of computation, it is widely used in practice.
+\end{parag}
+
+\begin{parag}{Idea}
+    Like before, our Hamiltonian is the one of the electronic structure problem:
+    \[\hat{H} = \sum_{i=1}^{N} \left[-\frac{\hbar}{2m} \nabla^2_{r_i} + V_{en}\left(r_i\right)\right] + \sum_{i < j} \frac{e^2}{\left|r_i - r_j\right|}.\]
+
+    We decompose it into $\hat{H} = \hat{H}_{eg} + \sum_{i} V_{en}\left(r_i\right)$, where:
+    \[\hat{H}_{eg} = \underbrace{\sum_{i=1}^{N} \left(-\frac{\hbar^2}{2m} \nabla^2 r_i\right)}_{= \hat{T}_e} + \underbrace{\sum_{i < j} \frac{e^2}{\left|r_i - r_j\right|}}_{= \hat{W}_{ee}} = \hat{T}_e + \hat{W}_{ee}.\]
+
+    The idea is that $\hat{H}_{eg}$ does not depend on the material. In some sense, the only thing that creates material properties is:
+    \[V_{en}\left(r\right) = - e \sum_{i=1}^{M} \frac{Z_i}{\left|R_i - r\right|}\]
+
+    This is the intuition behind the idea we will exploit.
+\end{parag}
+
+\begin{parag}{Definition: Electron density}
+    We define the electron density operator as: 
+    \[\hat{\rho}\left(\bvec{r}\right) = \sum_{i=1}^{N} \delta\left(\bvec{r} - \bvec{r}_i\right).\]
+
+    We then define the electron density as the expected value of the operator, for some fermionic state $\ket{\psi}$: 
+    \autoeq{\rho\left(r\right) = \bra{\psi} \hat{\rho}\left(r\right) \ket{\psi} = \int dr_1 \cdots dr_N \left|\psi\left(r_1, \ldots, r_N\right)\right|^2 \sum_{i} \delta\left(r - r_i\right) = N \int dr_1 \cdots dr_N \left|\psi\left(r_1, \ldots, r_N\right)\right| \delta\left(r - r_1\right) = N \int dr_2 \cdots dr_N \left|\psi\left(r, r_2, \ldots, r_N\right)\right|^2.}
+
+    \begin{subparag}{Sanity check}
+        Note indeed that, as a sanity check, the total electron density is the number of electrons: 
+        \[\int dr \rho\left(r\right) = N \int dr dr_2 \cdots dr_N \left|\psi\left(r, r_2, \ldots, r_N\right)\right|^2 = N.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Variational principle}
+    Let $\hat{H}$ be some Hamiltonian of ground energy $E_0$. Then: 
+    \[E_0 = \min_{\psi} \bra{\psi} \hat{H} \ket{\psi}.\]
+
+    \begin{subparag}{Remark}
+        Here, the minimisation is done over normalised states. We will need the following more general version later in the course, where the minimisation is done over non-normalised (non-zero) states:
+        \[E_0 = \min_{\psi} \frac{\bra{\psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: Variational principle for the density}
+    Given an electron density $\rho\left(r\right)$, we let $\ket{\psi\left[\rho\right]}$ to represent an arbitrary state that matches this density. Moreover, we define $F\left[\rho\right]$ to be the \important{density function}, and $\bar{V}_{en}\left[\rho\right]$ as follows:
+    \[F\left[\rho\right] = \min_{\psi\left[\rho\right]} \left[\bra{\psi} \left(\hat{T}_e + \hat{W}_{ee}\right) \ket{\psi}\right], \mathspace \bar{V}_{en}\left[\rho\right] = \int d \bvec{r} \rho\left(\bvec{r}\right) V_{en}\left(\bvec{r}\right).\]
+
+    Then:
+    \[E_0 = \min_{\rho}\left(F\left[\rho\right] + \bar{V}_{en}\left[\rho\right]\right).\]
+
+    \begin{subparag}{Implication}
+        We can thus isolate all the universal part in $F\left[\rho\right]$; if we know it, we turn our optimisation problem on some 3-dimensional optimisation problem on $\rho\left(r\right)$. The idea is that we can use some physical intuition to try and minimise $F\left[\rho\right]$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We massage a bit the variational principle, by minimising both on states at a fixed density, and the fixed density $\rho$: 
+        \[E_0 = \min_{\rho} \min_{\psi\left[\rho\right]} \left[\bra{\psi} \left(\hat{T}_e + \hat{W}_{ee} + \sum_{i} V_{en}\left(\bvec{r}_i\right)\right) \ket{\psi}\right].\]
+
+        Recall that the terms $\hat{T}_e + \hat{W}_{ee}$ do not depend material. We moreover notice that the last term, in fact, only depends on the density: 
+        \autoeq{\bra{\psi} \sum_{i} V_{en}\left(\bvec{r}_i\right) \ket{\psi} = \sum_{i} \int d \bvec{r}_1 \cdots d\bvec{r}_N \left|\psi\left(\bvec{r}_1, \ldots, \bvec{r}_N\right)\right|^2 V_{en}\left(\bvec{r}_i\right) = N \int d\bvec{r}_1 \cdots d\bvec{r}_N \left|\psi\left(\bvec{r}_1, \ldots, \bvec{r}_N\right)\right|^2 V_{en}\left(\bvec{r}_1\right) = \int d \bvec{r}_1 \left(N \int d \bvec{r}_2 \cdots d \bvec{r}_N \left|\psi\left(\bvec{r}_1, \ldots, \bvec{r}_N\right)\right|^2\right) V_{en}\left(\bvec{r}_1\right) = \int d \bvec{r}_1 \rho\left(\bvec{r}_1\right) V_{en}\left(\bvec{r}_1\right) = \bar{V}_{en}\left[\rho\right].}
+
+        This is a functional of the density $\rho$. We can thus move the minimisation on $\ket{\psi\left[l\rho\right]}$ inwards:
+        \[F\left[\rho\right] = \min_{\psi\left[\rho\right]} \left[\bra{\psi} \left(\hat{T}_e + \hat{W}_{ee}\right) \ket{\psi}\right].\]
+        
+        Since we no longer have any dependence on $\psi$:
+        \[E_0 = \min_{\rho}\left(F\left[\rho\right] + \bar{V}_{en}\left[\rho\right]\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Kohn-Sham scheme}
+    We split $F\left[\rho\right]$ into: 
+    \[F\left[\rho\right] = E_k\left[\rho\right] + E_h\left[\rho\right] + E_{xc}\left[\rho\right].\]
+
+    This is named the \important{Kohm-Sham scheme}. We call $E_k\left[\rho\right]$ the kinetic energy, $E_h\left[\rho\right]$ the Hartree functional, and $E_{xc}\left[\rho\right]$ the exchange correlation functional. They are defined such that: 
+    \[E_h\left[\rho\right] = \frac{1}{2} \int d \bvec{r} d \bvec{r}' \rho\left(\bvec{r}\right) \frac{e^2}{\left|\bvec{r} - \bvec{r}'\right|} \rho\left(\bvec{r}'\right), \mathspace E_k\left[\rho\right] = \min_{\Phi\left[\rho\right]} \bra{\Phi} \hat{T}_e \ket{\Phi},\]
+    and $E_{xc}\left[\rho\right]$ is defined such that the decomposition $F\left[\rho\right] = E_k\left[\rho\right] + E_h\left[\rho\right] + E_{xc}\left[\rho\right]$ holds.
+
+    Although it is hard to prove mathematically, physically, it feels reasonable to assume that any density can be described by a Slater determinant:
+    \[\Phi\left[\rho\right] = \frac{1}{\sqrt{N!}} \det\begin{pmatrix} \phi_1\left(r_1\right) & \cdots & \phi_N\left(r_1\right) \\ \vdots & \ddots & \vdots \\ \phi_1\left(r_N\right) & \cdots & \phi_N\left(r_N\right) \end{pmatrix}.\]
+
+    Then, the $\phi_1, \ldots, \phi_N$ which density minimise the energy (given by the previous lemma) respect the following equation:
+    \[\left(-\frac{1}{2m} \nabla^2_{\bvec{r}} + V_{KS}\left(\bvec{r}\right)\right) \phi_{\mu}\left(\bvec{r}\right) = \epsilon_{\mu} \phi_{\mu}\left(\bvec{r}\right),\]
+    where:
+    \[V_{KS}\left(\bvec{r}\right) = V_{en}\left(\bvec{r}\right) + e^2 \int d \bvec{r}' \frac{\rho\left(\bvec{r}'\right)}{\left|\bvec{r} - \bvec{r}'\right|} + V_{xc}\left(\bvec{r}\right), \mathspace V_{xc}\left(\bvec{r}\right) = \frac{\delta E_{xc}\left[\rho\right]}{\delta \rho\left(\bvec{r}\right)}.\]
+
+    \begin{subparag}{Remark 1}
+        Note that this looks heavily like Schrödinger's equation, with an effective potential $V_{KS}\left(\bvec{r}\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+      Just like Hartree-Fock, we have a self-consistent problem $V_{KS}\left(\bvec{r}\right)$ depends on on our solution $\Phi$ (of $\rho$, in particular). Hence, we can again start with some random $\phi_i$, and then update it iteratively with this rule until convergence.
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        Essentially everything in our equation can be computed so far, except for $V_{xc}\left(\bvec{r}\right)$. Now, everything we have done has been without any approximation, but there's no free lunch and we need to make one. We will describe a method to compute $E_{xc}\left[\rho\right]$ (and hence $V_{xc}\left(\bvec{r}\right)$) in the following paragraph.
+
+        However, overall, this gives us a way to find the ground state energy.
+    \end{subparag}
+    
+    \begin{subparag}{Proof idea}
+        As stated in our previous lemma, using our decomposition of $F\left[\rho\right]$, we can write:
+        \autoeq{E_0 = \min_{\rho} \left[F\left[\rho\right] + \bar{V}_{en}\left[\rho\right]\right] = \min_{\rho} \left[\min_{\Phi\left[\rho\right]} \bra{\Phi} \hat{T}_e \ket{\Phi} + E_h\left[\rho\right] + E_{xc}\left[\rho\right] + V_{en}\left[\rho\right]\right].}
+
+        Now, as stated before, physically, it seams reasonable to suppose that we can restrict the minimisation to densities coming from Slater determinants; although it is however hard to prove mathematically. Hence, we can write:
+        \[E_0 = \min_{\rho_{\Phi}} \min_{\Phi\left[\rho_{\Phi}\right]} \left[\bra{\Phi} \hat{T}_e \ket{\Phi} + E_h\left[\rho_{\Phi}\right] + E_{xc}\left[\rho_{\Phi}\right]+ V_{en}\left[\rho_{\Phi}\right]\right].\]
+
+        It is possible to show that, for Slater determinants:
+        \[\rho_{\Phi}\left(r\right) = \sum_{i} \left|\phi_i\left(r\right)\right|^2.\]
+
+        Hence, $E_0$ requires to minimise on functionals that only depend on $\phi_i\left(r\right)$. To minimise our functional, we want to solve: 
+        \autoeq{\delta E\left[\rho\right] = 0 \implies \int dr \delta \rho\left(\bvec{r}\right) \left[V_{en}\left(\bvec{r}\right) + e^2 \int d \bvec{r}' \frac{\rho\left(\bvec{r}'\right)}{\left|\bvec{r} - \bvec{r}'\right|} + \frac{\delta E_k\left[\rho\right]}{\delta \rho} + \frac{\delta E_{xc}\left[\rho\right]}{\delta \rho}\right] = 0,}
+        subject to the constraint that $\int d \bvec{r} \delta\left(\bvec{r}\right) = 0$, since the total electron number $N$ is conserved.
+        
+        Doing this, we get exactly our result:
+        \[\left(-\frac{1}{2m} \nabla^2_{\bvec{r}} + V_{KS}\left(\bvec{r}\right)\right) \phi_{\mu}\left(\bvec{r}\right) = \epsilon_{\mu} \phi_{\mu}\left(\bvec{r}\right),\]
+        where:
+        \[V_{KS}\left(\bvec{r}\right) = V_{en}\left(\bvec{r}\right) + e^2 \int d \bvec{r}' \frac{\rho\left(\bvec{r}'\right)}{\left|\bvec{r} - \bvec{r}'\right|} + V_{xc}\left(\bvec{r}\right), \mathspace V_{xc}\left(\bvec{r}\right) = \frac{\delta E_{xc}\left[\rho\right]}{\delta \rho\left(\bvec{r}\right)}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Local density approximation}
+    As mentioned before, we now need to make an approximation to compute $E_{xc}\left[\rho\right]$.
+
+    The idea is that $E_{xc}^{LDA}$ is universal and does not depend on $V_{en}\left(\bvec{r}\right)$. We can thus compare it to the case of a uniform electron gas of constant density $\rho \in \mathbb{R}$. Now, our density is not uniform, so we need to combine it in some way. We do it in a linear fashion:
+    \[E_{xc}^{LDA}\left[\rho\right] = \int d \bvec{r} \rho\left(\bvec{r}\right) E_{xc}^{eg}\left(\rho\left(\bvec{r}\right)\right).\]
+
+    This is where our approximation, the \important{local density approximation}, comes in. This has this name since $E_{xc}^{LDA}\left[\rho\right]$ does not depend on any of the gradient of the density. Hence, this is expected to work well when there is no strong variation on the electron  density.
+
+    \begin{subparag}{Remark 1}
+        For this approximation to be useful, we just need to prove that $E_{xc}^{eg}\left(\rho\left(\bvec{r}\right)\right)$ can indeed be computed.
+
+        By the formula we found earlier, where we applied the variational principle on densities, knowing the fact $\hat{V}_{en}^{eg} = 0$ for an electron gas:
+        \[E^{eg}\left[\rho\right] = F^{eg}\left[\rho\right].\]
+
+        In other words, the ground energy of the electron gas is $F^{eg}\left[\rho\right]$. Moreover, we know that:
+        \[F^{eg}\left[\rho\right] = E_k\left[\rho\right] + E_h^{eg}\left[\rho\right] + E_{xc}^{eg}\left[\rho\right].\]
+
+        We are able to compute $E_k\left[\rho\right]$ and $E_h^{eg}\left[\rho\right]$. Moreover, later techniques in the course---such as quantum Monte Carlo---will allow to evaluate the ground energy $E^{eg}\left[\rho\right]$. So, we can indeed isolate $E_{xc}^{eg}\left[\rho\right]$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This allows us to compute $E_{xc}^{LDA}\left[\rho\right]$, but we are instead really interested in $V_{xc}^{LDA}\left(\bvec{r}\right)$. Applying a functional derivative on the definition $E_{xc}^{LDA}\left[\rho\right] = \int d \bvec{r} \rho\left(\bvec{r}\right) E_{xc}^{eg}\left(\rho\left(\bvec{r}\right)\right)$, we get:
+        \[V_{xc}^{LDA}\left(\bvec{r}\right) = \frac{\delta E_{xc}^{LDA}\left[\rho\right]}{\delta \rho\left(\bvec{r}\right)} = E_{xc}^{eg}\left(\rho\left(\bvec{r}\right)\right) + \rho\left(\bvec{r}\right) \nabla_{\rho} E_{xc}^{eg}\left(\rho\left(\bvec{r}\right)\right).\]
+
+        It is not important but, doing practical computations, we have: 
+        \[V_{xc}^{LDA}\left(\bvec{r}\right) = -\frac{e^2}{a_B} \left(\frac{3}{2\pi}\right)^{2/3} \frac{1}{r_s} \left[1 + 0.0545 r_s \ln\left(1 + \frac{11.4}{r_s}\right)\right],\]
+        for $r_s^{-1} = a_B \left(\frac{4\pi}{3} \rho\right)^{1/3}$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        In practice, if we want to use this type of computations, we should resort to libraries that implement everything very efficiently, much more that we could ever do.
+    \end{subparag}
+\end{parag}
+
+
+
+\end{document}

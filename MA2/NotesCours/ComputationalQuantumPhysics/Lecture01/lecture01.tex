@@ -1,0 +1,217 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-02-18 at 08:13:05.
+
+\usepackage{../../style}
+
+\title{Computational quantum physics}
+\author{Joachim Favre}
+\date{Mardi 18 février 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2025-02-18}{Quantum mechanics in one hour}{
+\begin{itemize}[left=0pt]
+    \item Summary of quantum mechanics: wave-functions, density matrices, observables, measurements, Schrödinger's equation, thermal density matrix and the continuous case. 
+\end{itemize}
+
+}
+
+\section{Introduction}
+
+\begin{parag}{Axiom: Wave-function}
+    A quantum state is represented by a state-function $\ket{\psi} \in \mathcal{H}$ from some Hilbert space $\mathcal{H}$. It is moreover assumed to be normalised: 
+    \[\left\|\ket{\psi}\right\| = \braket{\psi}{\psi} = 1.\]
+
+    \begin{subparag}{Example}
+        For instance, for spin-$\frac{1}{2}$ particles, $\mathcal{H} = \mathbb{C}^2$ and we have the following two basis states: 
+        \[\ket{\uparrow} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \mathspace \ket{\downarrow} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}.\]
+        
+        Any state can thus be written as $\ket{\psi} = \alpha \ket{\uparrow} + \beta \ket{\downarrow}$. The normalisation constraint $\braket{\psi}{\psi} = 1$ moreover implies that $\left|\alpha\right|^2 + \left|\beta\right|^2 = 1$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Inner product}
+    Let $\ket{\psi}, \ket{\phi} \in \mathcal{H}$ be vectors. Their inner product is $\braket{\phi}{\psi}$. 
+
+    \begin{subparag}{Example}
+        If they are of discrete dimension: 
+        \[\braket{\phi}{\psi} = \sum_{x} \braket{\phi}{x} \braket{x}{\psi}.\]
+
+        If they are of continuous dimension: 
+        \[\braket{\phi}{\psi} = \int_{-\infty}^{\infty} dx \phi\left(x\right)^* \psi\left(x\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Density matrices}
+    Let $p_i$ be a probability distribution, and $\ket{\psi_i}$ be a family of quantum states.
+
+    A \important{density matrix} is an operator of the form: 
+    \[\hat{\rho} = \sum_{i} p_i \ket{\psi_i}\bra{\psi_i}.\]
+
+    \begin{subparag}{Intuition}
+        This allows to mix a classical probabilities $\left(p_i\right)$ and quantum states $\left(\ket{\psi_i}\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Property}
+        The normalisation condition implies that: 
+        \[\Tr\left(\rho\right) = \sum_{i} p_i \Tr\left(\ket{\psi_i} \bra{\psi_i}\right) = \sum_{i} p_i \braket{\psi_i}{\psi_i} = \sum_{i} p_i = 1.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        A density matrix represents a pure state when $\hat{\rho} = \ket{\psi}\bra{\psi}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Observable}
+    A \important{observable} $\hat{O}$ is a Hermitian operator: 
+    \[\hat{O}^{\dagger} = \hat{O}.\]
+    
+    \begin{subparag}{Example}
+        For instance, we may consider the spin operators: 
+        \[\hat{S}_x = \frac{\hbar}{2} \hat{\sigma}_x = \frac{\hbar}{2} \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \mathspace \hat{S}_y = \frac{\hbar}{2} \hat{\sigma}_y = \frac{\hbar}{2} \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix},\]
+        \[\hat{S}_z = \frac{\hbar}{2} \hat{\sigma}_z = \frac{\hbar}{2} \begin{pmatrix} 1 & 0 \\ 0 & -1\end{pmatrix}.\]
+
+        They respect the following commutation properties: 
+        \[\left[\hat{S}_i, \hat{S}_j\right] = i \hbar \epsilon_{ijk} \hat{S}_k.\]
+    \end{subparag}
+
+    \begin{subparag}{Property}
+        By the spectral theorem, a Hermitian operator can be diagonalised in an orthogonal basis, with real eigenvalues.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Axiom: Measurement}
+    Let $\ket{\psi}$ be some state, and $\hat{O}$ be an observable of eigenspectrum $\hat{O} \ket{\lambda_k} = \lambda_k \ket{\lambda_k}$.
+
+    When measuring $\hat{O}$ on $\ket{\psi}$, we measure some $\lambda_k$ with probability $\left|\braket{\lambda_k}{\psi}\right|^2$. Moreover, $\ket{\psi}$ collapses to the state $\ket{\lambda_k}$.
+
+    \begin{subparag}{Example}
+        For instance, consider the state $\ket{\psi} = \ket{\uparrow}$. We want to measure the observable $\hat{S}_x$, which eigenvectors are: 
+        \[\ket{\rightarrow} = \frac{\ket{\uparrow} + \ket{\downarrow}}{\sqrt{2}}, \mathspace \ket{\leftarrow} = \frac{\ket{\uparrow} - \ket{\downarrow}}{\sqrt{2}}.\]
+
+        We thus have: 
+        \[\prob\left(\rightarrow\right) = \left|\braket{\rightarrow}{\psi}\right|^2 = \frac{1}{2}, \mathspace \prob\left(\leftarrow\right) = \left|\braket{\leftarrow}{\uparrow}\right|^2 = \frac{1}{2}.\]
+
+        This means that, after the measure, we have the following mixed state: 
+        \[\hat{\rho} = p_{\rightarrow} \ket{\rightarrow} \bra{\rightarrow} + p_{\leftarrow} \ket{\leftarrow} \bra{\leftarrow} = \frac{1}{2} \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Pure-state average}
+    Let $\ket{\psi}$ be some pure state, and $\hat{O}$ be an observable.
+
+    If we repeat the experiment consisting of preparing the state $\ket{\psi}$, and then measuring $\hat{O}$, we get on expected value of:
+    \[\left\langle \hat{O} \right\rangle_{\psi} = \bra{\psi} \hat{O} \ket{\psi}.\]
+
+    \begin{subparag}{Proof}
+        This is a direct proof, by leaving $\hat{O} = \sum_{k} \lambda_k \ket{\lambda_k}\bra{\lambda_k}$ to be its eigendecomposition: 
+        \[\bra{\psi} \hat{O} \ket{\psi} = \sum_{k} \lambda_k \braket{\psi}{\lambda_k} \braket{\lambda_k}{\psi}  = \sum_{k} \lambda_k \prob\left(\lambda_k\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Mixed-state average}
+    Let $\hat{\rho}$ be some mixed state, and $\hat{O}$ be an observable.
+
+    On expectation, we measure the following value: 
+    \[\left\langle O \right\rangle_{\rho} = \Tr\left(\hat{O} \hat{\rho}\right).\]
+\end{parag}
+
+\begin{parag}{Definition: Hamiltonian}
+    A \important{Hamiltonian} of a system is a Hermitian operator representing its energy.
+\end{parag}
+
+\begin{parag}{Axiom: Schrödinger's equation}
+    Let $\ket{\psi\left(t\right)}$ be a state evolving under some Hamiltonian $\hat{H}$. Then, it respects the following equation, named \important{Schrödinger's equation}: 
+    \[i \hbar \frac{\partial}{\partial t} \ket{\psi\left(t\right)} = \hat{H} \ket{\psi\left(t\right)}.\]
+
+    \begin{subparag}{Remark 1}
+        When $\hat{H}$ does not depend on time, its solution is always: 
+        \[\ket{\psi\left(t\right)} = \exp\left(-i \frac{\hat{H}}{\hbar} t\right)\ket{\psi\left(0\right)}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        It is in fact sufficient to be able to solve the following eigenvalue-eigenvector problem, named the \important{time-independent Schrödinger's equation}: 
+        \[\hat{H} \ket{\psi_k} = E_k \ket{\psi_k}.\]
+
+        Indeed, we then simply have:
+        \autoeq{\ket{\psi\left(t\right)} = \exp\left(-i \frac{\hat{H}}{\hbar} t\right)\ket{\psi\left(0\right)} = \exp\left(-i \frac{\hat{H}}{\hbar}t\right) \left(\sum_{k} c_k \ket{\psi_k}\right) = \sum_{k} \exp\left(-i \frac{E_k}{\hbar} t\right) c_k \ket{\psi_k},}
+        where $c_k = \braket{\psi_k}{\psi\left(0\right)}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Density operator time evolution}
+    Let $\rho\left(t\right)$ be a density operator evolving under some Hamiltonian $\hat{H}$. Then, it respects the following equation: 
+    \[i \hbar \frac{\partial}{\partial t} \hat{\rho}\left(t\right) = \left[\hat{H}, \hat{\rho}\left(t\right)\right].\]
+    
+    \begin{subparag}{Proof}
+        This is a consequence of Schrödinger's equation. It is a good exercise to try and prove it.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Thermal density matrix}
+    Let $\beta$ be a constant and $\hat{H}$ be a Hamiltonian of eigendecomposition $\hat{H} = \sum_{k} E_k\ket{\psi_k}\ket{\psi_k}$. A \important{thermal density matrix} is defined as: 
+    \[\hat{\rho}_{\beta} = \sum_{k} p_k^{\left(\beta\right)} \ket{\psi_k} \bra{\psi_k} = \frac{1}{Z} \sum_{k} \exp\left(-\beta E_k\right) \ket{\psi_k}\bra{\psi_k},\]
+    where $p_k^{\left(\beta\right)} = \frac{1}{Z} \exp\left(-\beta E_k\right)$ is the Boltzmann probability distribution and $Z = \sum_{k} \exp\left(- \beta E_k\right) \ket{\psi_k} \bra{\psi_k}$ is a normalisation factor.
+
+    \begin{subparag}{Equivalence}
+        Equivalently, this can be written as: 
+        \[\hat{\rho}_{\beta} = \frac{1}{Z} \exp\left(-\beta \hat{H}\right), \mathspace Z = \Tr\left(\exp\left(-\beta \hat{H}\right)\right)\]
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        Given a system of Hamiltonian $\hat{H}$ and temperature $T$, we expect a fraction $p_k^{\left(\beta\right)}$ for $\beta = \frac{1}{k_B T}$ of the particles to lie in the energy state $\ket{E_k}$. This density matrix represents exactly this.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 1}
+        This is a valid normalised quantum state, $\Tr\left(\hat{\rho}_{\beta}\right) = 1$, since:
+        \[Z = \Tr \left(\exp\left(- \beta \hat{H}\right)\right) = \sum_{k} \bra{\psi_k} \exp\left(-\beta \hat{H}\right) \ket{\psi_k} = \sum_{k} \exp\left(-\beta E_k\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The expected value of some observable $\hat{O}$ can simply be evaluated: 
+        \[\left\langle \hat{O} \right\rangle_{\rho} = \Tr \left(\hat{\rho}_{\beta} \hat{O}\right) = \frac{\Tr \left(\exp\left(-\beta \hat{H}\right) \hat{O}\right)}{\Tr \left(\exp\left(-\beta \hat{H}\right)\right)}.\]
+
+        This is named a \important{thermal average}.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Continuous space}
+    Let us now consider a continuous Hilbert space, $\mathcal{H} = \mathbb{C}^n$. There are the following differences with a discrete case.
+
+    \begin{itemize}[left=0pt]
+        \item \textit{(Normalisation constraint)} $\int d x^n \left|\braket{x}{\psi}\right|^2 = 1$.
+        \item \textit{(Position and momentum operators)} There are position operators $\hat{x}_{\alpha}$ and momentum operators $\hat{p}_{\alpha} = - i \hbar \frac{\hat{\partial}}{\partial x_{\alpha}}$. Their commutation relations are: 
+        \[\left[\hat{x}_{\alpha}, \hat{p}_{\beta}\right] = i \hbar \delta_{\alpha \beta} \hat{I}.\]
+        \item \textit{(Hamiltonian)} Making a link with the classical case, if we have some potential $V\left(x\right)$, the Hamiltonian can be written as: 
+    \[\hat{H} = \frac{\hat{p}_x^2 + \hat{p}_y^2 + \hat{p}_z^2}{2m} + V\left(\hat{x}\right) = \frac{-\hbar^2}{2m} \bvec{\nabla}^2 + V\left(\hat{x}\right).\]
+    \end{itemize}
+    
+    \begin{subparag}{Remark}
+        This yields that we can rewrite the Schrödinger's equation as: 
+        \autoeq{i \hbar \frac{\partial}{\partial t} \ket{\psi} = \hat{H} \ket{\psi} \implies i \hbar \frac{\partial}{\partial t} \bra{x\ket{\psi\left(t\right)}} = \bra{x} \hat{H} \ket{\psi\left(t\right)} \implies i \hbar \frac{\partial}{\partial t} \psi\left(x, t\right) = -\frac{\hbar^2}{2m} \bvec{\nabla}^2 \psi\left(x, t\right) + V\left(x\right) \psi\left(x, t\right).}
+
+        This is Schrödinger's equation as he wrote it.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Goal}
+    We will try to compute multiple values in this class:
+    \begin{itemize}
+        \item Ground energy.
+        \item Ground state.
+        \item Average values $\left\langle O \right\rangle$ on the ground state.
+        \item Time evolution.
+        \item Average values $\left\langle O \right\rangle$ on a thermal state.
+    \end{itemize}
+
+    We will consider very general Hamiltonians, and some specific ones. We will also use both classical and quantum computers.
+\end{parag}
+
+\end{document}

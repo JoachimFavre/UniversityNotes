@@ -1,0 +1,153 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-06-19 at 16:55:10.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 8 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2025-04-08}{Machine learning methods}{
+\begin{itemize}[left=0pt]
+    \item Definition of artificial neural network.
+    \item Explanation of supervised learning.
+    \item Explanation of neural-network quantum states.
+    \item Explanation of how to compute the ground state using a neural-network quantum state.
+    \item Proof of the back-propagation algorithm.
+\end{itemize}
+
+}
+
+\subsection{Neural network quantum states}
+
+\begin{parag}{Definition: Artificial neural network}
+    A \important{artificial neural network} is a function $F$. It is defined by some number of layers $D$, non-linear functions $\phi^{\left(\ell\right)}$, matrices $W^{\left(\ell\right)}$ and vectors $b^{\left(\ell\right)}$.
+
+    We let $a_j^{\left(0\right)} = x_j$ to be the input. We then define layers recursively: 
+    \[a_j^{\left(\ell\right)} = \phi^{\left(\ell\right)}\left(\sum_{i} w_{ij} a_i^{\left(\ell-1\right)} + b^{\left(\ell\right)}_j\right).\]
+
+    We finally define $F\left(x\right) = a_j^{\left(D\right)}$ to be the result of the last layer.
+
+    \begin{subparag}{Activation function}
+        The non-linear functions $\phi^{\left(\ell\right)}$ are called \important{activation functions}. An example is the sigmoid: 
+        \[\phi\left(x\right) = \frac{1}{1 + \exp\left(-x\right)}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        The neural network can be seen as just being a large composition of functions: 
+        \[F\left(x\right) = \left(\phi^{\left(D\right)} \circ W^{\left(D\right)} \circ \ldots \circ \phi^{\left(2\right)} \circ W^{\left(2\right)} \circ \phi^{\left(1\right)} \circ W^{\left(1\right)}\right)\left(x\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The number of layers, the activation functions and the shape of the matrices and vectors are kept fixed. However, we leave as a parameter the exact values of the matrices and vectors: 
+        \[\theta = \left(W^{\left(1\right)}, b^{\left(1\right)}, \ldots, W^{\left(D\right)}, b^{\left(D\right)}\right).\]
+        
+        Hence, an artificial neural network is essentially just a large parametrised function, so we may write $F\left(x; \theta\right)$. We then refer to ``learning'' when we optimise for the best $\theta$ to solve for a task.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Supervised learning}
+    An example of usage is supervised learning. Let suppose that we have a dataset $D = \left\{\left(x_1, y_1\right), \ldots, \left(x_{N_s}, y_{N_s}\right)\right\}$. The goal is to find a $\theta$ such that $F\left(x_i; \theta\right) \approx y_i$ for all $\left(x_i, y_i\right) \in D$. More specifically, we are looking for the $\theta$ that minimises a \important{loss function}: 
+    \[\mathcal{L}\left(\theta\right) = \frac{1}{N_s}\sum_{i=1}^{N_s} \left|F\left(x_i; \theta\right) - y_i\right|^2.\]
+    
+    This can be optimised through gradient descent.
+
+    \begin{subparag}{Remark}
+        In practice, we split the data-set into training data and validation data. The latter is used to be able to test the model on data it has never seen while training.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Neural network quantum state}
+   Artificial neural networks can represent many classes of functions. Hence, we consider our variational quantum states to be given by a neural network: 
+   \[\braket{x}{\psi\left(\theta\right)} = F\left(x; \theta\right).\]
+   
+   This is called \important{neural-network quantum state} (NQS).
+
+   \begin{subparag}{Remark 1}
+       In general, we want the outputs to be complex. Hence, this means that we actually use complex-valued matrices. Moreover, the last layer must output a single value, since $\braket{x}{\psi\left(\theta\right)}$ is a scalar.
+   \end{subparag}
+
+   \begin{subparag}{Remark 2}
+       In practice, we want $\braket{x}{\psi\left(\theta\right)}$ to be able to vary on many orders of magnitude. Hence, a more usual parameterisation is: 
+       \[\braket{x}{\psi\left(\theta\right)} = \exp\left(F\left(x; \theta\right)\right).\]
+   \end{subparag}
+\end{parag}
+
+\begin{parag}{Stochastic gradient descent}
+    Consider some loss function $\mathcal{L}\left(\theta\right)$. Also, suppose that we have a distribution $\Pi\left(x; \theta\right)$ from which we can sample $x^{\left(1\right)}, \ldots, x^{\left(N_S\right)}$, and that we can use these samples to estimate a gradient of the loss function: 
+    \[\frac{\partial}{\partial \theta_k} \mathcal{L}\left(\theta\right) = \exval_{x \followsdistr \Pi\left(x; \theta\right)}\left(G_k\left(x; \theta\right)\right) \approx \frac{1}{N_S} \sum_{s=1}^{N_S} G_k\left(x^{\left(i\right)}; N_S\right) \over{=}{def} G^{\left(s\right)}.\]
+
+    We can the consider some value $\eta > 0$, named \important{learning parameter}, and use the following update rule to converge to a minimum of $\mathcal{L}$, under some hypotheses: 
+    \[\theta^{\left(s+1\right)} = \theta^{\left(s\right)} - \eta G^{\left(s\right)}.\]
+
+    This algorithm is named \important{stochastic gradient descent}.
+\end{parag}
+
+\begin{parag}{Ground state}
+    Considering what we studied in the last lecture, we want to minimise the energy to get an estimator of the ground energy: 
+    \[\mathcal{L}\left(\theta\right) = \frac{\bra{\psi\left(\theta\right)} \hat{H} \ket{\psi\left(\theta\right)}}{\braket{\psi\left(\theta\right)}{\psi\left(\theta\right)}}.\]
+    
+    We have also seen that, given a $\theta$, we can estimate the energy and the gradient, by sampling some probability distribution $\Pi\left(x; \theta\right)$, and using the samples to compute some $E_{loc}\left(x\right)$ and some $D_k\left(x\right)$. $E_{loc}\left(x\right)$ can easily be computed, we have to show that $D_k\left(x\right)$ can be computed as well. Using the fact $\braket{x}{\psi} = \exp\left(F\left(x; \theta\right)\right)$: 
+    \[D_k\left(x\right) = \frac{\partial_{\theta_k} \braket{x}{\psi}}{\braket{x}{\psi}} = \frac{\partial_{\theta_k} \exp\left(F\left(x; \theta\right)\right)}{\exp\left(F\left(x; \theta\right)\right)} = \frac{\partial}{\partial \theta_k} F\left(x; \theta\right).\]
+    
+    Hence, all we need to compute is $\frac{\partial}{\partial \theta_k} F\left(x; \theta\right)$, which we present how to do in the following paragraph. We are then able to minimise $\mathcal{L}\left(\theta\right)$ using stochastic gradient descent.
+
+    \begin{subparag}{Remark}
+        Doing stochastic gradient descent, the distribution of parameters $\theta$ that we get converges to the Boltzmann distribution with temperature $T \approx \frac{\eta}{N_S}$: 
+        \[\Pi\left(\theta\right) = \frac{\exp\left(- \beta \mathcal{L}\left(\theta\right)\right)}{Z},\]
+        where $\beta = \frac{1}{k_B T}$. In other words, as we increase the number of samples, it is like if we diminished the average temperature of our systems. In the limit, we do get a mixed state of lowest energy, i.e. the ground state.  \end{subparag}
+\end{parag}
+
+\begin{parag}{Back-propagation algorithm}
+    We consider a neural network defined by: 
+    \[z_j^{\left(0\right)} = x_j, \mathspace F\left(x\right) = a^{\left(D\right)},\] 
+    \[z_j^{\left(\ell\right)} = \sum_{i} w_{ij}^{\left(\ell\right)} a_i^{\left(\ell-  1\right)} + b_j^{\left(\ell\right)}, \mathspace a_j^{\left(\ell\right)} = \phi\left(z_j^{\left(\ell\right)}\right).\]
+    
+    We moreover define the \important{sensitivity} to be: 
+    \[\Delta_j^{\left(\ell\right)} = \frac{\partial F}{\partial z_j^{\left(\ell\right)}}.\]
+    
+    Then, we have the three following equalities:
+    \begin{enumerate}
+        \item $\displaystyle \Delta_j^{\left(\ell\right)} = \begin{systemofequations} \sum_{k} \Delta_{k}^{\left(\ell+1\right)} w_{jk}^{\left(\ell + 1\right)} \phi'\left(z_j^{\left(\ell\right)}\right), & \text{if $\ell < D$,} \\ \phi'\left(z_j^{\left(D\right)}\right), & \text{if $\ell = D$.} \end{systemofequations}$
+        \item $\displaystyle \frac{\partial F}{\partial b_j^{\left(\ell\right)}} = \Delta_j^{\left(\ell\right)}$.
+        \item $\displaystyle \frac{\partial F}{\partial w_{ij}^{\left(\ell\right)}} = \Delta_j^{\left(\ell\right)} a_i^{\left(\ell- 1\right)}$.
+    \end{enumerate}
+    
+    \begin{subparag}{Remark}
+        This gives us an algorithm to compute the complete graident $\frac{\partial F}{\partial \bvec{\theta}}$, in two passes.
+        \begin{itemize}[left=0pt]
+            \item \textit{(Forward pass)} Compute and store $a_j^{\left(0\right)}, \ldots, a_j^{\left(D\right)}$ and $z_j^{\left(1\right)}, \ldots, z_j^{\left(D\right)}$.
+            \item \textit{(Backward pass)} Compute the sensitivites $\Delta_j^{\left(D\right)}, \ldots, \Delta_j^{\left(1\right)}$ using the recursive formula, and use them to find $\frac{\partial F}{\partial b_j^{\left(\ell\right)}}$ and $\frac{\partial F}{\partial w_{ij}^{\left(\ell\right)}}$.
+        \end{itemize}
+    \end{subparag}
+
+    \begin{subparag}{Proof 1}
+        We first consider the easy case, $\ell = D$: 
+        \[\Delta_j^{\left(D\right)} = \frac{\partial F}{\partial z_j^{\left(D\right)}} = \frac{\partial}{\partial z_j^{\left(D\right)}} \phi\left(z_j^{\left(D\right)}\right) = \phi'\left(z_j^{\left(D\right)}\right).\]
+
+        Let us now suppose that $\ell < D$. By using the chain rule for multivariate functions, we find: 
+        \autoeq{\Delta_j^{\left(\ell\right)} = \frac{\partial F}{\partial z_j^{\left(\ell\right)}} = \sum_{k} \frac{\partial F}{\partial z_k^{\left(\ell + 1\right)}}\cdot \frac{\partial z_k^{\left(\ell+1\right)}}{\partial z_j^{\left(\ell\right)}} = \sum_{k} \Delta_k^{\left(\ell + 1\right)} \frac{\partial}{\partial z_j^{\left(\ell\right)}} \left[\sum_{i} w_{ik}^{\left(\ell + 1\right)} \phi\left(z_k^{\left(\ell\right)}\right) + b_k^{\left(\ell + 1\right)}\right] = \sum_{k} \Delta_k^{\left(\ell+1\right)} w_{jk}^{\left(\ell + 1\right)} \phi'\left(z_k^{\left(\ell\right)}\right).}
+    \end{subparag}
+    
+    \begin{subparag}{Proof 2}
+        This is direct: 
+        \[\frac{\partial F}{\partial b_j^{\left(\ell\right)}} = \frac{\partial F}{\partial b_{j}^{\left(\ell\right)}} \underbrace{\frac{\partial b_j^{\left(\ell\right)}}{\partial z_j^{\left(\ell\right)}}}_{= 1} = \frac{\partial F}{\partial z_j^{\left(\ell\right)}} = \Delta_j^{\left(\ell\right)}.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 3}
+        Using the chain rule a final time: 
+        \[\frac{\partial F}{\partial w_{ij}^{\left(\ell\right)}} = \frac{\partial F}{\partial z_j^{\left(\ell\right)}}\cdot \frac{\partial z_j^{\left(\ell\right)}}{\partial w_{ij}^{\left(\ell\right)}} = \Delta_j^{\left(\ell\right)} a_i^{\left(\ell - 1\right)}.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

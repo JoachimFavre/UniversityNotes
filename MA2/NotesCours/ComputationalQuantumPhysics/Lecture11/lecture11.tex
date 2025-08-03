@@ -1,0 +1,297 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-06 at 08:19:54.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 06 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2025-05-06}{Finite-temperature quantum Monte Carlo}{
+\begin{itemize}[left=0pt]
+    \item Analogy between imaginary-time path-integrals and finite-temperature path-integrals.
+    \item Explanation of an estimator to evaluate the expected value of an observable under a thermal state.
+    \item Definition of fermionic and bosonic thermal states.
+    \item Explanation of an estimator to evaluate the expected value of an observable under a bosonic thermal state.
+    \item Explanation of Metropolis-Hasting update proposals to sample from these distributions.
+\end{itemize}
+
+}
+
+\subsection{Finite temperature}
+
+\begin{parag}{Goal}
+    We want to analyse the unnormalised thermal density matrix: 
+    \[\hat{\rho}^{\beta} = e^{-\beta \hat{H}},\]
+    where $\beta = \frac{1}{k_B T}$ and $T$ is the temperature.
+
+    Indeed, we do not live in an environment at zero Kelvin: essentially everything has a finite temperature. Hence, in any simulation, it is irrealistic to ignore temperature.
+
+    \begin{subparag}{Notation}
+        We let $Z$ to be the normalisation factor: 
+        \[Z = \Tr\left(\hat{\rho}^{\beta}\right) = \Tr\left(e^{-\beta \hat{H}}\right).\]
+
+        Then, $\hat{\rho}^{\beta} / Z$ is a valid mixed state.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Recall that the expected value over a mixed state is given by: 
+        \[\left\langle \hat{O} \right\rangle = \frac{\Tr\left(\hat{\rho}^{\beta} \hat{O}\right)}{Z}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Path-integral formalism}
+    We define the matrix elements of $\hat{\rho}^{\beta}$ t o be: 
+    \[G^{\beta}\left(x, y\right) = \rho^{\beta}\left(x, y\right) = \bra{x} e^{-\beta \hat{H}} \ket{y}.\]
+    
+    Leaving $p$ such that $\beta = p \Delta_{\tau}$, we have: 
+    \[\rho^{\beta}\left(x_0, x_p\right) = \sum_{x_1, \ldots, x_{p-1}} G^{\Delta_{\tau}}\left(x_0, x_1\right) \cdots G^{\Delta_{\tau}}\left(x_{p-1}, x_p\right).\]
+
+    \begin{subparag}{Proof}
+        This is exactly what we found in the previous lecture, except that we have $e^{-\beta \hat{H}}$ instead of $e^{- \tau \hat{H}}$. We can thus just let $\tau = \beta$ to get our result.
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        This then follows the exact same pattern as last lecture. We can use any expansion, such as the Trotter approximation, which is valid for small $\Delta_{\tau}$ even for unbounded Hamiltonians, where $\hat{H} = \hat{H}_0 + \hat{H}_1$ and $\hat{H}_0$ is diagonal: 
+        \[G^{\Delta_{\tau}}\left(x, y\right) \approx G_1^{\Delta_{\tau}}\left(x, y\right) e^{-\Delta_{\tau} H_0\left(y\right)}.\]
+
+        This then yields, writing $x_p = x_0$:
+        \[\rho^{\beta}\left(x_0, x_0\right) = \sum_{x_1, \ldots, x_{p-1}} \prod_{i=0}^{p-1} G_1\left(x_i, x_{i+1}\right) e^{-\Delta_{\tau} H_0\left(x_1\right)}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Using these notations, we have:
+        \[Z = \int dx \rho^{\beta}\left(x, x\right) \approx \sum_{x} \rho^{\beta}\left(x, x\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Expected value as state expected value}
+    Let $\hat{O}$ be an observable diagonal in the $\ket{x}$ basis. Moreover, writing $x_p = x_0$ and $\bvec{x} = \left(x_0, \ldots, x_{p-1}\right)$, we define: 
+    \[\bar{\Pi}\left(\bvec{x}\right) = \prod_{i=0}^{p-1} G_1^{\Delta_{\tau}}\left(x_i, x_{i+1}\right) e^{- \Delta_{\tau} H_0\left(x_i\right)}, \mathspace \Pi\left(\bvec{x}\right) = \frac{\bar{\Pi}\left(\bvec{x}\right)}{\sum_{y_0, \ldots, y_{p-1}} \bar{\Pi}\left(\bvec{y}\right)}\]
+    
+    Then: 
+    \[\left\langle \hat{O} \right\rangle_{\beta} = \sum_{x_0, \ldots, x_{p-1}} \Pi\left(\bvec{x}\right) O\left(x_0\right).\]
+
+    \begin{subparag}{Observation}
+        This is very similar to what we found for finding ground-states through path integrals, except that we have the constraint $x_0 = x_p$. Hence, in this case, the paths are closed loops.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        If there is no sign problem, we can write: 
+        \[\left\langle \hat{O} \right\rangle_{\beta} = \exval_{\bvec{x} \followsdistr \Pi\left(\bvec{x}\right)}\left[O\left(x_0\right)\right].\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Note that our previous theorem states that: 
+        \[\rho^{\beta}\left(x_0, x_0\right) = \sum_{x_1, \ldots, x_{p-1}} \bar{\Pi}\left(\bvec{x}\right).\]
+
+
+        Hence, since $\hat{O}$ is diagonal: 
+        \autoeq{\left\langle \hat{O} \right\rangle_{\beta} = \frac{\Tr\left(\hat{O} e^{-\beta \hat{H}}\right)}{\Tr\left(e^{-\beta \hat{H}}\right)} = \frac{\sum_{x_0} \bra{x_0} \hat{O} e^{-\beta \hat{H} \ket{x_0}}}{\sum_{y_0} \bra{y_0} e^{-\beta \hat{H}} \ket{y_0}} = \frac{\sum_{x_0} O\left(x_0\right) \rho^{\beta}\left(x_0, x_0\right)}{\sum_{y_0} \rho^{\beta}\left(y_0, y_0\right)}  = \sum_{x_0, \ldots, x_{p-1}} \frac{\prod_{i=0}^{p-1} G_1\left(x_i, x_{i+1}\right) e^{-\Delta_{\tau} H_0\left(x_i\right)} }{\sum_{y_0, \ldots, y_{p-1}} \prod_{i=0}^{p-1} G_1\left(y_i, y_{i+1}\right) e^{-\Delta_{\tau} H_0\left(y_i\right)}} O\left(x_0\right) = \sum_{x_0, \ldots, x_{p-1}} \Pi\left(\bvec{x}\right) O\left(x_0\right),}
+        where $x_p = x_0$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    We have that: 
+    \[\left\langle \hat{H} \right\rangle = -\frac{1}{Z}\cdot \frac{\partial Z}{\partial \beta} = - \frac{\partial}{\partial \beta} \ln\left(Z\right).\]
+
+    \begin{subparag}{Remark}
+        We can write the parution function $Z$ in the path integral formalism, as mentioned earlier. This then allows us to make an estimator for $\left\langle \hat{H} \right\rangle$ completely similarly.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        By definition, we know that: 
+        \[\left\langle \hat{H} \right\rangle = \frac{\Tr\left(\hat{H} \hat{\rho}^{\beta}\right)}{\Tr\left(\hat{\rho}^{\beta}\right)} = \frac{\Tr\left(\hat{H} \exp\left(\beta \hat{H}\right)\right)}{Z}.\]
+        
+        Moreover, we directly notice that:
+        \autoeq{\frac{\partial}{\partial \beta} Z = \frac{\partial}{\partial \beta} \Tr\left(\exp\left(-\beta \hat{H}\right)\right) = \Tr\left(-\hat{H} \exp\left(-\beta \hat{H}\right)\right) = - \frac{\Tr\left(\hat{H} \exp\left(-\beta \hat{H}\right)\right)}{Z}\cdot Z = - \left\langle \hat{H} \right\rangle Z.}
+
+        This does give exactly our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Definition: Fermionic thermal state}
+    Let $\hat{S}_{ferm}$ be the fermionic antisymmetriser:
+    \[\hat{S}_{ferm} \ket{x} = \frac{1}{N!} \sum_{\mathcal{P} \in S_N} \left(-1\right)^{\text{sign}\left(\mathcal{P}\right)} \ket{\mathcal{P}\left(x\right)},\]
+    where $S_N$ is the group of permutations and $\mathcal{P}\left(x_1, \ldots, x_N\right) = \left(x_{\mathcal{P}\left(1\right)}, \ldots, x_{\mathcal{P}\left(N\right)}\right)$.
+
+    We define the \important{fermionic thermal state} as: 
+    \[\hat{\rho}^{\beta}_{ferm} = \hat{S}_{ferm}^{\dagger} \hat{\rho}^{\beta} \hat{S}_{ferm}.\]
+    
+    \begin{subparag}{Intuition}
+        What we derived right before only works for distinguishable particles, since the density matrix was not symmetrised properly. Hence, we consider a correctly antisymmetrised density matrix to see how this behaves.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        If we do the same reasoning, we have negative signs appearing because of this anti-symmetrisation. This means that, again, $\Pi\left(\bvec{x}\right)$ is not a valid probability distribution for fermions. Let us develop this idea for bosonic systems, where this does work.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Bosonic thermal state}
+    Let $\hat{S}_{bose}$ be the bosonic symmetriser: 
+    \[\hat{S}_{bose} \ket{x} = \frac{1}{N!} \sum_{\mathcal{P} \in S_N} \ket{\mathcal{P}\left(x\right)}.\]
+
+    We define the \important{bosonic thermal state} as: 
+    \[\hat{\rho}^{\beta}_{bose} = \hat{S}_{bose}^{\dagger} \hat{\rho}^{\beta} \hat{S}_{bose}.\]
+    
+    \begin{subparag}{Properties}
+        Intuitively, symmetrising twice the same state should not change the result. This is illustrated mathematically by the fact: 
+        \[\hat{S}_{bose}^2 = \hat{S}_{bose}.\]
+        
+        Moreover, $\hat{S}_{bose}$ must be a valid symmetry of the quantum system, so:
+        \[\left[\hat{S}_{bose}, \hat{H}\right] = 0.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    We have: 
+    \[\bra{x} \hat{\rho}^{\beta}_{bose} \ket{y} = \frac{1}{N!} \sum_{\mathcal{P} \in S_N} \rho^{\beta}\left(x, \mathcal{P}\left(y\right)\right).\]
+
+    \begin{subparag}{Remark 1}
+        By the same argument as in the previous lecture, this is non-negative and hence $\Pi$ can be interpreted as a probability distribution.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Similarly, if we have a fermionic system instead:
+        \[\rho_{ferm}^{\beta}\left(x, y\right) = \frac{1}{N!} \sum_{\mathcal{P}} \left(-1\right)^{\text{sign}\left(\mathcal{P}\right)} \rho^{\beta}\left(x, \mathcal{P}\left(y\right)\right).\]
+
+        As mentioned before, this can be positive and negative, so $\Pi\left(x\right)$ is not a valid probability distribution. 
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        We know that $\left[\hat{S}_{bose}, \hat{H}\right] = 0$. Hence, in particular, $\hat{S}_{bose}$ must commute with $\exp\left(-\beta \hat{H}\right)$ and hence with $\hat{\rho}^{\beta}$. Using this together with the fact $\hat{S}_{bose}^2 = \hat{S}_{bose}$ and the fact $\hat{S}_{bose}^{\dagger} = \hat{S}_{bose}$: 
+        \autoeq{\bra{x} \hat{\rho}^{\beta}_{bose} \ket{y} = \bra{x} \hat{S}_{bose}^{\dagger} \hat{\rho}^{\beta} \hat{S}_{bose} \ket{y} = \bra{x} \rho^{\beta} \hat{S}_{bose}^2 \ket{y} = \bra{x} \hat{\rho}^{\beta} \hat{S}_{bose} \ket{y} = \frac{1}{N!} \sum_{\mathcal{P} \in S_n} \bra{x} \hat{\rho}^{\beta} \ket{\mathcal{P}\left(y\right)} = \frac{1}{N!} \sum_{\mathcal{P} \in S_n} \rho^{\beta}\left(x, y\right).}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Bosonic expected value}
+    We consider a bosonic system. Moreover, we define:
+    \[\bar{\Pi}_{bose}\left(x_0, \ldots, x_p, \mathcal{P}\right) = \frac{\bar{\Pi}\left(x_0, \ldots, x_p\right) \delta\left(x_p - \mathcal{P}\left(x_0\right)\right)}{n!}.\]
+
+    Then, for any $\hat{O}$ diagonalisable in the $\ket{x}$ basis: 
+    \[\left\langle \hat{O} \right\rangle_{\beta} = \frac{\Tr\left(\hat{\rho}_{bose}^{\beta} \hat{O}\right)}{\Tr\left(\hat{\rho}_{bose}^{\beta}\right)} = \exval_{\left(x_0, \ldots, x_p, \mathcal{P}\right) \followsdistr \Pi_{bose}}\left[O\left(x_0\right)\right].\]
+   
+    \begin{subparag}{Remark}
+        Note that we have one more variable in the space, the permutation $\mathcal{P}$1.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We compute the unnormalised expected value since we have seen all previous examples that the normalisation factor only normalises the probability distribution. Then:
+        \autoeq{\left\langle O \right\rangle_{\beta} = \Tr\left(\hat{\rho}_{bose}^{\beta} \hat{O}\right) = \int dx_0 \bra{x_0} \rho_{bose}^{\beta} \ket{x_0} O\left(x_0\right) = \frac{1}{N!} \sum_{\mathcal{P}} \int dx_0 \rho^{\beta}\left(x_0, \mathcal{P}\left(x_0\right)\right) O\left(x_0\right).}
+        
+        We want to remove the constraint that $x_p = x_0$, which we can do by adding a Dirac delta. Hence, using the path integral formulation:
+        \autoeq[s]{\frac{1}{N!} \sum_{\beta} \int dx_0 \rho^{\beta}\left(x_0, \mathcal{P}\left(x_0\right)\right) O\left(x_0\right) = \frac{1}{N!} \sum_{\beta} \int dx_0 \cdots dx_p \bar{\Pi}\left(x_0, x_1, \ldots, x_p\right) \delta\left(x_p - \mathcal{P}\left(x_0\right)\right) O\left(x_0\right).}
+
+        We can thus write: 
+        \[\left\langle O \right\rangle_\beta = \exval_{\left(x_0, \ldots, x_p, \mathcal{P}\right) \followsdistr \Pi_{\beta}^{bose}} \left[O\left(x_0\right)\right],\]
+        where note that we added one variable to the space of the distribution, the permutation $\mathcal{P}$, and where the unnormalised probability distribution is:
+        \[\bar{\Pi}_{bose}\left(x_0, \ldots, x_p, \mathcal{P}\right) = \frac{\Pi\left(x_0, \ldots, x_p\right) \delta\left(x_p - \mathcal{P}\left(x_0\right)\right)}{N!}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Two bosons}
+    Let's suppose that we have a system with two bosons. Since we have two particles, we have $2! = 2$ permutations: 
+    \[\mathcal{P}_{identity}\left(x_1, x_2\right) = \left(x_1, x_2\right), \mathspace \mathcal{P}_{exchange}\left(x_1, x_2\right) = \left(x_2, x_1\right).\]
+    
+    Suppose that each path contains $p = 5$ elements. We thus want the following values:
+    \[x_1\left(0\right), x_1\left(1\right), x_1\left(2\right), x_1\left(3\right), x_1\left(4\right), x_1\left(5\right),\]
+    \[x_2\left(0\right), x_2\left(1\right), x_2\left(2\right), x_2\left(3\right), x_2\left(4\right), x_2\left(5\right).\]
+
+    As found before, the expectation value must be computed on a path of the form $\left(x_0, \ldots, x_{p-1}, \mathcal{P}\left(x_p\right)\right)$. There are two possible boundary condition.
+    \begin{itemize}
+        \item We have the identity permutation, i.e. $x_1\left(4\right) = x_1\left(0\right)$ and $x_2\left(4\right) = x_2\left(0\right)$.
+        \item We have the exchange permutation, i.e. $x_1\left(4\right) = x_2\left(0\right)$ and $x_2\left(4\right) = x_1\left(0\right)$.
+    \end{itemize}
+    
+    These two paths can be visualised through the following picture, where the first particle is represented in red and the second in blue.
+    \imagehere[0.9]{BosonicExpectedValuePaths.png}
+
+    Each point is called a bead, and each closed loop is called a polymer (there are two polymers in the first picture and one in the second).
+\end{parag}
+
+\begin{parag}{Path-integral Monte-Carlo: Move a single bead}
+    Let us now present a Metropolis-Hastings update proposal distribution to sample from $\Pi\left(x_0, \ldots, x_p\right)$.
+
+    We sample a bead $\ell \followsdistr U\left(0, p-1\right)$ uniformly at random, and displace the bead $\bvec{r}\left(\ell\right)$ by some Gaussian distribution of standard deviation $\sigma$. In other words, we outputs: 
+    \[X' = \left(r_1\left(0\right), r_2\left(0\right), \ldots, r_1'\left(\ell\right), r_2'\left(\ell\right), \ldots, r_1\left(p-1\right), r_2\left(p-1\right), \ldots\right),\]
+    where $\bvec{r}'\left(\ell\right) \followsdistr \exp\left(-\frac{\left(\bvec{r}'\left(\ell\right) - \bvec{r}\left(\ell\right)\right)}{2 \sigma}\right)$.
+
+    Note that this move is automatically symmetric.
+
+    \begin{subparag}{Visualisation}
+        This move can be visualised on the following picture.
+        \imagehere[0.8]{TheremalPathIntegralMC-MoveSingleBead.png}
+    \end{subparag}
+
+    \begin{subparag}{Acceptance probability}
+        Let us compute the acceptance probability. First, by definition:
+        \[\Pi_P\left(x_0, \ldots, x_p\right) = \prod_{i=0}^{p-1} G_1^{\Delta_{\tau}}\left(x_i, x_{i+1}\right) e^{-\Delta_{\tau}H_0\left(x_i\right)}.\]
+
+        Now, in the previous lecture, we compute $G_1^{\Delta_{\tau}}$ in the context where $\hat{H}_1$ is the Hamiltonian of a free particle (which is essentially always the case). This allows us to simplify:
+        \autoeq[s]{\Pi_P\left(x_0, \ldots, x_p\right) = \prod_{i=0}^{p-1} \prod_{J=1}^{N} \exp\left(-\frac{\left(\bvec{r}_J\left(i\right) - \bvec{r}_J\left(i+1\right)\right)^2}{2 \Delta_{\tau}}\right) e^{-\Delta_{\tau} H_0\left(\bvec{r}_1\left(i\right), \ldots, \bvec{r}_N\left(i\right)\right)} = \exp\left(-S\left(\bvec{r}_1\left(1\right), \ldots, \bvec{r}_N\left(1\right), \ldots, \bvec{r}_N\left(p\right)\right)\right),}
+        for some particle index $J$ and imaginary time index $i$ and some function $S$.
+        
+        Now, we can compute the acceptance probability, using the fact the move is symmetric: 
+        \[A\left(x' \suchthat x\right) = \min\left(1, \frac{\Pi\left(x'\right)}{\Pi\left(x\right)} \frac{T\left(x \suchthat x'\right)}{T\left(x' \suchthat x\right)}\right) = \min\left(1, \frac{\Pi\left(x'\right)}{\Pi\left(x\right)}\right).\]
+
+        Hence, most terms of $\Pi$ cancel out, except for the ones depending on $\ell-1$, $\ell$, $\ell+1$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This will work if we do not have too many beads and particles. If we have too many particles and too small time steps, this will get rejected systemically. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Path-integral Monte-Carlo: Moving entire parts of the path}
+    We present another Metropolis-Hasting update proposal to sample from $\Pi\left(x_0, \ldots, x_p\right)$, which is accepted with higher probability.
+
+    We consider a random segment of size $m$ of the polymer. We then regenerate it with a probability proportional to the free propagators.
+
+    \begin{subparag}{Example}
+        Let us explain this more quantitatively using the following example.
+        \imagehere[0.8]{TheremalPathIntegralMC-MoveManyBeads.png}
+
+        Then, we sample the new beads using the following distribution:
+        \autoeq{T\left(X \to X'\right) = T\left(X' \suchthat X\right) = G_1^{\Delta_{\tau}}\left(x_0, x_1'\right) G_1^{\Delta_{\tau}}\left(x_1', x_2'\right) G_1^{\Delta_{\tau}}\left(x_2', x_3'\right) G_1^{\Delta_{\tau}}\left(x_3', x_4\right).}
+    \end{subparag}
+
+    \begin{subparag}{Acceptance probability}
+        This time, the update proposal is not symmetric. Doing the computations, it is possible to prove that, thanks to this choice of distribution of new sample, the acceptance probability only depends on $\hat{H}_0$, not on $\hat{H}_1$:
+        \[A_{MB}\left(X \to X'\right) = \min\left[1, \exp\left[-\Delta_{\tau}\left(\sum_{j=1}^{n} H_0\left(x'_{j_0 + j}\right) - H_0\left(X_{j_0 + j}\right)\right)\right]\right].\]
+    \end{subparag}
+
+    \begin{subparag}{Sample from $T$}
+        We finally need to be able to show that we can indeed sample from the new sample proposal distribution, for this to yield a valid algorithm.
+
+        The idea is that, on the example above, we start with $x_0, x_4$, and we want to regenerate $x_1', x_2', x_3'$. To do that, we start by regenerating $x_1'$. We want it to respect the probability distribution, where the two short-time propagators are not on the same time-step: 
+        \[T\left(X \to X'\right) = G_1^{\Delta_{\tau}}\left(x_0, x_1'\right) G_1^{3\Delta_{\tau}}\left(x_1', x_4\right).\]
+        Hence, we consider the following distribution, where $\Delta_{t}^{\left(1\right)}$ and $\Delta_t^{\left(2\right)}$ can be different, which we can show to be equal to:
+        \[G_1^{\Delta_{\tau}^{\left(1\right)}}\left(x_A, x'\right) G_1^{\Delta_{\tau}^{\left(2\right)}}\left(x', x_B\right) = \exp\left(-\frac{\left(x' - x_{AB}\right)^2}{2 \sigma^2}\right),\]
+        where $x_{AB} = \frac{\Delta_{\tau}^{\left(2\right)} x_A + \Delta_{\tau}^{\left(1\right)} x_B}{\Delta_{\tau}^{\left(1\right)} + \Delta_{\tau}^{\left(2\right)}}$ and $\sigma^2 = \left(\frac{1}{\Delta_{\tau}^{\left(1\right)}} + \frac{1}{\Delta_{\tau}^{\left(2\right)}}\right)^{-1}$, and where we used the fact that the product of two Gaussians is Gaussian.
+
+        That way, we can simply sample $x_1'$ using a Gaussian distribution. Then, we can continue the bridge, by sampling $x_2$ at a distance $\Delta_t$ from $x_1'$ and a distance $2\Delta_t$ from $x_4$. Continuing that way, we regenerated the full Gaussian bridge.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    There also exists methods to sample permutations, such as the Worm algorithm (which is the most efficient to do that in path integrals). However, they are quite cumbersome.
+\end{parag}
+
+\end{document}

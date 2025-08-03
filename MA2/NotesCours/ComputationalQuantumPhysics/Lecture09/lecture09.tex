@@ -1,0 +1,252 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-04-15 at 08:23:22.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 15 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2025-04-15}{Time-dependent variational principle}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the McLachlan variational principle for real time evolution.
+    \item Explanation of the imaginary time evolution principle.
+    \item Explanation of the Dirac-Frenkel variational principle for imaginary time evolution.
+    \item Proof of how to find the matrix and vector used by these two approaches using Monte-Carlo.
+\end{itemize}
+    
+}
+
+\subsection{Time dependence}
+
+
+\begin{parag}{Goal}
+     Suppose some Hamiltonian $\hat{H}$, and some initial state $\ket{\psi\left(0\right)}$. We know that $\ket{\phi\left(t\right)}$ respect the time-dependent Schrödinger's equation:
+    \[i \frac{\partial}{\partial t} \ket{\phi\left(t\right)} = \hat{H} \ket{\phi\left(t\right)}.\]
+
+    Suppose now that we have a variational parametrisation $\ket{\psi\left(\theta\right)}$. Our goal is to find parameters as a function of time $\theta\left(t\right)$ such that $\ket{\psi\left(\theta\left(t\right)\right)} \approx \ket{\phi\left(t\right)}$.
+
+    \begin{subparag}{Remark 1}
+        Without loss of generality, we suppose that the parameters $\theta$ are real (we can always split a complex parameter into two real parameters).
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We will suppose below that $\hat{H}$ is time-independent. However, everything can easily be generalised to time-dependent Hamiltonians $\hat{H}$.
+    \end{subparag}
+
+    \begin{subparag}{Notation}
+        We may note $\ket{\psi\left(\theta\left(t\right)\right)} = \ket{\psi\left[\theta\left(t\right)\right]}$, although the square brackets do not mean that $\psi$ is a functional, it is still a function. This is done in such a way to reduce parenthesis nesting.
+
+        Also, note the distinction between the exact state $\ket{\phi\left(t\right)}$ that uses a $\phi$, and the variational state $\ket{\psi\left(\theta\left(t\right)\right)} $ that uses $\psi$. This allows to write $\ket{\phi} = \ket{\phi\left(t\right)}$ and $\ket{\psi\left(\theta\left(t\right)\right)} = \ket{\psi}$ when the context is clear.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Notation}
+    Let $A$ be a complex tensor. We write $A^R = \cre\left(A\right)$ to be its real part, and $A^I = \cim\left(A\right)$ to be its imaginary part.
+\end{parag}
+
+\begin{parag}{Lemma}
+    Suppose that $\ket{\phi\left(t\right)} = \ket{\psi\left(\theta\left(t\right)\right)}$. We moreover consider the $\ell_2$ error for $\theta\left(t + \delta_t\right)$:
+    \[\Delta^2\left(\left\{\dot{\theta}_k\right\}\right) = \left\|\ket{\psi\left[\theta\left(t + \delta_t\right)\right]} - \ket{\phi\left(t + \delta_t\right)}\right\|^2.\]
+
+    The update to $\theta\left(t\right)$ that minimises this $\ell_2$ error is such that $S^R \dot{\theta} = C^I$, where $S$ is a matrix and $C$ is a vector defined by: 
+    \[S_{kk'} = \braket{\partial_{\theta_k}\psi}{\partial_{\theta_k} \psi}, \mathspace C_k = \bra{\partial_{\theta_k} \psi} \hat{H} \ket{\psi}.\]
+
+    \begin{subparag}{Remark}
+        This minimisation strategy makes the norm of $\ket{\psi}$ matter. This is bad, and must thus never be used; but it makes the derivation of this result easier. We will fix this by considering the infidelity in the following paragraph.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        We do some Taylor expansion on our exact state, and use the fact $\ket{\phi\left(t\right)} = \ket{\psi\left(\theta\left(t\right)\right)}$ by assumption: 
+        \autoeq{\ket{\phi\left(t + \delta_t\right)} = \ket{\phi\left(t\right)}  - i \hat{H} \delta_t \ket{\phi\left(t\right)} + O\left(\delta_t^2\right) = \ket{\psi\left(\theta\left(t\right)\right)} - i \hat{H} \delta_t \ket{\phi\left(t\right)} + O\left(\delta_t^2\right) = \ket{\psi} - i \hat{H} \delta_t \ket{\phi} + O\left(\delta_t^2\right),}
+        where we drop the dependence on time for readability.
+        
+        On the other hand, using a Taylor expansion on our variational state:
+        \[\ket{\psi\left[\theta\left(t + \delta_t\right)\right]} = \ket{\psi\left[\theta\left(t\right)\right]} + \delta_t \sum_{k} \dot{\theta}_k \frac{\partial}{\partial \theta_k} \ket{\psi\left[\theta\left(t\right)\right]} + O\left(\delta_t^2\right).\]
+
+        For the time-dependent variational principle, we want $\ket{\phi\left(t+ \delta_t\right)} = \ket{\psi\left[\theta\left(\theta + \delta_t\right)\right]}$, which puts a constraint on the $\dot{\theta}_k$ to match the time derivative of $\ket{\phi\left(t\right)}$. This is different from the time independent variational principle.
+
+        More formally, we wish to minimise:
+        \autoeq{\Delta^2\left(\left\{\dot{\theta}_k\right\}\right) = \left\|\ket{\psi\left[\theta\left(t + \delta_t\right)\right]} - \ket{\phi\left(t + \delta_t\right)}\right\|^2 = \delta_t^2 \left\|\sum_{k} \dot{\theta}_k \ket{\frac{\partial}{\partial \theta_k} \psi} + i \hat{H} \ket{\psi} \right\|^2 = \delta_t^2 \left[\sum_{k, k'} \dot{\theta}_k \dot{\theta}_{k'} \braket{\partial_{\theta_{k'}}\psi}{\partial_{\theta_k} \psi} + \bra{\psi} \hat{H}^2 \ket{\psi} \right.\fakesymbol{]} \fakeequal \mathspace\mathspace \left.\fakesymbol{[} + i \sum_{k} \dot{\theta}_k \bra{\partial_{\theta_k} \psi} \hat{H} \ket{\psi} - i \sum_{k} \dot{\theta}_k \bra{\psi} \hat{H} \ket{\partial_{\theta_k} \psi} \right].}
+        
+        This is a quadratic function of the parameter gradient $\dot{\theta}_k$. We can minimise this by computing the derivative with respect to $\dot{\theta}_k$: 
+        \autoeq{\frac{\partial \Delta^2}{\partial \dot{\theta}_k} = \delta_t^2 \left[\sum_{k'} \left(\dot{\theta}_{k'} \braket{\delta_{\theta_{k'}}\psi}{\partial_{\theta_k} \psi} + \dot{\theta}_{k'} \braket{\partial\theta_k \psi}{\partial \theta_{k'} \psi}\right) \right.\fakesymbol{]} \fakeequal \mathspace\mathspace \left.\fakesymbol{[} + i \bra{\partial_{\theta_k} \psi} \hat{H} \ket{\psi} - i \bra{\psi} \hat{H} \ket{\partial_{\theta_k \psi}}\right] = \delta_t^2 \left[\sum_{k'} \dot{\theta}_{k'} 2\cre\left(\braket{\partial_{\theta_{k'}}\psi}{\partial_{\theta_k}\psi}\right) + 2i \cre\left(\bra{\partial_{\theta_k} \psi} \hat{H} \ket{\psi}\right)\right].}
+
+        We want this to be equal to $0$, for all $k$. In other words, for all $k$:
+        \[\sum_{k'} \dot{\theta}_{k'} \cre\left(\braket{\partial_{\theta_{k'}}\psi}{\partial_{\theta_k}\psi}\right) = -i\cre\left(\bra{\partial_{\theta_k} \psi} \hat{H} \ket{\psi}\right) = \cim\left(\bra{\partial_{\theta_k} \psi} \hat{H} \ket{\psi}\right).\]
+
+        This is a limera system of equations. We can write it as $\hat{S}^R \dot{\theta} = C^I$, where: 
+        \[\hat{S}_{kk} = \braket{\partial_{\theta_{k'}}\psi}{\partial_{\theta_k}\psi}, \mathspace C_k = \bra{\partial_{\theta_k} \psi} \hat{H} \ket{\psi}.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: McLachlan variational principle}
+    Consider the infidelity between $\ket{\psi\left(\theta\left(t + \delta_t\right)\right)}$ and $\ket{\phi\left(t + \delta_t\right)}$ :
+    \[1 - \frac{\left|\braket{\psi\left(\theta\left(t+\delta_t\right)\right)}{\phi\left(t + \delta_t\right)}\right|^2}{\braket{\psi\left(\theta+\delta_t\right)}{\psi\left(\theta + \delta_t\right)} \braket{\phi\left(t+\delta_t\right)}{\phi\left(t + \delta_t\right)}}. \]
+
+    This is minimal when:
+    \[\sum_{k'} \cre\left(S_{k k'}\right) \dot{\theta}_{k'} = \cim\left(C_k\right),\]
+    with: 
+    \[S_{k k'} = \frac{\braket{\partial_{\theta_k}\psi}{\partial_{\theta_{k'}}\psi}}{\braket{\psi}{\psi}} - \frac{\braket{\partial_{\theta_k}\psi}{\psi}}{\braket{\psi}{\psi}} \frac{\braket{\psi}{\partial_{\theta_k} \psi}}{\braket{\psi}{\psi}}, \mathspace C_k = \frac{\bra{\partial_{\theta_k}\psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} - \frac{\braket{\partial_{\theta_k}\psi}{\psi}}{\braket{\psi}{\psi}} \frac{\bra{\psi} \hat{H}\ket{\psi}}{\braket{\psi}{\psi}}.\]
+
+    Equivalently, the equation for $\dot{\theta}$ can be rewritten as $S^R \dot{\theta} = C^I$.
+
+    \begin{subparag}{Observation}
+        Note that the first term of $S_{k k'}$ is the normalisation of the one we had before, and the second term is a new non-trivial one. The same can be said of $C_k$.
+    \end{subparag}
+
+    \begin{subparag}{Terminology}
+        This is known as the \important{McLachlan variational principle}. Moreover, the matrix $S$ is known as the \important{quantum geometric tensor}.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        As mentioned before, the advantage of the infidelity is that it is invariant of the norm of $\ket{\psi}$. This is important since it is not a real degree of freedom.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Overall, this gives us an ODE for the variational parameters:
+        \[\dot{\theta}_k\left(t\right) = G\left(\theta_1\left(t\right), \ldots, \theta_{N_p}\left(t\right)\right).\]
+
+        The first parameters are such that $\ket{\psi\left(\theta\left(0\right)\right)} = \ket{\phi\left(0\right)}$. Then, at any time, we can reconstruct $\ket{\phi\left(t\right)}$, by computing $\ket{\psi\left(\theta\left(t\right)\right)}$.
+
+        This is nice, because the only way we knew so far to compute time evolution was the exact diagonalisation method, which did not scale well for large systems. This allows to parameterise our system with less degrees of freedom, becoming more tractable.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Imaginary-time evolution}
+    Consider the following mathematical expression:
+    \[\ket{\psi\left(\tau\right)} = e^{-\tau \hat{H}} \ket{\psi\left(0\right)}.\]
+
+    We write $\hat{H} \ket{\phi_k} = E_k \ket{\phi_k}$ to be the eigendecomposition of $\hat{H}$, and let $c_0 = \braket{\phi_0}{\psi}$. Supposing $c_0 \neq 0$ and $\tau\left(E_1 - E_0\right) \gg 1$: 
+    \[\ket{\psi\left(\tau\right)} \to e^{-\tau E_0} c_0 \ket{\phi_0}.\]
+
+    \begin{subparag}{Implication}
+        Intuitively, this states that $\frac{1}{\left\|\ket{\psi\left(\tau\right)}\right\|} \ket{\psi\left(\tau\right)}$ converges to the ground state of $\hat{H}$.
+
+        However, extremely similar methods to the one we have seen so far can be applied to find $\ket{\psi\left(\tau\right)}$. This thus gives us for free a variational method for computing the ground state of a Hamiltonian, as we will see in the following paragraph.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        The expression of $\ket{\psi\left(\tau\right)}$ looks a lot like usual time evolution, except that $\tau = i\cdot t$. Hence, this is like if we plugged in an imaginary time to Schrödinger's equation. This is why we call this \important{imaginary-time evolution}.
+
+        Note however that this is a purely mathematical analogy, this is very useful but it does not make any physical sense.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This can be seen as the continuous analogue to the power method for computing eigenvectors. For instance, we need $c_0 \neq 0$ just the same for the two methods. In fact, the imaginary-time evolution can also be obtained by replacing the $\Lambda$ parameter from the power method by $\frac{1}{\Delta_{\tau}}$, since $\left(I - \Delta_{\tau} \hat{H}\right)^p \to \exp\left(-\tau \hat{H}\right)$ for $\tau = p \Delta_{\tau}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is direct:
+        \autoeq{\ket{\psi\left(\tau\right)} = \sum_{k} e^{-\tau E_k} c_k \ket{\phi_k} = e^{-\tau E_0}\left[c_0 \ket{\phi_0} + c_1 e^{-\tau \left(E_1 - E_0\right)} \ket{\phi_1} + c_2 e^{-\tau \left(E_2 - E_0\right)} \ket{\phi_2} + \ldots\right] \to e^{-\tau E_0} c_0 \ket{\phi_0},}
+        by removing all subdominant terms, supposing $c_0 \neq 0$ and $\tau\left(E_1 - E_0\right) \gg 1$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Time-dependent variational principle for imaginary time evolution}
+    Suppose that we want imaginary-time evolution:
+    \[\ket{\psi\left(\theta\left(\tau + \delta_{\tau}\right)\right)} \approx \ket{\psi\left(\theta\left(\tau\right)\right)} - \Delta_{\tau} \hat{H} \ket{\psi\left(\theta\left(\tau\right)\right)}.\]
+
+    Then, the derivative of the parameters must respect $S^R \dot{\theta} = -C^R$, for the same matrix $S$ and vector $C$ as before.
+
+    \begin{subparag}{Remark 1}
+        This is very similar to the equation $S^R \dot{\theta} = C^I$ we found before. The derivation is moreover almost completely the same (with just a factor $i$ that is replaced by $-1$).
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This is a very powerful method, that actually converges faster than gradient descent.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Dirac-Frenkel time-dependent variational principle}
+    Suppose now that $\ket{\psi\left(x; \theta\right)}$ has complex parameters $\theta$. We still need to be able to differentiate them, so this asks for the very strong hypothesis that this parameterisation is holomorphic.
+
+    Then, the equation for imaginary time evolution becomes $S \dot{\theta} = - i C$.
+
+    This is named the \important{Dirac-Frenkel variational principle}.
+
+    \begin{subparag}{Remark 1}
+        Note that the McLachlan variational principle could also be used on a holomorphic function, by splitting each complex parameter into two real ones. However, this version is interesting, because $\ket{\psi\left(x; \theta\right)}$ being a holomorphic function of $\theta$ requires the Cauchy equations to hold:
+        \[\frac{\partial^R\psi\left(x; \theta\right)}{\partial \theta_k^R} = \frac{\partial \psi^I\left(x; \theta\right)}{\partial \theta_k^I}, \mathspace \frac{\partial \psi^R\left(x; \tau\right)}{\partial \theta_k^I} = -\frac{\partial \psi^I\left(x; \theta\right)}{\partial \theta_k^R}.\]
+
+        This puts an analytic constraint on the parameter derivative, which is not here in the McLachlan variational principle. 
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This has an interesting properties. If $\hat{H}$ is time-independent, then the expectation value $\bra{\psi\left(\theta\left(t\right)\right)}\hat{H}\ket{\psi\left(\theta\left(t\right)\right)}/\braket{\psi\left(\theta\left(t\right)\right)}{\psi\left(\theta\left(t\right)\right)}$ is constant. This is indeed something which is to be expected for a time-independent Hamiltonian, the total energy of the system should not change, but that the McLahan time-depnedent variational principle does not preserve it.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        In practice, we tend to use McLahan's variational principle.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Time-dependent variational Monte-Carlo}
+    We again write: 
+    \[D_k\left(x; \theta\right) = \frac{\partial_{\theta_k}\psi\left(x; \theta\right)}{\psi\left(x; \theta\right)}.\]
+
+    Then, using again the expressions $\Pi\left(x\right) = \frac{\left|\braket{x}{\psi}\right|^2}{\braket{\psi}{\psi}}$ and $E_{loc}\left(x\right) = \frac{\bra{x} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}}$ found earlier when doing variational Monte-Carlo: 
+    \[S_{k k'} = \exval_{x \followsdistr \Pi\left(x\right)}\left(D_k^*\left(x\right) D_{k'}\left(x\right)\right) - \exval_{x \followsdistr \Pi\left(x\right)}\left[D_k^*\left(x\right)\right] \exval_{x \followsdistr \Pi\left(x\right)}\left[D_{k'}\left(x\right)\right] = \Cov\left(D_{k'}\left(x\right), D_k\left(x\right)\right),\]
+    \[C_k = \exval_{x \followsdistr \Pi\left(x\right)}\left[D_k^*\left(x\right) E_{loc}\left(x\right)\right] - \exval_{x \followsdistr \Pi\left(x\right)}\left[D_k^*\left(x\right)\right] \exval_{x \followsdistr \Pi\left(x\right)}\left[E_{loc}\left(x\right)\right] = \Cov\left(E_{loc}\left(x\right), D_k\left(x\right)\right).\]
+
+    \begin{subparag}{Remark}
+        We are some times able to compute $S$ and $C$ analytically. However, this gives us a way to Monte-Carlo way of evaluating them, even when this becomes analytically intractable.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        Note that the expression for $C_k$ is very similar to the one we obtained for the gradient of the energy for the variational Monte-Carlo approach for computing the ground energy:
+        \[\frac{\partial}{\partial \theta_k} E\left(\theta\right) = 2 C_k^R.\]
+
+        Note that when imaginary time evolution converges, we must have $C_k^R \approx 0$; this is what's required for $\dot{\theta} = 0$ in the equation $S^R \dot{\theta} = -C^R$. But then, in this case, the equation above means that $\partial_{\theta_k} E\left(\theta\right) = 0$. This makes sense: when we found the parameterisation for the ground state, we must also have reached the minimum energy. This is a good sanity check.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Consider some diagonal operator $\hat{D}_k\left(\theta\right)$ such that: 
+        \[\hat{D}_k\left(\theta\right) = \sum_{x} D_k\left(x; \theta\right) \ket{x}\bra{x} = \sum_{x} \frac{\partial_{\theta_k} \psi\left(x; \theta\right)}{\psi\left(x; \theta\right)} \ket{x}\bra{x}.\]
+        
+        This is such that $\ket{\partial_{\theta_k} \psi} = \hat{D}_k \ket{\psi}$, since:
+        \autoeq{\braket{x}{\partial_{\theta_k} \psi} = \partial_{\theta_k} \psi\left(x; \theta\right) = \frac{\partial_{\theta_k} \psi\left(x; \theta\right)}{\psi\left(x; \theta\right)} \psi\left(x; \theta\right) = D_k\left(x; \theta\right) \braket{x}{\psi} = \bra{x} \hat{D}_k\left(\theta\right) \ket{\psi}.}
+
+        Moreover, we recall that the probability distribution $\Pi\left(x\right)$ is such that any observable $\hat{O}$ which is diagonal in the $\ket{x}$ basis: 
+        \[\left\langle \hat{O} \right\rangle = \frac{\bra{\psi} \hat{O} \ket{\psi}}{\braket{\psi}{\psi}} = \exval_{x \followsdistr \Pi\left(x\right)}\left[O\left(x\right)\right].\]
+
+        By construction, $\hat{D}_k\left(\theta\right)$ is indeed diagonal in the $\ket{x}$ basis. This allows us to simplify the expression for the $S$ given by the McLachlan principle:
+        \autoeq{S_{k k'} = \frac{\braket{\partial_{\theta_k}\psi}{\partial_{\theta_{k'}}\psi}}{\braket{\psi}{\psi}} - \frac{\braket{\partial_{\theta_k}\psi}{\psi}}{\braket{\psi}{\psi}} \frac{\braket{\psi}{\partial_{\theta_k} \psi}}{\braket{\psi}{\psi}} = \frac{\bra{\psi}\hat{D}_k^{\dagger} \hat{D}_{k'} \ket{\psi}}{\braket{\psi}{\psi}} - \frac{\bra{\psi} \hat{D}_k^{\dagger} \ket{\psi}}{\braket{\psi}{\psi}} \frac{\bra{\psi} \hat{D}_{k'} \ket{\psi}}{\braket{\psi}{\psi}} = \exval_{x \followsdistr \Pi\left(x\right)}\left(D_k^*\left(x\right) D_{k'}\left(x\right)\right) - \exval_{x \followsdistr \Pi\left(x\right)}\left[D_k^*\left(x\right)\right] \exval_{x \followsdistr \Pi\left(x\right)}\left[D_{k'}\left(x\right)\right].}
+
+        Similarly, for the $C$ vector:
+        \autoeq{C_k = \frac{\bra{\partial_{\theta_k}\psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} - \frac{\braket{\partial_{\theta_k}\psi}{\psi}}{\braket{\psi}{\psi}} \frac{\bra{\psi} \hat{H}\ket{\psi}}{\braket{\psi}{\psi}} = \frac{\bra{\psi} \hat{D}_k^{\dagger} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} - \frac{\bra{\psi} \hat{D}_k^{\dagger} \ket{\psi}}{\braket{\psi}{\psi}} \frac{\bra{\psi} \hat{H} \ket{\psi}}{\braket{\psi}{\psi}} = \exval_{x \followsdistr \Pi\left(x\right)}\left[D_k^*\left(x\right) E_{loc}\left(x\right)\right] - \exval_{x \followsdistr \Pi\left(x\right)}\left[D_k^*\left(x\right)\right] \exval_{x \followsdistr \Pi\left(x\right)}\left[E_{loc}\left(x\right)\right].}
+
+        We can moreover simplify our result by using the definition of (complex) covariance, $\Cov\left(X, Y\right) = \exval\left(X Y^*\right) - \exval\left(X\right)\exval\left(Y\right)^*$.
+
+        \qed
+
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm}
+    Let us summarise the variational method we developed for real time evolution and imaginary time evolution. We start with a state parameterised by $\theta_k\left(t = 0\right)$. Then, at each time step:
+    \begin{enumerate}
+        \item Sample $N_S$ samples $x^{\left(1\right)}, \ldots, x^{\left(N_S\right)} \followsdistr \Pi\left(x, t\right) = \left|\psi\left(x; \theta\left(t\right)\right)\right|^2/\braket{\psi\left(\theta\left(t\right)\right)}{\psi\left(\theta\left(t\right)\right)}$, using usual Markov Chain Monte Carlo with Metropolis-Hastings tricks that do not require to compute $\braket{\psi\left(\theta\left(t\right)\right)}{\psi\left(\theta\left(t\right)\right)}$.
+        \item Estimate $S_{k k'}$ and $C_k$ by using this samples. Note that we use the same samples for $S$ and $C$, to reduce the variance on the following equation.
+        \item Solve the system $\sum_{k'} S_{k k'}^R \dot{\theta}_k = C_k^I$ for real time evolution, or $\sum_{k'} S_{k k'}^R \dot{\theta}_k = -C_k^R$ for imaginary time evolution, to get the vector $\dot{\theta}$.
+        \item Use any integrator to go to the next time step, for instance $\theta_k\left(t\right) = \theta_k\left(t\right) + \Delta_t \dot{\theta}_k\left(t\right)$.
+    \end{enumerate}
+
+    \begin{subparag}{Remark}
+        In practice, one should not use the forward Euler scheme $\theta_k\left(t\right) = \theta_k\left(t\right) + \Delta_t \dot{\theta}_k\left(t\right)$ as an integrator to go from one step to another in real time evolution. This is just an example for intuition. A much better method is Runge-Kutta.
+    \end{subparag}
+\end{parag}
+ 
+
+\end{document}

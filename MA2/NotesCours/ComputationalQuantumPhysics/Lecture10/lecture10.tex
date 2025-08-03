@@ -1,0 +1,272 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-04-29 at 08:13:23.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 29 avril 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2025-04-29}{Ground-state quantum Monte Carlo}{
+\begin{itemize}[left=0pt]
+    \item Proof of the path-integral formalism.
+    \item Proof of stochastic estimators for the expected value of the Hamiltonian and of observables that are diagonalisable in the $\ket{x}$ basis, under the imaginary-time evolved state.
+    \item Explanation of the sign problem.
+    \item Explanation of reptation Monte-Carlo.
+    \item Example in the continuous case, of $3N$ interacting particles in a box.
+\end{itemize}
+
+}
+
+\section{Path integral Monte Carlo}
+\subsection{Ground state}
+\subsubsection{Discrete case}
+
+\begin{parag}{Goal}
+    In the previous lectures, we considered variational Monte-Carlo methods. They are very powerful, and can solve essentially any problem: both for finding ground energy and grounds states. These strategies can in fact even be generalised for excited states. 
+
+    However, if the parameterisation $\ket{\psi\left(\theta\right)}$ is not descriptive enough and cannot be the ground state exactly, then there is a bias. The idea here is that we want to make a method that finds an exact ground state and ground energy.
+
+    \begin{subparag}{Remark}
+        We will require the path-integral formalism. We will introduce them in a self-contained way, we do not need to look at Quantum physics 4.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Path-integral formalism}
+    We deal with discrete variables for now, and assume no degeneracy. We define $\ket{\psi\left(\tau\right)} = e^{-\tau \hat{H}} \ket{\psi\left(0\right)}$ to be the imaginary time evolution of our state. We moreover define the \important{short-time propagator}:
+    \[G^{\Delta_{\tau}}\left(x, y\right) = \bra{x} e^{-\Delta_{\tau} \hat{H}} \ket{y}.\]
+
+    Then, for all $\Delta_{\tau}$ (even large ones):
+    \autoeq{\braket{x_p}{\psi\left(\tau\right)} = \sum_{x_0, \ldots, x_{p-1}} G^{\Delta_{\tau}}\left(x_p, x_{p-1}\right) G^{\Delta_{\tau}}\left(x_{p-1}, x_p\right) \cdots G^{\Delta_{\tau}}\left(x_1, x_0\right) \braket{x_0}{\psi\left(0\right)} = \sum_{x_0, \ldots, x_{p-1}} \prod_{i=0}^{p-1} G^{\Delta_{\tau}}\left(x_{i+1}, x_i\right) \braket{x_0}{\psi\left(0\right)}.}
+
+    \begin{subparag}{Remark}
+        We know that $\ket{\psi\left(\tau\right)}$ approaches the ground state of $\hat{H}$ when $\tau \gg E_1 - E_0$, by imaginary time evolution. Moreover, when $\Delta_{\tau}$ is small, $G^{\Delta_{\tau}}\left(x, y\right)$ can typically be computed. This is thus promising.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We split our Hamiltonian into small time-steps $\Delta_{\tau}$, such that $p \Delta_{\tau} = \tau$:
+        \[e^{-\tau \hat{H}} = \left(e^{- \Delta_{\tau} \hat{H}}\right)^p = e^{-\Delta_{\tau} \hat{H}} e^{-\Delta_{\tau} \hat{H}} \cdots e^{-\Delta_{\tau} \hat{H}}.\]
+
+        Therefore, adding a bunch of completeness relations: 
+        \autoeq{\braket{x}{\psi\left(\tau\right)} = \bra{x} e^{-\Delta_{\tau} \hat{H}} e^{-\Delta_{\tau} \hat{H}} \cdots e^{-\Delta_{\tau} \hat{H}} \ket{\psi\left(0\right)} = \sum_{x_0}  \bra{x} e^{-\Delta_{\tau} \hat{H}} e^{-\Delta_{\tau} \hat{H}} \cdots e^{-\Delta_{\tau} \hat{H}} \ket{x_0} \braket{x_0}{\psi\left(0\right)} = \sum_{x_0, x_1, \ldots, x_{p-1}}  \bra{x} e^{-\Delta_{\tau} \hat{H}} \ket{x_{p-1}}\bra{x_{p-1}} e^{-\Delta_{\tau} \hat{H}} \ket{x_{p-2}} \fakeequal\mathspace\mathspace\mathspace\mathspace\mathspace\mathspace \cdots \ket{x_1}\bra{x_1} e^{-\Delta_{\tau} \hat{H}} \ket{x_0} \braket{x_0}{\psi\left(0\right)}.}
+        
+        We recognise the expression of the short-time propagator, so this thus allows us to write, noting $x = x_p$ for notational purpose: 
+        \autoeq[s]{\braket{x_p}{\psi\left(\tau\right)} = \sum_{x_0, \ldots, x_{p-1}} G^{\Delta_{\tau}}\left(x_p, x_{p-1}\right) G^{\Delta_{\tau}}\left(x_{p-1}, x_p\right) \cdots G^{\Delta_{\tau}}\left(x_1, x_0\right) \braket{x_0}{\psi\left(0\right)} = \sum_{x_0, \ldots, x_{p-1}} \prod_{i=0}^{p-1} G^{\Delta_{\tau}}\left(x_{i+1}, x_i\right) \braket{x_0}{\psi\left(0\right)}.}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Short-time propagator}
+    In many important cases, we can write our Hamiltonian as $\hat{H} = \hat{H}_0 + \hat{H}_1$, where $\hat{H}_0$ is diagonal in the $\ket{x}$ basis. Then, using the first-order Trotter approximation, the short-time propagator becomes:
+    \autoeq{G^{\Delta_{\tau}}\left(x, y\right) = \bra{x} \exp\left(-\Delta_{\tau} \hat{H}\right) \ket{y} = \bra{x} \exp\left(- \Delta_{\tau} \hat{H}_0\right) \exp\left(- \Delta_{\tau} \hat{H}_1\right) \ket{y} + O\left(\Delta_{\tau}^2\right) = \exp\left(- \Delta_{\tau} H_0\left(x\right)\right) \bra{x} \exp\left(-\Delta_{\tau} \hat{H}_1\right) \ket{y} + O\left(\Delta_{\tau}^2\right)= \exp\left(-\Delta_{\tau} H_0\left(x\right)\right) G_1^{\Delta_{\tau}}\left(x, y\right) + O\left(\Delta_{\tau}^2\right).}
+
+    Similarly, using the second-order Trotter approximation:
+    \[G^{\Delta_{\tau}}\left(x, y\right) = \exp\left(-\frac{\Delta_{\tau}}{2} H_0\left(x\right)\right) G_1^{\Delta_{\tau}}\left(x, y\right) \exp\left(-\frac{\Delta_{\tau}}{2} H_0\left(y\right)\right) + O\left(\Delta_{\tau}^3\right).\]
+
+    \begin{subparag}{Remark}
+        Note again that the Trotter approximations are not true for continuous Hamiltonians which spectrum is unbounded. This is where our hypothesis that our operators are discrete appears.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Suppose that our state $\ket{\psi}$ and Hamiltonian $\hat{H}$ are real. Then:
+    \autoeq[s]{\braket{x_p}{\psi\left(\tau\right)}^2 = \sum_{x_0, \ldots, x_{p-1}, x_{p+1}, \ldots, x_{2p}} \braket{\psi\left(0\right)}{x_0} G^{\Delta_{\tau}}\left(x_0, x_1\right) G^{\Delta_{\tau}}\left(x_1, x_2\right) \cdots G^{\Delta_{\tau}}\left(x_{2p-1}, x_{2p}\right) \braket{x_{2p}}{\psi\left(0\right)}.}
+
+    Note that $x_p$ does not appear in the sum.
+
+    \begin{subparag}{Intuition}
+        This is a sum over $2p$ variables. This can be seen as summing over all paths $x_0 \to x_1 \to \ldots \to x_{2p}$ that go through $x_p$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Since our state and Hamiltonian are real, $G^{\Delta_{\tau}}\left(x, y\right) = G^{\Delta_{\tau}}\left(y, x\right)$, so: 
+        \autoeq[s]{\braket{x_p}{\psi\left(\tau\right)}^2 = \sum_{x_0, \ldots, x_{p-1}} \sum_{x_0', \ldots, x_{p-1}'} \braket{\psi\left(0\right)}{x_0} G^{\Delta_{\tau}}\left(x_0, x_1\right) \cdots G^{\Delta_{\tau}}\left(x_{p-1}, x_p\right) \fakeequal\hspace{10em}\cdot G^{\Delta_{\tau}}\left(x_{p}, x_{p-1}'\right) \cdots G^{\Delta_{\tau}}\left(x_1', x_0'\right) \braket{x_0'}{\psi\left(0\right)} = \sum_{x_0, \ldots, x_{p-1}, x_{p+1}, \ldots, x_{2p}} \braket{\psi\left(0\right)}{x_0} G^{\Delta_{\tau}}\left(x_0, x_1\right) G^{\Delta_{\tau}}\left(x_1, x_2\right) \fakeequal\hspace{10em} \cdots G^{\Delta_{\tau}}\left(x_{2p-1}, x_{2p}\right) \braket{x_{2p}}{\psi\left(0\right)},}
+        where the second inequality comes by relabelling the variables and being careful on the fact that we do not sum on $x_p$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: Observable expectation value}
+    Let $\hat{O}$ be an observable diagonal in the $\ket{x}$ basis. Moreover, we define a non-normalised function $\bar{\Pi}$ and its normalised version $\Pi$, for $\psi_0\left(x\right) = \braket{x}{\psi\left(0\right)}$:
+    \[\bar{\Pi}\left(\bvec{x}\right) = \psi_0\left(x_0\right) G^{\Delta_{\tau}}\left(x_0, x_1\right) \cdots G^{\Delta_{\tau}}\left(x_{2p-1}, x_{2p}\right) \psi_0\left(x_{2p}\right), \mathspace \Pi\left(\bvec{x}\right) = \frac{\bar{\Pi}\left(\bvec{x}\right)}{\sum_{x_0, \ldots, x_{2p}} \bar{\Pi}\left(\bvec{x}\right)}.\]
+
+    Then: 
+    \[\frac{\bra{\psi\left(\tau\right)} \hat{O} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \sum_{x_0, \ldots, x_{2p}} \Pi\left(\bvec{x}\right) O\left(x_p\right).\]
+
+    \begin{subparag}{Remark 1}
+        Note that, this time, we also sum over $x_p$ in all the sums.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        If $\Pi\left(\bvec{x}\right)$ is non-negative, then it is a probability distribution (since it is normalised by construction) and we can rewrite this result as: 
+        \[\frac{\bra{\psi\left(\tau\right)} \hat{O} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \exval_{\bvec{x} \followsdistr \Pi\left(\bvec{x}\right)}\left[O\left(x_p\right)\right].\]
+        
+        In that case, we can thus apply Markov chain Monte-Carlo. This gives to an algorithm called \important{path-integral-ground-state Monte Carlo} (PIGS). A sufficient condition for non-negativity is that $G^{\Delta_{\tau}}\left(x, y\right) \geq 0$ and $\braket{x}{\psi\left(0\right)} \geq 0$. We will explore more deeply below when exactly this probability distribution is negative.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        The case of a non-diagonal observable is significantly more complex, with one exception: the Hamiltonian $\hat{H}$. This is what is explored in the following paragraph.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Our corollary states that: 
+        \[\braket{x_p}{\psi\left(\tau\right)}^2 = \sum_{x_0, \ldots, x_{p-1}, x_{p+1}, \ldots, x_{2p}} \bar{\Pi}\left(\bvec{x}\right).\]
+        
+        Hence:
+        \autoeq{\frac{\bra{\psi\left(\tau\right)} \hat{O} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \frac{\sum_{x_p} \bra{\psi\left(\tau\right)} \hat{O} \ket{x_p}\braket{x_p}{\psi\left(\tau\right)}}{\sum_{x_p} \braket{\psi\left(\tau\right)}{x_p} \braket{x_p}{\psi\left(\tau\right)}} = \frac{\sum_{x_p} \braket{x_p}{\psi\left(\tau\right)}^2 O\left(x_p\right)}{\sum_{x_p} \braket{x_p}{\psi\left(\tau\right)}^2} = \sum_{x_0, \ldots, x_{2p}} \frac{\bar{\Pi}\left(\bvec{x}\right)}{\sum_{x_0, \ldots, x_{2p}} \bar{\Pi}\left(\bvec{x}\right)} O\left(x_p\right) = \sum_{x_0, \ldots, x_{2p}} \Pi\left(\bvec{x}\right) O\left(x_p\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: Expected value of $\hat{H}$}
+    Consider again the local energy defined for the variational principle, $E_{loc}\left(x\right) = \bra{x} \hat{H} \ket{\psi\left(0\right)} / \braket{x}{\psi\left(0\right)}$. Then, supposing $\Pi\left(\bvec{x}\right)$ is non-negative and hence a valid probability distribution: 
+    \[\frac{\bra{\psi\left(\tau\right)} \hat{H} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \exval_{\bvec{x} \followsdistr \Pi\left(\bvec{x}\right)}\left[\frac{E_{loc}\left(x_0\right) + E_{loc}\left(x_{2p}\right)}{2}\right].\]
+    
+    \begin{subparag}{Remark}
+        The way we will prove this result is by showing that:
+        \[\frac{\bra{\psi\left(\tau\right)} \hat{H} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \exval_{\bvec{x} \followsdistr \Pi\left(\bvec{x}\right)}\left[E_{loc}\left(x_0\right)\right] = \exval_{\bvec{x} \followsdistr \Pi\left(\bvec{x}\right)}\left[E_{loc}\left(x_{2p}\right)\right].\]
+
+        The advantage of the expression above is that it combines those two estimators, decreasing the standard deviation by a factor $\frac{1}{\sqrt{2}}$.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        We first prove that $\bra{\psi\left(\tau\right)} \hat{H} \ket{\psi\left(\tau\right)}/\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)} = \exval_{\bvec{x} \followsdistr \Pi\left(\bvec{x}\right)}\left[E_{loc}\left(x_{2p}\right)\right]$. To do that, notice:
+        \autoeq{\frac{\bra{\psi\left(\tau\right)} \hat{H} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \frac{\bra{\psi\left(\tau\right)} \hat{H} e^{-\tau \hat{H}}  \ket{\psi\left(0\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \frac{\bra{\psi\left(\tau\right)} e^{-\tau \hat{H}} \hat{H} \ket{\psi\left(0\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \frac{\bra{\psi\left(2\tau\right)} \hat{H} \ket{\psi\left(0\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \frac{\sum_{x_{2p}} \braket{\psi\left(2\tau\right)}{x_{2p}} \bra{x_{2p}} \hat{H} \ket{\psi\left(0\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}}.}
+
+        Now, by the path integral formalism, we know that, using twice as many $\Delta_{\tau}$ time steps to reach an imaginary time of $2\tau$:
+        \[\braket{x_{2p}}{\psi\left(\tau\right)} = \sum_{x_0, \ldots, x_{2p-1}} G^{\Delta_{\tau}}\left(x_{2p}, x_{2p - 1}\right) \cdots G^{\Delta_{\tau}}\left(x_1, x_0\right) \braket{x_0}{\psi_0} = \frac{\bar{\Pi}\left(\bvec{x}\right)}{\psi_0\left(2p\right)}.\]
+
+        Similarly, as mentioned before: 
+        \[\sum_{x_p} \braket{x_p}{\psi\left(\tau\right)}^2 = \sum_{x_0, \ldots, x_{2p}} \bar{\Pi}\left(\bvec{x}\right).\]
+        
+        Hence, this simplifies to: 
+        \autoeq{\frac{\bra{\psi\left(\tau\right)} \hat{H} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \sum_{x_0, \ldots, x_{2p}} \frac{\bar{\Pi}\left(\bvec{x}\right) / \psi_0\left(x_{2p}\right)}{\sum_{y_0, \ldots, y_{2p}} \bar{\Pi}\left(\bvec{y}\right)} \bra{x_{2p}} \hat{H} \ket{\psi\left(0\right)} = \sum_{x_0, \ldots, x_{2p}} \Pi\left(\bvec{x}\right) \cdot \frac{\bra{x_{2p}} \hat{H} \ket{\psi\left(0\right)}}{\braket{x_{2p}}{\psi\left(0\right)}} = \sum_{x_0, \ldots, x_{2p}} \Pi\left(\bvec{x}\right) E_{loc}\left(x_{2p}\right) = \exval_{\bvec{x} \followsdistr \Pi\left(\bvec{x}\right)}\left(E_{loc}\left(x_{2p}\right)\right).}
+        
+        The case for $\bra{\psi\left(\tau\right)} \hat{H} \ket{\psi\left(\tau\right)}/\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)} = \exval_{\bvec{x} \followsdistr \Pi\left(\bvec{x}\right)}\left[E_{loc}\left(x_{2p}\right)\right]$, we just use the fact:
+        \[\frac{\bra{\psi\left(\tau\right)} \hat{H} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \frac{\bra{\psi\left(0\right)} e^{-\tau \hat{H}} \hat{H} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}} = \frac{\bra{\psi\left(0\right)} \hat{H} \ket{\psi\left(2\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}}\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Sign problem}
+    As mentioned earlier, we need $\Pi\left(\bvec{x}\right)$ to be non-negative for it to be a valid probability distribution.  Recall that, by definition:
+    \[\bar{\Pi}\left(x\right) = \psi_0\left(x_0\right) G^{\Delta_{\tau}}\left(x_0, x_1\right) \cdots G^{\Delta_{\tau}}\left(x_{2p-1}, x_{2p}\right) \psi_0\left(x_{2p}\right).\]
+
+    For a free particle, $G_{\delta_{\tau}}\left(x, y\right)$ is a Gaussian. This is thus overall a product of exponentials, which is always non-negative. So, the only question is about the sign of $\psi_0\left(x_0\right)$ and $\psi_0\left(x_{2p}\right)$. 
+
+    We consider two cases.
+    \begin{itemize}[left=0pt]
+        \item For Fermions, the wave-function must be antisymmetric under particle permutation. This shows that it must be negative in some places and positive in some others. In that case, $\Pi\left(\bvec{x}\right)$ cannot be interpreted as a probability distribution.
+        \item Now, for Bosons, it is possible to show that the ground state never changes sign and can thus be supposed to be positive everywhere. We can then simply take $\braket{x}{\psi\left(0\right)} \geq 0$ everywhere. $\Pi\left(\bvec{x}\right)$ is thus a valid probability distribution for Bosons.
+    \end{itemize}
+     
+    \begin{subparag}{Remark}
+        This problem is known as the \important{sign problem} in quantum Monte-Carlo methods.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Reptation Monte-Carlo}
+    We consider the following update proposal rule for the Metropolis-Hasting method, in order to sample from $\Pi\left(\bvec{x}\right)$ (supposing it is indeed a valid probability distribution). This is named \important{reptation Monte-Carlo}. 
+
+    We suppose that $\hat{H} = \hat{H}_0 + \hat{H}_1$, where $\hat{H}_0$ is diagonal in the computation basis. As we saw before, this means that: 
+    \[G^{\Delta_{\tau}}\left(x, y\right) = e^{-\Delta_{\tau} H_0\left(x\right)} G_1^{\Delta_{\tau}}\left(x, y\right).\]
+
+    There are two moves available: a move \lang{LEFT} and a move \lang{RIGHT}. We sample one of them uniformly at random, and execute it. They consist in the following.
+    \begin{itemize}
+        \item Move \lang{RIGHT}: Sample some $x_t$ using the following distribution: 
+        \[T\left(x_t \suchthat x_{2p}\right) = \frac{G_{1}^{\Delta_{\tau}}\left(x_t, x_{2p}\right)}{\sum_{x'} G_1^{\Delta_{\tau}}\left(x', x_{2p}\right)}.\]
+        Output $\bvec{x}' = \left(x_1, \ldots, x_{2p}, x_t\right)$.
+        \item Move \lang{LEFT}: Sample some $x_t$ using the following distribution:
+        \[T\left(x_t \suchthat x_{0}\right) = \frac{G_{1}^{\Delta_{\tau}}\left(x_t, x_0\right)}{\sum_{x'} G_1^{\Delta_{\tau}}\left(x', x_{0}\right)}.\]
+        Output $\bvec{x}' = \left(x_t, x_0, \ldots, x_{2p-1}\right)$.
+    \end{itemize}
+
+    \begin{subparag}{Intuition}
+        The move \lang{RIGHT} can be visualised as follows.
+        \imagehere[0.7]{ReptationMonteCarlo-MoveRight.png}
+
+        The move \lang{LEFT} is just the symmetric update.
+    \end{subparag}
+
+    \begin{subparag}{Acceptance probability}
+        This has the big advantage of having a simple acceptance probability. Let's compute it.
+
+        Suppose that we just did a move \lang{RIGHT} to get $\bvec{x}'$ from $\bvec{x}$. Then, the probability to get $\bvec{x}'$ from $\bvec{x}$ is $\frac{1}{2} T\left(x_t \suchthat x_{2p}\right)$: we must use a \lang{RIGHT} move and sample the right element $x_t$ to add on the right. For the Metropolis-Hastings rule, we also need the probability to get $\bvec{x}$ from $\bvec{x}'$. This is symetrically $\frac{1}{2} T\left(x_0 \suchthat x_1\right)$: we need to choose a \lang{LEFT} move, and add $x_0$ on the left. Hence, the acceptance is, by the Metropolis-Hastings rule: 
+        \autoeq[s]{A_R = \min\left(1, \frac{\Pi\left(\bvec{x}\right)}{\Pi\left(\bvec{x}'\right)}\cdot \frac{\prob\left(\text{propose $x$} \suchthat \text{had $x'$}\right)}{\prob\left(\text{propose $x'$} \suchthat \text{had $x$}\right)}\right) = \min\left(1, \frac{\Pi\left(\bvec{x}\right)}{\Pi\left(\bvec{x}'\right)}\cdot \frac{\frac{1}{2} T\left(x_0 \suchthat x_1\right)}{\frac{1}{2}T\left(x_t \suchthat x_{2p}\right)}\right)  = \min\left(1, \frac{\psi_0\left(x_1\right) G^{\Delta_{\tau}}\left(x_1, x_2\right) G^{\Delta_{\tau}}\left(x_2, x_3\right) G^{\Delta_{\tau}}\left(x_{2p}, x_t\right) \psi_0\left(x_t\right)}{\psi_0\left(x_0\right) G^{\Delta_{\tau}}\left(x_0, x_1\right) \cdots G^{\Delta_{\tau}}\left(x_{2p+1}, x_{2p}\right) \psi_0\left(x_{2p}\right)} \frac{G_1^{\Delta_{\tau}}\left(x_1, x_0\right)}{G_1^{\Delta_{\tau}}\left(x_{2p}, x_t\right)}\right).}
+        
+        Skipping some computations that aren't too hard (i.e. substituting $G^{\Delta_{\tau}}\left(x, y\right) = e^{- \Delta_{\tau} H_0\left(x\right)} G_1^{\Delta_{\tau}}\left(x, y\right)$ and simplifying everything we can), we get:
+        \autoeq{A_R = \min\left(1, \frac{\psi_0\left(x_1\right) \psi_0\left(x_t\right)}{\psi_0\left(x_0\right) \psi_0\left(x_{2p}\right)} \exp\left(-\frac{\Delta_{\tau}}{2} \Delta S_R\right)\right),}
+        where:
+        \[\Delta S_R = H_0\left(x_t\right) + H_0\left(x_{2p}\right) - H_0\left(x_0\right) - H_0\left(x_1\right).\]
+
+        In fact, this results shows why we chose the distribution $T\left(x_t \suchthat x_{2p}\right)$ that way: this allows all the short-time propagators to cancel out in the acceptance probability.
+
+        Moreover, this tends to be a reasonable acceptance probability. Moreover, the case for the move \lang{LEFT} is completely similar.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        We can compute everything, since, for small enough $\Delta_{\tau}$:
+        \[G_1^{\Delta_{\tau}}\left(x_t, x_{2p}\right) = 1 - \Delta_{\tau} \bra{x_t} \hat{H}_1 \ket{x_{2p}}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Supposing that $\Pi\left(\bvec{x}\right)$ is a valid probability distribution, this thus allows us to compute expectation value on the ground state: 
+        \[\frac{\bra{\psi\left(\tau\right)} \hat{H} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}}, \mathspace \frac{\bra{\psi\left(\tau\right)} \hat{O} \ket{\psi\left(\tau\right)}}{\braket{\psi\left(\tau\right)}{\psi\left(\tau\right)}},\]
+        where $\hat{O}$ is an observable diagonal in the $\ket{x}$ basis.
+
+        This result is independent of a parametrisation, and hence unbiased. Note that this however does not tell us the ground state $\ket{\psi\left(\tau\right)}$.
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Continuous case}
+
+\begin{parag}{Remark}
+    Recall that we cannot use Trotter's approximation in the continuous case. However, by sheer luck, the results still holds, thanks to the following formula that holds in the continuous case (assuming a bounded ground state):
+    \[\lim_{N \to \infty} \left(e^{- \frac{\tau}{N} \hat{H}_0} e^{-\frac{\tau}{N} \hat{H}_1}\right)^N = e^{- \tau \hat{H}}.\]
+
+
+    Then, we find just the same results. For instance, for a diagonal operator $\hat{O}$:
+    \[\Pi\left(x_0, x_{2p}\right) = \psi_0\left(x_0\right) \left(\prod_{i=0}^{2p-1} G_1^{\Delta_{\tau}}\left(x_{i+1}, x_i\right) \exp\left(- \Delta_{\tau} H_0\left(x_i\right)\right)\right) \psi_0\left(x_{2p}\right).\]
+    \[\left\langle \hat{O} \right\rangle = \int d x_0 \cdots dx_p \Pi\left(x_0, \ldots, x_{2p}\right) O\left(x_p\right).\]
+\end{parag}
+
+\begin{parag}{Example}
+    Suppose that we have a Hamiltonian for interacting particles: 
+    \[\hat{H} = \underbrace{-\frac{\hbar^2}{2m}\sum_{i=1}^{N} \nabla^2_{\bvec{r}_i}}_{=\hat{H}_1} + \underbrace{\sum_{i}  V_1\left(\bvec{r}_i\right) + \sum_{i \neq j} V_2\left(\bvec{r}_i, \bvec{r}_j\right)}_{\hat{H}_0\left(\bvec{r}_1, \ldots, \bvec{r}_N\right)}.\]
+
+    Then, each of our integration variable $x_i$ has $3N$ parameters: 
+    \[x_i = \begin{pmatrix} \bvec{r}_{i1} & \cdots & \bvec{r}_{iN} \end{pmatrix},\]
+
+    In total, we are integrating over $2p \cdot 3N = 6 Np$ scalars. We are able to compute everything, except for $G_1^{\Delta_{\tau}}\left(x, y\right)$. Hence, using that all momentums commute: 
+    \[G_1^{\Delta_{\tau}}\left(x, y\right) = \bra{x} e^{- \Delta_{\tau} \sum_{i} \frac{\bvec{p}_i^2}{2m}} \ket{y} = \prod_{i=1}^{N} \bra{\bvec{r}_i} e^{-\Delta_{\tau} \frac{\bvec{p}_i^2}{2m}} \ket{\bvec{r}_i'} = \prod_{i=1}^{N} \prod_{\alpha \in \left\{x, y, z\right\}} \bra{r_{\alpha i}} e^{-\Delta_t \frac{\hat{p}_{\alpha i}^2}{2m}} \ket{r_{\alpha i}'}.\]
+
+    Now, we can assume that our particles are in a $L \times L \times L$ box with periodic boundary condition. In that case, they are standing waves and their position and momentum are discretised: 
+    \autoeq{G_1^{\Delta_{\tau}}\left(x, y\right) = \prod_{i=1}^{N} \prod_{\alpha \in \left\{x, y, z\right\}} \sum_{n} \bra{r_{\alpha i}} \exp\left(- \Delta_{\tau} \frac{\hat{p}_{\alpha i}^2}{2m}\right) \ket{p_{\alpha i}\left(n\right)} \braket{p_{\alpha i}\left(n\right)}{r'_{\alpha i}} = \prod_{i=1}^{N} \prod_{\alpha \in \left\{x, y, z\right\}} \sum_{n} \exp\left(- \Delta_{\tau} \frac{p_{\alpha i}\left(n\right)^2}{2m}\right) \braket{r_{\alpha i}}{p_{\alpha i}\left(n\right)} \braket{p_{\alpha i}\left(n\right)}{r'_{\alpha i}}.}
+    
+    It is possible to show that $p_{\alpha}\left(n\right) = \hbar \frac{2\pi}{L} n_{\alpha}$. Hence, this is a Fourier transform. We however know that the Fourier transform of a Gaussian is itself a Gaussian. This then simplifies to:
+    \[G_1^{\Delta_{\tau}}\left(x, y\right) = \left(\frac{m}{2 \pi \hbar^2 \Delta_{\tau}}\right)^{3N/2} \prod_{i=1}^{N} \prod_{\alpha \in \left\{x, y, z\right\}} \exp\left(-\frac{\left(r_{\alpha i} - r_{\alpha i}'\right)^2}{2 \Delta_{\tau} \hbar^2 / m}\right).\]
+
+    This shows that $G_1^{\Delta_{\tau}}\left(x, y\right)$ is iteself a Gaussian. Now, in reptation Monte-Carlo, we need to sample from $G_{1}^{\Delta_{\tau}}\left(x_t, x_{2p}\right)$ in the \lang{RIGHT} move (or from $G_1^{\Delta_{\tau}}\left(x_t, x_0\right)$ for the \lang{LEFT} move, but this is just symmetrical). This thus boils down to sampling a random vector $x_t$ from a Gaussian distribution of mean $x_{2p}$ and variance $\Delta_{\tau} \hbar^2 / m$. Assuming that $\hbar = m = 1$, this can be simply done by considering a vector $\bvec{\chi}$ with $3N$ components sampled from independent normal Gaussians, and leaving $x_t = \left(\bvec{r}_1', \ldots, \bvec{r}_N'\right)$ where: 
+    \[\bvec{r}_i' = \bvec{r}_i + \sqrt{\Delta_{\tau}} \bvec{\chi}_i.\]
+    
+    \begin{subparag}{Remark}
+        The important things to remember from this example is that we add a completeness for the momentum eigenkets, which yields a product of Gaussians, which is itself just a Gaussian.
+
+        Moreover, another important thing to remember, is that we were able to evaluate the free propagator of a free particle $G_1^{\Delta_{\tau}}\left(x, y\right)$. Since this is typically the one for most examples, it is important.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

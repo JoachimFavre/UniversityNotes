@@ -1,0 +1,326 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-05-20 at 08:26:27.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 20 mai 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2025-05-20}{Quantum computing}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the computation model for quantum computers.
+    \item Explanation of how to compute time evolution of quantum states on a quantum computer.
+    \item Explanation of how to compute energy on a quantum computer.
+\end{itemize}
+
+}
+
+\section{Digital quantum computing}
+
+\subsection{Model}
+
+\begin{parag}{Idea}
+    Let's now suppose that we have access to a quantum computer. We wonder how this can help us compute properties of our quantum systems.
+\end{parag}
+
+\begin{parag}{Model}
+    Just like for classical computing, we do not use the physical model behind it, we add an abstraction layer without really caring how it's physically implemented. 
+
+    Hence, we consider qubits: 
+    \[\ket{0} = \ket{\uparrow} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \mathspace \ket{1} = \ket{\downarrow} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}.\]
+    
+    A quantum circuit manipulates $N$ qubits. We will moreover only consider unitary operators $\hat{U} \ket{\psi}$, which we refer to gates, and state how measurement is represented.
+\end{parag}
+
+\begin{parag}{Single-qubit gates}
+    We consider the following single-qubit quantum gates.
+    \begin{itemize}
+        \item The Pauli gates:
+        \[\hat{X} = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \mathspace \hat{Z} = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.\]
+        \item The Hadamard gate:
+        \[\hat{H} = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}.\]
+        It must not be mistaken with a Hamiltonian, which we will now note $\hat{\mathcal{H}}$. This gate is moreover important because it rotates from the $z$ to the $x$ basis. 
+        \item The $\hat{T}$  gate: 
+    \[\hat{T} = \begin{pmatrix} 1 & 0 \\ 0 & \exp\left(i\frac{\pi}{4}\right) \end{pmatrix}.\]
+    \end{itemize}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Any single-qubit unitary $\hat{U}$ for a single qubit can be written as a product of $\hat{X}$, $\hat{Z}$, $\hat{H}$ and $\hat{T}$.
+\end{parag}
+
+\begin{parag}{Two-qubit gates}
+    We consider the following two-qubit quantum gates.
+
+    \begin{itemize}
+        \item A controlled-unitary gate, for any $U$: 
+            \begin{center}
+            \hfill
+            \begin{minipage}{0.55\textwidth}
+                \[\ket{0}\bra{0} \otimes I + \ket{1}\bra{1} \otimes U = \begin{pmatrix} I &  \\  & U \end{pmatrix} ;\]
+            \end{minipage}
+            \hfill
+            \begin{minipage}{0.10\textwidth}
+                \begin{center}
+                \begin{quantikz}
+                    & \ctrl{1} & \\
+                    & \gate{U} & 
+                \end{quantikz}
+                \end{center}
+            \end{minipage}
+            \hfill
+            \phantom{a}
+            \end{center}
+
+        \item The controlled-not gate, which is a controlled unitary with $U = X$:
+            \begin{center}
+            \hfill
+            \begin{minipage}{0.55\textwidth}
+                \[\ket{0}\bra{0} \otimes I + \ket{1}\bra{1} \otimes U = \begin{pmatrix} 1 &  &  &  \\  & 1 &  &  \\  &  & 0 & 1 \\  &  & 1 & 0 \end{pmatrix} ;\]
+            \end{minipage}
+            \hfill
+            \begin{minipage}{0.10\textwidth}
+                \begin{center}
+                \begin{quantikz}
+                    & \ctrl{1} & \\
+                    & \targ{} & 
+                \end{quantikz}
+                \end{center}
+            \end{minipage}
+            \hfill
+            \phantom{a}
+            \end{center}
+            
+        \item The SWAP gate:
+            \begin{center}
+            \hfill
+            \begin{minipage}{0.45\textwidth}
+                \[SWAP = \begin{pmatrix} 1 &  &  &  \\  & 0 & 1 &  \\  & 1 & 0 &  \\  &  &  & 1 \end{pmatrix}.\]
+            \end{minipage}
+            \hfill
+            \begin{minipage}{0.40\textwidth}
+                \begin{center}
+                \begin{quantikz}
+                    & \swap{1} & \\
+                    & \targX{} & 
+                \end{quantikz}
+                =
+                \begin{quantikz}
+                    & \ctrl{1} & \targ{} & \ctrl{1} & \\
+                    & \targ{} & \ctrl{-1} & \targ{} &
+                \end{quantikz}
+                \end{center}
+            \end{minipage}
+            \hfill
+            \phantom{a}
+            \end{center}
+
+            The idea is that it is such that it swaps the two qubits:
+            \[SWAP \begin{pmatrix} c_{00} \\ c_{01} \\ c_{10} \\ c_{11} \end{pmatrix} = \begin{pmatrix} c_{00} \\ c_{10} \\ c_{01} \\ c_{11} \end{pmatrix}.\]
+    \end{itemize}
+\end{parag}
+
+\begin{parag}{Lemma}
+    The $CNOT$, $\hat{T}$ and $\hat{H}$ gates are enough to approximate any arbitrary unitary up to precision $\epsilon$.
+\end{parag}
+
+\begin{parag}{Measurement}
+    Given a circuit $U$, we can then measure the state using the following symbol:
+    \begin{center}
+    \begin{quantikz}
+        \lstick{\ket{0}} & \gate[2]{U} & \meter{}  \\
+        \lstick{\ket{0}} &             &           
+    \end{quantikz}
+    \end{center}
+
+    The measure is always done in the $Z$-basis. Then, the probability to measure some value is:
+    \[\prob\left(S_1 = \pm 1\right) = \sum_{S_2 \in \left\{\pm 1\right\}} \left|\bra{S_1, S_2} \hat{U} \ket{00}\right|^2.\]
+
+    \begin{subparag}{Remark 1}
+        Note that we measure $+1$ when the state is $\ket{0}$, and $-1$ when the sate is $\ket{1}$, since we measure spin.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        To measure in another basis, we can apply a unitary before the measurement. For instance, to measure in the $X$-basis, we can apply a Hadamard gate, and then measure in the $Z$-basis.
+        \begin{center}
+        \begin{quantikz}
+            \lstick{\ket{0}} & \gate[2]{U} & \gate{H} & \meter{}  \\
+            \lstick{\ket{0}} &             &          &          
+        \end{quantikz}
+        \end{center}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Bell states}
+    As an example, let us consider the following circuit:
+    \begin{center}
+    \begin{quantikz}
+        \lstick{\ket{x}} & \gate{H} & \ctrl{1} & \\
+        \lstick{\ket{y}} &          & \targ{}  &
+    \end{quantikz}
+    \end{center}
+
+    Then, we have: 
+    \[\ket{\beta_{x, y}} = CNOT \left(\hat{H} \otimes \hat{I}\right) \ket{xy} = CNOT \left(\frac{\ket{0} + \left(-1\right)^x \ket{1}}{\sqrt{2}} \otimes \ket{y}\right) = \frac{\ket{0x} + \left(-1\right)^x \ket{1 \bar{y}}}{\sqrt{2}},\]
+    where $\bar{y} = \text{not}\left(y\right)$. We can check that this represents the four Bell states. For instance, when $x = y = 0$:
+    \[\ket{\beta_{00}} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}.\]
+\end{parag}
+
+\subsection{Quantum dynamics}
+
+\begin{parag}{Goal}
+    Let us first focus on simulating quantum dynamics.
+
+    \begin{subparag}{Remark}
+        Recall that the best we could do to simulate spins exactly was to store the whole wave-function, which takes exponential space and time. We will present an exponential speedup using a quantum computer.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Pauli rotation}
+    Given a Pauli operator $P$ and some angle $\theta$, we define the following gate:
+    \[\hat{R}_P^N\left(\theta\right) = \exp\left(-i \frac{\theta}{2} \hat{P}\right).\]
+
+    \begin{subparag}{Remark}
+        It is possible to show that it suffices to be able to implement $\hat{R}_Z$ gates. For instance: 
+        \[R_{ZZ}\left(\theta\right) = \exp\left(-i \frac{\theta}{2} \hat{Z}_{1} \hat{Z}_2\right) = CNOT \left(I \otimes R_Z\left(\theta\right)\right) CNOT.\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example: Simulation of quantum dynamics of spin}
+    Let us consider the Hamiltonian for the transverse-field Ising model:
+    \[\hat{\mathcal{H}} = -\Gamma \sum_{i} \hat{X}_i + \sum_{\left\langle \ell, m \right\rangle} J_{\ell m} \hat{Z}_{\ell} \hat{Z}_m.\]
+    
+    Then, we have: 
+    \[\ket{\psi\left(t\right)} = \exp\left(-i \hat{\mathcal{H}} t\right) \ket{0}^{\otimes n}.\]
+
+    Let us introduce a discretisation, $\Delta_t$ and $p$ such that $p \Delta_t = t$. Since the Hamiltonian has a bounded eigenspectrum, we can compute a Trotter decomposition. A single step of the first order troterised time evolution looks like:
+    \[e^{-i \Delta_t \hat{\mathcal{H}}} = \underbrace{e^{i \Gamma \hat{X}_1} \cdots e^{i \Gamma \hat{X}_N \Delta_t}}_{e^{-i \hat{H}_1 \Delta_t}} \underbrace{e^{-iJ_{12} \hat{Z}_1 \hat{Z}_2 \Delta_t} e^{-i J_{23} \hat{Z}_2 \hat{Z}_3 \Delta_t} \cdots}_{e^{-i\hat{H}_0 \Delta_t}}.\]
+    
+    Using the Pauli rotation gates and the fact the $R_{ZZ}$ gate be written using $CNOT$ and $R_Z$, the circuit for a single Trotter step thus looks like:
+    \begin{center}
+    \begin{quantikz}
+        \lstick{\ket{0}} & \gate{R_X\left(-2 \Delta_t \Gamma\right)} & \ctrl{1} & & \ctrl{1} & \rstick{$\cdots$}\\
+        \lstick{\ket{0}} & \gate{R_X\left(-2 \Delta_t \Gamma\right)} & \targ{}  & \gate{R_Z\left(2 \Delta_t J_{1 2}\right)} & \targ{}  & \rstick{$\cdots$}\\
+        \lstick{\ket{0}} & \gate{R_X\left(-2 \Delta_t \Gamma\right)} &  & & &  \rstick{$\cdots$}
+    \end{quantikz}
+    \end{center}
+    
+
+    \begin{subparag}{Complexity}
+        Let's analyse the complexity of the circuit. To do so, let $\alpha$ be such that $N \alpha$ is the total number of bonds in the topology. Note that, typically, $\alpha$ does not depend on $N$ (which is for instance the case if each qubit is only connected to its nearest neighbours).
+
+        We consider a single Trotter step first. We have $N$ $\hat{R}_X$ gates, $2 \alpha N$ $CNOT$ gates and $N \alpha$ $\hat{R}_Z$ gates. Hence, the total number of gates is of order $N$.
+
+        Since we have $p = \frac{t}{\Delta_t}$ Trotter steps, the total circuit has complexity of order: 
+        \[O\left(N p\right) = O\left(N \frac{t}{\Delta_t}\right)\]
+
+        Finally, as we took the first-order Trotter decomposition, the error is simply $\Delta_t^2 p$, since it accumulates every trotter step. Note that we could have had a smaller error if we had consider the second-order Trotter decomposition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{General time evolution}
+    The approach we used above works in the very general case to find $\ket{\psi\left(t\right)}$.
+
+    However, it requires that the initial state $\ket{\psi\left(0\right)}$ can be prepared. For instance, if this is a product state, this is fine. However, if this is the ground state of an arbitrary Hamiltonian, then it's probably not fine.
+
+    Indeed, the main strategy we used to find the ground state of an arbitrary Hamiltonian was imaginary time evolution, which is just a mathematical curiosity, not a physical property. This is interesting because it shows that, even if we have access to a quantum computer, it does not mean that we can solve every quantum problem in polynomial time.
+\end{parag}
+
+\subsection{Energy spectrum}
+
+\begin{parag}{Goal}
+    We now analyse how to compute the energy spectrum of an arbitrary Hamiltonian, which will also prove itself to be very hard.
+\end{parag}
+
+\begin{parag}{Algorithm: Quantum phase estimation}
+    Let $\mathcal{\mathcal{H}}$ be an arbitrary Hamiltonian. Suppose that we prepared a state which is an exact eigenstate of $\mathcal{H}$: 
+    \[\ket{\psi} = \ket{E_n}, \mathspace \hat{\mathcal{H}} \ket{E_n} = E_n \ket{E_n}.\]
+
+    We now consider the following circuit, leaving $\hat{U}\left(t\right) = \exp\left(-i \hat{\mathcal{H}} t\right)$.
+    \begin{center}
+    \begin{quantikz}[slice all] 
+        \lstick{\ket{0}} & \gate{H} & \ctrl{1} & \gate{H} & \meter{} \\
+        \lstick{\ket{\psi}} & & \gate{U} & & 
+    \end{quantikz}
+    \end{center}
+
+    Then, leaving $\phi = E_n t$, the probability to measure $+1$ on the first qubit is: 
+    \[\prob_1\left(1\right) = \cos\left(\frac{\phi}{2}\right)^2.\]
+    
+    \begin{subparag}{Implication}
+       Let's say that we do manage to construct the state $\ket{E_n}$. We know how to construct $\hat{U}\left(t\right)$ thanks to the previous analysis. Then, we are able to run this experiment many times to evaluate the probability $\prob_1\left(1\right)$ experimentally, from which we can extract $\phi = E_n t$ and hence the energy $E_n$.
+
+       However, being able to prepare $\ket{E_n}$ is hard.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Time evolution is given by:
+        \[\ket{\psi\left(t\right)} = e^{-i \hat{\mathcal{H}} t} \ket{\psi} = e^{-i E_n t} \ket{\psi} = e^{-i \phi} \ket{\psi}.\]
+
+        Hence, this algorithm allows us to compute the phase of some state, which may be surprising. Note however that, here, this is not a global phase thanks to the ancilla qubit $\ket{0}$, this is just a local phase. 
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        After the first Hadamard, we directly have:
+        \[\ket{\psi_1} = \frac{\ket{0} + \ket{1}}{\sqrt{2}} \otimes \ket{\psi} = \frac{\ket{0} \ket{\psi} + \ket{1}\ket{\psi}}{\sqrt{2}}.\]
+        
+        After the controlled-unitary, we then have, using the fact $\ket{\psi}$ is an eigenvector of $\hat{\mathcal{H}}$: 
+        \[\ket{\psi_2} = \frac{\ket{0}\ket{\psi} + e^{-i \phi} \ket{1} \ket{\psi}}{\sqrt{2}}.\]
+
+        This is promising, but we still cannot measure $\phi$ in the $Z$-basis. However, after the second Hadamard: 
+        \[\ket{\psi_3} = \frac{\left(1 + e^{-i\phi}\right)\ket{0}\ket{\psi} + \left(1 - e^{-i\phi}\right)\ket{1}\ket{\psi}}{2}.\]
+        
+        So, the probability to measure $0$ on the first qubit is: 
+        \autoeq{\prob_1\left(1\right) = \frac{1}{4} \left|1 + e^{-i \phi}\right|^2 = \frac{1}{4} \left[1 + 1 + e^{i\phi} + e^{-i\phi}\right] = \frac{1}{4}\left[2 + 2 \cos\left(\phi\right)\right] = \cos\left(\frac{\phi}{2}\right)^2.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Algorithm: Exact energy}
+    Let's now suppose that $\ket{\psi}$ is arbitrary. We consider its decomposition in the eigenstates of $\hat{\mathcal{H}}$:
+    \[\ket{\psi} = \sum_{\ell=0}^{2^N - 1} c_{\ell} \ket{E_{\ell}}.\]
+
+    We consider the exact same circuit, still leaving $U\left(t_j\right) = \exp\left(-i t_j \hat{\mathcal{H}}\right)$:
+    \begin{center}
+    \begin{quantikz} 
+        \lstick{\ket{0}} & \gate{H} & \ctrl{1} & \gate{H} & \meter{} \\
+        \lstick{\ket{\psi}} & & \gate{U\left(t_j\right)} & & 
+    \end{quantikz}
+    \end{center}
+
+    Then, the probability to measure $1$ on the first qubit is:
+    \[\prob_1\left(1, t_j\right) = \sum_{\ell} \left|c_{\ell}\right|^2 \cos\left(\frac{E_{\ell}t_j}{2}\right)^2.\]
+
+    \begin{subparag}{Consequence}
+        We can run this algorithm for $p$ different values of $t_j \in \left\{0, \Delta_t, 2\Delta_t, \ldots, T\right\}$. For each of these times, we evaluate $\prob_1\left(1, t_j\right)$. We can then do a discrete Fourier transform to be able to reconstruct the frequencies and hence the energies.
+
+        Now, to be able to do that, we need to be able to detect energy differences of order:
+        \[\delta E = \frac{2\pi}{p \Delta_t} = \frac{2\pi}{t}.\]
+        
+        To get energy of a low resolution, we need to run this for a long time.
+
+        Moreover, the Fourier transform will give us frequencies, but with amplitude $\left|c_{\ell}\right|^2$. So, we moreover also need $\left|c_{\ell}\right|^2 \in \lang{poly}\left(\frac{1}{N}\right)$ since, otherwise, we need exponential precision and hence exponential runtime. This is the crucial limitation: in general, we are not able to make a state with this constraint. In particular, with a random state, the coefficients are exponentially small. Note that this was not a problem for the classical case, where it can be exponentially small (but non-zero), since we had exponentially fast converging algorithms. 
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We will not make the full derivation here, since it is completely similar to the previous one. However, essentially, using linearity and the previous result, we have:
+        \[\ket{\psi_3\left(t_j\right)} = \frac{1}{2} \sum_{\ell} c_{\ell} \left[\left(1 + e^{-i E_{\ell} t_j}\right)\ket{0}\ket{E_{\ell}} + \left(1 - e^{-iE_{\ell}t_j}\right)\ket{1}\ket{E_{\ell}}\right].\]
+
+        This then gives:
+        \[\prob_1\left(1, t_j\right) = \sum_{\ell} \left|c_{\ell}\right|^2 \frac{\left|1 + e^{-i E_{\ell} t_j}\right|^2}{4} = \sum_{\ell} \left|c_{\ell}\right|^2 \cos\left(\frac{E_{\ell}t_j}{2}\right)^2.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

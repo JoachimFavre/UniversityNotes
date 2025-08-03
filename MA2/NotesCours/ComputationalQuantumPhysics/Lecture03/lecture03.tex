@@ -1,0 +1,201 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-04 at 08:18:53.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 04 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2025-03-04}{Exact diagonalisation for many-body problems}{
+\begin{itemize}[left=0pt]
+    \item Exact diagonalisation of many-spins systems through the power method.
+    \item Definition of the transverse-field Ising model.
+    \item Proof of methods for the dynamics of many-spins systems, one using a Taylor expansion, the other using the Trotter-Suzuki decomposition.
+\end{itemize}
+    
+}
+
+\subsection{Many-spins systems}
+\subsubsection{Ground state}
+
+\begin{parag}{Goal}
+    We have $N$ particles of spin-$\frac{1}{2}$, and we want to find the ground state.
+
+    \begin{subparag}{Remark}
+        Essentially, everything we have developed so far can be applied directly to this case. We will however still make an example, and explain how we can find the eigenvector associate to the smallest eigenvalue of a very large matrix.
+        
+        However, we are considering a Hilbert space $\mathcal{H}^{\left(N\right)} = \mathbb{C}^{2^N}$. Hence, keeping track of an element of this Hilbert space takes $2^N$ complex numbers. For instance, if we $N = 30$ spins, we already need $\SI{16}{\giga\byte }$ of RAM, i.e. all the memory of a laptop. This shows that when $N$ gets too large, exact diagonalisation methods stop working. We will find other ways to solve this problem later in this course.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        Let us first identify a matrix:
+        \[\ket{s_1 \ldots s_N} = \ket{s_1} \otimes \ldots \ket{s_N},\]
+        where $\hat{\sigma}_i^z \ket{s_i} = s_i \ket{s_i}$ are eigenkets of the $z$ Pauli matrix, and $s_i \in \left\{\pm 1\right\}$. This yields that we can write any state $\ket{\psi} \in \mathcal{H}^{\left(N\right)}$ as: 
+        \[\ket{\psi} = \sum_{s_1, \ldots, s_N} C_{s_1, \ldots, s_N} \ket{s_1, \ldots, s_N}.\]
+
+        Then, to store $\ket{\psi} \in \mathcal{H}^{\left(N\right)}$ in memory, we only need to store $C_{s_1, \ldots, s_N}$. Similarly, any Hamiltonian operator can be written using Pauli matrices.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Notation}
+    For any operator $\hat{U}$ and integer $i \in \left\{1, \ldots, N\right\}$, we note
+    \[\hat{U}_i = \underbrace{\hat{I} \otimes \hat{I} \otimes \ldots \otimes \hat{I}}_{i - 1 \text{ times}} \otimes \hat{U} \otimes \underbrace{\hat{I} \otimes \ldots \otimes \hat{I}}_{N - i  \text{ times}} = \hat{I}^{\otimes \left(i-1\right)} \otimes \hat{U} \otimes \hat{I}^{\otimes \left(N-i\right)},\]
+    where the operator $\hat{U}$ acts on the $i$\Th qubit.
+
+    \begin{subparag}{Remark}
+        The matrix $\hat{U}_i$ is very sparse, and can thus be stored efficiently in a computer.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Transverse-field Ising model}
+    Let $\left\langle i, j \right\rangle$ represent some lattice (i.e. they are edges of a graph), and $J_{i, j}$ and $\Gamma$ be coefficients. We define the \important{transverse-field Ising model} (TFIM) to have the following Hamiltonian:
+    \[\hat{H} = \sum_{\left\langle i, j \right\rangle} J_{i, j} \hat{\sigma}_i^z \hat{\sigma}_j^z - \Gamma \sum_{i=1}^{N} \hat{\sigma}_i^x.\]
+
+    \begin{subparag}{Remark}
+        This will often come back throughout this class.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Transverse-field Ising model}
+    We consider the TFI model:
+    \[\hat{H} = \sum_{\left\langle i, j \right\rangle} J_{i, j} \hat{\sigma}_i^z \hat{\sigma}_j^z - \Gamma \sum_{i=1}^{N} \hat{\sigma}_i^x.\]
+
+    The diagonal elements are given by the $\hat{\sigma}^z$ terms: 
+    \[\bra{s} \hat{H} \ket{s} = \sum_{\left\langle i, j \right\rangle} J_{i j} s_i s_j.\]
+
+    The off-diagonal elements are given by the $\hat{\sigma}^x$ terms: 
+    \[\hat{\sigma}_i^x \ket{s_1, \ldots, s_n}  = \ket{s_1}\ket{s_2} \cdots \hat{\sigma}^x \ket{\sigma_i} \cdots \ket{s_n} = \ket{s_1, \ldots, -s_i, \ldots, s_N}.\]
+
+    The first gives us one non-zero coefficient per line of $\hat{H}$ (on the diagonal), the second gives $N$ non-zero coefficients per line, hence there are $N+1$ non-zero terms per line. Since $\hat{H}$ has $2^n$ rows, this shows that there are $2^N \left(N+1\right) \in \Theta\left(N 2^N\right)$ non-zero terms in this matrix, hence it is very sparse. However, this takes time $O\left(N^3 \left(2^N\right)^3\right)$ to diagonalise, which is still very bad. This leads us to the following, faster, algorithm.
+\end{parag}
+
+\begin{parag}{Theorem: Power method}
+    Suppose that we are given some Hermitian matrix $\hat{H}$, for which we are able to compute $\hat{H} \ket{v}$. We consider the following sequence, parametrised on some $\Lambda \in \mathbb{R}$: 
+    \[\ket{u_{k+1}} = \left(\Lambda \hat{I} - \hat{H}\right) \ket{u_k}, \mathspace k \in \left\{0, \ldots, p\right\}.\]
+
+    Let $\hat{H} \ket{E_{\ell}} = E_{\ell} \ket{E_{\ell}}$ be the diagonalisation of $\hat{H}$, ordered in such a way $E_0 \leq E_1 \leq \ldots \leq E_{2^N - 1}$. If $\braket{E_0}{u_0} \neq 0$ and $\Lambda \geq E_{max}$ then, when $p \to \infty$, then $\frac{1}{\left\|\ket{u_p}\right\|}\ket{u_p} \to \ket{E_0}$ converges to the ground state.
+
+    \begin{subparag}{Remark}
+        The hypothesis that $\braket{E_0}{u_0} \neq 0$ can easily be fulfilled by picking a random vector. This then holds with probability $1$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We can write: 
+        \[\ket{u_0} = \sum_{\ell} c_{\ell} \ket{E_{\ell}}.\]
+        
+        Our recursive definition expands to: 
+        \[\ket{u_p} = \left(\Lambda \hat{I} - \hat{H}\right)^p \ket{u_0} = \sum_{\ell} c_{\ell} \left(\Lambda - E_{\ell}\right)^p \ket{E_{\ell}}.\]
+        
+        Let $\ket{v_p} = \frac{1}{\left\|\ket{u_p}\right\|} \ket{u_p}$ be the normalisation of $\ket{u_p}$. Notice that, by the Cauchy-Schwartz inequality, $\left|\braket{E_0}{v_p}\right| \leq \braket{E_0}{E_0} \braket{v_p}{v_p} = 1$, with equality when $\ket{E_0}$ and $\ket{v_p}$ are collinear, i.e.~when $\ket{E_0} = e^{i\phi} \ket{v_p}$. Hence, to have $\ket{v_p} = e^{i\phi} \ket{E_0} \equiv \ket{E_0}$, it suffices to ask that $\left|\braket{E_0}{v_p}\right|^2$ is close to $1$. Let us look at this expression more closely:
+        \autoeq{\left|\braket{E_0}{v_p}\right|^2 = \frac{\left|\braket{E_0}{u_p}\right|^2}{\braket{u_p}{u_p}} = \frac{\left|c_0\right|^2 \left(\Lambda - E_0\right)^{2p}}{\sum_{\ell} \left(\Lambda - E_{\ell}\right)^{2p} \left|c_{\ell}\right|^2} = \frac{1}{1 + \left(\frac{\Lambda - E_1}{\Lambda - E_0}\right)^{2p} \left|\frac{c_1}{c_0}\right|^2 + \left(\frac{\Lambda - E_2}{\Lambda - E_0}\right)^{2p} \left|\frac{c_2}{c_0}\right|^2 + \ldots},}
+        where we used the fact $c_0 \neq 0$ to be able to divide by $\left|c_0\right|^2$. For this to be close to $1$, we can ask to have$\frac{\Lambda - E_{\ell}}{\Lambda - E_0} < 1$ for all $\ell$. Now, note that $\Lambda \geq E_{max}$ is sufficient, in that case $0 \leq \Lambda - E_{\ell} < \Lambda - E_0$ for all $\ell \neq 0$ and hence: 
+        \[0 \leq \frac{\Lambda - E_{\ell}}{\Lambda - E_0} < 1.\]
+        
+        This moreover shows exponential convergence, which is very fast.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Quantum dynamics}
+
+\begin{parag}{Goal}
+    Given $N$ particles of spin $\frac{1}{2}$ of initial state $\ket{\psi\left(0\right)}$ and a Hamiltonian $\hat{H}$, we want to see how their wavefunction $\ket{\psi\left(t\right)}$ evolves.
+
+    \begin{subparag}{Remark}
+        We suppose that the Hamiltonian is time-independent for simplicity. Time evolution is thus given by: 
+        \[\ket{\psi\left(t\right)} = \exp\left(-i t \hat{H}\right) \ket{\psi\left(0\right)}.\]
+        
+        Note that the following reasoning can be generalised to time-dependent Hamiltonians.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Taylor expansion}
+    Let $s$ be a parameter. We consider the following algorithm to compute $\ket{\psi\left(t + \Delta_t\right)}$ from $\ket{\psi\left(t\right)}$:
+    \begin{itemize}
+        \item Let $\ket{\Gamma_0} = \ket{\Delta_0} = \ket{\psi\left(t\right)}$
+        \item For $k \in \left\{1, 2, \ldots, s\right\}$, evaluate:
+        \[\ket{\Gamma_k} = -i\frac{\Delta_t}{k} \hat{H} \ket{\Gamma_{k-1}}, \mathspace \ket{\Delta_k} = \ket{\Delta_{k-1}} + \ket{\Gamma_k},\]
+        \item Output $\ket{\Delta_s}$.
+    \end{itemize}
+
+    This result is such that $\ket{\Delta_s} = \ket{\psi\left(t + \Delta_t\right)} + O\left(\Delta_t^{s+1}\right)$.
+    
+    \begin{subparag}{Proof}
+        Doing a Taylor expansion, we find:
+        \[\ket{\psi\left(t + \Delta_t\right)} = \left(\hat{I} - i \Delta_t \hat{H} - \frac{\Delta_t^2}{2} \hat{H}^2 + i \frac{\Delta_t^3}{6} \hat{H}^3 + \ldots\right) \ket{\psi\left(t\right)}.\]
+
+        This algorithm is then just a fancy way of computing this series at order $s$, while minimising the number of computations: 
+        \autoeq{\Delta_k = \ket{\Gamma_0} + \ldots + \ket{\Gamma_k} = \ket{\psi\left(t\right)} + \ldots  + \frac{\left(-i \Delta_t \hat{H}\right)^k}{k!} \ket{\psi\left(t\right)} = \ket{\psi\left(t + \Delta_t\right)} + O\left(\delta_t^{k+1}\right).}
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        This algorithm relies on a degree $s$ polynomial $P_s\left(\hat{H}\right)$: 
+        \[\ket{\Delta_s} = \underbrace{\left(\hat{I} - i \Delta_t \hat{H} + \ldots + \frac{\left(-i \Delta_t \hat{H}\right)^s}{s!}\right)}_{P_s\left(\hat{H}\right)}\ket{\psi\left(t\right)}.\]
+
+        Now, this polynomial only depends on $\Delta_t$. Hence, as a pre-computation step, we can factorise it:
+        \[\ket{\psi\left(t + \Delta_t\right)} = \prod_{i=1}^{s} \left(I - i \Delta c_i \hat{H}\right) \ket{\psi\left(t\right)},\]
+        where the $c_i$ are the zeroes of $P_s\left(x\right)$. For instance, when $s = 2$, then $c_1 = \frac{i+1}{2}$ and $c_2 = \frac{1-i}{2}$, implying: 
+        \[\ket{\psi\left(t + \Delta_t\right)} = \left(1 - \frac{\left(i+1\right) \Delta_t \hat{H}}{2}\right)\left(1 - \frac{\left(i-1\right)\Delta_t \hat{H}}{2}\right) \ket{\psi\left(t\right)}.\]
+
+        This is interesting since it allows to do less operations. This is named the \important{Taylor root expansion} and outputs the exact same result as the Taylor expansion (by construction).
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Both our Taylor expansion and our Taylor root expansion methods are very interesting. However, neither is unitary. This brings us to the following method instead.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Trotter-Suzuki decomposition}
+    Let $\hat{H} = \hat{H}_1 + \hat{H}_2$, where $\hat{H}_1$ and $\hat{H}_2$ do not necessarily commute. We moreover suppose that $\hat{H}$ has a bounded eigenspectrum.
+
+    Then, up to the first order: 
+    \[\exp\left(-i \Delta_t \hat{H}\right) = \exp\left(-i\Delta_t \hat{H}_1\right) \exp\left(-i \Delta_t \hat{H}_2\right) + O\left(\Delta_t^2\right).\]
+    
+    Moreover, up to the second order: 
+    \[\exp\left(-i \Delta_t \hat{H}\right) = \exp\left(-i \frac{\Delta_t}{2} \hat{H}_1\right) \exp\left(-i \Delta_t \hat{H}_2\right) \exp\left(-i\frac{\Delta_t}{2} \hat{H}_1\right) + O\left(\Delta_t^3\right).\]
+
+    \begin{subparag}{Intuition}
+        Staring long enough at these expressions should make them intuitive.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        Those decomposition are unitary.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        The hypothesis of bounded eigenspectrum is important. Indeed, otherwise, for instance $\Delta_{t}^3\cdot  \hat{H} + \Delta_t^4 \hat{H}^2 \neq O\left(\Delta_t^3\right)$ since we can always just multiply by an eigenvector of arbitrarily large eigenvalue.  However, in fact, the following still holds for unbounded eigenspectrum operators: 
+        \[\lim_{N \to \infty} \left(\exp\left(-i\frac{t}{N} \hat{H}_0\right) \exp\left(-i\frac{t}{N} \hat{H}_1\right)\right)^N = \exp\left(-it \hat{H}\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We can use these formulations to get $\ket{\psi\left(t\right)}$ from $\ket{\psi\left(0\right)}$. For instance, the second-order formulation tells us that:
+        \autoeq{\ket{\psi\left(t\right)} = \exp\left(-i t \hat{H}\right) \ket{\psi\left(0\right)} = \exp\left(-i \Delta_t \hat{H}\right)^s \ket{\psi\left(0\right)} = \left[\exp\left(-i \frac{\Delta_t}{2} \hat{H}_1\right) \exp\left(-i \Delta_t \hat{H}_2\right) \exp\left(-i \frac{\Delta_t}{2} \hat{H}_1\right)\right]^s \ket{\psi\left(0\right)} = \exp\left(-i\frac{\Delta_t}{2} \hat{H}_1\right) \exp\left(-i \Delta_t \hat{H}_2\right) \exp\left(-i \Delta_t \hat{H}_1\right) \exp\left(-i \Delta_t \hat{H}_2\right) \fakeequal\cdots \exp\left(-i \Delta_t \hat{H}_2\right) \exp\left(-i\frac{\Delta_t}{2} \hat{H}_1\right)\ket{\psi\left(0\right)},}
+        here we combined $\exp\left(-i \frac{\Delta_t}{2} \hat{H}_1\right)^2 = \exp\left(-i \Delta_t \hat{H}_1\right)$ for all the terms we could (meaning all but the extremities).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: transverse field Ising model}
+    We consider again the transverse field Ising model: 
+    \[\hat{H} = \underbrace{\sum_{\left\langle i, j \right\rangle} J_{i, j} \hat{\sigma}_i^z \hat{\sigma}_j^z}_{= \hat{H}_{zz}} - \underbrace{\Gamma \sum_{i=1}^{N} \hat{\sigma}_i^x}_{= \hat{H}_x}.\]
+
+    We wish to apply the Trottez-Suzuki decomposition on $\hat{H} = \hat{H}_{zz} + \hat{H}_x$. To do so, we first notice, using properties of Pauli matrices: 
+    \[\exp\left(-i \Delta_t \hat{H}_x\right) = \prod_{\ell=1}^{N} \exp\left(i \Gamma \Delta_t \hat{\sigma}_{\ell}^x\right) = \prod_{\ell=1}^{N} \left[\cos\left(\Delta_t \Gamma\right) \hat{I} + i \sin\left(\Delta_t \Gamma\right) \hat{\sigma}_{\ell}^x\right],\]
+    \[\exp\left(-i \Delta_t \hat{H}_{zz}\right) = \prod_{\left\langle \ell, m \right\rangle} \exp\left(-i J_{\ell m} \Delta_t \hat{\sigma}_{\ell}^z \hat{\sigma}_m^z\right) = \prod_{\left\langle \ell, m \right\rangle} \left[\cos\left(J_{\ell m} \Delta_t\right) \hat{I} - i \sin\left(J_{\ell m} \Delta_t\right) \hat{\sigma}_{\ell}^z \hat{\sigma}_{m}^z\right].\]
+
+    Hence, we can easily evaluate $\exp\left(-i \Delta_t \hat{H}_x\right) \ket{\psi}$ and $\exp\left(-i \Delta_t \hat{H}_{zz}\right) \ket{\psi}$. Supposing that $N = 2$, the first order Trotter-Suzuki decomposition reads: 
+    \autoeq{\ket{\psi\left(t + \Delta_t\right)} = \exp\left(-i \Delta_t \hat{H}\right) \ket{\psi\left(t\right)} = \exp\left(-i \Delta_t \hat{H}_1\right) \exp\left(-i \Delta_t \hat{H}_2\right) \ket{\psi\left(t\right)} = \exp\left(-i J_{12} \Delta_t \hat{\sigma}_1^z \hat{\sigma}_2^z\right) \exp\left(i \Gamma \Delta_t \hat{\sigma}_1^x\right) \exp\left(i \Gamma \Delta_t \hat{\sigma}_2^x\right) \ket{\psi\left(t\right)}.}
+\end{parag}
+
+
+\end{document}

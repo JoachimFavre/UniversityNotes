@@ -1,0 +1,234 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-03-11 at 08:28:59.
+
+\usepackage{../../style}
+
+\title{CQP}
+\author{Joachim Favre}
+\date{Mardi 11 mars 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2025-03-11}{Indistinguishable particles}{
+\begin{itemize}[left=0pt]
+    \item Recall of fermions and bosons: their Fock space, creation and annihilation operators, their commutation properties and the normal ordering.
+    \item Explanation of some fermionic Hamiltonians.
+    \item Explanation of the Jordan-Wignner mapping, to find exact diagonalisation of fermionic Hamiltonians.
+\end{itemize}
+
+}
+
+\subsection{Indistinguishable particles}
+
+\begin{parag}{Introduction}
+    Suppose that we have two particles, of generalised position $\bvec{q}_1, \bvec{q}_2$. We know that their wavefunction $\ket{\psi}$ can be written as $\ket{\psi} = \sum_{i, j} a_{i, j} \ket{\phi_i} \otimes \ket{\phi_j}$, where $\ket{\phi_i}$ is a basis for the single-particle Hilbert space. But then, by properties of the tensor product: 
+    \[\psi\left(\bvec{q}_1, \bvec{q}_2\right) = \braket{\bvec{q}_1,\bvec{q}_2}{\psi} = \left(\bra{\bvec{q}_1} \otimes \bra{\bvec{q}_2}\right) \sum_{i, j} a_{i, j} \left(\ket{\phi_i} \otimes \ket{\phi_j}\right) = \sum_{i, j} a_{ij} \phi_i\left(\bvec{q}_1\right) \phi_j\left(\bvec{q}_2\right).\]
+    
+    Hence, we can take $\phi_{i, j}^{\left(2\right)}\left(\bvec{q}_1, \bvec{q}_2\right) = \phi_i\left(\bvec{q}_1\right)\cdot \phi_j\left(\bvec{q}_2\right)$ as a basis. However, in general, we are able to inject more information in the system: we typically know that our particles are indistinguishable. Now, we know that for indistinguishable particles we have: 
+    \[\psi\left(\bvec{q}_1, \bvec{q}_2\right) = e^{i \phi} \psi\left(\bvec{q}_2, \bvec{q}_1\right),\]
+    where $\phi = 0$ for bosons (integer spin) and $\phi = \pi$ for fermions (half-integer spins).
+    
+    Now, the basis above does not capture this, meaning that it is not the best one. For instance, for bosons, in the general case:
+    \[\phi_{i, j}^{\left(2\right)}\left(\bvec{q}_1, \bvec{q}_2\right) = \phi_i\left(\bvec{q}_1\right) \phi_j\left(\bvec{q}_2\right) \neq  \phi_i\left(\bvec{q}_2\right) \phi_j\left(\bvec{q}_1\right) = \phi_2^{\left(2\right)}\left(\bvec{q}_2, \bvec{q}_1\right).\]
+
+    This is then exactly the idea of a Fock space: we want to find a basis that is inherently symmetrical, such that $\Phi_{i, j}^{\left(2\right)}\left(\bvec{q}_1, \bvec{q}_2\right) = - \Phi_{ij}\left(\bvec{q}_2, \bvec{q}_1\right)$ for fermions for instance.
+\end{parag}
+
+\subsubsection{Fermions}
+
+\begin{parag}{Theorem: Pauli exclusion principle}
+    Two indistinguishable fermions cannot have the same generalised position.
+
+    \begin{subparag}{Example}
+        This for instance states that we may have a fermion with a up-spin and one with a down-spin at the same position, but they cannot be both with a up-spin at the same position.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Fock space for fermions}
+    Consider $N$ fermions, and $L$ basis functions (where $L \geq N$, because of the Pauli exclusion principle). The state $\ket{n_1, \ldots, n_L}$, for $n_i \in \left\{0, 1\right\}$ and $\sum_{i=1}^{L} n_i = N$, states that there are $n_i$ particles in mode $i$.
+
+    This is the Fock space for fermions.
+
+    \begin{subparag}{Example}
+        Suppose that we have $L = 2$ available modes (such as spins), and that a particle in mode $1$ has wavefunction $\ket{\phi_1}$ and a particle in mode $2$ has wavefunction $\ket{\phi_2}$. 
+
+        If we have $N = 1$ particle, then we can have either the state $\ket{n_1 = 1, n_2 = 0}$ (i.e. the particle is in mode 1) or $\ket{n_1 = 0, n_2 = 1}$, such that: 
+        \[\braket{\bvec{q}}{1, 0} = \phi_1\left(\bvec{q}\right), \mathspace \braket{\bvec{q}}{0, 1} = \phi_2\left(\bvec{q}\right).\]
+        
+        Now, if we have $N = 2$ particles, then we must have the state $\ket{n_1 = 1, n_2 = 1}$ (i.e. a particle is in mode $1$, the other in mode $2$) by the Pauli exclusion principle, which is such that:
+        \autoeq{\braket{\bvec{q}_1,\bvec{q}_2}{n_1=1, n_2=1} = \frac{1}{\sqrt{2}} \left[\phi_1\left(\bvec{q}_1\right) \phi_2\left(\bvec{q}_2\right) - \phi_1\left(\bvec{q}_2\right) \phi_2\left(\bvec{q}_1\right)\right] = \frac{1}{\sqrt{2}} \det\begin{pmatrix} \phi_1\left(\bvec{q}_1\right) & \phi_1\left(\bvec{q}_2\right) \\ \phi_2\left(\bvec{q}_1\right) & \phi_2\left(\bvec{q}_2\right) \end{pmatrix} .}
+
+        This is because it is the only normalised linear combination of $\phi_1\left(\bvec{q}_1\right)\phi_2\left(\bvec{q}_2\right)$ and $\phi_2\left(\bvec{q}_1\right)\phi_1\left(\bvec{q}_2\right)$ which is anti-symmetric.
+    \end{subparag}
+
+    \begin{subparag}{General formula}
+        Generalising this to $N$ particles, this gives us the Slater determinant: 
+        \[\braket{\bvec{q}_1,\ldots,\bvec{q}_N}{n_1,\ldots,n_L} = \frac{1}{\sqrt{N!}} \det \begin{pmatrix} \phi_{a_1}\left(\bvec{q}_1\right) & \cdots & \phi_{a_1}\left(\bvec{q}_N\right) \\ \vdots & \ddots & \vdots \\ \phi_{a_N}\left(\bvec{q}_1\right) & \cdots & \phi_{a_N}\left(\bvec{q}_N\right) \end{pmatrix},\]
+        where $a_1 < \ldots < a_N$ are the $N$ integers such that $n_{a_i} \neq 0$ (i.e. the $N$ active modes).
+
+        This does preserve anti-symmetry: swapping two column of the matrix yields a negative sign.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Creation and annihilation operators for fermions}
+    We define $\hat{c}_i^{\dagger}, \hat{c}_i$ to be the \important{creation and annihilation operators} for fermions, respectively. The first one creates a fermion in mode $i$, whereas the second one removes a fermion from mode $i$, i.e: 
+    \[\hat{c}_i^{\dagger} \ket{n_i=0} = \ket{n_i=1}, \mathspace \hat{c}_i \ket{n_i=1} = \ket{n_i=0}.\]
+\end{parag}
+
+\begin{parag}{Properties}
+    Creation and annihilation operators for fermions are such that:
+    \[\left\{\hat{c}_i, \hat{c}_j^{\dagger}\right\} = \delta_{ij} \hat{I}, \mathspace \left\{\hat{c}_i, \hat{c}_j\right\} = 0, \mathspace \left\{\hat{c}_i^{\dagger}, \hat{c}_j^{\dagger}\right\} = 0,\]
+    where $\left\{\hat{A}, \hat{B}\right\} = \hat{A} \hat{B} + \hat{B} \hat{A}$.
+
+    \begin{subparag}{Proof}
+        We do not prove all these properties, only a subset. The proofs are however all very similar.
+        \begin{itemize}[left=0pt]
+            \item For instance, let us consider $\left\{\hat{C}_i^{\dagger}, \hat{C}_i\right\}$. We notice that: 
+            \[\hat{c}_i^{\dagger} \hat{c}_i \ket{n_i = 0} = 0, \mathspace \hat{c}_i \hat{c}_i^{\dagger} \ket{n_i=0} = \ket{n_i=0}.\]
+            
+            Summing these two equations, we find:
+            \[\left(\hat{c}_i^{\dagger} \hat{c}_i + \hat{c}_i \hat{c}_i^{\dagger}\right) \ket{n_i = 0} = \ket{n_i=0},\]
+
+            Similarly:
+            \[\hat{c}_i^{\dagger} \hat{c}_i \ket{n_i=1} = \ket{n_i=1}, \mathspace \hat{c}_i \hat{c}_i^{\dagger} \ket{n_i=1} = 0.\]
+            
+            Hence:
+            \[\left(\hat{c}_i^{\dagger} \hat{c}_i + \hat{c}_i \hat{c}_i^{\dagger}\right) \ket{n_i = 1} = \ket{n_i=1}.\]
+
+            Since $n_i \in \left\{0, 1\right\}$, we considered all possibilities for basis states, which does show that $\left\{\hat{c}_i^{\dagger}, \hat{c}_i\right\} = \hat{I}$.
+
+            \item Let us now look at $\left\{\hat{c}_i^{\dagger}, \hat{c}_j^{\dagger}\right\}$, for some $i \neq j$. We have:
+            \[\hat{c}_i^{\dagger} \hat{c}_j^{\dagger} \ket{0} = \ket{n_i=1, n_j=1},\]
+            \[\hat{c}_j^{\dagger} \hat{c}_i^{\dagger} \ket{0} = \ket{n_j=1, n_i=1} = -\ket{n_i=1, n_j=1}.\]
+
+            Note that, in the first case, $\ket{n_i = 1, n_j=1}$ means that the first fermion is in mode $i$ and the second one is in mode $j$. In the second case, $\ket{n_j = 1, n_i = 1}$ means the inverse: the first fermion is in mode $j$ and the second is in mode $i$. To be able to compare them, we want in both cases that the first fermion is in mode $i$, which requires swapping two fermions in the second case, introducing a negative sign.
+            
+            Therefore, $\hat{c}_i^{\dagger} \hat{c}_j^{\dagger} = - \hat{c}_j^{\dagger} \hat{c}_i^{\dagger}$, i.e. $\left\{\hat{c}_i^{\dagger}, \hat{c}_j^{\dagger}\right\} = 0$.
+        \end{itemize}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Number operator}
+    Moreover, we let $\hat{n}_i = \hat{c}_i^{\dagger} c_i$ to be the \important{number operator}: $\ket{\ldots, n_i, \ldots}$ is an eigenvector of $\hat{n}_i$ with eigenvalue $n_i \in \left\{0, 1\right\}$.
+\end{parag}
+
+
+\begin{parag}{Definition: Normal ordering}
+    We consider the following normal ordering for fermions: 
+    \[\ket{n_1, \ldots, n_L} = \prod_{i=1}^{L} \left(\hat{c}_i^{\dagger}\right)^{n_i} \ket{0} = \left(\hat{c}^{\dagger}_1\right)^{n_1} \cdots \left(\hat{c}_L^{\dagger}\right)^{n_L} \ket{0}.\]
+
+    The ordering of the operators is important, since commuting two adds a negative sign: $c_i^{\dagger} c_j^{\dagger} = -c_j^{\dagger} c_i^{\dagger}$ as found above.
+
+    \begin{subparag}{Property}
+        This notably yields that: 
+        \autoeq{\hat{c}_i \ket{n_1, \ldots, n_i=0, \ldots, n_L} = \hat{c}_i \left(\hat{c}_1^{\dagger}\right)^{n_1} \cdots \left(\hat{c}_L^{\dagger}\right)^{n_L} \ket{0} = \left(-1\right)^{\sum_{j=1}^{i-1} n_j}\ket{n_1, \ldots, n_i = 1, \ldots, n_L}}
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance: 
+        \[\ket{n_1 = 1, n_2 = 0, n_3 = 1, n_4 = 0} = \hat{c}_1^{\dagger} \hat{c}_3^{\dagger} \ket{0} = -\hat{c}_3^{\dagger} \hat{c}_1^{\dagger}\neq \hat{c}_3^{\dagger} \hat{c}_1^{\dagger} \ket{0}.\]
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Bosons}
+
+\begin{parag}{Definition: Fock space for bosons}
+    Consider $N$ bosons, and $L$ basis functions. The state $\ket{n_1, \ldots, n_L}$, for $n_i \in \left\{0, \ldots, N\right\}$ and $\sum_{i=1}^{L} n_i = N$, states that there are $n_i$ particles in mode $i$.
+
+    This is the Fock space for bosons.
+
+    \begin{subparag}{Example}
+        Let's consider $L = 2$ available modes, with $N = 2$ bosons. Then:
+        \[\braket{\bvec{q}_1,\bvec{q}_2}{1, 1} = \frac{1}{\sqrt{2}} \left(\phi_1\left(\bvec{q}_1\right) \phi_2\left(\bvec{q}_1\right) + \phi_1\left(\bvec{q}_2\right) \phi_2\left(\bvec{q}_1\right)\right).\]
+
+        Again, this is the only normalised linear combination of $\phi_1\left(\bvec{q}_1\right) \phi_2\left(\bvec{q}_2\right)$ and $\phi_2\left(\bvec{q}_1\right) \phi_1\left(\bvec{q}_2\right)$ which is symmetric.
+    \end{subparag}
+
+    \begin{subparag}{General formula}
+        We can again generalise this to $N$ particles: 
+        \[\braket{\bvec{q}_1,\ldots,\bvec{q}_N}{n_1, \ldots, n_L} = \sqrt{\frac{\prod_{j} n_j}{N!}} \text{perm}\begin{pmatrix} \phi_{a_1}\left(\bvec{q}_1\right) & \cdots & \phi_{a_1}\left(\bvec{q}_N\right) \\ \vdots & \ddots & \vdots \\ \phi_{a_N}\left(\bvec{q}_1\right) & \cdots & \phi_{a_N}\left(\bvec{q}_N\right) \end{pmatrix},\]
+        where $a_1 \leq \ldots \leq a_N$ are the $N$ integers such that $n_{a_i} \neq 0$ with multiplicities (i.e. we would have $a_1 = a_2$ if $n_1 = 2$ for instance), and ``perm'' is the permanent of the matrix. Note that the permanant is the symmetric version of the determinant; more formally, it is the sum of the permutations of the product of the elements of the matrix:
+        \[\braket{\bvec{q}_1,\ldots,\bvec{q}_N}{n_1, \ldots, n_L} = \sqrt{\frac{\prod_{j} n_j}{N!}} \sum_{\mathbb{P} \in S_N} \prod_{i=1}^{N} \phi_{a_i}\left(\bvec{q}_{\mathbb{P}\left(i\right)}\right),\]
+        where $S_n$ is the group of permutations $\mathbb{P}: \left\{1, \ldots, N\right\} \mapsto \left\{1, \ldots, N\right\}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Creation and annihilation operators for bosons}
+    We define $\hat{b}_i^{\dagger}, \hat{b}_i$ to be the \important{creation and annihilation operators} for bosons, respectively. The first one adds a boson in mode $i$, whereas the second one removes a boson from mode $i$, i.e: 
+    \[\hat{b}_i \ket{n_i} = \ket{n_i + 1}, \mathspace \hat{b}_i \ket{n_i} = \ket{n_i - 1}.\]
+\end{parag}
+
+\begin{parag}{Properties}
+    The creation and annihilation operators for bosons are such that: 
+    \[\left[\hat{b}_i, \hat{b}_j^{\dagger}\right] = \delta_{ij} \hat{I}, \mathspace \left[\hat{b}_i, \hat{b}_j\right] = 0, \mathspace \left[\hat{b}_i^{\dagger}, \hat{b}_j^{\dagger}\right] = 0\]
+
+    Moreover: 
+    \[\hat{b}_i \ket{n_1, \ldots, n_L} = \sqrt{n_i} \ket{n_1, \ldots, \left(n_i-1\right), \ldots, n_L},\]
+    \[\hat{b}_i^{\dagger} \ket{n_1, \ldots, n_L} = \sqrt{n_i + 1} \ket{n_1, \ldots, \left(n_i+1\right), \ldots, n_L}.\]
+    
+    Therefore: 
+    \[\ket{n_1, \ldots, n_L} = \prod_{i=1}^{L} \frac{\left(\hat{b}_i^{\dagger}\right)^{n_i}}{\sqrt{n_i!}} \ket{0}.\]
+
+    \begin{subparag}{Remark}
+        For bosons, we do not have to care about a normal ordering, since different particles commute: $\hat{b}_i \hat{b}_j = \hat{b}_j \hat{b}_i$.
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Fermionic Hamiltonians}
+
+\begin{parag}{Tight-binding Hamiltonian}
+    We may consider the following Hamiltonian, called a \important{tight-binding Hamiltonian}: 
+    \[\hat{H} = \sum_{i, j} t_{i, j} \hat{c}_i^{\dagger} \hat{c}_j.\]
+
+    This is very simple: there is no interaction between different fermions. In fact, this is diagonalisable analytically.
+
+    \begin{subparag}{Intuition}
+        This represents a Hamiltonian that describes fermions being able to jump from mode $j$ to mode $i$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Hubbard model}
+    We may consider the following Hamiltonian, named the \important{Hubbard model}: 
+    \[\hat{H} = \sum_{\left\langle i, j \right\rangle} \sum_{\sigma \in \left\{\uparrow, \downarrow\right\}} \left(t_{ij} \hat{c}^{\dagger}_{i, \sigma} \hat{c}_{j, \sigma} + t_{ij}^* \hat{c}_{j, \sigma}^{\dagger} \hat{c}_{i, \sigma}\right) + \sum_{i} U_i \hat{n}_{i, \uparrow} \hat{n}_{i, \downarrow}.\]
+
+    \begin{subparag}{Intuition}
+        This is a Hamiltonian very similar to the tight-binding Hamiltonian, except that we also some cost in energy to have two fermions of opposite spin at the same location.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Jordan-Wigner mapping}
+    We can express the formalism of fermions $n_i \in \left(0, 1\right)$ using the formalism for spins $s_i \in \left(1, -1\right)$; where $n_i=0 \mapsto s_i = 1$ and $n_i=1 \mapsto s_i = -1$. Then, defining $\hat{\sigma}^{\pm} = \left(\hat{\sigma}^x \pm i\hat{\sigma}^y\right)/2$, we have the mapping:
+    \begin{itemize}
+        \item \textit{(States)} $\displaystyle \ket{n_1, \ldots, n_L} \mapsto \ket{s_1, \ldots, s_L}$;
+        \item \textit{(Number operator)} $\displaystyle \hat{n}_i \mapsto \frac{\hat{I} - \hat{\sigma}_i^z}{2}$;
+        \item \textit{(Annihilation operator)} $\displaystyle \hat{c}_i \mapsto \left(\bigotimes_{j=1}^{i-1} \hat{\sigma}_j^z\right) \hat{\sigma}_i^+$;
+        \item \textit{(Creation operator)} $\displaystyle \hat{c}_i^{\dagger} \mapsto \left(\bigotimes_{j=1}^{i-1} \hat{\sigma}_j^z\right) \hat{\sigma}_i^-$.
+    \end{itemize}
+
+    This is named the \important{Jordan-Wigner} mapping.
+
+    \begin{subparag}{Intuition}
+        This idea is that, for instance:
+        \[\hat{c}_i \ket{n_1, \ldots, n_i, \ldots, n_L} = \delta_{n_i, 1} \left(-1\right)^{\sum_{j=1}^{i-1} n_j} \ket{n_1, \ldots, n_i-1, \ldots, n_L}.\]
+
+        This is completely similar to:
+        \autoeq[s]{\left(\bigotimes_{j=1}^{i-1} \hat{\sigma}_j^z\right) \otimes \hat{\sigma}_i^+ \ket{s_1, \ldots, s_L} = \left(-1\right)^{s_1} \left(-1\right)^{s_2} \cdots \left(-1\right)^{s_{i-1}} \delta_{s_i, -1} \ket{s_1, \ldots, -s_i, \ldots, s_L},}
+        where we used the fact: 
+        \[\hat{\sigma}^+ \ket{s = 1} = \frac{1}{2}\left[\begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} + i \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix} \right] \begin{pmatrix} 1 \\ 0 \end{pmatrix} = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix} \begin{pmatrix} 1 \\ 0 \end{pmatrix} = 0.\]
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        This mapping is very nice, since it allows to convert any fermionic Hamiltonian into a many-spin Hamiltonian. We can then use the strategies we found in the previous lecture.
+
+        Note that bosonic Hamiltonians do not need this type of mapping: since the different creation and annihilation operators already commute, $\hat{b}_i = \hat{I}^{\otimes \left(i-1\right)} \otimes \hat{b} \otimes \hat{I}^{L - i}$. This means that this is completely similar to the case for many-spins, and hence that we can use the exact same strategies.
+    \end{subparag}
+\end{parag}
+
+\end{document}
