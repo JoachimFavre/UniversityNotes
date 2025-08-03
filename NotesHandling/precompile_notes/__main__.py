@@ -46,7 +46,7 @@ courses: List[Course] = [
     #CourseList.DIGITAL_SYSTEM_DESIGN,
     
     # BA3
-    #CourseList.ALGORITHMS,
+    #CourseList.ALGORITHMS_1,
     #CourseList.ANALYSE_3,
     #CourseList.COMPUTER_NETWORKS,
     #CourseList.INTRO_TO_MACHINE_LEARNING_BA3,

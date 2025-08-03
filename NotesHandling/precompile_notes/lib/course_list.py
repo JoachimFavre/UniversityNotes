@@ -13,7 +13,7 @@ class CourseList:
     DIGITAL_SYSTEM_DESIGN = Course(is_bachelor=True, semester=2, name="DigitalSystemDesign")
     
     # BA3
-    ALGORITHMS = Course(is_bachelor=True, semester=3, name="Algorithms")
+    ALGORITHMS_1 = Course(is_bachelor=True, semester=3, name="Algorithms-1")
     ANALYSE_3 = Course(is_bachelor=True, semester=3, name="Analyse-3")
     COMPUTER_NETWORKS = Course(is_bachelor=True, semester=3, name="ComputerNetworks")
     INTRO_TO_MACHINE_LEARNING_BA3 = Course(is_bachelor=True, semester=3, name="IntroToMachineLearning-BA3-Summary", is_summary=True)
