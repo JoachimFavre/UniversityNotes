@@ -1,0 +1,308 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-08 at 11:15:54.
+
+\usepackage{../../style}
+
+\title{Information theorylengthing}
+\author{Joachim Favre}
+\date{Lundi 08 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2025-09-08}{Back to AICC 2 *happy human noises*}{
+\begin{itemize}[left=0pt]
+    \item Definition of source code, injective code, uniquely decodable code and prefix-free code.
+    \item Proof of inequalities on the Kraft sum.
+\end{itemize}
+}
+
+\section{Introduction}
+
+\begin{parag}{Setup}
+    \later{move? remove?}
+
+    We may be given a communication medium, i.e. something that accepts some inputs and produces some output. This could for instance represent the evolution of the voltage between two ends of a wire. Again, this is considered to be noisy, and hence random---since this is how the real world works. Our goal would then be to encode the data before the communication medium and decode it after, in such a way that we get the same data with high probability; in other words, we want the error probability to go to zero. One way to do this would be to repeat the data ten times at the encoding step. This is however extremely inefficient, so we wonder if we have to decrease the efficiency to zero as we decrease the error probability to zero.
+
+    We can make many other modifications of this model. We may have an eavesdropper on the communication medium. We hence want the signal on the communication medium to be statistically independent from the data, while still managing to communicate it.
+
+    There are many more topics that can be tackled by information theory. This theory gives us a lot of tools to attack many problems.
+
+    \later{picture? 8 September}
+\end{parag}
+
+\section{Source coding}
+
+\subsection{Uniquely decodable codes}
+
+\begin{parag}{Goal}
+    We have an information source, which produces information. We will consider information to be a sequence of letters (which can be very generic, it could even be real values). The way these are produced depends on the context, but they are typically sampled from a probability distribution (and not necessarily independently). The idea is that, if we know exactly what is going to be said, then we would not have to listen to it, and hence there is no information that is transmitted. It thus randomness that really creates information.
+
+    We want to know what's the method that minimises the number of bits required to store this information; we aim to do good data compression. This is named source coding.
+\end{parag}
+
+\begin{parag}{Notation}
+    We will use calligraphic letter $\mathcal{U}$ to bet sets, small letters $u$ to be elements $u \in \mathcal{U}$, and capital letters $U$ to be a random variable that takes values in this set.
+
+    \begin{subparag}{Remark}
+        This notation is a good general rule of thumbs, but we will sometimes not follow it. For instance, letters $i, j, k, \ell, m, n$ are considered to typically represent integers between $1$ and some maximum, in which case $I, J, K, L, M, N$ may be the maximum.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Klein star}
+    Let $\mathcal{A}$ be a set. We note its \important{Klein star}, $\mathcal{A}^*$, to be the set of all possible sequences of elements of $\mathcal{A}$ of finite length (including the empty string).
+
+    \begin{subparag}{Example}
+        For instance, noting $\emptystring$ to be the empty string: 
+        \[\left\{0, 1\right\}^* = \left\{\emptystring, 0, 1, 00, 01, 10, 11, 000, \ldots\right\}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that $\mathcal{A}^*$ does not contain any infinite-length strings. For instance, the binary representation of $\pi$ is not an element of $\left\{0, 1\right\}^*$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Source code}
+    Let $\mathcal{U}$ be a source alphabet, which we assume to be finite. 
+
+    A \important{(binary) source code} is a function $c: \mathcal{U} \mapsto \left\{0,1\right\}^*$.
+
+    \begin{subparag}{Example}
+        For instance, we may have $\mathcal{U} = \left\{a, b, c\right\}$ (note that $c$ here is not the function $c$), and take: 
+        \[\mathcal{U} = \left\{a, b, c\right\} \over{\mapsto}{$c$}  \left\{\emptystring, 0, \emptystring\right\}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Since the binary case is simpler, we will focus on it in this class. The theory is however exactly the same for other types of source codes. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Injective code}
+    Let $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ be a source code. It is said to be an \important{injective code} if $c$ is injective, i.e.~if for all $u \neq v \in \mathcal{U}$, then $c\left(u\right) \neq c\left(v\right)$.
+
+    \begin{subparag}{Example}
+        The code from the previous example is not injective. The following however is injective:
+        \[\mathcal{U} = \left\{a, b, c\right\} \over{\mapsto}{$c$}  \left\{\emptystring, 0, 1\right\}.\]
+
+        Note that this is still not a good code since, concatenating the letter codes, we cannot always decode it. More precisely, if we are given the binary representation of $ab$ and the one of $b$, we cannot distinguish in which case we are in. To state this more precisely, we will first need the following definitions.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Code product}
+    Given $c': \mathcal{U}' \mapsto \left\{0, 1\right\}^*$ and $c'': \mathcal{U}'' \mapsto \left\{0, 1\right\}^*$, we define their \important{product}, written $c = c' \times c''$, to be a function $c: \mathcal{U}' \times \mathcal{U}'' \mapsto \left\{0, 1\right\}^*$ such that: 
+    \[c\left(u', u''\right) = c'\left(u'\right) c''\left(u''\right).\]
+    
+    In other words, $c$ concatenates the two binary representations.
+
+    \begin{subparag}{Example}
+        Let us for instance consider: 
+        \[\left\{a, b, c\right\} \over{\mapsto}{$c'$} \left\{0, 1, 11\right\}, \mathspace \left\{\alpha, \beta\right\} \over{\mapsto}{$c''$} \left\{000, 10111\right\}.\]
+        
+        Then, we have: 
+        \[\left(c'' \times c'\right)\left(\alpha b\right) = 0001, \mathspace \left(c' \times c''\right)\left(a \alpha\right) = 0000,\]
+        and $\left(c' \times c''\right)\left(\alpha b\right)$ is undefined.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $c^n$}
+    Let $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ and $n \geq 1$. Then, we define: 
+    \[c^n = \underbrace{c \times c \times \ldots \times c}_{\text{$n$ times}}.\]
+    
+    In other words, $c^n: \mathcal{U}^n \mapsto \left\{0, 1\right\}^*$ is defined such that: 
+    \[c^n\left(u_1, \ldots, u_n\right) = c\left(u_1\right) c\left(u_2\right) \cdots c\left(u_n\right).\]
+
+    \begin{subparag}{Remark}
+        Note that this is very strongly typed: we have to feed a length-$n$ input to $c^n$. Hence, we consider the following definition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $c^*$}
+    Let $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$. We define $c^*: \mathcal{U}^* \mapsto \left\{0, 1\right\}^*$ such that, for all $n \geq 1$:
+    \[c^*\left(u_1, \ldots, u_n\right) = c^n\left(u_1, \ldots, u_n\right).\]
+\end{parag}
+
+
+\begin{parag}{Definition: Uniquely decodable code}
+    A code $c$ is called \important{uniquely decodable} if $c^*$ is injective.
+
+    \begin{subparag}{Remark}
+        To prove that a code is uniquely decodable, we have to show an algorithm that, for any $x \in \mathcal{U}^*$, and given only $c^*\left(x\right)$, is able to find $x$. 
+    \end{subparag}
+
+    \begin{subparag}{Example 1}
+        We consider again the same example:
+        \[\mathcal{U} = \left\{a, b, c\right\} \over{\mapsto}{$c$}  \left\{\emptystring, 0, 1\right\}.\]
+
+        This is not uniquely decodable since $ab \neq b$ but $c^*\left(ab\right) = 0 = c^*\left(b\right)$. In other words, encoding our strings, there is no way to differentiate $ab$ and $b$ when we're asked to decode the binary string $0$. This is thus not a code we would want to use in practice.
+    \end{subparag}
+
+    \begin{subparag}{Example 2}
+        We now consider:
+        \[\mathcal{U} = \left\{a, b, c\right\} \over{\mapsto}{$c$}  \left\{0, 1, x\right\},\]
+        where we want to choose $x \in \left\{0, 1\right\}^*$ such that $\mathcal{U}$ is uniquely decodable. This is however not possible.
+    \end{subparag}
+
+    \begin{subparag}{Example 3}
+        We consider:
+        \[\mathcal{U} = \left\{a, b, c\right\} \over{\mapsto}{$c$}  \left\{0, 10, 110\right\},\]
+        
+        This is uniquely decodable, since $0$ acts as a comma.
+    \end{subparag}
+
+    \begin{subparag}{Example 4}
+        We now consider:
+        \[\mathcal{U} = \left\{a, b, c\right\} \over{\mapsto}{$c$}  \left\{0, 10, 11\right\},\]
+        
+        This is still uniquely decodable. The idea is that we can make a decoding algorithm. This can be explained through the following finite state machine:
+        \svghere[0.8]{UniquelyDecodableExample.svg}
+
+        This reasoning can in fact be simplified thanks to the following definitions. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Prefix}
+    A sequence $u_1, \ldots, u_n$ is said to be a prefix of a sequence $v_1, \ldots, v_m$ if $m \geq n$ and $u_1 \cdots u_n = v_1 \cdots v_b$.
+    
+    \begin{subparag}{Example}
+        For instance, the prefixes of $v = \text{banana}$ are: 
+        \[v = \emptystring, \mathspace v = \text{b}, \mathspace v = \text{ba}, \mathspace v = \text{ban}, \mathspace \ldots, \mathspace v = \text{banana}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Prefix-free code}
+    A code $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ is said to be \important{prefix-free} if, for all $u \neq v \in \mathcal{U}$, then $c\left(u\right)$ is not a prefix of $c\left(v\right)$.
+
+    \begin{subparag}{Example}
+        Consider again: 
+        \[\left\{a, b, c\right\} \over{\mapsto}{c} \left\{0, 10, 11\right\}.\]
+        
+        This is a prefix-free code.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Notation}
+    We will note sequences of $n$ letters as: 
+    \[u^n = \left(u_1, \ldots, u_n\right).\]
+    \later{concatenation or sequence?}
+
+    \begin{subparag}{Remark}
+        This notation is similar to exponentiation, but this shouldn't be ambiguous in all important cases.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Theorem}
+    If $c$ is prefix-free, then $c$ is uniquely decodable.
+
+    \begin{subparag}{Remark}
+        The converse is not necessarily true. The following code isn't prefix free, but it can be shown to be uniquely decodable (since its reverse is prefix-free and hence uniquely decodable: we can make a decoding algorithm by just reversing the string):
+        \[\left\{a, b, c\right\} \over{\mapsto}{c} \left\{0, 01, 11\right\}.\]
+
+        There also exists uniquely-decodable codes that are not prefix-free and which reverse are not prefix-free. In fact, we can construct the following hierarchy of source codes:
+        \svghere[1]{CodeHierarchy.svg}
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We make the proof by the contrapositive. In other words, we assume that $c$ is not uniquely decodable, and we want to show it is not prefix-free. By definition, there must exist some $u^n \neq v^m$ such that: 
+        \[c^*\left(u^n\right) = c^*\left(v^m\right) \iff c\left(u_1\right) \cdots c\left(u_n\right) = c\left(v_1\right) \cdots c\left(v_m\right).\]
+        
+        Amongst all these $u^n$ and $v^m$ examples, we pick the one for which $n + m$ is smallest. Note that, if $u_1 = v_1$, then we could make a smaller example by considering $u_2, \ldots, u_n$ and $v_2, \ldots, v_m$; so we know that $u_1 \neq v_1$. 
+
+        Suppose now that $\length\left(c\left(u_1\right)\right) \leq \length\left(c\left(v_1\right)\right)$ without loss of generality (otherwise, just swap $u^n$ and $v^m$). Note that, since $c\left(u_1\right) \cdots c\left(u_n\right) = c\left(v_1\right) \cdots c\left(v_m\right)$, then we must also have that the first $\length\left(c\left(u_1\right)\right)$ bits of the two sides of the equality are equal. But then, this states exactly that $c\left(u_1\right)$ is a prefix of $c\left(v_1\right)$. 
+
+        Overall, we found $u_1 \neq v_1$ such that $c\left(u_{1}\right)$ is a prefix of $c\left(v_1\right)$. This shows that $c$ is not prefix-free, finishing the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Kraft sum}
+    Let $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ be a code. We define: 
+    \[\KraftSum\left(c\right) = \sum_{u \in \mathcal{U}} 2^{-\length\left(c\left(u\right)\right)}.\]
+
+    \begin{subparag}{Example 1}
+        For instance, consider: 
+        \[\left\{a, b, c\right\} \over{\mapsto}{$c$} \left\{\emptystring, \emptystring, \emptystring\right\}.\]
+        
+        Then: 
+        \[\KraftSum\left(c\right) = 1 + 1 + 1 = 3.\]
+    \end{subparag}
+
+    \begin{subparag}{Example 2}
+        We now consider:
+        \[\left\{a, b, c\right\} \over{\mapsto}{$c$} \left\{\emptystring, 0, 1\right\}.\]
+        
+        Then: 
+        \[\KraftSum\left(c\right) = 1 + \frac{1}{2} + \frac{1}{2} = 2.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    If $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ is injective, then: 
+    \[\KraftSum\left(c\right) \leq \log_2\left(1 + \left|\mathcal{U}\right|\right).\]
+
+    \begin{subparag}{Example}
+        Consider for instance $\mathcal{U} = \left\{a, b, c\right\}$. To make it injective and maximise the Kraft sum, we have to assign each letter to the smallest available element of $\left\{0, 1\right\}^*$. Hence, we map $a \mapsto \emptystring, b \mapsto 0, c \mapsto 1$. This then gives us a Kraft sum of $2$.
+
+        This is the reasoning we will generalise in the following proof.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Note that: 
+        \[\left\{0, 1\right\}^* = \left\{\emptystring, 0, 1, 00, 01, \ldots\right\}.\]
+        
+        We can always just take the $\left|\mathcal{U}\right|$ first elements of this set as codewords to find an injective $c$ with largest Kraft sum. We can decompose $\left|\mathcal{U}\right| = 1 + 2 + \ldots + 2^{j-1} + r$ for some $0 \leq r < 2^j$. In our example above, we had $\left|\mathcal{U}\right| = 3$, that gets decomposed to $\left|\mathcal{U}\right| = 1 + 2^1 + 0$. If we instead had $\left|\mathcal{U}\right| = 5$ the decomposition would have been $\left|\mathcal{U}\right| = 1 + 2^1 + 2$.
+
+        For all $0 \leq i \leq j-1$, we have $2^i$ codewords of length $i$, and we have $r$ remaining codewords of length $j$. Hence: 
+        \[\KraftSum\left(c\right) = \sum_{i=0}^{j-1} 2^i \cdot  2^{-i} + r\cdot 2^{-j} = j + r 2^{-j}.\]
+        
+        We could stop the proof here, but this is an ugly expression. We hence want to simplify it. Note that $1 + 2 + \ldots + 2^{j-1} = 2^j - 1$. Hence, since our decomposition is $\left|\mathcal{U}\right| = 1 + 2 + \ldots + 2^{j-1} + r$, we get: 
+        \autoeq{\left|\mathcal{U}\right| = 2^j - 1 + r \iff 1 + \left|\mathcal{U}\right| = 2^j\left(1 + r 2^{-j}\right) \iff \log_2\left(1 + \left|\mathcal{U}\right|\right) = j + \log_2\left(1 + r2^{-j}\right).}
+        
+        Since $0 \leq r < 2^j$, we have $0 \leq r 2^{-j} < 1$. Now, it is well known that, for $x \in \left[0, 1\right]$, then $\log_2\left(1 + x\right) \geq x$. This thus gives us our result: 
+        \[\log_2\left(1 + \left|\mathcal{U}\right|\right) = j + \log_2\left(1 + r2^{-j}\right) \geq j + r 2^{-j} = \KraftSum\left(c\right).\]
+        
+        \qed
+    \end{subparag} 
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $c': \mathcal{U}' \mapsto \left\{0, 1\right\}^*$ and $c'': \mathcal{U}'' \mapsto \left\{0, 1\right\}^*$. Then: 
+    \[\KraftSum\left(c' \times c''\right) = \KraftSum\left(c'\right) \KraftSum\left(c''\right).\]
+    
+    \begin{subparag}{Proof}
+        When we concatenate codewords, lengthes add. Hence: 
+        \autoeq{\KraftSum\left(c' \times c''\right) = \sum_{u', u''} 2^{-\left[\length\left(c'\left(u'\right)\right) + \length\left(c''\left(u''\right)\right)\right]} = \sum_{u'} 2^{-\length\left(c'\left(u'\right)\right)} \sum_{u''} 2^{-\length\left(c''\left(u''\right)\right)} = \KraftSum\left(c'\right) \KraftSum\left(c''\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary 1}
+    We have: 
+    \[\KraftSum\left(c^n\right) = \KraftSum\left(c\right)^n.\]
+    
+    \begin{subparag}{Proof}
+        This is a direct consequence of the previous result.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary 2}
+    If $c$ is uniquely decodable, then: 
+    \[\KraftSum\left(c\right) \leq 1.\]
+
+    \begin{subparag}{Proof}
+        Since $c$ is uniquely decodable, then, for all $n \geq 1$, $c^n$ is injective. But then, since the domain of $c^n$ is $\mathcal{U}^n$, by our theorem: 
+        \[\KraftSum\left(c\right)^n = \KraftSum\left(c^n\right) \leq \log_2\left(1 + \left|\mathcal{U}\right|^n\right).\]
+
+        The left hand-side is exponential in $n$ and the right hand-side is linear in $n$. If $\KraftSum\left(c\right) > 1$, then the left hand-side would grow to infinity much faster. This necessarily implies that $\KraftSum\left(c\right) \leq 1$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

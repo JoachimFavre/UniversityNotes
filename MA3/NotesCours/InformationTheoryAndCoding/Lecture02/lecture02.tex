@@ -1,0 +1,243 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-27 at 17:59:42.
+
+\usepackage{../../style}
+
+\title{Information theory and coding}
+\author{Joachim Favre}
+\date{Samedi 27 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2025-09-09}{Remaking old pictures}{
+\begin{itemize}[left=0pt]
+    \item Explanation of binary encoding trees.
+    \item Justification of the interest of prefix-free for instantaneous decoding.
+    \item Explanation and proof of an algorithm to construct a prefix-free code from codeword lengthes.
+    \item Definition of entropy.
+    \item Proof that entropy lower bounds the expected codeword length of any uniquely decodable code.
+    \item Proof of the existence of a code which expected codeword length is close to the entropy.
+\end{itemize}
+
+}
+
+\begin{parag}{Remark: Encoding binary tree}
+    We can represent any code $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ using an encoding binary tree.
+
+    \begin{subparag}{Example}
+        We consider the following two codes:
+        \[\left\{a, b, c\right\} \over{\mapsto}{$c$}  \left\{0, 10, 11\right\}, \mathspace \left\{a, b, c\right\} \over{\mapsto}{$c'$}  \left\{0, 01, 11\right\}.\]
+
+        Their respective encoding binary trees are:
+        \svghere[0.9]{EncodingBinaryTreeExamples.svg}
+    \end{subparag}
+
+    \begin{subparag}{Property}
+        A code $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ is prefix-free if and only if none of the codeword is an ancestor of another codeword in the binary tree.
+
+        This property should be clear from the examples above: for the code $c'$, $a$ is an ancestor of $b$, and hence $c'\left(a\right)$ is a prefix of $c'\left(b\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation: Instantaneously decodable codes}
+    We consider again the following two codes: 
+    \[\left\{a, b, c\right\} \over{\mapsto}{$c$}  \left\{0, 10, 11\right\}, \mathspace \left\{a, b, c\right\} \over{\mapsto}{$c'$}  \left\{0, 01, 11\right\}.\]
+     
+    We know that they are both uniquely decodable. Now, suppose that we are a string that start with zero followed by many ones: 
+    \[011111111111111111111111111 \cdots 1111111111111.\]
+    
+    For $c'$, we cannot know if the first character is $a$ or $b$ until we have read the whole sequence; making decoding very inefficient. However, with $c$, we know immediately. What makes the difference here is that $c$ is prefix-free, but $c'$ is not. This is why prefix-free codes are also referred to as instantaneously decodable. 
+
+    \begin{subparag}{Remark}
+        Prefix-free codes are thus very interesting. Now, restricting to these does not cause any issue, as shown by the following theorem and corollary.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $L: \mathcal{U} \mapsto \mathbb{Z}_{\geq 0}$ be some function such that: 
+    \[\sum_{u \in \mathcal{U}} 2^{-L\left(u\right)} \leq 1.\]
+    
+    Then, there exists a prefix-free code $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ such that, for all $u \in \mathcal{U}$, $\length\left[c\left(u\right)\right] = L\left(u\right)$.
+
+    \begin{subparag}{Proof}
+        We consider the following algorithm to construct $c$. We order $\mathcal{U} = \left\{1, \ldots, k\right\}$ such that $L\left(1\right) \leq L\left(2\right) \leq \ldots  L\left(k\right)$. We moreover start with an empty encoding tree. Then, for $i = 1, \ldots, k$, we let $c\left(i\right)$ to be any available node at depth $L\left(i\right)$, and mark this node and all its descendants as unavailable.
+
+        For instance, if $L\left(1\right) = 1, L\left(2\right) = 2, L\left(3\right) = 3$, then we would make the following encoding tree (where circled nodes are the selected ones, and the crossed nodes are the descendants marked as unavailable):
+        \svghere{PrefixFreeCodeConstructionExample.svg}
+
+        We want to show the correctness of this algorithm. We prove that, right before the iteration $i$, the number of available nodes at depth $L\left(i\right)$ is non-zero. Now, by construction, for $1 \leq j < i$, we have $L\left(j\right) \leq L\left(i\right)$ and hence $j$ is never a descendent of $i$. In particular, this means that, out of all the $2^{L\left(i\right)}$ available nodes at depth $L\left(i\right)$, the node $j$ marked $2^{L\left(i\right) - L\left(j\right)}$ of them as unavailable. Hence, the number of available nodes left $A_i$ is given by: 
+        \[A_i = 2^{L\left(i\right)} - \sum_{j=1}^{i-1} 2^{L\left(i\right) - L\left(j\right)} = 2^{L\left(i\right)} \left(1 - \sum_{j=1}^{i-1} 2^{-L\left(j\right)}\right)\]
+
+        Now, note that $i - 1 < k$ (since $i \leq k$) and all terms in the sum are strictly positive. Combining this with our hypothesis: 
+        \[\sum_{j=1}^{i-1} 2^{-L\left(j\right)} < \sum_{j=1}^{k} 2^{-L\left(j\right)} \leq 1.\]
+        
+        Hence:
+        \[A_i = 2^{L\left(i\right)} \left(1 - \sum_{j=1}^{i-1} 2^{-L\left(j\right)}\right) > 2^{L\left(i\right)}\left(1 - 1\right) = 0.\]
+
+        Since $A_i$ is an integer, this tells us that $A_i \geq 1$, and hence that there is indeed an available node for iteration $i$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ be uniquely decodable. Then, there exists a prefix-free $c': \mathcal{U} \mapsto \left\{0, 1\right\}^*$ such that $\length\left(c\left(u\right)\right) = \length\left(c'\left(u\right)\right)$ for all $u \in \mathcal{U}$.
+
+    \begin{subparag}{Proof}
+        We know that the codeword length of any uniquely decodable respect the inequality from the previous theorem. This result is then just a direct application of the previous theorem.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This is very nice, because it means that restricting to prefix-free codes does not penalise us over what uniquely decodable codes can achieve.
+    \end{subparag}
+\end{parag}
+
+
+\subsection{Expected codeword length bounds}
+
+\begin{parag}{Goal}
+    Let $U$ be a random variable over some alphabet $\mathcal{U}$. Moreover, let $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ be a code. The expected number of bits in the representation of $U$, i.e.~the expected codeword length, is by definition: 
+    \[\exval\left(\length\left(c\left(U\right)\right)\right) = \sum_{u \in \mathcal{U}} \prob\left(U = u\right) \length\left(c\left(U\right)\right).\]
+    
+    A reasonable question is thus what's the minimum achievable expected length, over all uniquely decodable codes $c$.
+\end{parag}
+
+\begin{parag}{Definition: Entropy}
+    Let $U$ be a random variable. We define its \important{entropy} as: 
+    \[H\left(U\right) = p\left(u\right) \log_2\left(\frac{1}{p\left(u\right)}\right),\]
+    where we write $p\left(u\right) = \prob\left(U = u\right)$.
+\end{parag}
+
+\begin{parag}{Lemma: Information theorist’s favorite inequality}
+    For all $z > 0$: 
+    \[\ln\left(z\right) \leq z - 1.\]
+
+    Equality is moreover reached if and only if $z = 1$.
+
+    \begin{subparag}{Remark 1}
+        Many results in information theory come from this fact.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        In particular, this means that, for all $b > 1$: 
+        \[\log_b\left(z\right) = \frac{\ln\left(z\right)}{\ln\left(b\right)} \leq \frac{1}{\ln\left(b\right)} \left(z - 1\right) = \log_{b}\left(e\right)\left(z - 1\right),\]
+        where we used the fact $\frac{1}{\ln\left(b\right)} = \frac{1}{\log_{b}\left(b\right) / \log_{b}\left(e\right)} = \log_{b}\left(e\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This can easily be visualised using a graphing calculator. This can moreover trivially be proven using usual calculus tools.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ be a code and $U$ be a random variable. Then:
+    \[\exval\left[\length c\left(U\right)\right] \geq H\left(U\right) - \log_2\left(\KraftSum\left(c\right)\right).\]
+
+    Equality is moreover reached if and only if there exists some $d > 0$ such that  $p\left(u\right) = d\cdot  2^{-\length c\left(u\right)}$ for all $u \in \mathcal{U}$.
+     
+    \begin{subparag}{Proof}
+        We evaluate the following difference: 
+        \autoeq{\Delta = H\left(U\right) - \exval\left(\length c\left(U\right)\right) = \sum_{u} p\left(u\right) \log_2\left(\frac{1}{p\left(u\right)}\right) - \sum_{u} p\left(u\right) \length\left(c\left(u\right)\right).}
+
+        We aim to show $\Delta \leq \log_2\left(\KraftSum\left(c\right)\right)$. Towards the simplicity of the notation, we let $L\left(u\right) = \length\left(c\left(u\right)\right)$. Moreover, leaving $q\left(u\right) = 2^{-L\left(u\right)} \iff L\left(u\right) = \log_2\left(\frac{1}{q\left(u\right)}\right)$, we know that $\KraftSum\left(c\right) = \sum_{u} q\left(u\right)$. This yields naturally the definition $q'\left(u\right) = \frac{1}{\KraftSum\left(c\right)} q\left(u\right)$, such that $\sum_{u} q'\left(u\right) = 1$.
+
+        All this allows to simplify our result as follows:
+        \autoeq{\Delta = \sum_{u} p\left(u\right) \log_2\left(\frac{1}{p\left(u\right)}\right) - \sum_{u} p\left(u\right) \log_2\left(\frac{1}{q\left(u\right)}\right) = \sum_{u} p\left(u\right) \log_2\left(\frac{q\left(u\right)}{p\left(u\right)}\right) = \sum_{u} p\left(u\right) \log_2\left(\frac{\KraftSum\left(c\right) q'\left(u\right)}{p\left(u\right)}\right) = \sum_{u} p\left(u\right) \log_2\left(\frac{q'\left(u\right)}{p\left(u\right)}\right) + \log_2\left(\KraftSum\left(c\right)\right).}
+
+        Using now our favourite log inequality: 
+        \autoeq{\Delta = \frac{1}{\ln\left(2\right)}\sum_{u} p\left(u\right) \ln\left(\frac{q'\left(u\right)}{p\left(u\right)}\right) + \log_2\left(\KraftSum\left(c\right)\right) \leq \frac{1}{\ln\left(2\right)}\sum_{u} p\left(u\right)  \left(\frac{q'\left(u\right)}{p\left(u\right)} - 1\right) + \log_2\left(\KraftSum\left(c\right)\right) = \frac{1}{\ln\left(2\right)} \underbrace{\sum_{u} q'\left(u\right)}_{= 1} - \frac{1}{\ln\left(2\right)} \underbrace{\sum_{u} p\left(u\right)}_{= 1} + \log_2\left(\KraftSum\left(c\right)\right) = \log_2\left(\KraftSum\left(c\right)\right),}
+        as expected.
+
+        We moreover only used the log inequality, which holds with equality if and only if $\frac{q'\left(u\right)}{p\left(u\right)} = 1 \iff p\left(u\right) = q'\left(u\right) = \KraftSum\left(c\right) q\left(u\right)$ for all $u$. The constant $d > 0$ in the hypothesis is thus just $d = \KraftSum\left(c\right)$.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary 1}
+    Let $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ be a code and $U$ be a random variable. If $c$ is injective, then: 
+    \[\exval\left[\length c\left(U\right)\right] \geq H\left(U\right) - \log_2\left(\log_2\left(1 + \left|\mathcal{U}\right|\right)\right).\]
+    
+    \begin{subparag}{Proof}
+        For any injective $c$, we know that: 
+        \[\KraftSum\left(c\right) \leq \log_2\left(1 + \left|\mathcal{U}\right|\right).\]
+
+        The result is then direct.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary 2}
+    Let $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ be a code and $U$ be a random variable. If $c$ is uniquely decodable, then:
+    \[\exval\left[\length c\left(U\right)\right] \geq H\left(U\right).\]
+
+    Equality is moreover reached if and only if $p\left(u\right) = 2^{-\length c\left(u\right)}$ for all $u \in \mathcal{U}$.
+
+    \begin{subparag}{Proof}
+        We know that, for any uniquely decodable code $c$, then $\KraftSum\left(c\right) \leq 1$. 
+
+        Moreover, for equality, we notice that the following affirmations are equivalent.
+        \begin{itemize}
+            \item Equality is reached.
+            \item Equality is reached in the previous theorem and $\KraftSum\left(c\right) = 1$.
+            \item There exists a $d > 0$ (which we showed to be $d = \KraftSum\left(c\right)$) such that $p\left(u\right) = d\cdot  2^{- \length c\left(u\right)}$ for all $u \in \mathcal{U}$, and $\KraftSum\left(c\right) = 1$.
+            \item $p\left(u\right) = 2^{-\length c\left(u\right)}$ for all $u \in \mathcal{U}$.
+        \end{itemize}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $U$ be a random variable over some alphabet $\mathcal{U}$. Then, there exists a prefix-free code $c$ such that: 
+    \[\exval\left(\length c\left(U\right)\right) \leq H\left(U\right) + 1.\]
+
+    \begin{subparag}{Proof}
+        Let $U$ be an arbitrary random variable, of probability distribution $p\left(u\right) = \prob\left(U = u\right)$.
+
+        We proved earlier that, given any $L\left(u\right)$ such that $\sum_{u} 2^{-L\left(u\right)} \leq 1$, there exists a prefix-free code $c$ which codeword length matches $L$. We thus only need to design this $L\left(u\right)$.
+
+        By our previous corollary, expected length is minimised when $L\left(u\right) = \log_2\left(\frac{1}{p\left(u\right)}\right)$. Now, this may not be an integer, so we instead have to round it up: 
+        \[L\left(u\right) = \left\lceil \log_2\left(\frac{1}{p\left(u\right)}\right) \right\rceil.\]
+        
+        Note that this is such that $\log_2\left(\frac{1}{p\left(u\right)}\right) \leq L\left(u\right) \leq \log_2\left(\frac{1}{p\left(u\right)}\right) + 1$. Hence, there does exist a prefix-free code that matches these lengthes: 
+        \[\sum_{u} 2^{-L\left(u\right)} \leq \sum_{u} 2^{-\log_2\left(\frac{1}{p\left(u\right)}\right)} = \sum_{u} p\left(u\right) = 1.\]
+
+        Moreover, it has the required property: 
+        \autoeq{\exval\left(\length c\left(u\right)\right) = \sum_{u} p\left(u\right)L\left(u\right) \leq \sum_{u} p\left(u\right) \left(\log_2\left(\frac{1}{p\left(u\right)}\right) + 1\right) = \sum_{u} p\left(u\right) \log_2\left(\frac{1}{p\left(u\right)}\right) + \sum_{u} p\left(u\right) = H\left(U\right) + 1.}
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The $+1$ in the upper bound is a bit of an unsatisfactory nuisance factor, since the bound is overall not tight. However, this is mitigated by the following observation.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    We found so far that there exists a prefix-free code $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ such that: 
+    \[H\left(U\right) \leq \exval\left(\length c\left(U\right)\right) \leq H\left(U\right) + 1.\]
+    
+    Instead of focusing on codes that encode one character at a time, we can consider codes that encode multiple characters at a time. Our results imply that there exists a prefix-free code $c_n: \mathcal{U}^n \mapsto \left\{0, 1\right\}^n$ such that: 
+    \[\frac{1}{n} H\left(U_1, \ldots, U_n\right) \leq \frac{1}{n} \exval\left(\length c_n\left(U\right)\right) \leq \frac{1}{n}H\left(U_1, \ldots, U_n\right) + \frac{1}{n}.\]
+
+    In other words, as $n \to \infty$, the average number of bits required to encode each character tends to $\frac{1}{n} H\left(U_1, \ldots, U_n\right)$, this is the important value to analyse. Since this is also the lower bound for any code, entropy is thus indeed the key object that gives both a lower bound and an upper bound.
+
+    \begin{subparag}{Remark}
+        For any injective code $c_n: \mathcal{U}^n \mapsto \left\{0, 1\right\}^n$, we have: 
+        \[\frac{1}{n} \exval\left(\length c\left(U_1, \ldots, U_n\right)\right) \geq \frac{1}{n} H\left(U_1, \ldots, U_n\right) - \underbrace{\frac{1}{n} \log_2\left(\log_2\left(1 + \left|\mathcal{U}\right|^n\right)\right)}_{\sim \log_2\left(n\right) / n}.\]
+        
+        Hence, this lower bound is also very close to $\frac{1}{n} H\left(U_1, \ldots, U_n\right)$.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}
