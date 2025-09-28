@@ -44,6 +44,9 @@
 - [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2/QuantumInformationTheory.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2/QuantumInformationTheory.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2/QuantumInformationTheory.zip) · Quantum information theory — Prof. Zoë Holmes
 - [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2/SublinearAlgorithms.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2/SublinearAlgorithms.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA2/SublinearAlgorithms.zip) · Sublinear algorithms for big data analysis — Prof. Michael Kapralov
 
+#### Master semester 3 (Autumn 2025)
+- [PDF](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA3-DuringSemester/InformationTheoryAndCoding.pdf) | [LaTeX](https://github.com/JoachimFavre/UniversityNotes/releases/download/MA3-DuringSemester/InformationTheoryAndCoding.zip) | [Open in Overleaf](https://www.overleaf.com/docs?engine=lualatex&snip_uri=https://github.com/JoachimFavre/UniversityNotes/releases/download/MA3-DuringSemester/InformationTheoryAndCoding.zip) · (WIP) Information theory and coding — Prof. Emre Telatar
+
 ---
 
 The "Open in Overleaf" button will create a new project on your account with the given lecture notes, using [Overleaf's API](https://www.overleaf.com/devs). Due to long compilation time, this may require an Overleaf pro account—which is free for many students, [including EPFL's](https://www.overleaf.com/edu/epfl). You may also download the LaTeX project and compile it locally on your computer using LuaLaTeX (this is important), or simply directly download the PDF.
