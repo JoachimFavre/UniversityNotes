@@ -41,3 +41,8 @@ class CourseList:
     COMPUTATIONAL_QUANTUM_PHYSICS = Course(is_bachelor=False, semester=2, name="ComputationalQuantumPhysics")
     QUANTUM_INFORMATION_THEORY = Course(is_bachelor=False, semester=2, name="QuantumInformationTheory")
     SUBLINEAR_ALGORITHMS = Course(is_bachelor=False, semester=2, name="SublinearAlgorithms")
+
+    # MA3
+    INFORMATION_THEORY_AND_CODING = Course(is_bachelor=False, semester=3, name="InformationTheoryAndCoding")
+    INTRO_TO_QUANTUM_CRYPTOGRAPHY = Course(is_bachelor=False, semester=3, name="IntroToQuantumCryptography")
+    

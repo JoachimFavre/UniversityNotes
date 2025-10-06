@@ -21,6 +21,7 @@ BACHELOR_SEMESTERS = [
 MASTER_SEMESTERS = [
     BilingualDate(MASTER, 1, AUTUMN, 2024),
     BilingualDate(MASTER, 2, SPRING, 2025),
+    BilingualDate(MASTER, 3, AUTUMN, 2025),
 ]
 
 class Course:

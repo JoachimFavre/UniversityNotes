@@ -74,6 +74,10 @@ courses: List[Course] = [
     #CourseList.COMPUTATIONAL_QUANTUM_PHYSICS,
     #CourseList.QUANTUM_INFORMATION_THEORY,
     #CourseList.SUBLINEAR_ALGORITHMS,
+    
+    # MA3
+    #CourseList.INFORMATION_THEORY_AND_CODING,
+    #CourseList.INTRO_TO_QUANTUM_CRYPTOGRAPHY,
 ]
 
 
