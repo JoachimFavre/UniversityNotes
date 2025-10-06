@@ -1,0 +1,269 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-09 at 10:26:20.
+
+\usepackage{../../style}
+
+\title{Intro to quantum cryptography}
+\author{Joachim Favre}
+\date{Mardi 09 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{1}{2025-09-09}{The return of malicious names}{
+\begin{itemize}[left=0pt]
+    \item Definition of SKE protocols.
+    \item Definition of perfect correctness and perfect secrecy.
+    \item Explanation of the classical one-time pad, and proof of its perfect correctness and perfect secrecy.
+    \item Proof of Shannon's theorem on perfect secrecy.
+    \item Explanation of classical encryption through the quantum formalism.
+    \item Characterisation of perfect secrecy through the quantum formalism.
+\end{itemize}
+
+}
+
+\section{Introduction}
+
+\begin{parag}{Introduction}
+    Quantum cryptography is the study of how to use quantum information, and its properties---such as superposition, entanglement and the no-cloning theorem---for secure communication.
+
+    Note that this is different from post-quantum cryptography. The latter is classical cryptography which is secure to a quantum computer. We will not discuss this. This moreover notably requires computational assumption.
+
+    Quantum cryptography is instead the cryptography of the future. It is secure against everyone and does ont necessarily require any computational assumption on our adversaries.
+\end{parag}
+
+\begin{parag}{Topics}
+    We will see the following topics.
+    \begin{itemize}
+        \item Secure communication one-time pad and quantum one-time pad.
+        \item Quantum money (2 weeks).
+        \item Entanglement.
+        \item Quantify uncertainty through entropies.
+        \item Privacy amplification.
+        \item Quantum key distribution (4 weeks).
+        \item Two-party cryptography: coin-flipping.
+        \item Bounded storage model.
+        \item Encryption with certified deletion.
+    \end{itemize}
+
+    All these things are possible with quantum, but not with classical information.
+
+    \later{Turn this paragraph into section names at the end of the class}
+\end{parag}
+
+\section{One-time pad}
+
+\begin{parag}{Goal of cryptography}
+    The most basic goal of cryptography is to secure communication. The most basic one is to exchange messages privately.
+
+    We have two persons, Alice and Bob. Alice wants to send a message $m \in \mathcal{M}$ to Bob. However, there might be an eavesdropped, Eve, on the communication channel. So, Alice first computes $c = \lang{Enc}\left(m\right)$ such that Bob can compute $m = \lang{Dec}\left(c\right)$ but Eve cannot recover $m$ from $c$. There must naturally be a difference between Eve and Bob, a key; otherwise, they are mathematically equivalent and hence there is no reason that one can recover $m$ but not the other.
+    \svghere[0.8]{CryptographySetup.svg}
+\end{parag}
+
+\begin{parag}{Constraints}
+    To solve the cryptography problem, we want the following constraints:
+    \begin{itemize}
+        \item The channel is not private and Eve can read it. Otherwise, this would solve the problem trivially.
+        \item All encryption and decryption algorithms must be public.
+        \item There can be a private secrete shared by Alice and Bob but not Eve. We call this a secret key.
+        \item We can assume computation hardness, such as one-way functions (like the discrete log problem).
+        \item We have to use quantum information.
+    \end{itemize}
+\end{parag}
+
+
+\subsection{Classical definitions}
+
+\begin{parag}{Definition: SKE}
+    A \important{symmetric-key encryption} (SKE) is specified by 3 sets $\mathcal{M}, \mathcal{K}, \mathcal{C}$ and 3 algorithms $\lang{Gen}: \left(\right) \mapsto \mathcal{K}$, $\lang{Enc}: \mathcal{M} \times \mathcal{K} \mapsto \mathcal{C}$ and $\lang{Dec}: \mathcal{C} \times \mathcal{K} \mapsto \mathcal{M}$.
+
+    \begin{subparag}{Intuition}
+        The idea is that \lang{Gen} generates a key, which is known by both Alice and Bob. \lang{Enc} and \lang{Dec} are then encryption and decryption procedures, mapping between the set of plaintexts $\mathcal{M}$ and ciphertexts $\mathcal{C}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Perfectly correct}
+    A SKE $\left(\lang{Gen}, \lang{Enc}, \lang{Dec}\right)$ is \important{perfectly correct} if, for all $m \in \mathcal{M}$ and $k \in \mathcal{K}$: 
+    \[\lang{Dec}\left(\lang{Enc}\left(m, k\right), k\right) = m.\]
+\end{parag}
+
+\begin{parag}{Definition: Perfectly secure}
+    A SKE $\left(\lang{Gen}, \lang{Enc}, \lang{Dec}\right)$ is \important{perfectly secure} if for all $m, m' \in \mathcal{M}$ and $c \in \mathcal{C}$, then:
+    \[\prob_{k \leftarrow \lang{Gen}\left(\right)}\left(\lang{Enc}\left(m, k\right) = c\right) = \prob_{k \leftarrow \lang{Gen}\left(\right)}\left(\lang{Enc}\left(m', k\right) = c\right).\]
+
+    Equivalently but more succinctly: 
+    \[\left\{\lang{Enc}\left(m, k\right)\right\}_{k \leftarrow \lang{Gen}\left(\right)} = \left\{\lang{Enc}\left(m', k\right)\right\}_{k \leftarrow \lang{Gen}\left(\right)}.\]
+
+    \begin{subparag}{Intuition}
+        The idea is that the distribution of keys allows the ciphertext $c$ to be statistically independent from the plaintext $m$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        We can easily reach perfect secureness by considering an encryption protocol that throws away the plaintext $m$ and generates $c$ randomly. This is however not perfectly correct. We thus wonder if we can make a protocol that is both perfectly correct and perfectly secure, bringing us to the following protocol.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Classical one-time pad}
+    Let $\mathcal{M} = \mathcal{K} = \mathcal{C} = \left\{0, 1\right\}^n$. We let $\lang{Gen}$ to sample some key $k$ uniformly at random from $\mathcal{K}$. Then encryption and decryption are just xors: 
+    \[\lang{Enc}\left(m, k\right) = m \oplus k, \mathspace \lang{Dec}\left(c, k\right) = c \oplus k.\]
+     
+    \begin{subparag}{Example}
+        Suppose that $m = 010, k= 110$. Then: 
+        \[\lang{Enc}\left(m, k\right) = m \oplus k = 100, \mathspace \lang{Dec}\left(m, k\right) = 010.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    The classical one-time pad is perfectly correct and perfectly secure.
+
+    \begin{subparag}{Proof correctness}
+        Perfect correctness is direct:
+        \[\lang{Dec}\left(\left(\lang{Enc}\left(m, k\right), k\right)\right) = \left(m \oplus k\right) \oplus k = m.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof security}
+        Let $m, m', c \in \left\{0, 1\right\}^n$ be arbitrary and fixed.  Note that, for any $k$, $m \oplus k = c \iff k = c \oplus m$. Hence: 
+        \[\prob_{K \leftarrow_U \left\{0, 1\right\}^n}\left(m \oplus K = c\right) = \prob_K\left(K = c \oplus m\right) = \frac{1}{2^n},\]
+        where, for the last equality, we used the fact $c \oplus m$ is just a constant and $K$ is sampled uniformly at random in $\left\{0, 1\right\}^n$. This is independent of $m$, giving the result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $\left(\lang{Gen}, \lang{Enc}, \lang{Dec}\right)$ be perfectly correct and perfectly secure. We construct $\lang{Gen}' = \lang{Gen}$, and:
+    \[\lang{Enc}'\left(m_1 || m_2, k\right) = \lang{Enc}\left(m_1, k\right) || \lang{Enc}\left(m_2, k\right), \mathspace \lang{Dec}\left(c_1 || c_2, k\right) = \lang{Dec}\left(c_1, k\right) || \lang{Dec}\left(c_2, k\right),\]
+    where $||$ is concatenation.
+
+    This is perfectly correct but not perfectly secure.
+
+    \begin{subparag}{Proof}
+        Perfect correctness is easy. The absence of perfect security is slightly more interesting, and left as an exercise to the reader.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This would have been nice, it would have allowed to use smaller keys for larger encryption. This is in fact not possible, as stated by the following theorem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Shannon's theorem on perfect secrecy}
+    Any scheme which is both perfectly correct and perfectly secure is such that $\left|\mathcal{K}\right| \geq \left|\mathcal{M}\right|$.
+
+    \begin{subparag}{Examples}
+        The previous theorem is an example of a protocol with $\left|\mathcal{K}\right| < \left|\mathcal{M}\right|$ which is perfectly correct but not perfectly secure. Considering an encryption protocol that just outputs the key no matter $m$, is an example of protocol with $\left|\mathcal{K}\right| < \left|\mathcal{M}\right|$ which is perfectly secure but not perfectly correct.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We can visualise the $\lang{Enc}$ map by drawing an arrow from $m \in \mathcal{M}$ to $c \in \mathcal{C}$ whenever there exists a $k \in \mathcal{K}$ (that has non-zero probability to be generated) such that $c = \lang{Enc}\left(m, k\right)$. For instance:
+        \svghere[0.7]{ShannonTheoremPerfectSecrecy.svg}
+
+        For instance, on this diagram, $\lang{Enc}\left(m_1, k_1\right) = c_1$ and $\lang{Enc}\left(m_1, k_2\right) = c_2$. We can translate what perfect correctness and perfect security each require on the diagram.
+        \begin{itemize}[left=0pt]
+            \item Perfect correctness requires that the same key cannot map two different plaintexts to the same ciphertext. Otherwise, it could not be inverted by \lang{Dec}.
+            \item Perfect security requires that, given some $c$, there should be either no arrow coming into it, or an arrow from every single messages. Indeed, otherwise, there would exist $m, m'$ such that there is an arrow from $m$ to $c$ but no arrow from $m'$ to $c$, meaning that $\prob_k\left(\lang{Enc}\left(m, k\right) = c\right) > 0 = \prob_k\left(\lang{Enc}\left(m', k\right) = c\right)$, contradicting perfect security.
+        \end{itemize}
+
+        Consider some arbitrary $c \in \mathcal{C}$ that has at least one arrow coming to it. The second property tells us that there must be an arrow coming from every single plaintexts, meaning that there are $\left|\mathcal{M}\right|$ arrows coming to it. The first property however tells us that each of these arrows are associated to different keys, meaning that there must be at least $\left|\mathcal{K}\right| \geq \left|\mathcal{M}\right|$ keys.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Perfect security in quantum notation}
+
+\begin{parag}{Definition: Pure state}
+    A \important{pure state} on $n$ qubits is a vector $\ket{\psi} \in \left(\mathbb{C}^2\right)^{\otimes n}$ which is normalised.
+
+    \begin{subparag}{Example}
+        For instance, $\ket{\psi} = \ket{0 \cdots 0}$ and $\ket{\psi} = \ket{m}$ are pure states.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        The quantum information formalism is assumed to be known for this class, even though some of it will be recalled. Luckily, this formalism is not hard, and, in case anything is missing, I invite the reader to read the corresponding sections in my notes of Prof.~Zoë Holmes' Quantum information theory class, available at:
+        \begin{center}
+            \url{https://github.com/JoachimFavre/UniversityNotes}
+        \end{center}
+    \end{subparag}
+\end{parag}
+ 
+\begin{parag}{Definition: Density matrix}
+    A \important{density matrix}, or mixed state, is a matrix $\rho \in \mathbb{C}^{2^n \times 2^n}$ such that $\rho$ is positive semi-definite and $\Tr\left(\rho\right) = 1$.
+
+    \begin{subparag}{Example}
+        For instance, $\rho = \ket{\psi}\bra{\psi}$ is a valid density matrix for any pure state $\ket{\psi}$. Another example is: 
+        \[\rho = \frac{1}{2} \ket{0}\bra{0} + \frac{1}{2} \ket{1}\bra{1} = \frac{I}{2}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Classical density matrix}
+    A density matrix $\rho_X$ is said to be \important{classical} if it is diagonal in the computation basis, i.e. if: 
+    \[\rho_X = \sum_{x \in \left\{0, 1\right\}^n} p_x \ket{x}\bra{x}.\]
+
+    \begin{subparag}{Intuition}
+        This is just a way to represent a classical random distribution.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: CQ density matrix}
+    A density matrix $\rho_{XE}$ is \important{classical-quantum} (CQ) if it can be written as: 
+    \[\rho_{XE} = \sum_{x} p_x \ket{x}\bra{x} \otimes \rho_E^{\left(x\right)}.\]
+
+    \begin{subparag}{Example}
+        For instance, the following is a CQ density matrix: 
+        \[\rho_{XE} = \frac{1}{2} \ket{0}\bra{0}_X \otimes \frac{I_E}{2} + \frac{1}{2} \ket{1}\bra{1}_X \otimes \ket{+}\bra{+}_E.\]
+        
+        If we trace out the $E$ space, then $X$ is just a coin-flip. The state in the $E$ space is then correlated to the result of this coin-flip.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    We can represent our cryptography setup using density matrices.
+
+    Alice starts with some message $m \in \mathcal{M}$, which we can represent as the state $\ket{m}\bra{m}$. Alice and Bob moreover  share a random key $k$, which we can represent as $\sum_{k \in \mathcal{K}} p_k \ket{k}\bra{k}_{K_A} \otimes \ket{k}\bra{k}_{K_B}$. Overall, at the start, the state is: 
+    \[\sum_{k \in \mathcal{K}} p_k \underbrace{\ket{k}\bra{k}_{K_A} \otimes \ket{m}\bra{m}_{M}}_{Alice} \otimes \underbrace{\ket{k}\bra{k}_B}_{Bob}.\]
+
+    When Alice encrypts $m$, this gets turned to: 
+    \[\rho_{K_A M C K_B} = \sum_{k \in \mathcal{K}} p_k \underbrace{\ket{k}\bra{k}_{k_A} \otimes \ket{m}\bra{m}_{M} \otimes \ket{\lang{Enc}\left(m, k\right)}\bra{\lang{Enc}\left(m, k\right)}_{C}}_{Alice} \otimes \underbrace{\ket{k}\bra{k}_{K_B}}_{Bob}.\]
+
+    Then, Alice sends the ciphertext to Bob, the qubit $C$ just moves ownership to Bob. Decryption can finally be described completely similarly.
+\end{parag}
+
+\begin{parag}{Theorem}
+    We consider the following state: 
+    \[\rho_C = \Tr_{K_A M K_B}\left(\rho_{K_A M C K_B}\right).\]
+
+    The SKE protocol is perfectly secure if and only if $\rho_C$ is independent of $m$.
+
+    \begin{subparag}{Intuition}
+        An eavesdropper only has access to the register $C$, which is the one communicated. However, the definition of perfect secrecy is exactly that the communicated bits are independent from $m$. 
+    \end{subparag}
+
+    \begin{subparag}{Proof $\implies$}
+        We can simply evaluate $\rho_C$:
+        \autoeq{\rho_C = \Tr_{K_A M K_B}\left(\rho_{K_A M C K_B}\right) = \sum_{k} p_k \ket{\lang{Enc}\left(m, k\right)}\bra{\lang{Enc}\left(m, k\right)} = \sum_{c} \prob_k\left(\lang{Enc}\left(m, k\right) = c\right) \ket{c}\bra{c}_C.}
+   
+        Now, the protocol is perfectly secure by hypothesis. Hence, we know $\prob_k\left(\lang{Enc}\left(m, k\right) = c\right) = p_c$ is independent on $m$. This thus reads: 
+        \[\rho_C = \sum_{c} p_c \ket{c}\bra{c},\]
+        which is indeed independent from $m$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        The fact that it is a sufficient condition should be intuitive, and is left as an exercise to the reader.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: One-time pad}
+    We consider again the classical one-time pad. In this case, as we found: 
+    \[\rho_C = \sum_{k \in \left\{0, 1\right\}^n} \frac{1}{2^n} \ket{m \oplus k}\bra{m \oplus k} = \sum_{c \in \left\{0, 1\right\}^n} \frac{1}{2^n} \ket{c}\bra{c} = \frac{1}{2^n} I,\]
+    where we used the completeness relation. 
+
+    This is indeed independent from $m$, showing perfect secrecy.
+\end{parag}
+
+\end{document}

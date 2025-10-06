@@ -1,0 +1,221 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-16 at 10:23:59.
+
+\usepackage{../../style}
+
+\title{Introduction to quantum cryptography}
+\author{Joachim Favre}
+\date{Tuesday 16 September 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2025-09-16}{Scrooge McDuck is my role model}{
+\begin{itemize}[left=0pt]
+    \item Explanation of private-key quantum money schemes.
+    \item Explanation of quantum money correctness and $\epsilon$-security.
+    \item Explanation of the Wiesner quantum money scheme.
+    \item Definition of quantum channels.
+\end{itemize}
+
+}
+
+\section{Quantum money}
+
+\begin{parag}{Goal}
+    Physical money contains information such as the amount, the currency, the date it was minted. It also has a physical component, such as a bill or a coin.
+
+    The goal is to add a quantum state to the physical components, to prevent it from getting copied. 
+\end{parag}
+
+\begin{parag}{Definition: Private-key quantum money}
+    A \important{(private-key) quantum money scheme} is specified by two quantum algorithms \lang{Gen} and \lang{Ver} such that: 
+    \begin{itemize}
+        \item $\lang{Gen}\left(\right)$ outputs a key $k_{\$} \in \left\{0, 1\right\}^*$, a serial number $\$ \in \left\{0, 1\right\}^*$ and a quantum state representing the quantum state $\ket{\psi_{\$}}$. The key is kept private, the serial number and the quantum state are written on the bill.
+        \item $\lang{Ver}\left(k, \$, \ket{\psi}\right)$ outputs \lang{Accept} or \lang{Reject}.
+    \end{itemize}
+\end{parag}
+
+\begin{parag}{Definition: Correctness}
+    A quantum money scheme $\left(\lang{Gen}, \lang{Ver}\right)$ is \important{correct} if: 
+    \[\left(\lang{Ver} \circ \lang{Gen}\right)\left(\right) \equiv \lang{Accept}\]
+\end{parag}
+
+\begin{parag}{Definition: \lang{CLONE} game}
+    Given a candidate money scheme $\left(\lang{Gen}, \lang{Ver}\right)$, the game \lang{CLONE} contains two players: \lang{Challenger} and \lang{Adversary}. The game goes as follows.
+    \begin{itemize}
+        \item \lang{Challenger} samples $\left(k_{\$}, \$, \ket{\psi_{\$}}\right) \leftarrow \lang{Gen}\left(\right)$, and sends $\left(\$, \ket{\psi_{\$}}\right)$ to \lang{Adversary}.
+        \item \lang{Adversary} must come up with density matrices $\sigma, \sigma'$ and send them to \lang{Challenger}.
+        \item \lang{Adversary} wins if and only if $\lang{Ver}\left(k_{\$}, \$, \sigma\right) = \lang{Ver}\left(k_{\$}, \$, \sigma'\right) = \lang{Accept}$.
+    \end{itemize}
+    
+    \begin{subparag}{Remark 1}
+        \lang{Adversary} can send density matrices, they do not have to restrict to pure states, since there is no way for \lang{Challenger} to know if what they sent is pure or not.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The bank, meaning \lang{Challenger}, knows exactly which serial number have been produced. Hence, there is no reason to let \lang{Adversary} to create a new serial number.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        When we say that \lang{Adversary} sends $\sigma, \sigma'$, this means that they send $\sigma_{A A'}$. We then let $\sigma = \sigma_A$ and $\sigma' = \sigma_{A'}$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 4}
+        \lang{Adversary} cannot verify the validity of bills themselves, since they don't have accept to the key. However, we could imagine a case where they could go to the bank, and just ask if they bill is valid or not. This would yield a stronger definition. \later{which we will study next week I believe}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon$-security}
+    A quantum money scheme $\left(\lang{Gen}, \lang{Ver}\right)$ is $\epsilon$-secure if, for all \lang{Adversary} $\mathcal{A}$: 
+    \[\prob\left(\text{$\mathcal{A}$ wins in game \lang{CLONE}}\right) \leq \epsilon.\]
+
+    \begin{subparag}{Intuition}
+        The idea is that, given $\left(\$_1, \ket{\psi_{\$_1}}\right), \ldots, \left(\$_t, \ket{\psi_{\$_t}}\right)$, we cannot create some $\left(\$_1', \ket{\psi_{\$_1'}}\right), \ldots, \left(\$_{t+1}', \ket{\psi_{\$'_{t+1}}}\right)$ such that the verification procedure accepts. In our case, $t = 1$, but it can be shown that picking an arbitrary $t$ does not make this definition stronger.
+
+        Note that this would not work with classical encryption, since we could just make a copy.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Naive attempt}
+    Consider a quantum money scheme where $k \followsdistr_U \left\{0, 1\right\}^n, \$ \followsdistr_U \left\{0, 1\right\}^n$ are sampled uniformly and $\ket{\psi_{\$}} = \ket{\$} \in \left\{0, 1\right\}^{\otimes n}$.
+
+    However, then, $\ket{\psi_{\$}}$ can be copied using a $CNOT$. This hence does not work.
+\end{parag}
+
+\begin{parag}{No-cloning theory}
+    There does not exist a unitary $U$ such that: 
+    \[\ket{0}\ket{0}_{ancilla} \to \ket{0}\ket{0} \ket{\psi_0}_{garbage},\]
+    \[\ket{1}\ket{0}_{ancilla} \to \ket{1}\ket{1} \ket{\psi_1}_{garbage},\]
+    \[\ket{+}\ket{0}_{ancilla} \to \ket{+}\ket{+} \ket{\psi_+}_{garbage}.\]
+    
+    \begin{subparag}{Proof}
+        This just comes by linearity. The two first properties imply necessarily that: 
+        \autoeq{\ket{+}\ket{0}_{ancilla} = \frac{1}{\sqrt{2}}\ket{0}\ket{0}_{ancilla} + \frac{1}{\sqrt{2}}\ket{1}\ket{0}_{ancilla} \to \frac{1}{\sqrt{2}}\ket{0}\ket{0} \ket{\psi_0}_{garbage} + \frac{1}{\sqrt{2}}\ket{1}\ket{1} \ket{\psi_1}_{garbage} \neq \ket{+}\ket{+} \ket{\psi_+}_{garbage}.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Notation}
+    Let $x, \theta \in \left\{0, 1\right\}$. We note: 
+    \[\ket{x}_{\theta} = H^{\theta} \ket{x} = \begin{systemofequations} \ket{0}, & \text{if $x = 0$ and $\theta = 0$,} \\ \ket{1}, & \text{if $x = 1$ and $\theta = 0$}, \\ \ket{+}, & \text{if $x = 0$ and $\theta = 1$}, \\ \ket{-}, & \text{if $x = 1$ and $\theta = 1$}. \end{systemofequations}\]
+\end{parag}
+
+\begin{parag}{Definition: Wiesner quantum money}
+    We consider the following quantum money scheme, called \important{Wiesner quantum money} for the person who discovered it. \lang{Gen} and \lang{Ver} go as follows.
+    \begin{itemize}[left=0pt]
+        \item $\lang{Gen}\left(\right)$: Sample $k_{\$} = \left(x, \theta\right) \followsdistr_U \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n$ uniformly at random, $\$ \followsdistr_U \left\{0, 1\right\}^n$ also uniformly, and finally let: 
+    \[\ket{\psi_{\$}} = \ket{x_1}_{\theta_1} \ket{x_2}_{\theta_2} \cdots \ket{x_n}_{\theta_n}.\]
+
+        \item $\lang{Ver}\left(k = \left(x, \theta\right), \$, \rho\right)$: given some quantum state $\rho$, check that $\left(k, \$\right)$ are in the database. Then, apply $H^{\theta_1} \otimes \cdots \otimes H^{\theta_n}$ to $\rho$, measure it in the computation basis to get some $y \in \left\{0, 1\right\}^n$, and accept if and only if $y = x$.
+    \end{itemize}
+
+    \begin{subparag}{Example}
+        Let's consider $n = 3$. We may sample $k = \left(x, \theta\right) = \left(010, 110\right)$ and $\$ = 000$. This then gives: 
+        \[\ket{\psi_{\$}} = \ket{+} \ket{-} \ket{0}.\]
+
+        $\lang{Ver}$ would then apply Hadamards $H \otimes H \otimes I$, giving $\ket{0}\ket{1}\ket{0}$, which gives $y = 010$ once measured in the computation basis. We notice $y = x$ and hence we accept.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Wiesner's scheme is correct.
+
+    \begin{subparag}{Proof}
+        This should be clear from the previous example. A formal proof is left as an exercise to the reader.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Intuition: Security}
+    We restrict to $n = 1$ for now. \lang{Adversary} is given some $\ket{x}_{\theta} \in \left\{\ket{0}, \ket{1}, \ket{+}, \ket{-}\right\}$ and wants to create $\sigma, \sigma'$. We can consider some different adversaries for the sake of intuition.
+    \begin{itemize}[left=0pt]
+        \item Consider an adversary $A_1$ who maps $\ket{\psi}\bra{\psi}$ to $\sigma \otimes \sigma' = \ket{\psi}\bra{\psi} \otimes \frac{1}{2} I$. In other words, they keep the first state, and let the second state be a random one. Then, we directly find: 
+        \[\prob\left(\text{$A_1$ wins \lang{CLONE}}\right) = 1 \cdot  \frac{1}{2} = \frac{1}{2}.\]
+
+        \item Consider an adversary $A_2$ who measures $\ket{\psi}\bra{\psi}$ in the computational basis, and copies twice the result. We can summarise it in the following table.
+            \begin{center}
+            \begin{tabular}{ccc}
+                $\ket{\psi} \mapsto \text{Copy}$  & $\prob\left(\text{win}\right)$ \\
+                \hline
+                $\ket{0} \mapsto \ket{00}$ & 1  \\
+                $\ket{1} \mapsto \ket{11}$ & 1  \\
+                $\ket{+} \mapsto \frac{1}{2} \ket{00}\bra{00} + \frac{1}{2} \ket{11}\bra{11}$ & $1/4$  \\
+                $\ket{-} \mapsto \frac{1}{2} \ket{00}\bra{00} + \frac{1}{2} \ket{11}\bra{11}$ & $1/4$
+            \end{tabular}
+            \end{center}
+
+            For the cases $\ket{\psi} = \ket{+}$ and $\ket{\psi} = \ket{-}$, the idea is that the copied state is no longer pure since we made a measurement and hence we have classical randomness. Then, when we measure, both qubits have a probability $\frac{1}{2}$ to yield the right value $+$, giving an overall probability of $\frac{1}{2}\cdot \frac{1}{2} = \frac{1}{4}$.
+
+            Overall, this gives us a probability of success of $\frac{1}{4}\left(1 + 1 + \frac{1}{4} + \frac{1}{4}\right) = \frac{5}{8}$. We extracted slightly more information from the first state, increasing the chance of success from before.
+    \end{itemize}
+
+    Now, we would want to prove an upper bound on any adversary. To do that, we need to be able to model a general adversary, which requires the following mathematical notion.
+\end{parag}
+
+\begin{parag}{Definition: Quantum channel}
+    A map $\Phi: \mathbb{C}^{2^n} \times \mathbb{C}^{2^n} \mapsto \mathbb{C}^{2^{n'} \times 2^{n'}}$ is said to be a \important{quantum channel} (or CPTP map) if and only if any of the three following equivalent statement holds:
+    \begin{itemize}[left=0pt]
+        \item \textit{(Stinespring dilation)} $\Phi$ can be decomposed as:
+            \begin{enumerate}
+                \item adding ancilla qubits in state $\ket{0}\bra{0}$, i.e. $\rho \mapsto \rho \otimes \ket{0}\bra{0}^{\otimes t}$;
+                \item applying a unitary $\rho' \mapsto U \rho' U^{\dagger}$;
+                \item tracing out some qubits $\rho'' \mapsto \Tr_E\left(\rho''\right)$.
+            \end{enumerate}
+        \item \textit{(Kraus representation)} There exists some $A_i \in \mathbb{C}^{2^{n'} \times 2^n}$ called Kraus operators such that:
+            \begin{enumerate}
+                \item $\sum_{i} A_i^{\dagger} A_i = I$;
+                \item $\Phi\left(\rho\right) = \sum_{i} A_i \rho A_i^{\dagger}$.
+            \end{enumerate}
+        \item \textit{(CPTP)} $\Phi$ has the following properties:
+            \begin{enumerate}
+                \item $\Phi$ is linear;
+                \item $\Phi$ is completely-positive (CP), i.e. for any positive semi-definite operator $X \geq 0$, then $\left(\Phi \otimes I\right)\left(X\right) \geq 0$ is also positive semi-definite;
+                \item $\Phi$ is trace-preserving (TP), i.e. $\Tr\left(\Phi\left(X\right)\right) = \Tr\left(X\right)$. 
+            \end{enumerate}
+    \end{itemize}
+
+    \begin{subparag}{Remark 1}
+        Anything that can be done that maps a density matrix to another density matrix is a quantum channel. This includes measurements, unitary evolution, partial traces, state preparation, and so on. More detailed explanations can be found in my notes of Prof. Zoë Holmes' Quantum information theory, available at:
+        \begin{center}
+            \url{https://github.com/JoachimFavre/UniversityNotes}
+        \end{center}
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        All of the statements are equivalent, and any of them can be taken to be the definition of quantum channels. The first one is nice for intuition and algorithmic undstanding of quantum channels, but a bit of a pain to work with mathematically.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example: Bit-flip channel}
+    Let $p \in \left[0, 1\right]$ be arbitrary. We consider the following channel over a single qubit, $n = 1$: 
+    \[\Phi\left(\rho\right) = \left(1 - p\right) \rho + p X \rho X \in \mathbb{C}^{2 \times 2}.\]
+    
+    This means that with probability $\left(1-p\right)$ we keep the same state, and with probability $p$ we flip the qubit. We can look for its Stinespring dilation form and its Kraus representation.
+    \begin{itemize}
+        \item \textit{(Stinespring dilation)} We only need to check this representation for pure states. Then, for mixed states, this holds by linearity. Now, we do have:
+            \begin{align*}
+                \ket{\psi} & \longmapsto \ket{\psi}\ket{0} & \text{(Add ancilla qubit)} \\
+                & \longmapsto  \ket{\psi}\left(\sqrt{p} \ket{1} + \sqrt{1-p} \ket{0}\right) & \text{(Rotation unitary)} \\
+                & \longmapsto \sqrt{p} X \ket{\psi} \ket{1} + \sqrt{1-p} \ket{\psi} \ket{0} & \text{(Control-$X$ unitary)}\\
+                & \longmapsto p X \ket{\psi}\bra{\psi} X + \left(1-p\right)\ket{\psi}\bra{\psi} & \text{(Trace out qubit 2)}
+            \end{align*}
+               
+        \item \textit{(Kraus representation)} We leave:
+        \[A_1 = \sqrt{1-p} I, \mathspace A_2 = \sqrt{p} X.\]
+
+        We notice indeed that:
+        \[A_1^{\dagger} A_1 + A_2^{\dagger} A_2 = \left(1-p\right)I + p X^2 = I.\]
+    
+        Moreover, we do have $\Phi\left(\rho\right) = A_1 \rho A_1^{\dagger} + A_2 \rho A_2^{\dagger}$.
+    \end{itemize}
+    
+    We thus proved in two different ways that this is a valid quantum channel.
+\end{parag}
+
+
+\end{document}

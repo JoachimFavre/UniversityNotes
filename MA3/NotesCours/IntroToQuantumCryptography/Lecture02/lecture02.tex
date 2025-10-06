@@ -1,0 +1,187 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-06 at 18:18:13.
+
+\usepackage{../../style}
+
+\title{Intro to quantum cryptography}
+\author{Joachim Favre}
+\date{Lundi 06 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{2}{2025-09-11}{Quantum paddles}{
+\begin{itemize}[left=0pt]
+    \item Definition of quantum SKE.
+    \item Definition of perfect correctness and perfect security for quantum SKE protocols.
+    \item Explanation of the 1-qubit qOTP, and proof of its perfect correctness and perfect security.
+    \item Explanation of the $n$-qubit qOTP.
+\end{itemize}
+
+}
+
+\subsection{Quantum one-time pad}
+
+\begin{parag}{Definition: Quantum SKE}
+    A \important{quantum SKE} $\left(\lang{Gen}, \lang{Enc}, \lang{Dec}\right)$ is specified by some set $\mathcal{K}$, some Hilbert spaces $\mathcal{M}$ and $\mathcal{C}$, and some procedures such that: 
+    \[\lang{Gen}: \left(\right) \mapsto \mathcal{K}, \mathspace \lang{Enc}: \mathcal{M} \times \mathcal{K}\mapsto \mathcal{C}, \mathspace \lang{Dec}: \mathcal{C} \times \mathcal{K} \mapsto \mathcal{M}.\]
+    
+    \begin{subparag}{Intuition}
+        We may simply write:
+        \[\lang{Gen}\left(\right) = k, \mathspace \lang{Enc}\left(\ket{\psi}, k\right) = \ket{c}, \mathspace \lang{Dec}\left(\ket{c}, k\right) = \ket{\psi}.\]
+
+        This is the same as in the classical case, except that now we allow the plaintext and the ciphertext to be quantum states.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Perfectly correct}
+    A quantum SKE $\left(\lang{Gen}, \lang{Enc}, \lang{Dec}\right)$ is \important{perfectly correct} if, for all $\ket{\psi} \in \mathcal{M}$ and $k \in \mathcal{K}$: 
+    \[\lang{Dec}\left(\lang{Enc}\left(\ket{\psi}, k\right), k\right) = \ket{\psi}.\]
+\end{parag}
+
+\begin{parag}{Definition: Perfectly secure}
+    Let $\left(\lang{Gen}, \lang{Enc}, \lang{Dec}\right)$ be a quantum SKE. Just like in the classical case, we can consider: 
+    \[\rho_{K_A M C K_B} = \sum_{k \in \mathcal{K}} p_k \ket{k}\bra{k}_{K_A} \otimes \ket{\psi}\bra{\psi}_M \otimes \lang{Enc}\left(\ket{\psi}, k\right)\lang{Enc}\left(\ket{\psi}, k\right)^{\dagger}_{C} \otimes \ket{k}\bra{k}_{k_B}.\]
+    
+
+    The SKE protocol is said to be \important{perfectly secure} if $\rho_C = \Tr_{K_A M K_B}\left(\rho_{K_A M C K_B}\right)$ is independent of $\ket{\psi}$. 
+
+    \begin{subparag}{Intuition}
+        As studded in the previous section, this definition also works in the classical case.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Pauli matrices}
+    We call the following matrices \important{Pauli matrices}: 
+    \[X = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \mathspace Y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \mathspace Z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}.\]
+
+    Note that $X$ is just a $NOT$ gate.
+
+    \begin{subparag}{Remark}
+        These matrices have many properties, that are nice to be known.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        We will below use the matrix $X\cdot Z$. It is interesting to note that $X\cdot Z = -i Y$, meaning that this is essentially just the third Pauli matrix in disguise.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example: Classical one-time pad}
+    We may again look at classical one-time pad. We had $\lang{Enc}\left(m, k\right) = m\oplus k$, so we now want $\lang{Enc}\left(\ket{m}, k\right) = m \oplus k$. Writing this with Pauli matrices, when we have a single qubit: 
+    \[\lang{Enc}\left(\ket{\psi}, k\right) = X^k \ket{\psi}.\]
+    
+    In particular, for an arbitrary $\ket{\psi} = \alpha \ket{0} + \beta \ket{1}$, we find: 
+    \[\lang{Enc}\left(\ket{\psi}, k\right) = \alpha \ket{0 \oplus k} + \beta \ket{1 \oplus k} = \alpha \ket{k} + \beta \ket{\bar{k}},\]
+    where $\bar{k} = 1 \oplus k$ is the negation of $k$. In particular, for $\ket{\psi} = \ket{+}$ and $\ket{\psi} = \ket{-}$:
+    \[\lang{Enc}\left(\ket{+}, k\right) = \frac{1}{\sqrt{2}} \ket{k} + \frac{1}{\sqrt{2}} \ket{\bar{k}} = \ket{+}, \mathspace \lang{Enc}\left(\ket{-}, k\right) = \frac{1}{\sqrt{2}} \ket{k} - \frac{1}{\sqrt{2}} \ket{\bar{k}} = \left(-1\right)^k\ket{-}.\]
+
+    We thus just showed that $\ket{+}$ and $\ket{-}$ are not at all scrambled after being encrypted, meaning that we do not have perfect secrecy.
+\end{parag}
+
+\begin{parag}{Definition: 1-qubit qOTP}
+    We describe the \important{quantum one-time pad (qOTP)} protocol, assuming we work on $n = 1$ qubit for now towards simplicity.
+
+    We let $\mathcal{K} = \left\{0, 1\right\} \times \left\{0, 1\right\}$ to be two classical bits, and $\mathcal{M} = \mathcal{C} =\mathbb{C}^2$ to be the Hilbert spaces of one qubit. \lang{Gen} samples one of the four elements of $\mathcal{K}$ uniformly at random. Then, we let: 
+    \[\lang{Enc}\left(\ket{\psi}, k = \left(k_1, k_2\right)\right) = Z^{k_1} X^{k_2} \ket{\psi}, \mathspace \lang{Dec}\left(\ket{\psi},  k = \left(k_1, k_2\right)\right) = X^{k_2} Z^{k_1} \ket{\psi}.\]
+
+    \begin{subparag}{Correctness}
+        Correctness can easily be proven using the fact $X^2 = Z^2 = I$: 
+        \autoeq{\lang{Dec}\left(\lang{Enc}\left(\ket{\psi}, k\right), k\right) = X^{k_2} Z^{k_1} Z^{k_1} X^{k_2} \ket{\psi} = X^{k_2} \left(Z^2\right)^{k_1} X^{k_2} \ket{\psi} = \left(X^2\right)^{k_2} \ket{\psi} = \ket{\psi}.}
+
+        We now wonder if this is perfectly secure. To prove this, we first have to look at the following definition and lemma.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Inner product}
+    We consider the following operation on matrices in $\mathbb{C}^{2 \times 2}$: 
+    \[\left\langle A, B \right\rangle = \frac{1}{2} \Tr\left(A B^{\dagger}\right).\]
+
+    \begin{subparag}{Properties}
+        This can be shown to be an inner product on this vector space. In other words:
+        \begin{itemize}
+            \item $\left\langle A, B \right\rangle = \left\langle B, A \right\rangle^*$;
+            \item $\left\langle \lambda A + \mu B, C \right\rangle = \lambda \left\langle A, C \right\rangle + \mu \left\langle B, C \right\rangle$;
+            \item $\left\langle A, A \right\rangle > 0$ for any $A \neq 0$.
+        \end{itemize}
+
+        In particular, $\left\langle A, A \right\rangle = 0$ if and only if $A = 0$.
+
+        The fact that this is a valid inner product notably implies a notion of orthogonality.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    The matrices $\left(I, X, Z, X Z\right)$ form an orthonormal basis of $\mathbb{C}^{2 \times 2}$ on the inner product defined above. 
+
+    \begin{subparag}{Implication}
+        This means that we can write any matrix $M \in \mathbb{C}^{2 \times 2}$ as: 
+        \[M = \sum_{a, b \in \left\{0, 1\right\}} \alpha_{ab} X^a Z^b,\]
+        where $\alpha_{ab} = \left\langle M, X^a Z^b \right\rangle$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        For instance: 
+        \[\left\langle X, X \right\rangle = \frac{1}{2} \Tr\left(X X^{\dagger}\right) = \frac{1}{2} \Tr\left(I\right) = 1, \mathspace \left\langle X, Z \right\rangle = \Tr\left(X Z^{\dagger}\right) = 0.\]
+
+        We can check all other cases to check that they are indeed orthonormal (or we can use properties of Pauli matrices). Moreover, since we have four elements in our family and $\mathbb{C}^{2 \times 2}$ has dimension 4, this does mean that they form a basis.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    The 1-qubit qOTP protocol is perfectly secure.
+
+    \begin{subparag}{Proof}
+        In our context, we have: 
+        \autoeq[s]{\rho_{K_A M K_B C} = \frac{1}{4} \sum_{k \in \left\{0, 1\right\}^2} \ket{k}\bra{k}_{k_A}\otimes \ket{m}\bra{m}_M \otimes \ket{k}\bra{k}_{k_B} \otimes \left(Z^{k_1} X^{k_2} \ket{\psi}\bra{\psi} X^{k_2} Z^{k_1}\right)_C.}
+
+        Tracing out the qubits Eve cannot read, this becomes: 
+        \[\rho_C = \frac{1}{4} \sum_{k \in \left\{0, 1\right\}^2} Z^{k_1} X^{k_2} \ket{\psi}\bra{\psi} X^{k_2} Z^{k_1}.\]
+        
+        Now, let $\ket{\psi}\bra{\psi} = \sum_{a, b} \alpha_{ab} X^a Z^b$ be its decomposition in the $\left(I, X, Z, XZ\right)$ basis. This then reads, using the fact that $X^2 = Z^2 = I$, together with the fact that $XZ = -ZX$ and hence $X^a Z^b = \left(-1\right)^{ab} Z^b X^a$:
+        \autoeq{\rho_C = \frac{1}{4} \sum_{a, b} \alpha_{ab} \sum_{k \in \left\{0, 1\right\}^2} Z^{k_1} X^{k_2} X^a Z^b X^{k_2} Z^{k_1} = \frac{1}{4} \sum_{a, b} \alpha_{ab} \sum_{k \in \left\{0, 1\right\}^2} \left(-1\right)^{b k_2} Z^{k_1} X^{k_2} X^a X^{k_2} Z^b Z^{k_1}  = \frac{1}{4} \sum_{a, b} \alpha_{ab} \sum_{k \in \left\{0, 1\right\}^2} \left(-1\right)^{b k_2} Z^{k_1} X^a Z^b Z^{k_1}= \frac{1}{4} \sum_{a, b} \alpha_{ab} \left(\sum_{k \in \left\{0, 1\right\}^2} \left(-1\right)^{b k_2} \left(-1\right)^{a k_1}\right) X^a Z^b.}
+
+        However, we notice that $\sum_{k \in \left\{0, 1\right\}^2} \left(-1\right)^{b k_2} \left(-1\right)^{a k_1} = 0$ whenever $a \neq 0$ or $b \neq 0$ since, then, we have as many $-1$ as $+1$ in the sum. Now, whenever $a = b = 0$, we get $\sum_{k \in \left\{0, 1\right\}^2} \left(-1\right)^{b k_2} \left(-1\right)^{a k_1} = 4$. But then, this simplifies to: 
+        \[\rho_C = \frac{1}{4} \alpha_{00} \cdot 4 X^0 Z^0 = \alpha_{00} I.\]
+        
+        However, recall that $\alpha_{ab} = \left\langle \ket{\psi}\bra{\psi}, X^a Z^b \right\rangle = \frac{1}{2}\Tr\left(\ket{\psi}\bra{\psi} X^a Z^b\right)$, so: 
+        \[\rho_C = \frac{1}{2}\Tr\left(\ket{\psi}\bra{\psi}\right)I = \frac{1}{2} I.\]
+        
+        This is independent of $\ket{\psi}$, proving perfect secrecy. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Notation}
+    Let $k \in \left\{0, 1\right\}^n$. We write: 
+    \[X^k = X^{k_1} \otimes \ldots \otimes X^{k_n}, \mathspace Z^k = Z^{k_1} \otimes \ldots \otimes Z^{k_n}.\]
+\end{parag}
+
+\begin{parag}{Definition: $n$-qubit qOTP}
+    We now describe the $n$-qubit \important{quantum one-time pad (qOTP)} protocol. 
+
+    Let $\mathcal{K} = \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n$ to be $2n$ classical bits, and $\mathcal{M} = \mathcal{C} =\mathbb{C}^{2^n}$ to be the Hilbert spaces of $n$ qubit. \lang{Gen} samples one of the elements of $\mathcal{K}$ uniformly at random. Then, we let: 
+    \[\lang{Enc}\left(\ket{\psi}, k = \left(k_1, k_2\right)\right) = Z^{k_1} X^{k_2} \ket{\psi}, \mathspace \lang{Dec}\left(\ket{\psi},  k = \left(k_1, k_2\right)\right) = X^{k_2} Z^{k_1} \ket{\psi},\]
+    where $k_1, k_2 \in \left\{0, 1\right\}^n$.
+
+    \begin{subparag}{Intuition}
+        This is completely similar to the 1-qubit qOTP. 
+    \end{subparag}
+    
+    \begin{subparag}{Remark}
+        It can be shown that the $n$-qubit qOTP protocol is completely correct and completely secure, just like the $1$-qubit case.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        Interestingly, when the classical case required a key of length $n$, we now require a key of length $2n$.
+    \end{subparag}
+\end{parag}
+
+\end{document}
