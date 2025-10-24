@@ -14,7 +14,7 @@
 \begin{document}
 \maketitle
 
-\lecture{12}{2025-10-16}{Alèd}{
+\lecture{12}{2025-10-16}{Used to be alèd}{
 \begin{itemize}[left=0pt]
     \item Complete proof of the leftover hashing lemma.
     \item Explanation of the pretty-good measurement theorem.
@@ -24,44 +24,68 @@
 
 \begin{parag}{}
     \begin{subparag}{Complete proof}
-        We now make a complete proof, with an arbitrary $E$. It is not necessary to be able to redo this proof, and we will not do it completely formally. It is however good to understand the simplified proof before.
+        We now make a complete proof, with an arbitrary $E$. It is not necessary to be able to redo this proof, but it is good to understand the simplified proof from above.
 
         Hence, let $\rho_{XE} = \sum_{x} p_x \ket{x}\bra{x}_X \otimes \rho_x^E$ be an arbitrary $k$-source. We define: 
         \[\rho_{XYE} = \sum_{x} p_x \ket{x}\bra{x}_X \otimes \left(\frac{1}{2^d} \sum_{y} \ket{y}\bra{y}\right) \otimes \rho_x^E,\]
         \[\rho_{ZYE} = \sum_{x, y} p_k \ket{\text{Est}\left(x, y\right)}\bra{\text{Est}\left(x, y\right)} \otimes \frac{1}{2^d} \ket{y}\bra{y} \otimes \rho_x^E.\]
 
-        Our goal is to show that, leaving $\rho^E = \sum_{x} p_x \rho_x$: 
-        \[S = \left\|\rho_{ZYE} - \frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y \otimes \rho^E\right\|_{tr} \leq \epsilon.\]
+        Our goal is to show that, leaving $\rho = \sum_{x} p_x \rho_x$: 
+        \[S = \left\|\rho_{ZYE} - \frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y \otimes \rho\right\|_{tr} \leq \epsilon.\]
         Note that we can write: 
         \[\rho_{ZYE} = \sum_{z, y} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho_{zy}, \mathspace \text{where } \rho_{zy} = \frac{1}{2^d} \sum_{x: f_y\left(x\right) = z} p_x \rho_x.\]
         
         Hence, by properties of the trace distance: 
-        \autoeq{S = \left\|\sum_{z, y} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho_{zy} - \frac{1}{2^{d + m}} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho\right\|_{tr} = \sum_{z, y} \left\|\ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho_{zy} - \frac{1}{2^{d + m}} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho^E\right\|_{tr} = \sum_{z, y} \left\|\rho_{zy} - \frac{1}{2^{d + m}} \rho^E\right\|_{tr}}
+        \autoeq{S = \left\|\sum_{z, y} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho_{zy} - \frac{1}{2^{d + m}} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho\right\|_{tr} = \sum_{z, y} \left\|\ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho_{zy} - \frac{1}{2^{d + m}} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho\right\|_{tr} = \sum_{z, y} \left\|\rho_{zy} - \frac{1}{2^{d + m}} \rho\right\|_{tr}}
         
         Now, Cauchy-Schwarz tells us that $\Tr\left(X Y^{\dagger}\right) \leq \sqrt{\Tr\left(X X^{\dagger}\right) \Tr\left(Y Y^{\dagger}\right)}$. Hence: 
         \autoeq{\left\|X\right\|_1 = \Tr\left(\left|X\right|\right) = \Tr\left(\rho^{1/4} \rho^{-1/4} \left|X\right| \rho^{-1/4} \rho^{1/4}\right) = \Tr\left(\rho^{-1/4} \left|X\right| \rho^{-1/4} \rho^{1/2}\right) \leq \sqrt{\Tr\left(\left(\rho^{-1/4} \left|X\right| \rho^{-1/4}\right)^2\right)} \underbrace{\sqrt{\Tr\left(\left(\rho^{1/2}\right)^2\right)}}_{= 1} = \sqrt{\Tr\left(\rho^{-1/2} \left|X\right| \rho^{-1/2} \left|X\right|\right)}.}
 
         This tells us that: 
-        \autoeq{S = \frac{1}{2}\sum_{z, y} \left\|\rho_{zy} - \frac{1}{2^{d + m}} \rho^E\right\|_1 \leq \frac{1}{2} \sum_{z, y} \underbrace{\sqrt{\Tr\left(\rho^{-1/2} \left(\rho_{zy} - \frac{1}{2^{d + m}} \rho\right) \rho^{-1/2} \left(\rho_{zy} - \frac{1}{2^{d + m}} \rho\right)\right)}}_{= a_i} \underbrace{1}_{= b_i}.}
+        \autoeq{S = \frac{1}{2}\sum_{z, y} \left\|\rho_{zy} - \frac{1}{2^{d + m}} \rho\right\|_1 \leq \frac{1}{2} \sum_{z, y} \underbrace{\sqrt{\Tr\left(\rho^{-1/2} \left(\rho_{zy} - \frac{1}{2^{d + m}} \rho\right) \rho^{-1/2} \left(\rho_{zy} - \frac{1}{2^{d + m}} \rho\right)\right)}}_{= a_i} \underbrace{1}_{= b_i}.}
         
         We can again apply Cauchy-Schwarz, to get: 
         \autoeq{S \leq \frac{1}{2} \sqrt{\sum_{z, y} \Tr\left(\rho^{-1/2} \left(\rho_{zy} - \frac{1}{2^{d + m}} \rho\right) \rho^{-1/2} \left(\rho_{zy} - \frac{1}{2^{d + m}} \rho\right)\right)}\cdot \sqrt{2^{d + m}} = \frac{\sqrt{2^{d + m}}}{2} \sqrt{\sum_{z, y} \Tr\left(\rho^{-1/2} \rho_{zy} \rho^{-1/2} \rho_{zy}\right) - \frac{1}{2^{d+m}} \Tr\left(\rho\right)}.}
         
         We know that $\Tr\left(\rho\right) = 1$. So, we are only left with the inner sum. Using the definition of $\rho_{zy}$, the inner sum is: 
-        \autoeq{T = \sum_{z, y} \sum_{\substack{x: f_y\left(x\right) = z \\ x': f_y\left(x'\right) = z}} \frac{1}{2^{2d}} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) = \sum_{z, y} \sum_{\substack{x: f_y\left(x\right) = z \\ x' \neq x: f_y\left(x'\right) = z}} \frac{1}{2^{2d}} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) \fakeequal + \sum_{z, y}\sum_{x: f_y\left(x\right) = z} \frac{1}{2^{2d}}  \Tr\left(\rho^{-1/2} p_x \rho_x \rho^{-1/2} p_{x} \rho_{x}\right)}
+        \autoeq{T = \sum_{z, y} \sum_{\substack{x: f_y\left(x\right) = z \\ x': f_y\left(x'\right) = z}} \frac{1}{2^{2d}} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) = \frac{1}{2^{2d}} \sum_{z, y} \sum_{\substack{x: f_y\left(x\right) = z \\ x' \neq x: f_y\left(x'\right) = z}} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) \fakeequal + \frac{1}{2^{2d}} \sum_{z, y}\sum_{x: f_y\left(x\right) = z}  \Tr\left(\rho^{-1/2} p_x \rho_x \rho^{-1/2} p_{x} \rho_{x}\right)}
 
         Using the exact same reasoning as in the simplified proof, we then find:
-        \autoeq{T = \frac{1}{2^{d + m}} \sum_{x \neq x'} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) \fakeequal + \frac{1}{2^d} \sum_{x} \Tr\left(\rho^{-1/2} p_x \rho_x \rho^{-1/2} p_{x} \rho_{x}\right).}
+        \autoeq{T = \frac{1}{2^{d + m}} \sum_{x \neq x'} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) \fakeequal + \frac{1}{2^d} \sum_{x} p_{x}^2 \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x}\right).}
 
-        We can then massage this result to use the theory of pretty good measurements, which we introduce quickly below.
+        We have two sums to bound, which we can do in a similar way to the simplified proof. The first one is easy, since all terms are non-negative, using the fact that $\rho = \sum_{x} p_x \rho_x$:
+        \autoeq{T_1 = \sum_{x \neq x'} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) \leq \sum_{x, x'} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) = \Tr\left(\rho^{-1/2} \rho \rho^{-1/2} \rho\right) = \Tr\left(\rho\right) = 1.}
+
+        The second sum is slightly more tricky. Let $M_x = \rho^{-1/2} p_x \rho_x \rho^{-1/2}$, and note that we can write: 
+        \[T_2 = \sum_{x} p_x \Tr\left(\rho^{-1/2} p_x \rho_x \rho^{-1/2} \rho_{x}\right) = \sum_{x} p_x \Tr\left(M_x \rho_x\right).\]
+        
+        Now, we make two key observations. First, $M_x$ is a valid POVM. We can notably indeed check that, using $\rho = \sum_{x} p_x \rho_x$, then $\sum_{x} M_x = \rho^{-1/2} \sum_{x} p_x \rho_x \rho^{-1/2} = I$. This POVM is called a pretty-good measurement and has a nice interpretation, which we will explore in the following paragraphs.
+
+        Moreover, recall that:
+        \[P_{guess}\left(K \suchthat E\right) = \max_{\left\{M_x\right\} \text{ POVM}} \sum_{x} p_x \Tr\left(M_x \rho_x\right).\]
+
+        This thus tells us that, since $P_{guess}\left(X \suchthat E\right)$ is the maximisation of the expression above over all POVMs and that $\left\{M_x\right\}$ is a specific POVM: 
+        \autoeq{T_2 =  \sum_{x} p_x \Tr\left(M_x \rho_x\right) \leq \max_{\left\{M_x\right\} \text{ POVM}} \sum_{x} p_x \Tr\left(M_x \rho_x\right) = P_{guess}\left(K \suchthat E\right) = 2^{- H_{min}\left(K \suchthat E\right)} \leq 2^{-k}.}
+        
+        We thus found that: 
+        \[T = \frac{1}{2^{d + m}} T_1 + \frac{1}{2^d} T_2 \leq \frac{1}{2^{d+m}}\cdot 1 + \frac{1}{2^d} 2^{-k}.\]
+
+        We can thus finish the proof exactly like we did in the simplified proof:
+        \autoeq{S \leq \frac{\sqrt{2^{d + m}}}{2} \sqrt{T - \frac{1}{2^{d+m}} \Tr\left(\rho\right)} \leq \frac{\sqrt{2^{d + m}}}{2} \sqrt{\frac{1}{2^{d + m}} + \frac{1}{2^{d + k}} - \frac{1}{2^{d+m}}} = \frac{2^{\left(d - k\right)/2}}{2} = \frac{\epsilon}{2}.}
+
+        \qed
     \end{subparag}
 \end{parag}
 
 \begin{parag}{Distinguishability problem}
     Let $\rho_1, \ldots, \rho_t$ be mixed states. The goal is to find the best POVM to distinguish them: 
     \[p_{succ} = \sup_{\left\{M_x\right\} \text{ POVM}} \sum_{x} p_x \Tr\left(M_x \rho_x\right).\]
+
+    \begin{subparag}{Remark 1}
+        Note that, by definition, $p_{succ} = P_{guess}\left(K \suchthat E\right)$ if $\rho_{KE} = \sum_{k} p_k \ket{k}\bra{k} \otimes \rho_k$.
+    \end{subparag}
     
-    \begin{subparag}{Remark}
+    \begin{subparag}{Remark 2}
         We showed that, when $t = 2$, this is linked to the trace distance. There is however no such clean solution when $t > 2$.
     \end{subparag}
 \end{parag}
@@ -71,10 +95,14 @@
     \[M_x = \rho^{-1/2} \rho_x \rho^{-1/2}, \mathspace \text{where } \rho = \sum_{x} \rho_x.\]
 
     This POVM is named a \important{pretty-good measurement} (PGM), because it is not optimal, but works pretty well: 
-    \[p_{succ}\left(PGM\right) = \sum_{x} p_x \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_x\right) \geq p_{succ}\left(OPT\right)^2.\]
+    \[p_{succ}\left(OPT\right)^2 \leq p_{succ}\left(PGM\right) = \sum_{x} p_x \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_x\right) \leq p_{succ}\left(OPT\right).\]
+
+    \begin{subparag}{Remark 1}
+        In the proof above, we used the easy bound $p_{succ}\left(PGM\right) \leq p_{succ}\left(OPT\right)$, since $OPT$ is optimal by definition. This theorem also shows that $p_{succ}\left(PGM\right) \geq p_{succ}\left(OPT\right)^2$, which is not trivial and gives its name to the PGM.
+    \end{subparag}
     
-    \begin{subparag}{Remark}
-        Note that this is indeed a valid POVM: 
+    \begin{subparag}{Remark 2}
+        Note that, as mentioned in the proof above, this is indeed a valid POVM. We can for instance check the normalisation:
         \[\sum_{x} M_x = \rho^{-1/2} \sum_{x} \rho_x \rho^{-1/2} = \rho^{-1/2} \rho \rho^{-1/2} = I.\]
     \end{subparag}
 \end{parag}
