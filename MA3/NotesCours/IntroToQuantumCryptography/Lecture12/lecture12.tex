@@ -1,0 +1,82 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-24 at 01:33:03.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Vendredi 24 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2025-10-16}{Alèd}{
+\begin{itemize}[left=0pt]
+    \item Complete proof of the leftover hashing lemma.
+    \item Explanation of the pretty-good measurement theorem.
+\end{itemize}
+
+}
+
+\begin{parag}{}
+    \begin{subparag}{Complete proof}
+        We now make a complete proof, with an arbitrary $E$. It is not necessary to be able to redo this proof, and we will not do it completely formally. It is however good to understand the simplified proof before.
+
+        Hence, let $\rho_{XE} = \sum_{x} p_x \ket{x}\bra{x}_X \otimes \rho_x^E$ be an arbitrary $k$-source. We define: 
+        \[\rho_{XYE} = \sum_{x} p_x \ket{x}\bra{x}_X \otimes \left(\frac{1}{2^d} \sum_{y} \ket{y}\bra{y}\right) \otimes \rho_x^E,\]
+        \[\rho_{ZYE} = \sum_{x, y} p_k \ket{\text{Est}\left(x, y\right)}\bra{\text{Est}\left(x, y\right)} \otimes \frac{1}{2^d} \ket{y}\bra{y} \otimes \rho_x^E.\]
+
+        Our goal is to show that, leaving $\rho^E = \sum_{x} p_x \rho_x$: 
+        \[S = \left\|\rho_{ZYE} - \frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y \otimes \rho^E\right\|_{tr} \leq \epsilon.\]
+        Note that we can write: 
+        \[\rho_{ZYE} = \sum_{z, y} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho_{zy}, \mathspace \text{where } \rho_{zy} = \frac{1}{2^d} \sum_{x: f_y\left(x\right) = z} p_x \rho_x.\]
+        
+        Hence, by properties of the trace distance: 
+        \autoeq{S = \left\|\sum_{z, y} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho_{zy} - \frac{1}{2^{d + m}} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho\right\|_{tr} = \sum_{z, y} \left\|\ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho_{zy} - \frac{1}{2^{d + m}} \ket{z}\bra{z} \otimes \ket{y}\bra{y} \otimes \rho^E\right\|_{tr} = \sum_{z, y} \left\|\rho_{zy} - \frac{1}{2^{d + m}} \rho^E\right\|_{tr}}
+        
+        Now, Cauchy-Schwarz tells us that $\Tr\left(X Y^{\dagger}\right) \leq \sqrt{\Tr\left(X X^{\dagger}\right) \Tr\left(Y Y^{\dagger}\right)}$. Hence: 
+        \autoeq{\left\|X\right\|_1 = \Tr\left(\left|X\right|\right) = \Tr\left(\rho^{1/4} \rho^{-1/4} \left|X\right| \rho^{-1/4} \rho^{1/4}\right) = \Tr\left(\rho^{-1/4} \left|X\right| \rho^{-1/4} \rho^{1/2}\right) \leq \sqrt{\Tr\left(\left(\rho^{-1/4} \left|X\right| \rho^{-1/4}\right)^2\right)} \underbrace{\sqrt{\Tr\left(\left(\rho^{1/2}\right)^2\right)}}_{= 1} = \sqrt{\Tr\left(\rho^{-1/2} \left|X\right| \rho^{-1/2} \left|X\right|\right)}.}
+
+        This tells us that: 
+        \autoeq{S = \frac{1}{2}\sum_{z, y} \left\|\rho_{zy} - \frac{1}{2^{d + m}} \rho^E\right\|_1 \leq \frac{1}{2} \sum_{z, y} \underbrace{\sqrt{\Tr\left(\rho^{-1/2} \left(\rho_{zy} - \frac{1}{2^{d + m}} \rho\right) \rho^{-1/2} \left(\rho_{zy} - \frac{1}{2^{d + m}} \rho\right)\right)}}_{= a_i} \underbrace{1}_{= b_i}.}
+        
+        We can again apply Cauchy-Schwarz, to get: 
+        \autoeq{S \leq \frac{1}{2} \sqrt{\sum_{z, y} \Tr\left(\rho^{-1/2} \left(\rho_{zy} - \frac{1}{2^{d + m}} \rho\right) \rho^{-1/2} \left(\rho_{zy} - \frac{1}{2^{d + m}} \rho\right)\right)}\cdot \sqrt{2^{d + m}} = \frac{\sqrt{2^{d + m}}}{2} \sqrt{\sum_{z, y} \Tr\left(\rho^{-1/2} \rho_{zy} \rho^{-1/2} \rho_{zy}\right) - \frac{1}{2^{d+m}} \Tr\left(\rho\right)}.}
+        
+        We know that $\Tr\left(\rho\right) = 1$. So, we are only left with the inner sum. Using the definition of $\rho_{zy}$, the inner sum is: 
+        \autoeq{T = \sum_{z, y} \sum_{\substack{x: f_y\left(x\right) = z \\ x': f_y\left(x'\right) = z}} \frac{1}{2^{2d}} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) = \sum_{z, y} \sum_{\substack{x: f_y\left(x\right) = z \\ x' \neq x: f_y\left(x'\right) = z}} \frac{1}{2^{2d}} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) \fakeequal + \sum_{z, y}\sum_{x: f_y\left(x\right) = z} \frac{1}{2^{2d}}  \Tr\left(\rho^{-1/2} p_x \rho_x \rho^{-1/2} p_{x} \rho_{x}\right)}
+
+        Using the exact same reasoning as in the simplified proof, we then find:
+        \autoeq{T = \frac{1}{2^{d + m}} \sum_{x \neq x'} p_x p_{x'} \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_{x'}\right) \fakeequal + \frac{1}{2^d} \sum_{x} \Tr\left(\rho^{-1/2} p_x \rho_x \rho^{-1/2} p_{x} \rho_{x}\right).}
+
+        We can then massage this result to use the theory of pretty good measurements, which we introduce quickly below.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Distinguishability problem}
+    Let $\rho_1, \ldots, \rho_t$ be mixed states. The goal is to find the best POVM to distinguish them: 
+    \[p_{succ} = \sup_{\left\{M_x\right\} \text{ POVM}} \sum_{x} p_x \Tr\left(M_x \rho_x\right).\]
+    
+    \begin{subparag}{Remark}
+        We showed that, when $t = 2$, this is linked to the trace distance. There is however no such clean solution when $t > 2$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Pretty-good measurement}
+    We consider the following POVM to solve the distinguishability problem: 
+    \[M_x = \rho^{-1/2} \rho_x \rho^{-1/2}, \mathspace \text{where } \rho = \sum_{x} \rho_x.\]
+
+    This POVM is named a \important{pretty-good measurement} (PGM), because it is not optimal, but works pretty well: 
+    \[p_{succ}\left(PGM\right) = \sum_{x} p_x \Tr\left(\rho^{-1/2} \rho_x \rho^{-1/2} \rho_x\right) \geq p_{succ}\left(OPT\right)^2.\]
+    
+    \begin{subparag}{Remark}
+        Note that this is indeed a valid POVM: 
+        \[\sum_{x} M_x = \rho^{-1/2} \sum_{x} \rho_x \rho^{-1/2} = \rho^{-1/2} \rho \rho^{-1/2} = I.\]
+    \end{subparag}
+\end{parag}
+
+\end{document}
