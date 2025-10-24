@@ -1,0 +1,289 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-07 at 10:22:23.
+
+\usepackage{../../style}
+
+\title{QCrypto}
+\author{Joachim Favre}
+\date{Mardi 07 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2025-10-07}{Fourth class with entropy in a row}{
+\begin{itemize}[left=0pt]
+    \item Explanation of ways to quantify information, such as perfect security, $\epsilon$-security and min-entropy.
+    \item Definition of conditional min-entropy, and explanation of its intuition.
+    \item Explanation and analysis of a guessing game where Alice wants to get random information independent from what Eve sends her.
+\end{itemize}
+
+}
+
+\section{Quantum key distribution}
+
+\subsection{Quantifying information}
+
+\begin{parag}{Setup}
+    We suppose that we have some state $\rho_{KE}$, where Alice has access to the register $K$ and the environment (or Eve) has access to the register $E$. Alice aims to measure $K$ to get some key $k \in \left\{0, 1\right\}^n$. We wonder how secure this is.
+\end{parag}
+
+\begin{parag}{Example 1}
+    Suppose that: 
+    \[\rho_{KE} = \frac{1}{2^n} \sum_{k \in \left\{0, 1\right\}^n} \ket{k}\bra{k}_K \otimes \ket{k}\bra{k}_E.\]
+    
+    Then, there is no security: Eve gets the exact copy of the key.
+
+    \begin{subparag}{Remark}
+        We thus want $\rho_{KE}$ to be of the form $\rho_{KE} = \rho_K \otimes \rho_E$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2}
+    Suppose now that: 
+    \[\rho_{KE} = \ket{0\cdots0}\bra{0\cdots0}_K \otimes \rho_E.\]
+    
+    We may think that this is secure since this is a tensor product. However, the key is deterministic, so Eve has full knowledge of it. This is hence not secure either.
+
+    \begin{subparag}{Remark}
+        We thus want $\rho_K = \frac{1}{2^n} I$, so that the key is uniformly random. Combining this with the previous example, this leads to the following definition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Perfect security}
+    Let $\rho_{KE} = \sum_{x} p_x \ket{x}\bra{x} \otimes \rho_E^{\left(x\right)}$ be a classical-quantum (CQ) state.
+
+    We say that the key is \important{perfectly secure} (from $E$) if there exists some $\rho_E$ such that:
+    \[\rho_{KE} = \frac{1}{2^n} I \otimes \rho_E.\]
+
+    \begin{subparag}{Remark}
+        Now, having perfect security is not always achievable. This leads us to the definition of $\epsilon$-security, for which we first need the definition of trace distance.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Trace distance}
+    Let $\sigma_0, \sigma_1$ be two density matrices. Their trace distance is defined to be: 
+    \[\left\|\sigma_1 - \sigma_2\right\|_{tr} = \frac{1}{2} \left\|\sigma_0 - \sigma_1\right\|_1 = \frac{1}{2} \Tr\left(\sqrt{\left(\sigma_0 - \sigma_1\right)\left(\sigma_0 - \sigma_1\right)^{\dagger}}\right).\]
+
+    \begin{subparag}{Operational interpretation}
+        Suppose that we are given $\sigma_0$ with probability $\frac{1}{2}$ and $\sigma_1$ with probability $\frac{1}{2}$, and that we want to find in which case we're in using a POVM $\left\{M_0, M_1\right\}$. Maximising the success probability, we find: 
+        \autoeq{p = \max_{M = \left\{M_0, M_1\right\} \text{ POVM}} \left[\frac{1}{2} \Tr\left(M_0 \sigma_0\right) + \frac{1}{2} \Tr\left(M_1 \sigma_1\right)\right] = \max_{M = \left\{M_0, M_1\right\} \text{ POVM}} \left[\frac{1}{2} \Tr\left(M_0 \sigma_0\right) + \frac{1}{2} \Tr\left(\left(I - M_0\right) \sigma_1\right)\right] = \max_{0 \leq M \leq I} \frac{1}{2} \Tr\left(M_0 \left(\sigma_0 - \sigma_1\right)\right) + \frac{1}{2}}
+
+        We recognise this maximisation to be a SDP. As seen in the third exercise series, we find that $\sup_{-I \leq X \leq I} \Tr\left(AX\right) = \left\|A\right\|_1$, which we can symmetrise to turn it into: 
+        \[p = \frac{1}{2} \left\|\sigma_0 - \sigma_1\right\|_{tr} + \frac{1}{2}.\]
+        
+        This shows that $\left\|\sigma_0 - \sigma_1\right\|_{tr}$ can be interpreted as a success probability (up to some scaling). Having a small trace distance thus means that no experiment can be made to distinguish two states.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon$-security}
+    Let $\rho_{KE}$ be a CQ state and $\epsilon > 0$. We say that the key is \important{$\epsilon$-secure} (from $E$) if there exists some $\rho_E$ such that: 
+    \[\left\|\rho_{KE} - \frac{1}{2^n} I \otimes \rho_E\right\|_{tr} \leq \epsilon.\]
+
+
+    \begin{subparag}{Remark}
+        Note that we use the trace distance here because, as explained above, it is directly linked to the success probability of any experiment trying to distinguish them.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example 3}
+    Let's suppose that $n = 4$ for simplicity. We consider the following state: 
+    \[\rho_{KE} = \frac{1}{2^4} \sum_{k \in \left\{0, 1\right\}^4} \ket{k_1 k_2 k_3 k_4}\bra{k_1 k_2 k_3 k_4} \otimes \ket{k_2 k_4}\bra{k_2 k_4}_E.\]
+
+    Doing the computations, we find that it is $\epsilon$-secure only for $\epsilon > 3/4$ (the $3/4$ is just here conservatively, doing the exact computations, we can find a larger scalar). However, the environment only knows part of the key, so throwing it away may be an overreaction. We wonder if there isn't anything we could do that could still use the secret bits to generate a key. This brings us to the notion of entropy.
+\end{parag}
+
+\begin{parag}{Example 4}
+    Suppose that $\rho_{KE} = \rho_K \otimes \rho_E$ where $\rho_K = \sum_{k} p_k \ket{k}\bra{k}$ is such that $k$ is uniform over all even-parity strings. This is still very good for a key since $\rho_K$ has very high entropy and the environment has no knowledge of it. However, it is again $\epsilon$-secure for only very large $\epsilon$, showing that our $\epsilon$-security definition is too restrictive.
+\end{parag}
+
+\begin{parag}{Definition: Entropy}
+    Let $\rho_K = \sum_{k} p_k \ket{k}\bra{k}$ be a classical state. Its \important{entropy} is defined to be: 
+    \[H\left(K\right) = - \sum_{k} p_k \ln\left(p_k\right).\]
+
+    \begin{subparag}{Properties}
+        This has the following properties:
+        \begin{itemize}
+            \item $H\left(K\right) = 0$ if and only if $K$ is deterministic.
+            \item $H\left(K\right) = n$ if and only if $K$ is uniform.
+        \end{itemize}
+        
+        This can thus be interpreted as a measure of randomness.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Suppose that: 
+        \[p_k = \begin{systemofequations} \frac{1}{2}, & \text{if $k = 0\cdots 0$,} \\ \frac{1}{2} \cdot \frac{1}{2^n - 1}, & \text{otherwise.} \end{systemofequations}\]
+        
+        Then, we find that: 
+        \[H\left(k\right) \approx \frac{n}{2}.\]
+        
+        This has a lot of entropy, so this shows a lot of randomness. Now, this is extremely bad for cryptography. This is thus a bad definition of entropy for cryptography: using this for a key would allow the opponent to guess it quite a large probability.
+
+        The idea of this definition of entropy is that we look at the surprise on average, repeating the experiment many times: if we sample 1000 keys from this distribution, then half of the time we will get a lot of randomness. The issue is that, in cryptography, we only do the experiment once, if the key is decrypted, well, too bad for us.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Min-entropy}
+    Let $\rho_K = \sum_{k} p_k \ket{k}\bra{k}$ be a classical state. Its \important{min-entropy} is defined to be: 
+    \[H_{min}\left(K\right) = - \log_2\left(\max_k p_k\right).\]
+    
+    \begin{subparag}{Example}
+        Consider again:
+        \[p_k = \begin{systemofequations} \frac{1}{2}, & \text{if $k = 0\cdots 0$,} \\ \frac{1}{2} \cdot \frac{1}{2^n - 1}, & \text{otherwise.} \end{systemofequations}\]
+        
+        Then: 
+        \[H_{min}\left(K\right) = -\log_2\left(\frac{1}{2}\right) = 1.\]
+
+        This makes more sense for cryptography.
+    \end{subparag}
+
+    \begin{subparag}{Properties}
+        We still have the following properties:
+        \begin{itemize}
+            \item $H_{min}\left(K\right) = 0$ if and only if $K$ is deterministic.
+            \item $H_{min}\left(K\right) = n$ if and only if $K$ is uniformly random.
+        \end{itemize}
+        
+        This is thus also a good measure of randomness. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    We have, for any classical state $\rho_K$: 
+    \[0 \leq H_{min}\left(K\right) \leq H\left(K\right) \leq n.\]
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $\rho_K$ be a classical state. Moreover, let $P_{guess}\left(K\right)$ be the maximum probability to guess $K$. In other words, if we have just one chance to guess the value that will be outputted by the $p_k$ random distribution, $P_{guess}\left(K\right)$ is the maximum probability to be correct.
+
+    Then:
+    \[H_{min}\left(K\right) = -\log_2\left(P_{guess}\left(K\right)\right),\]
+
+    \begin{subparag}{Remark 1}
+        This shows that, whereas entropy was a measure of average surprise, min-entropy is a measure of one-shot surprise.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This result is very important.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        It should be pretty easy to convince ourselves that $P_{guess}\left(K\right) = \max_k p_k$. Indeed, the best strategy is just to guess the value that has highest probability to be outputted by the distribution.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Conditional min-entropy}
+    Let $\rho_{KE} = \sum_{k} p_k \ket{k}\bra{k} \otimes \rho_k^E$ be a CQ state. We define: 
+    \[P_{guess}\left(K \suchthat E\right) = \max_{\left\{M_k\right\} \text{ POVM on $E$}} \sum_{k} p_k \Tr\left(M_k \rho_k^E\right).\]
+
+    Then, we define the \important{conditional min-entropy} as:
+    \[H_{min}\left(K \suchthat E\right) = -\log_2\left(P_{guess}\left(K \suchthat E\right)\right).\]
+
+    \begin{subparag}{Intuition}
+        Let us study this definition more intuitively. We consider the following game. Eve first chooses a POVM. Alice then measures the classical state, getting some value $k$ with probability $p_k$; making the shared state collapse to $\rho_{KE}' = p_k \ket{k}\bra{k} \otimes \rho_K^E$. Eve can then measure the state $\rho_k^E$ with her POVM, to try to get $k$. 
+
+        Then, $P_{guess}\left(K \suchthat E\right)$ is the maximum success probability of this game.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        If there is no $E$, or if $\rho_{KE} = \rho_K \otimes \rho_E$, we recover: 
+        \[H_{min}\left(K \suchthat E\right) = H_{min}\left(K\right).\]
+
+        Indeed, let us for instance consider the case $\rho_{KE} = \sum_{k} p_k \ket{k}\bra{k} \otimes \rho_E$. Then: 
+        \[P_{guess}\left(K \suchthat E\right) = \max_{\left\{M_k\right\}} \sum_{k} p_k \Tr\left(M_k \rho_E\right) = \max_{\left\{M_k\right\}} \Tr\left(\left(\sum_{k} p_k M_k\right) \rho_E\right).\]
+
+        This is maximised by taking $M_j = I$ and $M_k = 0$ for all $k \neq j$, where $j = \argmax_k p_k$, giving exactly that: 
+        \[P_{guess}\left(K \suchthat E\right) = p_j = \max_k p_k = P_{guess}\left(K\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Let's consider the case $n = 1$. Then: 
+        \autoeq{P_{guess}\left(K \suchthat E\right) = \max_{\left\{M_0, M_1\right\} \text{ POVM}} \left[p_0 \Tr\left(M_0 \rho_0\right) + p_1 \Tr\left(M_1 \rho_1\right)\right] = \frac{1}{2} + \left\|p_0 \rho_0 - p_1 \rho_1\right\|_{tr}.}
+
+        This makes sense, we can consider the following specific examples.
+        \begin{itemize}[left=0pt]
+            \item Suppose that $p_0 \rho_0 = p_1 \rho_1$. Then:
+            \[P_{guess}\left(K \suchthat E\right) = \frac{1}{2} \implies H\left(K \suchthat E\right) = 1.\]
+
+            This makes sense since, taking a trace on both sides of $p_0 \rho_0 = p_1 \rho_1$, this tells us that $p_0 = p_1$ and thus $\rho_0 = \rho_1$. Hence, by our first remark, we are back to $H\left(K \suchthat E\right) = H\left(K\right)$. Since moreover $p_0 = p_1$ means that $p_0 = p_1 = \frac{1}{2}$, this shows exactly that $H\left(K \suchthat E\right) = H\left(K\right) = 1$.
+            \item Suppose that $p_0 = p_1 = \frac{1}{2}$, $\rho_0 = \ket{0}\bra{0}$ and $\rho_1 = \ket{1}\bra{1}$. Then: 
+            \[P_{guess}\left(K \suchthat E\right) = 1 \implies H\left(K \suchthat E\right) = 0.\]
+            
+            This again makes a lot of sense, we have: 
+            \[\rho_{KE} = \frac{1}{2} \ket{0}\bra{0} \otimes \ket{0}\bra{0} + \frac{1}{2} \ket{1}\bra{1}\otimes \ket{1}\bra{1}.\]
+            
+            Hence, Eve can make a measurement on her qubit to always know exactly the value Alice measured.
+        \end{itemize}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 3}
+    We consider again our third example: 
+    \[\rho_{KE} = \frac{1}{2^4} \sum_{k \in \left\{0, 1\right\}^4} \ket{k_1 k_2 k_3 k_4}\bra{k_1 k_2 k_3 k_4} \otimes \ket{k_2 k_4}\bra{k_2 k_4}_E.\]
+    
+    Then, when Eve measures her state, she learns two bits of the key. She thus has to guess the two others, which she can do with probability $\frac{1}{4}$, giving:
+    \[H_{min}\left(K \suchthat E\right) = -\log_2\left(P_{guess}\left(K \suchthat E\right)\right) = -\log_2\left(\frac{1}{4}\right) = 2.\]
+\end{parag}
+
+\begin{parag}{Example 4}
+    Consider again the fourth example, $\rho_{KE} = \rho_K \otimes \rho_E$ where $\rho_K = \sum_{k} p_k \ket{k}\bra{k}$ is such that $k$ is uniform over all even-parity strings. In that case, $H_{min}\left(K \suchthat E\right) = H_{min}\left(K\right)$  since this is a product state. But then: 
+    \[H_{min}\left(K \suchthat E\right) = H_{min}\left(K\right) = -\log_2\left(\max_k p_k\right) = -\log_2\left(\frac{1}{2^{n-1}}\right) = n-1.\]
+
+    \begin{subparag}{Observation}
+        These two examples show that the conditional min-entropy is a much better way to quantify shared information.
+    \end{subparag}
+\end{parag}
+
+\subsection{Uncertainty principle}
+
+\begin{parag}{Goal}
+    In our quantum key distribution, we will want Alice and Bob to have some quantum states they can measure to get some shared random key. To obtain these, they will have to go through some physical links, which cannot be trusted. We will model this through the following games.
+\end{parag}
+
+\begin{parag}{Guessing game}
+    Suppose that Eve send some unknown qubit $\rho_A$ to Alice. Alice's goal is to get a value independent of anything Eve stored.
+
+    To do so, Alice samples some $\theta \leftarrow_U \left\{0, 1\right\}$. She then measures $\rho_A$ in the basis $\theta$ getting some measurement $X \in \left\{0, 1\right\}$. In other words, she measures in the computational basis if $\theta = 0$, and in the Hadamard basis if $\theta =1$. 
+
+    We then do not want the randomness to come from the random choice of $\theta$, so we force Alice to send it back to Eve. We want to know $H_{min}\left(X \suchthat \theta\right)$, under different constraints for Eve.
+
+    \begin{subparag}{Solution: No information}
+        Suppose first that Eve does not keep any information of what she sends to Alice. All she knows is $\theta$, so we have: 
+        \[P_{guess}\left(X \suchthat \theta\right) = \frac{1}{2} P_{guess}\left(X \suchthat \theta = 0\right) + \frac{1}{2} P_{guess}\left(X \suchthat \theta = 1\right).\]
+        
+        We notice that we can just suppose that Eve always guesses $X = 0$ without loss of generality, and then maximise her success probability based on the state she sends to Alice. This gives:
+        \autoeq{P_{guess}\left(X \suchthat \theta\right) = \max_{\rho_A} \left[\frac{1}{2} \bra{0} \rho_A \ket{0} + \frac{1}{2} \bra{+} \rho_A \ket{+}\right] = \max_{\rho_A}\frac{1}{2} \Tr\left(\rho_A \left(\ket{0}\bra{0} + \ket{1}\bra{1}\right)\right)= \frac{1}{2} \left\|\ket{0}\bra{0} + \ket{+}\bra{+}\right\|_{\infty} = \frac{1}{2}+ \frac{1}{2 \sqrt{2}} \approx 0.85.}
+
+        The optimal $\rho_A$ in this case is the pure state $\cos\left(\frac{\pi}{8}\right) + \sin\left(\frac{\pi}{8}\right) \ket{1}$.
+    \end{subparag}
+
+    \begin{subparag}{Solution: Classical information}
+        Let's now assume that Eve keeps some classical information about $\rho_A$: 
+        \[\rho_{AE} = \sum_{c} p_c \rho_A^c \otimes \ket{c}\bra{c}_E.\]
+        
+        This will not change anything. We just have: 
+        \autoeq{P_{guess}\left(X \suchthat E, \Theta\right) = \sum_{\theta} \frac{1}{2} \sum_{c} p_c P_{guess}\left(X \suchthat E = c, \Theta = \theta\right) = \sum_{c} P_c \left[\frac{1}{2} \sum_{\theta} p_{guess}\left(X \suchthat E = c, \Theta = \theta\right)\right].}
+
+        Now, the squared bracket is exactly what we computed before. This gives:
+        \[P_{guess}\left(X \suchthat \theta E\right) = \sum_{c} p_c \left(\frac{1}{2}+ \frac{1}{2 \sqrt{2}}\right) = \frac{1}{2} + \frac{1}{2 \sqrt{2}}.\]
+    \end{subparag}
+
+    \begin{subparag}{Solution: Quantum information}
+        Suppose finally that Eve can keep quantum information about $\rho_A$. Then, Eve can always win. Indeed, suppose she prepares: 
+        \[\rho_{AE} = \ket{EPR}\bra{EPR}.\]
+
+        When Eve receives $\theta$, she can measure in the $\theta$ basis, just like Alice. She will then get the exact same measurement as Alice, by properties of the EPR pair. Hence: 
+        \[P_{guess}\left(X \suchthat E, \theta\right) = 1.\]
+
+        Now, we cannot prevent Eve from storing quantum information. We aim to solve it through the following setup.
+    \end{subparag}
+\end{parag}
+
+\end{document}

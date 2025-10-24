@@ -1,0 +1,172 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-18 at 13:22:14.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Jeudi 18 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2025-09-18}{Hi from BM5 202}{
+\begin{itemize}[left=0pt]
+    \item \textit{I cleaned part of this lecture's notes in BM5 202, during some event.}
+    \item Definition of SDP, \lang{PRIMAL} and \lang{DUAL} optimisation problems.
+    \item Explanation of the primal-dual theorem.
+\end{itemize}
+}
+
+\subsection{Semi-definite programs}
+
+\begin{parag}{Definition: SDP}
+    A \important{semi-definite program} (SDP) is a tuple $\left(A, B, \Phi\right)$, where $A \in \mathbb{C}^{n \times n}$ is Hermitian, $B \in \mathbb{C}^{n' \times n'}$ is also Hermitian and $\Phi: \mathbb{C}^{n \times n} \mapsto \mathbb{C}^{n' \times n'}$ is a linear and Hermitian-preserving map (meaning that for any $X$ such that $X^{\dagger} = X$, then $\Phi\left(X\right)^{\dagger} = \Phi\left(X\right)$).
+
+    \begin{subparag}{Remark}
+        Note that $\Phi$ is not necessarily a quantum channel.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        Semi-definite programs are strongly linked to linear programs, in the sense that any linear program can be encoded as a semi-definite program. This is not important for this class, but I invite a reader who is interested in linear programs to read the corresponding section in my notes of the Algorithms~II class, available on my GitHub:
+        \begin{center}
+            \url{https://github.com/JoachimFavre/UniversityNotes}
+        \end{center}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Primal optimisation}
+    Let $\left(A, B, \Phi\right)$ be a SDP. The \important{primal optimisation problem} $\lang{PRIMAL}\left(A, B, \Phi\right)$ is defined as follows: 
+    \begin{semidefiniteprogram}{Supremum}{$\left\langle A, X \right\rangle = \sum_{i, j} A_{ij} X_{i j}$}
+        $\Phi\left(X\right) = B$,\\
+        & $X \geq 0$.
+    \end{semidefiniteprogram}
+
+    \begin{subparag}{Remark 1}
+        Since $X$ is positive semi-definite, it is in particular Hermitian. Hence, we do have: 
+        \[\left\langle A, X \right\rangle = \Tr\left(A X^{\dagger}\right) = \Tr\left(AX\right) = \sum_{i, j} A_{ij} X_{ij}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        It can be shown that the \lang{PRIMAL} problem can be equivalently written as:
+        \begin{semidefiniteprogram}{Supremum}{$\left\langle A, X \right\rangle = \sum_{i, j} A_{ij} X_{i j}$}
+            $\left\langle M_i, X \right\rangle = c_i$, & $\forall i \in \left\{1, \ldots, m\right\}$\\
+            & $X \geq 0$,
+        \end{semidefiniteprogram}
+        for some matrices $M_1, \ldots, M_m$ and scalars $c_1, \ldots, c_m$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    Consider $\Phi: X \mapsto \Tr\left(X\right)$. This is indeed linear and Hermitian-preserving. Suppose also that $B = 1$. The \lang{PRIMAL} optimisation problem is:
+    \begin{semidefiniteprogram}{Supremum}{$\left\langle A, X \right\rangle$}
+        $\Tr\left(X\right) = 1$,\\
+        & $X \geq 0$.
+    \end{semidefiniteprogram}
+
+    Something that traces to 1 and is positive semi-definite is just a density matrix. Hence, we can write this as:
+    \begin{semidefiniteprogram}{Supremum}{$\left\langle A, \rho \right\rangle$}
+        $\rho$ is a valid quantum state.
+    \end{semidefiniteprogram}
+
+    Let $\rho = \sum_{i} p_i \ket{\lambda_i}\bra{\lambda_i}$ to be its eigendecomposition, we always find that: 
+    \[\left\langle A, \rho \right\rangle = \Tr\left(A \rho\right) = \sum_{i} p_i \bra{\lambda_i} A \ket{\lambda_i} \leq \sum_{i} p_i \lambda_{max}\left(A\right) = \lambda_{max}\left(A\right),\]
+    where we used the fact $\bra{\lambda_i} A \ket{\lambda_i} \leq \lambda_{max}\left(A\right)$ and $\sum_{i} p_i = \Tr\left(\rho\right) = 1$ since it is a valid quantum state.
+
+    Now, this is indeed achievable: leaving $\ket{v_1}$ to be the eigenvector of $A$ associated to the largest eigenvalue $\lambda_{max}\left(A\right)$, and $\rho = \ket{v_1}\bra{v_1}$, we find: 
+    \[\left\langle A, \rho \right\rangle = \Tr\left(A \ket{v_1}\bra{v_1}\right) = \bra{v_1} A \ket{v_1} = \lambda_{max}\left(A\right) \braket{v_1}{v_1} = \lambda_{max}\left(A\right).\]
+    
+    This tells us that $\lang{OPT}\left(\lang{PRIMAL}\right) = \lambda_{max}\left(A\right)$ in this case.
+\end{parag}
+
+\begin{parag}{Notation}
+    Let $A, B$ be matrices. We write $A \leq B$ whenever $B - A$ is positive semi-definite.
+\end{parag}
+
+\begin{parag}{Example 2}
+    We consider the following SDP:
+    \begin{semidefiniteprogram}{Supremum}{$\left\langle A, X \right\rangle = \Tr\left(AX\right)$}
+        $X \geq -I$,\\
+        & $X \leq I$.
+    \end{semidefiniteprogram}
+
+    This isn't written as as a SDP form. It is left as an exercise to write this as an SDP.
+
+    The fact $-I \leq X \leq I$ means that all the eigenvalues of $X$ are between $-1$ and $1$. Now, we can diagonalise $A = \sum_{i} \mu_i \ket{v_i} \bra{v_i}$. Then, we can show that the best $X$ is $X = \sum_{i} \sgn\left(\mu_i\right) \ket{v_i}\bra{v_i}$, where $\sgn\left(x\right) \in \left\{-1, 1\right\}$ is the sign of $x$. Intuitively, this is because we have no reason to use a coefficient which is not $1$ in absolute value, otherwise we would be decreasing the total value. We moreover want to match the sign of the eigenvalue to make the product positive. Overall, this gives:
+    \[\Tr\left(AX\right) = \sum_{i} \left|\mu_i\right| = \left\|A\right\|_1.\]
+
+    This is thus a 1-norm.
+\end{parag}
+
+\begin{parag}{Theorem}
+    Under some hypotheses, $\lang{PRIMAL}\left(A, B, \Phi\right)$ can be solved to accuracy $\pm \epsilon$ in time $\lang{poly}\left(n, n', \log\left(\frac{1}{\epsilon}\right)\right)$.
+
+    \begin{subparag}{Remark}
+        We do not focus on algorithms in this class, this is mainly for our culture.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Dual optimisation}
+    Let $\left(A, B, \Phi\right)$ be a SDP. The \important{dual optimisation problem} $\lang{DUAL}\left(A, B, \Phi\right)$ is defined as follows: 
+    \begin{semidefiniteprogram}{Infimum}{$\left\langle B, Y \right\rangle = \sum_{i, j} B_{ij} Y_{i j}$}
+        $\Phi^*\left(Y\right) \geq A$,\\
+        & $Y \in \mathbb{C}^{n' \times n'}$ is Hermitian,
+    \end{semidefiniteprogram}
+    where $\Phi^*$ is defined such that, for all $X, Y$, $\left\langle \Phi\left(X\right), Y \right\rangle = \left\langle X, \Phi^*\left(Y\right) \right\rangle$.
+
+    \begin{subparag}{Remark}
+        It can be shown that the \lang{DUAL} problem can be equivalently written as:
+        \begin{semidefiniteprogram}{Infimum}{$y^T c = y_1 c_1 + \ldots + y_m c_m$}
+            $y_1 M_1 + \ldots + y_m M_m \geq A$, \\
+            & $y_1, \ldots, y_m \in \mathbb{R}$.
+        \end{semidefiniteprogram}
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        If $\Phi\left(X\right) = \Tr\left(X\right)$, then we can check that $\Phi^*: \mathbb{C}^{1 \times 1} \mapsto \mathbb{C}^{n \times n}$ is such that: 
+        \[\Phi^*\left(y\right) = y I.\]
+
+        Indeed, using the fact that $y \in \mathbb{R}$ since it is Hermitian: 
+        \[\left\langle \Phi\left(X\right), y \right\rangle = \Tr\left(\Phi\left(X\right) y^{\dagger}\right) = y\Tr\left(X\right),\]
+        \[\left\langle X, \Phi^*\left(y\right) \right\rangle = \Tr\left(X \Phi^*\left(y\right)^{\dagger}\right) = \Tr\left(X y I\right) = y \Tr\left(X\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    We consider again $\Phi = \Tr$ and $B = 1$. This lead to the following primal problem:
+    \begin{semidefiniteprogram}{Supremum}{$\left\langle A, X \right\rangle$}
+        $\Tr\left(X\right) = 1$,\\
+        & $X \geq 0$.
+    \end{semidefiniteprogram}
+
+    The dual problem is:
+    \begin{semidefiniteprogram}{Infimum}{$y$}
+        $y I \geq A$,\\
+        & $y \in \mathbb{R}$.
+    \end{semidefiniteprogram}
+
+    In words, the dual solution is the minimal number such that $yI \geq A$. But then, this is just the largest eigenvalue of $A$. This was exactly the solution of the primal problem. This is not a coincidence, as shown by the following theorem.
+\end{parag}
+
+\begin{parag}{Primal-dual theorem}
+    We have the following results linking the primal and dual problems.
+    \begin{itemize}
+        \item \textit{(Weak duality)} $\lang{OPT}\left(\lang{PRIMAL}\right) \leq \lang{OPT}\left(\lang{DUAL}\right)$.
+        \item \textit{(Strong duality)} If $\lang{OPT}\left(\lang{PRIMAL}\right) < +\infty$ and there exists a $X > 0$ such that $\Phi\left(X\right) = B$, then $\lang{OPT}\left(\lang{PRIMAL}\right) = \lang{OPT}\left(\lang{DUAL}\right)$
+    \end{itemize}
+
+    \begin{subparag}{Remark}
+        Contrary to linear programs, duality (the second affirmation) is reached much less often. Together with the fact that infimums and supremums not being always attained, this is another example of SDPs being less structured than linear programs.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        SDPs are really nice for finding upper bounds thanks to weak duality. Hence, the idea is now to exploit weak duality to prove a bound on the \lang{CLONE} game. 
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

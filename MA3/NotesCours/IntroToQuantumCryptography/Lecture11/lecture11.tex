@@ -1,0 +1,283 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-14 at 11:13:08.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Mardi 14 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2025-10-14}{This one's for you Pierre}{
+\begin{itemize}[left=0pt]
+    \item Definition of strong and weak seeded extractor.
+    \item Justification of why we want strong seeded extractors.
+    \item Definition of 1-universal and 2-universal hashing family.
+    \item Proof of a construction of a 2-universal hashing family.
+    \item Simplified proof of the leftover hashing lemma, that allows to construct a strong seeded extractor from any 2-universal hashing family.
+\end{itemize}
+
+}
+
+\begin{parag}{Idea}
+    Let $\rho_{XE}$ be a CQ state which is a $k$-source. Our goal to have some extractor $Z = \text{Ext}\left(X\right)$ such that $\rho_{ZE}$ and $\frac{1}{2^m} I_Z \otimes \rho_E$ are $\epsilon$-close.
+
+    \begin{subparag}{Remark}
+        There is a big flaw with this idea. Writing $\text{Ext}\left(x\right)_1$ to be the first bit of $\text{Ext}\left(x\right)$, we may receive the following $\left(n-1\right)$-source: 
+        \[\rho_{XE} = \frac{1}{2^n} \sum_{x} \ket{x}\bra{x}_X \otimes \ket{\text{Ext}\left(x\right)_1}\bra{\text{Ext}\left(x\right)_1}.\]
+        
+        But then, leaving $Z = \text{Ext}\left(X\right)$, we get: 
+        \[\rho_{ZE} = \frac{1}{2^n} \sum_{x} \ket{\text{Ext}\left(x\right)}\bra{\text{Ext}\left(x\right)}_X \otimes \ket{\text{Ext}\left(x\right)_1}\bra{\text{Ext}\left(x\right)_1}.\]
+        
+        This is not $\epsilon$-close to $\frac{1}{2^m} I_m \otimes \rho_E$ since Eve will always learn 1 bit of $\text{Ext}\left(x\right)$. This reasoning shows that no deterministic extractor can ever work, we need randomness. This brings us to the following definition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Strong seeded extractor}
+    A \important{$\left(k, \epsilon\right)$-strong seeded extractor} is a function $\text{Ext}: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^d \mapsto \left\{0, 1\right\}^m$ for some $m \leq n$, such that for any $k$-source $\rho_{XE}$ it maps $\rho_{XE} \otimes \frac{1}{2^d} I_Y \over{\mapsto}{Ext} \rho_{Z = \text{Ext}\left(X, Y\right), Y, E}$, in such a way that:
+    \[\left\|\rho_{Z Y E} - \frac{I_Z}{2^m} \otimes \frac{I_Y}{2^d} \otimes \rho_E \right\|_1 \leq \epsilon.\]
+
+    \begin{subparag}{Intuition}
+        This time, we use some uniformly random seed $Y$ as the second input to our extractor.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Weak seeded extractor}
+    A \important{$\left(k, \epsilon\right)$-weak seeded extractor} is a function $\text{Ext}: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^d \mapsto \left\{0, 1\right\}^m$ for some $m \leq n$, such that for any $k$-source $\rho_{XE}$ it maps $\rho_{XE} \otimes \frac{1}{2^d} I_Y \over{\mapsto}{Ext} \rho_{Z = \text{Ext}\left(X, Y\right), Y, E}$, in such a way that: 
+    \[\left\|\rho_{Z E} - \frac{I_Z}{2^m} \otimes \rho_E \right\|_1 \leq \epsilon.\]
+
+    \begin{subparag}{Intuition}
+        The difference with a strong seeded extractor is that, in a weak extractor, $Y$ may be correlated with $Z$. In other words, $Z$ is uncorrelated from both $Y$ and $Z$ for a strong extractor, but $Z$ is uncorrelated from only $E$ for a weak extractor.
+
+        This is an important distinction since it means that the result of $Y$ cannot be public for a weak extractor.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Consider the following extractor: 
+        \[\text{Ext}\left(x, y\right) = y.\]
+        
+        Then, this is a $\left(k, 0\right)$-weak extractor: 
+        \[\rho_{ZE} = \rho_{YE} = \frac{1}{2^d} I_Y \otimes \rho_E.\]
+
+        However, it is not a strong extractor:
+        \[\rho_{ZYE} = \frac{1}{2^d} \sum_{y} \ket{y}\bra{y}_Z \otimes \ket{y}\bra{y}_Y \otimes \rho_E.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Setup}
+    Let us take a step back, and think again why we want to use extractors.
+
+    Alice and Bob sample the same random $X \in \left\{0, 1\right\}^d$ which is known to be a $k$-source, using the strategy from the previous section. Their goal is to extract a bitstring of length $k$ which is completely unknown for Eve.
+
+    To do so, Alice samples some $Y \leftarrow_U \left\{0, 1\right\}^d$ and evaluates $Z = \text{Ext}\left(X, Y\right)$. She wants Bob to also be able to compute it, and hence sends $Y$ to Bob who also evaluates the same $Z$. However, Eve can read anything which is transmitted, and hence she also learns $Y$.
+
+    If they use a strong extractor, Alice and Bob successfully managed to create a common key $Z$, which is independent from everything known to Eve. This is however not true if they used a weak extractor, since Eve knows $Y$. We thus aim to make a strong extractor.
+
+    \begin{subparag}{Remark}
+        Recall that we defined $\text{Ext}: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^d \mapsto \left\{0, 1\right\}^m$ and that $\rho_{XE}$ is a $k$-source.
+
+        We wish for $m$ to be as large as possible so that Alice and Bob share a string which is a long as possible for the least effort. Since $X$ contains $k$ bits of randomness that are unknown from Eve, this means that we want $m \approx k$.
+    \end{subparag}
+\end{parag}
+
+\subsection{Two-universal hashing}
+
+\begin{parag}{Definition: 1-universal hashing family}
+    Let $m \leq n$. A family of functions $\mathcal{F} \subseteq \left\{f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}^m\right\}$ is said to be a \important{1-universal hashing family} if, for all $x \in \left\{0, 1\right\}^n$ and $z \in \left\{0, 1\right\}^m$: 
+    \[\prob_{f \leftarrow_U \mathcal{F}}\left(f\left(x\right) = z\right) = \frac{1}{2^m}.\]
+\end{parag}
+
+\begin{parag}{Example 1}
+    We can take $\mathcal{F}$ to be the set of all functions. Then, it can be shown to be 1-universal.
+
+    However, the number of bits required to represent any of its element is: 
+    \[\log_2 \left|\mathcal{F}\right| = \log_2\left(\left(2^m\right)^{\left(2^n\right)}\right) = m2^n.\]
+    
+    This is way too much, and cannot be used in practice.
+\end{parag}
+
+\begin{parag}{Example 2}
+    We consider the following hashing family: 
+    \[\mathcal{F} = \left\{f_y\left(x\right) = x \oplus y \suchthat y \in \left\{0, 1\right\}^n\right\}.\]
+    
+    Note that any $f \in \mathcal{F}$ is such that $f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}^n$. Moreover, this time, we only need $n$ bits to describe an element of $\mathcal{F}$, so this is indeed usable. Let us finally prove that it is 1-universal.
+
+    For any $x, z \in \left\{0, 1\right\}^n$, we find that: 
+    \[\prob_{f \leftarrow \mathcal{F}}\left(f\left(x\right) = z\right) = \prob_y\left(x \oplus y = z\right) = \prob_y\left(y = x \oplus z\right) = \frac{1}{2^n},\]
+    since $\prob\left(y = a\right) = \frac{1}{2^n}$ for any constant $a \in \left\{0, 1\right\}^n$. This shows exactly that $\mathcal{F}$ is 1-universal.
+\end{parag}
+
+\begin{parag}{Definition: 2-universal hashing family}
+    Let $m \leq n$. A family of functions $\mathcal{F} \subseteq \left\{f: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}^m\right\}$ is said to be a \important{2-universal hashing family} if, for all $x, x' \in \left\{0, 1\right\}^n$ such that $x \neq x'$, and for all $z, z' \in \left\{0, 1\right\}^m$: 
+    \[\prob_{f \leftarrow_U \mathcal{F}}\left(f\left(x\right) = z \land f\left(x'\right) = z'\right) = \frac{1}{2^{2m}}.\]
+
+    \begin{subparag}{Intuition}
+        This implies that sampling $f \leftarrow \mathcal{F}$, then the random variables $f\left(x_1\right), \ldots, f\left(x_k\right)$ are pairwise independent for any $x_1, \ldots, x_k \in \left\{0, 1\right\}^n$ that are all different.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\mathcal{F}$ be a 2-universal hashing family. Then, it is 1-universal.
+
+    \begin{subparag}{Proof}
+        Let $x, x' \in \left\{0, 1\right\}^n$ and $z \in \left\{0, 1\right\}^m$ be fixed, with $x \neq x'$. Then, using the fact $\mathcal{F}$ is 2-universal: 
+        \autoeq{\prob_{f \leftarrow \mathcal{F}}\left(f\left(x\right) = z\right) = \sum_{z' \in \left\{0, 1\right\}^m} \prob\left(f\left(x\right) = z \land f\left(x'\right) = z'\right) = \sum_{z' \in \left\{0, 1\right\}^m} \frac{1}{2^{2m}} = \frac{1}{2^m}.}
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The converse is not true. Consider again the following family: 
+        \[\mathcal{F} = \left\{f_y: x \mapsto x \oplus y \suchthat y \in \left\{0, 1\right\}^n\right\}.\]
+        
+        As we have seen, it is 1-universal. However, it is not 2-universal: 
+        \autoeq{\prob_f\left(f\left(x\right) = z \land f\left(x'\right) = z'\right) = \prob_y\left(x \oplus y = z \land x' \oplus y = z'\right) = \prob\left(y = x \oplus z \land y = x' \oplus z'\right) = \frac{1}{2^m} I\left(x \oplus z = x' \oplus z'\right).}
+    \end{subparag} 
+\end{parag}
+
+\begin{parag}{Remark}
+    There are many ways to construct 2-universal hash families. There are very nice constructions from error correcting code. We will however consider one based on finite fields.
+\end{parag}
+
+\begin{parag}{Definition: Finite field}
+    We let $\mathbb{F}_q$ to denote the finite field of size $q = p^k$ for some prime $p$.
+
+    \begin{subparag}{Remark}
+        $\mathbb{F}_q$ exists and is unique.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        We will only work with $q = 2^k$. Now, $\mathbb{F}_2 = \mathbb{Z}/2\mathbb{Z} = \left\{0, 1\right\}$ is just modulo 2 multiplication and addition.
+
+        In a more general case, we do a field extension. For instance, $\mathbb{F}_4 = \mathbb{F}_2\left[x\right] / \left(x^2 + x + 1\right)$. This means that its elements are polynomials with coefficients in $\mathbb{F}_2$, where we do computations modulo $x^2 + x + 1$ (meaning that we let $x^2 + x + 1 = 0 \iff x^2 = x + 1$). Hence, $\mathbb{F}_4 = \left\{0, 1, x, 1+x\right\}$, and for instance: 
+        \[x \left(1 + x\right) = x + x^2 = 1.\]
+        
+        We will not have to do computations inside these finite fields. All we need to know is that they do exist.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $q = 2^n$. We let: 
+    \[\mathcal{F} = \left\{f_{a, b}: x \in \mathbb{F}_q \mapsto ax + b \in \mathbb{F}_q \suchthat a, b \in \mathbb{F}_q\right\}.\]
+
+    This family is 2-universal. Moreover, $\left|\mathcal{F}\right| = 2^{2n}$, so any of its elements takes $2n$ bits to describe.
+
+    \begin{subparag}{Remark 1}
+        Since $\left|\mathbb{F}_q\right| = q = 2^n$, we can find a bijection between it and $\left\{0, 1\right\}^n$. We can thus indeed encode any $x \in \left\{0, 1\right\}^n$ into $\mathbb{F}_q$ and back.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that $\mathcal{F}$ maps $\left\{0, 1\right\}^n$ to $\left\{0, 1\right\}^n$. For any other $t \in \left\{1, \ldots, t\right\}$, we can consider $\mathcal{F}_{\leq t}$ that maps $\left\{0, 1\right\}^n$ to $\left\{0, 1\right\}^t$ by sampling some $f \leftarrow \mathcal{F}$, evaluating $f\left(x\right) \in \left\{0, 1\right\}^n$, and only keeping the first $t$ bits.
+
+        It can be shown that this is indeed a 2-universal family as well.
+
+        This shows that we can construct a 2-universal family mapping $\left\{0, 1\right\}^n$ to $\left\{0, 1\right\}^t$ for any $1 \leq t \leq n$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $x, x', z, z' \in \left\{0, 1\right\}^n$ be fixed, with $x \neq x'$. Then: 
+        \[p = \prob_f\left(f\left(x\right) = z \land f\left(x'\right) = z'\right) = \prob_{a, b}\left(ax + b = z \land ax' + b = z'\right).\]
+        
+        Now, over any field, an affine function is uniquely defined by two points it passes through. Indeed: 
+        \[\begin{systemofequations} ax + b = z, \\ ax' + b = z' \end{systemofequations} \iff \begin{systemofequations} a = \frac{z - z'}{x - x'}, \\ b = z + ax. \end{systemofequations}\]
+
+        There is thus a unique $a, b$ over all the $2^{2n}$ possible ones such that $ax + b = z$ and $ax' + b = z'$. Hence, we get exactly what we wanted: 
+        \[p = \frac{1}{2^{2n}}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Cauchy-Schwarz inequality}
+    Let $a_1, \ldots, a_n, b_1, \ldots, b_n \in \mathbb{R}$. Then:
+    \[\left|\sum_{i} a_i b_i\right| \leq \sqrt{\sum_{i} a_i^2} \sqrt{\sum_{i} b_i^2}.\]
+\end{parag}
+
+
+\begin{parag}{Theorem: leftover hashing lemma}
+    Let $\mathcal{F} = \left\{f_y \suchthat y \in \left\{0, 1\right\}^d\right\}$ be a 2-universal hashing family, mapping $\left\{0, 1\right\}^n$ to $\left\{0, 1\right\}^m$. We define:
+    \[\begin{split}
+    \text{Ext}: \left\{0,1\right\}^n \times \left\{0, 1\right\}^d &\longmapsto \left\{0, 1\right\}^m \\
+    \left(x, y\right) &\longmapsto f_Y\left(x\right)
+    \end{split}\]
+    
+    Moreover, let $k = m + 2 \log_2\left(\frac{1}{\epsilon}\right)$.
+
+    Then, $\text{Ext}$ is a $\left(k, \epsilon\right)$ strong seeded extractor.
+
+    \begin{subparag}{Remark}
+        Consider the following CQ state: 
+        \[\rho_{XE} = \frac{1}{2^n} \sum_{x} \ket{x}\bra{x} \otimes \left[\delta \ket{x}\bra{x} + \left(1 - \delta\right) \ket{\perp}\bra{\perp}\right].\]
+        
+        The adversary always has some chance to just know $\ket{x}$. Then, $P_{guess}\left(X \suchthat E\right) \approx \delta+ \left(1 - \delta\right)2^{-n}$. This shows a perfect strong seeded extractor is not possible, and hence that the $\frac{1}{\epsilon}$ dependence is necessary.
+    \end{subparag}
+
+    \begin{subparag}{Simplified proof}
+        Let's suppose first that $E = \o$, since it greatly simplifies the proof. Writing $\rho_X = \sum_{x} p_x \ket{x}\bra{x}$, we know that $H_{min}\left(x\right) = - \log_2\left(\max_x p_x\right) \geq k$.
+
+        Since $E = \o$, the goal is to show that, by definition of strong extractor:
+        \[\left\|\rho_{ZY} - \frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y\right\|_1 \leq \epsilon.\]
+
+        Now, $\rho_{ZY} = \sum_{y, z} \prob\left(\text{Ext}\left(x, y\right) = z \land Y = y\right) \ket{z}\bra{z} \otimes \ket{y}\bra{y}$. Since it is diagonalisable in the same basis as $\frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y$, we can easily find their singular values, allowing to easily evaluate the trace distance:
+        \autoeq{S = \left\|\rho_{ZY} - \frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y\right\|_1 = \frac{1}{2} \sum_{y, z} \left|\prob\left(\text{Ext}\left(x, y\right) = z \land Y = y\right) - \frac{1}{2^{d + m}}\right|.}
+
+        For any $z \in \left\{0, 1\right\}^m$ and $y \in \left\{0, 1\right\}^d$ fixed, we let $p_{zy} = \prob\left(\text{Ext}\left(x, y\right) = z \land Y = y\right)$. Then, using the Cauchy-Schwarz inequality: 
+        \autoeq{S = \frac{1}{2} \sum_{y, z} \underbrace{\left|p_{zy} - \frac{1}{2^{d + m}}\right|}_{= a_i}\cdot \underbrace{1}_{= b_i} \leq \frac{1}{2} \sqrt{\sum_{y, z} \left|p_{zy} - \frac{1}{2^{d + m}}\right|^2} \sqrt{\sum_{y', z'} 1} = \frac{\sqrt{2^{d + m}}}{2} \sqrt{\sum_{y, z} p_{zy}^2 - \frac{2}{2^{d + m}} \sum_{y, z} p_{z, y} + \sum_{y, z} \frac{1}{2^{2\left(d + m\right)}}}.}
+
+        However, $\sum_{y, z} p_{zy} = 1$, so this reads: 
+        \autoeq{S = \frac{\sqrt{2^{d + m}}}{2} \sqrt{\sum_{y, z} p_{zy}^2 - \frac{2}{2^{d + m}} + 2^{d + m} \frac{1}{2^{2\left(d + m\right)}}} = \frac{\sqrt{2^{d + m}}}{2} \sqrt{\sum_{y, z} p_{zy}^2 - \frac{1}{2^{d + m}}}.}
+
+
+        We are only left with upper-bounding the term $\sum_{y, z} p_{zy}^2$. First, we notice that, considering some fixed $z, y$:
+        \autoeq{p_{zy} = \prob_{x \followsdistr p_x}\left(\text{Ext}\left(x, y\right) = z \land Y = y\right) = \prob\left(Y = y\right) \prob\left(\text{Ext}\left(x, y\right) = z \suchthat Y = y\right) = \frac{1}{2^d} \sum_{x: f_y\left(x\right) = z} p_x.}
+
+        Hence:
+        \autoeq{\sum_{y, z} p_{zy}^2 = \frac{1}{2^{2d}} \sum_{y, z} \sum_{\substack{x: f_y\left(x\right) = z \\ x': f_y\left(x'\right) = z}} p_x p_{x'} = \frac{1}{2^{2d}} \sum_{y, z} \left(\sum_{\substack{x: f_y\left(x\right) = z \\ x' \neq x: f_y\left(x'\right) = z}} p_x p_{x'} + \sum_{x: f_y\left(x\right) = z} p_x^2\right)}
+
+        We consider each sum in the brackets separately. Consider some fixed $x \neq x'$, we want to know how many times the term $p_x p_{x'}$ appears when summing over all $y, z$. It appears every time $f_y\left(x\right) = z = f_y\left(x'\right)$. However, by the 2-universal hashing property, fixing some $z$, there is a fraction $2^{-2m}$ of the $f_y$ that maps both $x$ and $x'$ to this same specific $z$. Since there are $2^d$ different $y \in \left\{0, 1\right\}^d$ and $2^m$ different $z \in \left\{0, 1\right\}^m$, this means that this $p_x p_{x'}$ terms appears exactly $2^{d + m} \cdot 2^{-2m} = 2^{d -m}$ times.
+
+        We can make the exact same analysis for the second sum. Consider some fixed $x$. By the 1-universal hashing property, fixing $z$, there is a fraction $2^{-m}$ of the function that maps $x$ to this specific $z$. Since there are $2^{m + d}$ different $y$ and $z$, the term $p_x^2$ appears $2^{d + m}\cdot 2^{-m} = 2^d$ times.
+
+        Overall, this means that:
+        \autoeq{\sum_{y, z} p_{zy}^2 = \frac{1}{2^{2d}}\left(\sum_{x \neq x'} 2^{d -m} p_x p_{x'} + \sum_{x} 2^d p_x^2\right) = \frac{1}{2^{d + m}} \sum_{x \neq x'} p_x p_{x'}  + \frac{1}{2^d} \sum_{x} p_x^2.}
+
+        Now, we can use the facts that: 
+        \[\sum_{x \neq x'} p_x p_{x'} \leq \sum_{x, x'} p_{x} p_{x'} = 1,\]
+        \[\sum_{x} p_{x}^2 \leq \sum_{x} p_x\cdot p_{max} = p_{max} \sum_{x} p_x = p_{max} = 2^{- H_{min}\left(X\right)} = 2^{-k}.\]
+        
+        This yields that: 
+        \[\sum_{y, z} p_{zy}^2 \leq \frac{1}{2^{d + m}} + \frac{1}{2^d} \cdot \frac{1}{2^k} = \frac{1}{2^{d + m}} + \frac{1}{2^{d + k}}.\]
+        
+        Combining everything, we finally get what we wanted: 
+        \[S \leq \frac{\sqrt{2^{d + m}}}{2} \sqrt{\frac{1}{2^{d+m}} + \frac{1}{2^{d + k}} - \frac{1}{2^{d + m}}} = \frac{1}{2} \sqrt{\frac{2^{d + m}}{2^{d + k}}} = \frac{2^{\left(m -k\right)/2}}{2} = \frac{1}{2} \epsilon,\]
+        if $\epsilon$ is such that $k = m + 2 \log_2\left(\frac{1}{\epsilon}\right)$.
+        
+        %Let $y \in \left\{0, 1\right\}^d$ be fixed. Let us analyse the probability above: 
+        %\autoeq{p_{zy} = \prob_{x \followsdistr p_x}\left(\text{Ext}\left(x, y\right) = z \land Y = y\right) = \prob\left(Y = y\right) \prob\left(\text{Ext}\left(x, y\right) = z \suchthat Y = y\right) = 2^{-d} \sum_{x: f_y\left(x\right) = z} p_x.}
+
+        %The proof strategy is to reduce this to a $\ell_2$-bound (collision probability) through the Cauchy-Schwartz \later{check} inequality, and then use the 2-universal property to conclude.
+        %
+        %We find: 
+        %\[S = \frac{1}{2} \sum_{y, z} \left|p_{zy} - \frac{1}{2^{d + m}}\right| = \frac{1}{2} \cdot \frac{1}{2^d} \sum_{y, z} \underbrace{\left|\sum_{x: f_y\left(x\right) = z} p_x - \frac{1}{2^m}\right|}_{= 1}\cdot \underbrace{1}_{= b_i}.\]
+        %
+        %Using the Cauchy-Schwartz inequality, this leads to: 
+        %\[S \leq \frac{1}{2}\cdot \frac{1}{2^d} \sqrt{\sum_{y, z} \left|\sum_{x: f_y\left(x\right) = z} p_x - \frac{1}{2^m}\right|^2} \sqrt{2^{d + m}} = \frac{1}{2} \sqrt{\frac{2^m}{2^d}} \cdot \sqrt{\sum_{y, z} 2^{2d} p_{zy}^2 - \frac{1}{2^m}}.\]
+        %\later{didn't need to expand out $2^d p_{zy}$} \later{$p_{zy}$ or $p_{yz}$?}
+        %
+        %We can now apply the definition of 2-universal hashing: 
+        %\[\sum_{y, z} p_{zy}^2 = \frac{1}{2^{2d}} \sum_{y, z} \sum_{\substack{x: f_y\left(x\right) = z \\ x': f_y\left(x'\right) = z'}} p_x p_{x'} =  \]
+        %\later{aled, photo. Will go again Thursday}
+        %
+        %We get a bound of approximately $\frac{1}{2} 2^{\frac{m-k}{2}}$, so with the parameters given, this yields $\leq \frac{1}{2} \epsilon$.
+    \end{subparag}
+\end{parag}
+
+
+
+\end{document}

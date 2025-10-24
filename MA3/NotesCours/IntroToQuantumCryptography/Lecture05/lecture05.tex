@@ -1,0 +1,208 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-23 at 13:27:14.
+
+\usepackage{../../style}
+
+\title{Quantum cryptography}
+\author{Joachim Favre}
+\date{Jeudi 23 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2025-09-23}{A very clever argument}{
+\begin{itemize}[left=0pt]
+    \item Definition of the Choi-Jamio{\l}kowski representation, and proof of its properties.
+    \item Proof that Wiesner scheme over $n=1$ qubits is $\frac{3}{4}$-secure, and explanation of the generalisation to $n$ qubits.
+    \item Explanation of another security game setup.
+\end{itemize}
+
+}
+
+\subsection{Guarantees on Wiesner's scheme}
+
+\begin{parag}{Definition: Choi-Jamio{\l}kowski representation}
+    Let $\Phi: \mathbb{C}^{d \times d} \mapsto \mathbb{C}^{d' \times d'}$ be linear. 
+
+    We define its \important{Choi-Jamio{\l}kowski representation} as: 
+    \[CJ\left(\Phi\right) = \sum_{i = 1}^{d} \sum_{j=1}^{d} \Phi\left(\ket{i}\bra{j}\right) \otimes \ket{i}\bra{j}.\]
+    
+    Equivalently, leaving  $\ket{\psi_d} = \sum_{i=1}^{d} \ket{i} \otimes \ket{i}$: 
+    \[CJ\left(\Phi\right) = \left(\Phi \otimes I\right) \left(\ket{\psi_d}\bra{\psi_d}\right).\]
+
+    \begin{subparag}{Example}
+        Consider for instance some $\Phi: \mathbb{C}^{2 \times 2} \mapsto \mathbb{C}^{4 \times 4}$. Then, we would have: 
+        \[CJ\left(\Phi\right) = \begin{pmatrix} \Phi \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}  & \Phi \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix} \\ \Phi \begin{pmatrix} 0 & 0 \\ 1 & 0 \end{pmatrix}  & \Phi \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix}  \end{pmatrix} \in \mathbb{C}^{8 \times 8}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Properties}
+    Let $\Phi: \mathbb{C}^{d \times d} \mapsto \mathbb{C}^{d' \times d'}$ be linear. We have the following properties.
+    \begin{enumerate}
+        \item $\Phi$ is completely positive if and only if $CJ\left(\Phi\right) \geq 0$.
+        \item $\Phi$ is trace-preserving if and only if $\Tr_1\left(CJ\left(\Phi\right)\right) = I$.
+        \item For any $\ket{\psi} \in \mathbb{C}^{d \times d}$ and $\ket{\phi} \in \mathbb{C}^{d' \times d'}$, then, writing $\ket{\psi^*}$ to be the complex conjugate of $\ket{\psi}$:
+        \[\bra{\phi} \Phi\left(\ket{\psi}\bra{\psi}\right) \ket{\phi} = \bra{\phi} \bra{\psi^*} CJ\left(\Phi\right) \ket{\phi} \ket{\psi^*}.\]
+    \end{enumerate}
+
+    \begin{subparag}{Implication}
+        This shows very interesting properties of the Choi-Jamio{\l}kowski representation. Indeed, given any matrix $X$, it is the Choi-Jamio{\l}kowski representation of some valid linear operator $\Phi$: it describes the mapping of each element of a basis through $\Phi$, describing all elements of the vector space by linearity. Now, for the resulting linear operator to be a valid quantum channel, we also need it to be completely positive and trace preserving. By this lemma, this means that $X$ must be such that $X \geq 0$ and $\Tr_1\left(X\right) = I$.
+
+        In other words, this shows that there is a bijection between quantum channels $\Phi$ and matrices $X = CJ\left(\Phi\right)$ such that $X \geq 0$ and $\Tr_1\left(X\right) = I$. This makes the analysis over arbitrary quantum channels a lot simpler.
+    \end{subparag}
+
+    \begin{subparag}{Proof 1}
+        We only prove the direction $\implies$, the other direction is a bit harder. Hence, suppose that $\Phi$ is completely positive. By definition, this means that for any $X \geq 0$: 
+        \[\left(\Phi \otimes I\right)\left(X\right) \geq 0.\]
+        
+        But then, choosing $X = \ket{\psi_d}\bra{\psi_d} \geq 0$, this gives exactly that: 
+        \[CJ\left(\Phi\right) = \left(\Phi \otimes I\right)\left(\ket{\psi_d}\bra{\psi_d}\right) \geq 0.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        Note that: 
+        \[\Tr_1\left(CJ\left(\Phi\right)\right) = \sum_{i, j} \Tr\left(\Phi\left(\ket{i}\bra{j}\right)\right) \ket{i}\bra{j}.\]
+        
+        This is equal to the identity matrix if and only if its component match the one of the identity matrix, i.e.~$\Tr\left(\Phi\left(\ket{i}\bra{j}\right)\right) = \delta_{ij}$. This means that $\Phi$ preserves the trace of the computation basis, which is equivalent to $\Phi$ being trace preserving.
+    \end{subparag}
+
+    \begin{subparag}{Proof 3}
+        We can check that, for any $\ket{\psi}$: 
+        \[\left(I \otimes \bra{\psi^*}\right) \ket{\psi_d}\bra{\psi_d} \left(I \otimes \ket{\psi^*}\right) = \ket{\psi}\bra{\psi}.\]
+        
+        But then: 
+        \autoeq{\bra{\phi}\bra{\psi^*} CJ\left(\Phi\right) \ket{\phi}\ket{\psi^*} = \bra{\phi}\bra{\psi^*} \left(\Phi \otimes I\right)\left(\ket{\psi_d}\bra{\psi_d}\right) \ket{\phi}\ket{\psi^*} = \bra{\phi} \Phi\left(\left(I \otimes \bra{\psi^*}\right) \ket{\psi_d}\bra{\psi_d} \left(I \otimes \ket{\psi^*}\right)\right) \ket{\phi} = \bra{\phi} \Phi\left(\ket{\psi}\bra{\psi}\right) \ket{\phi}.}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Lemma}
+    Let $\Psi = \Tr_1: \mathbb{C}^{4 \times 4} \otimes \mathbb{C}^{2 \times 2} \mapsto \mathbb{C}^{2 \times 2}$ be the partial trace and: 
+    \[Q = \frac{1}{4} \sum_{x, \theta} \ket{x}_{\theta}\bra{x}_{\theta} \otimes \ket{x}_{\theta}\bra{x}_{\theta} \otimes \ket{x}_{\theta}\bra{x}_{\theta}.\]
+
+    Then, the maximum success probability of an adversary to the \lang{CLONE} game is the value of the following SDP, $\lang{PRIMAL}\left(Q, I_{2 \times 2}, \Psi\right)$:
+    \begin{semidefiniteprogram}{Supremum}{$\left\langle Q, X \right\rangle$}
+        $\Psi\left(X\right) = I_{2 \times 2}$,\\
+        & $X \geq 0$.
+    \end{semidefiniteprogram}
+
+    \begin{subparag}{Proof}
+        Consider an arbitrary adversary first, who, given some state $\ket{x}_{\theta}$, clones it into $\Phi\left(\ket{x}_{\theta} \bra{x}_{\theta}\right)$. The adversary is completely described by this quantum channel $\Phi$. Moreover, their probability to win in \lang{CLONE} is:
+        \autoeq{p = \frac{1}{4} \sum_{x, \theta} \prob\left(\text{adversary wins} \suchthat \ket{\psi_{\$}} = \ket{x}_{\theta}\right) = \frac{1}{4} \sum_{x, \theta} \bra{x}_{\theta} \bra{x}_{\theta} \Phi\left(\ket{x}_{\theta}\bra{x}_{\theta}\right) \ket{x}_{\theta} \ket{x}_{\theta}.}
+
+        Using properties of the Choi-Jamio{\l}kowski representation, this becomes: 
+        \autoeq{p = \frac{1}{4} \sum_{x, \theta} \bra{x}_{\theta} \bra{x}_{\theta} \bra{x}_{\theta}^* CJ\left(\Phi\right) \ket{x}_{\theta} \ket{x_{\theta}} \ket{x_{\theta}}^*  = \frac{1}{4} \sum_{x, \theta} \bra{x}_{\theta} \bra{x}_{\theta} \bra{x}_{\theta} CJ\left(\Phi\right) \ket{x}_{\theta} \ket{x_{\theta}} \ket{x_{\theta}},}
+        where we used the fact that all vectors are real.
+
+        We are close to writing this as an SDP. We consider the following matrix: 
+        \[Q = \frac{1}{4} \sum_{x, \theta} \ket{x}_{\theta}\bra{x}_{\theta} \otimes \ket{x}_{\theta}\bra{x}_{\theta} \otimes \ket{x}_{\theta}\bra{x}_{\theta}.\]
+
+        It was chosen so that we can write:
+        \[p = \Tr\left(CJ\left(\Phi\right) Q\right) = \left\langle CJ\left(\Phi\right), Q \right\rangle.\]
+
+        The maximum success probability is thus: 
+        \autoeq{p_{max} = \sup_{\Phi \text{ is a quantum channel}} \left\langle CJ\left(\Phi\right), Q \right\rangle = \sup_{X \text{ is a valid Choi-Jamio{\l}kowski representation of a channel}} \left\langle X, Q \right\rangle.}
+
+        As discussed earlier, in the properties of the Choi-Jamio{\l}kowski representation, $X$ is a valid Choi-Jamio{\l}kowski representation of a channel if and only if $X \geq 0$ and $\Tr_1\left(X\right) = I$. But then, leaving $\Psi = \Tr_1: \mathbb{C}^{4 \times 4} \otimes \mathbb{C}^{2 \times 2} \mapsto \mathbb{C}^{2 \times 2}$, this yields that $p_{max}$ is the value of the following SDP:
+        \begin{semidefiniteprogram}{Supremum}{$\left\langle Q, X \right\rangle$}
+            $\Psi\left(X\right) = I_{2 \times 2}$,\\
+            & $X \geq 0$.
+        \end{semidefiniteprogram}
+
+        This finishes the proof.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    The dual of the SDP from the previous lemma, $\lang{DUAL}\left(Q, I_{2 \times 2}, \Psi\right)$ is: 
+    \begin{semidefiniteprogram}{Infimum}{$\left\langle I_{2 \times 2}, Y \right\rangle$}
+        $\Psi^*\left(Y\right) \geq Q$,\\
+        & $Y \in \mathbb{C}^{2 \times 2}$ is Hermitian.
+    \end{semidefiniteprogram}
+
+    Moreover, $\Psi^*\left(Y\right) = I_{4 \times 4} \otimes Y$.
+
+    \begin{subparag}{Remark}
+        By weak duality, $p_{max} = \lang{OPT}\left(\lang{PRIMAL}\right) \leq \lang{OPT}\left(\lang{DUAL}\right)$. This will allow us to prove an upper bound on the maximum success probability $p_{max}$ to the \lang{CLONE} game.
+
+        Note in fact that it is possible to show that we are in a strong duality case, $\lang{OPT}\left(\lang{PRIMAL}\right) = \lang{OPT}\left(\lang{DUIAL}\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The fact that this is indeed the dual SDP directly comes by definition. We thus only need to check that: 
+        \[\left\langle \Psi\left(A\right), B \right\rangle = \left\langle A, \Psi^*\left(B\right) \right\rangle \iff \left\langle \Tr_1\left(A\right), B \right\rangle = \left\langle A, I_{4 \times 4} \otimes B \right\rangle.\]
+        
+        Now, this does hold:
+        \autoeq{\left\langle A, I_{4 \times 4} \otimes B \right\rangle = \Tr\left(A \left(I_{4 \times 4} \otimes B\right)\right) = \Tr\left(\Tr_1\left(A \left(I_{4 \times 4} \otimes B\right)\right)\right) = \Tr\left(\Tr_1\left(A\right) B\right) = \left\langle \Tr_1\left(A\right), B \right\rangle.} 
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Wiesner's scheme over $n = 1$ qubit is $\frac{3}{4}$-secure.
+
+    \begin{subparag}{Proof}
+        By our lemmas, we know that the maximum success probability to the \lang{CLONE} game $p_{max}$ is such that:
+        \[p_{max} = \lang{OPT}\left(\lang{PRIMAL}\right) \leq \lang{OPT}\left(\lang{DUAL}\right).\]
+
+        The dual problem was:
+        \begin{semidefiniteprogram}{Infimum}{$\left\langle I_{2 \times 2}, Y \right\rangle$}
+            $I_{4 \times 4} \otimes Y \geq Q$,\\
+            & $Y \in \mathbb{C}^{2 \times 2}$ is Hermitian.
+        \end{semidefiniteprogram}
+
+        In particular, we can just try the solution $Y = \lambda_{max}\left(Q\right)$. Using computers, we find that $\lambda_{max}\left(Q\right) = \frac{3}{8}$. Note that $Y$ is indeed a solution: we have both $I_{4 \times 4} \otimes Y \geq Q$ and that $Y$ is Hermitian. Hence, this means that, since the \lang{DUAL} is an infimum over all possibilities, its optimal solution cannot be higher than the value obtained with this $Y$:
+        \[\lang{OPT}\left(\lang{DUAL}\right) \leq \left\langle I_{2 \times 2}, Y \right\rangle = \Tr\left(Y\right) = \lambda_1\left(Q\right) \Tr\left(I\right) = 2 \lambda_1\left(Q\right) = \frac{3}{4}.\]
+        
+        We have thus shown that $p_{max} \leq \frac{3}{4}$. There also exists an attack that succeeds with probability $p = \frac{3}{4}$, showing $p_{max} = \frac{3}{4}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Wiesner's scheme over $n$ qubit is $\left(\frac{3}{4}\right)^n$-secure.
+
+    \begin{subparag}{Proof}
+        To show that $p_{max} \leq \left(\frac{3}{4}\right)^n$, the proof is completely similar to what we just did for $n = 1$, except that we would have $Q^{\otimes n}$ in the SDP, which largest eigenvalue is $\lambda_{max}\left(Q^{\otimes n}\right) = \lambda_{max}\left(Q\right)^n = \left(\frac{3}{4}\right)^n$.
+
+        It is also easy to show that $p_{max} \geq \left(\frac{3}{4}\right)^n$ by finding an attack that succeeds with probability $\left(\frac{3}{4}\right)^n$. This can be simply done by cloning each qubit independently with success probability $\frac{3}{4}$ by using the attack on $n = 1$ qubit.
+
+        This proof sketch then shows that $p_{max} = \left(\frac{3}{4}\right)^n$.
+    \end{subparag}
+\end{parag}
+
+\subsection{Bomb testing}
+
+\begin{parag}{Goal}
+    We consider a new security game. We now assume that the adversary can bring a quantum bill to the bank, who will verify its validity. 
+
+    More precisely, the adversary now also has an oracle access to $\lang{Ver}\left(k, \$, \cdot\right)$, which they can evaluate with any $\rho$. Their goal is again to produce $\sigma, \sigma'$ such that $\lang{Ver}\left(k, \$, \sigma\right) = \lang{Ver}\left(k, \$, \sigma'\right) = \lang{Accept}$.
+
+    \begin{subparag}{Remark 1}
+        We can consider two types of oracles.
+        \begin{itemize}
+            \item The bank always gives back the bill to the adversary, even if the bill is invalid.
+            \item If the bill appears to be invalid, the bank will know the adversary was doing forgery, and they will arrest them. In other words if at any point the oracle outputs \lang{Reject}, then the adversary looses immediately.
+        \end{itemize}
+        
+        The first type of oracle is pretty easy to break: by feeding $\frac{I}{2} \otimes \ket{x_2}\bra{x_2}_{\theta_2} \otimes \ldots \otimes \ket{x_n}\bra{x_n}_{\theta_n}$ to the oracle, it has a probability $1/2$ to output \lang{Accept}. In that case, the first qubit collapsed to $\ket{x_1}\bra{x_1}_{\theta_1}$ (since it was measured by the verification procedure), yielding that the adversary successfully cloned it. Overall, the adversary can clone each qubit of $\ket{x_1}\bra{x_1}_{\theta_1} \otimes \ldots \otimes \ket{x_n}\bra{x_n}_{\theta_n}$ with 2 expected calls to the oracle each, meaning in an expected $2n$ number of steps overall.
+
+        The second type of oracles is a lot more interesting: the same strategy does not work. We will thus focus on this type of oracles. We will show that the adversary can also win with arbitrary success probability in this case. 
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        Attacks can be mitigated if, instead of just naively running $\lang{Ver}\left(k, \$, \cdot \right)$ on the bill, the bank also prepares the quantum bill back to the correct state. The goal of this analysis is however to show the importance of correctly defining the security game for the analysis.
+    \end{subparag}
+\end{parag}
+
+\end{document}

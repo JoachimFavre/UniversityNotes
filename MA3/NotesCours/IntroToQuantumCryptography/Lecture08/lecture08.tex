@@ -1,0 +1,125 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-02 at 13:17:26.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Jeudi 02 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2025-10-02}{Studying the romantic behaviour of entanglement}{
+\begin{itemize}[left=0pt]
+    \item Explanation of a quantum strategy that achieves success probability $\frac{1}{2} + \frac{1}{2 \sqrt{2}}$  for the CSHS game.
+    \item Heuristic explanation of monogamy for entanglement.
+    \item Explanation of the three-player CSHS game, and its link with the monogamy of entanglement.
+\end{itemize}
+
+}
+
+\begin{parag}{}
+    \begin{subparag}{Proof quantum}
+        We will consider a strategy that has success probability $\prob\left(\text{win}\right) = \frac{1}{2} + \frac{1}{2\sqrt{2}}$. This will show that $p_q \geq \frac{1}{2} + \frac{1}{2\sqrt{2}}$. We will not show that it is indeed optimal, since it is not necessary in order to show a separation between classical and quantum strategies.
+
+        Let us describe the strategy used by Alice and Bob. They start with the following shared state:
+        \[\ket{\psi}_{AB} = \frac{\ket{00} + \ket{11}}{\sqrt{2}} \in \mathbb{C}^2 \otimes \mathbb{C}^2.\]
+        
+        On question $x$, Alice measures in a basis $\left\{\ket{u_0^x}, \ket{u_1^x}\right\}$. When $x = 0$, this is the computation basis; and when $x = 1$ this is the Hadamard basis. Similarly, on question $y$, Bob measures in some basis $\left\{v_0^y, v_1^y\right\}$, which is slightly rotated as shown on the following picture, where there is an angle of $\frac{\pi}{8}$ between each arrow. We write Alice's bases in blue, Bob's bases in red, the bases with $x = 0$ using solid lines, and the bases with $x = 1$ using dashed lines.
+        \svghere[0.8]{CSHSGameMeasurementBases.svg}
+        
+        Suppose that Alice measures in some basis $\left\{\ket{u}, \ket{u^\perp}\right\}$ and Bob measures in $\left\{\ket{v}, \ket{v^\perp}\right\}$. This tells us that, using the fact every vector has real components: 
+        \autoeq{\prob\left(\text{$A$ gets $\ket{u}$, $B$ gets $\ket{v}$}\right) = \left|\left(\bra{u} \otimes \bra{v}\right)  \ket{\psi}\right|^2 = \frac{1}{2} \left|\braket{u}{0} \braket{v}{0} + \braket{u}{1}\braket{v}{1}\right|^2 = \frac{1}{2} \left|\braket{u}{0}\braket{0}{v} + \braket{u}{1}\braket{1}{v}\right|^2 = \frac{1}{2} \left|\braket{u}{v}\right|^2.}
+
+        Doing the computations, we find for instance that:
+        \[\prob\left(\left(a, b\right) = \left(0, 1\right) \suchthat \left(x, y\right) = \left(1, 1\right)\right) = \frac{1}{2} \cos^2\left(\frac{\pi}{8}\right),\]
+        \[\prob\left(\left(a, b\right) = \left(1, 0\right) \suchthat \left(x, y\right) = \left(1, 1\right)\right) = \frac{1}{2} \cos^2\left(\frac{\pi}{8}\right).\]
+        
+        This thus tells us that, when $\left(x, y\right) = \left(1, 1\right)$, the probability of success is $\cos^2\left(\frac{\pi}{8}\right) = \frac{1}{2} + \frac{1}{2\sqrt{2}}$. Now, we can check that this is also the case for all $\left(x, y\right)$, giving a total success probability of $\frac{1}{2} + \frac{1}{2 \sqrt{2}}$. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Monogamy}
+ 
+\begin{parag}{Heuristic}
+    Playing a bit with entanglement, we can find heuristically that is has some form of ``monogamy''. In other words, if we have strong entanglement between $A$ and $B$, then we must have weak entanglement between $A$ and $C$. 
+
+    To illustrate this point, we will consider examples where this is true, and examples where this is not.
+
+    \begin{subparag}{Example 1}
+        Consider for instance $\rho_{AB} = \ket{EPR}\bra{EPR}$, where: 
+        \[\ket{EPR}= \frac{\ket{00} + \ket{11}}{\sqrt{2}}.\]
+
+        Let $\ket{\psi}_{ABC}$ be arbitrary such that $\Tr_C\left(\ket{\psi}\bra{\psi}\right) = \rho_{AB}$. Then, necessarily, there exists some $\ket{\phi}_C$ such that $\ket{EPR}_{AB} \otimes \ket{\phi}_C$. Let us prove this result.
+
+        Note that $\ket{\psi}_{ABC}$ is a purification of $\rho_{AB}$. Now, $\ket{EPR} \otimes \ket{0}$ is a valid purification. We know by Uhlman's theorem that $\ket{\psi}_{ABC} = \left(I \otimes U\right) \ket{EPR} \otimes \ket{0} = \ket{EPR} \otimes U \ket{0}$, and hence it gives our result.
+
+        Note that this result does not in fact have much in common with entanglement: all we used was that $\rho_{AB}$ is pure. It is however already very interesting as we will see in the following example.
+    \end{subparag}
+
+    \begin{subparag}{Example 2}
+        We could give one qubit to Alice, two to Bob and one to Charlie, in such a way that they are EPR pairs like in the following diagram:
+        \svghere{NonMonogamyOfEntanglement.svg}
+
+        However, different particles are entangled; and we still have some form of monogamy.
+    \end{subparag}
+
+    \begin{subparag}{Example 3}
+        Let us consider the GHZ state:
+        \[\ket{\psi}_{ABC} = \ket{GHZ} = \frac{\ket{000} + \ket{111}}{\sqrt{2}}.\]
+        
+        There is some form of entanglement between the three of them, but it is not as strong as before. Let's look at what Alice and Bob have together: 
+        \[\rho_{AB} = \Tr_C\left(\ket{\psi}\bra{\psi}\right) = \frac{1}{2} \ket{00}\bra{00} + \frac{1}{2} \ket{11} \bra{11} \neq \ket{EPR}\bra{EPR}.\]
+        
+        This is very different from the EPR pair, it is notably a separable pair. Hence, Alice and Bob cannot use this state for anything quantum. Note that this could have been expected from the first example: tracing out $C$ could never have lead to an EPR pair.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Qualifying monogamy}
+    Suppose that $E$ is some measure of entanglement. It is said to express monogamy if for all $\rho_{ABC}$:
+    \[E\left(A: B\right) + E\left(A: C\right) \leq E\left(A: BC\right).\]
+
+    \begin{subparag}{Intuition}
+        This is pretty intuitive: if we have 6 bits between $A$ and $BC$, we cannot have $4$ bits between $A$ and $B$ and 4 bits between $A$ and $C$. However, this does not hold for many measures $E$; finding good measures of entanglement for mixed states is hard in practice.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, it holds for the Von Neumann entropy $E\left(\rho_{AB}\right) = -\Tr\left(\rho_A \log_2\left(\rho_A\right)\right)$.
+
+        Consider $\ket{\psi} = \ket{GHZ}$. We note that $E\left(A: B\right) = E\left(A: C\right) = 0$ since the reduced states are pure, and $E\left(A: BC\right) = 1$. We then do have: 
+        \[E\left(A: B\right) + E\left(A: C\right) = 0 \leq E\left(A : BC\right) = 1.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Three-player CSHNS}
+    We consider another representation of the monogamy of entanglement through a 3-player CSHS game.
+
+    We consider a game with Alice, Bob, Charlie and a Referee. The Referee samples $\left(x, y, z\right) \leftarrow_U \left\{0, 1\right\}^3$ and sends $x$ to Alice, $y$ to Bob and $z$ to Charlie. They they have to produce answers $\left(a, b, c\right)$. The referee then samples $r \leftarrow \left\{0, 1\right\}$, and they win if: 
+    \[\begin{systemofequations} a \oplus b =  x \land y, & \text{if $r = 0$,}\\ b \oplus c = y \land z, & \text{if $r = 1$.} \end{systemofequations}\]
+
+    In other words, we play two games of CSHS game at the same time. 
+
+    \begin{subparag}{Naive solution}
+        We may give an EPR pair to Alice and Bob, and one to Bob and Charlie. Alice and Charlie can do the usual CSHS strategy. The issue is that Bob has two qubits, but he must output a single bit, so there is an issue.
+    \end{subparag}
+    
+    \begin{subparag}{Solution}
+        We will show in the fourth exercise series that:
+        \[p_{win, quantum} = p_{win, classical} = \frac{3}{4}.\]
+
+        This does show some form of monogamy: if we have two people, entanglement comes to the rescue; but if we have three people, suddenly quantum does not help anymore.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    Monogamy of entanglement will be useful for cryptography. If Alice and Bob share some strongly entangled qubits, then they will know that Eve cannot also be entangled to these qubits.
+\end{parag}
+
+\end{document}

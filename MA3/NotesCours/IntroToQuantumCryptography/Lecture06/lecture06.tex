@@ -1,0 +1,122 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-25 at 13:16:35.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Jeudi 25 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2025-09-25}{Quantum minesweeper}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the bomb testing game, and proof of a strategy.
+    \item Proof of an attack on Wiesner's scheme when we have an oracle access to the verification procedure.
+\end{itemize}
+    
+}
+
+\begin{parag}{Bomb testing}
+    Before diving into the attack, we consider a simplified game called \important{bomb testing}.
+
+    We consider a machine, which can be a bomb or a dud. We can input two things: 0 (which means ``no test'') and 1 (which means ``test''). When we input 0, it always outputs 0. If we input 1, if it is a bomb it explodes, and if it is a dud then it outputs a 1.
+
+    In the classical case, it is clearly impossible to test whether it is a bomb without making it explode. Let us thus quantise it: 
+    \[\alpha \ket{0} + \beta \ket{1} \mapsto \begin{systemofequations} \text{If it is a bomb, with probability $\left|\beta\right|^2$, explode}, \\ \text{If it is a bomb, with probability $\left|\alpha\right|^2$, output $\ket{0}$}, \\ \text{If it is a dud, do nothing output $\alpha \ket{0} + \beta \ket{1}$.}\end{systemofequations}\]
+
+    Then, we can test whether it is a bomb without exploding with arbitrary success probability.
+
+    \begin{subparag}{Intuition}
+        The idea is that if it is a bomb, then it will measure the state; but if it is a dud, it will do nothing. We will try to exploit this.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $\delta > 0$ be our (small) braveness parameter, it will represent how happy we are with blowing up. We let: 
+        \[\ket{\psi_{\delta}} = \cos\left(\delta\right) \ket{0} + \sin\left(\delta\right) \ket{1}.\]
+        
+        Then, testing this, this becomes: 
+        \[\ket{\psi_{\delta}} \mapsto \begin{systemofequations} \text{Explode}, & \text{if it is a bomb, with probability $\sin\left(\delta\right)^2 \approx \delta^2$,}\\  \ket{0}, & \text{if it is a bomb, with probability $\cos\left(\delta\right)^2 \approx 1 - \delta^2$},\\ \ket{\psi_{\delta}}, & \text{if it is a dud.} \end{systemofequations}\]
+
+        The bomb did not explode with high probability; and we get a different state if it is a bomb or a dud. Our idea is now to repeat this experiment $N$ times to make a bigger difference between the two states. More precisely, starting with state $\ket{0}$, we repeat $N$ times the following algorithm:
+        \begin{itemize}
+            \item Apply $\displaystyle R_{\delta} = \begin{pmatrix} \cos\left(\delta\right) & -\sin\left(\delta\right) \\ \cos\left(\delta\right) & \cos\left(\delta\right) \end{pmatrix}$ on the state.
+            \item Feed it to the bomb/dud.
+            \item If we are still alive, repeat.
+        \end{itemize}
+
+        The case where it is a dud goes as follows: 
+        \[\ket{0} \over{\mapsto}{$R_{\delta}$} \ket{\psi_{\delta}} \over{\mapsto}{Bomb?}  \ket{\psi_{\delta}} \over{\mapsto}{$R_{\delta}$} \ket{\psi_{2\delta}} \over{\mapsto}{Bomb?}  \ket{\psi_{2\delta}} \over{\mapsto}{$R_{\delta}$} \ket{\psi_{3\delta}} \over{\mapsto}{Bomb?}  \ket{\psi_{3\delta}} \mapsto \ldots \mapsto \ket{\psi_{N \delta}}.\]
+        
+        The case where this is a bomb, assuming we never explode: 
+        \[\ket{0} \over{\mapsto}{$R_{\delta}$} \ket{\psi_{\delta}} \over{\mapsto}{Bomb?}  \ket{0} \over{\mapsto}{$R_{\delta}$} \ket{\psi_{\delta}} \over{\mapsto}{Bomb?}  \ket{0} \over{\mapsto}{$R_{\delta}$} \ket{\psi_{\delta}} \over{\mapsto}{Bomb?}  \ket{0} \mapsto \ldots \mapsto \ket{0}.\]
+
+        We check $N$ times whether the state $\ket{\psi_{\delta}}$ is a bomb, yielding an explosion probability of roughly $N \delta^2$.
+
+        Now, leaving $N \approx \frac{\pi}{2 \delta}$, the resulting state is: 
+        \[\begin{systemofequations} \ket{\psi_{N \delta}} \approx \ket{\psi_{\pi/2}} = \ket{1}, & \text{if it is a dud,}\\ \ket{0}, & \text{if it is a bomb.} \end{systemofequations}\]
+        
+        Measuring this state in the computation basis thus tells us if it is a bomb or a dud; and we exploded with probability $N \delta^2 = O\left(\delta\right)$. This does show that this procedure works with arbitrary success probability $1 - \delta$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Attack on Wiesner's scheme}
+    We consider an attack based on the bomb testing idea. Let $\delta > 0$ be small and $N = 2\left\lceil \frac{\pi}{4 \delta} \right\rceil $. We consider the following quantum circuit:
+    \begin{center}
+    \begin{quantikz} 
+        \lstick{$\ket{x}_{\theta}$} & \gategroup[wires=2,steps=3,style={inner ysep=6pt, inner xsep=2pt, color=red}]{{\color{red}Repeat $N$ times}}                  & \targ{} & \gate{\lang{Ver}\left(k, \$, \cdot\right)} & \midstick{$\cdots$} &\rstick{$\ket{x}_{\theta}$} \\
+        \lstick{\ket{0}}     & \gate{R_{\delta}} & \ctrl{-1} & & \midstick{$\cdots$} & \meter{}
+    \end{quantikz}
+    \end{center}
+
+    We go to jail with probability at most approximately $N \delta^2 = O\left(\delta\right)$, stopping the attack immediately. If we don't go to jail, and we measure $1$ at the end, then necessarily $\ket{x}_{\theta} = \ket{+}$. Reciprocally, if we measure $0$ at the end, then $\ket{x}_{\theta} \neq \ket{+}$ with high probability.
+
+    \begin{subparag}{Implication}
+        By applying some $H$ and/or some $X$ gates to our $\ket{x}_{\theta} \in \left\{\ket{0}, \ket{1}, \ket{+}, \ket{-}\right\}$, and after and before the verification procedure, we are able to know which of the four states it is exactly. Overall, this allows us to know the exact state of $\ket{\psi_{\$}} = \ket{x_1}_{\theta_1} \otimes \ldots \otimes \ket{x_n}_{\theta_n}$, allowing perfect cloning.
+
+        This does show that this oracle access to the verification procedure is not secure for the Wiesner scheme.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We consider the different cases.
+        \begin{itemize}[left=0pt]
+            \item Suppose that $\ket{x}_{\theta} = \ket{+}$. Let us apply one iteration of the circuit on $\ket{+}\ket{\psi_{i\delta}}$: 
+                \autoeq[s]{CNOT_{21} \left(I \otimes R_{\delta}\right) \ket{+}\ket{\psi_{i \delta}} = CNOT_{21} \ket{+} \ket{\psi_{\left(i+1\right) \delta}} = CNOT_{21} \cos\left(\left(i+1\right)\delta\right) \ket{+0} + CNOT_{21} \sin\left(\left(i+1\right)\delta\right) \ket{+1} = \cos\left(\left(i+1\right)\delta\right) \ket{+0} + \sin\left(\left(i+1\right)\delta\right) \ket{+1} = \ket{+}\ket{\psi_{\left(i+1\right)\delta}},}
+                where we used the fact that $X \ket{+} = \ket{+}$.
+            
+                Now, when we apply the verification procedure to the first qubit, it will do nothing since it is valid. An iteration thus maps: 
+                \[\ket{+} \ket{\psi_{i \delta}} \mapsto \ket{+} \ket{\psi_{\left(i+1\right) \delta}}.\]
+                
+                After $N$ iterations, this is thus the state $\ket{+} \ket{\psi_{N \delta}}$. Since we picked $N = 2 \left\lceil \frac{\pi}{4 \delta} \right\rceil \approx \frac{\pi}{2 \delta}$, the second qubit is the state $\ket{\psi_{N \delta}} \approx \ket{\psi_{\pi/2}} = \ket{1}$. Hence, measuring it, we do get 1 with high probability. 
+                \item Suppose now that $\ket{x}_{\theta} = \ket{-}$. We consider one iteration:
+                    \autoeq[s]{CNOT_{21} \left(I \otimes R_{\delta}\right) \ket{-}\ket{\psi_{i \delta}} = CNOT_{21} \ket{-} \ket{\psi_{\left(i+1\right) \delta}} = CNOT_{21} \cos\left(\left(i+1\right)\delta\right) \ket{-0} + CNOT_{21} \sin\left(\left(i+1\right)\delta\right) \ket{-1} = \cos\left(\left(i+1\right)\delta\right) \ket{-0} - \sin\left(\left(i+1\right)\delta\right) \ket{-1} = \ket{-}\ket{\psi_{-\left(i+1\right)\delta}}.}
+
+                Again, the verification procedure will do nothing. Hence, one iteration of the algorithm maps: 
+                \[\ket{-}\ket{\psi_{i \delta}} \mapsto \ket{-} \ket{\psi_{-\left(i+1\right) \delta}}.\]
+                
+                We start with $i = 0$, so two iterations of the algorithm give: 
+                \[\ket{-}\ket{0} \mapsto \ket{-} \ket{\psi_{- \delta}} \mapsto \ket{-} \ket{\psi_{0 \delta}} = \ket{-} \ket{0}.\]
+                
+                In other words, every two iterations, we are back to $\ket{-}\ket{0}$. Now, we picked $N = 2 \left\lceil \frac{\pi}{4 \delta} \right\rceil $ to be even. Hence, after the whole circuit, we are back to $\ket{-}\ket{0}$. We will thus necessarily measure $0$ at the end on the second qubit. 
+             
+            \item Suppose now that $\theta = 0$ and hence $\ket{x}_{\theta} \in \left\{\ket{0}, \ket{1}\right\}$. We write $\ket{x}_{\theta} = \ket{x}$. Considering the first iteration of the circuit, we find:
+                \autoeq{CNOT_{21} \left(I \otimes R_{\delta}\right) \ket{x}\ket{0} = CNOT_{21} \ket{x} \ket{\psi_{\delta}} = CNOT_{21}\left(\cos\left(\delta\right) \ket{x}\ket{0} + \sin\left(\delta\right) \ket{x}\ket{1}\right) = \cos\left(\delta\right) \ket{x}\ket{0} + \sin\left(\delta\right) \ket{\bar{x}}\ket{1}.}
+
+                This time, the verification has a chance to fail, with probability $\sin^2\left(\delta\right) \approx \delta^2$. However, with remaining probability, it will measure $\ket{x}$ and hence pass, mapping the circuit back to $\ket{x}\ket{0}$. Hence, every iteration is such that, with probability $\approx 1 - \delta^2$: 
+                \[\ket{x}\ket{0} \mapsto \ket{x}\ket{0}.\]
+                
+                Overall, this yields a probability to go to jail of approximately $N \delta^2 = O\left(\delta\right)$. However, if we don't, then we necessarily measure $0$ on the second qubit.
+        \end{itemize}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

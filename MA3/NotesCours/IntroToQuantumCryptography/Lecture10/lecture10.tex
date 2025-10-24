@@ -1,0 +1,134 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-09 at 13:17:47.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Jeudi 09 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2025-10-09}{Linear algebra goes brrr}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the threee-player guessing game, and proof of an upper bound on the optimal strategy.
+    \item Introduction to privacy amplification through the definition of $k$-source and some examples.
+\end{itemize}
+
+}
+
+\begin{parag}{Three-player guessing game}
+    We have three players: Alice, Bob and Eve. Eve prepares some state $\rho_{ABE}$, keeps $\rho_E$ but sends $\rho_A$ to Alice and $\rho_B$ to Bob. Alice decides of some $\theta \leftarrow_U \left\{0, 1\right\}$. She wants Bob to also know it, so she has to send it to him; but then Eve can read it and also knows it.
+
+    Both Alice and Bob measure their respective qubit in the basis $\theta$, getting some $X_A$ and $X_B$. Eve can then produce some $X_E \in \left\{0, 1\right\}$.
+
+    Everyone finally reveals their value to some trusted referee. If $X_A \neq X_B$, Eve fails: she wants them to have the same answer. Winning happens whenever $X_E = X_A = X_B$.
+
+    Then, the maximum success probability is such that: 
+    \[p_{win} = \prob\left(X_E = X_A = X_B\right) \leq \frac{1}{2} + \frac{1}{2 \sqrt{2}}.\]
+
+    \begin{subparag}{Intuition}
+        The idea here is that Eve wants an EPR pair with Alice, so that she can get the same measurement. However, she also wants Alice to have an EPR pair with Bob. This is an issue with the monogamy of entanglement.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This is very useful for cryptography. Let's say that Alice and Bob want to prepare some EPR pair. If they do get an EPR pair, they can then measure it in the same basis, getting the same value and hence creating a shared random key.
+
+        Now, they want to make sure Eve is not able to just give them the state $\frac{1}{\sqrt{2}} \ket{000} + \frac{1}{\sqrt{2}} \ket{111}$. This is the interest of this analysis.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We want to compute Eve's maximum success probability: 
+        \autoeq[s]{p_{win} = \sup \prob\left(x_A = x_B = x_E\right) = \sup_{\substack{\rho_{ABE} \\ \text{$\forall \theta$, $\left\{M_0^{\theta}, M_1^{\theta}\right\}$ POVM}}} \frac{1}{2} \sum_{\theta \in \left\{0, 1\right\}} \sum_{x} \Tr\left(\rho_{ABE} \ket{x}\bra{x}_{\theta}^A \otimes \ket{x}\bra{x}_{\theta}^B \otimes M_x^{\theta}\right).}
+        where $\ket{x}\bra{x}_{\theta}^A$ is Alice's measurement in the $\theta$ basis, $\ket{x}\bra{x}_{\theta}^B$ is Bob's measurement and $M_x^{\theta}$ is Eve's measurement. Then, $\Tr\left(\rho_{ABE} \ket{x}\bra{x}_{\theta}^A \otimes \ket{x}\bra{x}_{\theta}^B \otimes M_x^{\theta}\right)$ is the probability that they all find $x$.
+
+        Using Naimark's theorem Eve can purify her measurement into a projective measurement. Hence, we can consider the following projective measurement: 
+        \[\Pi_x^{\theta} = \ket{x}\bra{x}_{\theta}^{A} \otimes \ket{x}\bra{x}_{\theta}^{B} \otimes M_x^{\theta}.\]
+        
+        This yields: 
+        \autoeq{p_{win} = \sup_{\substack{\rho_{ABE} \\ \text{$\forall \theta \in \left\{0, 1\right\}$, $\left\{M_0^{\theta}, M_1^{\theta}\right\}$ POVM on $E$}}} \Tr\left(\rho \frac{1}{2} \sum_{\theta} \frac{1}{2} \sum_{x} \Pi_x^{\theta}\right) = \sup_{\substack{\rho_{ABE} \\ \forall \theta, \left\{M_0^{\theta}, M_1^{\theta}\right\} \text{ projective POVM on $\mathcal{H}_E$}}} \frac{1}{2} \sum_{\theta} \Tr\left(\rho_{ABE} \Pi_{\theta}\right),}
+        where $\Pi_{\theta} = \sum_{x \in \left\{0, 1\right\}} \ket{x}\bra{x}_{\theta} \otimes \ket{x}\bra{x}_{\theta} \otimes M_x^{\theta}$. Intuitively, $\frac{1}{2} \sum_{\theta} $ means the random choice of the $\theta$, and $\Pi_{\theta}$ is the POVM that tells if everyone measures the same value.
+
+        We can simplify our expression to:
+        \autoeq{p_{win} = \sup_{\substack{\rho_{ABE} \\ \forall \theta, \left\{M_0^{\theta}, M_1^{\theta}\right\}} \text{ projective POVM on $\mathcal{H}_E$}} \Tr\left(\rho_{ABE} \cdot \frac{1}{2} \left(\Pi_0 + \Pi_1\right)\right) = \sup_{ \forall \theta, \left\{M_0^{\theta}, M_1^{\theta}\right\} \text{ projective POVM on $\mathcal{H}_E$}} \frac{1}{2}\left\|\Pi_0 + \Pi_1\right\|_{\infty},}
+        where we used the fact that $\sup_{\rho} \Tr\left(\rho A\right) = \lambda_{max}\left(A\right)$ as we have already seen, and that $\lambda_{max}\left(A\right) = \left\|A\right\|_{\infty}$ since it is a projector and hence all its eigenvalues are non-negative.
+
+        We are now going to use a bunch of linear algebra inequalities, which we are not expected to know. For two projectors $P, Q$, then $\left\|P + Q\right\|_{\infty} \leq 1 + \left\|PQ\right\|_{\infty}$. It thus suffices to study $\left\|\Pi_0 \Pi_1\right\|_{\infty}$. Now, it is also possible to show that if $\Pi_0 \leq \widetilde{\Pi}_0$ and $\Pi_1 \leq \widetilde{\Pi}_1$, then: 
+        \[\left\|\Pi_0 \Pi_1\right\|_{\infty}^2 = \left\|\Pi_0 \Pi_1 \left(\Pi_0 \Pi_1\right)^{\dagger}\right\|_{\infty} = \left\|\Pi_0 \Pi_1 \Pi_0\right\|_{\infty} \leq \left\|\widetilde{\Pi}_0 \widetilde{\Pi}_1 \widetilde{\Pi}_0\right\|_{\infty}.\]
+        
+        %or, more simply: 
+        %\[\left\|\Pi_0 \Pi_1\right\|_{\infty}^2 = \left\|\Pi_0 \Pi_1 \left(\Pi_0 \Pi_1\right)^{\dagger}\right\|_{\infty} = \left\|\Pi_0 \Pi_1^2 \Pi_0\right\|_{\infty} = \left\|\Pi_0 \Pi_1 \Pi_0\right\|_{\infty},\]
+        %where we used the fact $\left\|A\right\|_{\infty} = \left\|A A^{\dagger}\right\|_{\infty}$.
+
+        %Completely similarly, we find that $\left\|\Pi_0 \Pi_1\right\|_{\infty}^2 = \left\|\Pi_1 \Pi_0 \Pi_1\right\|_{\infty}$.
+
+        Now, we can let: 
+        \[\Pi_0 = \sum_{x} \ket{x}\bra{x}_0 \otimes \ket{x}\bra{x}_0 \otimes \overbrace{M_x^0}^{\leq I} \leq \sum_{x} \ket{x}\bra{x}_0 \otimes \ket{x}\bra{x}_0 \otimes I = \widetilde{\Pi}_0,\]
+        \[\Pi_1 = \sum_{x} \ket{x}\bra{x}_1 \otimes \underbrace{\ket{x}\bra{x}_1}_{\leq I} \otimes M_x^1 \leq \sum_{x} \ket{x}\bra{x}_1 \otimes I \otimes M_x^1 = \widetilde{\Pi}_1.\]
+        
+        % Overall, this means that $\left\|\Pi_0 \Pi_1 \Pi_0\right\|_{\infty} \leq \left\|\widetilde{\Pi}_0 \widetilde{\Pi}_1 \widetilde{\Pi}_0\right\|_{\infty}$. We are using here the fact that $A \leq C$ implies $BAB^{\dagger} \leq BCB^{\dagger}$. #later{better justify this, this will be better justified in the notes}
+        
+        As explained above, we aim to study $\left\|\widetilde{\Pi}_0 \widetilde{\Pi}_1 \widetilde{\Pi}_0\right\|_{\infty}$. However, they are such that:
+        \autoeq[s]{\widetilde{\Pi}_0 \widetilde{\Pi}_1 \widetilde{\Pi}_0 = \sum_{x} \ket{x}\bra{x}_0 \otimes \ket{x}\bra{x}_0 \otimes I \cdot  \sum_{y} \ket{y}\bra{y}_1 \otimes I \otimes M_y^1 \cdot  \sum_{z} \ket{z}\bra{z}_0 \otimes \ket{z}\bra{z}_0 \otimes I = \sum_{\substack{x = z \\ y}} \left(\ket{x}\bra{x}_0 \cdot \ket{y}\bra{y}_1 \cdot \ket{x}\bra{x}_0\right) \otimes \ket{x}\bra{x}_0 \otimes M_y^1.}
+        
+        Now, $\bra{x}_0 \ket{y}_1 \bra{y}_1 \ket{x}_0 = \frac{1}{2}$ no matter $x$ and $y$. So this simplifies to:
+        \[\widetilde{\Pi}_0 \widetilde{\Pi}_1 \widetilde{\Pi}_0 = \frac{1}{2} \sum_{x} \ket{x}\bra{x}_0 \otimes \ket{x}\bra{x}_0 \otimes \underbrace{\left(\sum_{y} \Pi_y^1\right)}_{= I} = \frac{\ket{00}\bra{00} + \ket{11}\bra{11}}{2} \otimes I.\]
+
+        This shows that $\left\|\widetilde{\Pi}_0 \widetilde{\Pi}_1 \widetilde{\Pi}_0\right\|_{\infty} = \frac{1}{2}$. Hence, feeding everything back to our equation: 
+        \autoeq{p_{win} = \frac{1}{2} \left\|\Pi_0 + \Pi_1\right\|_{\infty} \leq \frac{1}{2}\left(1 + \left\|\Pi_0 \Pi_1\right\|_{\infty}\right) \leq \frac{1}{2}\left(1 + \sqrt{\left\|\widetilde{\Pi}_0 \widetilde{\Pi}_1 \widetilde{\Pi}_0\right\|_{\infty}}\right) = \frac{1}{2}\left(1 + \frac{1}{\sqrt{2}}\right) = \frac{1}{2} + \frac{1}{2 \sqrt{2}}.}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+%\begin{parag}{Intuition}
+%    The idea is that Alice and Bob want to prepare some EPR pair. If they do get an EPR pair, they can then measure it in the same basis, getting the same value and hence creating a random key. Now, they want to make sure Eve is not able to just give them the state $\frac{1}{\sqrt{2}} \ket{000} + \frac{1}{\sqrt{2}} \ket{111}$, hence the analysis we are doing right now.
+%
+%    We want to show that $\prob\left(x_A = x_B = x_E\right)$ is small. This will tell us information on $\prob\left(x_E = x_A \suchthat x_A = x_B\right)$, which is the real value we want to bound.
+%\end{parag}
+
+\subsection{Privacy amplification}
+
+\begin{parag}{Definition: $k$-source}
+    Let $\rho_{XE}$ be a CQ state and $k \in \mathbb{Z}_{\geq 0}$. It is called \important{$k$-source} if $H_{min}\left(X \suchthat E\right) \geq k$.
+
+    \begin{subparag}{Intuition}
+        The idea is that, if we have $\rho_{XE}$, then we should be able to generate a string which is at least partially secret, i.e.~such that Eve can guess with probability $2^{-k}$.
+
+        Our goal is to get $k$ bits of uniform and private randomness from $X$. Note that $X$ may be a lot more than $k$ bits, and that we do not know what information Eve has.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    Let's suppose that $X \followsdistr_U \left\{0, 1\right\}^3$ and $E = X_1 \oplus X_2$. Writing this as a CQ state, we have: 
+    \[\rho_{XE} = \frac{1}{8} \sum_{x \in \left\{0,1\right\}^3} \ket{x}\bra{x}_X \otimes \ket{x_1 \oplus x_2}\bra{x_1 \oplus x_2}_E.\]
+    
+    Let us compute the min-entropy. We have: 
+    \[H_{min}\left(X \suchthat E\right) = -\log_2\left(P_{guess}\left(X \suchthat E\right)\right) = -\log_2\left(\frac{1}{4}\right) = 2.\]
+
+    Indeed, Eve's best strategy is just to guess $x_1, x_3$ (with probability $\frac{1}{4}$) and evaluate $x_2$ with the rest of her knowledge (with probability $1$).
+
+    Now, we can extract $\left(x_1, x_2, x_3\right) \mapsto \left(x_1, x_3\right)$. This is nice because $\left(x_1, x_3\right)$ is independent from $x_1 \oplus x_2$.
+
+    \begin{subparag}{Remark}
+        In this example, we used that we knew what Eve has. We will however want to develop techniques that will work whatever the adversary knows.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let $X \followsdistr \left\{0, 1\right\}^n$ be sampled in such a way $X_1, \ldots, X_n$ are IID, and $\prob\left(X_i = 0\right) = \frac{3}{4}$ and $\prob\left(X_i = 1\right) = \frac{1}{4}$. The min-entropy can easily be computed since there is no Eve: 
+    \[H_{min}\left(X\right) = -\log_2\left(\max_x p_x\right) = -\log_2\left(\prob\left(X = 0\cdots0\right)\right) = -\log_2\left(\left(\frac{3}{4}\right)^n\right) = n \log_2\left(\frac{4}{3}\right).\]
+    
+    We thus want to extract a string of length $n \log_2\left(\frac{4}{3}\right)$. One can check that the string $X_1' = X_1 \oplus X_2, X_2' = X_3 \oplus X_4, \ldots$ has less bias, although it outputs a string of length $\frac{1}{2} n$, which is not very efficient. There are other strategies that are more efficient.
+
+    \begin{subparag}{Remark}
+        Our general strategy should also work no matter the distribution of $X$.
+    \end{subparag}
+\end{parag}
+
+\end{document}

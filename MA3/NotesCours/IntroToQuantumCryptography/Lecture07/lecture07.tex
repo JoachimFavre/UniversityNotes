@@ -1,0 +1,358 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-30 at 11:15:40.
+
+\usepackage{../../style}
+
+\title{QCrypto}
+\author{Joachim Favre}
+\date{Mardi 30 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2025-09-30}{Hidden variables}{
+\begin{itemize}[left=0pt]
+    \item Definition of entangled state.
+    \item Explanation of the Schmidt decomposition and of the Schmidt rank.
+    \item Definition of the purification of a state.
+    \item Explanation and proof of Uhlmann's theorem.
+    \item Explanation of the secret sharing problem.
+    \item Explanation of the CSHS game.
+    \item Proof that the best classical strategy to the CSHS game has success probability $3/4$.
+\end{itemize}
+
+}
+
+\section{Entanglement}
+
+\subsection{Definitions}
+
+\begin{parag}{Definition: Entanglement for pure states}
+    Let $\ket{\psi} \in \mathcal{H}_A \otimes \mathcal{H}_B$ be a pure state. It is said to be a \important{product state} if there exists $\ket{\psi_1} \in \mathcal{H}_A$ and $\ket{\psi_2} \in \mathcal{H}_B$ such that: 
+    \[\ket{\psi}_{AB} = \ket{\psi_1}_A \otimes \ket{\psi_2}_B.\]
+
+    Otherwise, it is said to be \important{entangled}.
+    
+    \begin{subparag}{Remark}
+        Entanglement is intrinsically a bipartite notion. For instance, let us consider the following state: 
+        \[\ket{\psi}_{ABC} = \frac{\ket{000} + \ket{110}}{\sqrt{2}}.\]
+
+        It can be shown to be entangled between $A$ and $\left(B, C\right)$. However, it is not entangled between $\left(A, B\right)$ and $C$: 
+        \[\ket{\psi}_{ABC} = \frac{\ket{00} + \ket{11}}{\sqrt{2}} \otimes \ket{0}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Entanglement for mixed states}
+    Let $\rho_{AB}$ be a mixed state. It is said to be \important{separable} if we can find some probability distribution $p_i$ and mixed states $\rho_i^{A}, \rho_i^{B}$ such that: 
+    \[\rho_{AB} = \sum_{i} p_i \rho_i^A \otimes \rho_i^B.\]
+
+    Otherwise, it is said to be \important{entangled}.
+    
+    \begin{subparag}{Remark}
+        This is a generalisation of the definition of entanglement for pure states.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    We consider the following state, named an \important{EPR pair}: 
+    \[\ket{EPR} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}.\]
+    
+    Then, this state is entangled.
+
+    \begin{subparag}{Proof}
+        This proof is left as an exercise to the reader. The idea is to make a proof by contradiction, supposing that we can find $\ket{\psi_1} = \alpha_1 \ket{0} + \beta_1 \ket{1}$ and $\ket{\psi_2} = \alpha_2 \ket{0} + \beta_2 \ket{1}$ such that $\ket{EPR} = \ket{\psi_1} \otimes \ket{\psi_2}$, and then to find a contradiction.
+
+        Another way of proving this is through the following lemma.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\rho_{AB}$ be a mixed state over 2 qubits. We suppose that if we measure both qubits in the computation basis, then they both yield the same measurement. Similarly, we suppose that if we measure both qubits in the Hadamard basis, then they both yield the same measurement.
+
+    Then, $\rho_{AB}$ is entangled.
+\end{parag}
+
+\begin{parag}{Remark}
+    There are two ways of analysing the entanglement of some state: the Schmidt decomposition and Hullman's theorem. We will see both.
+\end{parag}
+
+\begin{parag}{Theorem: Schmidt decomposition}
+    Let $\ket{\psi}_{AB} \in \mathcal{H}_A \otimes \mathcal{H}_B$ be a pure state.
+
+    Then, there exists a probability distribution $p_i$, an orthonormal basis $\ket{u_i}_A$ of $\mathcal{H}_A$ and an orthonormal basis $\ket{v_i}_B$ of $\mathcal{H}_B$, such that: 
+    \[\ket{\psi} = \sum_{i} \sqrt{p_i} \ket{u_i} \otimes \ket{v_i}.\]
+
+    \begin{subparag}{Remark}
+        A direct corollary is that $p_i$ are the non-zero eigenvalues of $\rho_A = \Tr_B\left(\ket{\psi}\bra{\psi}\right)$ associated to eigenvectors $\ket{u_i}$, and they are eigenvalues of $\rho_B = \Tr_A\left(\ket{\psi}\bra{\psi}\right)$ associated to eigenvectors $\ket{v_i}$.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        The idea is that we can always write $\ket{\psi} = \sum_{i, j} a_{i, j} \ket{i} \otimes \ket{j}$. But then, we can consider the matrix $A$ such that $A_{ij} = a_{ij}$. This result then comes by doing an SVD decomposition on $A$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $\ket{\psi}_{AB} = \sum_{i} \sqrt{p_i} \ket{u_i} \otimes \ket{v_i}$ be the Schmidt decomposition of a pure state. We consider its \important{Schmidt rank} to be the number of non-zero $p_i$: 
+    \[SR\left(\ket{\psi}_{AB}\right) = \left|\left\{i \suchthat p_i > 0\right\}\right|.\]
+
+    $\ket{\psi}_{AB}$ is entangled if and only if $SR\left(\ket{\psi}\right) > 1$.
+
+    \begin{subparag}{Intuition}
+        The idea is that $\ket{\psi}_{AB}$ is a product state if and only if it can be written as $\ket{\psi}_{AB} = \ket{u} \otimes \ket{v}$, which is equivalent to having $SR\left(\ket{\psi}\right) = 1$.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Let $\epsilon \in \left]0, 1\right[ $ be arbitrary. Then, for instance, the following state is entangled: 
+        \[\ket{\psi} = \sqrt{1 - \epsilon} \ket{00} + \sqrt{\epsilon} \ket{11}.\]
+
+        This is nice, but instead of having a yes/no answer to entanglement, it would be nice to have a value measuring the amount of entanglement. This leads us to the following definition.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Von-Neumann entropy}
+    Let $\ket{\psi}_{AB} = \sum_{i} \sqrt{p_i} \ket{u_i} \otimes \ket{v_i}$ be the Schmidt decomposition of a pure state.We define its \important{Von-Neuman} entropy as: 
+    \[H\left(\left\{p_i\right\}\right) = -\sum_{i} p_i \log_2\left(p_i\right).\]
+    
+    \begin{subparag}{Example}
+        Let us consider the following example:
+        \[\ket{\psi} = \sqrt{1 - \epsilon} \ket{00} + \sqrt{\epsilon} \ket{11}.\]
+
+        Then: 
+        \[H\left(\left\{p_i\right\}\right) = -\epsilon \log_2\left(\epsilon\right) - \left(1 - \epsilon\right) \log_2\left(1 - \epsilon\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Purification}
+    Let $\rho_A$ be a mixed state. Some pure state $\ket{\psi}_{AB} \in \mathcal{H}_A \otimes \mathcal{H}_B$ (for some $\mathcal{H}_B$) is called a \important{purification} of $\rho_A$ if: 
+    \[\Tr_B\left(\ket{\psi}\bra{\psi}\right) = \rho_A.\]
+    
+    \begin{subparag}{Example}
+        Consider the following density matrix: 
+        \[\rho_A = \frac{1}{4} \ket{0}\bra{0} + \frac{3}{4} \ket{1}\bra{1}.\]
+
+        Then, considering any orthonormal states $\left\{\ket{u}, \ket{u^{\perp}}\right\}$, we can consider: 
+        \[\ket{\psi}_{AB} = \sqrt{\frac{1}{4}} \ket{0} \ket{u} + \sqrt{\frac{3}{4}} \ket{1} \ket{u^{\perp}}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        Any density matrix can be purified, in a way similar to the example above. For instance, given $\rho_A = \sum_{i} p_i \ket{u_i}\bra{u_i}$, we can always take $\ket{\psi}_{AB} = \sum_{i} \sqrt{p_i} \ket{u_i}_A \otimes \ket{i}_B$.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        If the reader wants to learn more about purifications, I invite them to read the corresponding section in my notes of Prof. Zoë Holmes' Quantum information theory class, available at:
+        \begin{center}
+            \url{https://github.com/JoachimFavre/UniversityNotes}
+        \end{center}
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Purifications are not unique in general. However, the following theorem tells us how they are related.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Uhlmann's theorem}
+    Let $\ket{\psi}_{AB} \in \mathcal{H}_A \otimes \mathcal{H}_B$ and $\ket{\psi'}_{AB'} \in \mathcal{H}_A \otimes \mathcal{H}_{B'}$ be pure states. Suppose moreover without loss of generality that $\dim \mathcal{H}_B \leq \dim \mathcal{H}_{B'}$.
+
+    $\ket{\psi}_{AB}$ and $\ket{\psi'}_{AB'}$ are two purifications of the same state if and only and there exists an isometry $V_{B \mapsto B'}: \mathcal{H}_B \mapsto \mathcal{H}_{B'}$ such that $\left(I_A \otimes V_{B \mapsto B'}\right) \ket{\psi}_{AB} = \ket{\psi'}_{AB'}$.
+
+    \begin{subparag}{Proof $\implies$}
+        Let $\rho_A$ be the state they both purify. We consider its diagonalisation $\rho_A = \sum_{i} p_i \ket{u_i}\bra{u_i}$, and suppose for simplicity of the argument that the $p_i$ are pairwise distinct (this hypothesis can be removed from the proof, but it makes the proof more complicated).
+
+        Since the $p_i$ are pairwise distinct, the Schmidt decomposition is unique and hence we must have: 
+        \[\ket{\psi}_{AB} = \sum_{i} \sqrt{p_i} \ket{u_i}_A \otimes \ket{v_i}_{B}, \mathspace \ket{\psi'}_{AB'} = \sum_{i} \sqrt{p_i} \ket{u_i}_A \otimes \ket{v_i'}_{B'}.\]
+
+        The coefficients $\sqrt{p_i}$ and the vectors $\ket{u_i}_A$ are forced by the fact they are purifications of $\rho_A$. We can then just let $V_{B \mapsto B'}$ to be the isometry that maps $V_{B \mapsto B'} \ket{v_i}_B = \ket{v_i'}_{B'}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof $\impliedby$}
+        We notice that, using the fact $V_{B \mapsto B'}^{\dagger} V_{B \mapsto B'} = I_{B}$ is an identity over the space $B$ by definition of isometry: 
+        \autoeq{\Tr_{B'}\left(\ket{\psi'}\bra{\psi'}\right) = \Tr_{B'}\left(\left(I \otimes V_{B \mapsto B'}\right) \ket{\psi}\bra{\psi} \left(I \otimes V_{B \mapsto B'}^{\dagger}\right)\right) = \Tr_B\left(\ket{\psi}\bra{\psi}\right).}
+
+        They have the same partial trace, so they are purifications of the same state.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Bell states}
+    We call the following states the \important{Bell states}: 
+    \[\ket{\psi_{00}} = \frac{\ket{00} + \ket{11}}{\sqrt{2}}, \mathspace \ket{\psi_{10}} = \frac{\ket{01} + \ket{10}}{\sqrt{2}},\]
+    \[\ket{\psi_{01}} = \frac{\ket{00} - \ket{11}}{\sqrt{2}}, \mathspace \ket{\psi_{11}} = \frac{\ket{01} - \ket{10}}{\sqrt{2}}.\]
+    
+    \begin{subparag}{Remark}
+        They all have the same reduced state, $\rho_A = \frac{1}{2} I$. Hence, Uhlmann's theorem applies, and we can find: 
+        \[\ket{\psi_{ab}} = \left(I_A \otimes X_B^a Z_B^b\right) \ket{\psi_{00}}.\]
+    \end{subparag}
+\end{parag}
+
+\subsection{Secret sharing}
+
+\begin{parag}{Goal}
+    We consider an easy application of entanglement: secret sharing.
+\end{parag}
+
+\begin{parag}{Secret sharing}
+    Let $s \in \left\{0, 1\right\}$ be some secret. We want Alice to know some $s_A$ and Bob to know some $s_B$ so that, individually, they don't know anything about $s$ but if they get together they can get $s$ from $\left(s_A, s_B\right)$. 
+
+    \begin{subparag}{Classical protocol}
+        This can be solved by giving some $r \leftarrow_U \left\{0, 1\right\}$ to Alice and $s \oplus r$ to Bob. Individually, they don't have information, but together they can get $s$ by xoring there bits.
+
+        This can however made be better with quantum.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Quantum secret sharing}
+    Let $s \in \left\{0, 1\right\}^2$. We want to have some state $\ket{\psi}_{AB}$ such that $\rho_A$ and $\rho_B$ are independent of $s$, but $\ket{\psi_{AB}}$ recovers $s$.
+
+    \begin{subparag}{Protocol}
+        Given $s = \left(s_1, s_2\right)$, we take the Bell state $\ket{\psi_{s_1, s_2}}$. The reduced matrix is always $\rho_A = \rho_B = \frac{1}{2} I$, giving no information on $s$. However, the Bell states are orthogonal, so if they are together, they can measure $\ket{\psi_{s_1, s_2}}$ in the Bell basis to get $s = \left(s_1, s_2\right)$.
+
+        In the classical case, we protected a one-bit secret; in the quantum case, it was a two-bit secret. This is thus better.
+    \end{subparag}
+\end{parag}
+
+\subsection{CSHS game}
+
+\begin{parag}{Definition: Non-local game}
+    \important{Non-local games} are family of games defined as follows.
+
+    We have three players: Alice, Bob and some Referee. Everyone knows some distribution $\pi$ and some verification $V$. The Referee samples some $\left(x, y\right) \followsdistr \pi$, sends $x$ to Alice and $y$ to Bob. Then Alice answers $a$ and Bob answers $b$, and the referee accepts if and only if $V\left(a, b \suchthat x, y\right) = 1$.
+\end{parag}
+
+\begin{parag}{Definition: CSHS game}
+    The \important{CSHS game} is a non-local game, where $\pi \leftarrow_U \left\{0, 1\right\} \times \left\{0, 1\right\}$ and: 
+    \[V\left(a, b \suchthat x, y\right) = \begin{systemofequations} 1, & \text{if $a \oplus b = x \land y$,} \\ 0, & \text{otherwise,} \end{systemofequations}\]
+    where $a, b \in \left\{0, 1\right\}$.
+
+    \begin{subparag}{Intuition}
+        We can draw the following table of answers $a, b$ that are accepted by $V$:
+        \begin{center}
+        \begin{tabular}{|cc|c|}
+            \hline
+            $x$ & $y$ & $a \oplus b$ \\
+            \hline
+            $0$ & $0$ & $0$ \\
+            $0$ & $1$ & $0$ \\
+            $1$ & $0$ & $0$ \\
+            $1$ & $1$ & $1$  \\
+            \hline
+        \end{tabular}
+        \end{center}
+        
+        The hardness here comes from the fact that, if Alice is given $x = 1$, then she does not know if Bob got $y = 0$ or $y = 1$, and hence which parity they should produce.
+    \end{subparag}
+    
+\end{parag}
+
+\begin{parag}{Strategies}
+    Players are modeled by using a family of distributions $\left(p\left(a, b \suchthat x, y\right)\right)_{a, b}$ for all $\left(x, y\right)$. The probability of winning is then 
+    \[\prob\left(\text{win}\right) = \sum_{x,y} \pi\left(x, y\right) \sum_{a, b} V\left(a, b \suchthat x, y\right) p\left(a, b \suchthat x, y\right).\]
+
+    Now, we cannot just let $p\left(a, b \suchthat x, y\right)$ to be arbitrary. Otherwise, they could just let $p\left(0, 0 \suchthat 0, 0\right) = 1, \ldots, p\left(1, 0 \suchthat 1, 1\right) = 1$; always outputting the correct answer. Depending on whether they have access to quantum or not, we will put different constraints on this $p\left(a, b \suchthat x, y\right)$.
+
+    \begin{subparag}{Classical strategy}
+        Let us consider the classical case first.
+
+        We assume that Alice has some distribution $p_A\left(a \suchthat x\right)$ and Bob has a distribution $p_B\left(b \suchthat y\right)$. We then assume that their choice is done independently: 
+        \[p\left(a, b \suchthat x, y\right) = p_A\left(a \suchthat x\right) p_B\left(b \suchthat y\right).\]
+        
+        Note that this also allows for deterministic strategies. Indeed, if Alice has a function $f_A: x \mapsto a$ and Bob has a function $f_B : y \mapsto b$, we would have $p_A\left(a \suchthat x\right) = I\left(f\left(x\right) = a\right)$ and $p_B\left(b \suchthat y\right) = I\left(f_B\left(y\right) = b\right)$.
+
+        Moreover, we could assume that Alice and Bob have access to some common randomness, for instance because they tossed some coins before the start of the experiment and wrote it down. Then, this would become $p\left(a, b \suchthat x, y\right) = \int  d \lambda p_{\Lambda}\left(\lambda\right) p_A\left(a \suchthat x, \lambda\right) p_B\left(b \suchthat y, \lambda\right)$. However, $\prob\left(\text{win}\right)$ is linear, and so there is no interest in taking any convex combination: we could just pick beforehand the $\lambda$ that maximises the success probability. This remark is not too important, but it has strong link with hidden variables. By the exact same reasoning, we can in fact restrict to deterministic strategies.
+
+        Overall, the classical probability of success is: 
+        \[p_c = \sup_{p\left(a, b \suchthat x, y\right) = p_A\left(a \suchthat x\right) p_B\left(b \suchthat y\right)} \prob\left(\text{win}\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Quantum strategy}
+        Let us now consider quantum strategies.
+
+        Alice and Bob share some $\ket{\psi}_{AB} \in \mathcal{H}_A \otimes \mathcal{H}_B$ initially. On reception of $x$, Alice measures using the POVM $\left\{A_a^x\right\}_a$ and obtains $a$. On reception of $y$, Bob measures using the POVM $\left\{B_b^y\right\}_b$ and obtains $b$. They finally return $a, b$. This gives: 
+        \[p\left(a, b\suchthat x, y\right) = \bra{\psi} A_a^x \otimes B_b^y \ket{\psi}.\]
+
+        Note that POVMs represent anything they can do, including classical randomness and applying unitaries before their measure.
+
+        Overall, the quantum probability of success is: 
+        \[p_q = \sup_{p\left(a, b \suchthat x, y\right) = \bra{\psi} A_a^x \otimes B_b^y \ket{\psi}} \prob\left(\text{win}\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Projective measurement}
+    Let $A_0, A_1$ be a binary POVM. It is said to be \important{projective} if $A_0$ and $A_1$ are projections. 
+
+    \begin{subparag}{Example}
+        For instance, we may have: 
+        \[A_0 = \ket{0}\bra{0}, \mathspace A_1 = \ket{1}\bra{1}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        There is a theorem called Naimark's theorem that tells us that any POVM can be turned into a projective measurement, if we add Ancilla qubits. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Observable}
+    Let $A_0, A_1$ be a binary projective POVM. $A = A_0 - A_1$ is called the \important{observable} associated with $\left\{A_0, A_1\right\}$.
+
+    Conversely, for any $A$ such that $A$ is Hermitian and $A^2 = I$, it is an observable that corresponds to the following projective POVM: 
+    \[A_0 = \frac{I + A}{2}, \mathspace A_1 = \frac{I - A}{2}.\]
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\ket{\psi}_{AB}, \left\{A_0^x, A_1^x\right\}, \left\{B_0^y, B_1^y\right\}$ be a quantum strategy for the CSHS game. As mentioned earlier, without loss of generality, we can assume that $\left\{A_0^x, A_1^x\right\}$ and $\left\{B_0^y, B_1^y\right\}$ to be projective. 
+
+    Then, using the observables $A^x$ and $B^y$ associated to the respective POVMs:
+    \[\prob\left(\text{win}\right) = \frac{1}{2} + \frac{1}{8}\left(\bra{\psi} A^0 \otimes B^0 \ket{\psi} + \bra{\psi} A^0 \otimes B^1 \ket{\psi} + \bra{\psi} A^1 \otimes B^0 \ket{\psi} - \bra{\psi} A^1 \otimes B^1 \ket{\psi}\right).\]
+
+    \begin{subparag}{Remark}
+        In physics classes, the CSHS game is typically presented directly in the form given by this lemma.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We notice that:
+        \autoeq{\prob\left(a \oplus b = 0 \suchthat x, y\right) = p\left(0, 0 \suchthat x, y\right) + p\left(1,  1 \suchthat x, y\right) = \bra{\psi} A_0^x \otimes B_0^y \ket{\psi} + \bra{\psi} A_1^x \otimes B_1^y \ket{\psi} = \bra{\psi} \frac{I + A^x}{2} \otimes \frac{I + B^y}{2} \ket{\psi} + \bra{\psi} \frac{I - A^x}{2} \otimes \frac{I - B^y}{2} \ket{\psi} = \frac{1}{2} + \frac{1}{2} \bra{\psi} A^x \otimes B^y \ket{\psi}.}
+
+        This makes sense. Indeed, the probability that $a \oplus b = 0$ is the probability that they measure the same value on the observables $A^x$ and $B^y$. Now, if they always measure the same value, then $\left\langle A^x \otimes B^y \right\rangle = 1$, giving $\prob\left(a \oplus b = 0 \suchthat x, y\right) = 1$. If they always measure opposite value $\left\langle A^x \otimes B^y \right\rangle = 0$, giving $\prob\left(a \oplus b = 0 \suchthat x, y\right) = 0$.
+
+        Similarly, we find: 
+        \[\prob\left(a + b = 1 \suchthat x, y\right)=  1-  \prob\left(a + b = 0 \suchthat x, y\right) = \frac{1}{2} - \frac{1}{2} \bra{\psi} A^x \otimes B^y \ket{\psi}.\]
+
+        Overall, this tells us that: 
+        \autoeq[s]{\prob\left(\text{win}\right) = \frac{1}{4} \sum_{x, y} \sum_{\substack{a, b \\ a \oplus b = x \land y}} \prob\left(a, b \suchthat x, y\right) = \frac{1}{2} + \frac{\bra{\psi} A^0 \otimes B^0 \ket{\psi} + \bra{\psi} A^0 \otimes B^1 \ket{\psi} + \bra{\psi} A^1 \otimes B^0 \ket{\psi} - \bra{\psi} A^1 \otimes B^1 \ket{\psi}}{8}.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    We have, for the CSHS game: 
+    \[p_c = \frac{3}{4}, \mathspace p_q = \frac{1}{2} + \frac{1}{2\sqrt{2}} = \cos^2\left(\frac{\pi}{8}\right) \approx 0.85.\]
+    
+    \begin{subparag}{Remark}
+        In particular, $p_c < p_q$. We can indeed do this experiment physically, showing something that cannot be predicted by classical physics but that can be predicted by quantum mechanics.
+    \end{subparag}
+
+    \begin{subparag}{Proof classical}
+        The classical optimal strategy is very easy: Alice and Bob always output $\left(a, b\right) = \left(0, 0\right)$. We notice that this does achieve $\prob\left(\text{success}\right) = \frac{3}{4}$: they always win, except if $\left(x, y\right) = \left(1, 1\right)$. We now want to show that this is indeed optimal.
+
+        As explained before, we can restrict to deterministic strategy. Hence, let $f_A\left(x\right) \in \left\{0, 1\right\}$ be Alice's and $f_B\left(y\right) \in \left\{0, 1\right\}$ be Bob's. We aim to use our previous lemma, so we encode this using POVMs. We do not need any qubit shared between the two, so we notice that we can let:
+        \[\ket{\psi} = 1 \in \mathbb{C}^{2^0}, \mathspace A^x_a = I\left(f_A\left(x\right) = a\right), \mathspace B^y_a = I\left(f_B\left(y\right) = b\right).\]
+        
+        Suppose for instance that $x = 0$ and $f_A\left(0\right) = 1$. Then, Bob uses the POVM $\left(A_0^0, A_0^1\right) = \left(0, 1\right)$, which gives the value $1 = f_A\left(0\right)$ with probability 1. This is indeed exactly what we wanted. The corresponding observables are: 
+        \[A^x = A^x_0 - A^x_1 = I\left(f_A\left(x\right) = 0\right) - I\left(f_A\left(x\right) = 1\right) = \left(-1\right)^{f_A\left(x\right)},\]
+        \[B^y = \left(-1\right)^{f_B\left(y\right)}.\]
+        
+        Since $A^x \in \left\{-1, 1\right\}$, we write $a^x = A^x$ for clarity; and completely similarly $b^x = B^x$. Then, by our lemma:
+        \autoeq{\prob\left(\text{win}\right) = \frac{1}{2} + \frac{1}{8}\left(a^0 b^0 + a^0 b^1 + a^1 b^0 - a^1 b^1\right) = \frac{1}{2} + \frac{1}{8}\left(a^0 \left(b^0 + b^1\right) + a^1 \left(b^0 - b^1\right)\right).}
+
+        Since $b^0, b^1 \in \left\{-1, 1\right\}$, note that either $b^0 + b^1 = 0$ or $b^0 - b^1 = 0$. Hence, this tells us that, by the triangle inequality: 
+        \autoeq{\prob\left(\text{win}\right) = \left|\frac{1}{2} + \frac{1}{8}\left(a^0 \left(b^0 + b^1\right) + a^1 \left(b^0 - b^1\right)\right)\right| \leq \frac{1}{2} + \frac{1}{8}\left(\left|a^0 \left(b^0 + b^1\right)\right| + \left|a^1 \left(b^0 - b^1\right)\right|\right) \leq \frac{1}{2}+ \frac{1}{8} \left(1 \cdot 2 + 1\cdot 0\right) = \frac{1}{2} + \frac{1}{4} = \frac{3}{4}.}
+        
+        This does prove that our strategy with success probability $\frac{3}{4}$ was optimal.
+    \end{subparag}
+\end{parag}
+
+\end{document}
