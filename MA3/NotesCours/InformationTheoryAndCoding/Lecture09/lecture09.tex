@@ -1,0 +1,303 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-07 at 13:15:34.
+
+\usepackage{../../style}
+
+\title{Information theory and coding}
+\author{Joachim Favre}
+\date{Mardi 07 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{9}{2025-10-07}{What an amazing proof}{
+\begin{itemize}[left=0pt]
+    \item Formal definition of the Lempel-Ziv method.
+    \item Definition of finite-state machines, and information-lossless FSMs.
+    \item Proof of a lower bound on the number of bits outputted by a information-lossless FSM.
+    \item Proof of an upper bound on the number of bits outputted by LZ.
+\end{itemize}
+
+}
+
+\begin{parag}{Lempel-Ziv method}
+    We describe the Lempel-Ziv method formally. We aim to represent in bits some infinite length string $u = u_1 u_2 \cdots$ where $u_i \in \mathcal{U}$.
+
+    We start with $i = 0$ (how many $u$'s we have represented yet) and $\mathcal{D} = \mathcal{U}$ (the dictionary of words). This then goes as follows.
+    \begin{enumerate}
+        \item Assign $\left\lceil \log_2\left|\mathcal{D}\right| \right\rceil $ bit representation to $w \in \mathcal{D}$.
+        \item Find $w \in \mathcal{D}$ a prefix of $u_{i+1} u_{i+2} \cdots$.
+        \item Send the binary representation  of $w$.
+        \item Update the dictionary, $\mathcal{D} \leftarrow \mathcal{D} \setminus \left\{w\right\} \cup \left\{w \alpha \suchthat \alpha \in \mathcal{U}\right\}$.
+        \item Let $i \leftarrow i + \length\left(w\right)$.
+        \item Repeat from step 1.
+    \end{enumerate}
+\end{parag}
+
+\begin{parag}{Proof strategy}
+    To prove the asymptotic optimality of LZ, we will prove that, asymptotically, it performs better than (or just as good as) any encoding that can be done with a finite-state machines. We will also show that we can use finite-state machines to make Huffman codes, which will indeed give exactly our result.
+
+    Let us make this more formal.
+\end{parag}
+
+\begin{parag}{Definition: Finite-state machine compression}
+    A \important{finite-state machine compression scheme} is represented by the following objects:
+    \begin{itemize}
+        \item A state $\mathcal{S}$ of states, which is finite $\left|\mathcal{S}\right| < \infty$.
+        \item A starting state $s_0 \in \mathcal{S}$.
+        \item A next-state function $\mathcal{S} \times \mathcal{U} \mapsto \mathcal{S}$: if we are in state $s \in \mathcal{S}$ and read letter $u \in \mathcal{U}$, this tells us the next state.
+        \item An output function $\mathcal{S} \times \mathcal{U} \mapsto \left\{0, 1\right\}^*$: if we are in state $s \in \mathcal{S}$ and read letter $u \in \mathcal{U}$, this tells what is outputted the machine.
+    \end{itemize}
+
+    It then works as follows. For $i = 0, 1, \ldots$ we let $s_{i+1} = \verb|next_state|\left(s_i, u_{i+1}\right)$ and $y_{i+1} = \verb|output|\left(s_i, u_{i+1}\right)$.
+
+    \begin{subparag}{Remark 1}
+        Given $v^n \in \mathcal{U}^*$, we can also let the following helper functions:
+        \begin{itemize}[left=0pt]
+            \item $\verb|final_state|\left(s, v^n\right) \in \mathcal{S}$ to be the state machine is in after reading $v^n$. 
+            \item $\verb|output|\left(s, v^n\right) \in \left\{0, 1\right\}^*$ to be the concatenation of the outputs while reading $v_1, \ldots, v_n$.
+        \end{itemize}
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We can always assume without loss of generality that every $s \in \mathcal{S}$ can be reached starting from $s_0$ (through the $\verb|final_state|\left(s, v^n\right)$ function). Otherwise, we can just get rid of the states that are not reachable, since it will not change the functionality of the machine at all.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    We can consider the following machine:
+    \svghere[0.6]{ExampleFSMCompression1.svg}
+
+    In other words, no matter the symbol it reads, it outputs $\emptystring$. It is very bad, since it is not decompressible.
+\end{parag}
+
+\begin{parag}{Example 2}
+    We can now consider the following machine:
+    \svghere[0.45]{ExampleFSMCompression2.svg} 
+
+    It just assigns a 2-bit string to each letter, $\left(a, b, c\right) \mapsto \left(00, 01, 10\right)$.
+\end{parag}
+
+\begin{parag}{Example 3}
+    Let us now consider the following machine, which is left incomplete to avoid clutter:
+    \svghere[0.5]{ExampleFSMCompression3.svg}
+
+    This machine encodes two letters at a time, implementing some $c: \mathcal{U}^2 \mapsto \left\{0, 1\right\}^*$ such that $u_1, u_2, u_3, u_4, \ldots \mapsto c\left(u_1, u_2\right) c\left(u_3, u_4\right) \cdots$. For instance, $c\left(a, b\right) = 10$.
+
+    \begin{subparag}{Implication}
+        This example shows that we can encode codes that encodes blocks of letters. In particular, we can encode a Huffman code of length $n$ with finite-state machines.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that the machine above is not injective as a function $\mathcal{U}^* \mapsto \left\{0, 1\right\}^*$. For instance, it maps both $a$ and $b$ to the empty string. It is however injective if we look at infinite-length strings.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    We cannot implement LZ using FSMs since it requires an unbounded amount of memory for its dictionary.
+\end{parag}
+
+\begin{parag}{Definition: Information lossless}
+    A FSM is \important{information lossless} (IL) if, for all $u^n \neq v^m \in \mathcal{U}^*$, then at least one of the following holds:
+    \begin{itemize}
+        \item $\verb|output|\left(s_0, u^n\right) \neq \verb|output|\left(s_0, v^m\right)$;
+        \item $\verb|final_state|\left(s_0, u^n\right) \neq \verb|final_state|\left(s_0, v^m\right)$.
+    \end{itemize}
+
+    In other words, either the machine shows they are different in the output, or it knows in its states that they are different.
+
+    \begin{subparag}{Remark 1}
+        The first example above is not information lossless.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Any injective machine is also information lossless.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    A FSM is information lossless if and only if for all $s \in \mathcal{S}, u \in \mathcal{U}^*, v \in \mathcal{U}^*$ such that $u \neq v$, then at least one of the following holds:
+    \begin{itemize}
+        \item $\verb|output|\left(s, u^n\right) \neq \verb|output|\left(s, v^m\right)$;
+        \item $\verb|final_state|\left(s, u^n\right) \neq \verb|final_state|\left(s, v^m\right)$.
+    \end{itemize}
+
+    \begin{subparag}{Intuition}
+        This is completely similar to the definition of information lossless, except that it is now for all $s \in \mathcal{S}$, not only for $s = s_0$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is a direct consequence of our assumption that all $s \in \mathcal{S}$ is reachable from $s_0$, meaning that for all $s \in \mathcal{S}$, there exists some $w \in \mathcal{U}^*$ such that $s = \verb|final_state|\left(s_0, w\right)$. Indeed, then starting from $s$ and reading $u$ is completely equivalent to starting from $s_0$ and reading $wu$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Distinct parsing}
+    Let $u^n \in \mathcal{U}^*$. Some $w_1, \ldots, w_m \in \mathcal{U}^*$ is called a \important{distinct parsing} of $u$ if $u = w_1 w_2 \cdots w_m$ and for $i \neq j$ then $w_i \neq w_j$.
+
+    \begin{subparag}{Intuition}
+        The second property just states that none of the $w_i$ are the same.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Consider $u = abbaac$. 
+
+        We can take $w_1 = \emptystring$ and $w_2 = u$, giving a distinct parsing.
+
+        We might also take $\emptystring, a, b, ba, ac$. This is also a distinct parsing. In fact, it is, in some sense, what Lempel-Ziv does.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $m^*$}
+    Let $u^n \in \mathcal{U}^*$. We let \important{$m^*\left(u^n\right)$} to be the largest $m$ for which there exists a distinct $m$-word parsing of $u^n$.
+
+    \begin{subparag}{Example}
+        Suppose that $u^n = aaa$. Then, the largest distinct parsing is $\emptystring, a, aa$, so $m^*\left(u^n\right) = 3$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $u_1, u_2, \ldots$ be an infinite sequence. Then, the $m^*$ of the prefix $u^n$ is such that: 
+    \[\lim_{n \to \infty} \frac{m^*\left(u^n\right)}{n} = 0.\]
+    
+    In other words, $m^*\left(u^n\right) = o\left(n\right)$.
+
+    \begin{subparag}{Remark}
+        It is pretty easy to see that $m^*\left(u^n\right) \leq n+1$: we can use $\emptystring$ at most once, and then this bound just assumes that each letter can be split into its own word. We thus easily find that $m^*\left(u^n\right) = O\left(n\right)$. However, the lemma above shows that, in fact, $m^*\left(u^n\right) \neq \Theta\left(n\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $m = m^*\left(u^n\right)$. By definition, there exists some $m$-word distinct parsing of $u^n$, which we write $w_1, \ldots, w_m$. 
+
+        Let $k \in \mathbb{Z}_{\geq 1}$ be an arbitrary positive integer. The number of $w_i$'s that are such that $\length\left(w_i\right) < k$ is at most: 
+        \[1 + \left|\mathcal{U}\right| + \left|\mathcal{U}\right|^2 + .. + \left|\mathcal{U}\right|^{k-1} \over{=}{def}  F_k.\]
+        
+        Indeed, there are $\mathcal{U}^j$ different words of length $j$, and none of the $w_i$ are equal. Consequently, $m - F_j$ of the $w_i$'s have length at least $k$. Consequently: 
+        \[n \geq \left(m - F_k\right)\cdot k \iff m \leq \frac{n}{k} + F_k \iff \frac{m^*\left(u^n\right)}{n} \leq \frac{1}{k} + \frac{F_k}{n}.\]
+        
+        Taking the limit as $n \to \infty$, this tells us that: 
+        \[\limsup_{n \to \infty} \frac{m^*\left(u^n\right)}{n} \leq \frac{1}{k}.\]
+
+        Now, since $k$ was arbitrary and this is a non-negative sequence, this tells us necessarily that: 
+        \[\lim_{n \to \infty} \frac{m^*\left(u^n\right)}{n} = 0.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $y_1, \ldots, y_m \in \left\{0, 1\right\}^*$ be distinct binary sequences (in other words, for all $i \neq j$, then $y_i \neq y_j$).
+
+    We can always write $m = \sum_{j=0}^{k-1} 2^j + r$, where $0 \leq r < 2^k$. Then: 
+    \[\sum_{i=1}^{m} \length\left(y_i\right) \geq \sum_{j=0}^{k-1} j 2^j + r k.\]
+
+    \begin{subparag}{Example}
+        Suppose that $m = 17$. We can decompose $m = 2^0 + 2^1 + 2^2 + 2^3 + 2$. The minimum total length is then $1\cdot 0 + 2\cdot 1 + 4\cdot 2 + 8\cdot 3 + 2\cdot 4$. 
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        We know that $\left\{0, 1\right\}^* = \left\{\emptystring, 0, 1, 00, 01, 10, 11, 000, \ldots\right\}$. To minimise the total length $\sum_{i=1}^{m} \length\left(y_i\right)$, we can just pick the smallest length binary sequences. Since $m = \sum_{j=0}^{k-1} 2^j + r$, we have $2^j$ elements of length $j$ for all $0 \leq j \leq k-1$, and $r$ elements of length $k$. This then gives our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $y_1, \ldots, y_m \in \left\{0, 1\right\}^*$ be distinct binary sequences (in other words, for all $i \neq j$, then $y_i \neq y_j$). Then: 
+    \[\sum_{i=1}^{m} \length\left(y_i\right) \geq m \log_2\left(\frac{m}{8}\right).\]
+    
+    \begin{subparag}{Proof}
+        We aim to use the previous lemma. We know that there exists some $0 \leq r < 2^k$ such that: 
+        \[m = 2^0 + \ldots + 2^{k-1}+ r = 2^k - 1 + r.\]
+
+        We know that: 
+        \[\sum_{j=0}^{k-1} j \alpha ^{j-1} = \frac{d}{d \alpha} \sum_{j=0}^{k-1} \alpha^j = \frac{d}{d \alpha} \frac{\alpha^k - 1}{\alpha - 1} = \frac{k \alpha ^{k-1} \left(\alpha - 1\right) - \left(\alpha ^{k} - 1\right)}{\left(\alpha - 1\right)^2}.\]
+
+        Hence: 
+        \[\sum_{j=0}^{k-1} j 2^j = 2\sum_{j=0}^{k-1} j 2^{j-1} = 2\left(k 2^{k-1} - 2^k + 1\right) = k2^{k} - 2^{k+1} + 2.\]
+
+        This tells us that, by the previous lemma and using the fact $m = 2^k - 1 + r$ as seen above:
+        \autoeq{\sum_{i=1}^{m} \length\left(y_i\right) \geq \sum_{j=0}^{k-1} j2^{j} + rk = 2^k\left(k - 2\right) + 2 + rk = \left(m + 1 - r\right)\left(k - 2\right) + 2 + rk = m\left(k-2\right) + \left(k-2\right) - r \left(k-2\right) + 2 + rk = m\left(k-2\right) + k + 2r \geq m\left(k-2\right).}
+
+        To make this bound cleaner, we can finally use the fact $m < 2^{k + 1} \iff \log_2\left(m\right) - 1 < k$: 
+        \[\sum_{i=1}^{m} \length\left(y_i\right) \geq m \left(\log_2\left(m\right) - 3\right) = m \log_2\left(\frac{m}{8}\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $u^n \in \mathcal{U}^*$. Suppose that it is fed to an information lossless FSM with $s$ states. 
+
+    Then: 
+    \[\length\left(\text{output of the FSM having read $u^n$}\right) \geq m^*\left(u^n\right) \log_2\left(\frac{m^*\left(u^n\right)}{8 s^2}\right).\]
+    
+    \begin{subparag}{Proof}
+        Let $m = m^*\left(u^n\right)$, and $u^n = w_1 \cdots w_m$ be a corresponding maximal distinct word decomposition.
+
+        The machine starts at $z_0 = s_0$. We then feed it $w_1$, where it will output $t_1$ and end up in the state $z_1$. We then keep doing this, up until we feed it $w_m$, where it outputs $t_m$ and ends up in state $z_m$.
+        \begin{center}
+        \begin{tabular}{lccccccccc}
+            State & $z_0$ & & $z_1$ & & $z_2$ & & $\cdots$ & & $z_m$ \\
+            Input &    & $w_1$ & & $w_2$ & & $w_3$ & $\cdots$ & $w_m$ & \\
+            Output &    & $t_1$ & & $t_2$ & & $t_3$ & $\cdots$ & $t_m$ & \\
+        \end{tabular}
+        \end{center}
+
+        For any $\alpha, \beta \in \mathcal{S}$, we define $I_{\alpha \beta} = \left\{i \suchthat z_{i-1} = \alpha, z_i = \beta\right\}$. 
+
+        Notice that, given some fixed $\alpha, \beta \in \mathcal{S}$, then $\left\{w_i \suchthat i \in I_{\alpha \beta}\right\}$ is a distinct collection of words; since the $\left(w_i\right)$ are distinct by hypothesis. Moreover, the information lossless property requires that $\left\{t_i \suchthat i \in I_{\alpha \beta}\right\}$ are distinct binary sequences: it starts at the same state and ends up at the same state since $i \in I_{\alpha \beta}$, so it cannot output the same bitstring on different words. By our lemma, this implies that: 
+        \[\sum_{i \in I_{\alpha \beta}} \length\left(t_i\right) \geq \left|I_{\alpha \beta}\right| \log_2\left(\frac{\left|I_{\alpha \beta}\right|}{8}\right).\]
+        
+        Summing over all $\alpha, \beta \in \mathcal{S}$, this yields: 
+        \autoeq{\sum_{i=1}^{m} \length\left(t_i\right) = \sum_{\alpha, \beta \in \mathcal{S}}  \sum_{i \in I_{\alpha \beta}} \length\left(t_i\right) \length\left(t_i\right) \geq \sum_{\alpha, \beta \in \mathcal{S}} \left|I_{\alpha \beta}\right| \log_2\left(\frac{\left|I_{\alpha \beta}\right|}{8}\right).}
+        
+        We aim to simplify this sum. We know that $\sum_{\alpha, \beta} \left|I_{\alpha \beta}\right| = m$ since they form a disjoint partition of the $\left\{w_1, \ldots, w_m\right\}$. Using the convexity of the function $f\left(x\right) = x \log_2\left(x/8\right)$, we get:
+        \autoeq{\sum_{i=1}^{m} \length\left(t_i\right) \geq \sum_{\alpha, \beta \in \mathcal{S}} \left|I_{\alpha \beta}\right| \log_2\left(\frac{\left|I_{\alpha \beta}\right|}{8}\right) = \left|\mathcal{S}\right|^2\cdot \frac{1}{\left|\mathcal{S}\right|^2}\sum_{\alpha, \beta \in \mathcal{S}} f\left(\left|I_{\alpha \beta}\right|\right) \geq \left|\mathcal{S}\right|^2  f\left(\frac{1}{\left|\mathcal{S}\right|^2} \sum_{\alpha, \beta \in \mathcal{S}} \left|I_{\alpha \beta}\right| \right) = \left|\mathcal{S}\right|^2 f\left(\frac{m}{\left|\mathcal{S}\right|^2}\right) = m \log_2\left(\frac{m}{8\left|\mathcal{S}\right|^2}\right).}
+
+        This yields exactly our result.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+%\begin{parag}{Corollary}
+%    Suppose that $u_1 u_2 \cdots$ is fed to an information lossless FSM with $s$ states. Then: 
+%    \[\frac{1}{n} \length\left(\text{output after reading $u^n$}\right) \geq \frac{1}{n} m^*\left(u^n\right) \log_2\left(m^*\left(u^n\right)\right).\]
+%   
+%    #later{forget this corollary we don't really need thisè}
+%\end{parag}
+
+\begin{parag}{Theorem}
+    Let $u^n \in \mathcal{U}^*$. The output of LZ is such that: 
+    \[\length\left(\text{output of LZ that allows the recovery of $u^n$}\right) \leq m^*\left(u^n\right) \log_2\left(2 m^*\left(u^n\right) \left|\mathcal{U}\right|\right).\]
+
+    \begin{subparag}{Remark}
+        Note that there is a distinction between ``the number of bits produced after seeing $u^n$'' (for FSM) and ``the number of bits needed to recover $u^n$'' (for LZ). We have in fact been very generous with FSMs, and we are not at all for LZ. This corresponds to the fact we want to lowerbound FSMs but upperbound LZ. To be able to compare them, we will then be able to use the fact that:
+        \autoeq[s]{\length\left(\text{output of an IL FSM that allows the recovery of $u^n$}\right) \geq \length\left(\text{output of an IL FSM having read $u^n$}\right) \geq m^*\left(u^n\right) \log_2\left(\frac{m^*\left(u^n\right)}{8 s^2}\right).}
+
+        Let us study a bit more the distinction between the two, and why we have been very generous with FSMs. Consider an algorithm on $u^n = \left\{0, 1\right\}^n$ such that at time $n$ it outputs: 
+        \[\begin{systemofequations} u_i, & \text{if $n = 2^i$ for some $i \geq 1$,} \\ \emptystring, & \text{otherwise}. \end{systemofequations}\]
+        
+        For instance after reading $u_1 u_2 \cdots u_8$, it outputs: 
+        \[\emptystring u_1 \emptystring u_2 \emptystring \emptystring \emptystring u_3.\]
+        
+        Note that it does not compress anything. When $n \to \infty$, it just outputs $u^n$. However, in the first criterion, after $n$ bits, it only output $\log_2\left(n\right)$ bits after having read $u^n$. With the second criterion, it requires $n$ bits to recover $u^n$. There can thus be a very big difference between the two.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Note that LZ decomposes $u^n = w_1 w_2 \ldots w_m  w_{m+1}$ in such a way that $w_1, \ldots, w_m$ is a distinct parsing: LZ removes the word it parsed from the dictionary and adds its extensions, so it can never use the same word twice. Moreover, we notice that $\emptystring, w_1, \ldots, w_{m-1}, \left(w_m w_{m+1}\right)$ is a distinct parsing of length $m+1$, since LZ never uses $\emptystring$ and if $w_m w_{m+1} = w_j$ for some $j$, it would mean that $w_m$ is a prefix of $w_j$, which is impossible in the way LZ works. Hence, by definition of $m^*$, we have $m+1 \leq m^*\left(u^n\right)$. 
+
+        Now, when it considers $w_1$, it outputs $\left\lceil \log_2 \left|\mathcal{U}\right| \right\rceil $ bits by definition. Then, when it considers $w_2$, it outputs $\left\lceil \log_2 \left(2 \left|\mathcal{U}\right| - 1\right)\right\rceil \leq \left\lceil \log_2\left(2 \left|\mathcal{U}\right|\right) \right\rceil $ bits. It then continues that way up to $\left\lceil \log_2\left(m \left|\mathcal{U}\right|\right) \right\rceil $ $w_m$. Now, we aim to consider the number of bits that will allow to recover $u_1, \ldots, u_n$, meaning that we also consider the bits corresponding to some letters that have not been seen yet. Because of that, we also add $\left\lceil \log_2\left(\left(m+1\right)\left|\mathcal{U}\right|\right)  \right\rceil $ bits. Overall, combining this with the fact $m+1 \leq m^*\left(u^n\right)$ as found above, this gives:
+        \autoeq[s]{\length\left(\text{output of LZ that allows the recovery of $u^n$}\right) \leq \left\lceil \log_2\left|\mathcal{U}\right| \right\rceil + \left\lceil \log_2\left(2 \left|\mathcal{U}\right|\right) \right\rceil + \ldots + \left\lceil \log_2\left(m\left|\mathcal{U}\right|\right) \right\rceil + \left\lceil \log_2\left(\left(m+1\right)\left|\mathcal{U}\right|\right) \right\rceil \leq \left(m+1\right) \left\lceil \log_2\left(m+1\right)\left|\mathcal{U}\right| \right\rceil \leq m^*\left(u^n\right) \left(\log_2\left(m^*\left(u^n\right) \left|\mathcal{U}\right|\right) + 1\right) = m^*\left(u^n\right) \log_2\left(2m^*\left(u^n\right) \left|\mathcal{U}\right|\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

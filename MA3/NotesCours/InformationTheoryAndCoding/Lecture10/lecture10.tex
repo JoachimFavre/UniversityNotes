@@ -1,0 +1,224 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-13 at 11:21:33.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 13 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{10}{2025-10-13}{Predicting Nvidia will go to the moon}{
+\begin{itemize}[left=0pt]
+    \item Proof of the optimality of LZ on stationary sources.
+    \item Explanation of the probability distribution learnt by LZ.
+    \item Definition of the model for transmission of data.
+    \item Definition of memoryless and stationary channels.
+    \item Definition of transmission system without feedback.
+    \item Definition of the binary erasure channel.
+\end{itemize}
+
+}
+
+\begin{parag}{Theorem}
+    Let $u^n \in \mathcal{U}^n$. Considering an arbitrary information-lossless FSM with $s$ states, then:
+    \autoeq[s]{\frac{\text{excess number of bits of LZ in comparison to the FSM that allows the recovery of $u^n$}}{n} \leq \frac{m^*\left(u^n\right)}{n} \log_2\left(16 \left|\mathcal{U}\right|s^2\right) = o\left(1\right).}
+    
+    In other words, asymptotically, LZ outputs at most as many bits as this arbitrary FSM.
+
+    \begin{subparag}{Remark}
+        This means that, even if LZ is blind (i.e.~it does not know the probability distribution), it beats any ILFSM (which could be chosen by an adversary to match the probability distribution). The formal implication is displayed in the following corollary.
+
+        Now, it is possible to show that $\frac{m^*\left(u^n\right)}{n}$ converges extremely slowly to $0$. Trying some real-life values in this bound gives very large $n$ for nice guarantees. It may thus be surprising to work in practice, but it actually does. Now, the state-of-the-art is much more sophisticated algorithms, that are harder to analyse; but a similar idea is widely used by many standards (such as gzip).
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We found that:
+        \autoeq[s]{\length\left(\text{output of the IL FSM that allows the recovery of $u^n$}\right) \geq \length\left(\text{output of the IL FSM having read $u^n$}\right) \geq m^*\left(u^n\right) \log_2\left(\frac{m^*\left(u^n\right)}{8 s^2}\right).}
+
+        Similarly:
+        \autoeq[s]{\length\left(\text{output of LZ that allows the recovery of $u^n$}\right) \leq m^*\left(u^n\right) \log_2\left(2 m^*\left(u^n\right) \left|\mathcal{U}\right|\right).}
+
+        Subtracting the first from the second, we find that the excess of LZ above any ILFSM is at most: 
+        \autoeq{\leq m^*\left(u^n\right) \log_2\left(2 m^*\left(u^n\right) \left|\mathcal{U}\right|\right) - m^*\left(u^n\right) \log_2\left(\frac{m^*\left(u^n\right)}{8 s^2}\right) = m^*\left(u^n\right) \log_2\left(16 \left|\mathcal{U}\right| s^2\right).}
+        
+        In other words, the excess per source-letter is at most:
+        \[\leq \frac{1}{n} m^*\left(u^n\right) \log_2\left(16 \left|\mathcal{U}\right| s^2\right).\]
+
+        This is our first result. Since we proved that $m^*\left(u^n\right) = o\left(n\right)$, and since $s = \Theta\left(1\right)$ by definition of FSM, this also gives the second result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Suppose that $U_1, U_2, \ldots$ is a stationary stochastic process, of entropy rate $\mathcal{H} = \lim_{n \to \infty} \frac{H\left(U^n\right)}{n}$.
+
+    Then, LZ is optimal asymptotically:
+    \[\lim_{n \to \infty} \frac{\exval\left(\text{number of bits produced by LZ that allows the recovery of $U_1, \ldots, U_n$}\right)}{n} = \mathcal{H}.\]
+
+    \begin{subparag}{Remark}
+        This proves the asymptotic optimality of LZ on stationary processes; even if the probability distribution is unknown. This is a very nice result.
+
+        Moreover, it also gives us an algorithmic way to compute $\mathcal{H}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $\epsilon > 0$ be arbitrary. By definition of the limit, there must exist some $n > 0$ such that:
+        \[\frac{H\left(U^n\right) + 1}{n} \leq \mathcal{H} + \epsilon.\]
+
+        This was however an upper bound to the expected codeword length of the Huffman code, meaning that there exists a prefix-free code $c_n$ such that: 
+        \[\frac{1}{n} \exval\left(\length c_n\left(U_1, \ldots, U_n\right)\right) \leq \frac{H\left(U^n\right) + 1}{n} \leq \mathcal{H} + \epsilon.\]
+
+        By stationary, this also means that, for all $i$:
+        \[\frac{1}{n} \exval\left(\length c_n\left(U_{in + 1}, \ldots, U_{\left(i+1\right)n}\right)\right) \leq \mathcal{H} + \epsilon.\]
+        
+        As already seen, we can implement an IL FSM that looks at blocks of length $n$ and encodes them with length $n$, i.e: 
+        \[\underbrace{U_1 \cdots U_n}_{c_n} \underbrace{U_{n+1} \cdots U_{2n}}_{c_n} \underbrace{U_{2n+1} \cdots U_{3n}}_{c_n} \cdots\]
+        
+        This tells us that this FSM is such that, for all $k$: 
+        \[\frac{1}{k} \exval\left(\text{number of bits produced by the FSM after seeing $u_1, \ldots, u_k$}\right) \leq \mathcal{H} + \epsilon.\]
+        
+        By using our theorem above, this tells us that:
+        \autoeq[s]{\lim_{n \to \infty} \frac{\exval\left(\text{number of bits produced by LZ that allows the recovery of $U^n$}\right)}{n} \leq \mathcal{H}.}
+
+        Since moreover this is lower-bounded by $\mathcal{H}$, this tells us that this is in fact an equality, giving our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Observation}
+    Note that LZ can be seen as assigning a probability distribution to every sequences of characters.
+
+    Let us for instance suppose that $\mathcal{U} = \left\{a, b, c\right\}$. To start with, each letter is assigned probability $\frac{1}{3}$: 
+    \[p\left(U_1 = a\right) = p\left(U_1 = b\right) = p\left(U_1 = c\right) = \frac{1}{3}.\]
+    
+    Now, let's say that LZ sees a $a$. Then the dictionary will become $\left\{aa, ab, ac, b, c\right\}$, meaning that, effectively: 
+    \[p\left(U_2U_3 = aa \suchthat U_1= a\right) = p\left(ab \suchthat a\right) = p\left(ac \suchthat a\right) = p\left(U_2 = b \suchthat U_1 = a\right) = p\left(c \suchthat a\right) = \frac{1}{5}.\]
+
+    In particular, it means that: 
+    \[p\left(U_2 = a \suchthat U_1 = a\right) = \frac{3}{5}.\]
+    
+    We can do that for any sequence of symbols, giving the following tree (which is incomplete to avoid clutter).
+    This is exactly the probability distribution that LZ considers, on an arbitrary sequence.
+    \svghere[0.5]{LZProbabilityTree.svg}
+
+    Overall, we can infer some probability assignment from the LZ algorithm, $q_{LZ}\left(u_n \suchthat u_1, \ldots, u_{n-1}\right)$ as given on this tree. Now, since LZ compresses any stationary process well, we have seen a few lectures ago that, for any stationary process $p$, most times $i$ and probability $\approx 1$ in the set of sequences $u_1, \ldots, u_{i-1}$, we must have that the LZ-divergence from the learnt $q_{LZ}$ to the true $p$ must be small: 
+    \[D\left(p_{u_i | u^{i-1}}\left(\cdot  \suchthat u^{i-1}\right) || q_{LZ}\left(\cdot \suchthat u^{i-1}\right)\right) \approx 0.\]
+    
+    In other words, this algorithm thus also gives us a way to find the probability distribution of stationary processes.
+
+    \begin{subparag}{Application}
+        Assuming the stock market is stationary (which it is not, no financial advice here \wink), this would allow to find the probability distribution of the stock of Nvidia; giving a way to predict its future.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Making predictions}
+    Let us consider another, similar, problem. This will give us another way to understand LZ as a good predictor.
+
+    We are asked to predict the realisation of a random variable $U$ in the form of a probability distribution $q$ on $U$. Then, $U$ is observed, giving some value $u$ with probability $q\left(u\right)$. We then pay a penalty $\text{penalty}\left(q\left(u\right)\right)$ where $\text{penalty}: \left[0, 1\right] \mapsto \mathbb{R}$ is a decreasing function. The idea is that, if we predicted that something has small probability to appear, we should be penalised more.
+
+    The goal is to minimise the expected penalty: 
+    \[\exval\left(\text{penalty}\left(q\left(U\right)\right)\right) = \sum_{u} p\left(u\right) \text{penalty}\left(q\left(u\right)\right).\]
+     
+    \begin{subparag}{Example}
+        Suppose that $\text{penalty}\left(z\right) = 1-z$, and that $U \in \left\{0, 1\right\}$ has probability $p_0$ to be $0$ and $p_1$ to be $1$. We thus look for: 
+        \[\argmin_{0 \leq q_0 \leq 1} p_0 \left(1 -q_0\right) + p_1 \underbrace{\left(1 - q_1\right)}_{= q_0} = \argmin_{0 \leq q_0 \leq 1} \left(p_1 - p_0\right) q_0 + p_0 = \begin{systemofequations} 0, & \text{if $p_1 > p_0$} \\ 1, & \text{if $p_1 \leq p_0$.} \end{systemofequations}\]
+        
+        This shows that this penalty is a bad one, we are not incentivised to let $q^* = p$. If we however let $\text{penalty}\left(z\right) = \left(1- z\right)^2$, still for the binary case, then it is possible to show that $q^* = p$. It however does not work in general.
+
+        Overall, this shows that the choice of the penalty function is very important so that people reveal their true belief on $p$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        It is possible to show that a penalty function that always have $q^* = p$ is $\text{penalty}\left(z\right) = \log_2\left(\frac{1}{z}\right)$. This is however exactly the one we used for source coding.
+
+        We have thus shown that, under this penalty, LZ is optimal. This is another way to see that LZ can be seen as a good predictor.
+    \end{subparag}
+\end{parag}
+
+\section{Transmission of data}
+
+\begin{parag}{Model}
+    We consider the following model to transmit data. We are given some data, which we want to send on some noisy channel. To do that, we aim to encode the data in some way which we will design, then send in on the channel, and finally decode it.
+
+    The channel is described by a probability distribution
+    \[\prob\left(Y_i = y_i \suchthat X_i = x_i, X^{i-1} = x^{i-1}, Y^{i-1}\right),\]
+    for all $i$, which may depend on time $i$, and on the past $X^{i-1}, Y^{i-1}$. We moreover suppose that the encoder may have knowledge of what was outputted by the channel before; meaning that, when it encodes $X_i$, it may know $Y^{i-1}$.
+
+    This can be summarised on the following diagram.
+    \svghere{SetupTransmission.svg}
+
+    We will moreover use the following vocabulary.
+    \begin{itemize}
+        \item The channel is said to be \important{memoryless} if, knowing $X_i$, then $Y_i$ is independent of the past:
+        \[\prob\left(Y_i = y_i \suchthat X_i = x_i, X^{i-1} = x^{i-1}, Y^{i-1} = y^{i-1}\right) = \prob\left(Y_i = y_i \suchthat X_i = x_i\right).\]
+        \item The channel is said to be \important{stationary} if its distribution is stationary. This notably requires that:
+        \[\prob\left(Y_n = y \suchthat X_n = x\right) = \prob\left(Y_1 = y \suchthat X_1 = x\right).\]
+        \item The transmission system is said to be \important{without feedback} if there isn't the dashed arrow on the diagram. In other words, if knowing $X^{i-1}$, then $X_i$ is independent:
+    \[\prob\left(X_i = x_i \suchthat X^{i-1} = x^{i-1}, Y^{i-1} = y^{i-1}\right) = \prob\left(X_i \suchthat X^{i-1} = x^{i-1}\right).\]
+    \end{itemize}
+\end{parag}
+
+\begin{parag}{Definition: Transmission rate}
+    Supposing that $w \in \left\{0, 1\right\}^k$, then we define $\frac{k}{n}$ to be the \important{transmission rate}.
+
+    \begin{subparag}{Intuition}
+        This is the ratio between the number of bits that we want to send $w \in \left\{0, 1\right\}^k$ and the number of bits we actually send $X^n \in \mathcal{X}^n$. The idea is that, if the channel transmits one bit per second, then we are encoding and decoding we are able to transmit $\frac{k}{n}$ actual bits per second.
+    \end{subparag} 
+\end{parag}
+
+
+\begin{parag}{Example 1: Binary erasure channel}
+    Consider the following memoryless and stationary channel:
+    \svghere[0.25]{BinaryErasureChannel.svg}
+
+    This can only erase bits, never flip them. This is thus named a \important{binary erasure channel}, and written $\BEC\left(p\right)$.
+\end{parag}
+
+\begin{parag}{Example 2: Additive Gaussian channel}
+    Given $x \in \mathbb{R}$, we can consider $Y = \mathcal{N}\left(x, \sigma^2\right)$ to be the output of the channel. This is an \important{additive Gaussian channel}.
+
+    Note that we are not working on finite $\mathcal{X}, \mathcal{Y}$ here.
+\end{parag}
+
+\begin{parag}{Lemma}
+    Any channel which is both memoryless in a transmission system without feedback is such that: 
+    \[\prob\left(Y^n = y^n \suchthat X^n = x^n\right) = \prod_{i=1}^{n} \prob\left(Y_i = y_i \suchthat X_i = x_i\right) = \prod_{i=1}^{n} p_i\left(y_i \suchthat x_i\right).\]
+
+    If the channel is moreover stationary: 
+    \[\prob\left(Y^n = y^n \suchthat X^n = x^n\right) = \prod_{i=1}^{n} p\left(y_i \suchthat x_i\right).\]
+    
+    \begin{subparag}{Proof}
+        All we have to prove is that
+        \[\prob\left(Y^n = y^n \suchthat X^n = x^n\right) = \prod_{i=1}^{n} \prob\left(Y_i = y_i \suchthat X_i = x_i\right),\]
+        the rest is just notation. We know that, by Bayes' rule: 
+        \[\prob\left(Y^n = y^n \suchthat X^n = x^n\right) = \frac{\prob\left(X^n = x^n, Y^n = y^n\right)}{\prob\left(X^n = x^n\right)}.\]
+        
+        Let us study the numerator: 
+        \autoeq[s]{\prob\left(X^n = x^n, Y^n = y^n\right) = \prob\left(X_1 = x_1\right) \prob\left(Y_1 = y_1 \suchthat X_1 = x_1\right) \fakeequal\cdot \prob\left(X_2 = x_2 \suchthat X_1 = y_1, Y_1 = y_1\right) \prob\left(Y_2 = y_2 \suchthat X_2 = x_2, X_1 = x_1, Y_1 = y_1\right) \fakeequal \cdots \prob\left(X_n = x_n \suchthat x^{n-1}, y^{n-1}\right) \prob\left(Y_n = y_n \suchthat x_n, x^{n-1}, y^{n-1}\right).}
+        
+        By the no-feedback property, we find
+        \[\prob\left(X_2 = x_2 \suchthat X_1 = x_1, Y_1 = y_1\right) = \prob\left(X_2 = x_2 \suchthat X_1 = x_1\right).\]
+
+        Similarly, the memoryless property tells us
+        \[\prob\left(Y_2 = y_2 \suchthat X_2 = x_2, X_1 = x_1, Y_1 = y_1\right) = \prob\left(Y_2 = y_2 \suchthat X_2 = x_2\right).\]
+
+        This thus becomes:
+        \autoeq[s]{\prob\left(X^n = x^n, Y^n = y^n\right) = \prob\left(X_1 = x_1\right) \prob\left(X_2 = x_2 \suchthat X_1 = x_1\right) \cdots \prob\left(X_n = x_n \suchthat x_{n-1}\right)  \fakeequal\cdot \prob\left(Y_1 = y_1 \suchthat X_1 = x_1\right)\prob\left(Y_2 = y_2 \suchthat X_2 = x_2\right) \cdots \prob\left(Y_n = y_n \suchthat x_n\right) = \prob\left(X^n = x_n\right) \prod_{i=1}^{n} \prob\left(Y_i = y_i \suchthat X_i = x_i\right).}
+
+        Feeding this back to Bayes' rule, this is exactly what we wanted to prove.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}
