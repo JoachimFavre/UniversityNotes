@@ -1,0 +1,298 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-23 at 13:26:01.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 23 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{5}{2025-09-23}{Entropy of parked processes}{
+\begin{itemize}[left=0pt]
+    \item Definition of the binary entropy function.
+    \item Definition of convex set, convex function and concave function.
+    \item Proof that entropy is concave.
+    \item Definition of entropy rate.
+    \item Computation of entropy rate for IID processes.
+    \item Definition of Markov processes.
+    \item Definition of \textit{stationary} processes, and proof that their entropy rate exists.
+\end{itemize}
+
+}
+
+\begin{parag}{Definition: Binary entropy}
+    We let the \important{binary entropy} function $h_2: \left[0, 1\right] \mapsto \left[0, 1\right]$ to be defined as: 
+    \[h_2\left(\alpha\right) = \alpha \log_2\left(\frac{1}{\alpha}\right) + \left(1 - \alpha\right) \log_2\left(\frac{1}{1 - \alpha}\right).\]
+
+    \begin{subparag}{Intuition}
+        This is the entropy of a probability distribution with two values, appearing with probability $\alpha$ and $1 - \alpha$, respectively. 
+    \end{subparag}
+
+    \begin{subparag}{Graph}
+        The graph looks the following:
+        \svghere[0.6]{BinaryEntropyGraph.svg}
+
+        We can make the following observations:
+        \begin{itemize}
+            \item It is symmetric around $\alpha = \frac{1}{2}$. 
+            \item When $\alpha \in \left\{0, 1\right\}$, it is zero (since we have determinism).
+            \item It is concave.
+            \item It is very flat around $\alpha \approx \frac{1}{2}$. For instance $h_2\left(\sim 0.11\right) = \frac{1}{2}$, showing that we have to go pretty far from the middle to divide the function by $2$.
+        \end{itemize}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Convex set}
+    A set $\mathcal{S} \subseteq \mathbb{R}^n$ is said to be \important{convex} if, for all $x, y \in \mathcal{S}$ and $0 \leq \lambda \leq 1$, then: 
+    \[\lambda x + \left(1 - \lambda\right) y \in \mathcal{S}.\]
+
+    \begin{subparag}{Intuition}
+        The idea is that the lines between any two points are entirely contained inside the set. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Convex function}
+    Let $\mathcal{S}$ be a convex set. A function $f: S \mapsto \mathbb{R}$ is said to be \important{convex} if for all $x, y \in \mathcal{S}$ and $0 \leq \lambda \leq 1$: 
+    \[\lambda f\left(x\right) + \left(1 - \lambda\right) f\left(y\right) \geq f\left(\lambda x + \left(1 - \lambda\right) y\right).\]
+
+    \begin{subparag}{Intuition}
+        The idea is that, picking any two points $x, y$, and drawing the chord $\lambda f\left(x\right) + \left(1 - \lambda\right) f\left(y\right)$, then all the points between lie below this chord.
+    \end{subparag}
+
+    \begin{subparag}{Examples}
+        Examples of convex function are $f\left(x\right) = \left|x\right|$, $f\left(x\right) = x^2$ and $f\left(x\right) = x^4$. Now, $f\left(x\right) = x^3$ is not convex, unless we restrict its domain to $x > 0$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        We need $\mathcal{S}$ to be convex in order to guarantee $f\left(\lambda x + \left(1 - \lambda\right) y\right)$ is well-defined.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    A function $f \in C^2\left(\mathbb{R}\right)$ is convex if and only if $f''\left(x\right) \geq 0$ for all $x$.
+\end{parag}
+
+\begin{parag}{Definition: Concave function}
+    Let $\mathcal{S}$ be a convex set. A function $f: S \mapsto \mathbb{R}$ is said to be \important{concave} if $-f$ is convex.
+
+    \begin{subparag}{Remark}
+        Equivalent, $f$ is concave if and only if, for all $x, y \in \mathcal{S}$ and $0 \leq \lambda \leq 1$: 
+        \[\lambda f\left(x\right) + \left(1 - \lambda\right) f\left(y\right)\ {\color{red}\leq}\ f\left(\lambda x + \left(1 - \lambda\right) y\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    The binary entropy function is concave.
+
+    \begin{subparag}{Remark}
+        We can in fact prove the following more general fact.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    We notice that $H\left(U\right)$ is a function of $p_U$. Moreover, if $\left|\mathcal{U}\right| = k$, we can identify $p_U$ with a point in $\mathbb{R}^k$. More precisely, we can identify it as being a point in the simplex $S_k \subseteq \mathbb{R}^k$, where: 
+    \[S_k = \left\{\left(x_1, \ldots, x_k\right) \in \mathbb{R}^k \suchthat \sum_{i=1}^{k} x_i = 1 \text{ and } \forall i, x_i \geq 0\right\}.\]
+
+    It can easily be proven that $S_k$ is convex. These observations bring us to the following result.
+\end{parag}
+
+\begin{parag}{Theorem}
+    Seeing the entropy $H: S_k \mapsto \mathbb{R}$ as a function of $p_U$, then is concave.
+
+    \begin{subparag}{Remark}
+        This is nice because it means that, if we show that the solution to a problem comes by maximising entropy, then this can easily be done algorithmically.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $p, q \in S_k$ and $0 \leq \lambda \leq 1$ be arbitrary. Our goal is to show that: 
+        \[\lambda H\left(p\right) + \left(1 - \lambda\right) H\left(q\right) \leq H\left(\lambda p + \left(1 - \lambda\right) q\right).\]
+        
+        To do so, we construct a pair of random variables $\left(U, V\right)$ such that $U \in \left\{1, 2\right\}$, $V \in \left\{1, \ldots, k\right\}$, and their distribution are: 
+        \[p_U\left(1\right) = \lambda, \mathspace p_U\left(2\right) = 1 - \lambda,\]
+        \[p_{V|U}\left(v\suchthat 1\right) = p\left(v\right), \mathspace p_{V|U}\left(v \suchthat 2\right) = q\left(v\right).\]
+        
+        We notice that this characterises the whole distribution $p_{U, V}$. Moreover, we find that, for all $v$: 
+        \[p_V\left(v\right) = \lambda p\left(v\right) + \left(1 - \lambda\right) q\left(v\right) \implies p_V = \lambda p + \left(1- \lambda\right)q.\]
+
+        This thus tells us that: 
+        \[H\left(\lambda p + \left(1 - \lambda\right) q\right) = H\left(V\right).\]
+        
+        Moreover, we notice that: 
+        \autoeq{\lambda H\left(p\right) + \left(1 - \lambda\right) H\left(q\right) = p_U\left(1\right) H\left(V \suchthat U = 1\right) + p_U\left(2\right) H\left(V \suchthat U = 2\right) = H\left(V \suchthat U\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    $I\left(U, V\right)$ can be viewed as a function of $\left(p_U, p_{V | U}\right)$. Now, $p_U \in S_{\left|\mathcal{U}\right|}$ and $p_{V | U} \in S_{\left|\mathcal{V}\right|}^{\left|\mathcal{U}\right|}$. It is easy to show the product of convex sets is convex. 
+
+    Then:
+    \begin{itemize}
+        \item Fixing $p_{V | U}$, then $I$ is a concave function of $p_U$.
+        \item Fixing $p_U$, then $I$ is a convex function of $p_{V | U}$.
+    \end{itemize}
+    
+    \begin{subparag}{Proof}
+        These proofs are left as exercises to the reader.
+    \end{subparag}
+\end{parag}
+
+\subsection{Entropy rate}
+
+\begin{parag}{Recall}
+    As explained before, $\frac{1}{n} H\left(U_1, \ldots, U_n\right)$ play an important role when analysing the efficiency of uniquely decodable codes. This motivates the following definition.
+\end{parag}
+
+\begin{parag}{Definition: Entropy rate}
+    Given a stochastic process $U_1, U_2, \ldots$, its \important{entropy rate} is defined to be, if the limit exists: 
+    \[\mathcal{H}\left(\left(U_i \suchthat i \in \mathbb{Z}_{> 0}\right)\right) = \lim_{n \to \infty} \frac{1}{n} H\left(U^n\right),\]
+    where, as usual, $U^n = \left(U_1, \ldots, U_n\right)$ is just a notation.
+
+    \begin{subparag}{Remark}
+        If the limit does not exist, then it is also possible to look at the limsup and the liminf. This is not important for this class, but the idea is that we can consider other values that also have an engineering interest even if the sequence  $\frac{1}{n} H\left(U^n\right)$ does not converge.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    Consider $U_1, U_2, \ldots$ to be IID. Then, using (1) independence and (2) the fact they are identically distributed: 
+    \autoeq{H\left(U^n\right) = H\left(U_1\right) + H\left(U_2 \suchthat U_1\right) + \ldots + H\left(U_n \suchthat U^{n-1}\right) \over{=}{(1)}  H\left(U_1\right) + H\left(U_2\right) + \ldots + H\left(U_n\right) \over{=}{(2)}  H\left(U_1\right) + H\left(U_1\right) + \ldots + H\left(U_1\right) = n H\left(U_1\right).}
+    
+    Hence, the entropy rate is: 
+    \[\mathcal{H}\left(\left(U_i \suchthat i \in \mathbb{Z}_{> 0}\right)\right) = \lim_{n \to \infty} \frac{n H\left(U_1\right)}{n} = H\left(U_1\right).\]
+\end{parag}
+
+\begin{parag}{Observation}
+    To specify the statistics of $U_1, U_2, \ldots$, it suffices to know: 
+    \[p_{U_1}\left(u_1\right), \mathspace p_{U_2 | U_1}\left(u_2 \suchthat u_1\right), \mathspace p_{U_3|U_1, U_2}\left(u_3 \suchthat u_1, u_2\right), \mathspace \ldots\]
+
+    In other words, we want to know $p_{U_n | U^{n-1}}\left(u_n \suchthat u_1, \ldots, u_{n-1}\right)$ for all $n \geq 1$. This is very general, and holds for any process.
+\end{parag}
+
+\begin{parag}{Definition: Markov process}
+    A stochastic process is said to be \important{Markov} if: 
+    \[p_{U_n | U_1, \ldots, U_{n-1}}\left(u_n \suchthat u_1, \ldots, u_{n-1}\right) = p_{U_n | U_{n-1}}\left(u_n \suchthat u_{n-1}\right).\]
+
+    Then, we may write $U_1 - U_2 - U_3 - U_4 - \ldots$.
+
+    \begin{subparag}{Intuition}
+        $U_1 - \ldots - U_n$ is a Markov chain means that, conditioned on $U_i$, then $\left(U_1, \ldots, U_{i-1}\right)$ are independent from $\left(U_{i+1}, \ldots, U_n\right)$.
+
+        Another way of seeing this is that we can consider some independent random variables $W_1, W_2, \ldots$, such that $U_i = f_i\left(U_{i-1}, W_i\right)$. In other words, $U_i$ is a random function of $U_{i-1}$.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        We studied some properties of Markov chains in the first exercise series.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let $U_1, U_2, \ldots$ be a stationary binary Markov process. Binary means that it takes values in $\left\{0, 1\right\}$, meaning that we can draw the following diagram, where $\alpha = \prob\left(U_{i+1} = 1 \suchthat U_i = 0\right)$, and similarly for $\beta$:
+    \svghere[0.75]{BinaryMarkovProcess.svg}
+
+    Stationary means that the transition kernel $\alpha, \beta$ does not depend on time, and that the distribution does not depend on time. In other words, if $\prob\left(U_1 = 0\right) = \pi_0$ and $\prob\left(U_1 = 1\right) = \pi_1$, then for all $i$: 
+    \[\prob\left(U_i = 0\right) = \pi_0 \text{ and } \prob\left(U_i = 1\right) = \pi_1.\]
+
+    Now, using the chain rule and Markovity: 
+    \autoeq{H\left(U^n\right) = H\left(U_1\right) + H\left(U_2 \suchthat U_1\right) + H\left(U_3 \suchthat U_1, U_2\right) + \ldots + H\left(U_n \suchthat U^{n-1}\right) = H\left(U_1\right) + H\left(U_2 \suchthat U_1\right) + H\left(U_3 \suchthat U_2\right) + \ldots + H\left(U_n \suchthat U_{n-1}\right),}
+    
+    Now, by stationarity, we have $H\left(U_2 \suchthat U_1\right) = H\left(U_3 \suchthat U_2\right)$. Indeed, $H\left(U_3 \suchthat U_2 = 0\right) = H\left(U_2 \suchthat U_1 = 0\right)$ since the kernel does not depend on time, and $\prob\left(U_2 = 0\right) = \pi_0 = \prob\left(U_1 = 0\right)$. This thus becomes: 
+    \[H\left(U^n\right) = U_1 + \left(n-1\right) H\left(U_2 \suchthat U_1\right).\]
+    
+    But then, the entropy rate is: 
+    \autoeq{\lim_{n \to \infty} \frac{1}{n} H\left(U^n\right) = \lim_{n \to \infty} \left[\frac{H\left(U_1\right)}{n} + \frac{n-1}{n} H\left(U_2 \suchthat U_1\right)\right] = H\left(U_2 \suchthat U_1\right) = \pi_0 h_2\left(\alpha\right) + \pi_1 h_2\left(\beta\right).}
+
+
+    \begin{subparag}{Remark 1}
+        Stationarity requires that: 
+        \autoeq{\pi_0 \left(1 - \alpha\right) + \pi_1 \beta = \pi_0 \implies \alpha \pi_0 = \beta \pi_1 \implies \left(\pi_0, \pi_1\right) = \left(\frac{\beta}{\alpha + \beta}, \frac{\alpha}{\alpha + \beta}\right).}
+
+        Hence, this means that:
+        \[\lim_{n \to \infty} \frac{1}{n} H\left(U^n\right) = \frac{\beta h_2\left(\alpha\right) + \alpha h_2\left(\beta\right)}{\alpha + \beta}.\]
+    
+        Note that stationarity is a very restrictive hypothesis, it puts a big constraint on $\pi_0, \pi_1$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        In fact, the stationary hypothesis can be loosened to ergodicity. This was however supposed to just be an example, hence the lack of generality.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Stationary process}
+    A process $U_1, U_2, \ldots$ is said to be \important{stationary} if, for all $i \geq 0$ and $n \geq 1$: 
+    \[\prob\left(U_{i+1} = u_{1}, \ldots, U_{i+n} = u_{n}\right) = \prob\left(U_1 = u_1, \ldots, U_n = u_n\right).\]
+
+    We may also write $U^n \followsdistr \left(U_{i+1}, \ldots, U_{i+n}\right)$.
+    
+    \begin{subparag}{Remark}
+        This generalises the notion of stationary we used in the example above for Markov chains.
+    \end{subparag}
+    
+    \begin{subparag}{Example}
+        This means that the probability to find the word ABRACADABRA starting at $i = 17$ is exactly the same as $i = 89$. More precisely, this means that the probability distribution only depends on the relative distance of the random variables, not their exact positions.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: Cesàro mean}
+    Let $\alpha_1, \alpha_2, \ldots$ be a converging sequence, i.e.~such that $\alpha = \lim_{n \to \infty} \alpha_n \in \mathbb{R}$ exists. We consider the following sequence:
+    \[\beta_n = \frac{\alpha_1 + \ldots + \alpha_n}{n}.\]
+    
+    Then, $\lim_{n \to \infty} \beta_n = \alpha$.
+
+    \begin{subparag}{Proof}
+        Without loss of generality, we assume that $\alpha = 0$. Otherwise, we can just consider the sequence $\alpha'_n = \alpha_n - \alpha$.
+
+        By definition of the limit, for all $\epsilon > 0$, there exists a $n\left(\epsilon\right)$ such that for all $n > n\left(\epsilon\right)$, then $\left|\alpha_n\right| < \epsilon$. Now, if $n > n\left(\epsilon\right)$: 
+        \autoeq{\left|\beta_n\right| = \left|\frac{\alpha_1 + \ldots + \alpha_{n\left(\epsilon\right)} + \alpha_{n\left(\epsilon\right) + 1} + \ldots + \alpha_n}{n}\right| \leq \frac{\overbrace{\left|\alpha_1\right| + \ldots + \left|\alpha_{n\left(\epsilon\right)}\right|}^{= S\left(\epsilon\right)} + \overbrace{\left|\alpha_{n\left(\epsilon\right) + 1}\right|}^{\leq \epsilon} + \ldots + \overbrace{\left|\alpha_n\right|}^{\leq \epsilon}}{n} < \frac{S\left(\epsilon\right) + n \epsilon}{n}.}
+        
+        Hence, taking $N\left(\epsilon\right) = \max\left\{\frac{S\left(\epsilon\right)}{\epsilon}, n\left(\epsilon\right)\right\}$, we get that, for all $n > N\left(\epsilon\right)$: 
+        \[\left|\beta_n\right| < \epsilon + \frac{S\left(\epsilon\right)}{n} < \epsilon + \frac{S\left(\epsilon\right)}{S\left(\epsilon\right)/\epsilon} = 2 \epsilon.\]
+        
+        This shows that $\beta_n$ also converges to 0.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $U_1, U_2, \ldots$ be a stationary process. Then, the entropy rate exists and is equal to: 
+    \[\lim_{n \to \infty} \frac{1}{n}H\left(U^n\right) = \lim_{n \to \infty} H\left(U_n \suchthat U^{n-1}\right).\]
+
+    In other words, both limits exists and are equal.
+
+    \begin{subparag}{Remark}
+        This result is very powerful. Note however that it does not tell us that the limit can easily be computed.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 1}
+        We first show that the first limit exists.
+
+        We define $\alpha_n = H\left(U_n \suchthat U^{n-1}\right)$. We want to show it converges. By stationarity, we have: 
+        \[\alpha_n = H\left(U_n \suchthat U_1, \ldots, U_{n-1}\right) = H\left(U_{n+1} \suchthat U_2, \ldots, U_n\right).\]
+
+        Now, since conditioning reduces entropy:
+        \[\alpha_n = H\left(U_{n+1} \suchthat U_2, \ldots, U_n\right) \geq H\left(U_{n+1} \suchthat U_1, U_2, \ldots U_n\right) = \alpha_{n+1}.\]
+
+        Since moreover entropies are non-negative, this tells us that $0 \leq \alpha_{n+1} \leq \alpha_n$. This is a decreasing sequence bounded from below, so its limit exists.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        We now aim to show both limits are equal. We consider the following sequence: 
+        \[\beta_n = \frac{1}{n} H\left(U^n\right) = \frac{1}{n}\left(\alpha_1 + \ldots + \alpha_n\right).\]
+
+        Since $\alpha_n$ converges, we know that $\beta_n$ converges to the same value by Cesàsro means. This gives our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+
+\end{document}

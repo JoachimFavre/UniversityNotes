@@ -1,0 +1,307 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-16 at 13:16:42.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 16 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{4}{2025-09-16}{Entropy zoo}{
+\begin{itemize}[left=0pt]
+    \item Proof of the log-sum inequality.
+    \item Definition of conditional entropy, mutual information and conditional mutual information.
+    \item Proof of the chain rule for entropy and mutual information.
+    \item Proof that conditioning decreases entropy.
+\end{itemize}
+
+}
+
+\begin{parag}{Log-sum inequality}
+    Let $a_1, \ldots, a_k \geq 0$ and $b_1, \ldots, b_k \geq 0$. We also note $A = \sum_{i=1}^{k} a_i$ and $B = \sum_{i=1}^{k} b_i$. Then: 
+    \[\sum_{i=1}^{k} a_i \log\left(\frac{a_i}{b_i}\right) \geq A \log\left(\frac{A}{B}\right),\]
+    where we note $0 \log\left(\frac{0}{B}\right) = 0$ if $B \neq 0$ and $A \log\left(\frac{A}{0}\right) = +\infty$ if $A \neq 0$ by continuous extension.
+
+    Equality is moreover reached if and only if $a_i / A = b_i / B$ for all $i$.
+    
+    \begin{subparag}{Proof}
+        Note that if $A = 0$, then $a_1 = \ldots = a_k = 0$, giving the result easily. Similarly, if $B = 0$, we directly get our result. We thus assume that $A > 0$ and $B > 0$.
+
+        Let $p_i = a_i/A$ and $q_i = b_i/B$. Note that they are valid probability distributions. Hence: 
+        \autoeq{\sum_{i=1}^{k} a_i \ln\left(\frac{a_i}{b_i}\right) = A \sum_{i=1}^{k} p_i \ln\left(\frac{A p_i}{B q_i}\right) = A \sum_{i=1}^{k} p_i \ln\left(\frac{p_i}{q_i}\right) + A \ln\left(\frac{A}{B}\right) \underbrace{\sum_{i=1}^{k} p_i}_{= 1}.}
+        
+
+        We only need to show that the first term is non-negative. This is a direct consequence of the fact $\ln\left(z\right) \leq z-1$ (and hence $-\ln\left(z\right) \geq -\left(z-1\right)$): 
+        \[\sum_{i=1}^{k} p_i \ln\left(\frac{p_i}{q_i}\right) = -\sum_{i=1}^{k} p_i \ln\left(\frac{q_i}{p_i}\right) \geq -\sum_{i=1}^{k} p_i \left(\frac{q_i}{p_i}-  1\right) = -\left(1 - 1\right) =0.\]
+
+        Overall, this does give us exactly:
+        \[\sum_{i=1}^{k} a_i \ln\left(\frac{a_i}{b_i}\right) = \underbrace{A}_{> 0} \underbrace{\sum_{i=1}^{k} p_i \ln\left(\frac{p_i}{q_i}\right)}_{\geq 0} + A \ln\left(\frac{A}{B}\right) \geq A \ln\left(\frac{A}{B}\right).\]
+        
+        Moreover, we have equality if and only if equality is reached in the only inequality we used, $\ln\left(z\right) \leq z-1$. This happens if and only if $p_i = q_i \iff a_i/A = b_i/B$ for all $i$.
+
+        %Now, what we want to show is that: 
+        %\[\sum_{i=1}^{k} \frac{a_i}{A} \log\left(\frac{a_i}{b_i}\right) \geq \log\left(\frac{A}{B}\right) \iff \sum_{i=1}^{k} \frac{a_i}{A} \log\left(\frac{a_i}{b_i}\right) - \log\left(A\right) \geq \log\left(\frac{A}{B}\right) - \log\left(A\right).\]
+
+        %Hence, letting $p_i = \frac{a_i}{A}$, which sums to one, this is equivalent to: 
+        %\[\sum_{i=1}^{k} p_i \log\left(\frac{p_i}{b_i}\right) \geq \log\left(\frac{1}{B}\right).\]
+        %
+        %By adding $\log\left(B\right)$ and defining $q_i = \frac{b_i}{B}$, which also sums to one, this is equivalent to: 
+        %\[\sum_{i=1}^{k} p_i \ln\left(\frac{a_i}{b_i}\right) \leq 0.\]
+
+        %#later{structure}
+
+        %However, we know that $\ln\left(z\right) \leq z-1$, so we do have that: 
+        %\[\sum_{i=1}^{k} p_i \ln\left(\frac{q_i}{p_i}\right) \leq \sum_{i=1}^{k} p_i \left(\frac{q_i}{p_i}-  1\right) = 1 - 1 =0.\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $U, V$ be random variables. Then:
+    \[H\left(U, V\right) \leq H\left(U\right) + H\left(V\right).\]
+
+    This is moreover reached with equality if and only if $U$ and $V$ are independent.
+
+    \begin{subparag}{Intuition}
+        If we make a Huffman code $c: \mathcal{U} \times \mathcal{V} \mapsto \left\{0, 1\right\}^*$ for $\left(U, V\right)$, we will get an average codeword length close to $H\left(U, V\right)$. Now, we could also have simply made a code $c' = c_U \times c_V$ by concatenating the two Huffman codes for $U$ and $V$, which would give an expected codeword length close to $H\left(U\right) + H\left(V\right)$. This second code, $c'$, cannot be better than the first one, $c$, since Huffman codes are optimal. 
+
+        This informal reasoning gives exactly this result.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We aim to show that: 
+        \autoeq[s]{\sum_{u, v} p_{U, V}\left(u, v\right) \log_2\left(\frac{1}{p_{U, V}\left(u, v\right)}\right) \leq \sum_{u} p_U\left(u\right) \log_2\left(\frac{1}{p_U\left(u\right)}\right) + \sum_{v} p_V\left(v\right) \log_2\left(\frac{1}{p_V\left(v\right)}\right).}
+        
+        Now, we know that $\sum_{u} p_{U, V}\left(u, v\right) = p_V\left(v\right)$. Hence, this is equivalent to proving:
+        \autoeq[s]{\sum_{u, v} p_{U, V}\left(u, v\right) \log_2\left(\frac{1}{p_{U, V}\left(u, v\right)}\right) \leq \sum_{u, v} p_{U, V}\left(u, v\right) \log_2\left(\frac{1}{p_U\left(u\right)}\right) + \sum_{u, v} p_{U, V}\left(u, v\right) \log_2\left(\frac{1}{p_V\left(v\right)}\right).}
+
+        Hence, what we are trying to prove is completely equivalent to: 
+        \[\sum_{u, v} p_{U, V}\left(u, v\right) \log_2\left(\frac{p_{U, V}\left(u, v\right)}{p_U\left(u\right) p_V\left(v\right)}\right) \geq 0.\]
+
+        However, leaving $a_{u, v} = p_{U, V}\left(u, v\right)$ and $b_{u, v} = p_U\left(u\right) p_V\left(v\right)$, this yields $A = B = 1$ and hence our result directly comes from the log-sum inequality.
+
+        Moreover, equality holds if and only if $a_{u, v} /A = b_{u, v} / B \iff p_{U, V}\left(u, v\right)= p_U\left(u\right) p_V\left(v\right)$ for all $u, v$. This is exactly the definition of the independence of $U$ and $V$.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Mutual information}
+    Given a pair of random variables $U, V$, we define the \important{mutual information} between $U$ and $V$ as: 
+    \[I\left(U; V\right) = H\left(U\right) + H\left(V\right) - H\left(U, V\right).\]
+
+    \begin{subparag}{Remark 1}
+        By the previous theorem, we have $I\left(U, V\right) \geq 0$, and $I\left(U, V\right) = 0$ if and only if $U$ and $V$ are independent.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The definition is symmetric, hence: 
+        \[I\left(U; V\right) = I\left(V; U\right).\]
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Definition: Conditional entropy}
+    Let $U, V$ be random variables. The \important{conditional entropy} of $V$ given $U$ is defined as: 
+    \[H\left(V \suchthat U\right) = \sum_{u, v} p_{U, V}\left(u, v\right) \log_2\left(\frac{1}{p_{V | U}\left(v \suchthat u\right)}\right).\]
+
+    Equivalently: 
+    \autoeq{H\left(V \suchthat U\right) = \sum_{u} p_U\left(u\right) \sum_{v} p_{V|U}\left(v \suchthat u\right) \log_2\left(\frac{1}{p_{V|U}\left(v \suchthat u\right)}\right) = \sum_{u} p_U\left(u\right) H\left(V \suchthat U = u\right).}
+
+    \begin{subparag}{Remark 1}
+        Note that $f\left(U\right) = E\left(V \suchthat U\right)$ is a random variable but $H\left(V \suchthat U\right)$ is a scalar.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property: Chain rule}
+    We have: 
+    \[H\left(U, V\right) = H\left(U\right) + H\left(V \suchthat U\right).\]
+
+    More generally: 
+    \[H\left(U_1, \ldots, U_n\right) = H\left(U_1\right) + H\left(U_2 \suchthat U_1\right) + H\left(U_3 \suchthat U_1, U_2\right) + \ldots + H\left(U_n \suchthat U_1, \ldots, U_{n-1}\right).\]
+
+    This is named the \important{chain rule for entropy}.
+
+    \begin{subparag}{Remark 1}
+        Note that $U_3 \mid U_1, U_2$ means ``$U_3$ given both $U_1$ and $U_2$''. This could also be wrongfully parsed as ``$U_3$ given $U_1$, and $U_2$''.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Since $H\left(U, V\right) = H\left(V, U\right)$, completely equivalently:
+        \[H\left(U, V\right) = H\left(V\right) + H\left(U \suchthat V\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        We can find a direct corollary of this result. To do so, we notice that:
+        \[H\left(V, U_1, \ldots, U_n\right) = H\left(V\right) + H\left(U_1, \ldots, U_n \suchthat V\right).\]
+
+        Similarly, applying the chain rule in a different way:
+        \autoeq[s]{H\left(V, U_1, \ldots, U_n\right) = H\left(V\right) + H\left(U_1 \suchthat V\right) + H\left(U_2 \suchthat U_1, V\right) + \ldots + H\left(U_n \suchthat U_1, \ldots, U_{n-1}, V\right).}
+        
+        The two equations are equal, so, reordering the terms, this gives: 
+        \[H\left(U^n \suchthat V\right) = \sum_{i=1}^{n} H\left(U_i \suchthat U^{i-1}, V\right),\]
+        where, as mentioned earlier, we note $U^n = \left(U_1, \ldots, U_n\right)$.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Note that, for the function $f\left(u\right) = \log_2\left(\frac{1}{p\left(u\right)}\right)$: 
+        \[H\left(U\right) = \sum_{u} p\left(u\right) \log_2\left(\frac{1}{p\left(u\right)}\right) = \exval\left[f\left(U\right)\right].\]
+        
+        Moreover, we know that: 
+        \autoeq{p_{U, V}\left(u, v\right) = p_U\left(u\right) p_{V|u}\left(v \suchthat u\right) \iff -\log_2\left(p_{U, V}\left(u, v\right)\right) = -\log_2\left(p_V\left(u\right)\right) - \log_2\left(p_{V|U}\left(v|u\right)\right) \implies \exval\left[\log_2\left(\frac{1}{p_{U, V}\left(U, V\right)}\right)\right] = \exval\left[\log_2\left(\frac{1}{p_U\left(U\right)}\right)\right] + \exval\left[\log_2\left(\frac{1}{p_{V|U}\left(V \suchthat U\right)}\right)\right].}
+
+        The first term is $H\left(U, V\right)$, the second one is $H\left(U\right)$, and the third one is $H\left(U \suchthat V\right)$. This is exactly our first result. Note that conditional entropy can be seen as being define exactly so that this result holds.
+
+        The proof of the more general case is completely similar, and is based on the fact:
+        \autoeq[s]{p_{U_1, \ldots, U_n}\left(u_1, \ldots, u_n\right) = p_{U_1}\left(u_1\right) p_{U_2|U_1}\left(u_2 \suchthat u_1\right) \cdots p_{U_n | U_1, \ldots, U_{n-1}}\left(u_n \suchthat u_1, \ldots, u_{n-1}\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Intuition}
+    Consider a setup where we want to send a random variable $V$; and the encoder and decoder both know some random variable $U$ (which may or may not be correlated with $V$).
+
+    If they don't use $U$, we know that we have to send $H\left(V\right)$ bits. Now, we could imagine that, for each $u \in \mathcal{U}$, we consider a different code $c_u : \mathcal{V} \mapsto \left\{0, 1\right\}^*$. The distribution of $V$ is then $p_{V | U = u}\left(v\right)$. Hence, assuming we have $U = u$, the number of bits to describe $V$ is: 
+    \[\sum_{v} p\left(v \suchthat u\right) \log_2\left(\frac{1}{p\left(v \suchthat u\right)}\right).\]
+    
+    Overall, averaging over the probability that $U = u$, we use the following number of bits 
+    \[\sum_{u, v} p_U\left(u\right) p_{V|U}\left(v \suchthat u\right) \log_2\left(\frac{1}{p_{V|U}\left(v \suchthat u\right)}\right) = H\left(V \suchthat U\right).\]
+
+    This gives an intuitive interpretation of conditional entropy: $H\left(V \suchthat U\right)$ is the number of bits used to encode $V$ when we have the added shared knowledge of $U$. 
+
+    \begin{subparag}{Remark}
+        If they ignore $U$, they can only make a worse compression scheme. This yields the following property.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    We have: 
+    \[H\left(V \suchthat U\right) \leq H\left(V\right).\]
+    
+    \begin{subparag}{Proof}
+        This can be understood intuitively from the previous reasoning. From a more formal approach, we know the two following properties: 
+        \[H\left(U, V\right) = H\left(U\right) + H\left(V \suchthat U\right), \mathspace H\left(U, V\right) \leq H\left(U\right) + H\left(V\right).\]
+        
+        We get our result by combining the two.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Mutual information has the following equivalent definitions:
+    \[I\left(U; V\right) = H\left(U\right) + H\left(V\right) - H\left(U, V\right) = H\left(V\right) - H\left(V \suchthat U\right) = H\left(U\right) - H\left(U \suchthat V\right).\]
+    
+    \begin{subparag}{Proof}
+        This directly comes from the fact $H\left(U, V\right) = H\left(U\right) + H\left(V \suchthat U\right) = H\left(V\right) + H\left(U \suchthat V\right)$.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        $I\left(U; V\right) = H\left(V\right) - H\left(V \suchthat U\right)$ represents the savings in bits to describe $V$ by the common knowledge of $U$. Completely similarly, $I\left(U; V\right) = H\left(U\right) - H\left(U \suchthat V\right)$ is the savings in bits to describe $U$ by the common knowledge of $V$.
+
+        This symmetry is not trivial and may seem surprising.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Conditional mutual information}
+    Let $U, V, W$ be random variables. The \important{conditional mutual information} between $U$ and $V$ given $W$ is defined equivalently by: 
+    \[I\left(U; V \suchthat W\right) = H\left(U \suchthat W\right) - H\left(U \suchthat V, W\right) = H\left(V \suchthat W\right) - H\left(V \suchthat U, W\right).\]
+
+    \begin{subparag}{Intuition}
+        Using a similar intuition as above, $I\left(U; V \suchthat W\right)$ is the saving in bits when we want to send $V$ knowing both $U, W$ versus when we want to send $V$ knowing only $W$. 
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Note that:
+        \autoeq{I\left(U; V \suchthat W\right) = H\left(U \suchthat W\right) - H\left(U \suchthat V, W\right) = H\left(U, W\right) - H\left(W\right) - H\left(U, V, W\right) + H\left(V, W\right).}
+
+        This is invariant if we swap $U$ and $V$, giving the result.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    We have: 
+    \[I\left(U; V \suchthat W\right) \geq 0.\]
+
+    Moreover, we have equality if and only if, conditioned on $W$, then $U$ and $V$ are independent.
+
+    \begin{subparag}{Proof}
+        Notice that, using the fact $p\left(u, v, w\right) = p\left(u, v \suchthat w\right)p\left(w\right)$, and similarly for $p\left(u, w\right)$ and $p\left(v, w\right)$:
+        \autoeq[s]{I\left(U; V \suchthat W\right) = H\left(U, W\right) - H\left(W\right) - H\left(U, V, W\right) + H\left(V, W\right) = \sum_{u, v, w} p_{UVW}\left(u, v, w\right) \log_2\left(\frac{p_W\left(w\right) p_{U, V, W}\left(u, v, w\right)}{p_{U,W}\left(u, w\right) p_{V,W}\left(v,w\right)}\right) = \sum_{w} p_W\left(w\right) \sum_{u, v} p_{U,V|W}\left(u, v \suchthat w\right) \log_2\left(\frac{p_{U,V|W}\left(u, v \suchthat w\right)}{p_{U|W}\left(u\suchthat w\right) p_{V|W}\left(v \suchthat w\right)}\right) = \sum_{w} p_W\left(w\right) I\left(U, V \suchthat W = w\right).}
+    
+        Now, we notice that $I\left(U; V \suchthat W = w\right) \geq 0$ by the log-sum inequality. Hence, $I\left(U; V \suchthat W\right) \geq 0$.
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Corollary}
+    We have: 
+    \[H\left(U \suchthat W\right) \geq H\left(U \suchthat W, V\right).\]
+    
+    \begin{subparag}{Remark}
+        Taking $W$ to be deterministic, this gives the result we already had that: 
+        \[H\left(U\right) \geq H\left(U \suchthat W\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Chain rule for mutual information}
+    We have: 
+    \autoeq[s]{I\left(U_1, \ldots, U_n; V \suchthat W\right) = I\left(U_1; V \suchthat W\right) + I\left(U_2; V \suchthat U_1,W\right) + \ldots + I\left(U_n; V \suchthat U_1, \ldots, U_{n-1} W\right).}
+
+    Equivalently, using simpler notation: 
+    \[I\left(U^n; V \suchthat W\right) = \sum_{i=1}^{n} I\left(U_i; V \suchthat U^{i-1}, W\right).\]
+
+    This is named the \important{chain rule for mutual information}.
+    
+    \begin{subparag}{Proof}
+        By definition and the chain rule for entropy, we have: 
+        \autoeq{I\left(U^n; V \suchthat W\right) = H\left(U^n \suchthat W\right) - H\left(U^n \suchthat V, W\right) = \sum_{i = 1}^n \left[H\left(U_i \suchthat U^{i-1}, W\right) - H\left(U_i \suchthat U^{i-1}, V, W\right)\right] = \sum_{i=1}^{n} I\left(U_i; V \suchthat U^{i-1}, W\right)}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Consider three random variables $X, Y, Z$. They can only take values such that $X \oplus Y \oplus Z = 0$, where $\oplus$ is addition modulo 2. In other words, $\left(X, Y, Z\right) \in \left\{000, 011, 101, 110\right\}$. We moreover suppose that each of the four possibility have probability $\frac{1}{4}$. 
+
+    Since this is a uniform distribution over a set with 4 elements, we easily find: 
+    \[H\left(X, Y, Z\right) = \log_2\left(4\right) = 2.\]
+
+    Completely similarly, $\left(X, Y\right)$ take four different values, each with probability $\frac{1}{4}$, giving: 
+    \[H\left(X, Y\right) = \log_2\left(4\right) = 2.\]
+
+    In fact by a completely similar argument, we find: 
+    \[H\left(X, Z\right) = H\left(Y, Z\right) = 2.\]
+
+    Now, $X$ takes each value with probability $\frac{1}{2}$ (and completely similarly for $Y$ and $Z$), giving: 
+    \[H\left(X\right) = H\left(Y\right) = H\left(Z\right) = 1.\]
+    
+    We notice that $H\left(X\right) + H\left(Y\right) = H\left(X, Y\right)$, telling us that $X$ and $Y$ are independent. This moreover also implies that $H\left(X \suchthat Y\right) = H\left(X\right) = 1$ since they are independent. This moreover also gives us that: 
+    \[I\left(X; Y\right) = I\left(X; Z\right) = I\left(Y; Z\right) = 0.\]
+    
+    Moreover, to compute $H\left(Z \suchthat X, Y\right)$, we can do to approaches. We could just use the fact $H\left(Z \suchthat X, Y\right) = H\left(X, Y, Z\right) - H\left(X, Y\right)$. More intuitively, given $X$ and $Y$, $Z$ is deterministically given by $Z = X \oplus Y$. Hence: 
+    \[H\left(Z \suchthat X, Y\right)=  H\left(X \suchthat Y, Z\right) = H\left(Y \suchthat X, Z\right) = 0.\]
+    
+    Finally, we find that: 
+    \[I\left(X; Y \suchthat Z\right) = 1 > I\left(X; Y\right) = 0.\]
+
+    Note that this is an example where conditioning increases mutual information.
+\end{parag}
+
+\end{document}

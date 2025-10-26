@@ -1,0 +1,256 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-06 at 11:26:31.
+
+\usepackage{../../style}
+
+\title{Information theory and coding}
+\author{Joachim Favre}
+\date{Lundi 06 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{8}{2025-10-06}{Summing Sharikov the cat}{
+\begin{itemize}[left=0pt]
+    \item Proof of an optimal strategy for data compression under distributional uncertainty and some regret.
+    \item Application to IID sequences.
+    \item Proof that having good data compression under distributional uncertainty means learning the unknown probability distribution.
+    \item Explanation of the Lempel-Ziv method.
+\end{itemize}
+
+}
+
+
+\begin{parag}{Theorem}
+    Suppose that we aim to find the $q$ that minimises the second regret:
+    \[\max_{p \in \mathcal{P}} \max_{u \in \mathcal{U}} \log_2\left(\frac{p\left(u\right)}{q\left(u\right)}\right)\]
+
+    Let $f\left(u\right) = \max_{p \in \mathcal{P}} p\left(u\right)$, and: 
+    \[S\left(\mathcal{P}\right) = \sum_{u \in \mathcal{U}} f\left(u\right).\]
+    
+    The optimal $q$ is $q^*\left(u\right) = f\left(u\right)/S$, and gives a regret of $\log_2\left(S\right)$.
+
+    \begin{subparag}{Remark}
+        We call $S\left(\mathcal{P}\right)$ the \important{Shtarkov sum}.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Note that we can write the regret as follows, since $\log_2\left(z\right)$ is an increasing function:
+        \autoeq{\max_{p \in \mathcal{P}} \max_{u \in \mathcal{U}} \log_2\left(\frac{p\left(u\right)}{q\left(u\right)}\right) = \max_{u \in \mathcal{U}} \max_{p \in \mathcal{P}} \log_2\left(\frac{p\left(u\right)}{q\left(u\right)}\right) = \max_{u \in \mathcal{U}} \log_2\left(\frac{f\left(u\right)}{q\left(u\right)}\right) = \log_2\left(S\right) + \underbrace{\max_{u \in \mathcal{U}} \log_2\left(\frac{f\left(u\right)/S}{q\left(u\right)}\right)}_{= M\left(q\right)}.}
+
+        Note that we only want to find the $q$ that minimises $M\left(q\right)$, since $\log_2\left(S\right)$ is independent of $q$. However, note that $M\left(q\right) \geq 0$. Indeed, let's suppose for the sake of contradiction that $M\left(q\right) < 0$. But then, for all $u \in \mathcal{U}$, we must have $q\left(u\right) < f\left(u\right)/S$. Summing on $u \in \mathcal{U}$, this reads: 
+        \[\sum_{u \in \mathcal{U}} q\left(u\right) < \sum_{u \in \mathcal{U}} \frac{f\left(u\right)}{S} = \frac{S}{S} = 1,\]
+        which is a contradiction since $\sum_{u} q\left(u\right) = 1$.
+
+        Since we always have $M\left(q\right) \geq 0$, if we find a $q$ such that $M\left(q\right) = 0$ then it has to be optimal. Now, $q\left(u\right) = f\left(u\right)/S$, which is a valid probability distribution, is exactly such that $M\left(q\right) = 0$; finishing the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $\mathcal{U} = \left\{0, 1\right\}^n$ and $\mathcal{P}$ be the class of IID distributions on $\mathcal{U}$. More mathematically: 
+    \[\mathcal{P} = \left\{p_{\theta} \suchthat p_{\theta}\left(u^n\right) = \theta^{k} \left(1 - \theta\right)^{n-k}\right\},\]
+    where $k = \left\|u^n\right\|_1$ is the number of ones in $u^n$.
+
+    Then, there exists a code such that the excess bits because of distributional uncertainty and per character vanishes asymptotically for all $u^n \in \mathcal{U}^n$:
+    \[\frac{\length c\left(u^n\right) - \log_2\left(\frac{1}{p_{\theta}\left(u^n\right)}\right)}{n} \leq \underbrace{\frac{1 + \log_2\left(n+1\right)}{n}}_{\to 0}.\]
+
+    In other words, if we have enough observations, we are able to figure out the distribution $p_{\theta}$ sufficiently well before making our code.
+
+    \begin{subparag}{Remark}
+        An implication of this result is that, for $U^n \iid p_{\theta}$: 
+        \[\frac{\exval\left(c\left(U^n\right) - \log_2\left(\frac{1}{p_{\theta}\left(U^n\right)}\right)\right)}{n} \to 0.\]
+        
+        However, our result is stronger than that; it also states that there is no outlier codeword for which the excess bits would not vanish. This is a consequence of minimising the second regret.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $u^n$ be a vector with $k$ ones. Our theorem above tells us to consider: 
+        \[f\left(u^n\right) = \max_{0 \leq \theta \leq 1} \theta^k \left(1 - \theta\right)^{n- k}.\]
+        
+        Using usual calculus tools, we find that this is maximal when $\theta = \frac{k}{n}$, and hence: 
+        \[f\left(u^n\right) = \left(\frac{k}{n}\right)^k \left(1 - \frac{k}{n}\right)^{n - k}.\]
+
+        The Shtarkov sum then reads, using the fact there are $\binom{n}{k}$ vectors $u^n$ that have $k$ ones: 
+        \[S\left(\mathcal{P}\right) = \sum_{u^n \in \left\{0, 1\right\}^n} f\left(u^n\right) = \sum_{k=0}^{n} \binom{n}{k} \left(\frac{k}{n}\right)^k \left(1- \frac{k}{n}\right)^{n-k}.\]
+        
+        Now, we know that, for any $0 \leq \alpha \leq 1$: 
+        \[1 = \left[\alpha + \left(1 - \alpha\right)\right]^n = \sum_{k=0}^{n} \binom{n}{k} \alpha^k \left(1 -  \alpha\right)^{n-k} \geq \binom{n}{k} \alpha^k \left(1 - \alpha\right)^{n-k}.\]
+        
+        This thus gives us the following rough upper bound: 
+        \[S\left(\mathcal{P}\right) \leq \sum_{k=0}^{n} 1 = n+1.\]
+
+        It is in fact possible to prove that $S\left(\mathcal{P}\right)$ is of order $\sqrt{n}$ by using a better approximation on the binomial coefficient. However, it will not change our result. By our theorem above, this means that $q\left(u^n\right) = f\left(u^n\right)/S$ is such that:
+        \[\max_{p \in \mathcal{P}} \max_{u \in \mathcal{U}} \log_2\left(\frac{p\left(u\right)}{q\left(u\right)}\right) = \log_2\left(S\left(\mathcal{P}\right)\right) = \log_2\left(n+1\right).\]
+
+        In other words, designing a code under this distribution $q$, this yields that, for any $u^n \in \mathcal{U}^n$: 
+        \autoeq{\length c\left(u^n\right) - \log_2\left(\frac{1}{p_{\theta}\left(u^n\right)}\right) = \left\lceil \log_2\left(\frac{1}{q\left(u^n\right)}\right) \right\rceil - \log_2\left(\frac{1}{p_{\theta}\left(u^n\right)}\right) \leq 1 + \log_2\left(\frac{p_{\theta}\left(u^n\right)}{q\left(u^n\right)}\right) \leq 1 + \max_{p \in \mathcal{P}} \max_{u \in \mathcal{U}} \log_2\left(\frac{p\left(u\right)}{q\left(u\right)}\right) = 1 + \log_2\left(n + 1\right).}
+
+        Dividing by $n$ to get the excess bits per character, it gives exactly our result.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The proof tells us how to construct the code $c$. We will also consider another construction of such a code $c$ below, which is actually doable in practice.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    We have: 
+    \[\binom{n}{k} \leq 2^{n h_2\left(k/n\right)}.\]
+
+    \begin{subparag}{Proof}
+        We have, for any $0 \leq \alpha \leq 1$:
+        \autoeq{1 = \left[\alpha + \left(1 - \alpha\right)\right]^n = \sum_{k} \binom{n}{k} \alpha^k \left(1- \alpha\right)^{n-k} \geq \binom{n}{k} \alpha^k \left(1 - \alpha\right)^{n-k} \iff \binom{n}{k} \leq \alpha ^{-k} \left( 1 - \alpha\right)^{-\left(n-k\right)}.}
+        
+        This bound can be made tightest with $\alpha = \frac{k}{n}$, yielding: 
+        \autoeq{\binom{n}{k} \leq \left(\frac{k}{n}\right)^{-k} \left(1 - \frac{k}{n}\right)^{-\left(n-k\right)} \iff \frac{1}{n}\log_2 \binom{n}{k} \leq h_2\left(\frac{k}{n}\right) \iff \binom{n}{k} \leq 2^{n h_2\left(k/n\right)}.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Consider again $\mathcal{U} = \left\{0, 1\right\}^n$ and $\mathcal{P}$ be the class of IID distributions on $\mathcal{U}$. We can consider a coding scheme $c: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}^*$ which, on input $u^n$, concatenates the following two pieces of information:
+    \begin{itemize}
+        \item Describe $k \in \left\{0, 1, \ldots, n\right\}$ in binary; which takes at most $\left\lceil \log_2\left(1 + n\right) \right\rceil $ bits.
+        \item Describe which of the $\binom{n}{k}$ sequences it is; which can be done in at most $\left\lceil \log_2\binom{n}{k} \right\rceil $ bits.
+    \end{itemize}
+
+    Hence, using our lemma, the total length is upper bounded by: 
+    \autoeq{\length c\left(u^n\right) \leq 2 + \log_2\left(n+1\right) + \log_2\binom{n}{k} \leq 2 + \log_2\left(n+1\right) + n h_2\left(\frac{k}{n}\right) \implies \frac{1}{n} \length c\left(u^n\right) \leq h_2\left(\frac{k}{n}\right) + \frac{2 + \log_2\left(n+1\right)}{n}.}
+    
+    When $n$ is sufficiently large, we expect $\frac{k}{n} \approx \theta$. This is thus an encoding scheme that achieves approximately $H\left(p\right)$ for all $p \in \mathcal{P}$, and could be implemented in practice.
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $\mathcal{P}$ be a class of stochastic processes on some alphabet $\mathcal{U}$, and suppose that we find some stochastic $q$ that minimises the first regret:
+    \[\max_{p \in \mathcal{P}} D\left(p || q\right).\]
+
+    We note $q_n$ to be $q$ restricted to the first $n$ letters, and similarly for $p_n$. We finally suppose that:
+    \[\lim_{n \to \infty} \frac{1}{n} \max_{p \in \mathcal{P}} D\left(q_n || p_n\right) = 0.\]
+
+    Let $\epsilon > 0$ be arbitrary. For $n$ large enough, picking some $i \followsdistr \left\{1, \ldots, n\right\}$ uniformly at random and some $u^{i-1} \followsdistr p_{i-1}$, then with high probability:
+    \[D\left(p\left(\cdot | u^{i-1}\right) || q\left(\cdot \suchthat u^{i-1}\right)\right) \leq \sqrt{\epsilon}.\]
+
+    \begin{subparag}{Remark}
+        Note that the limit hypothesis held when we considered IID processes.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        This states that, for most of the $i$ and of the $u^{i-1}$, then $q$ makes a prediction which is very close to $p$. In other words, being able to make good source coding means learning the function $p$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We have: 
+        \[D\left(p_n || q_n\right) = \sum_{u^n} p\left(u^n\right) \log_2\left(\frac{p\left(u^n\right)}{q\left(u^n\right)}\right),\]
+        \[p_n\left(u^n\right) = p\left(u_1\right) p\left(u_2 \suchthat u_1\right) \cdots p\left(u_n \suchthat u^{n-1}\right),\]
+        \[q_n\left(u^n\right) = q\left(u_1\right) q\left(u_2 \suchthat u_1\right) \cdots q\left(u_n \suchthat u^{n-1}\right).\]
+
+        Combining these, this yields: 
+        \autoeq{x = \frac{1}{n} D\left(p_n || q_n\right) = \frac{1}{n} \sum_{u^n} p_n\left(u^n\right) \sum_{i=1}^{n} \log_2\left(\frac{p\left(u_i \suchthat u^{i-1}\right)}{q\left(u_i \suchthat u^{i-1}\right)}\right) = \frac{1}{n} \sum_{i=1}^{n} \sum_{u^n} p_n\left(u^n\right) \log_2\left(\frac{p\left(u_i \suchthat u^{i-1}\right)}{q\left(u_i \suchthat u^{i-1}\right)}\right).}
+
+        However, note that the inner sum is of the form: 
+        \autoeq{\sum_{u^n} p_n\left(u^n\right) g\left(u^i\right) = \sum_{u^i} p_i\left(u^i\right) g\left(u^i\right) \underbrace{\sum_{u_{i+1}, \ldots, u_n} p\left(u_{i+1}, \ldots, u_n \suchthat u^i\right)}_{= 1} = \sum_{u^i} p_i\left(u^i\right) g\left(u^i\right).}
+
+        Hence, we can simplify our result as:
+        \autoeq{x = \frac{1}{n} \sum_{i=1}^{n} \sum_{u_i} p_i\left(u^i\right) \log_2\left(\frac{p\left(u_i \suchthat u^{i-1}\right)}{q\left(u_i \suchthat u^{i-1}\right)}\right) = \frac{1}{n} \sum_{i=1}^{n} \sum_{u^{i-1}} p_{i-1}\left(u^{i-1}\right) \sum_{u_i} p\left(u_i \suchthat u^{i-1}\right) \log_2\left(\frac{p\left(u_i \suchthat u^{i-1}\right)}{q\left(u_i \suchthat u^{i-1}\right)}\right) = \frac{1}{n} \sum_{i=1}^{n} \sum_{u^{i-1}} p\left(u^{i-1}\right) D\left(p\left(\cdot  | u^{i-1}\right) || q\left(\cdot | u^{i-1}\right)\right).}
+
+        Leaving $I \followsdistr \left\{1, \ldots, n\right\}$ to be sampled uniformly and $U^{I-1} \followsdistr p_{I-1}$, we recognise the definition of expected value. Hence, this reads:  
+        \[\frac{1}{n} D\left(p_n || q_n\right) = x = \exval\left[D\left(p\left(\cdot \suchthat U^{I-1}\right) || q\left(\cdot  \suchthat u^{i-1}\right)\right)\right].\]
+
+        This is a very interesting result, which we can exploit using Markov's inequality: 
+        \autoeq{\prob\left(D\left(p\left(\cdot \suchthat U^{I-1}\right) || q\left(\cdot  \suchthat u^{i-1}\right)\right) > \sqrt{\epsilon}\right) \leq \frac{\exval\left[D\left(p\left(\cdot \suchthat U^{I-1}\right) || q\left(\cdot  \suchthat u^{i-1}\right)\right)\right]}{\sqrt{\epsilon}} = \frac{D\left(p_n || q_n\right)/n}{\sqrt{\epsilon}}.}
+
+        We can finally use the hypothesis that $D\left(p_n || q_n\right) /n \to 0$ to get that, for $n$ sufficiently large:
+        \[\prob\left(D\left(p\left(\cdot \suchthat U^{I-1}\right) || q\left(\cdot  \suchthat u^{i-1}\right)\right) > \sqrt{\epsilon}\right) \leq \frac{\epsilon}{\sqrt{\epsilon}} = \sqrt{\epsilon}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+%\begin{parag}{name}
+%    #later{name}
+%
+%    We again want to do data-compression for sequences under distributional uncertainty. Hence, $\mathcal{P}$ is a class of stochastic processes on some alphabet $\mathcal{U}$. Suppose that we manage solving the $\min_q \max_{p \in \mathcal{P}} D\left(p || q\right)$ problem. This gives us a stochastic process $q$.
+%
+%    We consider $q_n$ to be $q$ restricted to the first $n$ letters. We finally suppose that $\lim_{n \to \infty} \frac{1}{n} \max_{p \in \mathcal{P}} D\left(q_n || p_n\right) = 0$. Note that this held when we considered IID processes.
+%
+%    Picking some $i \followsdistr \left\{1, \ldots, n\right\}$ uniformly at random and some $u^{i-1} \followsdistr p_{i-1}$, then, with high probability:
+%    \[D\left(p\left(\cdot | u^{i-1}\right) || q\left(\cdot \suchthat u^{i-1}\right)\right) \leq \sqrt[4]{\epsilon_n}.\]
+%
+%    \begin{subparag}{Intuition}
+%        
+%    \end{subparag}
+%
+%    \begin{subparag}{Proof}
+%    We have: 
+%    \[D\left(p_n || q_n\right) = \sum_{u^n} p\left(u^n\right) \log_2\left(\frac{p\left(u^n\right)}{q\left(u^n\right)}\right),\]
+%    \[p_n\left(u^n\right) = p\left(u_1\right) p\left(u_2 \suchthat u_1\right) \cdots p\left(u_n \suchthat u^{n-1}\right),\]
+%    \[q_n\left(u^n\right) = q\left(u_1\right) q\left(u_2 \suchthat u_1\right) \cdots q\left(u_n \suchthat u^{n-1}\right).\]
+%
+%    Combining these, this yields: 
+%    \autoeq{\frac{1}{n} D\left(p_n || q_n\right) = \frac{1}{n} \sum_{u^n} p_n\left(u^n\right) \sum_{i=1}^{n} \log_2\left(\frac{p\left(u_i \suchthat u^{i-1}\right)}{q\left(u_i \suchthat u^{i-1}\right)}\right) = \frac{1}{n} \sum_{i=1}^{n} \sum_{u^n} p_n\left(u^n\right) \log_2\left(\frac{p\left(u_i \suchthat u^{i-1}\right)}{q\left(u^i \suchthat u^{i-1}\right)}\right) =%
+%    \frac{1}{n} \sum_{i=1}^{n} \sum_{u_i} p_i\left(u^i\right) \log_2\left(\frac{p\left(u_i \suchthat u^{i-1}\right)}{q\left(u_i \suchthat u^{i-1}\right)}\right) = \frac{1}{n} \sum_{i=1}^{n} \sum_{u^{i-1}} p_{i-1}\left(u^{i-1}\right) \sum_{u_i} p\left(u_i \suchthat u^{i-1}\right) \log_2\left(\frac{p\left(u_i \suchthat u^{i-1}\right)}{q\left(u_i \suchthat u^{i-1}\right)}\right)%
+%= \frac{1}{n} \sum_{i=1}^{n} \underbrace{\sum_{u^{i-1}} p\left(u^{i-1}\right) D\left(p\left(\cdot  | u^{i-1}\right) || q\left(\cdot | u^{i-1}\right)\right)}_{= \delta_i}.}
+%#later{Using the fact that $\sum_{u^n} p_n\left(u^n\right) f\left(u^i\right) = \sum_{u^i} p\left(u^i\right) f\left(u^i\right) \sum_{u_{i+1}, \ldots, u_n} p\left(u_{i+1}, \ldots, u_n \suchthat u^i\right) = \sum_{u^i} p\left(u^i\right) f\left(u^i\right)$.}
+%#later{My choice for $\delta_{i}$, probably can find better name}
+%    
+%    Hence, supposing $\frac{1}{n} D\left(p_n || q_n\right) = \frac{1}{n} \sum_{i=1}^{n} \delta_i = \epsilon_n$, we can have $\delta_i > \sqrt{\epsilon_n}$ for at most $n \sqrt{\epsilon_n}$ (by Markov's inequality, or by a direct contradiction). Let $i$ such that $\delta_i = \sum_{u^{i-1}} p\left(u^{i-1}\right) D\left(p\left(\cdot | u^{i-1}\right) || q\left(\cdot  || u^{i-1}\right)\right)\leq \sqrt{\epsilon_n}$. The total $p\left(.\right)$ probability of the $\left(u^{i-1}\right)$ for which $D\left(p\left(\cdot \suchthat u^{i-1}\right) || q\left(\cdot || u^{i-1}\right)\right) \geq \sqrt[4]{\epsilon_n}$, by the exact same reasoning.
+%
+%    #later{can do Markov's inequality for both at the same time}
+%
+%    Overall, we found that for most of the $i$ and most of the $u^{i-1}$ (in terms of the probability distribution $p$), we have $D\left(p\left(\cdot | u^{i-1}\right) || q\left(\cdot \suchthat u^{i-1}\right)\right) \leq \sqrt[4]{\epsilon_n}.$
+%
+%    In other words, for most of the $i$ and of the $u^{i-1}$, then $q$ makes a prediction which is very close to $p$. We are thus really learning the function $p$.
+%
+%    \end{subparag}
+%
+%\end{parag}
+
+\subsection{Universal data compression by the Lempel-Ziv algorithm}
+
+\begin{parag}{Remark}
+    We consider a one-pass method that allows to compress an arbitrary sequence $u_1, u_2, \ldots$ such that all that is known beforehand is that $u_i \in \mathcal{U}$ for all $i$ (in particular, it does not need to know any distribution). This method is called the \important{Lempel-Ziv method} (LZ).
+
+    We will not see exactly the one that was described by Lempel and Ziv, nor one which is used in practice. We will consider a method which is implementable in polynomial time and space, and which is optimal asymptotically, but which will perform less well than the state-of-the-art on finite-length strings. The compromise will naturally be the complexity of the analysis: this is a simpler method and hence its analysis will be simpler.
+\end{parag}
+
+\begin{parag}{Example}
+    Before diving into formalism, let us describe the algorithm through an example.
+
+    Let's suppose that $\mathcal{U} = \left\{a, b, c\right\}$, and the sequence to compress is $abba\ldots$. The encoding and decoding goes as follows.
+
+    \begin{subparag}{Encoding}
+        Set $\mathcal{D} = \left(a, b, c\right)$ be a dictionary, which is ordered. Since we have three letters, we decide to encode each of them with fixed length encoding, in the same order as they appear in the dictionary: $a \mapsto 00$, $b \mapsto 01$, $c \mapsto 10$.
+        
+        \begin{enumerate}[left=0pt]
+            \item We start with the first letter, $a$. We know it, so we output $00$. Since we have just seen $a$, we replace $a$ by its single letter extension $\mathcal{D} = \left(aa, ab, ac, b, c\right)$. This dictionary now has 5 words, so we use three bits $aa \mapsto 000$, $ab \mapsto 001$, $ac \mapsto 010$, $b \mapsto 011$, $c\mapsto 100$.
+            \item Now, we read the second letter, $b$. Its code is $011$, which we output. We moreover update the dictionary to be $\mathcal{D} = \left(aa, ab, ac, ba, bb, bc, c\right)$. There are seven element, which we can still represent using three bits, $aa \mapsto 000$, $ab \mapsto 001$, $ac \mapsto 010$, $ba \mapsto 011$, $bb \mapsto 100$, $bc \mapsto 101$, $c \mapsto 110$.
+            \item We now read the following. $b$ isn't part of the dictionary, so we have to read two letters, $ba$, outputting $011$. We then update the dictionary: 
+            \[\mathcal{D} = \left(aa, ab, ac, baa, bab, bac, bb, bc, c\right) \mapsto \left(0000, \ldots, 1000\right).\]
+        \end{enumerate}
+        
+        Overall, we output $00011011$. This can then be continued for an arbitrary number of letters.
+    \end{subparag}
+
+    \begin{subparag}{Decoding}
+        Suppose that we receive $00011011$. We know that the encoder started with $\mathcal{D} = \left(a, b, c\right)$. It must have been using two bits, so $\mathcal{D} \mapsto \left(00, 01, 10\right)$. Hence, the first letter is $a$. The dictionary must then be updated to: 
+        \[\mathcal{D} = \left(aa, ab, ac, b, c\right) \mapsto \left(000, 001, 010, 011, 100\right).\]
+
+        We can then continue that way, following what the encoding did. This is hence clearly reversible.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        The idea is that sequences of letters that appear very often will need less bits per letter than very rare sequences. This can thus be hoped to be much better than simply encoding the whole sequence using $a \mapsto 00$, $b \mapsto 01$, $c \mapsto 10$.
+    \end{subparag}
+\end{parag}
+ 
+\end{document}

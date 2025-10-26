@@ -1,0 +1,258 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-30 at 13:18:13.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 30 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{7}{2025-09-30}{I'm happy the class is going in this direction}{
+\begin{itemize}[left=0pt]
+    \item Explanation of data compression via typicality.
+    \item Definition of KL divergence.
+    \item Proof of many properties on $\epsilon$-typical sequences when there is an error on the distribution.
+    \item Definition of $f$-divergence, and proof of properties.
+    \item Explanation of problem of data compression under distributional uncertainty.
+\end{itemize}
+
+}
+
+\begin{parag}{Data compression via typicality}
+    Let $U_1, \ldots, U_n \iid p$, and some $\epsilon > 0$. Moreover, let $R > \left(1 + \epsilon\right) H\left(p\right)$. We consider the following compression algorithm.
+
+    As a pre-processing step, we know that $\left|T\left(n, \epsilon, p\right)\right| \leq 2^{n\left(1 + \epsilon\right) H\left(p\right)}$. Hence, assign distinct binary sequences of length $nR$ to each element of $T$; in such a way that it is known to both the encoder and the decoder.
+
+    The encoder goes as follows.
+    \begin{itemize}
+        \item If $U^n \in T\left(n, \epsilon, p\right)$, output a 1 followed by the $nR$ bits of the binary representation of the corresponding element of $T\left(n, \epsilon, p\right)$.
+        \item If $U^n \not\in T\left(n, \epsilon, p\right)$, output a 0, followed by a $n \log_2\left|\mathcal{U}\right|$-bit description of $U^n$.
+    \end{itemize}
+    
+    The decoder can indeed decode the result easily. Moreover, asymptotically, this encodes $U^n$ using an average of $R$ bits per codeword. Since $R \approx H\left(p\right)$, this is optimal.
+    
+
+    \begin{subparag}{Proof}
+        The number of bits per letter is approximately: 
+        \[\begin{systemofequations} R + \frac{1}{n}, & \text{if $U^n \in T$,}\\ \log_2\left|\mathcal{U}\right| + \frac{1}{n}, & \text{if $U^n \notin T$.} \end{systemofequations}\]
+
+        The first case appears with probability 1 asymptotically, so we do get an average $R$ bits per codeword asymptotically. 
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        We know that $\prob\left(U^n \in T\left(n, \epsilon, p\right)\right)$ with high probability, so we may be tempted to only keep the first step of the encoder. However, in that case, the encoding would fail with small probability, which is not a behaviour we wish for.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This algorithm cannot be used in practice since it takes exponential space and time to run, we need to store the whole table that maps between elements of $T\left(n, \epsilon, p\right)$ and their $nR$-bit description.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        Just like Huffman codes, this require a perfect knowledge of $p$. If we made a slight mistake in it, this gives a very bad compression scheme, as we will see below.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $S_n \subseteq \mathcal{U}^n$ is a sequence of subsets, for $n = 1, 2, \ldots$, and let $\delta > 0$. If $\prob_{U^n \iid p}\left(U^n \in S_n\right) \geq \delta$ for all $n$, then: 
+    \[\liminf_{n \to \infty} \left(\frac{1}{n} \log_2\left|S_n\right|\right) \geq H\left(p\right).\]
+
+    \begin{subparag}{Intuition}
+        This states that no set of smaller size than $T\left(n, \epsilon, p_U\right)$ can contain IID sequences with a probability that does not tend to 0.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is left as an exercise to the reader.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Kullbach-Leibler divergence}
+    Let $p, q$ be probability distributions. Then, we define the \important{Kullbach-Leibler divergence} from $p$ to $q$ (or KL divergence, or I-divergence, or relative entropy): 
+    \[D\left(q || p\right) = \sum_{u \in \mathcal{U}} q\left(u\right) \log_2\left(\frac{q\left(u\right)}{p\left(u\right)}\right).\]
+
+    \begin{subparag}{Intuition}
+        This object appears naturally in the following proof. We will then study it in more details.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Importantly, $D\left(q || p\right) \neq D\left(p || q\right)$ in the general case.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $p, q$ be probability distributions, which may (or may not) be different. We have the following results that relate IID sequences under $p$, $U^n \iid p$; and the set of typical sequences over $q$, $T\left(n, \epsilon, q\right)$.
+    \begin{enumerate}[left=0pt]
+        \item For any $u^n \in T\left(n, \epsilon, q\right)$:
+        \[2^{-n \left(H\left(q\right) + D\left(q || p\right)\right) \left(1 + \epsilon\right)} \leq \prob\left(U^n = u^n\right) \leq 2^{-n \left(H\left(q\right) + D\left(q || p\right)\right) \left(1 - \epsilon\right)}.\]
+
+    \item For $n$ large enough:
+        \[\left(1 - \epsilon\right) 2^{-n \left[D\left(q || p\right) - \epsilon \left[2 H\left(q\right) + D\left(q || p\right)\right]\right]}  \leq \prob\left(U^n \in T\left(n, \epsilon, q\right)\right) \leq 2^{-n \left[D\left(q || p\right) - \epsilon \left[2 H\left(q\right) + D\left(q || p\right)\right]\right]}.\]
+
+        In fact, the second inequality holds for any $n$.
+    \end{enumerate}
+
+    \begin{subparag}{Intuition}
+        The second result states morally that: 
+        \[\prob_{U^n \iid p}\left(U^n \in T\left(n, \epsilon, q\right)\right) \approx 2^{-n D\left(q || p\right)}.\]
+
+        This shows that $D\left(q || p\right)$ is a distinguishability measure of the distribution $q$ with respect to $p$. This will be formalised in the following section.
+    \end{subparag} 
+
+    \begin{subparag}{Remark}
+        Note that, if $D\left(q || p\right) \neq 0$, then $\lim_{n \to \infty} \prob\left(U^n \in T\left(n, \epsilon, q\right)\right) = 0$. Hence, the encoding scheme defined above is extremely bad if there is a very small uncertainty on $p$.
+
+        We will study ways to tackle this issue in more details after analysing the KL-divergence.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 1}
+        We only consider the second inequality, the first one is completely similar. Since the random variables are IID: 
+        \[\prob\left(U^n = u^n\right) = \prod_{i=1}^{n} p\left(u_i\right) = \prod_{u \in \mathcal{U}} p\left(u\right)^{\type_{u^n}\left(u\right)}.\]
+        
+        But then, using the fact $u^n \in T\left(n, \epsilon, q\right)$ and hence $\type_{u^n}\left(u\right) \geq \left(1 - \epsilon\right) q\left(u\right)$, while being careful with the fact that $\log_2\left(p\left(u\right)\right) < 0$: 
+        \autoeq{\frac{1}{n} \log_2\left(\prob\left(U^n = u^n\right)\right) = \sum_{u \in \mathcal{U}} \type_{u^n}\left(u\right) \log_2\left(p\left(u\right)\right) \leq \left(1- \epsilon\right) \sum_{u \in \mathcal{U}} q\left(u\right) \log_2\left(p\left(u\right)\right).}
+
+        This looks a lot like entropy, but it isn't quite. We can instead decompose it as:
+        \autoeq{\sum_{u \in \mathcal{U}} q\left(u\right) \log_2\left(p\left(u\right)\right) = \sum_{u \in \mathcal{U}} q\left(u\right) \log_2\left(\frac{p\left(u\right)}{q\left(u\right)} q\left(u\right)\right) = - \left[H\left(q\right) + \sum_{u \in \mathcal{U}} q\left(u\right) \log_2\left(\frac{q\left(u\right)}{p\left(u\right)}\right)\right] = -\left[H\left(q\right) + D\left(q || p\right)\right].} 
+
+        Note that the definition of $D\left(q||p\right)$ appears naturally. The inequality then directly comes from the two previous equations.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        We again only prove the second inequality, the first one is similar. We notice that, using the first result and the fact that we know an upper bound on $\left|T\right|$: 
+        \autoeq{\prob\left(U^n \in T\right) = \sum_{u^n \in T} \prob\left(U^n = u^n\right) \leq |T|2^{-n\left(1 - \epsilon\right)\left(H\left(q\right) + D\left(q||p\right)\right)} =  2^{-n\left(1 - \epsilon\right)\left(H\left(q\right) + D\left(q || p\right)\right)} 2^{n\left(1 + \epsilon\right) H\left(q\right)} = 2^{-n D\left(q || p\right)} 2^{n \epsilon \left[2 H\left(q\right) + D\left(q || p\right)\right]}.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{$f$-divergence}
+
+\begin{parag}{Remark}
+    Let us consider a binary hypothesis test. We are given some $U^n$, which is either such that $U^n \iid p$ or $U^n \iid q$. We want to consider some decision rule $S_n \subseteq \mathcal{U}^n$ such that, we decide $q$ if $U^n \in S_n$, and we decide $p$ if if $U^n \notin S_n$.
+
+    It is possible to show that, if $\prob\left(\text{error} \suchthat U^n \iid q\right)$ is small, then:
+    \[\prob\left(\text{error} \suchthat U^n \iid p\right) \gtrsim 2^{-n D\left(q || p\right)}.\]
+
+    In other words, if $D\left(q||p\right)$ is very large, then we are able to be correct both when $U^n \iid p$ and $U^n \iid q$. Similarly, if $D\left(q || p\right)$ is close to zero, then small error when $U^n \iid q$ means large error when $U^n \iid p$. For instance, in the second case, we may always be guessing that $U^n \iid q$.
+
+    This reasoning shows that $D\left(q||p\right)$ is indeed a measure of distinguishability of the distribution $q$ with respect to $p$: they are very distinguishable if it is close to zero, and not harder to distinguish otherwise.
+    
+    \begin{subparag}{Core idea}
+        This reasoning can be summarised with the following sentence. If the truth is $p$, then $q$ is able to fool us by $D\left(q || p\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        This reasoning allows us to intuitively understand why $D\left(q | p\right) \neq D\left(p || q\right)$ in the general case.
+
+        Let's assume that $p: \left\{a, b\right\} \mapsto \left\{0, 1\right\}$ and $q: \left\{a, b\right\} \mapsto \left\{\frac{1}{2}, \frac{1}{2}\right\}$. If we see a $a$, then we can immediately decide $p$. Deciding $q$ is however harder, we will never be sure of our choice.
+
+        Hence, knowing that $\prob\left(\text{error} \suchthat U^n \iid p\right)$ is small puts a lot less constraint on $\prob\left(\text{error} \suchthat U^n \iid q\right)$ than the converse.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    We have, for any random variables $U, V$:
+    \[I\left(U, V\right) = D\left(p_{UV} || p_U p_V\right).\]
+    
+    \begin{subparag}{Intuition}
+        Suppose we sample $U_1, U_2, \ldots \iid p_U$ and $V_1, V_2, \ldots \iid p_V$. Mutual information thus tells us how much we would mistake this from the joint distribution $\left(U_1, V_1\right), \left(U_2, V_2\right), \ldots \iid p_{U V}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is a direct proof:
+        \autoeq{I\left(U, V\right) = H\left(U\right) + H\left(V\right) - H\left(U, V\right) = \sum_{u, v} p\left(u, v\right) \log_2\left(\frac{p\left(u, v\right)}{p\left(u\right) p\left(v\right)}\right) = D\left(p_{UV} || p_U p_V\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $f$-divergence}
+    Let $f: \mathbb{R}_{\geq 0} \mapsto \mathbb{R} \cup \left\{+ \infty\right\}$ be a function, such that $f\left(1\right) = 0$ and $f$ is strictly convex. 
+
+    Given probability distributions $p, q$, we define the $f$ divergence from $p$ to $q$ as: 
+    \[D_f\left(q||p\right) = \sum_{u \in \mathcal{U}} p\left(u\right) f\left(\frac{q\left(u\right)}{p\left(u\right)}\right).\]
+    \begin{subparag}{Intuition}
+        As we will see in the following lemma, this generalises KL-divergence. We can however consider other types of divergences.
+        \begin{itemize}
+            \item Taking $f\left(z\right) = \left|z-1\right|$, this gives the $\ell_1$ distance (or total variation distance) $\sum_{u} \left|p\left(u\right) - q\left(u\right)\right|$.
+            \item Taking $f\left(z\right) = z^2 - 1$, this gives an object called $\chi^2$-divergence.
+        \end{itemize}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    The KL-divergence is a $f$-divergence, where $f\left(z\right) = z \log_2\left(z\right)$.
+
+    \begin{subparag}{Proof}
+        Note first that, leaving $f\left(z\right) = z \log_2\left(z\right)$, we do have:
+        \[D\left(q || p\right) = \sum_{u \in \mathcal{U}} p\left(u\right) \frac{q\left(u\right)}{p\left(u\right)} \log_2\left(\frac{q\left(u\right)}{p\left(u\right)}\right) = \sum_{u \in \mathcal{U}} p\left(u\right) f\left(\frac{q\left(u\right)}{p\left(u\right)}\right).\]
+
+        It is easy to indeed check that $f\left(1\right) = 0$ and $f$ is strictly convex.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    We have, for any $f$-divergence:
+    \begin{enumerate}
+        \item $D_f\left(q || p\right) \geq 0$.
+        \item $D_f\left(q || p\right) = 0 \iff p = q$.
+    \end{enumerate}
+
+    \begin{subparag}{Remark}
+        This shows that any such $D_f$ can be seen as some form of distinguishability measure (or distance) between $q$ and $p$. Note however that this is not a proper mathematical distance since, in general, it is not symmetrical and does not respect the triangle identity.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Using the fact that $f$ is convex and such that $f\left(1\right) = 0$:
+        \[D\left(q || p\right) = \sum_{u \in \mathcal{U}} p\left(u\right) f\left(\frac{q\left(u\right)}{p\left(u\right)}\right) \geq f\left(\sum_{u \in \mathcal{U}} p\left(u\right) \frac{q\left(u\right)}{p\left(u\right)}\right) = f\left(1\right) = 0.\]
+
+        The second property comes from the fact that $f$ is strictly convex, meaning that equality is reached above if and only if $\frac{q\left(u\right)}{p\left(u\right)} = 1$ for all $u$.
+    \end{subparag}
+\end{parag}
+
+\subsection{Data compression under distributional uncertainty}
+
+\begin{parag}{Observation}
+    Suppose $U \followsdistr p$ but we are wrongly told that $U \followsdistr q$. We would then design $c: \mathcal{U} \mapsto \left\{0, 1\right\}^*$ believing $q$. The ``ideal'' codeword lengths (following our wrong belief) would be $\length c\left(u\right) \approx \log_2\left(\frac{1}{q\left(u\right)}\right)$. However, this yields: 
+    \[\exval\left(\length c\left(U\right)\right) = \sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(\frac{1}{q\left(u\right)}\right) = \sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(\frac{p\left(u\right)}{q\left(u\right) p\left(u\right)}\right) = H\left(p\right) + D\left(p||q\right).\]
+    
+    Now, $H\left(p\right)$ is the optimal expected length. Hence, $D\left(p || q\right)$ is the ``penalty'' we have to pay for having used $q$ instead of the true distribution $p$. This is another way of seeing why $D\left(p || q\right)$ is a measure of distinguishability.
+\end{parag}
+
+\begin{parag}{Setup}
+    Suppose we receive some $U \followsdistr p$. We however don't know $p$, except that $p \in \mathcal{P}$ for some set of probability distributions $\mathcal{P}$.
+
+    Our goal is to choose some distribution $q$, and hence some codeword lengths $\length c\left(u\right) \approx \log_2\left(\frac{1}{q\left(u\right)}\right)$, in such a way that a regret is minimised. The regret could for instance be defined in one of the following two ways.
+    \begin{enumerate}
+        \item $\displaystyle \max_{p \in \mathcal{P}} D\left(p || q\right)$
+        \item $\displaystyle \max_{p \in \mathcal{P}} \max_{u \in \mathcal{U}} \log_2\left(\frac{p\left(u\right)}{q\left(u\right)}\right)$
+    \end{enumerate}
+
+    We can naturally choose other regrets.
+
+    \begin{subparag}{Intuition}
+        The choice of these regrets can be understood intuitively.
+
+        Using the observation above, the first regret corresponds to minimising the following function, which is very natural:
+        \[\max_{p \in \mathcal{P}} \left[\exval_{U \followsdistr p}\left[\length c\left(U\right)\right] - H\left(U\right)\right] = \max_{p \in \mathcal{P}} D\left(p || q\right).\]
+
+        Now, we notice that: 
+        \[\max_{p \in \mathcal{P}} D\left(p || q\right) = \max_{p \in \mathcal{P}} \sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(\frac{p\left(u\right)}{q\left(u\right)}\right).\]
+        
+        Instead of maximising the average penalty $\sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(\frac{p\left(u\right)}{q\left(u\right)}\right)$, the second regret maximises the maximum penalty $\max_{u \in \mathcal{U}} \log_2\left(\frac{p\left(u\right)}{q\left(u\right)}\right)$. This shows that the second regret is in fact stronger: if it is small, then the first one also has to be small. Its big interest is however that we can find a closed solution, as shown by the following theorem.
+
+        Now, there isn't one which is better than the other, it depends on the context and on which is easy to compute.
+    \end{subparag}
+\end{parag}
+
+\end{document}

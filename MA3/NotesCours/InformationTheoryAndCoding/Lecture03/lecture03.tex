@@ -1,0 +1,224 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-15 at 11:15:38.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 15 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{3}{2025-09-15}{Always nice to prove optimality}{
+\begin{itemize}[left=0pt]
+    \item Explanation and proof of the optimality of Huffman codes.
+    \item Proof of bounds on the entropy.
+    \item Definition of joint entropy.
+\end{itemize}
+
+}
+
+\subsection{Huffman code}
+
+\begin{parag}{Goal}
+    A natural question now is to find the prefix-free code that minimises the average codeword length.
+
+    \begin{subparag}{Remark}
+        One may wonder why we did all the bounds from the previous section if we can just always find the optimal code. 
+
+        Historically, the bounds first appeared, followed by this optimal code. If the optimal procedure was discovered earlier, we may not have discovered the link between $H\left(U\right)$ and the expected codeword length. It is nice to have an optimal procedure, but the entropy is such an important value that it is nice this procedure was not discovered ten years earlier.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Problem}
+    Let $\left(p\left(u\right)\right)_{u \in \mathcal{U}}$ be a probability distribution. We want to find integers $\left(L\left(u\right)\right)_{u \in \mathcal{U}}$ satisfying $\sum_{u \in \mathcal{U}} 2^{-L\left(u\right)} \leq 1$ that minimise $\sum_{u \in \mathcal{U}} p\left(u\right)L\left(u\right)$.
+
+    \begin{subparag}{Remark}
+        This type of problems is very hard to solve in general. We are very lucky to be able to solve in this case.
+    \end{subparag}
+
+    \begin{subparag}{Equivalent expression}
+        Equivalently, we aim to find $\left(q\left(u\right)\right)_{u \in \mathcal{U}}$ such that $q\left(u\right) \in \left\{1, \frac{1}{2}, \frac{1}{4}, \frac{1}{8}, \ldots\right\}$ and $\sum_{u \in \mathcal{U}} q\left(u\right) \leq 1$, in such way that it minimises $\sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(\frac{1}{q\left(u\right)}\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Relaxed form}
+        It can also be interesting to consider the relax expression, where we allow $q\left(u\right) \in \left[0, 1\right]$ to be arbitrary real numbers. In other words, we want to find $\left(q\left(u\right)\right)_{u \in \mathcal{U}}$ such that $q\left(u\right) \geq 0$ and $\sum_{u \in \mathcal{U}} q\left(u\right)$, in such a way that it minimises $\sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(\frac{1}{q\left(u\right)}\right)$.
+
+        Using analysis tools (such as Lagrange multipliers), we find that the optimal solution is $q = p$. The average codeword length is then exactly $\sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(\frac{1}{q\left(u\right)}\right) = H\left(U\right)$. This shows that even the relaxed problem cannot compress below entropy. In fact, this is another way to show that no uniquely decodable code can compress below entropy. 
+
+        This analysis is cute, but it is hard to convert it to a result to the original $q\left(u\right) \in \left\{1, \frac{1}{2}, \frac{1}{4}, \frac{1}{8}, \ldots\right\}$ problem. Let us consider another analysis.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Properties of optimal prefix-free codes}
+    Let $c$ be an optimal prefix-free code, of codeword length $L\left(u\right)$. Then, it has the following properties.
+    \begin{enumerate}
+        \item If $p\left(u\right) > p\left(v\right)$, then $L\left(u\right) \leq L\left(v\right)$.
+        \item In the binary tree representation of $c$, then each node is either a codeword or it has exactly two children.
+        \item There are at least 2 longest codewords (assuming the universe has more than one character, as usual).
+    \end{enumerate}
+
+    \begin{subparag}{Proof 1}
+        We make the proof by the contrapositive. In other words, consider a code $c$ such that there exists $u, v$ for which that $p\left(u\right) > p\left(v\right)$ and $\length c\left(u\right) > \length c\left(v\right)$. We aim to show this code isn't optimal. The idea is very simple, since $u$ is more likely than $v$, then we can just swap their representation to get a better code. Let's do this analysis more formally.
+
+        We consider a code $c'$ such that $c'\left(u\right) = c\left(v\right)$, $c'\left(v\right) = c\left(u\right)$, and all other letters match $c\left(w\right) = c'\left(w\right)$ for all $w \in \mathcal{U} \setminus \left\{u, v\right\}$. Note that all properties are preserved, meaning that since $c$ is prefix-free, then so is $c'$. However, we also find that: 
+        \autoeq[s]{\exval\left[\length c'\left(U\right)\right] = \sum_{w \in \mathcal{U} \setminus \left\{u, v\right\}} p\left(w\right) \length c\left(w\right) + p\left(u\right) \length c\left(v\right) + p\left(v\right) \length c\left(u\right),}
+        \autoeq[s]{\exval\left[\length c\left(U\right)\right] = \sum_{w \in \mathcal{U} \setminus \left\{u, v\right\}} p\left(w\right) \length c\left(w\right) + p\left(u\right) \length c\left(u\right) + p\left(v\right) \length c\left(v\right).}
+
+        Hence, their difference is just: 
+        \autoeq[s]{\exval\left[\length c'\left(U\right)\right] - \exval\left[\length c\left(u\right)\right] = \underbrace{\left(p\left(u\right) - p\left(v\right)\right)}_{> 0}\underbrace{\left(\length c\left(v\right) - \length c\left(u\right)\right)}_{< 0} < 0}
+        
+        In particular, $\exval\left[\length c'\left(U\right)\right] < \exval\left[\length c\left(u\right)\right]$, meaning that $c'$ is better than $c$, and hence $c$ cannot be optimal. 
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        In a prefix-free code binary tree representation, codewords must be the leafs. Hence, any node can be any of three types: a codeword (a leaf), have one children or have two children. Now, the idea is that writing the first as squares, the second as black circles and the third as white circles, the following tree isn't optimal. Indeed, if a node isn't a codeword and has two children, we can just delete it and move everything up, resulting in smaller average length.
+
+        \svghere{OptimalPrefixFreeCodeProperty.svg}
+    \end{subparag}
+
+    \begin{subparag}{Proof 3}
+        This is a direct corollary of the second property.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    There is an optimal prefix-free $c$ such that the two least likely letters are assigned as siblings codewords (in the sense that their immediate parent is the same).
+
+    \begin{subparag}{Proof}
+        Consider an arbitrary optimal code. The first property tells us that the least likely codewords have to be the longest codewords. If they aren't siblings, we can just construct our specific code by swapping them around to get the wanted property. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Huffman procedure}
+    Let $p_1, \ldots, p_{\left|\mathcal{U}\right|}$ be a probability distribution over some universe $\mathcal{U} = \left\{u_1, \ldots, u_{\left|\mathcal{U}\right|}\right\}$. We consider the following algorithm to construct the binary representation of an optimal prefix-free code, leaving $k = \left|\mathcal{U}\right|$.
+    \begin{itemize}
+        \item Sort $p_1 \geq \ldots \geq p_{k}$.
+        \item Make $u_{k-1}$ and $u_{k}$ neighbours, merging them into a single codeword of probability $p_{k-1} + p_k$.
+        \item Iterate recursively on the probability distribution $\left(p_1, \ldots, p_{k-2}, p_{k-1} + p_k\right)$.
+    \end{itemize}
+
+    This leads to a code named a \important{Huffman code}.
+
+    \begin{subparag}{Proof}
+        Let $q_1, \ldots, q_k$ be any probability distribution, such that, without loss of generality, $q_1 \geq \ldots \geq q_k$. We consider the following optimisation problem, the value of which we will call $\text{target}\left(q_1, \ldots, q_k\right)$: find $L_1, \ldots, L_k \in \mathbb{Z}_{\geq 0}$ such that:
+        \[\begin{systemofequations} \text{Minimise } \sum_{i=1}^{k} q_i L_i \\ \text{such that } \sum_{i=1}^{k} 2^{-L_i} \leq 1. \end{systemofequations}\]
+
+        Note that $\text{target}\left(p_1, \ldots, p_{\left|\mathcal{U}\right|}\right)$ is exactly what we try to evaluate. We look for a recursive formula.
+
+        We consider again $q_1, \ldots, q_k$. Since $q_1 \geq \ldots \geq q_k$ by hypothesis, we know by our corollary that $L_{k-1} = L_k$ in the optimal solution. However, we notice that our constraint then becomes:
+        \autoeq{\sum_{i=1}^{k} 2^{-L_i} = 2^{-L_1} + \ldots + 2^{- L_{k-2}} + 2^{-L_{k-1}} + 2^{-L_{k-1}} = 2^{-L_1} + \ldots + 2^{- L_{k-2}} + 2^{-L_{k-1} + 1} = 2^{-L_1} + \ldots + 2^{-L_{k-2}} + 2^{-\left(L_{k-1} - 1\right)}.}
+
+        We compressed the lengths from $\left(L_1, \ldots, L_k\right)$ to $\left(L_1, \ldots, L_{k-1}- 1\right)$. We can do something similar for the value we aim to minimise:
+        \autoeq[s]{\sum_{i=1}^{k} q_i L_i = q_1 L_1 + \ldots + q_{k-2} L_{k-2} + \left(q_{k-1} + q_k\right) L_{k-1} = q_1 L_1 + \ldots + q_{k-2} L_{k-2} + \left(q_{k-1} + q_k\right) \left(L_{k-1} - 1\right) + \left(q_{k-1} + q_k\right).}
+
+        But then, since $q_{k-1} + q_k$ has no impact on the optimisation, this tells us that:
+        \autoeq[s]{\begin{systemofequations} \text{Minimise } \sum_{i=1}^{k} q_i L_i \\ \text{such that } \sum_{i=1}^{k} 2^{-L_i} \leq 1 \end{systemofequations} \iff \begin{systemofequations} \text{Minimise } q_1 L_1 + \ldots + q_{k-2} L_{k-2} + \left(q_{k-1} + q_k\right) \left(L_{k-1} - 1\right) \\ \text{such that } 2^{-L_1} + \ldots + 2^{-L_{k-2}} + 2^{-\left(L_{k-1} - 1\right)} \leq 1 \end{systemofequations}}
+
+        This is however exactly our original problem, except that we have one less variable in our optimisation. In other words, we showed the following recurrence relation, assuming that $q_1 \geq \ldots \geq q_k$ without loss of generality as explained before: 
+        \[\text{target}\left(q_1, \ldots, q_k\right) = \text{target}\left(q_1, \ldots, q_{k-2}, q_{k-1} + q_k\right)\]
+
+        Moreover, finding a solution $\left(L_1', \ldots, L_{k-1}'\right)$ to $\text{target}\left(q_1, \ldots, q_{k-2}, q_{k-1} + q_k\right)$, then
+        \[\left(L_1, \ldots, L_{k}\right) = \left(L_1', \ldots, L_{k-2}', L_{k-1}' + 1, L_{k-1}' + 1\right)\]
+        is a solution to $\text{target}\left(q_1, \ldots, q_k\right)$. Since we finally trivially find that $\text{target}\left(q_1\right) = 0$ with $L_1 = 0$, this gives us a full recursive formula to find $L_1, \ldots, L_k$.
+
+        This is exactly the algorithm that is implemented by the Huffman procedure, finishing the proof.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Suppose that we have $\mathcal{U} = \left\{a, b, c, d, e, f\right\}$, with respective probabilities $0.3, 0.2, 0.2, 0.1, 0.1, 0.1$. We can then combine the two least likely, $0.1$ and $0.1$, to get only five number (step 1 below). After that, we combine one $0.2$ and $0.1$. We have multiple choices ($c$ and $d$, or $d$ and the parent of $e$ and $f$), we can pick the one we wish (step 2 below).
+        \svghere[0.7]{ExampleHuffmanCode_partial.svg}
+
+        Continuing this recursively, this gives us the following tree.
+        \svghere[0.7]{ExampleHuffmanCode.svg}
+
+        We can finally assign codewords arbitrarily. Supposing up is $0$ and down is $1$, this yields: 
+        \[c\left(a\right) = 11, \mathspace c\left(b\right) = 01, \mathspace c\left(c\right) = 101,\]
+        \[c\left(d\right) = 1000, \mathspace c\left(e\right) = 0001, \mathspace c\left(f\right) = 000.\]
+
+        This is an optimal code. We made a lot of choices along the way, showing that there are many optimal codes. There are different binary encodings but, in the general case, we can also find optimal codes that have different codeword length (but the same expected codeword length).
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        In the proof, the value of the final optimisation problem is just the sum of all the probabilities along the way. In the exemple before, and hence in the last picture, this tells us directly that:
+        \[\exval\left(\length c\left(U\right)\right) = 1 + 0.6 + 0.4 + 0.3 + 0.2 = 2.5.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Encoding $n$ characters at a time using the Huffman code takes $O\left(\left|\mathcal{U}\right|^n\right)$ time. This is exponential, which is very bad. We will later see a procedure that also reaches entropy asymptotically, but in linear time (and without even having to know the true probability distribution).
+    \end{subparag}
+\end{parag}
+
+\subsection{Entropy}
+
+\begin{parag}{Remark}
+    We have seen that $H\left(U\right)$ and $H\left(U_1, \ldots, U_n\right)$ play an important role in describing the efficiency of uniquely decodable codes. It thus makes sense to study this value in more details.
+\end{parag}
+
+\begin{parag}{Recall: Entropy}
+    Let $U$ be a random variable, taking values in $\mathcal{U}$ with probability $p\left(u\right) = \prob\left(U = u\right)$. We define its \important{entropy} such that: 
+    \[H\left(U\right) = \sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(\frac{1}{p\left(u\right)}\right),\]
+    where we define by continuous extension $0 \log_2\left(\frac{1}{0}\right) = 0$.
+
+    \begin{subparag}{Remark}
+        Note that we may not have $\mathcal{U} \subseteq \mathbb{R}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    For any random variable $U$: 
+    \[H\left(U\right) \geq 0.\]
+
+    Moreover, $H\left(U\right) = 0$ if and only if $U$ is deterministic.
+    
+    \begin{subparag}{Proof}
+        We have $0 \leq p\left(u\right) \leq 1$ since it is a probability distribution. Hence, $\log_2\left(\frac{1}{p\left(u\right)}\right) \geq 0$. This tells us that $H\left(U\right)$ is just a sum of non-negative terms, giving that $H\left(U\right) \geq 0$.
+        
+        Moreover, since this is a sum of non-negative terms, $H\left(U\right) = 0$ if and only if all terms are 0. Now, $p\left(u\right) \log_2\left(\frac{1}{p\left(u\right)}\right) = 0$ if and only if $p\left(u\right) \in \left\{0, 1\right\}$. Since $p\left(u\right)$ is a probability distribution and hence sums to one, this tells us that this is equivalent to having exactly one $u^*$ such that $p\left(u^*\right) = 1$, and all other $u \in \mathcal{U} \setminus \left\{u^*\right\}$ are such that $p\left(u\right) = 0$. This is however exactly the definition of determinism.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Property}
+    We have: 
+    \[H\left(U\right) \leq \log_2\left|\mathcal{U}\right|.\]
+
+    This is moreover reached with equality if and only if $U$ is uniformly distributed on $\mathcal{U}$.
+
+    \begin{subparag}{Proof}
+        We look at the following difference, using the fact $\sum_{u \in \mathcal{U}} p\left(u\right) = 1$: 
+        \autoeq{H\left(U\right) - \log_2\left|\mathcal{U}\right| = \sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(\frac{1}{p\left(u\right)}\right) - \sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left|\mathcal{U}\right| = \sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(\frac{1}{\left|\mathcal{U}\right| p\left(u\right)}\right).}
+
+        Using our favourite inequality, $\ln\left(z\right) \leq z - 1$ for all $z > 0$, this becomes: 
+        \autoeq{H\left(U\right) - \log_2\left|\mathcal{U}\right| = \log_2\left(e\right) \sum_{u \in \mathcal{U}} p\left(u\right) \ln\left(\frac{1}{p\left(u\right) \left|\mathcal{U}\right|}\right) \leq \log_2\left(e\right) \sum_{u \in \mathcal{U}} p\left(u\right) \left(\frac{1}{p\left(u\right) \left|\mathcal{U}\right|} - 1\right) = \log_2\left(e\right) \left(\sum_{u \in \mathcal{U}} \frac{1}{\left|\mathcal{U}\right|} - \sum_{u \in \mathcal{U}} p\left(u\right)\right) = \log_2\left(e\right)\left(1 - 1\right) = 0.}
+
+        Now, we know that $\ln\left(z\right) = z - 1$ if and only if $z = 1$ (otherwise, $\ln\left(z\right) < z-1$). Hence, we have equality if and only if $\frac{1}{p\left(u\right) \left|\mathcal{U}\right|} = 1 \iff p\left(u\right) = \frac{1}{\left|\mathcal{U}\right|}$ for all $u \in \mathcal{U}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Joint entropy}
+    Let $U, V$ be random variables. Note that $W = \left(U, V\right)$ is another random variable taking values in $\mathcal{W} = \mathcal{U} \times \mathcal{V}$. Moreover, if $w = \left(u, v\right) \in \mathcal{W}$, then $\prob\left(W = w\right) = \prob\left(U = u, V = v\right) = p\left(u, v\right)$ is the joint distribution, where the comma means ``\lang{AND}''.
+
+    We then define the \important{joint entropy} to be: 
+    \[H\left(U, V\right) = H\left(W\right) = \sum_{u \in \mathcal{U}, v \in \mathcal{V}} p\left(u, v\right) \log_2\left(\frac{1}{p\left(u, v\right)}\right).\]
+
+    \begin{subparag}{Remark}
+        From this point on, we will forget about the $W$ completely. It is nice to show that this definition is nothing new, that it just matches the previous definition (and hence that the previous properties still hold), but completely unnecessary for computations.
+    \end{subparag}
+\end{parag}
+
+\end{document}

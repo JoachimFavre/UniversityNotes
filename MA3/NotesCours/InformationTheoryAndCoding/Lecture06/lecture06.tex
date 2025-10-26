@@ -1,0 +1,182 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-09-29 at 11:29:00.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 29 septembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{6}{2025-09-29}{Defining normality mathematically}{
+\begin{itemize}[left=0pt]
+    \item \textit{Yes, I'm reusing lecture titles.}
+    \item Definition of the type of a sequence.
+    \item Definition of the set of $\epsilon$-typical sequences.
+    \item Proof of many properties on $\epsilon$-typical sequences.
+\end{itemize}
+
+}
+
+\subsection{Data compression of IID sources via typicality}
+
+\begin{parag}{Definition: Type}
+    Let $u^n = \left(u_1, \ldots, u_n\right) \in \mathcal{U}^n$ be a sequence. We define its \important{type} as a function $\type_{u^n}: \mathcal{U} \mapsto \mathbb{R}_{\geq 0}$ such that, for all $u \in \mathcal{U}$: 
+    \[\type\left(u\right) = \frac{1}{n} \sum_{i=1}^{n} I\left(u_i = n\right).\]
+    
+    In other words, $\type\left(u\right)$ is the fraction of the sequence that are equal to $u$.
+
+    \begin{subparag}{Remark 1}
+        We may write $\type = \type_{u^n}$ when the context is clear.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        Note that $\type\left(u\right)$ is a probability distribution since it is non-negative and $\sum_{u \in \mathcal{U}} \type\left(u\right) = 1$. Hence, some people also call $\type$ to be the empirical distribution of the sequence $u^n$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Since the type is always a rational number, not all probability distributions can be the type of a sequence.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: set of $\epsilon$-typical sequences}
+    Let $p_U$ be a probability distribution, $n \in \mathbb{Z}_{\geq 0}$ and $\epsilon > 0$ be arbitrary. We define the \important{set of $\epsilon$-typical sequences} of length $n$ with respect to $p_U$ as: 
+    \[T\left(n, \epsilon, p_U\right) = \left\{u^n \in \mathcal{U}^n \suchthat \forall u \in \mathcal{U}, \left(1 - \epsilon\right) p_U\left(u\right) \leq \type_{u^n}\left(u\right) \leq \left(1 + \epsilon\right) p_U\left(u\right)\right\}.\]
+
+    \begin{subparag}{Intuition}
+        This describes how typical random sequences $U^n$ will look. We will show that $U^n$ belongs to $T\left(n, \epsilon, p_U\right)$ with high probability. Together with a bound on the size of $T\left(n, \epsilon, p_U\right)$, this will give us a (very impractical) way of compressing data that does not rely on Huffman codes.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        The order of the parameters is not fixed, we may inconsistently write $T\left(\epsilon, p_U, n\right)$ for instance. This should however still be clear in the context.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We can in fact consider different measure of closeness:
+        \begin{enumerate}[left=0pt]
+            \item For all $u \in \mathcal{U}$, $\left|\type_{u^n}\left(u\right) - p_U\left(u\right)\right| < \epsilon$.
+            \item $\sum_{u \in \mathcal{U}} \left|\type_{u^n}\left(u\right) - p_U\left(u\right)\right| < \epsilon$.
+            \item For all $u \in \mathcal{U}$, $\left(1 - \epsilon\right) p_U\left(u\right) \leq \type_{u^n}\left(u\right) \leq \left(1 + \epsilon\right) p_U\left(u\right)$.
+
+                Equivalently, for all $u \in \mathcal{U}$, $\left|\type_{u^n}\left(u\right) - p_U\left(u\right)\right| < \epsilon p_U\left(u\right)$.
+            \item $\left|\sum_{u \in \mathcal{U}} \type\left(u\right) \log_2\left(\frac{1}{p_U\left(u\right)}\right) - \sum_{u \in \mathcal{U}} p_U\left(u\right) \log_2\left(\frac{1}{p_U\left(u\right)}\right)\right| < \epsilon$.
+        \end{enumerate}
+
+        Different books and different authors consider different measures of closeness. These are some examples, but there might be even others. In fact, the reference book, \textit{Elements of information theory} (Thomas Cover and Joy Thomas), uses the fourth definition in disguise.
+
+        Here, we chose the third one. It has a big advantage: if $p_U\left(u\right) = 0$, then we must have $\type_{u^n}\left(u\right) = 0$ and hence $u$ cannot belong to the sequence.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Let $\mathcal{U} = \left\{0, 1\right\}$, $p_U = \left(\frac{1}{2}, \frac{1}{2}\right)$ and $\epsilon = 1/10$. Then: 
+        \[T\left(1000, \epsilon, p_U\right) = \left\{u^n \in \left\{0, 1\right\}^n \suchthat \forall u \in \mathcal{U}, 0.45 \leq p_U\left(u\right) \leq 0.55 p_U\left(u\right)\right\}.\]
+
+        This is the set of sequences that contain between 450 and 550 zeroes.
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        As $n$ increases, the law of large number tells us that we expect $T$ to contain increasingly many sequences. This leads to the following theorem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $p_U$ be an arbitrary probability distribution and $\epsilon > 0$ be arbitrary. Then, all the following results h old.
+    \begin{enumerate}[left=0pt]
+        \item For all $n \in \mathbb{Z}_{\geq 0}$ and $u^n \in T\left(n, \epsilon, p_U\right)$:
+        \[2^{-n \left(1 + \epsilon\right) H\left(p\right)} \leq \prob_{U^n \iid p_U}\left(U^n = u^n\right) \leq 2^{-n \left(1 - \epsilon\right) H\left(p\right)}.\]
+        \item For all $n \in \mathbb{Z}_{\geq 0}$:
+            \[\left|T\left(n, \epsilon, p_U\right)\right| \leq 2^{n \left(1 + \epsilon\right) H\left(p\right)}.\]
+        \item For any $\epsilon' > 0$, there exists a $n\left(\epsilon, \epsilon', p_U\right) \in \mathbb{Z}_{\geq 0}$ such that, for all $n > n\left(\epsilon, p_U\right)$:
+            \[\prob_{U^n \iid p_U}\left(U^n \notin T\left(n, \epsilon, p_U\right)\right) < \epsilon'.\]
+
+            Equivalently:
+            \[\lim_{n \to \infty} \prob_{U^n \iid p_U}\left(U^n \in T\left(n, \epsilon, p_U\right)\right) = 1.\]
+
+        \item For $n$ large enough:
+            \[\left|T\left(n, \epsilon, p_U\right)\right| \geq \left(1 - \epsilon\right) 2^{n \left(1 - \epsilon\right) H\left(p\right)}.\]
+    \end{enumerate}
+
+    \begin{subparag}{Implication}
+        This theorem implies some very interesting results.
+
+        Combining the second and fourth result, we get that, for $n$ large enough, then $\left|T\left(n, \epsilon, p_U\right)\right| \approx 2^{n H\left(p\right)} .$ Now, $\left|\mathcal{U}^n\right| = 2^{n \log_2\left(\left|\mathcal{U}\right|\right)}$, so $T\left(n, \epsilon, p_U\right)$ is a lot smaller than $\mathcal{U}^n$. Yet, if we sample some $U^n \iid p_U$, then it will fall in $T\left(n, \epsilon, p_U\right)$ with very high probability by the third result. More than that, $U^n$ is approximately uniformly distributed in $T$ by the first result.
+
+        We will use this to make a compression algorithm.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 1}
+        Let $u^n \in T\left(n, \epsilon, p_U\right)$ be arbitrary, and let $q = \type_{u^n} = \frac{1}{n} \sum_{i=1}^{n} I\left(u_i = u\right)$ be its type. Writing $p_U = p$ for the simplicity of the notation, and using the fact that the random variables $U^n$ are IID, we know that:
+        \[\prob_{U^n \iid p}\left(U^n = u^n\right) = \prod_{i=1}^{n} p\left(u_i\right) = \prod_{u \in \mathcal{U}} p\left(u\right)^{n q\left(u\right)}.\]
+        
+        We take a logarithm to turn this (non-negative) product into a sum: 
+        \[\frac{1}{n} \log_2\left(\prob\left(U^n = u^n\right)\right) = \sum_{u \in \mathcal{U}} q\left(u\right) \log_2\left(p\left(u\right)\right).\]
+
+        Now, since $u^n \in T\left(n, \epsilon, p_U\right)$, we know by definition that $p\left(u\right)\left(1 - \epsilon\right) \leq q\left(u\right) \leq p\left(u\right) \left(1 + \epsilon\right)$. Applying this inequality on the equation above, while being careful that it is negative, it turns into:
+        \autoeq{\left(1 + \epsilon\right) \sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(p\left(u\right)\right) \leq \frac{1}{n} \log_2\left(\prob\left(U^n = u^n\right)\right) = \sum_{u \in \mathcal{U}} q\left(u\right) \log_2\left(p\left(u\right)\right) \leq \left(1 - \epsilon\right) \sum_{u \in \mathcal{U}} p\left(u\right) \log_2\left(p\left(u\right)\right)}
+
+        We however recognise the definition of entropy, so this reads:
+        \[\left(1 + \epsilon\right) \left(-H\left(U\right)\right) \leq \frac{1}{n} \log_2\left(\prob\left(U^n = u^n\right)\right) \leq \left(1 - \epsilon\right) \left(-H\left(U\right)\right).\]
+
+        This directly gives our result.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        This is just a direct corollary of the first result: since all elements have reasonably high probability to appear, this puts a constraint on the size of $T\left(n, \epsilon, p_U\right)$. For instance, we couldn't have 5 elements that all have probability $\frac{1}{4}$ to appear. 
+        
+        More mathematically, using the first result:
+        \autoeq{1 \geq \prob\left(U^n \in T\left(n, \epsilon, p_U\right)\right) = \sum_{u^n \in T} \prob\left(U^n = u^n\right) \geq \sum_{u^n \in T} 2^{-n \left(1 + \epsilon\right) H\left(p\right)} = \left|T\right| 2^{-n\left(1 + \epsilon\right) H\left(p\right)}.}
+
+        This directly gives our result.
+    \end{subparag}
+
+    \begin{subparag}{Proof 3}
+        We know that, by definition: 
+        \[u^n \notin T \iff \exists u, \left|\frac{1}{n} \sum_{i=1}^{n}  I\left(u_i = u\right) - p\left(u\right)\right| > \epsilon p\left(u\right).\]
+        
+        But then, by using the union bound: 
+        \autoeq{P = \prob\left(U^n \notin T\right) = \prob\left(\exists u, \left|\frac{1}{n} \sum_{i=1}^{n} I\left(U_i = u\right) - p\left(u\right)\right| > \epsilon p\left(u\right)\right) \leq \sum_{u \in \mathcal{U}} \prob\left(\left|\frac{1}{n} \sum_{i=1}^{n} I\left(U_i = u\right) - p\left(u\right)\right| > \epsilon p\left(u\right)\right).}
+        
+        Observe that, if $p\left(u\right) = 0$, then:
+        \[\prob\left(\left|\frac{1}{n} \sum_{i=1}^{n} I\left(U_i = u\right) - p\left(u\right)\right| > \epsilon p\left(u\right)\right) = 0.\]
+
+        Hence, we can remove all terms where $p\left(u\right) = 0$ without changing the equation:
+        \[P \leq \sum_{u \in \mathcal{U}: p\left(u\right) > 0} \prob\left(\left|\frac{1}{n} \sum_{i=1}^{n} I\left(U_i = u\right) - p\left(u\right)\right| > \epsilon p\left(u\right)\right).\]
+
+        Now, fix some $u \in \mathcal{U}$ such that $p\left(u\right) > 0$. Note that $X_i = I\left(U_i = u\right)$ is a random variable. $X_1, \ldots, X_n$ are IID with $\prob\left(X_i = 1\right) = p\left(u\right)$ and $\prob\left(X_i = 0\right) = 1 - p\left(u\right)$. Hence: 
+        \[\exval\left(X_i\right) = p\left(u\right), \mathspace \Var\left(X_i\right) = p\left(u\right)\left(1 - p\left(u\right)\right).\]
+
+        This also tells us that $\exval\left(\frac{1}{n} \sum_{i=1}^{n} X_i\right) = p\left(u\right)$. Moreover, by independence: 
+        \[\Var\left(\frac{1}{n} \sum_{i=1}^{n} X_i\right) = \frac{1}{n^2} \sum_{i=1}^{n}\Var\left( X_i\right) = \frac{1}{n} \Var\left(X_i\right) = \frac{1}{n} p\left(u\right) \left(1- p\left(u\right)\right).\]
+        
+        We can hence use the Chebyshev's inequality: 
+        \[\prob\left(\left|\frac{1}{n} \sum_{i=1}^{n} X_i - p\left(u\right)\right| > \epsilon p\left(u\right)\right) \leq \frac{\frac{1}{n} p\left(u\right) \left(1 - p\left(u\right)\right)}{\epsilon^2 p\left(u\right)^2} = \frac{1 - p\left(u\right)}{n \epsilon^2 p\left(u\right)}.\]
+
+        Note that we are indeed allowed to divide by $p\left(u\right)$ since it is non-zero as assumed above (and this is exactly the reason we assumed this). Overall, this tells us that: 
+        \[P \leq \underbrace{\left(\sum_{u \in \mathcal{U}: p\left(u\right) > 0} \frac{1 - p\left(u\right)}{p\left(u\right)}\right)}_{= S}\cdot \frac{1}{n \epsilon^2}.\]
+        
+        Note that $S$ is finite, since we are summing a finite (at most $\left|\mathcal{U}\right|$) number of finite terms. Hence, for $n$ large enough, we do have $P \leq \epsilon'$. Equivalently, since $P \geq 0$, $\lim_{n \to \infty} P = 0$ by the sandwich theorem.
+    \end{subparag}
+
+    \begin{subparag}{Proof 4}
+        For $n$ large enough, the third result tells us that: 
+        \[1 - \epsilon \leq \prob\left(U^n \in T\right).\]
+
+        We can then do a proof completely similar to the second result, using the first result: 
+        \autoeq{1 - \epsilon \leq \prob\left(U^n \in T\left(n, \epsilon, p_U\right)\right) = \sum_{u^n \in T} \prob\left(U^n = u^n\right) \leq \sum_{u^n \in T} 2^{-n \left(1-  \epsilon\right)H\left(p\right)} = \left|T\right| 2^{-n \left(1 - \epsilon\right) H\left(p\right)}.}
+
+        This directly gives our final result.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+
+
+\end{document}
