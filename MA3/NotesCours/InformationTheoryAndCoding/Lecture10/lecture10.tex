@@ -21,7 +21,7 @@
     \item Definition of the model for transmission of data.
     \item Definition of memoryless and stationary channels.
     \item Definition of transmission system without feedback.
-    \item Definition of the binary erasure channel.
+    \item Definition of the binary symmetric channel and of the binary erasure channel.
 \end{itemize}
 
 }
@@ -147,6 +147,8 @@
 
 \section{Transmission of data}
 
+\subsection{Capacity}
+
 \begin{parag}{Model}
     We consider the following model to transmit data. We are given some data, which we want to send on some noisy channel. To do that, we aim to encode the data in some way which we will design, then send in on the channel, and finally decode it.
 
@@ -163,7 +165,7 @@
         \[\prob\left(Y_i = y_i \suchthat X_i = x_i, X^{i-1} = x^{i-1}, Y^{i-1} = y^{i-1}\right) = \prob\left(Y_i = y_i \suchthat X_i = x_i\right).\]
         \item The channel is said to be \important{stationary} if its distribution is stationary. This notably requires that:
         \[\prob\left(Y_n = y \suchthat X_n = x\right) = \prob\left(Y_1 = y \suchthat X_1 = x\right).\]
-        \item The transmission system is said to be \important{without feedback} if there isn't the dashed arrow on the diagram. In other words, if knowing $X^{i-1}$, then $X_i$ is independent:
+        \item The transmission system is said to be \important{without feedback} if there isn't the dashed arrow on the diagram. In other words, if knowing $X^{i-1}$, then $X_i$ is independent of $Y^{i-1}$:
     \[\prob\left(X_i = x_i \suchthat X^{i-1} = x^{i-1}, Y^{i-1} = y^{i-1}\right) = \prob\left(X_i \suchthat X^{i-1} = x^{i-1}\right).\]
     \end{itemize}
 \end{parag}
@@ -178,13 +180,20 @@
 
 
 \begin{parag}{Example 1: Binary erasure channel}
-    Consider the following memoryless and stationary channel:
+    Let $p \in \left[0, 1\right]$. We consider the following memoryless and stationary channel:
     \svghere[0.25]{BinaryErasureChannel.svg}
 
     This can only erase bits, never flip them. This is thus named a \important{binary erasure channel}, and written $\BEC\left(p\right)$.
 \end{parag}
 
-\begin{parag}{Example 2: Additive Gaussian channel}
+\begin{parag}{Example 2: Binary symmetric channel}
+    Let $p \in \left[0, 1\right]$. We consider the following memoryless and stationary channel:
+    \svghere[0.25]{BinarySymmetricChannel.svg}
+
+    In other words, it flips the bit with probability $p$, and preserves it with probability $1-p$. This is named the \important{binary symmetric channel}, and written $\BSC\left(p\right)$.
+\end{parag}
+
+\begin{parag}{Example 3: Additive Gaussian channel}
     Given $x \in \mathbb{R}$, we can consider $Y = \mathcal{N}\left(x, \sigma^2\right)$ to be the output of the channel. This is an \important{additive Gaussian channel}.
 
     Note that we are not working on finite $\mathcal{X}, \mathcal{Y}$ here.
