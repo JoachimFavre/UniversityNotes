@@ -1,0 +1,235 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-03 at 12:05:07.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 03 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2025-11-03}{Random coding is cheating}{
+\begin{itemize}[left=0pt]
+    \item Construction of random codes through typical sets, and proof that they allow for transmission rate up to capacity at an arbitrary reliability.
+    \item Definition of channel with cost constraint.
+    \item Definition of channel capacity under a cost constraint.
+\end{itemize}
+
+}
+
+\subsection{Good-news result}
+
+\begin{parag}{Remark}
+    We slightly change notation. Instead of accepting a sequence $U_1, \ldots, U_k$, the encoder accepts a number $w \in \left\{1, \ldots, m\right\}$. This is just a minor change, that simplifies analysis.
+
+    The setup still goes as follows:
+    \svghere{EncoderDecoderSetup.svg}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $p_{Y|X}$ be an arbitrary channel, and $p_X$, $\epsilon > 0$, $m$ and $n$ be also arbitrary.
+
+    Then, there exists an encoder $\enc: w \in \left\{1, \ldots, m\right\} \mapsto X\left(w\right)$ and a decoder $\dec: y^n \mapsto \hat{w} \in \left\{1, \ldots, m, 0\right\}$, such that: 
+    \[\frac{1}{m} \sum_{i=1}^{m} \prob\left(\hat{w} \neq w \suchthat w\right) \leq \frac{\epsilon}{2} + \left(m-1\right) 2^{-n\left(1 - \epsilon\right) I\left(X; Y\right)}.\]
+
+    \begin{subparag}{Proof}
+        Note that the encoder $\enc: w \in \left\{1, \ldots, m\right\} \mapsto X\left(w\right)$ can be considered to a $m \times n$ table as follows.
+        \svghere[0.4]{RandomCodingTable.svg}
+
+        To construct this table, we consider some probability distribution $p_X$ (to be fixed later), and we sample each of the $mn$ components of the table IID from $p_X$. This is done in advance, so that both the encoder and the decoder know the full table.
+
+        We are then able to describe the encoder and the decoder.
+        \begin{itemize}[left=0pt]
+            \item \textit{(Encoder)} When the encoder receives some $w \in \left\{1, \ldots, m\right\}$, they look in the table and send $x\left(w\right)$  through the channel.
+            \item \textit{(Decoder)} Consider some $\delta > 0$ to be fixed later. The decoder receives some $y^n$. Then, for each $j \in \left\{1, \ldots, m\right\}$, they consider whether $y^n$ would correspond to $x^n\left(j\right)$ from a typicality point of view: 
+            \[\left(\left(x_1\left(j\right), y_1\right), \left(x_2\left(j\right), y_2\right), \ldots, \left(x_n\left(j\right), y_n\right)\right) \in T\left(n, \delta, p_{XY}\right),\]
+            where $p_{XY}$ is defined by $p_X$ (used to construct the table) and $p_{Y|X}$ (the channel), and where $T$ is the typical set seen earlier in the class. We will abuse notation and write this as $\left(x^n\left(j\right), y^n\right) \in T\left(n, \delta, p_{XY}\right)$.
+
+            If there exists a unique $j_0$ such that $\left(x^n\left(j_0\right), y^n\right) \in T\left(n, \delta, p_{XY}\right)$ (i.e.~for all $j \neq j_0$, then $\left(x^n\left(j\right), y^n\right) \notin T\left(n, \delta, p_{XY}\right)$), then the decoder outputs $\hat{w} = j_0$.
+
+            Otherwise, the decoder declares that it failed by outputting $\hat{w} = 0$.
+        \end{itemize}
+        
+        We aim to analyse the probability of error. Suppose that $w \in \left\{1, \ldots, m\right\}$ is the message sent.  By properties of typical sets, since each pair are sampled in $\left(x_i\left(w\right), y_i\right) \iid p_{XY}$, then for $n$ large enough: 
+        \[\prob\left[\left(\left(x_1\left(j\right), y_1\right), \left(x_2\left(j\right), y_2\right), \ldots, \left(x_n\left(j\right), y_n\right)\right) \notin T\left(n, \delta, p_{XY}\right)\right] \leq \frac{\epsilon}{2}.\]
+        
+        In other words, with high probability, the correct line should be noticed by the decoder. However, more lines could fall in the typical set. Consider some $w' \neq w$. Then, note that since $Y_i$ is a random function of $X_i\left(w\right)$ and hence it is independent of $X_i\left(w'\right)$: 
+        \[\prob\left(X_i\left(w'\right) = x \land Y_i = y\right) = \prob\left(X_i\left(w'\right) = x\right) \prob\left(Y_i = y\right) = p_X\left(x\right) p_Y\left(y\right).\]
+
+        This is different from $p_{XY}\left(x, y\right)$, which is the distribution the typical set is considering. By properties of typical set, this tells us that: 
+        \autoeq{\prob\left(\left(x^n\left(w'\right), y^n\right) \in T\left(n, \delta, p_{XY}\right)\right) \leq 2^{-n \left[\left(1-\delta\right) D\left(p_{XY} || p_X p_Y\right) - 2 \delta H\left(p_{XY}\right)\right]} \leq 2^{-n \left(1 - \epsilon\right) D\left(p_{XY} || p_Xp_Y\right)},}
+        where the last inequality comes by assuming $\delta > 0$ is sufficiently small. However, we recall that: 
+        \autoeq{D\left(p_{XY} || p_X p_Y\right) = \sum_{x, y} p_{XY}\left(x, y\right) \log_2\left(\frac{p_{XY}\left(x, y\right)}{p_X\left(x\right) p_Y\left(y\right)}\right) = H\left(X\right)+ H\left(Y\right) - H\left(X, Y\right) = I\left(X;Y\right).}
+        
+        Therefore, we found so far that the probability a wrong line is considered typical is also small: 
+        \[\prob\left(\left(x^n\left(w'\right), y^n\right) \in T\left(n, \delta, p_{XY}\right)\right) \leq 2^{-n \left(1 - \epsilon\right) I\left(X;Y\right)}.\]
+        
+        We are now ready to compute the probability $\hat{w} \neq w$, given $w \in \left\{1, \ldots, m\right\}$. We aim to use the union bound, on the two ways the protocol can fail (if $\left(x^n\left(w\right), y^n\right)$ is not considered typical, or if $\left(x^n\left(w'\right), y^n\right)$ is considered typical for $w' \neq w$): 
+        \autoeq{\left\{\hat{w} \neq w\right\} = \left\{\left(x^n\left(w\right), y^n\right) \notin T\left(n, \delta, p_{XY}\right)\right\} \fakeequal \cup \bigcup_{w' \neq w} \left\{\left(x^n\left(w'\right), y^n\right) \in T\left(n, \delta, p_{XY}\right)\right\}.}
+
+        Hence, by the union bound: 
+        \autoeq{\prob\left(\hat{w} \neq w \suchthat w\right) \leq \prob\left(\left(x^n\left(w\right), y^n \notin T\left(n, \delta, p_{XY}\right)\right)\right) +  \fakeequal \sum_{w \neq w'} \prob\left(\left(x^n\left(w'\right), y^n\right) \in T\left(n, \delta, p_{XY}\right)\right) \leq \frac{\epsilon}{2} + \sum_{w \neq w'} 2^{-n\left(1-\epsilon\right) I\left(X; Y\right)} \leq \frac{\epsilon}{2} + \left(m - 1\right) 2^{-n \left(1 - \epsilon\right) I\left(X; Y\right)}.}
+
+        We get our result by averaging this inequality for all $w \in \left\{1, \ldots, m\right\}$.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This states that, on average on the $w$'s, the error probability is small. However, it may mean that it is very small for some $w$, and very high for some other. This is not great, so we want to improve this.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $2m$ non-negative numbers $a_1, \ldots, a_{2m} \geq 0$ and some $\eta \geq 0$ be such that the following inequality holds:
+    \[\frac{1}{2m} \left(a_1 + \ldots + a_{2m}\right) \leq \eta.\]
+
+    Then, there is no more of $n$ of these numbers are more than $2\eta$. In other words: 
+    \[\sum_{j=1}^{2m} I\left(a_j > 2 \eta\right) \leq m.\]
+  
+    \begin{subparag}{Proof}
+        This is just Markov's inequality. Equivalently, if we suppose that it is wrong for the sake of contradiction, we directly find that $a_1 + \ldots + a_{2m} > 2m\eta$, which is a contradiction.
+
+         \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $p_{Y|X}$ be an arbitrary channel, and $p_X$, $\epsilon > 0$, $m$ and $n$ be also arbitrary.
+
+    Then, there exists an encoder $\enc: w \in \left\{1, \ldots, m\right\} \mapsto X\left(w\right)$ and a decoder $\dec: y^n \mapsto \hat{w} \in \left\{1, \ldots, m, 0\right\}$, such that for all $w \in \left\{1, \ldots, m\right\}$: 
+    \[\prob\left(\hat{w} \neq w \suchthat w\right) \leq \epsilon + 2\left(2m-1\right) 2^{-n\left(1 - \epsilon\right) I\left(X; Y\right)}.\]
+
+    \begin{subparag}{Proof}
+        By our first lemma, there exists an encoder and decoder over $2m$ $w$'s such that:
+        \[\frac{1}{2m} \sum_{i=1}^{2m} \prob\left(\hat{w} \neq w \suchthat w\right) \leq \frac{\epsilon}{2} + \left(2m-1\right) 2^{-n\left(1 - \epsilon\right) I\left(X; Y\right)}.\]
+
+        But then, by our second lemma, at least $m$ of these $w$'s are less than twice this value. Restricting our encoder and decoder to these $w$'s gives exactly our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $p_{Y|X}$ be an arbitrary channel, $\delta > 0$ be an arbitrary error probabilit, and $R < C\left(p_{Y|X}\right)$ be an arbitrary transmission rate. 
+
+    Then, for $n$ large enough, there exists an encoder and decoder such that:
+    \begin{itemize}
+        \item \textit{(Good transmission rate)} $m = \left\lceil 2^{n R} \right\rceil $ (i.e.~so that $\frac{1}{n} \log_2\left(m\right) \geq R$).
+        \item \textit{(Reliable)} $\prob\left(\hat{w} \neq w \suchthat w\right) < \delta$ for all $w \in \left\{1, \ldots, m\right\}$. 
+    \end{itemize}
+
+    \begin{subparag}{Remark 1}
+        This is a pretty strong result: no matter the target error probability $\delta$, and rate $R$ (as long as it does not exceed the channel capacity $C\left(p_{Y|X}\right)$), then we can find encoders and decoders matching these.
+
+        This is the good-news result we were looking for.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that the small error probability $\prob\left(\hat{w} \neq w \suchthat w\right) < \delta$ for all $w \in \left\{1, \ldots, m\right\}$ is a lot stronger than then naive $\frac{1}{m} \sum_{w= 1}^m \prob\left(\hat{w} \neq w \suchthat w\right) < \delta$. Indeed, this claim holds for all codewords, the channel does not favour any bitstrings.
+
+        Moreover, very interestingly, it states that with probability $1-\delta$, there is no error in the $\log_2\left(m\right)$ transmitted bits. In other words, we can send a whole file without having a single bit modified. This is something very powerful.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        The $n$ is sometimes considered as a proxy to explain the complexity of the encoder and decoder.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We aim to use our previous lemma. To do so, we fix $m = \left\lceil 2^{nR} \right\rceil $, and $p_X$ such that $I\left(X; Y\right) > R$ (which exists by definition of channel capacity $C\left(p_{Y|X}\right)$).
+        
+        Hence, our previous lemma tells us that:
+        \autoeq{\prob\left(\hat{w} \neq w \suchthat w\right) < \epsilon + 2 \left(2 \left\lceil 2^{nR} \right\rceil -1\right) 2^{-n\left(1-\epsilon\right) I\left(X;Y\right)} \leq \epsilon + 2\left(2\cdot 2^{nR} + 1\right) 2^{-n \left(1 - \epsilon\right) I\left(X;Y\right)} \leq \epsilon + 6\cdot  2^{n R} 2^{-n\left(1 - \epsilon\right) I\left(X;Y\right)},}
+        where we used the fact $1 \leq 2^{nR}$ for the last inequality.
+
+        We choose $\epsilon > 0$ to be as small as necessary such that both $\epsilon < \frac{\delta}{2}$ and $\left(1- \epsilon\right) I\left(X; Y\right) > R$ hold. This yields: 
+        \[\prob\left(\hat{w} \neq w \suchthat w\right) \leq \frac{\delta}{2} + 6\cdot 2^{-n \overbrace{\left[\left(1- \epsilon\right) I\left(X;Y\right) - R\right]}^{> 0}} < \frac{\delta}{2} + \frac{\delta}{2} = \delta,\]
+        for $n$ sufficiently large, since this is a decaying exponential.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Moral results}
+    Let $p_{Y|X}$ be some channel of capacity $C\left(p_{Y|X}\right)$, and $R$ be some transmission rate.
+
+    We morally found the following.
+    \begin{itemize}
+        \item \textit{(Bad news)} If $R > C\left(p_{Y|X}\right)$, then it is not possible to reliably communicate $R$ bits per channel use.
+        \item \textit{(Good news)} If $R < C\left(p_{Y|X}\right)$, then it is possible to reliably communicate $R$ bits per channel use.
+    \end{itemize}
+
+    \begin{subparag}{Remark 1}
+        This states that the channel capacity $C\left(p_{Y|X}\right)$ is indeed the correct value to look at for reliable transmission. This is completely analogous to the entropy for data compression.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        If $R = \frac{1}{2}$ and $n = 100$, then the encoding table we considered has $2^{nR} = 2^{50}$ rows. Hence, the decoding effort is at least $2^{50}$ operations. This means that the random code we considered above cannot be used in practice. We may thus wonder if there exists practical code that go to the capacity.
+
+        For long, it was believed that no such practical code existed; that this result is just purely mathematical. However, our result above can be made stronger: picking a random code, then it is good with very high probability. It thus meant that random codes were good, but the ones constructed by hand for which the encoder and decoder are made practical are very bad. In some sense, it's like looking for the hay in the haystack. 
+
+        We will see practical codes for some specific channels later in the course through polar codes.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    We consider a decoder that uses typicality. This may feel unnatural, the more principled decoder being to pick:
+    Consider the following rule, called the ML rule: 
+    \[\hat{w} = \argmax_{1 \leq j \leq m} p_{Y|X}\left(y^n \suchthat x^n\left(j\right)\right).\]
+    
+    This decoding rule is called the ML rule. In fact, it can indeed be shown to be better than the typicality decoding, since it is possible to show that it minimises $\frac{1}{m} \sum_{w=1}^{m} \prob\left(\hat{w} \neq w \suchthat w\right)$. Now, in our argument, we used the suboptimal typicality over the ML rule, since the latter is harder to analyse.
+\end{parag}
+
+\subsection{Transmission under cost constraint}
+
+\begin{parag}{Definition: Channel with cost constraint}
+    A \important{channel with a cost contraint} is defined by some probability distribution $p_{Y|X}$ and some cost $b: \mathcal{X} \mapsto \mathbb{R}$, where $b\left(x\right)$ is the cost of transmitting letter $x$.
+
+    \begin{subparag}{Remark}
+        We will design the following results without really caring if $b\left(x\right)$ is considered to be a cost which is better when minimised, a profit which is better being maximised, or anything else.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Channel capacity under cost constraint}
+    Let $p_{Y|X}$ be a channel, $b: \mathcal{X} \mapsto \mathbb{R}$ be a cost function and $\beta \in \mathbb{R}$ be a cost constraint. 
+
+    We define the \important{capacity of $p_{Y|X}$ under cost constraint $\beta$} as: 
+    \[C\left(p_{Y|X}, \beta\right) = \max_{\substack{p_X \\ \text{such that $\exval\left(b\left(X\right)\right) = \beta$}}} I \left(X; Y\right).\]
+
+    \begin{subparag}{Remark}
+        We will show that this is the transmission rate that can be achieved reliably, for this cost constraint.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $p_{Y|X}$ be a channel and $b: \mathcal{X} \mapsto \mathbb{R}$ be a cost function. Moreover, consider an arbitrary encoder-decoder pair, in the usual setup.
+    \svghere[0.8]{EncoderDecoderSetup_CostConstraint.svg}
+
+    Finally, let $\beta = \exval\left(\frac{1}{n} \sum_{i=1}^{n} b\left(X_i\right)\right)$. Then: 
+    \[I\left(U^k; V^k\right) \leq n C\left(p_{Y|X}, \beta\right).\]
+
+    \begin{subparag}{Proof}
+        The proof is exactly the same as the one we did to show that $I\left(U^k; V^k\right) \leq nC\left(p_{Y|X}\right)$, except that we upperbopund $I\left(X; Y\right) \leq n C\left(p_{Y|X}, \beta\right)$. With more details, we combine:
+        \begin{itemize}[left=0pt]
+            \item \textit{(Data processing)} $I\left(U^k; V^k\right) \leq I\left(X^n; Y^n\right)$.
+            \item \textit{(Memoryless and no feedback)} $I\left(X^n; Y^n\right) \leq \sum_{i=1}^{n}  I\left(X_i; Y_i\right)$.
+            \item \textit{(Concavity of $I\left(.; .\right)$ in $p_X$)} $\frac{1}{n} \sum_{i=1}^{n} I\left(X_i; Y_i\right) \leq I\left(X; Y\right)$ for $p_X = \frac{1}{n} \sum_{i=1}^{n} p_{X_i}$.
+        \end{itemize}
+
+        For a more formal proof, the reader is invited to read the proof of $I\left(U^k; V^k\right) \leq nC\left(p_{Y|X}\right)$ from a few lectures ago.
+
+        We are then finally allowed to upperbound $I\left(X; Y\right) \leq \max_{p_X : \exval\left(b\left(X\right)\right) = \beta} I\left(X; Y\right) = C\left(p_{Y|X}, \beta\right)$ since, for $p_X = \frac{1}{n} \sum_{i=1}^{n} p_{X_i}$: 
+        \autoeq{\exval\left(b\left(X\right)\right) = \sum_{x} p_X\left(x\right) b\left(x\right) =  \sum_{x} p_{X_i}\left(x\right) \frac{1}{n} \sum_{i=1}^{n} b\left(x\right) = \exval\left(\frac{1}{n} \sum_{i=1}^{n} b\left(X_i\right)\right) = \beta,}
+        by definition of $\beta$.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

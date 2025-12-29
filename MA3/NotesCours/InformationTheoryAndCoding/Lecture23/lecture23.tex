@@ -1,0 +1,264 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-12-08 at 12:00:28.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 08 décembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{23}{2025-12-08}{Writing essays}{
+\begin{itemize}[left=0pt]
+    \item Definition of $\epsilon$-mediocre, $\epsilon$-good and $\epsilon$-bad BEC channels.
+    \item Proof that there is a vanishingly small number of $\epsilon$-mediocre channels.
+    \item Proof that there are $n\left(1-p\right)$ channels which erasure probability sum to a vanishingly small number.
+\end{itemize}
+
+}
+
+\subsubsection{Formal proof}
+
+\begin{parag}{Remark}
+    As stated earlier, we will now focus on the BEC channel, and we will prove the following:
+    \begin{itemize}
+        \item There is a vanishingly small fraction of channels such that $p_i$ is away of both $0$ and $1$.
+        \item The sum of the $nR$ best $p_i$ is vanishingly small.
+    \end{itemize}
+    
+    These were all that was needed for our code described above to work.
+
+    \begin{subparag}{Remark (inside a remark)}
+        The results can be generalised to an arbitrary binary-input channel by using the result of the BEC.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon$-quality}
+    A channel $W = \BEC\left(p\right)$ is said to be:
+    \begin{itemize}
+        \item \important{$\epsilon$-mediocre} if $p \in \left]\epsilon, 1-\epsilon\right[ $;
+        \item \important{$\epsilon$-good} if $p \leq \epsilon $;
+        \item \important{$\epsilon$-bad} if $p \geq 1-p$.
+    \end{itemize}
+
+    \begin{subparag}{Remark}
+        We will first show that there is only a vanishingly small number of $\epsilon$-mediocre channels.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Mediocrity}
+    Given a channel $W = \BEC\left(p\right)$, we define its \important{mediocrity} to be: 
+    \[\med\left(W\right) = \sqrt{p \left(1-p\right)}.\]
+
+    \begin{subparag}{Remark}
+        This is large when $p$ is close to $\frac{1}{2}$, and it is small when the channel is perfect ($p \approx 0$) or when it is useless ($p = 1$).
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    We have, for $W = \BEC\left(p\right)$:
+    \[I\left(\text{$W$ is $\epsilon$-mediocre}\right) \leq \frac{\med\left(W\right)}{\sqrt{\epsilon \left(1- \epsilon\right)}}.\]
+
+    \begin{subparag}{Proof}
+        We only need to check the inequality when $W$ is indeed $\epsilon$-mediocre, the other case is trivial since the right handside is always non-negative. In that case, $p \in \left]\epsilon, 1-\epsilon\right[ $: 
+        \[p\left(1-p\right) \geq \epsilon \left(1-\epsilon\right),\]
+        where we used that $f\left(x\right)$ is symmetric around $x = \frac{1}{2}$ (i.e.\ $f\left(1-x\right)= f\left(x\right)$) and that it is increasing for $x \in \left[0, \frac{1}{2}\right] $. Therefore, in that case:
+        \[\frac{\med\left(W\right)}{\sqrt{\epsilon \left(1 - \epsilon\right)}} = \sqrt{\frac{p\left(1- p\right)}{\epsilon \left(1-\epsilon\right)}} \geq 1 = I\left(\text{$W$ is $\epsilon$-mediocre}\right).\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    For any channel $W = \BEC\left(p\right)$, we have: 
+    \[\frac{\med\left(W^-\right) + \med\left(W^+\right)}{2} \leq \sqrt{\frac{3}{4}} \med\left(W\right).\]
+
+    \begin{subparag}{Implication}
+        Chaining this result multiple times, this states that, at generation $t$, the average mediocrity is: 
+        \[\frac{1}{2^t} \sum_{s^t \in \left\{+, -\right\}^t} \med\left(W^{s^t}\right) \leq \left(\sqrt{\frac{3}{4}}\right)^t \med\left(W\right) \leq \frac{1}{2}\cdot \left(\sqrt{\frac{3}{4}}\right)^t,\]
+        since we always have $\med\left(W\right) \leq \frac{1}{2}$.
+    \end{subparag}
+   
+    \begin{subparag}{Proof}
+        Recall that $W^+ = \BEC\left(p^2\right)$ and $W^- = \BEC\left(p\left(2-p\right)\right)$. By definition, $\med\left(W\right) = \sqrt{p\left(1-p\right)}$, so: 
+        \[\med\left(W^+\right) = \sqrt{p^2 \left(1-p^2\right)} = \med\left(W\right) \sqrt{p\left(1+p\right)}.\]
+
+        Completely similarly:
+        \autoeq{\med\left(W^-\right) = \sqrt{p\left(2-p\right)\left(1 - p\left(2-p\right)\right)}= \sqrt{p\left(2-p\right)\left(1-p\right)^2} = \med\left(W\right) \sqrt{\left(2-p\right)\left(1-p\right)}.}
+
+        This thus tells us that:
+        \autoeq[s]{\frac{\med\left(W^-\right) + \med\left(W^+\right)}{2} = \med\left(W\right) \cdot \frac{1}{2}\left(\sqrt{p\left(1+p\right)} + \sqrt{\left(2-p\right)\left(1-p\right)}\right) \leq \med\left(W\right) \sqrt{\frac{3}{4}},}
+        where we used the fact that $f\left(p\right) = \sqrt{p\left(1+p\right)} + \sqrt{\left(2-p\right)\left(1-p\right)}$ is concave and, since it is symmetric around $p = \frac{1}{2}$ (i.e.\ since $f\left(1 - p\right) = f\left(p\right)$), its maximum is achieved at $p = \frac{1}{2}$ where it is such that $f\left(\frac{1}{2}\right) = 2 \sqrt{\frac{3}{4}}$.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    We have, for $W = \BEC\left(p\right)$ for all $\epsilon > 0$ and $t$: 
+    \[\frac{1}{2^t} \sum_{s^t \in \left\{+, -\right\}^t} I\left(\text{$W^{s^t}$ is $\epsilon$-mediocre}\right) \leq \frac{1}{\sqrt{\epsilon \left(1-\epsilon\right)}}\cdot \frac{1}{2} \left(\sqrt{\frac{3}{4}}\right)^t \over{\to}{$t \to +\infty$}  0.\]
+    
+    In other words, the fraction of $\epsilon$-mediocre channels at generation $t$ is vanishingly small. 
+
+    \begin{subparag}{Proof}
+        Let $t$ be arbitrary. By our first lemma, we have:
+        \autoeq{f\left(t\right) = \frac{1}{2^t} \sum_{s^t \in \left\{+, -\right\}^t} I\left(\text{$W^{s^t}$ is $\epsilon$-mediocre}\right) \leq \frac{1}{\sqrt{\epsilon\left(1-\epsilon\right)}} \frac{1}{2^t}\sum_{s^t \in \left\{+, -\right\}^t} \med\left(W^{s^t}\right).}
+
+        By our second lemma, this tells us that: 
+        \[f\left(t\right) \leq \frac{1}{\sqrt{\epsilon \left(1-\epsilon\right)}}\cdot \frac{1}{2} \left(\sqrt{\frac{3}{4}}\right)^t.\]
+        
+        Since $\sqrt{3/4} < 1$, the right hand side goes to zero as $t \to \infty$. By the sandwich theorem, this tells us that $\lim_{t \to \infty} f\left(t\right) = 0$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    We now aim to prove that the sum of the erasure probabilities of the $nR$ best channels is small whenever $R < 1-p$. To do this, we first consider an alternate construction where we prevent some channels from reproducing
+\end{parag}
+
+\begin{parag}{Tree elimination}
+    For every $\epsilon$-mediocre in generations $\left[t_0, t\right]$, let us eliminate all its descendants from the tree. This means that the \important{survivors} at generation $t$ will not have $\epsilon$-mediocre ancestors up to generation $t_0$.
+
+    \begin{subparag}{Intuition}
+        The idea is that the first generation $W$ is essentially always $\epsilon$-mediocre. We let the tree evolve up to some time. Then, we prevent any $\epsilon$-mediocre from reproducing.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    The fraction of channels removed by the process above $\delta_t$ is at most: 
+    \[\delta_t \leq \frac{1}{2 \sqrt{\epsilon \left(1 - \epsilon\right)}} \left(\frac{3}{4}\right)^{t_0/2} \frac{1}{1 - \sqrt{3/4}} \over{\to}{$t_0 \to \infty$} 0.\]
+
+    \begin{subparag}{Remark}
+        This goes to $0$ as $t_0 \to \infty$. More precisely, taking for instance $t_0 = \left\lfloor  \sqrt{t} \right\rfloor $, then the survivors at generation $t$ will all have non-$\epsilon$-mediocre ancestors up to generator $t_0$ and then generation $t$ will contain at least $2^t\left(1 - \delta_t\right) \approx 2^t$ survivors.
+
+        Note that almost all channels survived. Hence, we cannot have erased many good and bad channels in the process.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Our previous theorem states that, at depth $i$, there is at most the following fraction of $\epsilon$-mediocre channels:
+        \[\frac{1}{\sqrt{\epsilon \left(1-\epsilon\right)}}\cdot \frac{1}{2} \left(\sqrt{\frac{3}{4}}\right)^i.\]
+
+        At generation $t$, we have removed all the channels that have a $\epsilon$-mediocre ancestor at generation $i = t_0$, at generation $i = t_0 + 1$, and so on up to generation $i = t$. Hence, the fraction of the channels that is removed in total is at most:
+        \autoeq{\delta_t \leq \sum_{i=t_0}^{t} \frac{1}{2 \sqrt{\epsilon \left(1- \epsilon\right)}} \left(\sqrt{\frac{3}{4}}\right)^{i} < \frac{1}{2 \sqrt{\epsilon \left(1 - \epsilon\right)}} \sum_{i=t_0}^{\infty} \left(\sqrt{\frac{3}{4}}\right)^{i} = \frac{1}{2 \sqrt{\epsilon \left(1 - \epsilon\right)}} \left(\frac{3}{4}\right)^{t_0/2} \frac{1}{1 - \sqrt{3/4}}.}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let's assume that $\epsilon < \frac{1}{10}$ is small.
+
+    If $W^{s^t}$ is an $\epsilon$-good survivor at generation $t$, then for all $t_0 \leq i \leq t$, $W^{s^i}$ must also be $\epsilon$-good.
+
+    \begin{subparag}{Proof}
+        Since $\epsilon$ is small, note the following:
+        \begin{itemize}
+            \item If $W$ is $\epsilon$-good, then $W^+$ is $\epsilon$-good and $W^-$ is not $\epsilon$-bad.
+            \item If $W$ is $\epsilon$-bad, then $W^+$ is not $\epsilon$-good and $W^-$ is $\epsilon$-bad.
+        \end{itemize}
+
+        Hence, in one generation, one cannot change from $\epsilon$-bad to $\epsilon$-good or $\epsilon$-good to $\epsilon$-bad; there must be a transition through mediocre channels.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Unlucky channel}
+    A channel $W^{s^t}$ is said to be \important{$\epsilon$-unlucky} if: 
+    \[\frac{1}{t} \sum_{i=t_0}^{t} I\left(s_i = +\right) < \frac{1}{2} - \epsilon,\]
+    where $t_0 = \left\lfloor \sqrt{t} \right\rfloor $.
+    
+    \begin{subparag}{Remark}
+        Since $t_0 \ll t$, we expect the fraction of $+$ in $s$ to be approximately $\frac{1}{2}$. There should therefore not be many $\epsilon$-unlucky channels. This is formalised with the following lemma.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    The fraction $\delta_t'$ of $\epsilon$-unlucky channels at generation $t$ is such that: 
+    \[\lim_{t \to +\infty} \delta_t' = 0\]
+    
+    \begin{subparag}{Proof}
+        Sampling $s_i \in \left\{+, -\right\}$ uniformly and IID, we note that: 
+        \autoeq{\delta_t' = \prob\left(\sum_{i=t_0}^{t} I\left(s_i = +\right) < \left(\frac{1}{2} - \epsilon\right) t\right) = \prob\left(\frac{1}{t - t_0} \sum_{i=t_0}^{t} I\left(s_i = +\right) < \frac{\left(\frac{1}{2} - \epsilon\right) t}{t - t_0}\right).}
+
+        However, $\frac{1}{t - t_0} \sum_{i=t_0}^{t} I\left(s_i = +\right) \to \frac{1}{2}$ by the law of large number. Since the right hand side is at most $\left(\frac{1}{2} - \epsilon\right) t/\left(t - t_0\right) \leq \frac{1}{2} - \epsilon < \frac{1}{2}$, this probability goes to zero as $t \to \infty$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    The number of channels at generation $t$ which are $\epsilon$-good, survivors and $\epsilon$-lucky is at least: 
+    \[2^t \left[\underbrace{\left(\text{fraction of $\epsilon$-good channels}\right)}_{\to 1-p} - \underbrace{\delta_t}_{\to 0} - \underbrace{\delta_t'}_{\to 0}\right] \to \left(1-p\right)2^t.\]
+
+    \begin{subparag}{Proof}
+        This is just a consequence of $\delta_t \to 0$ and $\delta_t' \to 0$, as found earlier. Note that the fact that there are $1-p$ $\epsilon$-good channels comes from the fact that there is a vanishingly small number of $\epsilon$-mediocre channels, and that the sum of capacities must still be the original one $I\left(W\right) = 1-p$, i.e.: 
+        \[\sum_{s^t \in \left\{+, -\right\}^t} I\left(W^{s^t}\right) = 2^t I\left(W\right) = 2^t \left(1-p\right),\]
+        since $I\left(W^-\right) + I\left(W^+\right) = 2I\left(W\right)$, as found earlier in the class.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $W^{s^t}$ be a channel which is $\epsilon$-good, a survivor and $\epsilon$-lucky. Then, there exists some $\delta > 0$, such that the erasure probability of $W^{s^t}$ is at most:
+    \[p\left(s^t\right) \leq 2^{-n^{1/2 - \delta}} \approx 2^{-\sqrt{n}}.\]
+    
+    \begin{subparag}{Proof}
+        Let $p\left(s^t\right)$ be the erasure probability of $W^{s^t}$. Since it is $\epsilon$-good and a survivor, then all its predecessors $W^{s^i}$ must also be $\epsilon$-good for all $t_0 \leq i \leq t$, i.e.:
+        \[p\left(s^t\right) \leq \epsilon, \mathspace p\left(s^{t-1}\right) \leq \epsilon, \mathspace \ldots, \mathspace p\left(s^{t_0}\right) \leq \epsilon.\]
+        
+        Now, we know that: 
+        \[p\left(s^i\right) \leq \begin{systemofequations} p\left(s^{i-1}\right)^2, & \text{if $s_i = +$}, \\ p\left(s ^{i-1}\right)\cdot 2, & \text{if $s_i = -$.} \end{systemofequations}\]
+
+        We would however prefer a multiplicative bound:
+        \[p\left(s^i\right) \leq \begin{systemofequations} p\left(s^{i-1}\right)^2, & \text{if $s_i = +$}, \\ p\left(s ^{i-1}\right)^{1 - \eta}, & \text{if $s_i = -$.} \end{systemofequations}\]
+
+        For this to hold, using the fact $p < \epsilon$ as found above, $\eta$ must be such that:
+        \[2 \leq p^{-\eta} \iff 1 \leq \eta \log_2\left(\frac{1}{p}\right) \impliedby \eta = \frac{1}{\log_2\left(1/\epsilon\right)}.\]
+        
+        Overall, we found that, for this $\eta$: 
+        \[\log_2\left(\frac{1}{p\left(s^i\right)}\right) \geq \begin{systemofequations} 2 \log_2\left(\frac{1}{p\left(s^{i-1}\right)}\right), & \text{if $s_i = +$}, \\ \left(1 - \eta\right) \log_2\left(\frac{1}{p\left(s ^{i-1}\right)}\right), & \text{if $s_i = -$.} \end{systemofequations}\]
+
+        We can turn all multiplications into additions by using one more logarithm:
+        \[\log_2\log_2\left(\frac{1}{p\left(s^i\right)}\right) \geq \log_2 \log_2\left(\frac{1}{p\left(s^{i-1}\right)}\right) + \begin{systemofequations} 1, & \text{if $s_i = +$}, \\ \log_2\left(1 - \eta\right) := \epsilon', & \text{if $s_i = -$,} \end{systemofequations}\]
+        where $\epsilon'$ is a small negative number.
+        
+        Since the channel is $\epsilon$-lucky, there are at least $\frac{t}{2} \left(1- \epsilon\right)$ plus signs. Hence: 
+        \[\log_2 \log_2\left(\frac{1}{p\left(s^t\right)}\right) \geq \log_2 \log_2\left(\frac{1}{p\left(s^{t_0}\right)}\right) - t \epsilon' + \frac{t}{2} \left(1 - \epsilon\right).\]
+
+        Now, we know that $p\left(s^{t_0}\right) \leq \epsilon \leq 1/10$. Hence $ \log_2 \log_2\left(\frac{1}{p\left(s^{t_0}\right)}\right) \geq 0$, giving us:
+        \autoeq{\log_2 \log_2\left(\frac{1}{p\left(s^t\right)}\right) \geq \frac{t}{2} \left(1 - \underbrace{\left(\epsilon + 2 \epsilon'\right)}_{:= 2 \delta}\right) = \log_2\left(n\right) \left(\frac{1}{2} - \delta\right) = \log_2\left(n^{\frac{1}{2} - \delta}\right),}
+        where we used the fact $t = \log_2\left(n\right)$. This directly yields our result.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    For any $R < 1-p$, we have the following.
+    \begin{enumerate}
+        \item There are, for large $t$ and $n = 2^t$, $nR$ lucky $\epsilon$-good survivors.
+        \item All of these have erasure probability at most $\displaystyle 2^{-n^{1/2 - \delta}}$.
+    \end{enumerate}
+
+    \begin{subparag}{Implication}
+        In particular, the sum of the erasure probabilities is at most $\displaystyle n 2^{-n^{1/2 - \delta}} \to 0$. 
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is just a consequence of our two previous lemmas.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

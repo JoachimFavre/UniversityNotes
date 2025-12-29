@@ -1,0 +1,143 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-27 at 11:32:48.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 27 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{12}{2025-10-27}{Mathematical aliens invading the earth}{
+\begin{itemize}[left=0pt]
+    \item Proof of the bad-news result for data transmission.
+    \item Examples of the probabilistic method.
+\end{itemize}
+    
+}
+
+\begin{parag}{Lemma}
+    Consider some arbitrary communication system with a stationary source of entropy rate $\mathcal{H}$ producing $\rho_s$ letters per unit time, and with a channel of capacity $C\left(p_{Y|X}\right)$ capable of transmitting $\rho_c$ symbols per unit time. Moreover, let $k$ be arbitrary, $U_1, U_2, \ldots, U_k$ be symbols produced by the source and $V_1, V_2, \ldots, V_k$ be the ones recovered.
+
+
+    Then, the symbol error probability $p = \frac{1}{k} \sum_{i=1}^{k} \prob\left(U_i \neq V_i\right)$ is such that: 
+    \[h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}\right| - 1\right) \geq \mathcal{H} - \frac{\rho_c}{\rho_s} C\left(p_{y|X}\right).\]
+
+    \begin{subparag}{Intuition}
+        In any engineering scenario, we are given a stationary source and a channel, and we have to design a code. In other words, we are given everything in the right hand-side: $\mathcal{H}$ $C\left(p_{Y|X}\right)$, $\rho_c$ and $\rho_s$. Hence, the right-hand side. Again, if the right-hand side is positive, we cannot make $p$ arbitrarily close to zero.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Our previous result told us that:
+        \[h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}\right| - 1\right) \geq \frac{1}{k} H\left(U^k\right) - \frac{n}{k} C\left(p_{y|X}\right).\]
+        
+        Now, for stationary sources, we found that $\frac{1}{k} H\left(U^k\right)$ is a sequence that decreases down to $\mathcal{H} = \lim_{k \to \infty} \frac{1}{k} H\left(U^k\right)$. We can thus write: 
+        \[h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}\right| - 1\right) \geq \mathcal{H} - \frac{n}{k} C\left(p_{Y|X}\right) = \mathcal{H} - \frac{\rho_c}{\rho_s} C\left(p_{Y|X}\right),\]
+        where we used the fact that $n = T \rho_c$ and $k = T \rho_s$, supposing we run this during $T$ units time.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Bad-news result}
+    If $\rho_s \mathcal{H} > \rho_c C\left(p_{Y|X}\right)$, then it is impossible to design an arbitrarily reliable data transmission system.
+
+    \begin{subparag}{Intuition}
+        $\rho_s \mathcal{H}$ is the number of bits the source is actually creating, and $\rho_c C\left(p_{Y|X}\right)$ is the number of bits the channel can transmit reliably. 
+
+        This is a nice impossibility result, it is some form of ``bad news''. It is completely similar to the fact that we cannot compress below entropy.
+    \end{subparag}
+
+    \begin{subparag}{Converse}
+        We will show that the converse is true: if $\rho_s \mathcal{H} \leq \rho_c C\left(p_{Y|X}\right)$, then we can design some arbitrarily reliable data transmission system. This will be a form of ``good news''.
+
+        To do that, we will use the probabilistic method: sampling a random code, then there is a non-zero probability that it reaches the reliability we wish for, meaning that there must indeed exist one.
+    \end{subparag}
+\end{parag}
+
+\subsection{The probabilistic method}
+
+\begin{parag}{Remark}
+    Before proving our good-news result, we need to understand the probabilistic method. We will consider some examples where it is used. They should not be taken too seriously, their purpose it to understand the probabilistic method, but the theoretical notions we will introduce for our examples are not important. 
+
+    This lecture mostly consists of example since there was a midterm the following day and hence it is natural to assume nobody was listening.
+\end{parag}
+
+\begin{parag}{Example 1}
+    We consider a game played on a circle. An adversary can paint at most (but not exactly) $\SI{20}{\%}$ of the total perimeter in red. Our goal is to place a regular pentagon $ABCDE$ on the circle with no vertex falling on red paint.
+    \svghere[0.4]{ProbabilisticMethodExample1.svg}
+
+    No matter what the adversary does, then we can always find such a pentagon.
+
+    \begin{subparag}{Proof}
+        Giving an algorithmic method to find the pentagon is non-trivial. Even just describing the position of the red paint is hard. Instead, we consider the probabilistic method.
+
+        We pick the point $A$ uniformly at random on the circle. This describes the whole regular pentagon. Since $A$ is uniform and there is at most a $\SI{20}{\%} = \frac{1}{5}$ of the perimeter which is red, we find: 
+        \[\prob\left(\text{$A$ falls on red}\right) < \text{proportion of red} = \frac{1}{5}.\]
+        
+        Similarly, since $A$ is uniform, then $B, C, D, E$ are also uniformly at random on the circle. This means that, completely analogously: 
+        \[\prob\left(\text{$B$ falls on red}\right) < \frac{1}{5}.\]
+        
+
+        The probability that our choice is bad is given by, using the union bound: 
+        \autoeq{\prob\left(\text{bad}\right) = \prob\left(\text{$A$ is on red, or $B$ is on red, \ldots, or $E$ is on red}\right) \leq \prob\left(\text{$A$ is on red}\right) + \ldots + \prob\left(\text{$E$ is on red}\right) < 5\cdot \frac{1}{5} = 1.}
+
+        In other words, the probability that our choice is valid is such that: 
+        \[\prob\left(\text{valid}\right) = 1 - \prob\left(\text{bad}\right) > 0.\]
+
+        Since it is positive, there must exist a particular choice of $A, B, C, D, E$ which is valid.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        If the adversary was allowed to paint exactly $\SI{20}{\%}$ of the perimeter, they could paint a contiguous segment, which would prevent the existence of any such pentagon.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2: Ramsey number}
+    Consider a group of 6 people $A, B, C, D, E, F$, with some acquaintance graph. In this graph, we draw a white edge between acquaintances and a red edge between strangers. Then, it is easy to show that one of the following must hold.
+    \begin{itemize}
+        \item There are $3$ mutual acquaintances, meaning $X, Y ,Z$ form a white clique in the graph.
+        \item There are 3 mutual strangers, meaning  $X, Y, Z$ form a red clique in the graph.
+    \end{itemize}
+
+    This is written as $R\left(3\right) = 6$, because if a complete graph with 6 or more vertices has its edges coloured red and white, then either we have a red triangle or a white triangle. This function $R$ is called a Ramsey number. More generally, $R\left(n\right) = m$ states that any complete graph over at least $m$ vertices which edges are coloured red and white contains at least a monochromatic clique of size $n$. 
+
+    We will prove below that for any $m$ such that $\binom{m}{n} \cdot 2\cdot 2^{-\binom{n}{2}} < 1$, then $R\left(n\right) \geq m$. In other words, this gives a lower-bound on the value $R\left(n\right)$ can take. Morally, we can take $m \approx \exp\left(n\right)$, so this tells us that $R\left(n\right) \gtrapprox \exp\left(n\right)$.
+
+    \begin{subparag}{Remark 1}
+        Ramsey showed that for all $n$, there exists some $R\left(n\right)$ such that if a complete graph on $m \geq R\left(n\right)$ vertices has its edges coloured red and white, we have either a red clique with $n$ nodes or a white clique with $n$ nodes. In other words, he proved that this function is well-defined.
+
+        More precisely, their result states that $R\left(n\right) \lessapprox \exp\left(n^2\right)$, so there is a gap between this and what we stated morally above.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        As explained, $R\left(3\right) = 6$ is known. Similarly, it is possible to show $R\left(4\right) = 18$. Now, we do not know $R\left(5\right)$ and above. 
+
+        Essentially, the only approach we know to prove that $R\left(n\right) = m$ for some $m$ is to do bruteforce on all bicoloured graphs of size at most $m$. There are exponentially many such graphs. Moreover, as explained morally above,  $m = R\left(n\right)$ is at least exponentially large, so the bruteforce takes doubly-exponential time $\exp\left(\exp\left(n\right)\right)$. This explains why it is so hard to find Ramsey numbers $R\left(n\right)$ for $n \geq 5$.
+
+        Paul Erdös, a mathematician, jokingly told the following anecdote, related to this doubly-exponential computation time. ``[Suppose] aliens invade the earth and threaten to obliterate it in a year's time unless human beings can find the Ramsey number for red five and [white] five. We could marshall the world's best minds and fastest computers, and within a year we could probably calculate the value. If the aliens demanded the Ramsey number for red six and [white] six, however, we would have no choice but to launch a preemptive attack.'' (Ronald Graham and Joel Spencer. (July 1990). Ramsey Theory. \textit{Scientific American}, \textit{263}(1), 112-117. \url{https://doi.org/10.1038/scientificamerican0790-112})
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Let $n$ be given. Moreover, let $m$ to be fixed later. We aim to show that $R\left(n\right) \geq m$ cannot be too small. In other words, we aim to show that there is a complete graph with $m$ vertices and a bicolouring of its $\binom{m}{2}$ edges such that no monochrome clique of $n$ vertices are present.
+
+        We will show this by the probabilistic method, using some random colouring. In other words, we randomly colour its $\binom{m}{2}$ edges (independently, and equality likely to be red/white). Let us compute the expected number of monochrome $n$-cliques: 
+        \autoeq{x = \exval\left(\text{number of monochrome $n$-clique}\right) = \sum_{K \in \text{all $n$-clique}} \underbrace{\prob\left(\text{$K$ is monochrome}\right)}_{= 2\cdot 2^{-\binom{n}{2}}} = \binom{m}{n} 2\cdot 2^{- \binom{n}{2}},}
+        where we used the fact that there are $2^{\binom{n}{2}}$ ways to colour a clique of size $n$ (since it contains $\binom{n}{2}$ edges), amongst which only $2$ are monochromatic.
+
+        Note that, if each of the colourings are such that there exists at least one monochromatic clique, then $x \geq 1$. Hence, by the contrapositive, if $x < 1$, then there must exist a colouring of the $m$-graph such that no monochromatic $n$-clique exists. This gives exactly our result:
+        \[\binom{m}{n} \cdot 2 \cdot 2^{- \binom{n}{2}} < 1 \implies R\left(n\right) \geq m.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

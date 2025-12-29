@@ -1,0 +1,223 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-24 at 12:24:34.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 24 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{19}{2025-11-24}{Finally constructing some codes}{
+\begin{itemize}[left=0pt]
+    \item Definition of Hamming distance.
+    \item Justification of minimum-distance decoding.
+    \item Definition of the minimum distance of a code.
+    \item Proof of the singleton bound.
+    \item Proof of the sphere packing bound.
+    \item Explanation of Hamming codes.
+\end{itemize}
+
+}
+
+\subsection{Coding theory}
+\subsubsection{Minimum distance}
+
+\begin{parag}{Goal}
+    We restrict to the binary symmetric channel $\BSC\left(p\right)$ with $p \leq \frac{1}{2}$. Our goal is to design and analyse practical codes.
+
+    \begin{subparag}{Remark}
+        Note that this is without loss of generality with respect to $\BSC\left(p\right)$ with $p > \frac{1}{2}$ since we can always convert between $\BSC\left(p\right)$ and $\BSC\left(1 - p\right)$ by flipping the output.
+    \end{subparag}
+
+    \begin{subparag}{Recall}
+        As a recall, the binary symmetric channel is the following.
+        \svghere[0.3]{BinarySymmetricChannel.svg}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Hamming distance}
+    Let $x^n, y^n \in \left\{0,1\right\}^n$ be strings. We define their \important{Hamming distance} as the number of bits in which they differ: 
+    \[d_H\left(x^n, y^n\right) = \sum_{i=1}^{n} I\left(x_i \neq y_i\right).\]
+    
+    \begin{subparag}{Remark}
+        This is indeed a distance, since it respects the following axioms:
+        \begin{itemize}
+            \item (Non-negativity) $d_H\left(x, y\right) \geq 0$;
+            \item (Identity of indiscernables) $d_H\left(x, y\right) = 0 \iff x = y$.
+            \item (Symmetry) $d_H\left(x, y\right) =d_H\left(y, x\right)$;
+            \item (Triangle inequality) $d_H\left(x, y\right) + d_H\left(y, z\right) \geq d_H\left(x, z\right)$.
+        \end{itemize}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Minimum distance decoding}
+    We consider our usual communication setup.
+    \svghere{EncoderDecoderSetup_BSC.svg}
+
+    No matter the choice of the encoder, the decoder that minimises $\frac{1}{m} \sum_{w=1}^{m} \prob\left(\text{error} \suchthat w\right)$ outputs: 
+    \[\hat{w} = \argmin_w d_H\left(y^n, x^n\left(w\right)\right).\]
+
+    This is called \important{minimum distance decoding}.
+
+    \begin{subparag}{Proof}
+        Since the channel is $\BSC\left(p\right)$, we notice that: 
+        \autoeq{\prob\left(Y^n = y^n \suchthat X^n = x^n\right) = \left(1-p\right)^{\left|\left\{i \suchthat x_i = y_i\right\}\right|} p^{\left|\left\{i \suchthat x_i \neq y_i\right\}\right|} = \left(1-p\right)^{n - d_H\left(x^n,y^n\right)} p^{d_H\left(x^n, y^n\right)} = \left(\frac{p}{1-p}\right)^{d_H\left(x^n, y^n\right)} \left(1-p\right)^n.}
+
+        The maximum-likelihood estimator---which can be shown to minimise $\frac{1}{m} \sum_{w=1}^{m} \prob\left(\text{error} \suchthat w\right)$---yields on any given $y^n$:
+        \autoeq{\hat{w} = \argmin_w \prob\left(Y^n = y^n \suchthat X^n = x^n\left(w\right)\right) = \argmin_w \left(\frac{p}{1-p}\right)^{d_H\left(x^n\left(w\right), y^n\right)} \left(1-p\right)^n = \argmin_w d_H\left(x^n\left(w\right), y^n\right),}
+        where we used that $\frac{p}{1-p} < 1$ since $p \leq \frac{1}{2}$.
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        This means that designing a code only consists in designing a good set $\mathcal{C} = \left(x^n\left(w\right) \suchthat w \in \left\{1, \ldots, m\right\}\right) \subseteq \left\{0, 1\right\}^n$. We are then dividing the space $\left\{0, 1\right\}^n$ into different sets of points $y^n$ such that $d_H\left(y^n, x^n\left(w\right)\right)$ is minimal.
+        \svghere[0.5]{MinimumDistanceDecodingDividesSpace.svg}
+
+
+        Moreover, this naturally leads to the following value to judge the quality of a code. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Minimum distance}
+    Let $\mathcal{C} = \left(x^n\left(w\right) \suchthat w \in \left\{1, \ldots, m\right\}\right)$ be a code. We define its \important{minimum distance} to be: 
+    \[d_{min}\left(\mathcal{C}\right) = \min_{w \neq w'} d_H\left(x^n\left(w\right), x^n\left(w'\right)\right).\]
+
+    \begin{subparag}{Remark 1}
+        If we send some message $x^n\left(w\right)$ and the $y^n$ that is received is such that $d_H\left(x^n\left(w\right), y^n\right) < \frac{d_{min}}{2}$, then $y^n$ will be closer to $x^n\left(w\right)$ than to any other $x^n\left(w'\right)$ and hence it will be decoded correctly. Indeed, drawing a ball of radius $d_{min}/2$ around every point, none of these balls intersect by definition of $d_{min}$. More formally, by the triangle inequality for any $w' \neq w$: 
+        \autoeq{d_{min} \leq d_H\left(x^n\left(w\right), x^n\left(w'\right)\right) \leq d_H\left(x^n\left(w\right), y^n\right) + d_H\left(y^n, x^n\left(w'\right)\right) < \frac{d_{min}}{2} + d\left(y^n, x^n\left(w'\right)\right).}
+
+        Which implies exactly that:
+        \[d_H\left(y^n, x^n\left(w'\right)\right) > \frac{d_{min}}{2} > d_H\left(y^n, x^n\left(w\right)\right)\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Because of the first remark, we typically consider the minimum distance of a code $\mathcal{C}$ as its best figure of merit, i.e.~the larger the minimum distance, the better the code.
+
+        Now, naturally, this is not a perfect measure. For instance, given some $n$, the code with best minimum distance is the repetition code: 
+        \[\mathcal{C} = \left\{0^n, 1^n\right\}.\]
+
+        This is such that $d_{min}\left(\mathcal{C}\right) = n$, which is extremely large. However, this code is very naive and we can do a lot better.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        Given $n$ and $m$, we wonder what is the largest possible $d_{min}\left(\mathcal{C}\right)$ where $\mathcal{C} \subseteq \left\{0, 1\right\}^n$ and $\left|\mathcal{C}\right| = m$.
+
+        When $m = 2$, we found above that the best we can do is $d_{min}\left(\mathcal{C}\right) = n$ with the repetition code. For general $n, m$, this is an open question. However, we can consider some bounds.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Singleton bound}
+    Let $n, m$ be integers such that $m > 2^k$ and $k \leq n$.
+
+    Then, for any $\mathcal{C} \subseteq \left\{0, 1\right\}^n$ with $\left|\mathcal{C}\right| = m$, we have: 
+    \[d_{min}\left(\mathcal{C}\right) \leq n-k.\]
+
+    \begin{subparag}{Remark}
+        Note that the fact $k \leq n$ naturally comes from the fact that $\mathcal{C} \subseteq \left\{0, 1\right\}^n$ and hence:
+        \[2^k < m = \left|\mathcal{C}\right| \leq \left|\left\{0, 1\right\}^n\right| = 2^n.\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let us write $\text{hash}\left(x^n\right) = x^k$ to be its $k$ first bits. For instance, if $n = 5$ and $k = 3$: 
+        \[\text{hash}\left(10110\right) = 101.\]
+        
+        Note that $\text{hash}: \left\{0, 1\right\}^n \mapsto \left\{0, 1\right\}^k$. Now, $\left|\mathcal{C}\right| = m > 2^k$ and $\left|\left\{0, 1\right\}\right|^k = 2^k$. In other words, there are $2^k$ hash values and $m > 2^k$ codewords, so there must exist a collision $w \neq w' \in \mathcal{C}$ such that: 
+        \[\text{hash}\left(x^n\left(w\right)\right) = \text{hash}\left(x^n\left(w'\right)\right).\]
+
+        By definition, this states that their $k$ first bits match. They can only differ in the other $n-k$ bits, telling us that: 
+        \autoeq{d_{H}\left(x^n\left(w\right), x^n\left(w'\right)\right) \leq n-k \implies d_{min}\left(\mathcal{C}\right) \leq d_{H}\left(x^n\left(w\right), x^n\left(w'\right)\right) \leq n-k.}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $\mathcal{C} \subseteq \left\{0, 1\right\}^n$ be a code such that $\left|\mathcal{C}\right| = 2^k$. Then: 
+    \[d_{min}\left(\mathcal{C}\right) \leq n-k+1.\]
+
+    \begin{subparag}{Proof}
+        This is a direct consequence of the previous theorem with $k \leftarrow k-1$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Sphere packing bound}
+    Let $\mathcal{C} \subseteq \left\{0, 1\right\}^n$ be a code, and let $m = \left|\mathcal{C}\right|$ and $d = d_{min}\left(\mathcal{C}\right)$. Then: 
+    \[m \sum_{i=0}^{\left\lfloor \frac{d-1}{2} \right\rfloor } \binom{n}{i} \leq 2^n.\]
+
+    \begin{subparag}{Remark}
+        This gives a bound on $d_{min}\left(\mathcal{C}\right)$ knowing $n$ and $m$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $B\left(x^n, r\right)$ be the Hamming Ball around $x^n$ of radius $r$: 
+        \[B\left(x^n, r\right) = \left\{y^n \suchthat d_H\left(x^n, y^n\right) \leq r\right\}.\]
+        
+        Note that there are $\binom{n}{k}$ elements $y^n$ such that $d_H\left(x^n, y^n\right) = k$ since we can just choose all the $k$ bits of $x^n$ to flip. Hence: 
+        \[\left|B\left(x^n, r\right)\right| = \binom{n}{0} + \binom{n}{1} + \ldots + \binom{n}{r} = \sum_{i=0}^{r} \binom{n}{i}.\]
+        
+        Note that this is independent of $x^n$.
+
+        Let us write $\mathcal{C} = \left(x^n\left(1\right), \ldots, x^n\left(m\right)\right)$ to be the collection of codewords. Note that the following is a disjoint collection of Hamming balls (as stated earlier): 
+        \[\left(B\left(x^n\left(w\right), \left\lfloor \frac{d-1}{2} \right\rfloor\right) \suchthat w \in \left\{1, \ldots, m\right\}\right).\]
+        
+        Indeed, if there was some $y^n \in B\left(x^n\left(w\right)\right) \cap B\left(x^n\left(w'\right)\right)$ for $w \neq w'$, we would have $d_H\left(x^n\left(w\right), y^n\right) \leq \left\lfloor \frac{d-1}{2} \right\rfloor $ and $d_H\left(x^n\left(w'\right), y^n\right) \leq \left\lfloor \frac{d-1}{2} \right\rfloor $ by definition of Hamming ball and hence we would have
+        \[d_H\left(x^n\left(w\right), x^n\left(w'\right)\right) \leq d_H\left(x^n\left(w\right), y^n\right) + d_H\left(y^n, x^n\left(w'\right)\right) \leq d-1 < d\]
+        by the triangle inequality, which is a contradiction.
+
+        Since the balls are disjoint, we find that, leaving $r = \left\lfloor \frac{d-1}{2} \right\rfloor $: 
+        \autoeq{\bigcup_{w=1}^{m} B\left(x^n\left(w\right), r\right) \subseteq \left\{0, 1\right\}^n \implies 2^n \geq \left|\bigcup_{w=1}^{m} B\left(x^n\left(w\right), r\right)\right| = \sum_{w=1}^{m} \left|B\left(x^n\left(w\right), r\right)\right| = m \sum_{i=0}^{r} \binom{n}{i}.}
+        
+        This is named sphere packing since it corresponds to trying to fit the maximum number of spheres in the space.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Hamming codes}
+    For any $\ell$, there exists a code with $\left(n, k, d_{min}\right) = \left(2^{\ell} - 1, 2^{\ell} - \ell - 1, 3\right)$, where $m = 2^k$. These codes are called \important{Hamming codes}.
+
+    \begin{subparag}{Remark}
+        These codes make the sphere packing bound be reached with equality:
+        \[\sum_{i=0}^{\left\lfloor \frac{d-1}{2} \right\rfloor } \binom{n}{i} = \binom{n}{0} + \binom{n}{1} = n + 1.\]
+
+        Hence, we do have:
+        \[m \sum_{i=0}^{\left\lfloor \frac{d-1}{2} \right\rfloor } \binom{n}{i} = m \left(n+1\right) = 2^{2^{\ell} - 1 - \ell} 2^{\ell} = 2^{2^{\ell} - 1} = 2^n.\]
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        For instance, for $\ell = 3$, there exists a code with: 
+        \[\left(n, k, d_{min}\right) = \left(7, 4, 3\right).\]
+
+        This code is given by: 
+        \[\mathcal{C} = \left\{x^7 \in \mathbb{F}_2^7 \suchthat \begin{pmatrix} 1 & 0 & 0 & 0 & 1 & 1 & 1 \\ 0 & 1 & 0 & 1 & 0 & 1 & 1 \\ 0 & 0 & 1 & 1 & 1 & 0 & 1 \end{pmatrix} \begin{pmatrix} x_1 \\ \vdots \\ x_7 \end{pmatrix} = \begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix} \right\},\]
+        where $\mathbb{F}_2 = \left\{0, 1\right\}$ is the (unique) finite field containing 2 elements.
+
+        This matrix is called a parity check matrix. Here, it is constructed by taking the columns to be all the different binary vectors of dimension 3, except for the all-zero one.
+        
+        We can rewire the matrix multiplication above into the following system of equations, using the fact that $-x = x$ for any $x \in \mathbb{F}_2$: 
+        \[\begin{systemofequations} x_1 = x_5 + x_6 + x_7, \\ x_2 = x_4 + x_6 + x_7, \\ x_2 = x_4 + x_5 + x_7. \end{systemofequations}\]
+        
+        In other words, for any choice of $\left(x_4, x_5, x_6, x_7\right)$, this gives us a constraint on $x_1, x_2, x_3$. There are $2^4 = 16$ ways to pick $\left(x_4, x_5, x_6, x_7\right)$, telling us $\left|\mathcal{C}\right| = 16$. 
+
+        We are only left with proving that the minimum distance is $3$. For each $y \in \mathbb{F}_2^7$, consider $s = H y \in \mathbb{F}_2^3 = \left\{000, 001, 010, 100, 011, 101, 110, 111\right\}$. If $s = 000$, then $y \in \mathcal{C}$ by definition. If $s = 100$, then $y$ is the sum of a particular solution and an element of the null space (which is $\mathcal{C}$); meaning that $y$ is the sum of a codeword and $1000000$. Similarly, if $s = 111$, then $y$ is a codeword plus $0000001$. We can continue similarly for all $s$.
+
+        We can use this to make a decoding rule for some $y$:
+        \[\begin{systemofequations} y, & \text{if $s = H y = 000$,} \\ y + 1000000, & \text{if $s = 100$,} \\ \vdots \\ y + 0000001, & \text{if $s = 111$.} \end{systemofequations}\] 
+        
+        This decoding rule corrects any single channel error. Hence, the Hamming balls of radius 1 around each codeword must be disjoint, telling us $d_{min} \geq 3$.
+
+        %later{Simpler approach: Consider codewords $x \neq x'$ . Then, $H\left(x + x'\right) = 0$. Note that if $x + x'$ has a single one, $H \left(x + x'\right) = 000$ would mean that a column of $H$ is full of zeros, which is impossible. If $x + x'$ has two ones, then $H\left(x + x'\right) = 000$ means that two columns of $H$ add to zero and hence that two columns of $H$ are the same, which is not possible. This thus tells us that $x + x'$ has at least three ones, meaning that $d_H\left(x, x'\right) \geq 3$. And, indeed, we can find three columns of $H$ that add to 000.}
+    \end{subparag}
+\end{parag}
+
+\end{document}

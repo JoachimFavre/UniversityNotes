@@ -1,0 +1,253 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-11 at 13:18:44.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 11 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{16}{2025-11-11}{Continuous randomness yields infinite entropy}{
+\begin{itemize}[left=0pt]
+    \item Definition of differential entropy.
+    \item Definition of joint and conditional entropy.
+    \item Proof of the chain rule and that conditioning reduces entropy.
+    \item Definition of mutual information for continuous random variables.
+    \item Proof of a link between differential entropy and discrete entropy.
+    \item Proof of a link between continuous mutual information and discrete mutual information.
+    \item Definition of KL-divergence for PDFs.
+    \item Proof of bounds on the differential entropy given some hypotheses on the random variable.
+\end{itemize}
+
+}
+
+\begin{parag}{Observation}
+    We were able to write the capacity $C\left(p_{Y|X}\right)$ as both a maximisation and a minimisation. The former is nice for finding lower bounds, the latter for finding upper bounds.
+\end{parag}
+
+\subsection{Continuous random variables}
+
+\subsubsection{Differential entropy}
+
+\begin{parag}{Naive construction}
+    We aim to define entropy $H\left(U\right)$ for a continuous random variable $U \in \mathbb{R}$ with probability density function $f_U$. 
+
+    We consider the following naive approach, that will not work. We have a quantity $Q$ that only works for finite objects $U$, and we want to extend it to continuous objects by considering all quantisations of $\mathcal{U}$. More mathematically, we consider an arbitrary $k \in \mathbb{Z}_{\geq 1}$ and $f: \mathcal{U} \mapsto \left\{1, \ldots, k\right\}$, and evaluate $Q\left(f\left(U\right)\right)$. We can then define $Q\left(U\right) = \sup_{k, f} Q\left(f\left(U\right)\right)$.
+
+    Let us consider a specific example of this reasoning for entropy. Consider $U \in \left[0, 1\right[$ with a uniform distribution. We can consider the discretisation $f\left(U\right) = \left\lfloor k U \right\rfloor  \in \left\{0, \ldots, k-1\right\}$, that take probabilities $\frac{1}{k}, \ldots, \frac{1}{k}$. Hence, $H\left(f\left(U\right)\right) = \log_2\left(k\right)$. Since $k$ is arbitrary, it tells us that, taking the supremum, this goes to infinity. A similar example can be made for many reasonable continuous random variables.
+
+    This yields an object which is mostly always infinite, and hence it is not very interesting.
+
+    \begin{subparag}{Remark 1}
+        Although it does not work in this specific case, this is still a good idea and can be used in some other cases.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We instead consider the following approach, which works better.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Differential entropy}
+    If $U$ is a $\mathbb{R}$-valued continuous random variable with probability distribution $f_U$, we define \important{differential entropy} to be: 
+    \[h\left(U\right) = \int_{\mathbb{R}} f_U\left(u\right) \log_2\left(\frac{1}{f_U\left(u\right)}\right) du.\]
+    
+    \begin{subparag}{Intuition}
+        We just turned the sum into an integral and $p_U\left(u\right)$ into $f_U\left(u\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Consider $U \in \left[0, 1\right]$ with a uniform distribution. In other words, $f_U\left(u\right) = 1$ for $u \in \left[0, 1\right]$. Then: 
+    \[h\left(U\right) = \int_{0}^{1} \log_2\left(\frac{1}{1}\right) du = 0.\]
+
+    Now, let $a > 0$ be arbitrary and consider $V = a U$. In other words, $f_V\left(v\right) = \frac{1}{a}$ for $v \in \left[0, a\right]$. Then: 
+    \[h\left(V\right) = \int_{0}^{a} \frac{1}{a} \log_2\left(a\right) dv = \log_2\left(a\right).\]
+
+    Note that $h\left(V\right) < 0$ when $0 < a < 1$. Similarly, $h\left(V\right) > 0$ when $a > 1$; and $h\left(V\right) = 0$ when $a = 1$. Hence, differential entropy is not necessarily non-negative.
+
+    Moreover, another difference with the discrete case is that although there is a bijection between $U$ and $V$, we have $h\left(U\right) \neq h\left(V\right)$ (when $a \neq 1$).
+
+    \begin{subparag}{Remark}
+        This example may make us think that this is a bad definition. However, other properties still hold, so this is actually a good definition.
+
+        However, the fact that there exists random variables in bijection $U, V$ such that $h\left(U\right) \neq h\left(V\right)$ means that it no longer really represents the ``amount of randomness'' of a random variable. We will therefore not consider this value to be a first-class citizen, our meaningful results will depend on other values that make more intuitive sense, such as mutual information $I\left(\cdot ; \cdot\right)$ and the KL-divergence $D\left(\cdot ||\cdot \right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Joint differential entropy}
+    For a collection $U_1, \ldots, U_n$ of $\mathbb{R}$-valued continuous random variables with joint PDF $f_{U^n}\left(u^n\right)$, we define their \important{joint differential entropy}: 
+    \[h\left(U^n\right)=  \idotsint_{\mathbb{R}^n} f_{U^n}\left(u^n\right) \log_2\left(\frac{1}{f_{U^n}\left(u^n\right)}\right) du_1 \cdots du_n.\]
+\end{parag}
+
+\begin{parag}{Definition: Condition differential entropy}
+    For continuous $\mathbb{R}$-valued random variables $U, V$, we define:
+    \[h\left(U \suchthat V\right) = \iint_{\mathbb{R}^2} f_{UV}\left(u, v\right) \log_2\left(\frac{1}{p_{U|V}\left(u \suchthat v\right)}\right) du dv.\]
+
+    \begin{subparag}{Remark}
+        Note that $f_{U^n}\left(u^n\right) = f_{U_1}\left(u_1\right) f_{U_2 | U_1}\left(u_2 \suchthat u_1\right) \cdots f_{U_n | U^{n-1}}\left(u_n \suchthat u^{n-1}\right)$. So, this definition is such that the chain rule holds:
+        \[h\left(U^n\right) = h\left(U_1\right) + h\left(U_2 \suchthat U_1\right) + \ldots + h\left(U_n \suchthat U^{n-1}\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Conditioning reduces differential entropy:
+    \[h\left(U \suchthat V\right) \leq h\left(U\right).\]
+    
+    Moreover, we have equality if and only if $U$ and $V$ are independent.
+
+    \begin{subparag}{Proof}
+        We notice:
+        \autoeq{h\left(U\right) - h\left(U \suchthat V\right) = h\left(U\right) + h\left(V\right) - h\left(U, V\right) = \iint_{\mathbb{R}^2} f_{UV}\left(u, v\right) \log_2\left(\frac{f_{UV}\left(u, v\right)}{f_U\left(u\right) f_V\left(v\right)}\right) du dv.}
+        
+
+        Hence, since $\ln\left(z\right) \leq z-1$: 
+        \autoeq{h\left(U\right)- h\left(U \suchthat V\right) = \iint_{\mathbb{R}^2} f_{UV}\left(u, v\right) \ln\left(\frac{f_U\left(u\right) f_V\left(v\right)}{f_{UV}\left(u, v\right)}\right) \leq \iint_{\mathbb{R}^2} \left(f_{UV}\left(u, v\right) \frac{f_U\left(u\right) f_V\left(v\right)}{f_{UV}\left(u, v\right)} - f_{UV}\left(u, v\right)\right) du dv = 1\cdot 1 - 1 = 0.}
+
+        This gives our inequality. Moreover, equality happens if and only if $z = 1$, i.e.~if $f_U\left(u\right)f_V\left(v\right) = f_{UV}\left(u, v\right)$. This is equivalent to saying that $U$ and $V$ are independent.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Mutual information}
+    We define mutual information of continuous random variables as: 
+    \[I\left(U; V\right) = h\left(U\right) + h\left(V\right) - h\left(U, V\right) = h\left(U\right) - h\left(U \suchthat V\right) = h\left(V\right) - h\left(V \suchthat U\right).\]
+    
+    \begin{subparag}{Remark}
+        Note that we changed the letter $H \to h$ for differential entropy; but we kept a capital $I$ for mutual information. The reason is that the construction mentioned earlier, where we take the supremum over discretisations, works for mutual information.  
+
+        Because of this, it keeps many more properties. This is a value which is much more meaningful from an engineering point of view than differential entropy.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Relationship between discrete and differential entropy}
+    Suppose $U \in \mathbb{R}$ which PDF $f_U$ is sufficiently well behaved. Then, we have: 
+    \[h\left(U\right) = \lim_{\delta \to 0^+} \left(H\left(\left\lfloor \frac{U}{\delta} \right\rfloor \right) + \log_2\left(\delta\right)\right)\]
+
+    \begin{subparag}{Remark 1}
+        This is exactly the reason why we changed the symbol of differential entropy.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Doing a completely similar reasoning: 
+        \[h\left(U, V\right) = \lim_{\substack{\epsilon \to 0^+ \\ \delta \to 0^+}} \left[H\left(\left\lfloor \frac{U}{\delta} \right\rfloor, \left\lfloor \frac{V}{\epsilon} \right\rfloor \right) + \log_2\left(\delta\right) + \log_2\left(\epsilon\right)\right].\]
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Given an arbitrary $\delta > 0$, we define
+        \[U_{\delta} = \delta \left\lfloor \frac{U}{\delta} \right\rfloor \in \left\{\ldots, -\delta, 0, \delta, 2\delta, \ldots\right\}.\]
+
+        This corresponds to quantising $U$ into discrete multiples of $\delta$. We notice that: 
+        \[H\left(U_{\delta}\right) = \sum_{i=-\infty}^{\infty} p_i \log_2\left(\frac{1}{p_i}\right),\]
+        where $p_i = \prob\left(U_{\delta} = i\delta\right) = \prob\left(i \delta \leq U < \left(i+1\right) \delta\right)$.
+        
+        Similarly: 
+        \[h\left(U\right) = \int_{\mathbb{R}} f\left(u\right) \log_2\left(\frac{1}{f\left(u\right)}\right) du = \sum_{i=-\infty}^{\infty} \int_{i \delta}^{\left(i+1\right)\delta} f\left(u\right) \log_2\left(\frac{1}{f\left(u\right)}\right) du.\]
+
+        Assuming $\delta > 0$ is sufficiently small and $f\left(u\right)$ is sufficiently well-behaved, for $u \in \left[i\delta, \left(i+1\right)\delta\right[$, then $f\left(u\right) \approx p_i / \delta$ (since the area under the curve is $\int_{i \delta}^{\left(i+1\right)\delta} f\left(u\right) du = p_i$, and it has width $\delta$). But then: 
+            \autoeq{h\left(U\right) \approx \sum_{i=-\infty}^{\infty} \int_{i\delta}^{\left(i+1\right)\delta} f\left(u\right) \log_2\left(\frac{\delta}{p_i}\right) du = \sum_{i=-\infty}^{\infty} p_i \log_2\left(\frac{\delta}{p_i}\right) = H\left(U_{\delta}\right) + \log_2\left(\delta\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    We have: 
+    \[I\left(U; V\right) = \lim_{\substack{\epsilon \to 0^+ \\ \delta \to 0^+}} I\left(\left\lfloor \frac{U}{\delta} \right\rfloor, \left\lfloor \frac{V}{\epsilon} \right\rfloor \right).\]
+
+    Moreover, it can be shown that this is indeed the supremum over all discretisation.
+    
+    \begin{subparag}{Remark}
+        This is exactly the reason why we did not change the symbol for mutual information.
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        This means that all properties from discrete mutual information are inherited for the continuous one.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is a direct consequence of the previous theorem and its generalisation mentioned in the second remark:
+        \autoeq{I\left(U; V\right) = h\left(U\right) + h\left(V\right) - h\left(U, V\right) = \lim_{\substack{\epsilon \to 0^+ \\ \delta \to 0^+}} \left[H\left(\left\lfloor \frac{U}{\delta} \right\rfloor \right) + H\left(\left\lfloor \frac{V}{\epsilon} \right\rfloor\right) - H\left(\left\lfloor \frac{U}{\delta} \right\rfloor, \left\lfloor \frac{V}{\epsilon} \right\rfloor \right)\right] = \lim_{\substack{\epsilon \to 0^+ \\ \delta \to 0^+}} I\left(\left\lfloor \frac{U}{\delta} \right\rfloor, \left\lfloor \frac{V}{\epsilon} \right\rfloor \right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: KL-divergence}
+    Let $f, g$ be PDFs. We let their \important{divergence} (or KL-divergence) to be: 
+    \[D\left(f || g\right) = \int_{\mathcal{U}} f\left(u\right) \log_2\left(\frac{f\left(u\right)}{g\left(u\right)}\right) du = \lim_{\delta \to 0^+} D\left(p_{\delta} || q_{\delta}\right),\]
+    where $p_{\delta}\left(i\right) = \int_{i\delta}^{\left(i+1\right)\delta} f\left(u\right)du$ and similarly $q_{\delta}\left(i\right) = \int_{i \delta}^{\left(i+1\right)\delta}  g\left(u\right) du$.
+
+    \begin{subparag}{Remark}
+        Note that: 
+        \[I\left(U; V\right) = D\left(f_{UV} || f_U f_V\right).\]
+
+        This means that the two expressions given above for $D\left(f || g\right)$ are indeed equivalent by our previous corollary.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    We have: 
+    \[D\left(f || g\right) \geq 0,\]
+    with equality if and only if $f = g$.
+    
+    \begin{subparag}{Proof idea}
+        The proof directly comes the fact $\ln\left(z\right) \leq z - 1$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $U \in \mathbb{R}$ be a random variable. 
+    \begin{enumerate}
+        \item If $U \in \left[0, 1\right]$, then:
+            \[h\left(U\right) \leq 0.\]
+
+            Moreover, equality holds if and only if $U$ is uniformly distributed.
+        \item If $U \in \left[0, +\infty\right[ $ and $\exval\left(U\right) = 1$, then: 
+            \[h\left(U\right) \leq \log_2\left(e\right).\]
+            
+            Moreover, equality holds if and only if $U$ is exponentially distributed.
+        \item If $\exval\left(U^2\right) = 1$, then:
+            \[h\left(U\right) \leq \frac{1}{2} \log_2\left(2\pi e\right).\]
+
+            Moreover, equality holds if and only if $U \followsdistr N\left(0, 1\right)$ is a Gaussian random variable of mean 0 and variance $1$.
+    \end{enumerate}
+
+    \begin{subparag}{Proof 1}
+        Let $f$ be the PDF of $U$. Also, let $g\left(u\right) = 1$ for $0 \leq u \leq 1$ and 0 otherwise be the PDF of a uniform random variable on $\left[0, 1\right]$. Note that: 
+        \[0 \geq -D\left(f || g\right) = \int_{0}^{1} f\left(u\right) \log_2\left(\frac{1}{f\left(u\right)}\right) du = h\left(U\right).\]
+
+        Moreover, we have equality if and only if $f = g$, i.e.~when $U$ is uniformly distributed.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        Let $f$ be the PDF of $U$. By definition: 
+        \[f\left(u\right) \geq 0, \mathspace \int_{0}^{\infty} f\left(u\right) du = 1.\]
+
+        Moreover, by hypothesis: 
+        \[\int_{0}^{\infty} u f\left(u\right) du = \exval\left(U\right) = 1.\]
+
+        Let $g\left(u\right) = e^{-u}$ for any $u \geq 0$ be the PDF of an exponentially distributed random variable (of expectation $1$). Note that this is a valid PDF. Hence: 
+        \autoeq{0 \geq - D\left(f || g\right) = \int_{0}^{\infty} f\left(u\right) \log_2\left(\frac{e^{-u}}{f\left(u\right)}\right) du = h\left(U\right) - \int_{0}^{\infty} u f\left(u\right) \log_2\left(e\right) du = h\left(U\right) - \log_2\left(e\right).}
+
+        Again, equality holds if and only if $f = g$.
+    \end{subparag}
+
+    \begin{subparag}{Proof 3}
+        Let $f$ be the PDF of $U$. Moreover, let $g\left(u\right) = \frac{1}{\sqrt{2\pi}}\exp\left(-u^2/2\right)$ for $u \in \mathbb{R}$ be the PDF of a Gaussian random variable. Then, using the fact $\exval\left(U^2\right) = 1$ by hypothesis: 
+        \autoeq{0 \geq - D\left(f || g\right) = \int_{-\infty}^{\infty} f\left(u\right) \log_2\left(\frac{\exp\left(-u^2/2\right)/\sqrt{2\pi}}{f\left(u\right)}\right) du = h\left(U\right) - \int_{-\infty}^{\infty} \left[\frac{u^2}{2} \log_2\left(e\right) + \frac{1}{2} \log_2\left(2\pi\right)\right] f\left(u\right) du = h\left(U\right) - \frac{1}{2} \log_2\left(e\right) \exval\left(U^2\right) - \frac{1}{2} \log_2\left(2\pi\right) = h\left(U\right) - \frac{1}{2} \log_2\left(2\pi e\right).}
+
+        Again, equality holds if and only if $f = g$.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

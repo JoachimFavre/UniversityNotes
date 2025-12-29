@@ -1,0 +1,279 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-14 at 13:17:15.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 14 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{11}{2025-10-14}{Bears hugging}{
+\begin{itemize}[left=0pt]
+    \item \textit{Thanks AL \smiley.}
+    \item Definition of channel capacity.
+    \item Computation of the capacity of the BSC and the BEC channels.
+    \item Explanation and proof of Fano's inequality.
+    \item Explanation and proof of the data-processing inequality.
+    \item Proof of the bad-news result for data transmission.
+\end{itemize}
+
+}
+
+\begin{parag}{Corollary}
+    If we have a memoryless and stationary channel, with a transmission system without feedback, then: 
+    \[H\left(Y^n \suchthat X^n\right) = \sum_{i=1}^{n} H\left(Y_i \suchthat X_i\right).\]
+
+    \begin{subparag}{Remark}
+        In the general case, we have instead: 
+        \[H\left(Y^n \suchthat X^n\right) = \sum_{i=1}^{n} H\left(Y_i \suchthat Y^{i-1}, X^n\right) \leq \sum_{i=1}^{n} H\left(Y_i \suchthat X_i\right).\]
+
+        The fact that this holds with equality is thus not obvious.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is a direct consequence from our previous result, i.e. that: 
+        \[p_{Y^n | X^n}\left(y^n \suchthat x^n\right) = \prod_{i=1}^{n} p_{Y_i | X_i}\left(y_i \suchthat x_i\right).\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Capacity}
+    Consider a memoryless and stationary channel described by the probability kernel $p_{Y|X}$. We define its \important{capacity} as: 
+    \[C\left(p_{Y|X}\right) = \max_{p_X} I\left(X; Y\right).\]
+    
+    \begin{subparag}{Intuition}
+        This states how much dependence there can be between the input of the channel and the output of the channel. We will prove that this is the rate at which we can operate the channel in a reliable way.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: BSC}
+    Let's compute the capacity of the channel $\BSC\left(p\right)$. We notice that, fixing $X = x$, then $Y$ is just a Bernoulli-$p$ random variable (or Beroulli-$1-p$) and hence:
+    \[H\left(Y \suchthat X = 0\right) = h_2\left(p\right), \mathspace H\left(Y \suchthat X = 1\right) = h_2\left(p\right).\]
+    
+    Hence, for any probability distribution $p_X$: 
+    \[H\left(Y \suchthat X\right) = \sum_{x \in \left\{0, 1\right\}} p_X\left(x\right) H\left(Y \suchthat X = x\right) = h_2\left(p\right) \sum_{x \in \left\{0, 1\right\}} p_X\left(x\right) = h_2\left(p\right).\]
+
+    This thus directly gives us that:
+    \[I\left(X; Y\right) = H\left(Y\right) - H\left(Y \suchthat X\right) = H\left(Y\right) - h_2\left(p\right).\]
+
+    To compute the capacity of the channel, we have to maximise $I\left(X; Y\right)$. Since $h_2\left(p\right)$ is a constant with respect to $p_X$, we have to maximise $H\left(Y\right)$. Now, if $X$ is uniformly distributed over $\left\{0, 1\right\}$, then so is $Y$, and hence $H\left(Y\right) = 1$. Since moreover $H\left(Y\right) \leq 1$ since $Y \in \left\{0, 1\right\}$, this tells us that the uniform distribution on $X$ yields the maximal entropy. This thus tells us that: 
+    \[C\left(\BSC\left(p\right)\right) = 1 - h_2\left(p\right).\]
+    
+    For instance, if the channel is perfect, $p = 0$, we get that $C\left(\BSC\left(p\right)\right) = 1$ is maximal. Similarly, if the channel always flips, $p = 1$, then $C\left(\BSC\left(p\right)\right) = 1$ is also maximal. In both cases, we can use the channel without using any redundancy (when $p = 1$, we can simply just flip the output back).
+
+    The worst case is $p = \frac{1}{2}$, where $C\left(\BSC\left(p\right)\right) = 0$. In this case, no matter $x$, $Y$ is uniformly distributed in $\left\{0, 1\right\}$, and hence there is no information about $x$ that can be recovered, no matter the amount of redundancy.
+
+    The channel capacity indeed seems to intuitively represent the amount of information we can transmit on the channel. 
+\end{parag}
+
+\begin{parag}{Example 2: BEC}
+    Let's now compute the capacity of the $\BEC\left(p\right)$ channel. In the previous example, we computed $I\left(X; Y\right) = H\left(Y\right) - H\left(Y \suchthat X\right)$ but, this time, let us evaluate it by using its symmetric definition:
+    \[I\left(X; Y\right) = H\left(X\right) - H\left(X \suchthat Y\right).\]
+    
+    Knowing that the output is $0$, then we know for sure that the input must have been 0. This is completely similar for $1$, telling us: 
+    \[H\left(X \suchthat Y = 0\right) = 0, \mathspace H\left(X \suchthat Y = 1\right) = 0.\]
+    
+    The only thing that is left is $H\left(X \suchthat Y = \text{?}\right)$. Let $p_X = \left(p_0, p_1\right)$ be arbitrary. We note that, by Bayes' rule: 
+    \autoeq{\prob\left(X = 0 \suchthat Y = \text{?}\right) = \frac{\prob\left(X = 0, Y = \text{?}\right)}{\prob\left(Y = \text{?}\right)} = \frac{\prob\left(Y = \text{?} \suchthat X = 0\right) \prob\left(X = 0\right)}{\prob\left(Y = \text{?} \suchthat X = 0\right)\prob\left(X = 0\right) + \prob\left(Y = \text{?} \suchthat X=1\right) \prob\left(X = 1\right)} = \frac{p \cdot  p_0}{p\cdot p_0 + p\cdot p_1} = \frac{p\cdot p_0}{p} = p_0,}
+    since $p_0 + p_1 = 1$. By the exact same reasoning, $\prob\left(X = 1 \suchthat Y = \text{?}\right) = p_1$. Consequently: 
+    \[H\left(X \suchthat Y= \text{?}\right) = H\left(X\right).\]
+
+    This allows us to evaluate $H\left(X \suchthat Y\right)$: 
+    \autoeq{H\left(X \suchthat Y\right) = \underbrace{H\left(X \suchthat Y = 1\right)}_{= 0}\prob\left(Y = 1\right) + \underbrace{H\left(X \suchthat Y = 0\right)}_{=  0} \prob\left(Y = 0\right) + \underbrace{H\left(X \suchthat Y = \text{?}\right)}_{= H\left(X\right)}\underbrace{\prob\left(Y = \text{?}\right)}_{= p} = p H\left(X\right).}
+
+    Hence:
+    \[I\left(X; Y\right) = H\left(X\right) - H\left(X \suchthat Y\right) = H\left(X\right) -p H\left(X\right) = \left(1 - p\right) H\left(X\right).\]
+    
+    We are finally able to compute the capacity of the channel, since $1-p > 0$ is a non-negative constant: 
+    \[C\left(\BEC\left(p\right)\right) = \max_{p_X} \left(1-p\right)H\left(X\right) = \left(1-p\right)\cdot 1 = 1-p,\]
+    which is achieved for $X$ being sampled uniformly from $\left\{0, 1\right\}$.
+
+    This result is again interesting. If $p = 0$, we have that $C\left(\BEC\left(p\right)\right) = 1$ is maximal; which matches the fact the channel does not erase anything.  If $p = 1$, the capacity is zero; which corresponds to the fact that the channel erases everything and hence we can't send any data over it.
+\end{parag}
+
+\subsection{Bad-news result}
+
+\begin{parag}{Theorem}
+    Let $p_{Y|X}$ be given. Then, the map $p_X \mapsto I\left(X; Y\right)$ is concave. 
+
+    \begin{subparag}{Implication}
+        Hence, fixing some channel $p_{Y|X}$, we can compute its capacity $C\left(p_{Y|X}\right)$ in poly-time.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We can write: 
+        \[I\left(X; Y\right) = H\left(Y\right) - H\left(Y \suchthat X\right) = H\left(Y\right) - \sum_{x} p_X\left(x\right) H\left(Y \suchthat X = x\right).\]
+        
+        Now, $H\left(Y \suchthat X = x\right) = \sum_{y} p_{Y|X}\left(y \suchthat x\right) = \log_2\left(\frac{1}{p_{Y|X}\left(y \suchthat x\right)}\right)$ is only a function of $p_{Y|X}$. The term $\sum_{x} p_X\left(x\right) H\left(Y \suchthat X = x\right)$ is hence just linear in $p_X$. In particular, it is also convex in $p_X$ and hence $-\sum_{x} p_X\left(x\right) H\left(Y \suchthat X = x\right)$ is concave in $p_X$.
+
+        Similarly, $p_Y$ is also a linear function of $p_X$: 
+        \[p_Y\left(y\right) = \sum_{x} p_{Y|X}\left(y|x\right) p_X\left(x\right).\]
+
+        Moreover, we know that $H\left(Y\right)$ is a concave function of $p_Y$. Combining the two, this tells us that: 
+        \[p_X \over{\mapsto}{linear} p_Y \over{\mapsto}{concave} H\left(Y\right).\]
+        
+        In other words, $H\left(Y\right)$ is a concave function of $p_X$. 
+
+        Overall, we found that $I\left(X; Y\right)$ is the sum of two concave functions, telling us it is itself concave.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Fano's inequality}
+    Let $U, V$ be random variables taking values in a common alphabet $\mathcal{U}$. Moreover, let $p = \prob\left(U \neq V\right)$.
+
+    Then: 
+    \[H\left(U \suchthat V\right) \leq h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}\right| - 1\right).\]
+    
+    \begin{subparag}{Intuition}
+        The graph of $f\left(p\right) = h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}\right| - 1\right)$ looks as follows:
+        \svghere{FanosInequality.svg}
+
+        Let's study what this means intuitively. Let us first assume that $\left|\mathcal{U}\right| \geq 3$. We moreover assume that we have some random variable $U$, and some information about it $V$, such that $H\left(U \suchthat V\right) \geq \alpha$ for some $\alpha > 0$. In other words, knowing $V$ still leaves some non-negligible entropy on $U$. This theorem then states that $p = \prob\left(U \neq V\right)$ must be sufficiently far from zero, i.e.~that $V$ cannot be an arbitrarily good estimator to $U$, there must be a sufficiently high probability that they are different. This makes sense: if they were equal with very high probability, then knowing $V$ would tell us all the information there is about $U$.
+
+        Now, if $\left|\mathcal{U}\right| = 2$ and $H\left(U \suchthat V\right) \geq \alpha > 0$, then this result also tells us that $p = \prob\left(U \neq V\right)$ must be sufficiently far from one. This makes again a lot of sense since, in the binary case, if we know that $U \neq V$ with very high probability, then we know that $U = \bar{V}$ with high probability and hence $H\left(U \suchthat V\right)$ must be small. 
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Consider the following random variable: 
+        \[W = \begin{systemofequations} 1, & \text{if $U = V$,} \\ 0, & \text{if $U \neq V$.} \end{systemofequations}\]
+
+        Note that $H\left(W \suchthat U, V\right) = 0$, since it is a deterministic function of $U$ and $V$. Hence: 
+        \[H\left(U, W \suchthat V\right) = H\left(U \suchthat V\right) + H\left(W \suchthat U, V\right) = H\left(U \suchthat V\right).\]
+        
+        Using the chain rule in a different way:
+        \autoeq{H\left(U, W \suchthat V\right) = H\left(W \suchthat V\right) + H\left(U \suchthat W, V\right) \leq H\left(W\right) + H\left(U \suchthat W, V\right) = h_2\left(p\right)+ H\left(U \suchthat W, V\right).}
+        
+        We expand the last term: 
+        \[H\left(U \suchthat W, V\right) = \sum_{w  \in \left\{0, 1\right\}} \sum_{v} p_{W V}\left(w, v\right) H\left(U \suchthat W = w, V = v\right).\]
+        \[\]
+        Now, when $W = 1$, we know that we always have $U = V$. Hence: 
+        \[H\left(U \suchthat W = 1, V =v\right) = 0.\]
+        
+        Similarly, if $W = 0$, then we know $U \neq V$. Hence, if we also know $V = v$, $U$ can take its value in a space of size $\left|\mathcal{U}\right| -1$, telling us: 
+        \[H\left(U \suchthat W = 0, V = v\right) \leq \log_2\left(\left|\mathcal{U}\right| - 1\right).\]
+        
+        Overall, this gives us that: 
+        \autoeq{H\left(U \suchthat W, V\right) \leq \sum_{v} \prob\left(W = 0, V = v\right) \log_2\left(\left|\mathcal{U}\right| - 1\right) = \prob\left(W = 0\right) \log_2\left(\left|\mathcal{U}\right| -1\right) = p \log_2\left(\left|\mathcal{U}\right| - 1\right).}
+        
+        Combining everything, we get exactly our result: 
+        \autoeq{H\left(U \suchthat V\right) = H\left(U, W \suchthat V\right) \leq h_2\left(p\right) + H\left(U \suchthat W, V\right) \leq h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}\right| - 1\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $U_1, \ldots, U_k, V_1, \ldots, V_k$ be random variables over a common alphabet $\mathcal{U}$. Moreover, let $p_i = \prob\left(U_i \neq V_i\right)$ and $p = \frac{1}{k} \sum_{i=1}^{k} p_i$. Then: 
+    \[\frac{1}{k} H\left(U^k \suchthat V^k\right) \leq h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}-1\right|\right).\]
+    
+    \begin{subparag}{Proof}
+        We have, by the chain rule: 
+        \autoeq{\frac{1}{k} H\left(U^k \suchthat V^k\right) = \frac{1}{k} \sum_{i=1}^{k}  H\left(U_i \suchthat U^{i-1}, V^k\right) \leq \frac{1}{k} \sum_{i=1}^{k} H\left(U_i \suchthat V_i\right) \over{\leq}{Fano}  \frac{1}{k} \sum_{i=1}^{k} \left(h_2\left(p_i\right) + p_i \log_2\left(\left|\mathcal{U}\right|- 1\right)\right) = \frac{1}{k} \sum_{i=1}^{k} h_2\left(p_i\right) + p \log_2\left(\left|\mathcal{U}\right|- 1\right).}
+        
+        The result finally comes from the fact 
+        \[\frac{1}{k} \sum_{i=1}^{k} h_2\left(p_i\right) \leq h_2\left(\frac{1}{k}\sum_{i=1}^{k} p_i\right)\]
+        by the concavity of $h_2$. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Data-processing inequality}
+    Let $X - Y - Z$ be random variables forming a Markov chain. Then: 
+    \[I\left(X; Z\right) \leq I\left(X; Y\right).\]
+
+    This result is named the \important{data-processing inequality}.
+    
+    \begin{subparag}{Intuition}
+        As explained earlier, since $X - Y - Z$ form a Markov chain, we can see $Y$ as being a random function of $X$, $Z$ being a random function of $Y$, and the two random functions being independent of each other and of $X, Y, Z$. This states that the shared information between $X$ and $Z$, $I\left(X; Z\right)$, must necessarily be smaller than the one shared between $X$ and $Y$, $I\left(X; Y\right)$. This makes a lot of sense: since $Z$ is a random function of $Y$ (and the random function is independent of $X$), this is just a more ``processed'' piece of information, it must necessarily tell us less about $X$.
+
+        Another way of phrasing this is that processing of information does not create more information. This justifies the name of this theorem.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        By the Markov chain hypothesis, we know that $X$ and $Z$ are independent knowing $Y$, i.e.~$I\left(X; Z \suchthat Y\right) = 0$, so: 
+        \[I\left(X; Y, Z\right) = I\left(X; Y\right) + I\left(X; Z \suchthat Y\right) = I\left(X; Y\right).\]
+
+        Using the chain rule in a different way: 
+        \[I\left(X; Y, Z\right) = I\left(X; Z\right) + I\left(X; Y \suchthat Z\right) \geq I\left(X; Z\right).\]
+        
+        This gives exactly our result: 
+        \[I\left(X; Z\right) \leq I\left(X; Y, Z\right) = I\left(X; Y\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $U - X -Y - V$ be a Markov chain. Then: 
+    \[I\left(U; V\right) \leq I\left(X; Y\right).\]
+    
+    \begin{subparag}{Proof}
+        Note that we have $\left(U, X\right) - Y - V$. Hence, by the data-prcessing inequality, $I\left(U, X; V\right) \leq I\left(U, X; Y\right)$. Hence, using the fact $I\left(U; V\right) \leq I\left(U, X; V\right)$ (which should be clear intuitively since adding a random variable should only add to the shared information, but it can also easily be shown by the chain rule): 
+        \autoeq{I\left(U; V\right) \leq I\left(U, X ; V\right) \leq I\left(U, X; Y\right) = I\left(X; Y\right) + \underbrace{I\left(U; Y \suchthat X\right)}_{= 0} = I\left(X; Y\right),}
+        where we used the fact that, knowing $X$, then $U$ and $Y$ are independent by the Markov chain hypothesis.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Consider an arbitrary encoder-decoder pair and the following setup.
+    \svghere{ChannelCommunicationSetup.svg}
+    \vspace{0.5em}
+
+    Then: 
+    \[I\left(U^k; V^k\right) \leq n C\left(p_{Y|X}\right)\]
+    
+    \begin{subparag}{Intuition}
+        This is a very intuitive inequality: the information we can obtain on $U^k$ from $V^k$ is at most $n$ times the number of bits we can send reliably on the channel.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Since the diagram is honest, we observe that $U^k - X^n - Y^n - V^k$ is a Markov chain. Hence: 
+        \[I\left(U^k; V^k\right) \leq I\left(X^n; Y^n\right).\]
+        
+        Now, we also have: 
+        \[I\left(X^n; Y^n\right) = H\left(Y^n\right) - H\left(Y^n \suchthat X^n\right) \leq \sum_{i=1}^{n} H\left(Y_i\right) - H\left(Y^n \suchthat X^n\right).\]
+
+        Since the channel is memory-less and we have no feedback, we also know that $H\left(Y^n \suchthat X^n\right) = \sum_{i=1}^{n} H\left(Y_i \suchthat X_i\right)$. Hence: 
+        \autoeq{I\left(X^n; Y^n\right) \leq \sum_{i=1}^{n} H\left(Y_i\right) - \sum_{i=1}^{n} H\left(Y_i \suchthat X_i\right) = \sum_{i=1}^{n} I\left(X_i; Y_i\right) = n\cdot \left(\frac{1}{n}\sum_{i=1}^{n} I\left(X_i; Y_i\right)\right).}
+        
+        Now, we also found that $I\left(X_i; Y_i\right) = \text{func}\left(p_{X_i}, p_{Y|X}\right)$ is a concave function of $p_{X_i}$. Hence, writing $p_X = \frac{1}{n} \sum_{i=1}^{n} p_{X_i}$, this gives:
+        \[\frac{1}{n}\sum_{i=1}^{n} I\left(X_i; Y_i\right) \leq I\left(X; Y\right) \leq \max_{p_X} I\left(X; Y\right) = C\left(p_{Y|X}\right).\]
+
+        We have thus found so far that: 
+        \[I\left(U^k; V^k\right) \leq I\left(X^n; Y^n\right) \leq n \cdot \left(\frac{1}{n} \sum_{i=1}^{n} I\left(X_i; Y_i\right)\right) \leq n C\left(p_{Y|X}\right)\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Lemma}
+    Consider an arbitrary encoder-decoder pair and the setup from the previous lemma. Also, let $p_i = \prob\left(U_i \neq V_i\right)$ and $p = \frac{1}{k} \sum_{i=1}^{k} p_i$. Then: 
+    \[h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}\right| - 1\right) \geq \frac{1}{k} H\left(U^k\right) - \frac{n}{k} C\left(p_{Y|X}\right).\]
+    
+    \begin{subparag}{Intuition}
+        $\frac{1}{k} H\left(U^k\right)$ is the amount of information per symbol we aim to send. (We aim to show that) $C\left(p_{Y|X}\right)$ tells us the number of bits we can reliably send per channel use, so $n C\left(p_{Y|X}\right)$ is the number of bits we are able to send reliably and $\frac{n}{k} C\left(p_{Y|X}\right)$ is the number of bits per symbol we can send reliably. If we can send more bits per symbol than the amount of information per symbol, then the right-hand side is negative and this result does not tell us anything. However, otherwise, it states that $p$ cannot be made arbitrarily close to zero. This is made more intuitive with the following results.    \end{subparag}
+
+    \begin{subparag}{Proof}
+         This results comes by combining our previous lemma and Fano's inequality: 
+        \autoeq{h_2\left(p\right) + p\log_2\left(\left|\mathcal{U}\right| - 1\right) \geq \frac{1}{k} H\left(U^k \suchthat V^k\right) = \frac{1}{k}\left(H\left(U^k\right) - I\left(U^k; V^k\right)\right) \geq \frac{1}{k} \left(H\left(U^k\right) - n C\left(p_{Y|X}\right)\right).}
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

@@ -1,0 +1,232 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-25 at 13:22:13.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 25 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{20}{2025-11-25}{Visiting Cambridge}{
+\begin{itemize}[left=0pt]
+    \item Proof of the minimum distance of general Hamming codes.
+    \item Proof of the Gilbert-Varshamov bound.
+    \item Definition of linear codes and linear subspaces.
+    \item Explanation of the equivalence between linear codes, linear subspaces, generator matrices and parity-check matrices.
+    \item Proof that the minimum weight is equal to the minimum distance for linear codes.
+    \item Examples of linear codes.
+\end{itemize}
+
+}
+
+\begin{parag}{}
+    \begin{subparag}{General definition}
+        More generally, a Hamming code $\left(n, \log_2\left(m\right), d\right) = \left(2^{\ell} - 1, n - \ell, 3\right)$ is defined such that: 
+        \[\mathcal{C} = \left\{x \in \mathbb{F}_2^n \suchthat H x = 0\right\}, \mathspace \text{where } H = \begin{pmatrix}  &  &  &  &  &  \\  & I_{\ell} &  &  & A &  \\  &  &  &  &  &  \end{pmatrix},\]
+        where $A$ is the matrix with $\ell$ rows such that all the vectors of Hamming weight $2$ or more appear. Equivalently, we have: 
+        \[x \in \mathcal{C} \iff \begin{pmatrix} x_1 \\ \vdots \\ x_{\ell} \end{pmatrix} = A \begin{pmatrix} x_{\ell+1} \\ \vdots \\ x_{n} \end{pmatrix}.\]
+        
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We aim to prove that Hamming codes are indeed such that $d_{min}\left(\mathcal{C}\right) = 3$.
+
+        Let $x, x' \in \mathcal{C}$ be arbitrary such that $x \neq x'$. By definition, $Hx = 0$ and $H x' = 0$, and hence $z = x + x' \neq 0$ is such that $H z = 0$. Note that the number of ones in $z$ is $d_H\left(x, x'\right)$.
+
+        Now, $z$ cannot have only a single one since $Hz$ would be a column of $H$ and none of them is zero. Similarly, it cannot have two ones since we cannot sum two columns of $H$ to get 0 (since no two columns are equal). Hence, $z$ must have three or more ones, telling us $d_H\left(x, x'\right) \geq 3$. This shows that $d_{min\left(\mathcal{C}\right)} \geq 3$.
+
+        Now, we know that $d_{min}\left(\mathcal{C}\right) \leq 3$ by the sphere packing inequality. This does tell us that $d_{min}\left(\mathcal{C}\right) = 3$.
+
+        \qed
+
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Gilbert–Varshamov bound}
+    Let $n, d$ be arbitrary.
+
+    Then, there is a code $\mathcal{C} \subseteq \left\{0, 1\right\}^n$ with $d_{min}\left(\mathcal{C}\right) \geq d$ such that $m = \left|\mathcal{C}\right|$ satisfies: 
+    \[m \sum_{i=0}^{d-1} \binom{n}{i} \geq 2^n.\]
+
+    \begin{subparag}{Remark}
+        Note that the sphere-packing inequality told us that:
+        \[m \sum_{i=0}^{\left\lfloor \frac{d-1}{2} \right\rfloor } \binom{n}{i} \leq 2^n.\]
+
+        The difference is thus in the direction of the inequality, and in the upper bound of the sum.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We consider a greed algorithm to construct a code with the required property.
+ 
+        Start by setting $\mathcal{C} = \o$ to be the constructed codewords, $\mathcal{A} = \left\{0, 1\right\}^n$ to be the space of yet uncovered codewords and $w = 0$ be the number of codewords we have put in $\mathcal{C}$. Then, while $\mathcal{A} \neq \o$:
+        \begin{enumerate}
+            \item Pick some $a \in \mathcal{A}$.
+            \item Set $w \leftarrow w + 1$.
+            \item Define $x\left(w\right) = a$ and increase $\mathcal{C} \leftarrow \mathcal{C} \cup \left\{a\right\}$.
+            \item Reduce the size of potential codewords $\mathcal{A} \leftarrow \mathcal{A} \setminus B\left(a, d-1\right)$.
+        \end{enumerate}
+
+        Note that the code has a minimum distance at least $d$ by construction of $\mathcal{A}$: we always remove from $\mathcal{A}$ all codewords that have a distance at most $d-1$ to any codeword we add to $\mathcal{C}$. Moreover, every  iteration, we remove at most $\left|B\left(a, d-1\right)\right| = \sum_{i=0}^{d-1} \binom{n}{i}$ elements from $\mathcal{A}$. Hence, overall in the algorithm, we removed at most $m \sum_{i=0}^{d-1} \binom{n}{i}$ elements from $\mathcal{A}$. We however start with $\left|\mathcal{A}\right| = 2^n$ and end with $\left|\mathcal{A}\right| = 0$, telling us we must have: 
+        \[m \sum_{i=0}^{d-1} \binom{n}{i} \geq 2^n.\]
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that, even if we constructed a code, it does not mean that it can be used in practice. Indeed, we might have $m = 2^{50}$ and we need to be able to traverse $\mathcal{C} = \left(x^n\left(1\right), \ldots, x^n\left(m\right)\right)$ to be able to encode and decode.
+
+        More precisely, an unstructured code $\mathcal{C}$ is not practical. Now, we know that for every $R < C\left(\BSC\left(p\right)\right) = 1 - h_2\left(p\right)$ and $\epsilon > 0$, there exists $n$ and $m \geq 2^{nk}$ and a code $\mathcal{C} \subseteq \left\{0, 1\right\}^n$ with $\left|\mathcal{C}\right| = m$ such that: 
+        \[\prob\left(\text{error of the code on $\BSC\left(p\right)$}\right) < \epsilon.\]
+
+        Hence, we have to add constraints so that we have more structure for encoding and decoding, without adding too many so that we can still reach the guarantee above. An example is linear codes. We will later also consider another approach with polar codes, considering a decoding simpler than $y^n \mapsto \hat{w} = \argmin_w d_H\left(x^n\left(w\right), y^n\right)$.
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Linear codes}
+
+\begin{parag}{Definition: Finite field}
+    Let $q = p^k$ for some prime number $p$ and integer $k \geq 1$. We write $\mathbb{F}_q$ to be the (unique) finite field containing $q$ elements.
+\end{parag}
+
+\begin{parag}{Definition: Linear encoder}
+    We say an encoder $w \mapsto x^n\left(w\right)$ is a \important{linear encoder} if:
+    \begin{itemize}
+        \item $w \in \mathbb{F}_2^k$;
+        \item $w \mapsto x^n\left(w\right)$ is a linear map, i.e.~if for any $w_1, w_2 \in \mathbb{F}_2^k$ and $a_1, a_2 \in \mathbb{F}_2$:
+            \[x^n\left(a_1 w_1 + a_2 w_2\right) = a_1 x^n\left(w_1\right) + a_2 x^n\left(w_2\right).\]
+    \end{itemize}
+    
+    \begin{subparag}{Remark 1}
+        We no longer have $w \in \left\{1, \ldots, m\right\}$. Indeed, leaving $m = 2^k$, they naturally form a vector space $w \in \mathbb{F}_2^k$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Let $\left(e_i\right)$ to be the unit vectors: 
+        \[e_1 = 100\cdots0, \mathspace e_2 = 010\cdots0, \mathspace \ldots, \mathspace e_n = 0\cdots001.\]
+        
+        Now, if we specify $x^n\left(e_1\right), \ldots, x^n\left(e_2\right)$, we have specified our whole code: 
+        \[x^n\left(\begin{pmatrix} a_1 \\ \vdots \\ a_k \end{pmatrix} \right) = \sum_{i=1}^{k} a_i x\left(e_i\right).\] 
+        
+        Hence, as any linear map, we can write it as a matrix multiplication:
+        \[x^n\left(w\right) = \underbrace{\begin{pmatrix}  &  &  \\ x\left(e_1\right) & \cdots & x\left(e_n\right) \\  &  &  \end{pmatrix}}_{= G} w.\]
+        
+        The matrix $G \in \mathbb{F}^{n \times k}$ is called the \important{generator matrix.}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Linear subspace}
+    Let $\mathcal{C} \subseteq \mathbb{F}_2^n$. We say that $\mathcal{C}$ is a \important{linear subspace} of $\mathbb{F}_2^n$ if for all $x, x' \in \mathcal{C}$ then $x + x' \in \mathcal{C}$.
+
+    \begin{subparag}{Remark}
+        An equivalent requirement is that for all $x, x' \in \mathcal{C}$ and every $a, a' \in \mathbb{F}_2^n$, then $a x + a' x' \in \mathcal{C}$. This is the more general definition of linear subspace. The phrasing above is a simplification in the binary case.
+    \end{subparag}
+
+    \begin{subparag}{Property}
+        It is possible to show that if $\mathcal{C}$ is a linear subspace of $\mathbb{F}_2^n$, then:
+        \begin{itemize}
+            \item There exists a $k$ such that $\left|\mathcal{C}\right| = 2^k$;
+            \item There exists a $G \in \mathbb{F}_2^{n \times k}$ such that $\mathcal{C} = \left\{G w \suchthat w \in \mathbb{F}_2^k\right\}$.
+        \end{itemize}
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Proposition: Characterisation of linear codes}
+    The following propositions are equivalent.
+    \begin{itemize}
+        \item $\mathcal{C}$ is a linear code, i.e.~$w \mapsto x\left(w\right)$ is linear.
+        \item $\mathcal{C}$ is a linear subspace, i.e.~for all $x, x' \in \mathcal{C}$ then $x + x' \in \mathcal{C}$.
+        \item There exists a $k$ and a $G \in \mathbb{F}_2^{n \times k}$ such that $x\left(w\right) = G w$. $G$ is called the \important{generator matrix}.
+        \item There exists a $H \in \mathbb{F}^{\left(n-k\right) \times n}$ such that $\mathcal{C} = \left\{x \suchthat Hx = 0\right\}$. $H$ is called the \important{parity-check matrix}.
+    \end{itemize}
+
+    \begin{subparag}{Proof}
+        We already proved the first three propositions. The last two simply come from the fact that any linear subspace can be written as the image of a matrix or as the kernel of another matrix.
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Hamming codes are linear codes, they are stated by their parity-check matrix. Note however that not all linear codes are Hamming codes.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Minimum-weight}
+    Let $\mathcal{C}$ be a code. We define its \important{minimum weight} to be:
+    \[\weight_{min}\left(\mathcal{C}\right) = \min_{x \in \mathcal{C} \setminus \left\{0\right\}} w_H\left(x\right),\]
+    where $w_H\left(x\right) = d_H\left(0, x\right) = \left(\text{number of ones in $x$}\right)$ is its Hamming weight.
+\end{parag}
+
+\begin{parag}{Theorem}
+    If $\mathcal{C}$ is linear, then: 
+    \[d_{min}\left(\mathcal{C}\right) = \weight_{min}\left(\mathcal{C}\right).\]
+
+    \begin{subparag}{Remark}
+        Using the naive computation, $d_{min}\left(\mathcal{C}\right)$ requires $\Theta\left(n^2\right)$ computations but $\weight_{min}\left(\mathcal{C}\right)$ requires $\Theta\left(n\right)$ computations. This thus simplifies a bit the evaluation of $d_{min}\left(\mathcal{C}\right)$ for linear codes.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Note that $0 \in \mathcal{C}$. Hence, $\weight_{min}\left(\mathcal{C}\right) \geq d_{min}\left(\mathcal{C}\right).$ On the other hand, if $x, x' \in \mathcal{C}$ are such that $d_H\left(x, x'\right) = d_{min}\left(\mathcal{C}\right)$, then $x + x' \in \mathcal{C}$ is such that: 
+        \[w_H\left(x + x'\right) = d_H\left(0, x + x'\right) = d_H\left(x, x'\right) = d_{min}\left(\mathcal{C}\right).\]
+        
+        Now, $\weight_{min}\left(\mathcal{C}\right) \leq w_H\left(x + x'\right)$, giving that $\weight_{min}\left(\mathcal{C}\right) \geq d_{min}\left(\mathcal{C}\right)$. We thus do have that the two are equal.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    By construction, $\left(2^{\ell}- 1, 2^{\ell}- 1 - \ell, 3\right)$-Hamming codes are linear codes, and with the following parity check matrix: 
+    \[H = \begin{pmatrix}  &  &  &  &  &  \\  & I_{\ell} &  &  & A &  \\  &  &  &  &  &  \end{pmatrix},\]
+    where the columns of $A$ are all binary vectors of weight at least $2$. 
+
+    Equivalently, we also found that:
+    \[x \in \mathcal{C} \iff \begin{pmatrix} x_1 \\ \vdots \\ x_{\ell} \end{pmatrix} = A \begin{pmatrix} x_{\ell+1} \\ \vdots \\ x_n \end{pmatrix} \iff \begin{pmatrix} x_1 \\ \vdots \\ x_{n} \end{pmatrix} = \underbrace{\begin{pmatrix}  &  &  \\  & A &  \\  &  &  \\  &  &  \\  & I_{n - \ell} &  \\  &  &  \end{pmatrix}}_{= G} \begin{pmatrix} x_{\ell+1} \\ \vdots \\ x_n \end{pmatrix}.\]
+
+    Hence, we can also write $\left(2^{\ell}- 1, 2^{\ell}- 1 - \ell, 3\right)$-Hamming codes with their generator matrix:
+    \[\mathcal{C} = \left\{G w \suchthat w \in \mathbb{F}_2^{n-\ell}\right\}\]
+\end{parag}
+
+\begin{parag}{Example 2}
+    Consider the following code, named single-parity check code and defined by: 
+    \[H = \begin{pmatrix} 1 & 1 & \cdots & 1 \end{pmatrix}.\]
+
+    In other words: 
+    \[\mathcal{C} = \left\{x \in \mathbb{F}_2^n \suchthat \sum_{i=1}^{n} x_i = 0\right\}.\]
+
+    In other words, these are all the codes of length $n$ that have an even number of ones. One possible generator matrix is: 
+    \[G = \begin{pmatrix} 1 & \cdots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \cdots & 1 \\ 1 & 1 & 1 \end{pmatrix} \in \mathbb{F}_2^{n \times \left(n-1\right)}.\]
+\end{parag}
+
+\begin{parag}{Example 3: Reed-Solomon codes}
+    Let $\mathbb{F}_q$ be a field, and $k \leq n \leq q$ be integers. Moreover, let $\alpha_1, \ldots, \alpha_n \in \mathbb{F}_q$ be distinct elements of $\mathbb{F}_q$ (which can be found since $n \leq q$). We construct a code called a \important{Reed-Solomon code}.
+
+    The encoder goes as follows on input $w = \left(w_0, \ldots, w_{k-1}\right) \in \mathbb{F}_q^k$. Consider the polynomial $w\left(\alpha\right) = w_0 + w_1 \alpha + \ldots + w_{k-1} \alpha ^{k-1}$, which is well-defined for any $\alpha \in \mathbb{F}_q$, and output: 
+    \[x\left(w\right) = \begin{pmatrix} w\left(\alpha_1\right) \\ \vdots \\ w\left(\alpha_n\right) \end{pmatrix} \in \mathbb{F}_q^n.\]
+
+    This is a linear map since we can write it with a generator matrix, called a Vandermonde matrix:
+    \[\begin{pmatrix} x_1 \\ \vdots \\ x_{n} \end{pmatrix}  = \begin{pmatrix} 1 & \alpha_1 & \cdots & \alpha_1 ^{k-1} \\ 1 & \alpha_2 & \cdots & \alpha_2 ^{k-1} \\ \vdots & \vdots & \ddots & \vdots \\ 1 & \alpha_n & \cdots & \alpha_n ^{k-1} \end{pmatrix} \begin{pmatrix} w_0 \\ \vdots \\ w_{k-1} \end{pmatrix}.\]
+
+    We can also show that $d_{min}\left(\mathcal{C}\right) \geq n -k  + 1$. Indeed, any non-zero polynomial of degree $k-1$ can have at most $k-1$ roots. Hence, the weight of any $x\left(w\right)$ for $w \neq 0$ is at least $n - \left(k-1\right) = n-k+1$. The singleton bound can be generalised to state that $d_{min}\left(\mathcal{C}\right) \leq n-k+1$. Hence, this code is such that: 
+    \[d_{min}\left(\mathcal{C}\right) = n-k+1.\]
+
+    This is the largest possible minimum distance for a code leaving in $\mathbb{F}_q^n$ with $2^k$ codewords.
+\end{parag}
+
+\begin{parag}{Personal remark}
+    We will not study exactly how to make a polynomial-time decoder for linear codes. The analysis above was mostly for completeness, but linear codes are a much deeper field. A natural approach is decoding based on syndromes, and it can be found in my notes of the Advanced information, computation, communication II class, available at:
+    \begin{center}
+        \url{https://github.com/JoachimFavre/UniversityNotes}
+    \end{center}
+\end{parag}
+
+
+\end{document}
+

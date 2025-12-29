@@ -1,0 +1,167 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-12-09 at 13:24:58.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 09 décembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{24}{2025-12-09}{Back to bad-news and good-news results}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the lossy compression setup.
+    \item Definition of rate distortion.
+    \item Proof that no loss compression can be done at rate below rate distortion.
+\end{itemize}
+
+}
+  
+\begin{parag}{Summary}
+    Let $W$ be an arbitrary binary-input channel, $\delta > 0$ and $R < I\left(w\right)$. Moreover, let $t$ be large enough and $n = 2^t$. We can construct the following.
+    \svghere{PolarCodeSummary.svg}
+    where the empty ellipse evaluates:
+    \[U^n = \begin{pmatrix} & & \\ & \text{Some permutation matrix} & \\ & &\end{pmatrix} \begin{pmatrix} \text{data} \\ 0 \end{pmatrix}\]
+
+    This is such that there exists a $\delta > 0$ for which:
+    \[\prob\left(\widehat{\text{data}} \neq \text{data}\right) \leq 2^{-n^{1/2 - \delta}}.\]
+
+    \begin{subparag}{Remark 1}
+        We encode $U^n$ by doing a permutation of the data concatenated to fix known bits (which are defined to be zero in the diagram above), because we have to send known data on the $\epsilon$-bad channels and some actual bits of the $nR$ bits-data on the $\epsilon$-good channels.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        We only proved this result for $\BEC\left(p\right)$, but it holds for any binary-input channel.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+         For most channels where there is enough symmetry, we have $I\left(W\right) = C\left(W\right)$; which is a really good news.
+    \end{subparag}
+\end{parag}
+
+\section{Lossy compression}
+
+\subsection{Bad-news result}
+
+\begin{parag}{Goal}
+    We aim to study lossy compression. This field is also called quantization or rate-distortion theory.
+
+    This is interesting to try and compress beyond entropy, although we will not be able to completely recover the data.
+\end{parag}
+
+\begin{parag}{Setup}
+    The setup goes as follows. We are given data $U^n$, which we assume to be IID from some distribution $p_U$ for the sake of simplicity. We then feed this to a ``quantizer'' that outputs $n R$ bits, which can be seen as some encoder. These bits can then be fed to a dequantizer that outputs some $V^n$, which can be seen as some decoder.
+    \svghere[0.95]{LossCompressionSetup.svg}
+
+    Given some function $d: \mathcal{U} \times \mathcal{V} \mapsto \mathbb{R}$ to evaluate the quality of the recovery, we define: 
+    \[D = \exval\left(\frac{1}{n} \sum_{i=1}^{n}  d\left(U_i, V_i\right)\right).\]
+    
+    This system thus has to parameters: $R$ and $D$.
+
+    \begin{subparag}{Example 1}
+        Let's for instance assume that $U_1, U_2, \ldots \iid N\left(0, \sigma^2\right)$, with $\mathcal{U} = \mathcal{V} = \mathbb{R}$. We could then take: 
+        \[d\left(u, v\right) = \left(u-v\right)^2.\]
+    \end{subparag}
+
+    \begin{subparag}{Example 2}
+        Let us assume that $U_1, U_2, \ldots \iid \Ber\left(p\right)$ to be Bernoulli random variables; with $\mathcal{U} = \mathcal{V} = \left\{0, 1\right\}$. We can then take: 
+        \[d\left(u, v\right) = I\left(u \neq v\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        Note that we may have $\mathcal{U} \neq \mathcal{V}$ in the general case.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We also write: 
+        \[d\left(U^n, V^n\right) = \frac{1}{n} \sum_{i=1}^{n} d\left(U_i, V_i\right).\]
+
+        This is such that:
+        \[D = \exval\left(d\left(U^n, V^n\right)\right).\]
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        The following results rely heavily on the fact that $U^n$ is IID. Now, if we look at the letters of an English text, then they are clearly not IID, which is an issue. This can be mitigated by considering paragraphs instead, since they are much more independent. 
+
+        Although the theory we will develop below has some uses, it is often hard to implement in practice. For instance, for compressing images, JPEG uses a strategy completely different.
+
+        Similarly, finding a good $d: \mathcal{U} \times \mathcal{V} \mapsto \mathbb{R}$ is hard: it is clearly non-trivial to know what we can remove from a music song while still sounding good to humans.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    In a system as above, there exists a conditional distribution $p_{V|U}$ such that both the following properties hold:
+    \begin{itemize}
+        \item $R \geq I\left(U; V\right)$; 
+        \item $D = \exval\left(d\left(U, V\right)\right)$.
+    \end{itemize}
+
+    \begin{subparag}{Remark}
+        Note that this result is purely artificial: $V$ is not the one from the system above, it is just an auxiliary random variable such that we have the lowerbound on $R$ and the equality on $D$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The system induces a distribution $p_{U^n, V^n}$. For instance, $U^n \iid p_U$ is IID and $V^n$ may be computed deterministically through the encoder and decoder. Similarly, the encoder and decoder may add randomness on the construction of $V^n$ from $U^n$. All this is captured from in the probability distribution $p_{U^n, V^n}$.
+
+        We can marginalise this probability distribution to get $p_{U_1 V_1}, \ldots, p_{U_n V_n}$. For each $i$, we can write: 
+        \[p_{U_i V_i}\left(u, v\right) = p_{U_i}\left(u\right) p_{V_i|U_i}\left(v \suchthat u\right) = p_U\left(u\right) p_{V_i|U_i}\left(v \suchthat u\right),\]
+        where we used the fact that the $U_i$ are IID. We use this to define: 
+        \autoeq{p_{UV}\left(u, v\right) = \frac{1}{n} \sum_{i=1}^{n}  p_{U_i V_i}\left(u, v\right) = p_U\left(u\right) \cdot \frac{1}{n}\sum_{i=1}^{n} p_{V_i|U_i}\left(v \suchthat u\right) \implies p_{V|U}\left(v \suchthat u\right) = \frac{1}{n} \sum_{i=1}^{n} p_{V_i | U_i}\left(v \suchthat u\right).}
+        
+        It can easily be checked that $p_{UV}asdu, v$ is a valid probability distribution. This thus induces some random variable $V \followsdistr p_{V|U}$. This random variable is such that:
+        \autoeq{D = \exval\left(\frac{1}{n} \sum_{i=1}^{n} d\left(U_i, V_i\right)\right) = \frac{1}{n} \sum_{i=1}^{n} \sum_{u, v} p_{U_i V_i}\left(u_i, v_i\right) d\left(u, v\right) = \sum_{u, v} \left[\frac{1}{n} \sum_{i=1}^{n}  p_{U_i V_i}\left(u, v\right)\right] d\left(u, v\right) = \sum_{u, v} p_{UV}\left(u, v\right) d\left(u, v\right) = \exval\left(d\left(U, V\right)\right).}
+
+        This is our first property. We now aim to show that $R \geq I\left(U; V\right)$. Let $W \in \left\{1, \ldots, 2^{nR}\right\}$ be the value between the encoder and the decoder. We know that, using the data-processing inequality at $\dagger$: 
+        \[nR \geq H\left(W\right) \geq I\left(W; V^n\right) \over{\geq}{\dagger} I\left(U^n; V^n\right) = H\left(U^n\right) - H\left(U^n \suchthat V^n\right).\]
+
+        Moreover, using the fact that the $U_i$ are IID: 
+        \autoeq{nR \geq \sum_{i=1}^{n} H\left(U_i\right) - H\left(U^n \suchthat V^n\right) = \sum_{i=1}^{n}  \left[H\left(U_i\right) - H\left(U_i \suchthat U^{i-1} V^n\right)\right] \geq \sum_{i=1}^{n} \left[H\left(U_i\right) - H\left(U_i \suchthat V_i\right)\right] = \sum_{i=1}^{n}  I\left(U_i; V_i\right).}
+
+        We have shown so far that $R \geq \frac{1}{n} \sum_{i=1}^{n} I\left(U_i; V_i\right)$. However, we know that $I\left(U_i; V_i\right)$ is a function of $p_U, p_{V_i|U_i}$, which is concave in $p_{U_i} = p_U$ and convex in $p_{V_i|U_i}$. By definition, $p_{V|U} = \frac{1}{n} \sum_{i} p_{V_i|U_i}$, so: 
+        \[R  \geq \frac{1}{n} \sum_{i=1}^{n} I\left(U_i; V_i\right) \geq I\left(U; V\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Rate distortion}
+    Let $p_U$, $d: \mathcal{U} \times \mathcal{V} \mapsto \mathbb{R}$ and $D$ be arbitrary. We define the \important{rate distortion} as: 
+    \[R\left(D\right) = \min_{\substack{p_{V|U} \\ \exval\left(d\left(U, V\right)\right) = D}} I\left(U; V\right).\]
+\end{parag}
+
+\begin{parag}{Theorem: Bad-news result}
+    In any system operating at a given $\left(R, D\right)$, we must have:
+    \[R \geq R\left(D\right).\]
+    
+    \begin{subparag}{Remark 1}
+        This is a bad news result: this imposes a lowerbound on the number of bits per letter we have to use.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We will also prove that it is possible to achieve a design such that:
+        \begin{itemize}
+            \item $\displaystyle  R \leq R\left(D\right) + \epsilon$;
+            \item $\displaystyle D = \left(1 \pm \epsilon\right) \exval\left(\frac{1}{n} \sum_{i=1}^{n} d\left(U_i, V_i\right)\right)$. 
+        \end{itemize}
+
+        This will show that the rate distortion $R\left(D\right)$ is the threshold stating which rates are possible, just like entropy for compression and capacity for the transmission of data.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This is a direct consequence of our previous lemma. Indeed, we know that there exists a distribution $p_{V|U}$ such that $\exval\left(d\left(U, V\right)\right) = D$ and:
+        \[R \geq I\left(U; V\right).\]
+
+        However, this is just a specific example of such a distribution, so we can replace it with a minimum:
+        \[R \geq I\left(U; V\right) \geq \min_{\substack{p_{V|U} \\ \exval\left(d\left(U, V\right)\right) = D}} I\left(U; V\right) = R\left(D\right).\]
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

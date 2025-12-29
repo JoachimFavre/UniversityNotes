@@ -1,0 +1,259 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-12-15 at 11:52:46.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 15 décembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{25}{2025-12-15}{So many diagrams}{
+\begin{itemize}[left=0pt]
+    \item Two examples of computation of the rate-distortion.
+    \item Proof of the good-news theorem for the rate-distortion theory, assuming some external fact about typicality.
+    \item Explanation of the external fact about typicality.
+\end{itemize}
+
+}
+
+\begin{parag}{Example 1}
+    Let us consider $\mathcal{U} = \mathcal{V} = \left\{0, 1\right\}$ with $U \followsdistr \Ber\left(\frac{1}{2}\right)$ and $d\left(u, v\right) = I\left(u \neq v\right) \in \left\{0, 1\right\}$.
+
+    We aim to compute the rate-distortion. Hence, let $D$ be arbitrary, and let us consider an arbitrary distribution $p_{V|U}$ such that: 
+    \[D = \exval\left(d\left(U, V\right)\right) = \prob\left(U \neq V\right).\]
+    
+    We then evaluate: 
+    \autoeq{I\left(U; V\right) = H\left(U\right) - H\left(U \suchthat V\right) = 1 - H\left(U \suchthat V\right) = 1 - H\left(U \oplus V \suchthat V\right) \geq 1 - H\left(U \oplus V\right) = 1 - h_2\left(D\right),}
+    where we used that conditioning reduces entropy, and that the probability distribution of $U \oplus V$ is $\prob\left(U \neq V\right) = D, \prob\left(U = V\right) = 1-D$.
+
+    This gives a lower bound on the rate distortion: 
+    \[R\left(D\right) \geq I\left(U; V\right) \geq 1 - h_2\left(D\right).\]
+    
+    We now aim to show that there exists a distribution $p_{U|V}$ that achieves this lower-bound. Let us consider $p_{V|U} = \BSC\left(D\right)$ to be the binary symmetric channel with flipping probability $D$. By the same reasoning as the one we did to compute the capacity of this channel, it is pretty easy to show that $\exval\left(d\left(U, V\right)\right) = \prob\left(U \neq V\right) = D$  and:
+    \[I\left(U; V\right) = 1 - h_2\left(D\right).\]
+    
+    We have therefore shown that: 
+    \[R\left(D\right) = 1- h_2\left(D\right).\]
+    
+    We can plot this as follows.
+    \svghere[0.5]{RateDistortionExample1.svg}
+
+    As explained before, a system $\left(R, D\right)$ can be realised if and only if $R \geq R\left(D\right)$ (i.e.~it lies in the blue region). For instance, this states that, when $D = \frac{1}{2}$, we can take $R = 0$. This makes sense, we want $\prob\left(U \neq V\right) = D = \frac{1}{2}$, so the dequantizer can output a random $V \followsdistr \Ber\left(\frac{1}{2}\right)$ without needing any input. Similarly, if we want $D \in \left\{0, 1\right\}$, then we need $R = 1$. This again makes sense: $D = 0$ asks to output $V^n = U^n$ and $D= 1$ requires to output $V^n = \bar{U^n}$, which both require to fully know $U^n$. We can finally greatly decrease the rate to $R = \frac{1}{2}$ by accepting some small penalty $D \approx 0.11$.
+\end{parag}
+
+\begin{parag}{Definition: Positive part}
+    Let $a \in \mathbb{R}$ be a number. We define its positive part as: 
+    \[a^+ = \max\left(a, 0\right).\]
+
+    \begin{subparag}{Intuition}
+        This simply turns any negative number to zero:
+        \[3^+ = 3, \mathspace \left(-2\right)^+ = 0.\]
+    \end{subparag}
+    
+    \begin{subparag}{Remark}
+        We can define the negative part completely analogously: 
+        \[a^- = \left(-a\right)^+ = \max\left(-a, 0\right).\]
+        
+        That way, we can always write: 
+        \[a = a^+ - a^-.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 2}
+    Let us consider $\mathcal{U} = \mathcal{V} = \mathbb{R}$, $U \followsdistr N\left(0, \sigma^2\right)$ to be Gaussian and $d\left(u, v\right) = \left(u- v\right)^2$. 
+
+    We again aim to compute the rate-distortion. Hence, let $D$ be arbitrary, and let us consider an arbitrary distribution $p_{U|V}$ such that: 
+    \[D = \exval\left(d\left(U, V\right)\right) = \exval\left(\left(U - V\right)^2\right).\]
+
+    Note that this implies $h\left(U - V\right) \leq \frac{1}{2} \log_2\left(2\pi e D\right)$, as we have found earlier in the class. Then, using the fact that shifting by a constant does not change differential entropy and that conditioning reduces entropy:
+    \autoeq{I\left(U; V\right) = h\left(U\right) - h\left(U \suchthat V\right) = h\left(U\right) - h\left(U - V \suchthat V\right) \geq h\left(U\right) - h\left(U - V\right) \geq \frac{1}{2} \log_2\left(2\pi e \sigma^2\right) - \frac{1}{2} \log_2\left(2\pi eD\right) = \frac{1}{2} \log_2\left(\frac{\sigma^2}{D}\right),}
+    where we used that $h\left(U\right) = \frac{1}{2} \log_2\left(2\pi e \sigma^2\right)$ since $U \followsdistr N\left(0, \sigma^2\right)$. Note moreover that we trivially know that $I\left(U; V\right) \geq 0$. Hence, this yields: 
+    \[R\left(D\right) = \min_{\substack{p_{V|U} \\ \exval\left(d\left(U, V\right)\right) = D}} I\left(U; V\right) \geq \left[\frac{1}{2} \log_2\left(\frac{\sigma^2}{D}\right)\right]^+.\]
+
+    We aim to show that this lower bound is indeed tight. We consider two cases.
+    \begin{itemize}
+        
+
+        \item Let us now assume that $D \geq \sigma^2$. We aim to show that $R\left(D\right) \leq 0$.
+
+            Consider $V$ to be independent of $U$ and such that $\exval\left(V\right) = 0$ and $\exval\left(V^2\right) = D - \sigma^2 \geq 0$. This is indeed such that: 
+            \autoeq{\exval\left(d\left(U, V\right)\right) = \exval\left(\left(U - V\right)^2\right) = \exval\left(U^2\right) -2 \exval\left(U\right)\exval\left(V\right) + \exval\left(V^2\right) = \sigma^2 + 0 + \left(D - \sigma^2\right) = D.}  
+            
+            Moreover, by independence: 
+            \[I\left(U; V\right) = 0.\]
+
+            This states indeed that, in this case: 
+            \[R\left(D\right) = \min_{\substack{p_{V|U} \\ \exval\left(d\left(U, V\right)\right) = D}} I\left(U; V\right) \leq 0 = \left[\frac{1}{2} \log_2\left(\frac{\sigma^2}{D}\right)\right]^+.\]
+            
+            
+            \item Let us assume that $D \leq \sigma^2$ first. We aim to show that $R\left(D\right) \leq \frac{1}{2} \log_2\left(\frac{\sigma^2}{D}\right)$.
+
+             We used two inequalities in the reasoning to show $R\left(D\right) \geq \frac{1}{2} \log_2\left(\frac{\sigma^2}{D}\right)$ above: $h\left(U - V \suchthat V\right) \leq h\left(U - V\right)$ and $h\left(U- V\right) \leq \frac{1}{2} \log_2\left(2 \pi e D\right)$. We want both inequalities to be reached with equality, so we aim to find a $V$ such that, for the random variable $Z = U - V$:
+            \begin{itemize}
+                \item $Z$ is independent of $V$.
+                \item $Z \followsdistr N\left(0, D\right)$.
+            \end{itemize}
+            
+            However, note that: 
+            \[U = V + \left(U - V\right) = V + Z.\]
+
+            Since $U \followsdistr N\left(0, \sigma^2\right)$, $Z \followsdistr N\left(0, D\right)$, and $Z$ and $V$ are independent, this necessarily means that $V \followsdistr N\left(0, \sigma^2 - D^2\right)$. More precisely, the joint distribution of $V$ and $Z$ is jointly Gaussian since they are independent Gaussian: 
+            \[\begin{pmatrix} Z \\ V \end{pmatrix} \followsdistr N\left(\begin{pmatrix} 0 \\ 0 \end{pmatrix}, \begin{pmatrix} D & 0 \\ 0 & \sigma^2  - D\end{pmatrix} \right).\]
+
+            By linear transformations of jointly Gaussian random variables, we know that $\left(U, V\right) $ is also jointly Gaussian. Now, $\Cov\left(U, V\right) = \Cov\left(V, V\right) + \Cov\left(V, Z\right) = \Var\left(V\right) = \sigma^2 - D$, so:
+            \[\begin{pmatrix} U \\ V \end{pmatrix} \followsdistr N\left(\begin{pmatrix} 0 \\ 0 \end{pmatrix}, \begin{pmatrix} \sigma^2 & \sigma^2 - D \\ \sigma^2 -D & \sigma^2 - D \end{pmatrix} \right).\]
+
+            By construction, this gives a random variable $V \followsdistr p_{V|U}$ such that: 
+            \[I\left(U; V\right) = \frac{1}{2} \log_2\left(\frac{\sigma^2}{D}\right).\]
+
+            This does give our lower-bound to the rate distortion $R\left(D\right)$.
+    \end{itemize}
+
+    Overall, this gives tells us that rate-distortion is indeed given by: 
+    \[R\left(D\right) = \left[\frac{1}{2} \log_2\left(\frac{\sigma^2}{D}\right)\right]^+.\]
+    
+    We can also invert it to find the distortion rate function: 
+    \[D\left(R\right) = \sigma^2 2^{-2R}.\]
+
+    We can again make a plot to visualise these results.
+    \svghere[0.5]{RateDistortionExample2.svg}
+
+    This states that, whenever $D \geq \sigma^2$, we can take $R = 0$. This makes sense, since, as shown before in that case, the dequantizer can output some $V$ such that $\exval\left(V\right) = 0$ and $\exval\left(V^2\right) = D -\sigma^2$, without needing any information about $U$. The idea here is that we allow so much error that we cannot get any information back from our $U$ anyway.
+
+    Now, interestingly, if we want a small $D$, then it requires a rate $R$ increasing at logarithmic speed. We can naturally not take $D = 0$, the asymptote makes $R \to +\infty$, which makes sense since completely recovering $U \in \mathbb{R}$ requires an infinite number of bits. However, by using more and more bits, we can get a better and better approximation of $U$.
+\end{parag}
+
+\subsection{Good-news result}
+
+\begin{parag}{Theorem}
+    Let $p_U$ and $p_{V|U}$ be distributions, and let $\epsilon > 0$.
+
+    There exists an encoder-decoder pair such that $\text{enc}: \mathcal{U}^n \mapsto \left\{1, \ldots, 2^{nR}\right\}$ and $\text{dec}: \left\{1, \ldots, 2^{nR}\right\} \mapsto \mathcal{V}^n$ such that:
+    \begin{itemize}
+        \item $R < I\left(U; V\right) + \epsilon$
+        \item For $U^n \iid p_U$ and $V^n = \text{dec}\left(\text{enc}\left(U^n\right)\right)$, we have: 
+        \[\exval\left(d\left(U, V\right)\right) - \epsilon \leq \exval\left(\frac{1}{n} \sum_{i=1}^{n}  d\left(U_i, V_i\right)\right) \leq \exval\left(d\left(U, V\right)\right) + \epsilon.\]
+    \end{itemize}
+    
+
+    \begin{subparag}{Implication}
+        Let $p_{V|U}$ be the distribution that achieves the rate-distortion: 
+        \[I\left(U; V\right) = R\left(D\right) = \min_{\substack{p_{V|U} \\ \exval\left(d\left(U, V\right)\right) = D}} I\left(U; V\right).\]
+
+        Then, the construction above yields an encoder-decoder pair such that:
+        \begin{itemize}
+            \item $R < R\left(D\right) + \epsilon$;
+            \item $D - \epsilon \leq \exval\left(\frac{1}{n} \sum_{i=1}^{n}  d\left(U_i, V_i\right)\right) \leq D + \epsilon.$
+        \end{itemize}
+        
+        This is exactly the good-news result we advertised earlier.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        We let $n$ to be large enough and $\delta > 0$ to be small enough (both to be specified later). Moreover, let $R = I\left(U; V\right) + \epsilon$ and $m = \left\lfloor 2^{nR} \right\rfloor $. We generate $V_{ij} \iid p_V$ and construct the following table: 
+        \[V^n\left(1\right) = V_{11}, \ldots, V_{1 n},\]
+        \[V^n\left(2\right) = V_{21}, \ldots, V_{2 n},\]
+        \[\vdots\]
+        \[V^n\left(m\right) = V_{m1}, \ldots, V_{m n}.\]
+
+        We reveal this table to both the encoder and the decoder. They work as follows.
+        \begin{itemize}[left=0pt]
+            \item \textit{(Encoder)} Given some $u^n$, it looks for some $i$ such that $\left(u^n, V^n\left(i\right)\right) \in T\left(n, p_{UV}, \delta\right)$ is typical. If it finds one, it lets $\text{enc}\left(u^n\right) = i$; we call this event a success. If no such $i$ exists, then $\text{enc}\left(u^n\right)$ is chosen randomly in $\left\{1, \ldots, m\right\}$; we call this event a failure.
+            \item \textit{(Decoder)} On the reception of some $i \in \left\{1, \ldots, m\right\}$, it outputs $V^n\left(i\right)$.
+        \end{itemize}
+        
+
+        Since $m = \left\lfloor 2^{nR} \right\rfloor $, we have $\frac{1}{n} \log_2\left(m\right) < R = I\left(U; V\right) + \epsilon$, so the communication rate is valid.
+
+        We aim to show the inequality on $d\left(U, V\right)$ now. We aim to show two things: the probability the encoder succeed is high and, whenever it succeeds, then this inequality does hold. 
+
+        We first study the case the encoder succeeds. Hence, let's assume that $\left(u^n, V^n\left(i\right)\right) \in T\left(n, p_{UV}, \delta\right)$. Writing $V^n\left(i\right) = \left(V_1, \ldots, V_n\right) = V^n$ and using this hypothesis of typicality for $\dagger$:
+        \autoeq{\frac{1}{n} \sum_{j=1}^{n} d\left(u_j, V_j\right) = \sum_{\substack{\alpha \in \mathcal{U} \\ \beta \in \mathcal{V}}} \frac{1}{n} \sum_{j=1}^{n}  I\left(u_j = \alpha, V_j = \beta\right) d\left(\alpha, \beta\right) = \sum_{\substack{\alpha \in \mathcal{U} \\ \beta \in \mathcal{V}}} d\left(\alpha, \beta\right)\cdot \frac{1}{n} \sum_{j=1}^{n}  I\left(u_j = \alpha, V_j = \beta\right) \over{=}{$\dagger$} \sum_{\substack{\alpha \in \mathcal{U} \\ \beta \in \mathcal{V}}} d\left(\alpha, \beta\right)\cdot p_{UV}\left(\alpha, \beta\right)\left(1 \pm \delta\right) = \exval\left(d\left(U, V\right)\right) \pm \delta \exval\left(\left|d\left(U, V\right)\right|\right) = \exval\left(d\left(U, V\right)\right) \pm \frac{\epsilon}{2}.}
+        by choosing $\delta$ small enough.
+        
+        Now, by the law of total expectation, considering again $V^n = \text{dec}\left(\text{enc}\left(U^n\right)\right)$: 
+        \autoeq{\exval\left(\frac{1}{n} \sum_{j=1}^{n} d\left(U_j, V_j\right)\right) = \underbrace{\exval\left(\frac{1}{n} \sum_{j=1}^{n} d\left(U_j, V_j\right) \suchthat \text{success}\right)}_{\exval\left(d\left(U, V\right)\right) \pm \frac{\epsilon}{2}}\prob\left(\text{success}\right) \fakeequal + \underbrace{\exval\left(\frac{1}{n} \sum_{j=1} d\left(U_j, V_j\right) \suchthat \text{failure}\right)}_{\pm D_{max} = \pm \max_{u, v} d\left(u, v\right)} \prob\left(\text{failure}\right).}
+
+        Note here that we assume $D_{max} = \max_{u, v} d\left(u, v\right)$ exists, which is always the case if $\mathcal{U}, \mathcal{V}$ are finite. This assumption however does not hold in the previous example, when $\mathcal{U} = \mathcal{V} = \mathbb{R}$ and $d\left(u, v\right) = \left(u - v\right)^2$. This hypothesis can be gotten rid of, but it adds unnecessary complication to this proof, so we are happy with this assumption.
+
+        We are only left with showing that $\prob\left(\text{failure}\right) \to 0$. Indeed, this will imply that $\prob\left(\text{success}\right) \to 1$, and hence that $\exval\left(\frac{1}{n} \sum_{j=1}^{n} d\left(U_j, V_j\right)\right) \to \exval\left(d\left(U, V\right) \pm \frac{\epsilon}{2}\right)$ as proven above, giving our result for $n$ sufficiently large. Let us therefore study this probability of failure.
+
+        For $U^n = u^n$, failure means that for every $i \in \left\{1, \ldots, m\right\}$, then $\left(u^n, V^n\left(i\right) \right) \notin T\left(n, p_{UV}, \delta\right)$. By the law of total probability: 
+        \autoeq{\prob\left(\text{failure}\right) = \underbrace{\prob\left(\text{failure} \suchthat u^n \notin T\left(n, p_U, \frac{\delta}{2}\right)\right)}_{\leq 1} \underbrace{\prob\left(u^n \notin T\left(n, p_U, \frac{\delta}{2}\right)\right)}_{\to 0} \fakeequal + \prob\left(\text{failure} \suchthat u^n \in T\left(n, p_U, \frac{\delta}{2}\right)\right) \underbrace{\prob\left(u^n \in T\left(n, p_U, \frac{\delta}{2}\right)\right)}_{\to 1}.}
+
+        Hence, we can assume that $u^n \in T\left(n, p_U, \frac{\delta}{2}\right)$. From now on, all probabilities are conditioned on this hypothesis, without being explicitly mentioned. We have, by independence of the different rows of the table: 
+        \autoeq{\prob\left(\text{failure}\right) = \prod_{i=1}^{m} \prob\left(\left(u^n, V^n\left(i\right)\right) \notin T\left(n, p_{UV}, \delta\right)\right) = \prob_{V^n \iid p_V}\left(\left(u^n, V^n\right) \notin T\left(n, p_{UV}, \delta\right)\right)^m = \left(1 - \prob\left(\left(u^n, V^n\right) \in T\left(n, p_{UV}, \delta\right)\right)\right)^m \leq \exp\left(-m \prob\left(\left(u^n, V^n\right) \in T\left(n, p_{UV}, \delta\right)\right)\right),}
+        where we used the fact that $1-x \leq e^{-x}$ for all $x$.
+
+        However, by the following theorem, we have that:
+        \autoeq{\prob\left(\left(u^n, V^n\right) \in T\left(n, p_{UV}, \delta\right)\right) \geq 2^{-n \left[I\left(U; V\right) + \frac{\epsilon}{2}\right]}  \implies m \prob\left(\left(u^n, V^n\right) \in T\left(n, p_{UV}, \delta\right)\right) \geq 2^{n \left[R - I\left(U;V\right) - \frac{\epsilon}{2}\right]} \geq 2^{n \frac{\epsilon}{2}} \to \infty.}
+
+        This gives exactly that $\prob\left(\text{failure}\right) \to 0$, which gives our result as explained above.
+
+        \qed
+
+        %If we show that $\prob\left(\left(u^n, V^n\right) \in T\right) \geq 2^{-n \left[I\left(U; V\right) + \frac{\epsilon}{2}\right]}$, then we will have shown that $m \prob\left(\left(u^n, V^n\right) \in T\right) \geq 2^{n \left[R - I\left(U;V\right) - \frac{\epsilon}{2}\right]} \geq 2^{n \frac{\epsilon}{2}} \to \infty$ and $\prob\left(\text{failure}\right) \leq \exp\left(-m\prob\left(\left(u^n, V^n\right) \in T\right)\right) \to 0$ for $u^n \in T\left(n, p_U, \frac{\delta}{2}\right)$. Thus, the overall failure probability would be upper bounded by: 
+        %\[\prob\left(\text{failure}\right) \leq \underbrace{\prob\left(U^n \notin T\left(n, p_U, \frac{\delta}{2}\right)\right)}_{\to 0} + \underbrace{\exp\left(-m\prob\left(\left(u^n, V^n\right) \in T\right)\right)}_{\to 0} \to 0.\]
+        %%later{alèd}
+        %
+        %We are thus only left with proving that $\prob\left(\left(u^n, V^n\right) \in T\right)$. We use the following lemma. %later{aaah}
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The encoder-decoder pair described in this proof is not at all practical, it requires exponentially many computations. There however exists some encoder-decoder pairs that only take $n\log\left(n\right)$ time.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $p_{UV}$ be a joint probability distribution, $0 < \epsilon' < \epsilon$ and $u^n \in T\left(n, p_U, \epsilon'\right)$ be typical. We moreover consider the set of $v^n$ that are jointly typical with $u^n$:
+    \[S\left(u^n\right) = \left\{v^n \suchthat \left(u^n, v^n\right) \in T\left(n, p_{UV}, \epsilon\right)\right\}.\]
+
+    Then, considering random variables $U, V \followsdistr p_{UV}$: 
+    \begin{enumerate}[left=0pt]
+        \item If $V^n$ is sampled (IID) using $p_{V|U}$ given $u^n$, then:
+        \[\lim_{n \to \infty} \prob\left(V^n \in S\left(u^n\right)\right) = 1.\]
+        \item For every $v^n \in S\left(u^n\right)$, we have:
+        \[p_{V|U}\left(v^n \suchthat u^n\right) = 2^{-n H\left(V \suchthat U\right) \left(1 \pm \epsilon\right)}.\]
+        \item We always have that:
+            \[\left|S\left(u^n\right)\right| \leq 2^{n H\left(V \suchthat U\right) \left(1 + \epsilon\right)}.\]
+
+            Moreover, for $n$ large enough:
+            \[\left|S\left(u^n\right)\right| \geq \left(1-\epsilon\right) 2^{n H\left(V \suchthat U\right) \left(1 - \epsilon\right)}.\]
+        \item If $V^n$ is sampled from $q_{V|U}$ given $u^n$, then: 
+        \[\prob\left(V^n \in S\left(u^n\right)\right) \leq 2^{-n \left[D\left(p_{UV} || p_U q_{V|U}\right) - \epsilon \left(2 H\left(V \suchthat U\right) + D\left(p_{UV} || p_U q_{V|U}\right)\right)\right]}.\]
+
+        Moreover, if $n$ is large enough
+        \[\prob\left(V^n \in S\left(u^n\right)\right) \geq \left(1-\epsilon\right) 2^{-n \left[D\left(p_{UV} || p_U q_{V|U}\right) + \epsilon \left(2 H\left(V \suchthat U\right) + D\left(p_{UV} || p_U q_{V|U}\right)\right)\right]}.\]
+
+        
+        \item If $V^n \iid p_V$ is sampled independently from $u^n$, then still considering $U, V \followsdistr p_{UV}$: 
+        \[\prob\left(\left(u^n, V^n\right) \in T\left(n, p_{UV}, \epsilon\right)\right) = \prob\left(V^n \in S\left(u^n\right)\right) \leq 2^{-n \left[I\left(U;V\right) + \epsilon \left[2 H\left(V \suchthat U\right) + I\left(U; V\right)\right]\right]}.\]
+
+        If moreover $n$ is large enough:
+        \[\prob\left(\left(u^n, V^n\right) \in T\left(n, p_{UV}, \epsilon\right)\right) = \prob\left(V^n \in S\left(u^n\right)\right) \geq \left(1-\epsilon\right)2^{-n \left[I\left(U;V\right) - \epsilon \left[2 H\left(V \suchthat U\right) + I\left(U; V\right)\right]\right]}.\]
+    \end{enumerate}
+
+    \begin{subparag}{Intuition}
+        These results are very close to the ones we found for typicality. The idea is that, if $u^n$ is typical with respect to $p_{U}$ (with error $\epsilon'$), then $\left(u^n, V^n\right)$ is likely typical with respect to $p_{UV}$ (with error $eg > \epsilon'$).
+
+        The main consequence of this result is that, because of point $5$, if $V^n$ is sampled independently from $u^n$, then:
+        \[\prob\left(V^n \in S\left(u^n\right)\right) \approx 2^{-n I\left(U; V\right)}.\]
+
+        This is indeed what we used in the proof above.
+    \end{subparag}
+
+    \begin{subparag}{Proof ideas}
+        The following proofs are similar to the proofs on typicality.
+
+        The idea is that (1) takes some time to prove, and (2) is relatively easy. Then, (3a) is a corollary of (2) and (3b) is a corollary of (1) and (2). Moreover, (4) is a corollary of (3); and (5) is a corollary of (4).
+    \end{subparag}
+\end{parag}
+
+\end{document}

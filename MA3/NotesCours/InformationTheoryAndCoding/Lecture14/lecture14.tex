@@ -1,0 +1,197 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-04 at 13:22:10.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 04 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2025-11-04}{Combining good news}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the bad-news result for data transmission under cost constraint.
+    \item Proof of the good-news result for data transmission under cost constraint.
+    \item Proof that channel coding and source coding can be combined modularly without loss of optimality.
+    \item Start of the proof of the KKT condition.
+\end{itemize}
+
+}
+
+\begin{parag}{Theorem}
+   Consider some channel $p_{Y|X}$ that can be used $\rho_c$ times per unit time, some cost function $b: \mathcal{X} \mapsto \mathbb{R}$, and some cost constraint $\beta$. Moreover, let $U_1, U_2, \ldots$ be a source with entropy rate $\mathcal{H}$, producing $\rho_s$ letters per unit time.
+
+   We furthermore assume that:
+    \begin{itemize}
+        \item $U_1, U_2, \ldots$ is stationary;
+        \item $\rho_s \mathcal{H} > \rho_c C\left(p_{Y|X}, \beta\right)$;
+        \item the time-average expected cost is $\beta$.
+    \end{itemize}
+    
+    Then, $p = \frac{1}{k} \sum_{i=1}^{k} \prob\left(U_i \neq V_i\right)$ is such that: 
+    \[h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}\right| - 1\right) \geq \mathcal{H} - \frac{\rho_c}{\rho_s} C\left(p_{Y|X}, \beta\right) > 0.\]
+
+    \begin{subparag}{Intuition}
+        This is a bad-news result: $p$ cannot be made arbitrarily small. This again states that we cannot reliably use the channel with a transmission rate greater than its capacity.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This directly comes from our previous result and Fano's inequality.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $p_{UV}$ be a probability distribution, $\delta > 0$ and $n$ be all given. Moreover, let $u^n, v^n$ be some strings.
+
+    If $\left(\left(u_1, v_1\right), \ldots, \left(u_n, v_n\right)\right) \in T\left(n, p_{UV}, \delta\right)$, then $u^n \in T\left(n, p_{U}, \delta\right)$.
+
+    \begin{subparag}{Intuition}
+        This states that typicality of the pairs implies typicality of the marginals.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        $u^n \in T\left(n, p_u, \delta\right)$ means that for all $u \in \mathcal{U}$, then $\frac{1}{n} \sum_{i=1}^{n}  I\left(u_i = u\right) = p_U\left(u\right) \left(1 \pm \delta\right)$. 
+
+        Using a slight abuse of notation to write $\left(u^n, v^n\right) = \left(\left(u_1, v_1\right), \ldots, \left(u_n, v_n\right)\right)$, we have by hypothesis that: 
+        \autoeq{\left(u^n, v^n\right) \in T\left(n, p_{UV}, \delta\right) \iff \forall \left(u, v\right) \in \mathcal{U} \times \mathcal{V},\ \frac{1}{n} \sum_{i=1}^{n} I\left(u_i = u, v_i = v\right) = p_{U, V}\left(u, v\right)\left(1 \pm \delta\right).}
+
+        Summing over $v \in \mathcal{V}$, this means that for all $u \in \mathcal{U}$: 
+        \[\frac{1}{n} \sum_{i=1}^{n} I\left(u_i = u\right) = p_U\left(u\right)\left(1 \pm \delta\right).\]
+
+        This states exactly that $u^n \in T\left(n, p_U, \delta\right)$ by definition.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $p_{Y|X}$ be an arbitrary channel, $b: \mathcal{X} \mapsto \mathbb{R}$ be an arbitrary cost function, $\beta$ be n arbitrary cost constraint, $R$ be an arbitrary transmission rate satisfying $R < C\left(p_{Y|X}, \beta\right)$ and $\epsilon > 0$ be an arbitrary error probability. Then, there exists an encoder and decoder such that:
+    \begin{itemize}
+        \item \textit{(Good transmission rate)} $\frac{1}{n} \log_2\left(m\right) \geq R$;
+        \item \textit{(System is reliable)} $\prob\left(\hat{w} \neq w \suchthat w\right) < \epsilon$ for all $w$;
+        \item \textit{(All message match the cost)} $\left|\frac{1}{n} \sum_{i=1}^{n} b\left(X_i\left(w\right)\right)- \beta\right| \leq \epsilon$ for all $w$ with probability $1$.
+    \end{itemize}
+    
+    \begin{subparag}{Remark 1}
+        The fact that the second and third results hold for all $w$ and not on average is something very nice. 
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This is a good-news result, showing $C\left(p_{Y|X}, \beta\right)$ is indeed the right value to consider.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We consider the random encoder construction we have seen before, with the corresponding typicality decoder. In other words, we pick $p_X$ with $\exval\left(b\left(X\right)\right) = \beta$ and $I\left(X; Y\right) > R$ (which exists by the definition of capacity). Moreover, we pick $n$ large enough and $m' = 2 \left\lceil 2^{nR} \right\rceil - 1$ (since we will get rid of half of the codewords later). Fill the encoding table with iid elements from $p_X$. Decoding is done by declaring $j_0$ if $\left(X^n\left(j_0\right), Y^n\right) \in T\left(p_{XY}, n, \delta\right)$ and for all $j \neq j_0$, $\left(X^n\left(j\right), Y^n\right) \notin T\left(p_{XY}, n, \delta\right)$.
+
+        As we proved, for small enough $\delta$ and large enough $n$: 
+        \[\frac{1}{m'} \sum_{w=1}^{m'} \prob\left(\hat{w} \neq w \suchthat w\right) < \frac{\epsilon}{2}.\]
+        
+        Now, pick a subset of $w$'s such that: 
+        \[\prob\left(\hat{w} \neq w \suchthat w\right) < \epsilon.\]
+        
+        As we saw, this subset has size at least $\left\lceil \frac{m'}{2} \right\rceil = \left\lceil 2^{nR} \right\rceil$. We only keep this subset as the rows of our table. This encoding and decoding satisfies both: 
+        \[\frac{1}{n} \log_2\left(m\right) \geq R, \mathspace \prob\left(\hat{w} \neq w \suchthat w\right) < \epsilon,\ \forall w.\]
+
+        We are finally left with proving the fact that all messages match the cost constraint. Now, note that the decoder always declares a $w$ such that $\left(x^n\left(w\right), y^n\right) \in T\left(p_{XY}, n, \delta\right)$ and hence, by our result above, such that $x^n\left(w\right) \in T\left(p_{X}, n, \delta\right)$. Now, note that we can write: 
+        \[\frac{1}{n} \sum_{i=1}^{n} b\left(x_i\left(w\right)\right) = \frac{1}{n} \sum_{x \in \mathcal{X}} b\left(x\right) \underbrace{\sum_{i=1}^{n} I\left(x_i\left(w\right) = x\right)}_{\text{number of $x_i$ such that $x_i\left(w\right) = x$}}\]
+
+        Hence, by typicality, $x^n\left(w\right) \in T\left(p_{X}, n, \delta\right)$:
+        \autoeq{\frac{1}{n} \sum_{i=1}^{n} b\left(x_i\left(w\right)\right) = \sum_{x \in \mathcal{X}} b\left(x\right)p_X\left(x\right) \left(1 \pm \delta\right) = \exval\left(b\left(X\right)\right) \pm \delta \exval\left[\left|b\left(X\right)\right|\right] = \beta \pm \epsilon,}
+        for $\delta$ sufficiently small.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Combining data compression and data transmission}
+
+\begin{parag}{Summary}
+    Overall, we found the following good-news result.
+
+    Let $p_{Y|X}$ be a channel and $\epsilon > 0$. We can make an encoder an decoder such that: 
+    \begin{itemize}
+        \item $\frac{1}{n} \log_2\left(m\right) \approx C\left(p_{Y|X}\right)$ (or $\frac{1}{n} \log_2\left(m\right) \approx C\left(p_{Y|X}, \beta\right)$ under some cost constraint);
+        \item $\prob\left(\hat{w} \neq w \suchthat w\right) < \epsilon$.
+    \end{itemize}
+\end{parag}
+
+\begin{parag}{Observation}
+    We can combine data transmission with our data compression results to make the following setup (where ellipses are systems we can design and rectangles are systems that are given to us).
+    \svghere{FullCommunicationSetup.svg}
+
+    This is a modular design. In other words, the source coder only needs to know of the source statistics, and the channel encoder only needs to know about the channel statistics. We are not designing one knowing what algorithm we will pick for the other. This is a typical approach in engineering: we must often do things modularly for tasks to be tractable. This however often yields a loss.
+
+    However, in our case, this design is also optimal. It works as long as $\rho_s \mathcal{H} < \rho_c C$, and we know that no design (modular or not) can work reliably whenever $\rho_s \mathcal{H} > \rho_c C\left(p_{Y|X}\right)$. This shows that we can restrict to modular designs without any loss of generality for this specific problem, which is really nice.
+\end{parag}
+
+\subsection{Computation of the channel capacity}
+
+\begin{parag}{Example}
+    Consider the binary erasure channel with probability $p$, $\BEC\left(p\right)$. We already computed that:
+    \[I\left(X; Y\right) = H\left(X\right) \left(1 - p\right).\]
+    
+    Hence, $C\left(p_{Y|X}\right) = \max_{p_X} I\left(X; Y\right) = 1-p$. Suppose moreover that we have input costs $b\left(0\right) = 0$ and $b\left(1\right) = 1$. Then, it is possible to find: 
+    \[C\left(p_{Y|X}, \beta\right) = \max_{p_x: \exval\left(b\left(X\right)\right) = \beta} I\left(X; Y\right) = \max_{p_x: \prob\left(X = 1\right) = \beta} I\left(X; Y\right) = h_2\left(\beta\right)\left(1-p\right).\]
+    
+    Note that maximising this over $\beta$, we do get exactly $C\left(p_{Y|X}\right)$. Also note that $C\left(p_{Y|X}, \beta\right)$ is a concave function of $\beta$, this is not an accident.
+\end{parag}
+
+\begin{parag}{Lemma}
+    For any $p_{Y|X}$, the function $\beta \mapsto C\left(p_{Y|X}, \beta\right)$ is concave.
+
+    \begin{subparag}{Proof}
+        The proof is left as an exercise to the reader.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Goal}
+    The results of the previous lectures justify giving $C\left(p_{Y|X}\right)$ the name of ``capacity of the channel $p_{Y|X}$''. Indeed, this is the highest data rate that can be achieved reliably over the channel. Given the importance of this value, we aim to study the following optimisation problem:
+    \autoeq{\max_{p_X} I\left(X;Y\right) = \max_{p_X} \sum_{x, y} p_X\left(x\right) p_{Y|X}\left(y\suchthat x\right) \log_2\left(\frac{p_{Y|X}\left(y\suchthat x\right)}{p_{Y}\left(y\right)}\right) = \max_{p_X} \underbrace{\sum_{x, y} p_X\left(x\right) p_{Y|X}\left(y\suchthat x\right) \log_2\left(\frac{p_{Y|X}\left(y\suchthat x\right)}{\sum_{x'} p_{Y|X}\left(y \suchthat x'\right)p_X\left(x'\right)}\right)}_{= F_X\left(p_X\right)}.}
+    
+    We have already seen that $I\left(X; Y\right)$ is concave in $p_X$, and hence so is $F_X: S_k \mapsto \mathbb{R}$ (where $S_k = \left\{\left(p_1, \ldots, p_k\right) \suchthat \text{$p$ is a probability distribution}\right\} \subseteq \mathbb{R}^k$ is the $k$-simplex, which was defined earlier and can be shown to be convex). This tells us that this is a maximisation problem which can easily be solved numerically. We however wish to find an analytical method.
+\end{parag}
+
+\begin{parag}{Theorem: KKT condition}
+    Let $f: S_k \mapsto \mathbb{R}$ be smooth (meaning that it is differentiable, and that its derivative is continuous).
+
+    If $p = \left(p_1, \ldots, p_k\right) \in S_k$ maximises $f$, then there exists a $\lambda$ such that:
+    \begin{itemize}
+        \item For all $i$ with $p_i > 0$, then $\frac{\partial f}{\partial p_i} = \lambda$.
+        \item For all $i$, then $\frac{\partial f}{\partial p_i} \leq \lambda$.
+    \end{itemize}
+
+    It is moreover also a necessary condition when $f$ is concave. 
+
+    This is named the \important{KKT condition}.
+
+    \begin{subparag}{Proof $\implies$}
+        Let $p \in S_k$ maximising $f$ be arbitrary. We aim to show that the KKT condition is met.
+
+        Let $\epsilon > 0$ be small. Moreover, let $i$ be arbitrary and let $j$ with $p_j > 0$ (which exists since $p$ is a probability distribution by definition of $S_k$). Consider $q = \left(q_1, \ldots, q_k\right)$ such that $q_{\ell} = p_{\ell}$ for $\ell \notin \left\{i, j\right\}$, $q_i = p_i + \epsilon$ and $q_j = p_j - \epsilon$. Note that $q \in S_k$.
+
+        Since $f$ is smooth, we can do a Taylor expansion: 
+        \[f\left(q\right) = f\left(p\right) + \epsilon \frac{\partial f\left(p\right)}{\partial p_i} - \epsilon \frac{\partial f\left(p\right)}{\partial p_j} + o\left(\epsilon\right) = f\left(p\right) + \epsilon \left[\frac{\partial f}{\partial p_i} - \frac{\partial f}{\partial p_j}\right] + o\left(\epsilon\right).\]
+
+        Now, $f\left(p\right)$ is supposed to be a maximiser by hypothesis. Hence, we must have $f\left(q\right) \leq f\left(p\right)$, which, since $\epsilon > 0$ can be made as small as needed, requires that:
+        \[\frac{\partial f}{\partial p_i} - \frac{\partial f}{\partial p_j} \leq 0.\]
+
+        Overall, we found so far that for every $i, j$ with $p_j > 0$, then: 
+        \[\frac{\partial f}{\partial p_j} \geq \frac{\partial f}{\partial p_i}.\]
+
+        Note that if both $p_i > 0$ and $p_j > 0$, we must have:
+        \[\frac{\partial f}{\partial p_j} \geq \frac{\partial f}{\partial p_i} \land \frac{\partial f}{\partial p_i} \geq \frac{\partial f}{\partial p_j} \implies \frac{\partial f}{\partial p_i} = \frac{\partial f}{\partial p_i}.\]
+
+        We call this value $\lambda$. This gives our result.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

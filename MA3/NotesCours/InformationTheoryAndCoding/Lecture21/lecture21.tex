@@ -1,0 +1,212 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-12-01 at 11:40:42.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 01 décembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{21}{2025-12-01}{Radicalising channels}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the polarising idea behind polar codes.
+    \item Proof that we can synthesise channels $W^-, W^+$ from two copies of a channel $W$, which mutual information sum to twice the one of $W$, and which are polarised.
+    \item Explanation why $W^+$ can indeed be considered as a synthesised channel.
+\end{itemize}
+
+}
+
+\subsection{Polar coding}
+
+\subsubsection{Setup}
+
+\begin{parag}{Setup}
+    We now assume that we have a binary-input channel $W: \mathbb{F}_2 \channelmaps \mathcal{Y}$.
+
+    We will design a code that achieves $I\left(X; Y\right)$ where $p_X \followsdistr \Ber\left(\frac{1}{2}\right)$. This is nice because it is such that the capacity is achieved for this probability distribution for any sufficiently symmetric channel, such as the $\BSC\left(p\right)$ and $\BEC\left(p\right)$.
+
+    \begin{subparag}{Remark}
+        As usual, this is described by probability distribution $p_{Y|X}\left(y \suchthat x\right) = W\left(y \suchthat x\right)$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Observation}
+    The transmission of data at channel capacity would be easy in any of the two following cases:
+    \begin{itemize}
+        \item \textit{($W$ is perfect)} $W$ maps $0$ to some set $\mathcal{Z}$ and $1$ to some set $\mathcal{O}$, where $\mathcal{Z} \cap \mathcal{O} = \o$. For instance, it maps $0 \channelmaps 0$ and $1 \channelmaps 1$ with probability $1$.
+        \item \textit{($W$ is useless)} It maps both $0$ and $1$ to the same element, or flips each bit with probability $\frac{1}{2}$. Indeed, then the capacity is zero and hence we can trivially reach it.
+    \end{itemize}
+
+    The worst case is thus for our channel to be neither perfect nor useless, but just average. The goal will be to convert multiple copies of our channel into ones that are either perfect or useless. This is polarising the channel, making it become radical. We will thus call this polar codes. 
+
+    \begin{subparag}{Remark}
+        The following value is an interesting measure of the quality of the channel:
+        \[\sum_{y} \sqrt{W\left(y \suchthat 0\right) W\left(y \suchthat 1\right)}.\]
+        
+        Indeed, when $W$ is perfect, it is equal to zero since we always have $W\left(y \suchthat 0\right) = 0$ or $W\left(y \suchthat 1\right) = 0$ (both can't be non-zero at the same time). When $W$ is useless, it is equal to zero since we always have $W\left(y \suchthat 0\right) = W\left(y \suchthat 1\right)$. One can easily check that, in general, this value is always at most 1 by Cauchy-Schwarz, indeed showing it is a reasonable measure.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition}
+    Let $W: X \channelmaps Y$ be a channel. Let $X \followsdistr \Ber\left(\frac{1}{2}\right)$ and $Y \followsdistr  W\left(y\suchthat x\right)$. We write: 
+    \[I\left(W\right) = I\left(X; Y\right).\]
+
+    \begin{subparag}{Remark}
+        For $W = \BEC\left(p\right)$ and $W = \BSC\left(p\right)$, this is the capacity, as mentioned above: 
+        \[I\left(W\right) = C\left(W\right).\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma}
+    Consider an encoder that, on input $U_1, U_2 \in \mathbb{F}_2$, outputs: 
+    \[X_1 = U_1 + U_2 \in \mathbb{F}_2, \mathspace X_2 = U_2 \in \mathbb{F}_2.\]
+
+    We can consider the synthesised channels $W^-: U_1 \channelmaps Y_1 Y_2$ and $W^+: U_2 \channelmaps Y_1 Y_2 U_1$. They are such that: 
+    \[I\left(W^-\right) + I\left(W^+\right) = 2 I\left(W\right).\]
+
+    \begin{subparag}{Intuition}
+        We can draw the setup as follows.
+        \svghere[0.75]{PolarCodeConstruction.svg}
+
+        The channel $W^-$ receives some input $U_1$, generates some $U_2 \followsdistr \Ber\left(\frac{1}{2}\right)$, and outputs $Y_1, Y_2$ sampled from the distributions $Y_1 \followsdistr W\left(\cdot \suchthat U_1 + U_2\right)$ and $Y_2 \followsdistr W\left(\cdot \suchthat U_2\right)$.
+
+        Similarly, on input $U_2$, $W^+$ samples some $U_1 \followsdistr \Ber\left(\frac{1}{2}\right)$ and outputs $\left(Y_1, Y_2, U_1\right)$ where again $Y_1 \followsdistr W\left(\cdot \suchthat U_1 + U_2\right)$ and $Y_2 f\followsdistr W\left(\cdot \suchthat U_2\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        The encoder and decoder can indeed assume that they have access to $W^-, W^+$ instead of two copies of $W$, it does not change the analysis. The only thing that may seem weird is that $W^+: U_2 \channelmaps Y_1 Y_2 U_1$ must output $U_1$, but the decoder does not receive this value. However, the decoder can get a good estimate of $U_1$ from the output of $W^-$. We will justify this more formally below.  For now, it suffise to accept that $W^-$ and $W^+$ can be seen as synthesised channels.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We use the assumption that the channel is a binary-input channel to be able to write $X_1 = U_1 + X_2$ with a XOR.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $U_1, U_2 \iid \Ber\left(\frac{1}{2}\right)$ be IID Bernoulli random variable with $p = \frac{1}{2}$. Then, we also have $X_1, x_2 \iid \Ber\left(\frac{1}{2}\right)$. 
+
+        Now, since the channel is memoryless and $X_1, X_2$ are independent: 
+        \[I\left(X_1, X_2; Y_1, Y_2\right) = I\left(X_1; Y_1\right) + I\left(X_2; Y_2\right) = 2 I\left(W\right),\]
+        where, as stated earlier, we note $I\left(W\right) = I\left(X; Y\right)$.
+        
+        Moreover, since there is a bijection between $X_1, X_2$ and $U_1, U_2$, using the chain rule: 
+        \autoeq{I\left(X_1, X_2; Y_1, Y_2\right) = I\left(U_1, U_2; Y_1, Y_2\right) = I\left(U_1; Y_1, Y_2\right) + I\left(U_2; Y_1 Y_2 \suchthat U_1\right) = I\left(U_1; Y_1, Y_2\right) + I\left(U_2; Y_1, Y_2, U_1\right),}
+        where we used that, since $U_1$ and $U_2$ are independent: 
+        \autoeq{I\left(U_2; Y_1 Y_2 \suchthat U_1\right) = H\left(U_2 \suchthat U_1\right) - H\left(U_2 \suchthat Y_1, Y_2, U_1\right) = H\left(U_2\right) - H\left(U_2 \suchthat Y_1, Y_2, U_1\right) = I\left(U_2; Y_1, Y_2, U_1\right)}
+         
+        Now, we may consider that there is a channel that maps $U_1$ to $Y_1 Y_2$, $W^- : U_1 \channelmaps Y_1 Y_2$, defined by:
+        \[W^-\left(y_1 y_2 \suchthat u_1\right) = \frac{1}{2} \sum_{u_2 \in \mathbb{F}_2} W\left(y_1 \suchthat u_1 + u_2\right) W\left(y_2 \suchthat u_2\right).\]
+
+        Since $U_1 \followsdistr \Ber\left(\frac{1}{2}\right)$, we can write $I\left(U_1; Y_1, Y_2\right) = I\left(W^-\right)$. Then: 
+        \autoeq[s]{W^-\left(y_1 y_2 \suchthat u_1\right) = \frac{1}{2}\prob\left(Y_1 Y_2 = y_1 y_2 \suchthat U_1 = u_1, U_2 = 0\right) + \frac{1}{2}\prob\left(Y_1 Y_2 = y_1 y_2 \suchthat U_1 = u_1, U_2 = 1\right) = \frac{1}{2}\prob\left(Y_1 Y_2 = y_1 y_2 \suchthat X_1 X_2 = u_1 0\right) + \frac{1}{2}\prob\left(Y_1 Y_2 = y_1 y_2 \suchthat X_1 X_2 = \bar{u}_1 1\right) = \frac{1}{2} W\left(y_1 \suchthat u_1\right) W\left(y_2 \suchthat 0\right) + \frac{1}{2} W\left(y_1 \suchthat \bar{u_1}\right) W\left(y_2 \suchthat 1\right).}
+
+        Similarly, we can consider some channel $W^+: U_2 \channelmaps Y_1 Y_2 U_1$ for which $I\left(U_2; Y_1 Y_2 U_1\right) = I\left(W^+\right)$. Then: 
+        \autoeq{W^+\left(y_1 y_2 u_1 \suchthat u_2\right) = \prob\left(U_1 = u_1, Y_1 = y_1, Y_2 = y_2 \suchthat U_2 = u_2\right) = \underbrace{\prob\left(U_1 = u_1  \suchthat U_2 = u_2\right)}_{= \prob\left(U_1 = u_1\right) = 1/2}\prob\left(Y_1Y_2 = y_1y_2 \suchthat U_1U_2 = u_1u_2\right) = \frac{1}{2} W\left(y_1 \suchthat u_1 + u_2\right) W\left(y_2 \suchthat u_2\right).}
+
+        Overall, we found exactly that, by construction of $W^-$ and $W^+$: 
+        \autoeq{I\left(W^-\right) + I\left(W^+\right) = I\left(U_1; Y_1 Y_1\right) + I\left(U_2; Y_1 Y_2 U_1\right) = I\left(X_1 X_2; Y_1 Y_2\right) = 2I\left(W\right).}
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example}
+    Let us assume that $W = \BEC\left(p\right)$ to be the binary erasure channel. Then, writing $U_2 \followsdistr \Ber\left(\frac{1}{2}\right)$ to be a fair coin flip, and looking at the diagram in the lemma above: 
+    \[W^- : U_1 \channelmaps \left(Y_1, Y_2\right) = \begin{systemofequations} \left(U_1 + U_2, U_2\right), & \text{with probability $\left(1-p\right)^2$,}\\ \left(U_1 + U_2, \text{?}\right), & \text{with probability $p\left(1-p\right)$,}\\ \left(\text{?}, U_2\right), & \text{with probability $\left(1-p\right)p$,}\\ \left(\text{?}, \text{?}\right), & \text{with probability $p^2$.} \end{systemofequations}\]
+
+    In the first case, we are able to recover $U_1$. In all the three other cases, we cannot recover any information about $U_1$. Hence, we can see this channel to be $W^- = \BEC\left(p \left(1-p\right) + p \left(1-p\right) + p^2\right) = \BEC\left(p\left(2-p\right)\right)$.
+
+    Similarly: 
+    \[W^+: U_2 \channelmaps \left(Y_1, Y_2, U_1\right) = \begin{systemofequations} \left(U_1 + U_2, U_2, U_1\right) & \text{with probability $\left(1-p\right)^2$,} \\ \left(U_1 + U_2, \text{?}, U_1\right) & \text{with probability $\left(1-p\right)p$,} \\ \left(\text{?}, U_2, U_1\right) & \text{with probability $p\left(1-p\right)$,} \\ \left(\text{?}, \text{?}, U_1\right) & \text{with probability $p^2$.} \\  \end{systemofequations}\]
+
+    In the first three cases, we are able to completely recover $U_2$. In the last case, we learn no information about it. Hence, $W^+ = \BEC\left(p^2\right)$.
+
+    Now, we know that $I\left(W\right) = C\left(W\right) = 1-p$ since capacity is achieved for the Bernoulli-$\frac{1}{2}$ distribution. Hence $2 I\left(W\right) = 2\left(1-p\right)$. By the same reasoning, since $W^-$ and $W^+$ are also binary erasure channels:
+    \[I\left(W^-\right) = 1 - p\left(2-p\right), \mathspace I\left(W^+\right) = 1 -p^2.\]
+
+    We do have $2I\left(W\right) = I\left(W^-\right) + I\left(W^+\right)$, as expected from our lemma above. Moreover, note that: 
+    \[I\left(W^-\right) \leq I\left(W\right) \leq I\left(W^+\right).\]
+
+    This is not an accident, as proven in the following lemma.
+\end{parag}
+
+\begin{parag}{Lemma}
+    We always have:
+    \[I\left(W^-\right) \leq I\left(W\right) \leq I\left(W^+\right).\]
+
+    \begin{subparag}{Remark}
+        Hence, we have polarised our two copies $W, W$, into $W^-, W^+$. We have seen that it is easy to achieve capacity on both perfect channels and useless channels, so this is going in the right direction.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Observe that, in general: 
+        \[I\left(W^+\right) = I\left(U_2, Y_1 Y_2 U_1\right) \geq I\left(U_2; Y_2\right) = I\left(X_2; Y_2\right) = I\left(W\right).\]
+
+        Since moreover $I\left(W^+\right) + I\left(W^-\right) = 2I\left(W\right)$, we must also have $I\left(W^-\right) \leq I\left(W\right)$. This finishes the proof.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    So far we have seen that from two independent uses of the channel $W$, we have synthesised two channels $W^-$ and $W^+$ with: 
+    \[I\left(W^-\right) + I\left(W^+\right) = 2I\left(W\right), \mathspace I\left(W^-\right) \leq I\left(W\right) \leq I\left(W^+\right).\]
+
+    As explained earlier, while $W^-$  can easily be interpreted as a channel, it is not clear that $W^+$ is indeed a synthesised channel. We will now justify why it can indeed be seen as a channel.
+\end{parag}
+
+\begin{parag}{Theorem}
+    Consider the following setup. We have some observation $Z$, and our goal is to recover some random variables $U_1, \ldots, U_n$. We consider two strategies.
+    \begin{itemize}[left=0pt]
+        \item \textit{(Access to a helper)} Let's assume that we have a helper first. We first make an estimation $\hat{U}_1 = \phi_1\left(Z\right)$, without the helper. Then, we assume that the helper suddenly reveals us the true value of $U_1$, and we make an estimation $\hat{U}_2 = \phi_2\left(Z, U_1\right)$. The helper then reveals the true value of $U_2$, and we make an estimation $\hat{U}_3 = \phi_3\left(Z, U_1, U_2\right)$. We continue that way up to $\hat{U}_n = \phi_n\left(Z, U^{n-1}\right)$. Overall, this means that our decisions are: 
+    \[\hat{U}_1 = \phi_1\left(Z\right), \mathspace \hat{U}_2 = \phi_2\left(Z, U_1\right), \mathspace \hat{U}_3 = \phi_3\left(Z, U_1, U_2\right), \mathspace \ldots, \mathspace \hat{U}_n = \phi_n\left(Z, U^{n-1}\right).\]
+
+        \item \textit{(No helper)} Let us thus assume we have no helper now. We however still assume that we keep the same functions $\phi_1, \ldots, \phi_n$ from the case with a helper. We then make our decisions as: 
+        \[\widetilde{U}_1 = \phi_1\left(Z\right), \mathspace \widetilde{U}_2 = \phi_2\left(Z, \widetilde{U}_1\right), \mathspace \widetilde{U}_3 = \phi_3\left(Z, \widetilde{U}_1, \widetilde{U}_2\right), \mathspace \ldots, \mathspace \widetilde{U}_n = \phi_n\left(Z, \widetilde{U}^{n-1}\right).\]
+    \end{itemize}
+
+    Then, the probability to make \emph{no} mistake is the same in the two cases:
+    \[\prob\left(\widetilde{U}^n \neq U^n\right) = \prob\left(\hat{U}^n \neq U^n\right).\]
+    
+    \begin{subparag}{Remark}
+         In practice, there is no such thing as a helper. However, if our goal is to make no mistake and we consider that we failed as soon as we have a single mistake (which is indeed the case when decoding a message), then this states that having access to a helper does not change the success probability. Moreover, this states that we can design our $\phi_1, \ldots, \phi_n$ as if we had access to a helper, which is a lot easier for a design since we do not have to consider the case where there is a mistake.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+         Note that this theorem only applies to the case where we are completely correct, not the number of errors; if there are two errors in the case with the helper, all we know is that there is at least one error in the case without helper (and not that there are also exactly two errors). 
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        In our case above, our observation is $Z = \left(Y_1, Y_2\right)$ and we want to recover $U_1, U_2$. 
+
+        This theorem states that we can simply run the decoder of the channel $W^-: U_1 \channelmaps Y_1 Y_2$ and decode the result $\widetilde{U}_1$. Then, we assume that $\widetilde{U}_1 = U_1$ and feed it to the decoder of $W^+: U_2 \channelmaps Y_1 Y_2 U_1$. By this analysis, this gives the same success probability to have no error at the end as if we had truly synthesised the channel $W^+$.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        Let us compare the events $A=  \left\{\hat{U}^n = U^n\right\}$ and $B = \left\{\widetilde{U}^n = U^n\right\}$.
+
+        The idea is that if $\widetilde{U}_1 = U_1$, then we will have $\hat{U}_2 = \widetilde{U}_2$ since we use the same function both times. If however $\widetilde{U}_1 \neq U_1$, then we may have $\hat{U}_2 \neq \widetilde{U}_2$.
+
+         More generally, if $A$ holds: 
+         \autoeq{\widetilde{U}_1 = \phi_1\left(Z\right) = \hat{U}_1 \over{=}{$(A)$}  U_1 \implies \widetilde{U}_2 = \phi_2\left(Z, \widetilde{U}_1\right) = \phi_2\left(Z, U_1\right) = \hat{U}_2 \over{=}{$(A)$} U_2 \implies \ldots \implies \widetilde{U}_n = \phi_n\left(Z, \widetilde{U}^{n-1}\right) = \phi_n\left(Z, U^{n-1}\right) = \hat{U}_n \over{=}{$(A)$}  U_n.}
+
+        Hence, if $A$ happens, then $B$ also happens. In other words, if we want everything to be correct, then the helper does not help.
+
+        Similarly, if $A$ does not happen, then there must exist a $i$ such that $\hat{U}^{i-1} = U^{i-1}$ and $\hat{U}_i \neq U_i$. But then, $\widetilde{U}^{i-1} = U^{i-1}$ by the same reasoning as above and
+        \[\widetilde{U}_i = \phi_i\left(Z, \widetilde{U}^{i-1}\right) = \phi_i\left(Z, U^{i-1}\right) = \hat{U}_i \neq U_i,\]
+        which implies that $B$ does not happen. 
+
+        Overall, this states that $A$ and $B$ either both happen, or neither happen. Hence:
+        \[\prob\left(\widetilde{U}^n \neq U^n\right) = \prob\left(\bar{B}\right) = \prob\left(\bar{A}\right) = \prob\left(\hat{U}^n \neq U^n\right).\]
+    
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

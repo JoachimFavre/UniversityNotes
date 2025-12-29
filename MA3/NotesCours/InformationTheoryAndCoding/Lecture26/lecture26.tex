@@ -1,0 +1,195 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-12-16 at 13:59:27.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 16 décembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{26}{2025-12-16}{My last lecture at EPFL? D:}{
+\begin{itemize}[left=0pt]
+    \item Proof of the external fact about typicality.
+    \item Summary of what has been studied in the class.
+    \item Five examples of open problems in information theory.
+\end{itemize}
+
+}
+
+\begin{parag}{}
+    \begin{subparag}{Proof 1}
+        We simplify the proof of the first point by assuming that $\left|\mathcal{U}\right| = \left|\mathcal{V}\right| = 2$ are binary alphabets. Using this hypothesis, we can assume without loss of generality that $\mathcal{U} = \left\{1, 2\right\}$ and $\mathcal{V} = \left\{a, b\right\}$. This proof naturally generalises to arbitrary alphabets.
+
+        We assume without loss of generality that $u^n$ is ordered as follows 
+        \[u^n = 1 \cdots 1 2 \cdots 2 = 1^{n_1} 2^{n_2},\]
+        where $n_1 + n_2 = n$. By the typicality hypothesis, we know that: 
+        \[n_1 = n p_U\left(1\right) \left(1 \pm \epsilon'\right), \mathspace n_2 = n p_U\left(2\right) \left(1 \pm \epsilon'\right).\]
+        
+        After sending $u^n$ through the channel $p_{V|U}$, we receive some: 
+        \[v^n = v_1 \cdots v_{n_1} v_1' \cdots v_{n_2}'.\]
+        
+        By definition, $v^n \in S\left(u^n\right)$ means that $\left(u^n, v^n\right) \in T\left(n, p_{UV}, \epsilon\right)$, and hence that for all $\alpha \in \left\{1, 2\right\}$ and $\beta \in \left\{a, b\right\}$, then $\sum_{i=1}^{n} I\left(\left(u_i, v_i\right) = \left(\alpha, \beta\right)\right) = np_{UV}\left(\alpha, \beta\right)\left(1 \pm \epsilon\right)$. In other words, thanks to our ordering, we require that all the following equations hold: 
+        \[\sum_{i=1}^{n_1} I\left(v_i = a\right) = n p_{UV}\left(1, a\right) \left(1 \pm \epsilon\right), \mathspace \sum_{i=1}^{n_1} I\left(v_i = b\right) = n p_{UV}\left(1, b\right) \left(1 \pm \epsilon\right),\]
+        \[\sum_{i=1}^{n_2} I\left(v_i = a\right) = n p_{UV}\left(2, a\right) \left(1 \pm \epsilon\right), \mathspace \sum_{i=1}^{n_2} I\left(v_i = b\right) = n p_{UV}\left(2, b\right) \left(1 \pm \epsilon\right),\]
+
+        We only consider the first constraint, $\sum_{i=1}^{n_1} I\left(v_i = a\right) = n p_{UV}\left(1, a\right) \left(1 \pm \epsilon\right)$, the other ones are similar. We call $E_1$ the event that this equation holds (and $E_2, E_3, E_4$ the event that the three others equations hold). We notice that: 
+        \autoeq{\prob\left(\bar{E}_1\right) = \prob\left(\left|\sum_{i=1}^{n_1} I\left(v_i = a\right) - n p_{UV}\left(1, a\right)\right| > \epsilon n p_{UV}\left(1, a\right)\right) = \prob\left(\left|\frac{1}{n_1}\sum_{i=1}^{n_1} I\left(v_i = a\right) - \frac{n}{n_1} p_{UV}\left(1, a\right)\right| > \epsilon \frac{n}{n_1} p_{UV}\left(1, a\right)\right).}
+        
+       We analyse both sides of the inequality inside of the probability. By the law of the large numbers, and using the fact $n_1 = np_U\left(1\right) \left(1 \pm \epsilon'\right)$ as stated above, the left-hand side tends towards:
+       \autoeq{\left|\frac{1}{n_1}\sum_{i=1}^{n_1} I\left(v_i = a\right) - \frac{n}{n_1} p_{UV}\left(1, a\right)\right| \to \left|p_{V|U}\left(a \suchthat 1\right) -  \frac{p_{UV}\left(1, a\right)}{p_U\left(1\right) \left(1 \pm \epsilon'\right)}\right| = \left|p_{V|U}\left(a \suchthat 1\right) - \frac{p_{V|U}\left(a \suchthat 1\right)}{1 \pm \epsilon'}\right| = p_{V|U}\left(a \suchthat 1\right) \left(1 - \frac{1}{1 \pm \epsilon'}\right) \leq p\left(a \suchthat 1\right) \frac{\epsilon'}{1- \epsilon'}.}
+
+       Then, using again the fact $n_1 = n p_U\left(1\right) \left(1 \pm \epsilon'\right)$ the right-hand side reads:
+       \[\epsilon \frac{n}{n_1} p_{UV}\left(1, a\right) \geq \epsilon \frac{n}{n \left(1- \epsilon'\right)} \frac{p_{UV}\left(1, a\right)}{p_U\left(1\right)} = \frac{\epsilon}{1- \epsilon'} p_{V|U}\left(a \suchthat 1\right).\]
+
+       We however know that $\epsilon > \epsilon'$ by hypothesis, so we have for $n \to \infty$:
+       \autoeq{\left|\frac{1}{n_1}\sum_{i=1}^{n_1} I\left(v_i = a\right) - \frac{n}{n_1} p_{UV}\left(1, a\right)\right| \leq p\left(a \suchthat 1\right) \frac{\epsilon'}{1- \epsilon'} < \frac{\epsilon}{1- \epsilon'} p\left(a \suchthat 1\right) \leq \epsilon \frac{n}{n_1} p_{UV}\left(1, a\right).}
+
+       Therefore, we never have $\left(\text{left-hand side}\right) > \left(\text{right-hand side}\right)$ when $n \to \infty$, telling us: 
+       \[\prob\left(\bar{E}_1\right) = \prob\left(\left|\frac{1}{n_1}\sum_{i=1}^{n_1} I\left(v_i = a\right) - \frac{n}{n_1} p_{UV}\left(1, a\right)\right| > \epsilon \frac{n}{n_1} p_{UV}\left(1, a\right)\right) \to 0.\]
+
+       By the exact same reasoning, we also have $\prob\left(\bar{E}_i\right) \to 0$ for $i \in \left\{2, 3, 4\right\}$.  This finally gives our result by the union bound: 
+       \autoeq{\prob\left(v^n \notin S\left(u^n\right)\right) = \prob\left(\bar{E}_1 \cup \bar{E}_2 \cup \bar{E}_3 \cup \bar{E}_4\right) \leq \prob\left(\bar{E}_1\right) + \prob\left(\bar{E}_2\right) + \prob\left(\bar{E}_3\right) + \prob\left(\bar{E}_4\right) \to 0.}
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        Since $v^n \in S\left(u^n\right)$ by hypothesis, we know that $\left(u^n, v^n\right) \in T\left(n, p_{UV}, \epsilon\right)$ by definition of $S\left(u^n\right)$. Therefore, by definition of typicality: 
+        \[\sum_{i=1}^n I\left(\left(u_i, v_i\right) = \left(\alpha, \beta\right)\right) = n p_{UV}\left(\alpha, \beta\right) \left(1 \pm \epsilon\right).\]
+        
+        This thus tells us that, using the fact sequences are IID: 
+        \autoeq{p_{V|U}\left(v^n \suchthat u^n\right) = \prod_{i=1}^{n} p_{V|U}\left(v_i \suchthat u_i\right) = \prod_{\alpha, \beta} p_{V|U}\left(\beta \suchthat \alpha\right)^{\sum_{i=1}^n I\left(\left(u_i, v_i\right) = \left(\alpha, \beta\right)\right)} = 2^{\sum_{\alpha, \beta} n \left(1 \pm \epsilon\right) p_{UV}\left(\alpha, \beta\right) \log_2\left(p_{V|U}\left(\beta \suchthat \alpha\right)\right)} = 2^{-n H\left(V \suchthat U\right)\left(1 \pm \epsilon\right)},}
+        as required.
+    \end{subparag}
+
+    \begin{subparag}{Proof 3a}
+        We prove the first inequality. By point (2), we find: 
+        \autoeq{1 \geq \prob\left(V^n \in S\left(u^n\right)\right) = \sum_{v^n \in S\left(u^n\right)} p_{V|U}\left(v^n \suchthat u^n\right) \over{\geq}{(2)} \sum_{v^n \in S\left(u^n\right)} 2^{-n H\left(V\suchthat U\right) \left(1 + \epsilon\right)} = \left|S\left(u^n\right)\right|2^{-n H\left(V\suchthat U\right) \left(1 + \epsilon\right)}.}
+
+        We get our result by dividing by the exponential on both sides.
+    \end{subparag}
+
+    \begin{subparag}{Proof 3b}
+        We now prove the second inequality. By points (1) and (2), for large $n$: 
+        \autoeq{\left(1- \epsilon\right) \leq \prob\left(V^n \in S\left(u^n\right)\right) = \sum_{v^n \in S\left(u^n\right)} p_{V|U}\left(v^n \suchthat u^n\right) \leq \sum_{v^n \in S\left(u^n\right)} 2^{-n H\left(V \suchthat U\right)\left(1-\epsilon\right)} = \left|S\left(u^n\right)\right| 2^{-n H\left(V\suchthat U\right) \left(1-\epsilon\right)}.}
+        
+        We again get our result by dividing by the exponential on both sides.
+    \end{subparag}
+
+    \begin{subparag}{Proof 4}
+        First, we note that for any $v^n \in S\left(u^n\right)$, and hence such that $\left(u^n, v^n\right) \in T\left(n, p_{UV}, \epsilon\right)$, using an approach completely similar to (2): 
+        \autoeq{q_{V|U}\left(v^n \suchthat u^n\right) = \prod_{i=1}^{n} q_{V|U}\left(v_i \suchthat u_i\right) = \prod_{\alpha, \beta} p_{V|U}\left(\beta \suchthat \alpha\right)^{\sum_{i=1}^{n} I\left(\left(u_i, v_i\right) = \left(\alpha, \beta\right)\right)} = 2^{\sum_{\alpha, \beta} n\left(1 \pm \epsilon\right) p_{UV}\left(\alpha, \beta\right) \log_2\left(q_{V|U}\left(\beta \suchthat \alpha\right)\right)} = 2^{-n \left(1 \pm \epsilon\right)\left[H\left(V \suchthat U\right) + D\left(p_{UV} || p_U q_{V|U}\right)\right]}.}
+
+        Therefore, using the first inequality from (3): 
+        \autoeq{\prob\left(V^n \in S\left(u^n\right)\right) = \sum_{v^n \in S\left(u^n\right)} q_{V|U}\left(v^n \suchthat u^n\right) \leq \sum_{v^n \in S\left(u^n\right)} 2^{-n\left(1 - \epsilon\right)\left[H\left(V \suchthat U\right) + D\left(p_{UV} || p_{U} q_{V|U}\right)\right]} = \left|S\left(u^n\right)\right| 2^{-n\left(1 - \epsilon\right)\left[H\left(V \suchthat U\right) + D\left(p_{UV} || p_{U} q_{V|U}\right)\right]} \leq 2^{n H\left(V \suchthat U\right) \left(1 + \epsilon\right)} 2^{-n\left(1 - \epsilon\right)\left[H\left(V \suchthat U\right) + D\left(p_{UV} || p_{U} q_{V|U}\right)\right]} = 2^{-n \left[D\left(p_{UV} || p_U q_{V|U}\right) - \epsilon \left(2 H\left(V \suchthat U\right) + D\left(p_{UV} || p_U q_{V|U}\right)\right)\right]}.}
+
+        By a completely similar reasoning, using the second inequality from (3) assuming $n$ is sufficiently large:
+        \autoeq[s]{\prob\left(V^n \in S\left(u^n\right)\right) \geq \sum_{v^n \in S\left(u^n\right)} 2^{-n\left(1 + \epsilon\right)\left[H\left(V \suchthat U\right) + D\left(p_{UV} || p_{U} q_{V|U}\right)\right]} \geq \left(1-\epsilon\right) 2^{n H\left(V \suchthat U\right) \left(1 - \epsilon\right)} 2^{-n\left(1 + \epsilon\right)\left[H\left(V \suchthat U\right) + D\left(p_{UV} || p_{U} q_{V|U}\right)\right]} = \left(1-\epsilon\right) 2^{-n \left[D\left(p_{UV} || p_U q_{V|U}\right) + \epsilon \left(2 H\left(V \suchthat U\right) + D\left(p_{UV} || p_U q_{V|U}\right)\right)\right]}.}
+    \end{subparag}
+
+    \begin{subparag}{Proof 5}
+        This is just a consequence of (4), using $q_{V|U} = p_V$ and the fact that: 
+        \[D\left(p_{UV} || p_U p_V\right) = I\left(U; V\right).\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\section{Conclusion}
+
+\begin{parag}{Summary}
+    In this class, we studied the following fields.
+    \begin{itemize}
+        \item (Lossless source coding) We showed that $H\left(U\right)$ is the minimum number of bits to describe data exactly.
+        \item (Universal lossless source coding) If a long sequence of data is to be described, then we have distribution (i.e.~source statistics) agnostic schemes, which perform almost as well as schemes that know source statistics. 
+        \item (Lossy source coding) We showed that $R\left(D\right) = \min_{p_{V|U}: \exval\left(d\left(U, V\right)\right) = D} I\left(U; V\right)$ is the minimum number of bits to describe data within a given fidelity. 
+        \item (Data transmission over a noisy channel) We showed that $C\left(p_{Y|X}\right) = \max_{p_X} I\left(X; Y\right)$ is the maximum number of data bits per channel use that can be reliably transmitted.
+        \item We proved that there is no harm to encode our source into bits and then turn the channel into a bit pipe; there is no need for the channel code to know the source code and inversely.
+    \end{itemize}
+
+    \begin{subparag}{Remark 1}
+        It is not possible to make universal data transmission over a noisy channel, even if we only consider binary channels that have rate at least $R$. However, for any $\mathcal{X}, \mathcal{Y}$, $p_X$ and $R$, we can design an encoder-decoder pair of rate $R$ such that for any channel $p_{Y|X}$ such that $I\left(X; Y\right) \eval_{p_X}^{} > R$, then the encoder-decoder will work.
+
+        It is therefore really nice that universal lossless source coding exists.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The message of the course should be understood to be mostly on the techniques we developed, more than the specific results.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 3}
+        It may seem like all problems are solved in information theory. There are however also problems that are still open problems. Let us state some of these examples.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: Interference channel}
+    Consider the following setup, which represents a channel that can be used for two simultaneous communications.
+    \svghere{OpenProblemExample1.svg}
+
+    Given $p_{Y_1 Y_2 | X_1 X_2}$, we wonder for which $\left(R_1, R_2\right)$ we can ensure that $\prob\left(\left(\hat{w}_1, \hat{w}_2\right) \neq \left(w_1, w_2\right)\right)$ can be made small; i.e. that for any $\epsilon > 0$, there exists a protocol such that the probability is at most $\epsilon$.
+
+    The answer to this is not known. Random coding allows to find a curve in the $\left(R_1, R_2\right)$ space below which it is possible. It is also possible to prove that there is a curve in the $\left(R_1, R_2\right)$ space above which it is not possible. However, the two curves do not match, so the bound is not tight.
+    \svghere[0.5]{OpenProblemExample1-Curves.svg}
+
+    This question has been open since the 1970s.
+\end{parag}
+
+\begin{parag}{Example 2: Multiple-access channel}
+    Consider the following setup, which is simpler:
+    \svghere{OpenProblemExample2.svg}
+
+    If we ask for $\frac{1}{2^{nR}} \sum_{w \in \left\{1, \ldots, 2^{nR}\right\}} \prob\left(\text{error} \suchthat w\right)$, then the two curves match. If we however ask for $\max_{w \in \left\{1, \ldots, 2^{nR}\right\}} \prob\left(\text{error} \suchthat w\right)$ to be small, then the curves do not match, and we can prove that they cannot be the same as the one of the other constraint, i.e.~that this second constraint allows strictly less rates.
+    
+    \begin{subparag}{Remark}
+        In the single-transmitter single-receiver case we have seen in class, we proved that the two errors were equivalent because we could just get rid of half of the codewords. In this case, it is hard to know which half to remove for each transmitter, so it does not work anymore.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 3: Broadcast channel}
+    Consider the following setup, which is the symmetry of the previous one: 
+    \svghere{OpenProblemExample3.svg}
+
+    Which $\left(R_1, R_2\right)$ are possible is again not known.
+
+    \begin{subparag}{Remark}
+        This problem, and the previous one, are really interesting for communication between cellphones and antenna for instance. In practice, the antenna will send data to one cellphone, then to the other, and the to the first one again; in a round-robbin fashion. However, it (theoretically) possible to do better. Since the actual protocols are very complicated, and can only bring up to a small factor rate increase, then we only use the round-robbin strategy in practice.
+
+        These are problems that have been studied for fifty years, and considering that we managed to find an elegant solution to all the problems we looked at, we may suppose that they are solved. However, this is not the case.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 4}
+    Consider the following source coding setup, where $U$ and $V$ may be correlated:
+    \svghere[0.8]{OpenProblemExample4.svg}
+
+    We want $\prob\left(\hat{U}^n \hat{V}^n \neq U^n V^n\right)$ to be small. Naturally, we can have $R_1 = H\left(U\right)$ and $R_2 = H\left(V\right)$, but we can do better. In fact, we can show that having $R_1 > H\left(U \suchthat V\right)$ (the first must contain all the information specific to $U$), $R_2 > H\left(V \suchthat U\right)$ (the second must contain all the information specific to $V$) and $R_1 + R_2 > H\left(U, V\right)$ (the two must contain the whole information) are sufficient and necessary conditions. This is thus a solved problem.
+
+    However, if we consider lossy source coding, the result is not known. It is interesting that a small perturbation to the problem makes an open problem.
+\end{parag}
+
+\begin{parag}{Example 5}
+    We can consider a combinatorial setup as well, through communication with zero error probability.
+
+    Let us consider a specific example. We consider a channel with 5 inputs and outputs. If we send $i$, then the listener receives $i$ or $\left(i+1\right) \Mod 5$ with some non-zero probability each.
+    \svghere[0.25]{OpenProblemExample5.svg}
+
+    Note that we cannot consider the code $\mathcal{C} = \left\{1, 2\right\}$. Indeed, if the decoder receives $2$, it cannot know if $1$ or $2$ was sent, and hence it cannot decode with zero error probability. 
+
+    However, we can consider the code $\mathcal{C} = \left\{1, 3\right\}$, and have zero error probability. This sends one bit per channel use, telling us that we can send at least $C_0 \geq 1$ bits per channel use.
+
+    We can also consider the code $\mathcal{C} = \left\{11, 23, 35, 42, 54\right\}$. This sends $\log_2\left(5\right)$ bits in two channel use, telling us $C_0 \geq \frac{1}{2} \log_2\left(5\right)$.
+
+    For this particular channel, we can show that $C_0 = \frac{1}{2} \log_2\left(5 \right)$ is the maximum number of bits that can be transmitted per use of the channel. The proof is extremely complicated. Moreover, the proof method is specific to this channel.
+
+    \begin{subparag}{Remark}
+        This problem is open for a general channel.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

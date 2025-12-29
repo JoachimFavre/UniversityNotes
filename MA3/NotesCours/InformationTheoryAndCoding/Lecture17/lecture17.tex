@@ -1,0 +1,248 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-17 at 11:50:46.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 17 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{17}{2025-11-17}{Bounds go brrr}{
+\begin{itemize}[left=0pt]
+    \item Proof of linear transformation properties of differential entropy.
+    \item Proof of more bounds on the differential entropy given some hypotheses on the random variable.
+    \item Proof of similar linear properties and bounds for multivariate random variables.
+\end{itemize}
+
+}
+
+\begin{parag}{Theorem}
+    Let $U$ be a random variable and $a \in \mathbb{R}$ be a scalar. Then:
+    \begin{enumerate}
+        \item $h\left(U + a\right) = h\left(U\right)$;
+        \item $h\left(a U\right) = \log_2\left|a\right| + h\left(U\right)$, if $a \neq 0$.
+    \end{enumerate}
+    
+    \begin{subparag}{Proof 1}
+        Let $V = U + a$. Note that: 
+        \[f_V\left(v\right) = \frac{d \prob\left(V \leq v\right)}{dv} = \frac{d \prob\left(U + a \leq v\right)}{dv} = \frac{d \prob\left(U \leq v - a\right)}{dv} = f_U\left(v-a\right).\]
+
+        Hence, doing the change of variable $u = v-a \implies du = dv$: 
+        \autoeq{h\left(U+a\right) = h\left(V\right) = \int_{\mathbb{R}} f_V\left(v\right) \log_2\left(\frac{1}{f_V\left(v\right)}\right) dv = \int_{\mathbb{R}} f_U\left(v-a\right) \log_2\left(\frac{1}{f_U\left(v-a\right)}\right)dv = \int_{\mathbb{R}} f_U\left(u\right) \log_2\left(\frac{1}{f_U\left(u\right)}\right) du = h\left(U\right).}
+    \end{subparag}
+    
+    \begin{subparag}{Proof 2}
+        We suppose that $a > 0$, the case $a < 0$ is completely similar. Let $V = a U$. The method we used above to find $f_V$ as a functional of $f_U$ works completely similarly. Let us however use a different but similar approach:
+        \autoeq{f_V\left(v\right) = \frac{d \prob\left(V \leq v\right)}{d v} = \lim_{\epsilon \to 0^+} \frac{\prob\left(V \leq v + \epsilon\right) - \prob\left(V \leq v\right)}{\epsilon} = \lim_{\epsilon \to 0^+} \frac{\prob\left(v < V \leq v + \epsilon\right)}{\epsilon}.}
+
+        Note that this expression holds for any random variable, we have not used the definition of $V$ yet. Using that $V = aU$ yields: 
+        \[f_V\left(v\right) = \lim_{\epsilon \to 0^+} \frac{\prob\left(v < aU \leq v + \epsilon\right)}{\epsilon} = \lim_{\epsilon \to 0^+} \frac{\prob\left(\frac{v}{a} < U \leq \frac{v}{a} + \frac{\epsilon}{a}\right)}{\epsilon}.\]
+
+        We aim to use the expression above. Let $\delta = \frac{\epsilon}{a} > 0$ (where we used that $a > 0$; we should use $\delta = \frac{\epsilon}{\left|a\right|}$ more generally). This then reads: 
+        \[f_V\left(v\right) = \lim_{\delta \to 0^+} \frac{\prob\left(\frac{v}{a} < U \leq \frac{v}{a} + \delta\right)}{a \delta} = \frac{1}{a} f_U\left(\frac{v}{a}\right).\]
+        
+        Note that we essentially just proved that $\frac{d}{dx} g\left(x / a\right) = \frac{1}{a} g'\left(x/a\right)$ by definition of the derivative. The reasoning we used to prove that $h\left(U + a\right) = h\left(U\right)$ may have been faster.
+
+        We could finish the proof completely similarly to the way we did for $h\left(U + a\right) = h\left(U\right)$, by doing a change of variable in the integral definition of differential entropy. However, we can take a simpler approach, using the fact $U = \frac{1}{a} V$: 
+        \autoeq{h\left(V\right) = \exval\left(-\log_2\left(f_V\left(V\right)\right)\right) = \exval\left(-\log_2\left(\frac{1}{a} f_U\left(\frac{V}{a}\right)\right)\right) = -\log_2\left(\frac{1}{a}\right) + \exval\left(- \log_2\left(f_U\left(U\right)\right)\right) = \log_2\left(a\right) + h\left(U\right).}
+
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $U \in \mathbb{R}$ be a random variable.
+    \begin{enumerate}
+        \item If $U \in \left[a, b\right]$, then: 
+        \[h\left(U\right) \leq \log_2\left(b-a\right).\]
+
+        Moreover, equality holds if and only if $U$ is uniform.
+        \item If $U \in \left[0, +\infty\right[ $ and $\exval\left(U\right) = \mu$, then: 
+        \[h\left(U\right) \leq \log_2\left(e \mu\right).\]
+
+        Moreover, equality holds if and only if $U$ is exponentially distributed.
+        
+        \item If $\Var\left(U\right) = \sigma^2$, then: 
+        \[h\left(U\right) \leq \frac{1}{2} \log_2\left(2\pi e \sigma^2\right).\]
+
+        Moreover, equality holds if and only if $U$ is a Gaussian random variable with variance $\sigma^2$ and an arbitrary mean.
+    \end{enumerate}
+    
+    \begin{subparag}{Proof 1}
+        We let $V = \frac{U-a}{b-a}$. Then, $V \in \left[0, 1\right]$ and hence $h\left(V\right) \leq 0$. However, we also notice $U = V \left(b-a\right)+ a$, and hence using our previous theorem: 
+        \[h\left(U\right) = h\left(V \left(b-a\right)+ a\right) = h\left(V \left(b-a\right)\right) = \log_2\left|b-a\right| + h\left(V\right) \leq \log_2\left|b-a\right|.\]
+
+        Moreover, equality holds if and only if $V$ is uniformly distributed, i.e.~if and only if $U = V\left(b-a\right) +a$ is uniformly distributed.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        The proof is completely similar, leaving $V = \frac{U}{\mu}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof 3}
+        The proof is completely similar, leaving $V = \frac{U - \mu}{\sigma}$ where $\mu = \exval\left(U\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsubsection{Multivariate bounds}
+
+\begin{parag}{Definition: Non-negative definite matrix}
+    Let $A \in \mathbb{R}^{n \times n}$ be a matrix. It is said to be \important{non-negative definite} if and only if it is symmetric and for any vector $a \in \mathbb{R}^n$ then $a^T A a \geq 0$.
+
+    \begin{subparag}{Remark}
+        When doing linear algebra over a complex field, asking for $a^{\dagger} A a \geq 0$ for all $a \in \mathbb{C}^n$ means necessarily that $A \in \mathbb{C}^n$ (or $A \in \mathbb{R}^n$) is symmetric. This is however not true if we only consider real vectors $a \in \mathbb{R}^n$.
+
+        Indeed, for any anti-symmetric $B$ (i.e.~such that $B^T = -B$), then since $\lambda^T = \lambda$ for any $\lambda \in \mathbb{R}$: 
+        \[a^T B a = \left(a^T B a\right)^T = a^T B^T a = - a^T B a \implies a^T B a = 0.\]
+        
+        Hence, $a^T \left(A + B\right) a = a^T A a$ does not depend on the anti-symmetric part of $A$. Hence, the following matrix is non-negative definite although it is not symmetric:
+        \[C = \begin{pmatrix} 1 & 1 \\ -1 & 1 \end{pmatrix} = \underbrace{\begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}}_{= A} + \underbrace{\begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix}}_{= B},\]
+        since $A$ is non-negative definite and $B$ is anti-symmetric.
+
+        Alternatively, it is easy to verify that $a^T C a \geq 0$ for all $a \in \mathbb{R}^n$.
+
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Positive definite matrix}
+    Let $A \in \mathbb{R}^{n \times n}$ be a matrix. It is said to be \important{positive definite} if and only if it is symmetric and for any vector $a \in \mathbb{R}^n \setminus \left\{0\right\}$ then $a^T A a > 0$.
+
+    \begin{subparag}{Remark 1}
+        This is very similar to non-negative definiteness, except that we ask for a strict inequality (for $a \neq 0$ since it is always such that $0^T A 0 =0$). 
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        If a matrix is positive definite, then it is invertible.
+
+        Let us prove this by the contrapositive. Let $A$ be non-invertible. Then, it has a non-trivial kernel and hence there exists some $a \in \mathbb{R}^n$ such that $A a = 0$. But then, $a^T A a = 0$, so $A$ is not positive definite.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $U^n$ be a $\mathbb{R}^n$-valued random vector. Then, writing $U = U^n$: 
+    \begin{enumerate}
+        \item $h\left(U + b\right) = h\left(U\right)$ for any deterministic vector $b \in \mathbb{R}^n$; 
+        \item $h\left(A U\right) = h\left(U\right) + \log_2\left|\det A\right|$ for any deterministic invertible matrix $A \in \mathbb{R}^{n \times n}$.
+    \end{enumerate}
+
+    \begin{subparag}{Proof 1}
+        The proof of the first property is considered trivial and left as an exercise to the reader.
+    \end{subparag}
+
+    \begin{subparag}{Proof 2}
+        We will prove that this expression holds when $A = L$ is lower triangular. By the exact same reasoning, it is possible to show that this expression also holds for an upper-triangular matrix. The result then finally comes from the fact that any matrix can be decomposed as a product of a lower-triangular and upper-triangular matrix by the LU decomposition.
+
+        We thus suppose that $A = L$ is lower-triangular. Let $V = A U = L U$. This reads:
+        \[V = LU \iff \begin{pmatrix} V_1 \\ \vdots \\ V_n \end{pmatrix} = \begin{pmatrix} L_{11} & \cdots & 0 \\ \vdots & \ddots & \vdots \\ L_{n1} & \cdots & L_{nn} \end{pmatrix} \begin{pmatrix} U_1 \\ \vdots \\ U_n \end{pmatrix}.\]
+
+        By the chain rule: 
+        \autoeq{h\left(V^n\right) = h\left(V_1\right) + h\left(V_2 \suchthat V_1\right) + \ldots + h\left(V_n \suchthat V^{n-1}\right) = h\left(L_{11} U_1\right) + h\left(L_{22} U_2 + L_{21} U_1 \suchthat V_1\right) + \ldots \fakeequal + h\left(L_{nn} U_n + L_{n1} U_1 + \ldots + L_{n, n-1} U_{n-1} \suchthat V^{n-1}\right).}
+
+        Now, we notice that $h\left(L_{22} U_2 + L_{21} U_1 \suchthat V_1\right) = h\left(L_{22} U_2 \suchthat V_1\right)$. Indeed, knowing $V_1$ is equivalent to knowing $U_1 = \frac{1}{L_1} V_1$ (since $A = L$ is invertible and hence its diagonal elements are non-zero). But then, knowing $V_1$, then $L_{21} U_1$ is just a constant shift, which does not matter for differential entropy. We can use this reasoning for every terms in the sum to get:
+        \autoeq{h\left(V^n\right) = h\left(L_{11} U_1\right) + h\left(L_{22} U_2 \suchthat V_1\right) + \ldots + h\left(L_{nn} U_n \suchthat V^{n-1}\right) = \sum_{i=1}^{n} h\left(L_{ii} U_i \suchthat V^{i-1}\right) = \sum_{i=1}^{n} \left(\log_2\left(L_{ii}\right) + h\left(U_i \suchthat V^{i-1}\right)\right),}
+        where we used the fact that $h\left(a U\right) = \log_2\left|a\right| + h\left(U\right)$. 
+
+        Now, we know that the product of the diagonal elements of a triangular matrix is its determinant. Moreover, as stated above, knowing $V^{i-1}$ is equivalent to knowing $U^{i-1}$. Hence, this becomes:
+        \[h\left(V^n\right) = \log_2\left|\prod_{i=1}^{n} L_{ii}\right| + \sum_{i=1}^{n} h\left(U_i \suchthat U^{i-1}\right) = \log_2\left|\det L\right| + h\left(U^n\right),\]
+        using the chain rule for differential entropy. This is exactly the result we wished for. As explained above, it holds for upper-triangular matrices by the exact same reasoning, and hence for any matrix thanks to the LU decomposition.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Cholesky decomposition}
+    Let $K$ be a positive definite matrix.
+
+    Then, there exists a lower-triangular and invertible matrix $L$ such that $K = L L^T$.
+
+    \begin{subparag}{Remark}
+        $L$ being invertible means that it only has non-zero elements on the diagonal.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $U^n$ be a random vector, which we write $U = U^n$, and $K = \exval\left(U U^T\right)$ be its second moment matrix. Then: 
+    \[h\left(U^n\right) \leq \frac{1}{2} \log_2\left(\det\left(2\pi e K\right)\right).\]
+
+    Moreover, equality is reached if and only if $U^n \followsdistr N\left(0, K\right)$ is a multivariate Gaussian vector.
+
+   \begin{subparag}{Proof 1}
+        Note that $K$ is non-negative definite since for any $a \in \mathbb{R}^n$:
+        \[a^T K a = \exval\left(a^T U U^T a\right) = \exval\left(\left(U \dotprod a\right)^2\right) \geq 0.\]
+
+        We assume for the sake of simplicity that it is in fact positive definite. Hence, let $K = L L^T$ be its Cholesky decomposition decomposition. Also, consider the vector $V = L^{-1} U$. Note that $V V^T$ is a matrix which $\left(i, j\right)$ entry is $V_i V_j$. Moreover, by definition: 
+        \[\exval\left(V V^T\right) = \left(L^T\right)^{-1} U U^T L^{-1} = L^{-1} K \left(L^T\right)^{-1} = L^{-1} L L^T \left(L^T\right)^{-1} = I.\]
+        
+        Overall, this tells us that: 
+        \[\exval\left(V_i V_j\right) = \begin{systemofequations} 0, & \text{if $i \neq j$,}\\ 1, & \text{if $i = j$.} \end{systemofequations}\]
+        
+        In particular, $\exval\left(V_i^2\right) = 1$ for all $i$. This tells us that $h\left(V_i\right) \leq \frac{1}{2}\log_2\left(2\pi e\right)$ for all $i$. Therefore, using the fact $V = L^{-1} U \iff U = L V$ and our previous theorem:
+        \autoeq{h\left(U^n\right) = h\left(L V^n\right) = \log_2\left|\det L\right| + h\left(V^n\right) \leq \log_2\left|\det L\right| + \sum_{i=1}^{n} h\left(V_i\right) \leq \log_2\left|\det L\right| + \frac{n}{2} \log_2\left(2\pi e\right),}
+        where $h\left(V^n\right) \leq \sum_{i=1}^{n} h\left(V_i\right)$ comes by the chain rule and that conditioning reduces entropy.
+        
+        We can make this result cleaner by using the fact $\det K = \det\left(L L^T\right) = \det\left(L\right)^2$, giving us: 
+        \autoeq{h\left(U^n\right) \leq \frac{1}{2} \left(\log_2\left(\det\left(L\right)^2\right) + \log_2\left(\left(2\pi e\right)^n\right)\right) = \frac{1}{2} \left[\log_2\left(\det K\right) + \log_2\left(\left(2\pi e\right)^n\right)\right] = \frac{1}{2} \log_2\left(\det\left(2 \pi e K\right)\right),}
+        where we used that $\det\left(a K\right) = a^n \det\left(K\right)$ for $K \in \mathbb{R}^{n \times n}$.
+        
+        Let us now study equality. For $h\left(V_i\right) = \frac{1}{2} \log_2\left(2\pi e\right)$ to hold, we need $V_i \followsdistr N\left(0, 1\right)$. Moreover, for $h\left(L_{ii} V_i \suchthat U^{i-1}\right) = h\left(L_{ii} V_i\right)$, we need the $V_i$ to be independent. Overall, this can be shown that this is equivalent to $U^n$ being a vector from a 0-mean multivariate Gaussian distribution.
+        
+        \qed
+   \end{subparag}
+
+   \begin{subparag}{Unimportant remark}
+        Let us make a (really unimportant) remark on the proof above. This reasoning proved that, given a Gaussian random vector $U^n$ with zero mean and non-singular second moment matrix, we can find a lower triangular $L$ such that $U^n = L V^n$ with $V_i \iid N\left(0, 1\right)$. In other words, this gives:
+        \[U_1 = V_1 \beta_{11}, \mathspace U_2 = \alpha_{21} U_1 + V_2 \beta_{22}, \mathspace U_3 = \alpha_{31} U_1 + \alpha_{32} U_2 + V_3 \beta_{32}, \mathspace \ldots\]
+
+        This is named an innovation sequence, and it is a form of linear regression. Indeed, given $U^{i-1}$, this tells us how to predict $U_i$. For instance, given $U_1, U_2$, the best we can predict is $U_3 \approx \alpha U_1 + \alpha_{32} U_2$ and we know we will have some leftover error $V_3 \beta_{32} \followsdistr N\left(0, \beta_{32}^2\right)$.
+   \end{subparag}
+
+   \begin{subparag}{Proof 2}
+       We make another proof, which is less elegant but might be seen as more principled. Let $f\left(u^n\right)$ be the PDF of $U^n$ and $g\left(u^n\right)$ be the Gaussian PDF, i.e: 
+       \[g\left(u^n\right) = \frac{1}{\sqrt{\det\left(2\pi K\right)}} \exp\left(-\frac{1}{2} u^T K^{-1} u\right).\]
+
+       By non-negativity of the divergence: 
+       \autoeq{0 \geq -D\left(f || g\right) = \int_{\mathbb{R}^n} f\left(u^n\right) \log_2\left(\frac{g\left(u^n\right)}{f\left(u^n\right)}\right) du^n = h\left(U^n\right) + \int_{\mathbb{R}^n} f\left(u^n\right) \log_2\left(g\left(u^n\right)\right) du^n = h\left(U^n\right) + \exval\left[\log_2\left(g\left(U^n\right)\right)\right].}
+
+       However, by definition of $g$: 
+       \autoeq{\exval\left[\log_2\left(g\left(U^n\right)\right)\right] = \exval\left[-\frac{1}{2} \log_2\left(\det\left(2\pi k\right)\right) - \frac{1}{2} \log_2\left(e\right) \sum_{i, j} U_i \left(K^{-1}\right)_{ij} U_j\right] = -\frac{1}{2} \log_2\left(\det\left(2\pi k\right)\right) - \frac{1}{2} \log_2\left(e\right) \sum_{i, j} \left(K^{-1}\right)_{ij} \exval\left(U_i U_j\right).}
+       
+       Hence, using the fact that $\exval\left(U_i U_j\right) = K_{ij}$ by definition, our inequality becomes:
+       \[0 \geq h\left(U^n\right) - \frac{1}{2} \log_2\left(\det\left(2\pi K\right)\right) - \frac{1}{2} \log_2\left(e\right) \sum_{i,j} K_{ij} \left(K^{-1}\right)_{ij}.\]
+       
+       However, $K_{ij} = \exval\left(U_i U_j\right) = \exval\left(U_j U_i\right) = K_{ji}$ is symmetric. Moreover, using the fact $\sum_{j} A_{ij} B_{jk} = \left(AB\right)_{ik}$ by definition of matrix multiplication:  
+       \[\sum_{i, j} K_{ij} K^{-1}_{ij} = \sum_{i, j} K_{ji} K^{-1}_{ij} = \sum_{j} \left(K K^{-1}\right)_{jj} = \sum_{j} 1 = n.\]
+       
+       Our inequality finally becomes:
+       \autoeq{0 \geq h\left(U^n\right) - \frac{1}{2} \log_2\left(\det\left(2\pi K\right)\right) - \frac{n}{2} \log_2\left(e\right) = h\left(U^n\right) - \frac{1}{2} \log_2\left(\det\left(2\pi e K\right)\right),}
+       where we used that $e^n \det\left(A\right) = \det\left(e A\right)$ for any matrix $A \in \mathbb{R}^{n \times n}$.
+       
+       \qed
+   \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $U^n = U$ be a $\mathbb{R}$-valued random vector. Moreover, let $K$ be its covariance matrix: 
+    \[K = \Cov\left(U\right) = \exval\left(U U^T\right) - \exval\left(U\right)\exval\left(U^T\right).\]
+
+    Then: 
+    \[h\left(U\right) \leq \frac{1}{2} \log_2\left(\det\left(2 \pi e K\right)\right),\]
+    with equality if and only if $U \followsdistr N\left(\mu, K\right)$ for an arbitrary $\mu \in \mathbb{R}$.
+
+    \begin{subparag}{Proof}
+        $K$ is the second moment matrix of $V = U - \exval\left(U\right)$. Hence, this corollary directly comes from our previous result on $V$, using the fact $h\left(U\right) = h\left(V\right)$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

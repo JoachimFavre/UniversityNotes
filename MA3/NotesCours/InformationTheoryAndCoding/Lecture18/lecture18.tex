@@ -1,0 +1,204 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-18 at 13:15:56.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 18 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{18}{2025-11-18}{An important date}{
+\begin{itemize}[left=0pt]
+    \item \textit{Happy birthday, M! \wink}
+    \item Definition of the additive Gaussian noise channel.
+    \item Computation of the capacity under constraint of the additive Gaussian noise channel in discrete time.
+    \item Generalisation to continuous time for our general knowledge.
+\end{itemize}
+
+}
+
+\subsubsection{Additive Gaussian noise channel}
+
+\begin{parag}{Definition: Additive Gaussian noise channel}
+    The \important{additive Gaussian noise channel} is such that, on an input $x \in \mathbb{R}$, it outputs $Y = x + Z$ for $Z \followsdistr N\left(0, \sigma^2\right)$ chosen independently of $x$. 
+
+    \begin{subparag}{Remark}
+        Unless $x$ is bounded, then it is pretty trivial to make reliable communication. We can for instance pick $2^{1000}$ points with a distance $1000 \sigma$ on $\mathbb{R}$. The decoder will then be able to know exactly which point we sent with extremely high probability. 
+
+        The number of bits sent reliably can be increased arbitrarily, showing that this channel has an infinite capacity. However, this is at the cost of the spectrum of $x$. If this is represented through electrical current, this could not be done physically, so we have to put some limits to what we can do.
+
+        Hence, we add a cost $b\left(x\right) = x^2$. This is motivated by the fact that the power is given by $R I^2 \propto I^2$, meaning that the power used is propositional to the square of the current.
+
+        This is however not perfect. The optimal distribution might take $0$ with very high probability and an insanely high value with very low probability. On expectation, we would have a small cost $\exval\left(b\left(X\right)\right)$, but the worst case would be very bad. This would not be usable in practice, so we may want to prevent it as well. 
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    The capacity of the additive Gaussian noise channel $x \mapsto x + Z$ for $Z \followsdistr N\left(0, \sigma^2\right)$, under the cost function $b\left(x\right) = x^2$,  is:
+    \[C\left(\beta\right) = \frac{1}{2} \log_2\left(1 + \frac{\beta}{\sigma^2}\right).\]
+
+    It is moreover attained with $X \followsdistr N\left(0, \beta\right)$.
+
+    \begin{subparag}{Remark 1}
+        Interestingly, this is one of the most known formula outside of the information theory community.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The optimal distribution for $X$ is a Gaussian, which is very well behaved. We are thus not in the case where it takes insanely high value with very low probability.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        Interestingly, asking for a bounded power does give us a finite capacity.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        By definition, capacity is defined by:
+        \[C\left(\beta\right) = \max_{p_X: \exval\left(X^2\right) = \beta} I\left(X; Y\right).\]
+         
+        Now, by definition of mutual entropy: 
+        \autoeq{I\left(X; Y\right) = h\left(Y\right) - h\left(Y \suchthat X\right) = h\left(X + Z\right) - h\left(X + Z \suchthat X\right) = h\left(X + Z\right) - h\left(Z \suchthat X\right) = h\left(X + Z\right) - h\left(Z\right),}
+        where we used that shifting a random variable does not change its differential entropy, and that $Z$ is independent of $X$. Since $Z \followsdistr N\left(0, \sigma^2\right)$ is Gaussian, we know that $h\left(Z\right) = \frac{1}{2} \log_2\left(2\pi e \sigma^2\right)$, so we only have to maximise $h\left(X + Z\right)$.
+        
+        Note that, since $\exval\left(X^2\right) = \beta$ by our constraint and since $X$ and $Z$ are independent: 
+        \autoeq{\exval\left(\left(X + Z\right)^2\right) = \exval\left(X^2\right)+ \exval\left(Z^2\right) + 2 \exval\left(X Z\right) = \beta + \sigma^2 + 2 \exval\left(X\right) \underbrace{\exval\left(Z\right)}_{=  0} = \beta + \sigma^2.}
+
+        Hence, as we have seen earlier in the class: 
+        \[h\left(X + Z\right) \leq \frac{1}{2} \log_2\left(2\pi e \left(\beta + \sigma^2\right)\right),\]
+        with equality if and only if $X + Z \followsdistr N\left(0, \beta + \sigma^2\right)$. Since $Z \followsdistr N\left(0, \sigma^2\right)$ is Gaussian and independent of $X$, this is equivalent to asking $X \followsdistr N\left(0, \beta\right)$.
+
+        Overall, we do find exactly that: 
+        \[I\left(X; Y\right) = \frac{1}{2} \log_2\left(2\pi e \left(\beta + \sigma^2\right)\right) - \frac{1}{2} \log_2\left(2\pi e \sigma^2\right) = \frac{1}{2} \log_2\left(\frac{\beta + \sigma^2}{\sigma^2}\right),\]
+        which is reached with equality for $X \followsdistr N\left(0, \beta\right)$.
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        The amount of bounds we have seen in the previous lectures may seem superfluous. However, as we can see in the proof above, they do come in handy as soon as we analyse continuous channels.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    Our model above assumes that we use our channel at discrete times: we send some $x_1, \ldots, x_n$ and the receiver receives some $Y_1, \ldots, Y_n$ where $Y_i = x_i + Z_i$ and the $Z_i \followsdistr N\left(0, 1\right)$ are independent. Now, in practice, we also have access to continuous time. In this case, the way we model our channel is that we send some $x\left(t\right)$ and that the receiver receives $x\left(t\right) + N\left(t\right)$ where $N\left(t\right)$ is a white Gaussian noise (which is just a generalisation of $Z_1, \ldots, Z_n \iid N\left(0, 1\right)$ to continuous times, and formalised slightly below).
+
+    We can again communicate infinite data by waiting some arbitrarily small $\Delta t$ between sending each bit, or by taking an arbitrarily long time to communicate. We will thus assume that we have access to some limited frequencies (we cannot blast gamma rays through a city) and some limited timeframe for communication (we're still just mortals).
+
+    This derivation is however just for our general knowledge, and should not be taken too seriously.
+\end{parag}
+
+\begin{parag}{Definition: White Gaussian noise}
+    A stochastic process $N\left(t\right)$ is said to be a \important{white Gaussian noise} if it is a stationary Guassian proces process such that: 
+    \[\exval\left(N\left(t\right)\right) = 0, \mathspace R\left(\tau\right) := \exval\left(N\left(t\right) N\left(t + \tau\right)\right) = \sigma^2 \delta\left(\tau\right),\]
+    where $\delta\left(\tau\right)$ is the Dirac delta.
+    
+    \begin{subparag}{Remark 1}
+        This for instance says that $N\left(t\right)$ and $N\left(t + 10^{-10}\right)$ are independent for any $t$. This indeed generalises $Z_1, \ldots, Z_n \iid N\left(0, 1\right)$.
+
+        This is a widely fluctuating process, we even have $R\left(0\right) = +\infty$ and hence it has an infinite variance. It therefore naturally does not really exist in practice.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        As explained above, we assume that the channel is such that, when we send $x\left(t\right)$, the receiver gets $x\left(t\right) + N\left(t\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        An intuitive way to understand this process is the following. Suppose that we feed $N\left(t\right)$ to some LTI filter which behaviour in the frequency domain is only to keep frequencies close to $f_0 \pm \frac{\Delta}{2}$ (i.e.~some band-pass filter). It then outputs $\widetilde{N}_{f_0, \Delta}\left(t\right)$. Since $N\left(t\right)$ was stationary, then $\widetilde{N}_{f_0, \Delta}\left(t\right)$ is still stationary. It is moreover also a Gaussian since linear transformation preserve Gaussianity. Now, this is such that: 
+        \[\exval\left(\widetilde{N}_{f_0, \Delta}\left(t\right)^2\right) = \sigma^2 \cdot 2 \Delta.\]
+
+        This does not depend on $f_0$. In other words, $N\left(t\right)$ contains the same amount of power in every constant frequency interval. This is thus analogous to white light, which contains the same amount of every frequency, giving it its name.
+
+        Now, in practice, this will indeed hold, but only up to some maximal frequency $f_0$. White Gaussian noise is however a good approximation; it turns out to be a good model of the noise we find in physical systems.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Brownian motion}
+    Another way to understand Gaussian noise is through Brownian motion.
+
+    Let us consider a random walk (i.e.~with a probability $\frac{1}{2}$ to do $+1$, and probability $\frac{1}{2}$ to do $-1$), which we interpolate with straight lines. This gives a function $\text{Walk}\left[t\right]$.
+    \svghere[0.6]{RandomWalk.svg}
+
+    Let $W_n\left(t\right) = \frac{1}{\sqrt{n}} \text{Walk}\left[nt\right]$ and $W\left(t\right) = \lim_{n \to \infty} W_n\left(t\right)$. Then, it can be shown to be related to Gaussian white noise $N\left(t\right)$ (with $\sigma^2 = 1$) in such a way that:
+    \[W\left(t\right) = \int_{0}^{t} N\left(s\right) ds, \mathspace N\left(t\right) = \frac{d}{dt} W\left(t\right),\]
+
+    In other words, $N\left(t\right)$ tells the slope of $W\left(t\right)$ at any time.
+
+    \begin{subparag}{Remark 1}
+        $W\left(t\right)$ cannot be differentiated, so this is really just intuition. This is similar to saying that the delta function is the derivative of the Heaviside function.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that $W\left(t\right) = \lim_{n \to \infty} W_n\left(t\right)$ is a Gaussian process by the central limit theorem, with $\exval\left(W\left(t\right)^2\right) = t$ and $\exval\left(W\left(t\right) W\left(s\right)\right) = \min\left(t, s\right)$. Its variance increases in time, which should be intuitive.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: SVD decomposition}
+    Let $K\left(t, \tau\right)$ be a function. If $\iint_{\mathbb{R}^2} \left|K\left(t, \tau\right)\right|^2 dt d\tau < +\infty$, then there exists $u_1\left(t\right), u_2\left(t\right), \ldots$, $v_1\left(t\right), v_2\left(t\right), \ldots$ and $d_1 \geq d_2 \geq \ldots \geq 0$ such that: 
+    \begin{enumerate}
+        \item $\displaystyle K\left(t, \tau\right) = \sum_{\ell} u_{\ell}\left(t\right) d_{\ell} v_{\ell}\left(\tau\right)$;
+            
+        \item The $\left(u_i\right)$ and the $\left(v_i\right)$ are two orthonormal families: 
+    \[\int_{\mathbb{R}} u_i\left(t\right) u_j\left(t\right)dt = \int_{\mathbb{R}} v_i\left(t\right) v_j\left(t\right) dt = \begin{systemofequations} 1, & \text{if $i = j$,}  \\ 0, & \text{otherwise.} \end{systemofequations}\]
+    \end{enumerate}
+
+    \begin{subparag}{Intuition}
+        $K\left(t, \tau\right)$ is the continuous equivalent to a matrix $K_{ij}$. Now, in the discrete case, we can find a SVD decomposition $K = U D V^T$, allowing to write $K_{ij} = \sum_{\ell} u_{i \ell} D_{\ell \ell} v_{j \ell}$. The result above is just its continuous equivalent.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Analysis}
+    Let us now analyse our channel $x\left(t\right) \mapsto x\left(t\right) + N\left(t\right)$. We assume that we only have a time $T$ to communicate, and access to some specific frequencies. Moreover, we assume that the listener only has some limited time $T$ to listen. We can enforce this by filtering out everything outside these timeframe (with a multiplication) and frequencies (with a multiplication in the frequency domain). Our channel thus becomes:
+    \svghere[0.9]{AdditiveGaussianNoiseChannelLTI.svg}
+
+    We can in fact also rescale the time units so that the frequency band has width $W = 1$, yielding:
+    \svghere[0.9]{AdditiveGaussianNoiseChannelLTINormalised.svg}
+
+    \begin{subparag}{Channel is discrete}
+        We first aim to show that our constraints makes the channel become discrete.
+
+        We know that the Fourier transform of a box is a sinc function. Hence, since multiplying in the frequency domain is equivalent to doing a convolution in the time domain, our output signal is such that:
+        \autoeq{y\left(t\right) = I\left(\left|t\right| < \frac{TW}{2}\right) \int_{\mathbb{R}} \sinc\left(t - \tau\right) x\left(\tau\right) I\left(\tau < \frac{TW}{2}\right) d \tau + N\left(t\right) I\left(\left|t\right| < \frac{TW}{2}\right) = \int_{\mathbb{R}} K\left(t, \tau\right) x\left(\tau\right) d\tau + N\left(t\right) I\left(\left|t\right| < \frac{TW}{2}\right),}
+        where $K\left(t, \tau\right) = I\left(\left|t\right| < \frac{T W}{2}\right) \sinc\left(t - \tau\right) I\left(\left|\tau\right| < \frac{T W}{2}\right)$. Note that $K\left(t, \tau\right) = K\left(\tau, t\right)$.
+
+        Note that $\int_{\mathbb{R}} K\left(t, \tau\right) x\left(\tau\right) d\tau$ is the continuous analogous to $\left(K \bvec{x}\right)_i = \sum_{j} K_{ij} x_j$. Applying an SVD decomposition $K\left(t, \tau\right) = \sum_{\ell} u_{\ell}\left(t\right) d_{\ell} v_{\ell}\left(\tau\right)$, we find for $\left|t\right| < \frac{TW}{2}$:
+        \[y\left(t\right) = \sum_{\ell} d_{\ell} u_{\ell}\left(t\right) \int_{\mathbb{R}} x\left(\tau\right) v_{\ell}\left(\tau\right) d \tau + N\left(t\right).\]
+
+        Now, let $x_{\ell} = \left\langle x, v_{\ell} \right\rangle = \int_{\mathbb{R}} x\left(\tau\right) v_{\ell}\left(\tau\right) d \tau$. Then: 
+        \[y\left(t\right) = \sum_{\ell} d_{\ell} x_{\ell} u_{\ell}\left(t\right) + N\left(t\right)\]
+
+        Similarly, define $y_{\ell} = \left\langle y, u_{\ell} \right\rangle$. By orthogonality of the $u_i\left(t\right)$: 
+        \[y_{\ell} = d_{\ell} x_{\ell} + Z_{\ell}, \mathspace \text{where } Z_{\ell} = \left\langle N, u_{\ell} \right\rangle.\]
+        
+        One can show that $Z_{\ell} \iid N\left(0, \sigma^2\right)$.
+        
+        We have thus shown overall that that $x\left(t\right) \channelmaps y\left(t\right) = x\left(t\right) + N\left(t\right)$ under time and band limitation is equivalent to $\left(x_1, x_2, \ldots\right) \channelmaps \left(y_1, y_2, \ldots\right)$ where $y_i = d_i x_i + Z_i$ and $Z_i \iid N\left(0, \sigma^2\right)$ and where $d_1, d_2, \ldots$ can be shown to be close to 1 up to $i \leq \left\lfloor T w \right\rfloor $ and then transitions to 0 in time $o\left(\log_2\left(Tw\right)\right)$. In other words, we have indeed shown that our continuous channel under time and band limitation just becomes discrete $x_i \channelmaps x_i + Z_i$ for $1 \leq i \leq n = TW$.
+    \end{subparag}
+
+    \begin{subparag}{Power limitation}
+        Let us now also add power limitation to our model. By orthogonality:
+        \[\int_{\mathbb{R}} x\left(t\right)^2 dt = \sum_{i=1}^{TW} x_i^2\]
+        
+        Hence, requiring the energy to be at most $PT$ (assuming we can provide a power $P$ during the whole allowed timeframe $T$), we have, for $n = TW$ 
+        \autoeq{\exval\left(\int_{\mathbb{R}} x\left(t\right)^2 dt\right) \leq PT \iff \exval\left(\frac{1}{n} \sum_{i=1}^{n} x_i^2\right) \leq \frac{P}{W}}
+
+        Now, as we shown in the previous paragraph, we are back to a channel $x_i \channelmaps x_i + Z_i$. We can thus use the result $C\left(\beta\right) = \frac{1}{2} \log_2\left(1 + \frac{\beta}{\sigma^2}\right)$ we found earlier. We read above that $\beta = \frac{P}{W}$, telling us that the channel capacity per unit time is given by (using again that $n = TW$): 
+        \autoeq{\frac{1}{T} I\left(X^n; Y^n\right) \leq \frac{1}{T} n C\left(\beta\right) = \frac{1}{T} n \frac{1}{2} \log_2\left(1 + \frac{P}{W \sigma^2}\right) = \frac{1}{2} W \log_2\left(1 + \frac{P}{W \sigma^2}\right) = B \log_2\left(1 + \frac{P}{B N_0}\right),}
+        where $B = W/2$ and $N_0 = 2 \sigma^2$. This represents the number of bits we can send per unit time.
+
+        Note that $\log_2\left(1 + x\right) \approx x \log_2\left(e\right)$ for small $x$. Hence, the asymptote as $B \to \infty$ is $B \log_2\left(1 + \frac{P}{\sigma^2 B}\right) \approx \log_2\left(e\right) \frac{P}{\sigma^2}$. This tells us that there is an interest to increase the bandwidth $B$ up to some point. Then, when it gets close to the asymptote, increasing the bandwidth does not bring much interest. At this point, one should increase the power $P$.
+    \end{subparag}
+
+    \begin{subparag}{Energy per bit sent}
+        As found above, in a period of time $T$, we can send $TB \log_2\left(1 + \frac{P}{\sigma^2 B}\right)$ bits by spending $TP$ amount of energy. Hence, we use $\frac{B}{P} \log_2\left(1 + \frac{P}{B \sigma^2}\right)$ bits per unit energy. We can rewrite this as: 
+        \[\frac{B}{P} \log_2\left(1 + \frac{P}{B \sigma^2}\right) = \frac{1}{\alpha \sigma^2} \log_2\left(1 + \alpha\right) \leq \frac{1}{\sigma^2} \log_2\left(e\right),\]
+        where we used that $\frac{1}{\alpha} \log_2\left(1 + \alpha\right) \leq \log_2\left(e\right)$ for $\alpha \geq 0$. We have thus shown that no system can use less than $\frac{1}{\log_2\left(e\right)/\sigma^2} = \sigma^2 \ln\left(2\right)$ units of energy per bits sent.
+    \end{subparag}
+\end{parag}
+
+\end{document}

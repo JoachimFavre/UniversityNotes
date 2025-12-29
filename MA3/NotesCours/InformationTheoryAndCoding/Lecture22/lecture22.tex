@@ -1,0 +1,147 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-12-02 at 13:17:08.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Mardi 02 décembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{22}{2025-12-02}{More propaganda for better radicalisation}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the encoding part of polar codes.
+    \item Explanation of the decoding part of polar codes.
+    \item Explanation of properties of polar codes on the BEC by doing a numerical experimentation.
+    \item Exploitation of the results of the numerical experimentation to design a code on the synthesised channels.
+\end{itemize}
+
+}
+
+\begin{parag}{Remark}
+    Polarising our channels once is nice, but we want to repeat this operation multiple times. \textit{We aim to show more propaganda to better radicalise our population.}
+\end{parag}
+
+\begin{parag}{Chaining polarisations (encoder)}
+    Consider the following setup:
+    \svghere[0.9]{PolarCodeConstruction-4.svg}
+
+    The idea is that we start with two pairs of polarising channels (in red): 
+    \[W^-: U_1 \mapsto Y_1 Y_2, \mathspace W^+: U_2 \mapsto Y_1 Y_2 U_1,\]
+    \[W^-: U_3 \mapsto Y_3 Y_4, \mathspace W^+: U_4 \mapsto Y_3 Y_4 U_3.\]
+    
+    We are then polarising our two $W^-$ channels (in blue), giving:
+    \[W^{--}: V_1 \mapsto Y^4, \mathspace W^{-+}: V_2 \mapsto Y^4 V_1.\]
+
+    Similarly, we polarise our two $W^+$ channels (in green):
+    \[W^{+ -}: V_3 \mapsto Y^4 U_1 U_3 = Y^4 V^2, \mathspace W^{++} : V_4 \mapsto Y^4 U_1 U_3 V_3 = Y^4 V^3.\]
+
+    \begin{subparag}{Remark}
+        We can polarise eight copies of $W$ to get $W^{---}, W^{-- +}, \ldots, W^{+++}$ by a completely similar reasoning. This can be generalised to any power of two.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Decoder}
+    Let us now describe our decoder. We will prove that:
+    \begin{enumerate}
+        \item For any channel $W: x \channelmaps y$, there exists a statistics $L_W\left(y\right) \in \mathbb{R}$ from which we can deduce an optimal guess for $\hat{x}$ in such a way that $\prob\left(X \neq \hat{x} \suchthat y\right)$ is minimised.
+        \item Considering two copies of the same channel $W$ that outputs $y_1, y_2$. We consider $W^-: u_1 \channelmaps y_1 y_2$ and $W^+: u_2 \channelmaps y_1 y_2 u_1$ to be their polarisation, and $u_1$ be the output of $W^+$. Then, there exists:
+            \begin{itemize}
+                \item an operator $D_-$ that maps $\left(L_W\left(y_1\right), L_W\left(y_2\right)\right)$ to $L_{W^-}\left(y_1, y_2\right)$,
+                \item an operator $D_+$ that maps $\left(L_W\left(y_1\right), L_W\left(y_2\right), u_1\right)$ to $L_{W^+}\left(y_1, y_2, u_1\right)$,
+            \end{itemize}
+    \end{enumerate}
+
+    We can construct our decoder from these. Indeed, recall that:
+    \[W^-: U_1 \mapsto Y_1 Y_2, \mathspace W^+: U_2 \mapsto Y_1 Y_2 U_1,\]
+    \[W^-: U_3 \mapsto Y_3 Y_4, \mathspace W^+: U_4 \mapsto Y_3 Y_4 U_3.\]
+    \[W^{--}: V_1 \mapsto Y^4, \mathspace W^{-+}: V_2 \mapsto Y^4 V_1.\]
+    \[W^{+ -}: V_3 \mapsto Y^4 U_1 U_3 = Y^4 V^2, \mathspace W^{++} : V_4 \mapsto Y^4 U_1 U_3 V_3 = Y^4 V^3.\]
+
+    We can then construct the following decoder.
+    \svghere{PolarCodeDecoding.svg}
+    
+    This can easily be generalised.
+
+    \begin{subparag}{Proof 1}
+        To minimise $\prob\left(X \neq \hat{x}\right)$, we use the minimum likelihood principle to find: 
+        \[\hat{x} = \begin{systemofequations} 0, & \text{if $W\left(y \suchthat 0\right) > W\left(y \suchthat 1\right)$}, \\ 1, & \text{if $W\left(y \suchthat 0\right) < W\left(y \suchthat 1\right)$} \end{systemofequations} = \begin{systemofequations} 0, & \text{if $\frac{W\left(y \suchthat 0\right)}{W\left(y \suchthat 1\right)} < 1$}, \\ 1, & \text{if $\frac{W\left(y \suchthat 0\right)}{W\left(y \suchthat 1\right)} > 1$}. \end{systemofequations}\]
+        
+        Hence, the value $L_W\left(y\right) = \frac{W\left(y \suchthat 0\right)}{W\left(y \suchthat 1\right)}$ allows us to make an optimal decision.
+    \end{subparag}
+    
+    \begin{subparag}{Proof 2}
+        We found: 
+        \[W^-\left(y_1 y_2 \suchthat u_1\right) = \frac{1}{2} \sum_{u_2} W\left(y_1 \suchthat u_1 + u_2\right) W\left(y_2 \suchthat u_2\right),\]
+        \[W^+\left(y_1 y_2 u_1 \suchthat u_2\right) = \frac{1}{2} W\left(y_1 \suchthat u_1 + u_2\right) W\left(y_2 \suchthat u_2\right).\]
+
+        Now, we note that:
+        \autoeq[s]{L_{W^-}\left(y_1, y_2\right) = \frac{W^-\left(y_1 y_2 \suchthat u_1 = 0\right)}{W^-\left(y_1 y_2 \suchthat u_1 = 0\right)} = \frac{W\left(y_1 \suchthat 0\right) W\left(y_2 \suchthat 0\right) + W\left(y_1 \suchthat 1\right) W\left(y_2 \suchthat 1\right)}{W\left(y_1 \suchthat 1\right) W\left(y_2 \suchthat 0\right) + W\left(y_1 \suchthat 0\right) W\left(y_2 \suchthat 1\right)} \cdot \frac{\frac{1}{W\left(y_1 \suchthat 1\right) W\left(y_2 \suchthat 1\right)}}{\frac{1}{W\left(y_1 \suchthat 1\right) W\left(y_2 \suchthat 1\right)}} = \frac{L_W\left(y_1\right) L_W\left(y_2\right) + 1}{L_W\left(y_2\right) + L_W\left(y_1\right)}.}
+        
+        We are thus indeed able to compute the decision statistics for the synthetic channel $W^-$ from the ones of $W$, giving us a $D_-$ operator. Doing a similar computation, we can find our $D_+$ operator: 
+        \[L_{W^+}\left(y_1 y_2 u_1\right) = \begin{systemofequations} L_W\left(y_1\right) L_W\left(y_2\right), & \text{if $u_1 = 0$,}\\ \frac{L_W\left(y_1\right)}{L_W\left(y_2\right)}, & \text{if $u_1 = 1$.} \end{systemofequations}\]
+        
+        This gives us a minus operator $D_-$ and a plus operator $D_+$.
+
+        %The first step is to compute $L_1, \ldots, L_4$ on the basis of the $y$ we receive. Applying our operators, we find $L_1^-$ and $L_2^-$, which we combine to get $L^{--}$. From this, we get $\hat{V}_1$. We then treat it as the true value, and feed it to $D_+$  to get $L^{-+}$ and hence telling us $\hat{V}_2$. These tell us $\hat{U}_1$ and $\hat{U}_3$. We can then use them to get $L_1^+$ and $L_2^+$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    If we polarise $n = 2^t$ channels, then:
+    \begin{itemize}[left=0pt]
+        \item The encoding effort to turn $U^n$ to $X^n$ is $O\left(t 2^t\right) = O\left(n \log\left(n\right)\right)$.
+        \item The decoding effort to map $Y^n$ to $\hat{U}^n$ is $O\left(t 2^t\right) = O\left(n \log\left(n\right)\right)$.
+    \end{itemize}
+
+    \begin{subparag}{Remark}
+        This is much better than the $2^{n R}$ effort for random codes.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Numerical experimentation}
+    We found that polarising $W = \BEC\left(p\right)$ gives $W^- = \BEC\left(p\left(2-p\right)\right)$ and $W^+\left(p^2\right)$. This gives us recursive formulas to evaluate $q\left(s\right)$ such that $W^s = \BEC\left(q\right)$ for any $s \in \left\{+, -\right\}^n$. Doing a numerical experimentation, we observe that performing $t$ polarisation stage (i.e.~polarising $n = 2^t$ copies of $W$), and leaving $p_1 \leq \ldots \leq p_n$ to be the erasure probabilities of the synthetic channel, then:
+    \begin{itemize}
+        \item The number of  $i$'s such that $p_i \approx 0$ is about $n \left(1 -p\right) = n I\left(W\right)$.
+        \item The number of $i$'s such that $p_i \approx 1$ is about $np$.
+        \item The number of $i$'s such that $p_i$ is away of both $0$ and $1$ is about $0$.
+        \item If $R < 1-p$, then $\sum_{i=1}^{nR} p_i \approx 0$. In other words, the $p_i$ are not just small, even their sum is small.
+    \end{itemize}
+    
+    \begin{subparag}{Remark}
+        This is not a fluke. In general, there are $n I\left(W\right)$ channels such that $I\left(W_i\right) \approx 1$ and $n \left(1 - I\left(W\right)\right)$ channels such that $I\left(W_i\right) \approx 0$. 
+
+        We will prove this is not a coincidence, but we will only prove it for the BEC. This can be generalised to any binary input channel by using the result for the BEC. We will do this by proving the third and fourth observations, the first and second naturally come from these.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Coding}
+    The observations from the previous paragraph suggests the following coding method for $W = \BEC\left(p\right)$.
+
+    Let $R < C\left(W\right) = 1- p$ and $\epsilon > 0$. Pick the number of polarisation stages $t$ large enough such that $n = 2^t$ gives $\sum_{i=1}^{nR} p_i < \epsilon$.
+
+    Of the $U_1, \ldots, U_n$, there are $nR < n\left(1-p\right)$ of them (and we know which) which are travelling on ``good'' synthetic channels (i.e.~with small $p_i$). Let $G$ be the set of indices such that $\left\{U_i \suchthat i \in G\right\}$ are the $U_i$ which are sent on the $nR$ best channels.
+
+    Our code then goes as follows.
+    \begin{itemize}
+        \item \textit{(Encoder)} If $i \notin G$, send $U_i = 0$. If however $i \in G$, send a bit of data on $U_i$. 
+        \item \textit{(Decoder)} The decoder know which are good and which are bad. Hence, if $i \notin G$, then it just uses $\hat{u}_i = 0$ without looking at the channel output. Otherwise, the decoder received $y_i = u_i$ with high probability $1 - p_i$, and can simply output $\hat{u}_i = y_i$.
+    \end{itemize}
+    
+    \begin{subparag}{Remark}
+       This method will transmit $nR$ data bits using the channel $W$ $n$ times, and its error probability is small:
+       \[\prob\left(\widehat{\text{data}} \neq \text{data}\right) \leq \sum_{i=1}^{nR} p_i \leq \epsilon.\]
+      
+       Indeed, all the channels that we actually uses (i.e.~not the ones where we send $U_i = 0$) have a failure probability of $p_i$.
+    \end{subparag}
+\end{parag}
+
+\end{document}

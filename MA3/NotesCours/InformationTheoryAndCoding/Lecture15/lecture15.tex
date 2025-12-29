@@ -1,0 +1,194 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-10 at 12:24:35.
+
+\usepackage{../../style}
+
+\title{ITC}
+\author{Joachim Favre}
+\date{Lundi 10 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{15}{2025-11-10}{Circlen't}{
+\begin{itemize}[left=0pt]
+    \item End of the proof of the KKT condition.
+    \item Corollary of KKT for the computation of channel capacity.
+    \item Examples of the usage of KKT.
+    \item Expression of channel capacity as a minimisation problem, and interpretation as a ``circle'' and as a source coding under distributional uncertainty problem.
+\end{itemize}
+    
+}
+
+\begin{parag}{}
+    \begin{subparag}{Proof $\impliedby$}
+        Let $f: S_k \mapsto \mathbb{R}$ be concave and let $p \in S_k$ satisfying the KKT conditions. We aim to show that $p$ maximises $f$, i.e.\ that $f\left(p\right) \geq f\left(q\right)$ for all $q \in S_k$.
+
+        Let $q \in S_k$ be arbitrary. For any $\theta \in \left]0, 1\right] $, we note that by concavity: 
+        \autoeq{f\left(\theta q + \left(1 - \theta\right) p\right) \geq \theta f\left(q\right) + \left(1 - \theta\right) f\left(p\right) \iff f\left(q\right) \leq \frac{1}{\theta} \left[f\left(\theta q + \left(1 - \theta\right) p\right) - f\left(p\right) + \theta f\left(p\right)\right] \iff f\left(q\right) \leq f\left(p\right) + \frac{1}{\theta} \left[f\left(p + \theta \left(q- p\right)\right) - f\left(p\right)\right].}
+        
+        We aim to show that $\lim_{\theta \to 0^+} \frac{1}{\theta} \left[f\left(p + \theta \left(q- p\right)\right) - f\left(p\right)\right] \leq 0$, which would give exactly our result for $\theta > 0$ sufficiently small by definition of the limit. 
+
+        Applying a Taylor expansion, we find that: 
+        \autoeq[s]{f\left(p + \theta\left(p-q\right)\right) - f\left(p\right) = f\left(p_1 + \theta\left(q_1 - p_1\right), \ldots, p_k + \theta \left(q_k - p_k\right)\right) - f\left(p_1, \ldots, p_k\right) = \theta \frac{\partial f\left(p\right)}{\partial p_1} \left(q_1 - p_q\right) + \ldots + \theta \frac{\partial f\left(p\right)}{\partial k} \left(q_k - p_k\right) + o\left(\theta\right) = \theta \sum_{i=1}^{k} \frac{\partial f\left(p\right)}{\partial i} \left(q_i - p_i\right) + o\left(\theta\right).}
+        
+        Now, we know by hypothesis that $\frac{\partial f \left(p\right)}{\partial p_i} = \lambda$ for all $i$ such that $p_i > 0$, and that $\frac{\partial f\left(p\right)}{\partial p_i} \leq \lambda$ for all $i$, so: 
+        \autoeq[s]{\lim_{\theta \to 0^+} \frac{f\left(p + \theta\left(q-p\right)\right) - f\left(p\right)}{\theta} = \sum_{i=1}^{k} \frac{\partial f\left(p\right)}{\partial p_i} \left(q_i - p_i\right) = \sum_{i: p_i > 0} \underbrace{\frac{\partial f\left(p\right)}{\partial p_i}}_{= \lambda} \left(q_i - p_i\right) + \sum_{i: p_i = 0} \underbrace{\frac{\partial f\left(p\right)}{\partial p_i}}_{\leq \lambda} \underbrace{\left(q_i - p_i\right)}_{\geq 0} \leq \sum_{i: p_i > 0} \lambda \left(q_i - p_i\right) + \sum_{i: p_i = 0} \lambda \left(q_i - p_i\right) = \sum_{i=1}^{k} \lambda \left(q_i - p_i\right) = 0,}   
+        since $\sum_{i=1}^{k} p_i = \sum_{i=1}^{k} q_i = 1$ by definition of $S_k$. This is exactly what we were looking for, finishing the proof as stated above.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Corollary}
+    Let $p_{Y|X}$ be an arbitrary channel. Some $p_x \in S_k$ maximises $I\left(X; Y\right)$ if and only if there exists some $\lambda$ such that:
+    \begin{itemize}
+        \item For all $x$, then $\displaystyle \sum_{y} p_{Y|X}\left(y \suchthat x\right) \log_2\left(\frac{p_{Y|X}\left(y \suchthat  x\right)}{p_Y\left(y\right)}\right) \leq \lambda$.
+        \item For all $x$ such that $p_X\left(x\right) > 0$, then $\displaystyle \sum_{y} p_{Y|X}\left(y \suchthat x\right) \log_2\left(\frac{p_{Y|X}\left(y \suchthat  x\right)}{p_Y\left(y\right)}\right) = \lambda$.
+    \end{itemize}
+
+    Moreover, $C\left(p_{Y|X}\right) = \lambda$.
+
+    \begin{subparag}{Proof}
+        Suppose without loss of generality that $\mathcal{X} = \left\{1, 2, \ldots, k\right\}$. As found before: 
+        \autoeq{\max_{p_X} I\left(X;Y\right) = \max_{p \in S_k} \underbrace{\sum_{i=1}^{k} \sum_{y} p_i p\left(y \suchthat i\right) \log_2\left(\frac{p\left(y \suchthat i\right)}{\sum_{j=1}^{k} p_j p\left(y \suchthat j\right)}\right)}_{:= f\left(p\right)}.}
+
+        We compute the derivative $\frac{\partial f\left(p\right)}{\partial p_1}$ for the sake of the notational simplicity, although this can easily be done for an arbitrary index. By the product rule: 
+        \autoeq{\frac{\partial f\left(p\right)}{\partial p_1} = \sum_{i=1}^{k} \sum_{y} \frac{\partial p_i}{\partial p_1} p\left(y \suchthat i\right) \log_2\left(\frac{p\left(y \suchthat i\right)}{\sum_{j=1}^{k} p_j p\left(y \suchthat j\right)}\right) \fakeequal + \sum_{i=1}^{k} \sum_{y} p_i p\left(y \suchthat i\right) \frac{\partial}{\partial p_1} \log_2\left(\frac{p\left(y \suchthat i\right)}{\sum_{j=1}^{k} p_j p\left(y \suchthat j\right)}\right) = \sum_{i=1}^{k} \sum_{y} I\left(i = 1\right) p\left(y \suchthat i\right) \log_2\left(\frac{p\left(y \suchthat i\right)}{\sum_{j=1}^{k} p_j p\left(y \suchthat j\right)}\right) \fakeequal - \sum_{i=1}^{k} \sum_{y} p_i p\left(y \suchthat i\right) \log_2\left(e\right)\frac{p\left(y \suchthat 1\right)}{\sum_{j=1}^{k} p_j p\left(y \suchthat j\right)},}
+        where we used the fact that: 
+        \autoeq{\frac{d}{dx} \log_2\left(\frac{\alpha}{\beta x + \gamma}\right) = - \frac{d}{dx} \log_2\left(\frac{\beta x + \gamma}{\alpha}\right) = -\log_2\left(e\right) \frac{\alpha}{\beta x + \gamma}\cdot \frac{\beta}{\alpha} = -\log_2\left(e\right) \frac{\beta}{\beta x + \gamma}.}
+        
+        The first sum can easily be simplified by exploiting the indicator function $I\left(i = 1\right)$. The second sum can be simplified by recognising that:
+        \autoeq{\sum_{i=1}^{k} \sum_{y} p_i p\left(y \suchthat i\right) \frac{p\left(y \suchthat 1\right)}{\sum_{j=1}^{k} p_j p\left(y \suchthat j\right)} = \sum_{y} p\left(y \suchthat 1\right) \frac{\sum_{i=1}^{k} p_i p\left(y \suchthat i\right)}{\sum_{j=1}^{k} p_j p\left(y \suchthat j\right)}=  \sum_{y} p\left(y \suchthat 1\right) = 1.}
+
+        We are thus able to simplify our derivative, finding:
+        \[\frac{\partial f\left(p\right)}{\partial p_1} = \sum_{y} p\left(y \suchthat 1\right) \log_2\left(\frac{p\left(y \suchthat 1\right)}{p\left(y\right)}\right) - \log_2\left(e\right).\]
+
+        More generally, for any $i$, this gives:
+        \[\frac{\partial f\left(p\right)}{\partial p_i} = \sum_{y} p\left(y \suchthat i\right) \log_2\left(\frac{p\left(y \suchthat i\right)}{p\left(y\right)}\right) - \log_2\left(e\right).\]
+        
+        We can then apply KKT to know that $p$ being a maximiser is equivalent to the existence of a $\lambda'$ such that: 
+        \[\begin{systemofequations} p_i > 0 \implies \sum_{y} p\left(y \suchthat i\right) \log_2\left(\frac{p\left(y \suchthat i\right)}{p\left(y\right)}\right) - \log_2\left(e\right) = \lambda', \\ \forall i, \ \sum_{y} p\left(y \suchthat i\right) \log_2\left(\frac{p\left(y \suchthat i\right)}{p\left(y\right)}\right) - \log_2\left(e\right) \leq \lambda'. \end{systemofequations}\]
+
+        Leaving $\lambda = \lambda' + \log_2\left(e\right)$, this is equivalent to:
+        \[\begin{systemofequations} p_i > 0 \implies \sum_{y} p\left(y \suchthat i\right) \log_2\left(\frac{p\left(y \suchthat i\right)}{p\left(y\right)}\right) = \lambda, \\ \forall i, \ \sum_{y} p\left(y \suchthat i\right) \log_2\left(\frac{p\left(y \suchthat i\right)}{p\left(y\right)}\right) \leq \lambda, \end{systemofequations}\]
+        
+        Moreover, we also find exactly that, for this maximiser $p$: 
+        \autoeq{C\left(p_{X|Y}\right) = I\left(X; Y\right) = \sum_{i} p_i \sum_{y} p\left(y \suchthat i\right) \log_2\left(\frac{p\left(y \suchthat i\right)}{p\left(y\right)}\right) = \sum_{i: p_i > 0} p_i \sum_{y} p\left(y \suchthat i\right) \log_2\left(\frac{p\left(y \suchthat i\right)}{p\left(y\right)}\right) = \sum_{i: p_i > 0} p_i \lambda = \sum_{i} p_i \lambda = \lambda.}
+        
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Example 1}
+    Let us try to maximise the following function over $S_3$: 
+    \[F\left(p_1, p_2, p_3\right) = p_1^2 p_2 \left(2 + p_3\right).\]
+
+    When $p_1 = 0$ or $p_2 = 0$, then $F\left(p\right) = 0$ is minimal. Otherwise, this function is always positive. This is thus equivalent to maximising $f\left(p\right) = \ln\left(F\left(p\right)\right) = 2 \ln\left(p_1\right) + \ln\left(p_2\right) + \ln\left(2 + p_3\right)$. This is a concave function since it is the sum of three concave functions. We aim to use KKT, so let us compute the derivatives: 
+    \[\frac{\partial f}{\partial p_1} = \frac{2}{p_1}, \mathspace \frac{\partial f}{\partial p_2} =\frac{1}{p_2}, \mathspace \frac{\partial f}{\partial p_3} = \frac{1}{2 + p_3}.\]
+    
+    Let $p$ be a maximiser. We assume that $p_1 > 0, p_2 >0, p_3 > 0$ first. KKT tells us that we must have: 
+    \[\frac{\partial f}{\partial p_1} = \frac{\partial f}{\partial p_2} = \frac{\partial f}{\partial p_3} \iff \frac{p_1}{2} = p_2 = 2 + p_3 \implies p_3 = p_2 - 2.\]
+
+    However, we must have $p_2 \in \left[0, 1\right]$ and $p_3 \in \left[0, 1\right]$ since $p$ is a probability distribution, so this is a contradiction. 
+
+    We noticed earlier that we must have $p_1 > 0$ and $p_2 > 0$. Hence, the only possibility left is that $p_3 = 0$. KKT tells us that: 
+    \[\frac{\partial f}{\partial p_1} = \frac{\partial f}{\partial p_2} \iff \frac{p_1}{2} = p_2 \iff \left(p_1, p_2, p_3\right) = \left(\frac{2}{3}, \frac{1}{3}, 0\right),\]
+    since $p_3 = 0$ and $p_1 + p_2 + p_3 = 1$ by definition of $S_3$. This tells us that $\lambda = 3$, which is indeed such that $\lambda = \frac{\partial f}{\partial p_1} = \frac{\partial f}{\partial p_2} $ and $\lambda \geq \frac{\partial f}{\partial p_3} = \frac{1}{2}$. This point is therefore indeed the maximaliser.
+\end{parag}
+ 
+\begin{parag}{Example 2}
+    Consider the $Z$ channel, where $0$ is mapped to 0 with probability $1$, and $1$ has a probability $\delta$ to be flipped. This can be seen as a model for optical communication, where $x$ represents whether a photon has been sent and $y$ whether a photon has been detected.
+    \svghere[0.25]{ZChannel.svg}
+
+    Let $p_0$ and $p_1$ be the capacity-achieving the input distribution, and let $q_0$ and $q_1$ be the corresponding output distribution: 
+    \[q_1 = \left(1 - \delta\right) p_1, \mathspace q_0 = 1 - q_1 = p_0 + \delta p_1.\]
+
+    Note that if $p_0 = 0$ or $p_1 = 0$, then $H\left(X\right) = 0$. However, $0 \leq I\left(X; Y\right) \leq H\left(X\right)$, so $p_0 = 0$ or $p_1 = 0$ imply $I\left(X; Y\right) = 0$ to be minimal. We can thus assume $p_0 > 0$ and $p_1 > 0$. We thus use KKT.
+
+    When $x = 0$, we must have: 
+    \[C = \frac{\partial f}{\partial p_0}  = \sum_{y} p_{Y|X}\left(y \suchthat 0\right) \log_2\left(\frac{p_{Y|X}\left(y \suchthat 0\right)}{p_{Y}\left(y\right)}\right) = \log_2\left(\frac{1}{q_0}\right).\]
+
+    When $x = 1$, we must have:
+    \[C = \frac{\partial f}{\partial p_1}  = \sum_{y} p_{Y|X}\left(y \suchthat 1\right) \log_2\left(\frac{p_{Y|X}\left(y \suchthat 1\right)}{p_{Y}\left(y\right)}\right) = \delta \log_2\left(\frac{\delta}{q_0}\right) + \left(1-  \delta\right) \log_2\left(\frac{1 - \delta}{q_1}\right).\]
+
+    The two expressions are equal to the capacity, so: 
+    \autoeq{\log_2\left(\frac{1}{q_0}\right) = \delta \log_2\left(\frac{\delta}{q_0}\right) + \left(1 - \delta\right) \log_2\left(\frac{1 - \delta}{q_1}\right) \iff \log_2\left(\frac{1}{q_0}\right) = \delta \log_2\left(\frac{1}{q_0}\right) + \left(1 - \delta\right) \log_2\left(\frac{1}{q_1}\right) - h_2\left(\delta\right) \iff \left(1- \delta\right) \log_2\left(\frac{q_1}{q_0}\right) = - h_2\left(\delta\right) \iff \frac{q_1}{q_0} = 2^{- h_2\left(\delta\right)/\left(1 - \delta\right)}.}
+
+    Since $q_0 + q_1 = 1$, we find: 
+    \[q_1 = \frac{2^{-h_2\left(\delta\right) / \left(1 - \delta\right)}}{1 + 2^{- h_2\left(\delta\right) / \left(1- \delta\right)}}, \mathspace q_0 = \frac{1}{1 +  2^{-h_2\left(\delta\right)/\left(1 - \delta\right)}}.\]
+    
+    This thus tells us that: 
+    \[C\left(p_{Y|X}\right) = \log_2\left(\frac{1}{q_0}\right) = \log_2\left(1 + 2^{-h_2\left(\delta\right)/\left(1 - \delta\right)}\right).\]
+
+    We can also find $p_0, p_1$ from these equations.
+
+    \begin{subparag}{Remark}
+        This example is very nice, since we find the capacity explicitly. However, in general, we do not expect to find a close form solution.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $p_{Y|X}$ be some channel. We can write its capacity as:
+    \[C\left(p_{Y|X}\right) = \min_q \max_{p_X} \sum_{x} p_X\left(x\right) D\left(p_{Y|X=x} || q\right) = \min_q \max_x D\left(p_{Y|X=x} || q\right).\]
+
+    \begin{subparag}{Proof}
+        We know that, for any distribution $q\left(y\right)$: 
+        \autoeq{I\left(X; Y\right) = \sum_{x} p_X\left(x\right) \sum_{y} p\left(y \suchthat x\right) \log_2\left(\frac{p\left(y \suchthat x\right)}{p_Y\left(y\right)} \cdot  \frac{q\left(y\right)}{q\left(y\right)}\right) = \sum_{x} p_X\left(x\right) \sum_{y} p\left(y \suchthat x\right) \log_2\left(\frac{q\left(y\right)}{p_Y\left(y\right)}\right) \fakeequal + \sum_{x} p_X\left(x\right) \sum_{y} p\left(y \suchthat x\right) \log_2\left(\frac{p\left(y \suchthat x\right)}{q\left(y\right)}\right) = \underbrace{\sum_{y} p_Y\left(y\right) \log_2\left(\frac{q\left(y\right)}{p\left(y\right)}\right)}_{= -D\left(p_Y|| q\right) \leq 0} + \sum_{x} p_X\left(x\right) \underbrace{\sum_{y} p\left(y \suchthat x\right) \log_2\left(\frac{p\left(y \suchthat x\right)}{q\left(y\right)}\right)}_{= D\left(p_{Y|X}\left(\cdot \suchthat x\right)||q\right)} \leq \sum_{x} p_X\left(x\right) D\left(p_{Y|X}\left(\cdot \suchthat x\right) || q\right).}
+        
+        Moreover, the only inequality becomes an equality if and only if $q = p_y$. Hence: 
+        \[I\left(X; Y\right) = \min_{\text{$q$: a distribution of $y$}} \sum_{x} p_X\left(x\right) D\left(p_{Y|X}\left(\cdot \suchthat x\right) || q\right).\]
+         
+        Consequently, this tells us that: 
+        \[C\left(p_{Y|X}\right) = \max_{p_X} \min_{q} \sum_{x} \underbrace{p_X\left(x\right) D\left(p_{Y|X = x} || q\right)}_{= funct\left(p_X, q\right)}.\]
+
+        Note that $funct\left(p_X, q\right)$ is a linear function of $p_X$ (which is concave, in particular). Moreover, $q$ only appears in a $-\log_2\left(q\right)$, so $funct\left(p_X, q\right)$ is convex in $q$. It is possible to show that one can swap the max and the min of a max-min of a concave-convex function: 
+        \[C\left(p_{Y|X}\right) = \min_q \max_{p_X} \sum_{x} p_X\left(x\right) D\left(p_{Y|X=x} || q\right).\]
+        
+        Fixing a $q$, we have $\left|\mathcal{X}\right|$ divergences $D\left(p_{Y|X=x} || q\right)$, which we average under the weights $p_X$. We can thus just put all the weight on the largest. More mathematically: 
+        \[\sum_{x} p_X\left(x\right) D\left(p_{Y|X=x} || q\right) \leq \max_x D\left(p_{Y|X=x} || q\right),\]
+        with equality if $p_X\left(x\right) = 1$ for $x = \argmax_x D\left(p_{Y|X=x} || q\right)$. Hence:
+        \[C\left(p_{Y|X}\right) = \min_q \max_x D\left(p_{Y|X=x} || q\right).\]
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        Intuitively, over all the $p_{Y|X=1}, p_{Y|X=2}, \ldots$ in the simplex, we are looking for the distribution $q$ such that the divergence ``circle'' (the divergence is not a distance, so this type of intuitions is dangerous) around it that contains all the $p_{Y|X=x}$ has smallest radius.
+
+        We can in fact get an even stronger visual intuition. Consider again the following intermediary step:
+        \[C\left(p_{Y|X}\right) = \min_q \max_{p_X} \sum_{x} p_X\left(x\right) D\left(p_{Y|X=x} || q\right).\]
+
+        Let $q$ be arbitrary. We can use KKT to find that the $\left(p_i\right) = \left(p_X\left(i\right)\right)$ that maximises $\sum_{x} p_X\left(x\right) D\left(p_{Y|X=x} || q\right)$ is such that there is some $\lambda$ for which: 
+        \[\begin{systemofequations} D\left(p_{Y|X=i} || q\right) = \lambda, & \text{if $p_i > 0$,} \\ D\left(p_{Y|X=i} || q\right) \leq \lambda, & \text{if $p_i = 0$.} \end{systemofequations}\]
+
+        Feeding this back to our optimisation problem, we get a constraint on the $\lambda$ which achieves the minimum:
+        \autoeq{C\left(p_{Y|X}\right) = \min_q \sum_{i} p_i D\left(p_{Y|X=i} || q\right) = \min_q \sum_{i: p_i > 0} p_i D\left(p_{Y|X=i} || q\right) = \min_q \lambda \sum_{i} p_i = \min_q \lambda.}
+
+        Overall, we have thus found that the solution $q$, which we have shown in the proof above to be $q = p_Y$, is a linear combination of $p_{Y|X=1}, \ldots, p_{Y=k}$ with weights $p_1, \ldots, p_k$ such that:
+        \[\begin{systemofequations} D\left(p_{Y|X=i} || q\right) = C\left(p_{Y|X}\right), & \text{if $p_i > 0$,} \\ D\left(p_{Y|X=i} || q\right) \leq C\left(p_{Y|X}\right), & \text{if $p_i = 0$.} \end{systemofequations}\]
+        
+        Coming back to our ``circle'' intuition (this is really not a circle), this means the following. Drawing a divergence-circle of size $C\left(p_{Y|X}\right)$ around $q$, all points $p_{Y|X=i}$ lie within the circle, and all the points $p_{Y|X=i}$ where $p_i > 0$ lie on the edge of the circle.
+
+        For instance, considering a case where $\left|\mathcal{X}\right| = 3$, $p_1, p_3 > 0$ and $p_2 = 0$, we could get the following, where the ``circle'' is drawn in blue.
+        \svghere[0.6]{CapacityMinimumDivergenceCircle.svg}
+    \end{subparag}
+
+    \begin{subparag}{Observation}
+        Let us consider $\mathcal{P} = \left\{p_{Y|X=x} \suchthat x \in \mathcal{X}\right\}$. Then, we can write:
+        \[C\left(p_{Y|X}\right) = \min_q \max_{p \in \mathcal{P}} D\left(p || q\right).\]
+
+        We recognise this to be the worst case average regret source code under distributional uncertainty problem. In other words, considering the $\left|\mathcal{X}\right|$ distributions $p\left(u \suchthat x\right)$, designing a code for $\mathcal{U}$ with $q\left(u\right) = 2^{-\length c\left(u\right)}$, then:
+        \[C\left(p_{Y|X}\right) = \min_q \max_{p \in \mathcal{P}} \left[\exval\left(\length c\left(U\right)\right) - H\left(U\right)\right].\]
+
+        This makes intuitive sense: the capacity of the channel being small means that all the distributions are relatively close to each other, and hence that there is a small regret for universal source coding.
+
+        Note that we prefer when this value is small for universal source coding, but we prefer that it is large for data transmission.
+    \end{subparag}
+\end{parag}
+
+\end{document}
