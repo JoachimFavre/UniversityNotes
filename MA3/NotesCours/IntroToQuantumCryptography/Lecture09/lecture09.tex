@@ -18,6 +18,7 @@
 \begin{itemize}[left=0pt]
     \item Explanation of ways to quantify information, such as perfect security, $\epsilon$-security and min-entropy.
     \item Definition of conditional min-entropy, and explanation of its intuition.
+    \item Explanation of the chain rule for min-entropy.
     \item Explanation and analysis of a guessing game where Alice wants to get random information independent from what Eve sends her.
 \end{itemize}
 
@@ -67,17 +68,29 @@
 \begin{parag}{Definition: Trace distance}
     Let $\sigma_0, \sigma_1$ be two density matrices. Their trace distance is defined to be: 
     \[\left\|\sigma_1 - \sigma_2\right\|_{tr} = \frac{1}{2} \left\|\sigma_0 - \sigma_1\right\|_1 = \frac{1}{2} \Tr\left(\sqrt{\left(\sigma_0 - \sigma_1\right)\left(\sigma_0 - \sigma_1\right)^{\dagger}}\right).\]
+\end{parag}
 
-    \begin{subparag}{Operational interpretation}
-        Suppose that we are given $\sigma_0$ with probability $\frac{1}{2}$ and $\sigma_1$ with probability $\frac{1}{2}$, and that we want to find in which case we're in using a POVM $\left\{M_0, M_1\right\}$. Maximising the success probability, we find: 
+\begin{parag}{Theorem: Operational interpretation of the trace distance}
+    Let $\sigma_0, \sigma_1$ be two density matrices. Suppose that we are given $\sigma_0$ with probability $\frac{1}{2}$ and $\sigma_1$ with probability $\frac{1}{2}$, and that we want to find in which case we're in using a POVM $\left\{M_0, M_1\right\}$.
+
+    Then, the best success probability to this task is:
+    \[p = \frac{1}{2} \left\|\sigma_0 - \sigma_1\right\|_{tr} + \frac{1}{2}.\]
+
+    \begin{subparag}{Intuition}
+        This shows that $\left\|\sigma_0 - \sigma_1\right\|_{tr}$ can be interpreted as a success probability (up to some scaling). Having a small trace distance thus means that no experiment can be made to distinguish two states. This result is very important and should be kept in mind when treating with trace distances.
+    \end{subparag}
+    
+    \begin{subparag}{Proof idea}
+        Maximising the success probability, we find: 
         \autoeq{p = \max_{M = \left\{M_0, M_1\right\} \text{ POVM}} \left[\frac{1}{2} \Tr\left(M_0 \sigma_0\right) + \frac{1}{2} \Tr\left(M_1 \sigma_1\right)\right] = \max_{M = \left\{M_0, M_1\right\} \text{ POVM}} \left[\frac{1}{2} \Tr\left(M_0 \sigma_0\right) + \frac{1}{2} \Tr\left(\left(I - M_0\right) \sigma_1\right)\right] = \max_{0 \leq M \leq I} \frac{1}{2} \Tr\left(M_0 \left(\sigma_0 - \sigma_1\right)\right) + \frac{1}{2}}
 
         We recognise this maximisation to be a SDP. As seen in the third exercise series, we find that $\sup_{-I \leq X \leq I} \Tr\left(AX\right) = \left\|A\right\|_1$, which we can symmetrise to turn it into: 
         \[p = \frac{1}{2} \left\|\sigma_0 - \sigma_1\right\|_{tr} + \frac{1}{2}.\]
         
-        This shows that $\left\|\sigma_0 - \sigma_1\right\|_{tr}$ can be interpreted as a success probability (up to some scaling). Having a small trace distance thus means that no experiment can be made to distinguish two states.
+
     \end{subparag}
 \end{parag}
+
 
 \begin{parag}{Definition: $\epsilon$-security}
     Let $\rho_{KE}$ be a CQ state and $\epsilon > 0$. We say that the key is \important{$\epsilon$-secure} (from $E$) if there exists some $\rho_E$ such that: 
@@ -241,7 +254,20 @@
     \end{subparag}
 \end{parag}
 
-\subsection{Uncertainty principle}
+\begin{parag}{Theorem: Chain rule for min-entropy}
+    Let $E$ be a quantum register of dimension $\left|E\right|$ (i.e.\ over $\log_2\left|E\right|$ qubits). Then: 
+    \[H_{min}\left(X \suchthat E\right) \geq H_{min}\left(X\right) - \log_2\left|E\right|.\]
+
+    \begin{subparag}{Remark}
+        This is an extremely useful inequality to find lowerbounds, we will use it a lot.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        This will be proven in the fifth exercise series.
+    \end{subparag}
+\end{parag}
+
+\subsection{Guessing game}
 
 \begin{parag}{Goal}
     In our quantum key distribution, we will want Alice and Bob to have some quantum states they can measure to get some shared random key. To obtain these, they will have to go through some physical links, which cannot be trusted. We will model this through the following games.
