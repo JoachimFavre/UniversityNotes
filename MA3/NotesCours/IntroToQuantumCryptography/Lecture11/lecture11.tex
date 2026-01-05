@@ -41,16 +41,46 @@
 
 \begin{parag}{Definition: Strong seeded extractor}
     A \important{$\left(k, \epsilon\right)$-strong seeded extractor} is a function $\text{Ext}: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^d \mapsto \left\{0, 1\right\}^m$ for some $m \leq n$, such that for any $k$-source $\rho_{XE}$ it maps $\rho_{XE} \otimes \frac{1}{2^d} I_Y \over{\mapsto}{Ext} \rho_{Z = \text{Ext}\left(X, Y\right), Y, E}$, in such a way that:
-    \[\left\|\rho_{Z Y E} - \frac{I_Z}{2^m} \otimes \frac{I_Y}{2^d} \otimes \rho_E \right\|_1 \leq \epsilon.\]
+    \[\left\|\rho_{Z Y E} - \frac{I_Z}{2^m} \otimes \frac{I_Y}{2^d} \otimes \rho_E \right\|_{tr} \leq \epsilon.\]
 
     \begin{subparag}{Intuition}
         This time, we use some uniformly random seed $Y$ as the second input to our extractor.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        $Z = \text{Ext}\left(X, Y\right)$ means that we measure the classical registers $X$ and $Y$, and store the result of $\text{Ext}\left(x, y\right)$ in some register $Z$.
+    \end{subparag}
+    
+    \begin{subparag}{Personal remark}
+        I personally find this notation slightly confusing. Let us therefore try to state what this means using the operational interpretation of the trace distance.
+
+        Let $Z = \text{Ext}\left(X, Y\right)$ be a random variable defined by measuring the $X$ classical register of $\rho_{XE}$ and by picking $Y \leftarrow_U \left\{0, 1\right\}^d$ uniformly at random. Similarly, let $\hat{Z}$ be an arbitrary random variable constructed from $Y$ and a POVM on the $E$ register; it can be whatever strategy an attacker chooses. We aim to show that this cannot be a good guess, that it is essentially just as good as sampling a random guess $\hat{Z} \leftarrow_U \left\{0, 1\right\}^m$:
+        \[\frac{1}{2^m} - \epsilon \leq \prob\left(\hat{Z} = Z\right) \leq \frac{1}{2^m} + \epsilon.\]
+
+        Let $\sigma_1 = \rho_{ZYE}$ and $\sigma_2 = \frac{I_Z}{2^m} \otimes \frac{I_Y}{2^d} \otimes \rho_E$ be two quantum states. By the operational definition of the trace distance, if we are given $\sigma$, which can be either with probability $\frac{1}{2}$, then the probability to correctly guess which one it is has to be upper bounded by: 
+        \[\prob\left(\text{success}\right) \leq \frac{1}{2} \left\|\sigma_1 - \sigma_2\right\|_{tr} + \frac{1}{2} \leq \frac{1}{2} \epsilon + \frac{1}{2},\]
+        by definition of strong seeded extractor.
+
+        Now, we give a protocol to distinguish $\sigma_1$ and $\sigma_2$. Let $\sigma_{ZYE} \in \left\{\sigma_1, \sigma_2\right\}$ be given. Looking at the registers $Y$ and $E$, we take the arbitrary strategy to generate $\hat{Z}$; and sample the classical register $Z$ to get some value. Then, we output that $\sigma = \sigma_1$ if and only if $Z = \hat{Z}$. This protocol, like all protocols, is bound to respect the inequality given above. Let us compute this value exactly: 
+        \autoeq{\prob\left(\text{success}\right) = \frac{1}{2} \prob\left(\text{success} \suchthat \sigma = \sigma_1\right) + \frac{1}{2} \prob\left(\text{success} \suchthat \sigma = \sigma_2\right) = \frac{1}{2} \prob\left(Z = \hat{Z}\right) + \frac{1}{2}\cdot \left(1 - \frac{1}{2^m}\right),}
+        where we used that $\prob\left(\text{success} \suchthat \sigma = \sigma_2\right) = 1 - \frac{1}{2^m}$ since whenever $\sigma = \sigma_2$, then $Z$ is just a uniformly random value in $\left\{0, 1\right\}^m$.
+
+        Combining these two equations, this tells us that:
+        \autoeq{\frac{1}{2} \prob\left(Z = \hat{Z}\right) + \frac{1}{2}\cdot \left(1 - \frac{1}{2^m}\right) = \prob\left(\text{success}\right) \leq \frac{1}{2} \epsilon + \frac{1}{2} \iff \prob\left(Z = \hat{Z}\right) + \left(1 - \frac{1}{2^m}\right) \leq \epsilon + 1 \iff \prob\left(Z = \hat{Z}\right) \leq \frac{1}{2^m} + \epsilon.}
+
+        This gives our first inequality. To get the second inequality, we make a very similar protocol, except that we output that $\sigma = \sigma_1$ if and only if $Z \neq \hat{Z}$. Then, the success probability is:
+        \autoeq{\prob\left(\text{success}\right) = \frac{1}{2} \prob\left(\text{success} \suchthat \sigma = \sigma_1\right) + \frac{1}{2} \prob\left(\text{success} \suchthat \sigma = \sigma_2\right) = \frac{1}{2} \prob\left(Z \neq \hat{Z}\right) + \frac{1}{2}\cdot \frac{1}{2^m}.}
+
+        Again, combining this with the bound on the success probability:
+        \autoeq{\frac{1}{2} \prob\left(Z \neq \hat{Z}\right) + \frac{1}{2}\cdot \frac{1}{2^m} = \prob\left(\text{success}\right) \leq \frac{1}{2} \epsilon + \frac{1}{2} \iff \left(1 - \prob\left(Z = \hat{Z}\right)\right) + \frac{1}{2^m} \leq \epsilon + 1 \iff \prob\left(Z = \hat{Z}\right) \geq \frac{1}{2^m} - \epsilon.}
+
+        This is our second inequality. All this shows indeed that $\hat{Z}$ essentially has to be a very mediocre guess for $Z$; and hence that learning $\rho_{YE}$ essentially does not tell anything on $Z$, as expected from this definition.
     \end{subparag}
 \end{parag}
 
 \begin{parag}{Definition: Weak seeded extractor}
     A \important{$\left(k, \epsilon\right)$-weak seeded extractor} is a function $\text{Ext}: \left\{0, 1\right\}^n \times \left\{0, 1\right\}^d \mapsto \left\{0, 1\right\}^m$ for some $m \leq n$, such that for any $k$-source $\rho_{XE}$ it maps $\rho_{XE} \otimes \frac{1}{2^d} I_Y \over{\mapsto}{Ext} \rho_{Z = \text{Ext}\left(X, Y\right), Y, E}$, in such a way that: 
-    \[\left\|\rho_{Z E} - \frac{I_Z}{2^m} \otimes \rho_E \right\|_1 \leq \epsilon.\]
+    \[\left\|\rho_{Z E} - \frac{I_Z}{2^m} \otimes \rho_E \right\|_{tr} \leq \epsilon.\]
 
     \begin{subparag}{Intuition}
         The difference with a strong seeded extractor is that, in a weak extractor, $Y$ may be correlated with $Z$. In other words, $Z$ is uncorrelated from both $Y$ and $Z$ for a strong extractor, but $Z$ is uncorrelated from only $E$ for a weak extractor.
@@ -200,14 +230,14 @@
 \end{parag}
 
 
-\begin{parag}{Theorem: leftover hashing lemma}
+\begin{parag}{Theorem: Leftover hash lemma}
     Let $\mathcal{F} = \left\{f_y \suchthat y \in \left\{0, 1\right\}^d\right\}$ be a 2-universal hashing family, mapping $\left\{0, 1\right\}^n$ to $\left\{0, 1\right\}^m$. We define:
     \[\begin{split}
     \text{Ext}: \left\{0,1\right\}^n \times \left\{0, 1\right\}^d &\longmapsto \left\{0, 1\right\}^m \\
     \left(x, y\right) &\longmapsto f_Y\left(x\right)
     \end{split}\]
     
-    Moreover, let $k = m + 2 \log_2\left(\frac{1}{\epsilon}\right)$.
+    Moreover, let $k \geq m + 2 \log_2\left(\frac{1}{\epsilon}\right)$. 
 
     Then, $\text{Ext}$ is a $\left(k, \epsilon\right)$ strong seeded extractor.
 
@@ -222,10 +252,10 @@
         Let's suppose first that $E = \o$, since it greatly simplifies the proof. Writing $\rho_X = \sum_{x} p_x \ket{x}\bra{x}$, we know that $H_{min}\left(x\right) = - \log_2\left(\max_x p_x\right) \geq k$.
 
         Since $E = \o$, the goal is to show that, by definition of strong extractor:
-        \[\left\|\rho_{ZY} - \frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y\right\|_1 \leq \epsilon.\]
+        \[\left\|\rho_{ZY} - \frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y\right\|_{tr} \leq \epsilon.\]
 
         Now, $\rho_{ZY} = \sum_{y, z} \prob\left(\text{Ext}\left(x, y\right) = z \land Y = y\right) \ket{z}\bra{z} \otimes \ket{y}\bra{y}$. Since it is diagonalisable in the same basis as $\frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y$, we can easily find their singular values, allowing to easily evaluate the trace distance:
-        \autoeq{S = \left\|\rho_{ZY} - \frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y\right\|_1 = \frac{1}{2} \sum_{y, z} \left|\prob\left(\text{Ext}\left(x, y\right) = z \land Y = y\right) - \frac{1}{2^{d + m}}\right|.}
+        \autoeq{S = \left\|\rho_{ZY} - \frac{1}{2^m} I_Z \otimes \frac{1}{2^d} I_Y\right\|_{tr} = \frac{1}{2} \sum_{y, z} \left|\prob\left(\text{Ext}\left(x, y\right) = z \land Y = y\right) - \frac{1}{2^{d + m}}\right|.}
 
         For any $z \in \left\{0, 1\right\}^m$ and $y \in \left\{0, 1\right\}^d$ fixed, we let $p_{zy} = \prob\left(\text{Ext}\left(x, y\right) = z \land Y = y\right)$. Then, using the Cauchy-Schwarz inequality: 
         \autoeq{S = \frac{1}{2} \sum_{y, z} \underbrace{\left|p_{zy} - \frac{1}{2^{d + m}}\right|}_{= a_i}\cdot \underbrace{1}_{= b_i} \leq \frac{1}{2} \sqrt{\sum_{y, z} \left|p_{zy} - \frac{1}{2^{d + m}}\right|^2} \sqrt{\sum_{y', z'} 1} = \frac{\sqrt{2^{d + m}}}{2} \sqrt{\sum_{y, z} p_{zy}^2 - \frac{2}{2^{d + m}} \sum_{y, z} p_{z, y} + \sum_{y, z} \frac{1}{2^{2\left(d + m\right)}}}.}
