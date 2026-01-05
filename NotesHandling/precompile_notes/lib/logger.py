@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 
 
 class Logger:
@@ -27,3 +28,7 @@ class Logger:
             error = "ERROR"
 
         print(f"\t\t{error}: {message}")
+
+    @staticmethod
+    def time_string() -> str:
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")

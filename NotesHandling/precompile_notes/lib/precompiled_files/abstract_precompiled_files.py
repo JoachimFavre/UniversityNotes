@@ -45,6 +45,7 @@ class AbstractPrecompiledFiles(ABC):
                 zip_path = base_path/f"{self.course.name}.zip"
                 Logger.info(f"Code zip created at {zip_path}.")
             if compile:
+                Logger.info(f"Starting compilation at time {Logger.time_string()}")
                 if self._compile(temp_path, base_path):
                     pdf_path = base_path/f"{self.course.name}.pdf"
                     Logger.info(f"Compilation successful, pdf at {pdf_path}.")
