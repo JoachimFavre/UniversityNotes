@@ -29,7 +29,7 @@ class FileLoader:
                 continue
             n_tex_files = len(list(path.glob("*.tex")))
             if n_tex_files == 0:
-                Logger.warn(f"Path ignored because no tex files found.", path)
+                Logger.warn(f"Path ignored because no tex file found.", path)
             elif n_tex_files > 1:
                 raise Exception(f"Multiple tex files found in the same lecture, path {path}.")
             else:
