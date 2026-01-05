@@ -133,11 +133,11 @@ class GenericPrecompiler:
             
             if lecture_info.summary.strip() == "":
                 Logger.warn("Empty summary in lecture command.", file_path)
+            else:
+                if lecture_info.summary.count(r"\begin{enumerate}") > 0:
+                    Logger.warn("Enumerate in summary, should use itemize.", file_path)
             
-            if lecture_info.summary.count(r"\begin{enumerate}") > 0:
-                Logger.warn("Enumerate in summary, should use itemize.", file_path)
-            
-            if lecture_info.summary.count(r"\begin{itemize}[left=0pt]") == 0:
-                Logger.warn("Should use itemize with left=0pt.", file_path)
+                if lecture_info.summary.count(r"\begin{itemize}[left=0pt]") == 0:
+                    Logger.warn("Should use itemize with left=0pt.", file_path)
 
         return self
