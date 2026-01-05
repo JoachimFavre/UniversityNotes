@@ -120,6 +120,9 @@ class GenericPrecompiler:
         if latex.lower().count("tranverse") > 0:
             Logger.warn("Potentially 'tranverse' instead of 'transverse' in transverse-field Ising model.", file_path)
 
+        if latex.lower().count("CSHS") > 0:
+            Logger.warn("'CSHS' instead of 'CHSH'.", file_path)
+
         for command in ["hat", "bvec", "bhat", "widetilde"]:
             if Parser.any_cmd_content_contains(latex, command, "_"):
                 Logger.warn(f"{command.capitalize()} containing underscore.", file_path)
