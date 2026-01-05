@@ -1,0 +1,154 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-04 at 11:18:07.
+
+\usepackage{../../style}
+
+\title{Intro to quantum cryptography}
+\author{Joachim Favre}
+\date{Mardi 04 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{14}{2025-11-04}{The protocol, finally}{
+\begin{itemize}[left=0pt]
+    \item Explanation of BB84.
+    \item Explanation of the IID assumption we make for the analysis of BB84.
+    \item Explanation of the Chernoff bound, and intuitive application to prove the correctness.
+    \item Explanation of a protocol that gives more freedom to Eve to simplify the analysis.
+\end{itemize}
+
+}
+
+\begin{parag}{QKD protocol: BB84}
+    We are now ready to state our QKD protocol.
+
+    Let $n$ be an integer, and $N = 4n$ be the number of ``words''. The protocol goes as follows: 
+    \begin{enumerate}
+        \item Alice samples $x \leftarrow_U \left\{0, 1\right\}^N$ and $\theta \leftarrow_U \left\{0, 1\right\}^N$. She then sends $\ket{x}_{\theta} = \ket{x_1}_{\theta_1} \cdots \ket{x_N}_{\theta_N}$ to Bob. This is the only usage of a quantum channel, all the rest is done using the CAC.
+        \item Bob samples $\widetilde{\theta} \leftarrow_U \left\{0, 1\right\}^N$, and measures $\ket{x}_{\theta}$ in the basis $\widetilde{\theta}$ to get some $\widetilde{x}$.
+        \item Bob tells Alice he is done.
+        \item They both communicate $\theta$ and $\widetilde{\theta}$ to each other.
+        \item Alice lets $S = \left\{j: \theta_j = \widetilde{\theta}_j\right\}$ to be the set of their common measures She also lets $T$ to be a random subset of $S$ to be the testing set, by taking each element of $S$ independently with probability $\frac{1}{2}$. She sends both $T$ and $S$ to Bob.
+        \item They exchange $x_T = \left\{x_i \suchthat i \in T\right\}$ and $\widetilde{x}_T$.
+        \item They abort if one of the following things happen.
+            \begin{itemize}
+                \item Leaving $\delta = \frac{1}{\left|T\right|} \left|\left\{j \in T : x_j \neq \widetilde{x}_j\right\}\right|$, if $\delta > \delta_{max}$, abort: all bits in $T$ (and in $S$) should match.
+                \item If $\left|S\right| < 0.9\cdot \frac{N}{2}$, abort: half of the bits should match.
+                \item If $\left|T\right| \notin \left[0.9\cdot \frac{N}{4}, 1.1\cdot \frac{N}{4}\right]$, then abort: this is also expected and will simplify the analysis.
+            \end{itemize}
+            \item Alice considers $x_A = x_{S \setminus T}$ and Bob considers $x_B = \widetilde{x}_{S \setminus T}$. These are almost the same and almost unknown to the adversary.
+            \item Perform information reconciliation, setting the number of parity checks to be $m = h\left(1.1 \delta_{max}\right)\left|T \setminus S\right| + \log_2\left(1/\epsilon_c\right)$.
+            \item Perform privacy amplification, setting the output length to be $m = \left(1 - 2 h\left(1.1 \delta_{max}\right)\right) \left|T \setminus S\right| - 2 \log_2\left(1/\epsilon_s\right)$.
+    \end{enumerate}
+
+    \begin{subparag}{Remark}
+        The parameters are chosen such that $\left|S \setminus T\right| \approx n$ with high probability. In other words, Alice and Bob end up with $n$ valid bits that should approximately match and that they have not communicated.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{IID assumption}
+    We make the assumption that each round can be treated independently, i.e.~that $I\left(x_j \neq \widetilde{x}_j\right)$ are independent random variables for $j \in \left\{1, \ldots, N\right\}$. 
+
+    \begin{subparag}{Remark 1}
+        This assumption is not strictly necessary for the analysis and can be gotten rid of, but given that the analysis will already be quite non-trivial, it is nice to take it. Its main interest is that we are able to sue the following theorem.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This assumption is valid if there is no adversary.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Chernoff bound}
+    Let $w_1, \ldots, w_t \in \left\{0, 1\right\}$ be IID Bernoulli random variables, and let $\mu = \exval\left[w_i\right]$. Then, for all $\gamma > 0$:
+    \[\prob\left(\frac{1}{t} \sum_{i=1}^{t} w_i \geq \left(1 + \gamma\right) \mu\right) \leq \exp\left(- \gamma^2 t \mu / 2\right).\]
+    \[\prob\left(\frac{1}{t} \sum_{i=1}^{t} w_i \leq \left(1 - \gamma\right) \mu\right) \leq \exp\left(- \gamma^2 t \mu / 2\right).\]
+\end{parag}
+
+\begin{parag}{Lemma}
+    We define $z_j = I\left(x_j \neq \widetilde{x}_j\right)$ to be an indicator random variable stating that bit $j$ does not match. We moreover define $\delta_T$ and $\delta_{S \setminus T}$ to be the fraction of bits in $T$ that do not match, and similarly for $S \setminus T$:
+    \[\delta_T = \frac{1}{\left|T\right|}\cdot \left|\left\{j \in T: z_j = 1\right\}\right|, \mathspace \delta_{S \setminus T} = \frac{1}{\left|S \setminus T\right|}\cdot \left|\left\{j \in S \setminus T: z_j = 1\right\}\right|.\]
+
+    Then:
+    \[\prob\left(\delta_{S \setminus T} \geq 1.02 \delta_T \right) \leq 2e^{-0.01^2 n \delta/\left(2 \cdot  1.01\right)}.\]
+
+    In other words, $\delta_{S \setminus T} \gg \delta_{T}$ only happens with very low probability.
+
+    \begin{subparag}{Remark}
+        In other words, since we know that $\delta_T$ is small as a condition  not to abort, then $\delta_{S \setminus T}$ is also small with high probability. But then, setting $\delta' = 1.01 \delta$ and running information reconciliation on $x_A, x_B$ with parameter $\delta$, we can take a code with $m = h\left(\delta'\right) n + \log_2\left(\frac{1}{\epsilon_C}\right)$ parity checks to get a correctness error of: 
+        \[\epsilon_c + 2 \exp\left(-0.01^2 n \delta / \left(2 \cdot 1.01\right)\right).\]
+
+        This states morally the correctness of this protocol. We will prove it more formally below.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We assume that $\left|T\right| = n$, and $\left|S \setminus T\right| = n$ for simplicity; which is not completely wrong since this will approximately hold with high probability. Moreover, we assume that the $z_1, \ldots, z_N$ are IID, as stated before.
+
+        Let $\mu = \exval\left[z_j\right]$. Using a Chernoff bound, we have: 
+        \[\prob\left(\delta_T \leq \left(1 - \gamma\right) \mu\right) \leq \exp\left(- \gamma^2 n \mu / 2\right),\]
+        \[\prob\left(\delta_{S \setminus T} \geq \left(1 + \gamma\right) \mu\right) \leq \exp\left(-\gamma^2 n \mu /2\right).\]
+
+        Hence, by the union bound: 
+        \[\prob\left(\delta_{S \setminus T} \geq \frac{1 + \gamma}{1 - \gamma} \delta_T\right) \leq 2 \exp\left(- \gamma^2 n \mu / 2\right).\]
+        
+        For $\gamma = 0.01$, and using the fact $\mu \geq \frac{1}{1 - \gamma}$ whenever $\delta_T \leq \left(1 - gg\right) \mu$ and $\delta_{S \setminus T} \geq \left(1 + \gamma\right) \mu$, this reads:
+        \[\prob\left(\delta_{S \setminus T} \geq 1.02 \delta_T \right) \leq 2e^{-0.01^2 n \delta/\left(2 \cdot  1.01\right)}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    We now also wish to analyse secrecy. In other words, we want to find a bound on the min-entropy. To do that, we first consider a protocol that gives more freedom to Eve, which we justify by first giving an equivalent protocol.
+\end{parag}
+
+%\begin{parag}{name}
+%    %later{name}
+%
+%    We now want to estimate $H_{min}\left(x_A \suchthat E\right) \geq kn$, where $k$ is the key rate. Note that this is conditioned on all the knowledge Eve has, including the fact that they do not abort.
+%
+%    However, Eve can always just keep the state $\ket{x}_{\theta}$ Alice sends at the beginning, and send something arbitrary to Bob. With some probability, then Bob will get exactly the same $\widetilde{x} = x$. There is thus a chance that an attacker gets all the knowledge. We thus instead want something of the ofrm: 
+%    \[H_{min}\left(x_A \suchthat E\right) \geq kn - \log_2\left(\frac{1}{\prob\left(\text{not abort}\right)}\right).\]
+%
+%    %later{prob not abort is dependent on the attack, because above is described an attack that always work given that does not abort, just abort probability is very small}
+%\end{parag}
+
+\begin{parag}{Modification of the protocol: Entanglement}
+    We can modify the first few steps of the protocol as follows:
+    \begin{enumerate}
+        \item Alice prepares $N$ EPR pairs, and sends the second qubit of each pair to Bob.
+        \item When Bob received all of them, he acknowledges.
+        \item Alice samples $\theta \leftarrow_U \left\{0, 1\right\}^N$ and measures her qubits to get some $x \in \left\{0, 1\right\}^N$; and Bob samples $\widetilde{\theta} \leftarrow \left\{0, 1\right\}^N$ and measures his qubits to get some $\widetilde{x} \in \left\{0, 1\right\}^N$.
+        \item Continue the protocol as before from step 4, sharing $\theta$ and $\widetilde{\theta}$ and so on.
+    \end{enumerate}
+
+    This is completely equivalent. Indeed, when we measure the first qubit in the basis $\theta$ and get some outcome $x$, then the second qubit of the pair becomes $\ket{x}_{\theta}$.
+\end{parag}
+
+\begin{parag}{Modification of the protocol: Purification}
+    To simplify the reasoning, we analyse another representation of the protocol, which is more general and gives strictly more power to Eve.
+    \begin{enumerate}
+        \item Eve prepares $\rho_{A^N B^N E}$.
+        \item She sends $N$ qubits $\rho_{A^N}$ to Alice and $N$ qubits $\rho_{B^N}$ to Bob.
+        \item Alice samples $\theta \leftarrow_U \left\{0, 1\right\}^N$ and measures her qubits in this basis to get some $x \in \left\{0, 1\right\}^N$; and Bob samples $\widetilde{\theta} \leftarrow \left\{0, 1\right\}^N$ and measures his qubits in this basis to get some $\widetilde{x} \in \left\{0, 1\right\}^N$.
+        \item Continue the protocol as before from step 4, sharing $\theta$ and $\widetilde{\theta}$ and so on.
+    \end{enumerate}
+    
+    \begin{subparag}{Remark 1}
+        Note that the only quantum steps are the steps $1$ to $3$. The rest is completely classical.
+
+        The quantum part looks a lot like the tripartite guessing game we analysed earlier.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        The IID assumption becomes that: 
+        \[\rho_{A^N B^N E} = \bigotimes_{i=1}^{N} \rho_{A_i B_i E_i}.\]
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

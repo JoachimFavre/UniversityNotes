@@ -1,0 +1,241 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-10-28 at 10:34:14.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Mardi 28 octobre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{13}{2025-10-28}{I have an exam this afternoon, aaah}{
+\begin{itemize}[left=0pt]
+    \item \textit{Yes, I am reusing lecture titles.}
+    \item Explanation of the interest behind information reconciliation.
+    \item Definition of classical linear error-correcting codes.
+    \item Explanation of an information reconciliation protocol.
+    \item Explanation of the goal of QKD.
+    \item Explanation of the assumptions behind QKD.
+    \item Explanation of everlasting security.
+\end{itemize}
+
+}
+
+\subsection{Information reconciliation}
+
+\begin{parag}{Goal}
+    We are almost able to state the quantum key distribution protocol. There is however a small issue. 
+
+    Let us first consider an example of how we would want the protocol to go if everything was pefcect.
+\end{parag}
+
+\begin{parag}{Example}
+    Consider a binary-symmetric channel $\BSC\left(q\right)$ for $0 \leq q \leq 1/2$. In other words, if Alice sends some $a \in \left\{0, 1\right\}$ and sends it to Bob, then Eve gets $a$ with probability $q$, and $\bar{a} = 1-a$ with probability $1-q$. We moreover assume that Bob receives exactly $a$ for now.
+
+    Note that if $q = 1/2$, then Eve just gets a random bit. If $q = 0$, then Eve learns exactly $a$.
+
+    \begin{subparag}{Protocol}
+        We consider the following protocol.
+        \begin{itemize}
+            \item Alice samples some $x \leftarrow_U \left\{0, 1\right\}^n$ and sends it to Bob.
+            \item Alice samples some $\ell \leftarrow_U \left\{0, 1\right\}^s$ and sends it to Bob. 
+            \item Alice and Bob both evaluate $K_A = \text{Ext}\left(x, s\right)$ and $K_B = \text{Ext}\left(x, s\right)$ using a strong-seeded extractor.
+        \end{itemize}
+
+        For the simplicity of the analysis, we assume that Eve knows $\ell$ completely. However, by construction of the channel as stated above, on the way of $x$, Eve learns some $y$ such that $y_i = x_i$ with probability $q$, and $y_i = 1 - x_i$ with probability $1 -q$.
+
+        We wish to know how many bits Alice and Bob can extract. To do so, as we have seen with privacy amplification, we have to compute the min-entropy. For each $y_i$, Eve has to guess its true value. It is most likely that $y_i = x_i$ was not flipped since $q \leq 1/2$, so she can just guess that $x = y$ with success probability $\left(1-q\right)^n$:
+        \autoeq{H_{min}\left(X \suchthat E\right) = - \log_2\left(P_{guess}\left(X \suchthat E\right)\right) = -\log_2\left(\left(1 - q\right)^n\right) = n \log_2\left(\frac{1}{1 - q}\right).}
+
+        By the leftover hashing lemma, they can thus extract $m = n \log_2\left(\frac{1}{1-q}\right) - 2\log_2\left(\frac{1}{\epsilon}\right)$ bits, meaning that: 
+        \[\left\|\rho_{KE} - \rho_{KE}^{ideal}\right\| \leq \epsilon.\]
+
+        This case is thus pretty easy.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This example above is a model of the problem we will study later. The idea is that Alice will send some qubits to Bob, from which Eve can extract some information. Doing so, she does learn some small information on $x$ (but not too much, or else Alice and Bob would just abort). However, this requires her to do some measurements, and hence Bob does not receive exactly $x$.
+
+        This is modelled more formally below.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Information reconciliation}
+    Suppose that Alice samples $x_A \leftarrow_U \left\{0, 1\right\}^n$ and sends it to Bob. Bob and Eve receive the following information.
+    \begin{itemize}
+        \item Bob receives $x_B$ such that $x_{B, i} = x_{A, i}$ with probability $1 - \delta$, and $x_{B, i} = 1 - x_{A, i}$ with probability $\delta$.
+        \item Eve receives $y$ such that $y_i = x_i$ with probability $q$, and $y_i = 1 - x_i$ with probability $1 -q$.
+    \end{itemize}
+
+    Our goal is to do \important{information reconciliation} (IR) so that Alice gets $x_A' \in \left\{0, 1\right\}^n$ and Bob gets $x_B' \in \left\{0, 1\right\}^n$ in such a way $x_A' = x_B'$.
+
+    \begin{subparag}{Remark 1}
+        This step is needed because, as is, we cannot just apply a strong-seeded extractor, since it is sensitive to errors (slightly modifying the input gives a completely different output) and $x_A \neq x_B$ with high probability.         
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We assume that Eve learns everything that is communicated between Alice and Bob as soon as we start doing information reconciliation.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 3}
+        We assume that the probability distribution $p_{x_A, x_B}$ is known.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon_R$-correct}
+    An IR protocol for $P_{X_A X_B}$ is $\epsilon_R$-correct and leaks $\leq c$ bits if: 
+    \begin{itemize}
+        \item $\displaystyle \prob\left(x_A' = x_B'\right) \geq 1 - \epsilon_R$.
+        \item The protocol protocol communicates $\leq c$ bits.
+    \end{itemize}
+\end{parag}
+
+\begin{parag}{Observation}
+    Let $C$ be the information leaked by doing IR. Then, by the chain rule:
+    \[H_{min}\left(X_A' \suchthat E, C\right)  \geq H_{min}\left(X_A \suchthat E\right) - c.\]
+
+    \begin{subparag}{Remark}
+        We thus aim to have $c$ to be as small as possible, which makes intuitive sense.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    The idea of IR is to use classical linear error-correcting code. Let us define them, and then describe a protocol using them.
+\end{parag}
+
+\begin{parag}{Definition: Linear error-correcting code}
+    A $\left[n, k, d\right]$-\important{linear error correcting code} is a vector subspace $S \subseteq \mathbb{F}_2^n$ such that $\dim\left(S\right) = k$ and: 
+    \[d = \min_{u \in S \setminus \left\{0\right\}} \left|u\right|_H,\]
+    where $\left|u\right|_H$ is the Hamming weight, which is defined to count the number of $1$'s in $u$.
+
+    \begin{subparag}{Remark}
+        Any code can be written as $C = \ker H$ for some parity-check matrix $H \in \mathbb{F}_2^{m \times n}$ where $m = n-k$.
+
+        For instance, for the $\left[3, 1, 1\right]$-repetition code $1 \mapsto 111$ and $0 \mapsto 000$, then we can write: 
+        \[H = \begin{pmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \end{pmatrix}.\]
+
+        Indeed, $\ker H = \left\{000, 111\right\}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Information reconciliation protocol}
+    We are now ready to describe the information reconciliation protocol. Alice starts with some $x_A$, Bob some $x_B$, and their goal is to get a matching string.
+    \begin{itemize}
+        \item Alice computes $s_A = H x_A \in \left\{0, 1\right\}^m$ and sends it to Bob.
+        \item Bob computes $s_B = H x_B$, and sets $s = s_A \oplus s_B$. Overall, right now, we have: 
+        \[s = H x_A \oplus H x_B = H \left(x_A \oplus x_B\right) = H z,\]
+        where $z = x_A \oplus x_B$ is the error. $s$ is called the syndrome for the error-correcting code. 
+        
+        \item Bob computes $z = \argmin_{u: Hu = s} \left|u\right|_H$, and lets $x_B' = x_B \oplus z$.
+        \item Alice keeps $x_A' = x_A$.
+    \end{itemize}
+    
+    \begin{subparag}{Remark}
+         Note that evaluating $z = \argmin_{u: Hu = s} \left|u\right|_H$ may be inefficient, but since this is exactly what is computed by the decoders in the usual purpose of error correcting codes, they tend to be designed so that it's fast. Anyway, we do not care about efficiency in this class.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        The idea is to consider $x_A \oplus x_B$ as codeword that has had an error. We thus apply error correction on it. The thing that makes it work here is that we only need to know $H \left(x_A \oplus x_B\right)$ for error correction, which can be computed from $H x_A$; Alice does not have to send $x_A$, she only needs to send many less bits.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Suppose that there was one error in the transmission: 
+        \[x_A = 101, \mathspace x_B = 100.\]
+        
+        We consider again the following error correcting code:
+        \[H = \begin{pmatrix} 1 & 1 & 0 \\ 0 & 1 & 1 \end{pmatrix}.\]
+        
+        Note that $x_A, x_B$ are not codewords, which is expected since $x_A$ is sampled uniformly at random. Now, Alice computes 
+        \[s_A = H x_A = \begin{pmatrix} 1  & 1 & 0 \\ 0 & 1 & 1 \end{pmatrix} \begin{pmatrix} 1 \\ 0 \\ 1 \end{pmatrix} = \begin{pmatrix} 1 \\ 1 \end{pmatrix} = 11.\]
+        and sends it to Bob. Bob Also evaluates $s_B = H x_B = 10$, giving: 
+        \[s = s_A + s_B = 11 + 10 = 01.\]
+        
+        Note that both $z = 001$ and $z = 110$ are such that $H z = 01 = s$. Now, Bob picks the one with smallest Hamming weight, i.e.~he sets $z = 001$. He thus finally get $x_B' = x_B \oplus z = 101$, which is indeed correct: $x_A = x_B$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    For any $n$ and error rate $\delta$, there exists an $\left[n, k, d\right]$ linear error correcting code such that, writing $h_2\left(x\right) = - x \log_2\left(x\right) - \left(1-x\right) \log_2\left(1-x\right)$ is the binary entropy: 
+    \[m = n - k \approx h_2\left(\delta\right) n + \log_2\left(\frac{1}{\epsilon}\right),\]
+    and the IR protocol is $\epsilon_R$ secure.
+    
+    \begin{subparag}{Remark}
+        This states that, using the protocol described above, we only leak $m \approx h_2\left(\delta\right) n + \log_2\left(\frac{1}{\epsilon}\right)$ many bits of min-entropy to Eve.
+    \end{subparag}
+\end{parag}
+
+\subsection{Protocol}
+
+\begin{parag}{Definition: QKD protocol}
+    In the \important{quantum key distribution} protocol (QKD), Alice and Bob publicly interact and generate $K_A \in \left\{0, 1\right\}^x \cup \left\{\bot_A\right\}$ and $K_A \in \left\{0, 1\right\}^x \cup \left\{\bot_B\right\}$, respectively. We moreover assume that there is some eavesdropper Eve.
+
+    \begin{subparag}{Intuition}
+        The idea is that we want Alice and Bob to come up with some shared key $K_A = K_B$. If one outputs $\bot$ it means that they abort the protocol.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon_c$-correctness}
+    A protocol is \important{$\epsilon_c$-correct} if: 
+    \[\prob\left(K_A \neq \bot_A \land K_B \neq \bot_B \land K_A \neq K_B\right) \leq \epsilon_c.\]
+
+    \begin{subparag}{Intuition}
+        This states that we want the case where the protocol is not aborted and where Alice and Bob end up with different keys to be rare.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon_s$-secrecy}
+    A protocol is \important{$\epsilon_s$-secret} if: 
+    \[\left(1 - \prob\left(\text{abort}\right)\right) \left\|\rho_{K_A, E | K_A \neq \bot} - \rho_{K_A E}^{ideal}\right\|_{tr} \leq \epsilon_s.\]
+    where $\prob\left(\text{abort}\right) = \prob\left(K_A = \bot \lor K_B = \bot\right)$, where $\rho_{K_A, E | K_A \neq \bot}$ is the final state conditioned on not aborting, and where $\rho_{K_A E}^{ideal} = \frac{I_K}{2^m} \otimes \rho_E$.
+
+    \begin{subparag}{Intuition}
+        We can consider two cases. If $\prob\left(\text{abort}\right) \approx 1$, then we are essentially always aborting and hence we do not leak information to Eve. If $\prob\left(\text{abort}\right) \not\approx 1$, then we ask for $\rho_{K_A, E | K_A \neq \bot} \approx \rho_{K_A E}^{ideal}$, i.e.~that Eve cannot distinguish the case where Alice did not abort and the case where she did not learn any information.
+
+        The idea is that we want to make sure to abort if Eve intercepts the messages.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Assumptions}
+    We make the following assumptions.
+    \begin{enumerate}
+        \item Quantum mechanics applies to all, including Eve. This notably asks not to have access to some crazy physics such as black holes.
+        \item Alice and Bob follow the protocol, and their private labs are shielded from Eve. For instance, Eve does not have access to microphones and cameras inside their labs.
+        \item  Eve has access to all communication (under the limits of the assumption (1)) and has infinite computation power.
+    \end{enumerate}
+\end{parag}
+
+\begin{parag}{Communication channels}
+    We also assume the existence of the following assumption channels.
+    \begin{enumerate}
+        \item \textit{(Quantum channel)} There exists a quantum communication channel between Alice and Bob, where they can communicate qubits. Eve can do whatever she wants on the state going on this channel.
+        \item \textit{(CAC)} There exists a classical communication channel, where we can assert the integrity and authenticity of all messages. In other words, Eve can read the messages, but she cannot modify them or impersonate anyone. This channel is called classical authenticated channel, or \important{CAC}.
+    \end{enumerate}
+    
+   \begin{subparag}{Remark}
+       The second assumption is very restrictive. It requires classical cryptography and hence computational assumption (such as one-way functions), using for instance MACs or digital signatures. Our goal was to make a protocol that does not rely on any computational assumption. We will however still try to argue that this is interesting thanks to everlasting security.
+
+        Note that authentification is required for any protocol. Indeed, otherwise, Eve could do a man-in-the-middle attack: she could impersonate Bob in front of Alice to set up a key with her, and impersonate Alice in front of Bob to get a key with them. 
+   \end{subparag}
+\end{parag}
+
+\begin{parag}{Everlasting security}
+    We will note that the CAC is only required to be secure during the protocol. Even if it gets compromised after the protocol has ended, then $K_A$ and $K_B$ stay secure forever. 
+
+    This is not the case for RSA for instance: if the computation assumptions get compromised later, then all messages that had been ciphered using RSA and stored by an attacker can be deciphered retroactively. This is thus an interesting quantum-only property, called \important{everlasting security}.
+
+    \begin{subparag}{Remark}
+        This may be overkill for many things. We only have a bounded lifetime and hence many of our secrets do not have to stay secret forever. Some other secrets, such as the recipe for a nuclear bomb, are however worth keeping secret forever.
+    \end{subparag}
+
+    \begin{subparag}{Goal}
+        In this language, the goal of QKD is to turn a quantum channel and a CAC into a quantum-secure channel. Its goal is not to turn nothing into security, contrary to how it is sometimes phrased by some scientists.
+    \end{subparag}
+\end{parag}
+
+\end{document}

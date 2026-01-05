@@ -1,0 +1,192 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2026-01-03 at 02:57:17.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Samedi 03 janvier 2026}
+
+\begin{document}
+\maketitle
+
+\lecture{24}{2025-12-09}{Using qubits is already certifying deletion}{
+\begin{itemize}[left=0pt]
+    \item Proof that PRFs yield computationally secure quantum cryptography.
+    \item Definition of encryption with certified deletion.
+    \item Explanation of a protocol for encryption with certified deletion.
+\end{itemize}
+
+}
+
+\begin{parag}{Theorem}
+    We describe a protocol, given a family of functions $\left(F_k: \left\{0, 1\right\}^{2n} \mapsto \left\{0, 1\right\}^{2n}\right)_{k \in \mathcal{K}_{\lambda}}$.
+    \begin{itemize}
+    \item \textit{(Encryption)} We describe encryption $\Enc_k\left(\rho\right)$. Let $\rho$ be arbitrary. We sample some $r \leftarrow_U \left\{0, 1\right\}^{2n}$, evaluate $\left(u, v\right) \leftarrow F_k\left(r\right)$ for $u, v \in \left\{0, 1\right\}^n$, and output the following $4n$-qubit state:
+    \[\sigma = \Enc_G\left(\rho\right) := \ket{r}\bra{r} \otimes X^u Z^v \rho \left(X^u Z^v\right)^{\dagger}.\]
+
+    \item \textit{(Decryption)} We describe decryption $\Dec_k\left(\sigma\right)$. We measure the first $2n$ qubits to get $r$. We then evaluate $\left(u, v\right) \leftarrow G\left(r\right)$ and, leaving $\sigma_2$ to be the last $n$ qubits of $\sigma$, output: 
+    \[\left(Z^v X^u\right) \sigma_2 \left(Z^v X^u\right)^{\dagger}.\]
+    \end{itemize}
+
+    This protocol is correct. If moreover $\left(F_k\right)_{k \in \mathcal{K}_{\lambda}}$ is a secure PRF, then this protocol is computationally secure.
+
+    \begin{subparag}{Intuition}
+        This is the same protocol as the one we described before, except that we now use a PRF instead of a truly random function.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We consider the super-security game. 
+        \begin{itemize}
+            \item The Adversary and the Challenger agree on the $\lambda$ they will use.
+            \item The Adversary prepares some $\rho_{EM}$, and sends $\rho_M$ to the Challenger.
+            \item The Challenger samples $b \leftarrow_U \left\{0, 1\right\}$ and $k \leftarrow \mathcal{K}_{\lambda}$. If $b = 0$, they send $\sigma_C = \Enc_k\left(\rho_M\right)$. If $b = 1$, they send $\sigma_C = \Enc_k\left(\ket{0}\bra{0}\right)$.
+            \item The Adversary produces some guess $d \in \left\{0, 1\right\}$, and sends it to the Challenger.
+            \item The Adversary wins if and only if $d = b$.
+        \end{itemize}
+
+        Let us suppose that there exists an Adversary $\mathcal{A}$ who wins with probability $\frac{1}{2} + \epsilon'$. We use it to make a reduction from the security game for PRF. The idea is that, if $\mathcal{A}$ can break the encryption with non-zero probability, we still know that it can't break the encryption of the case where $G$ is a completely random function by the perfect security of this QES, and hence it gives them a way to know distinguish the PRF from a completely random function (which cannot be done by hypothesis). Let's make it more formal. We construct an adversary $\mathcal{A}'$ fro the PRF security game (under a challenger $\mathcal{C}'$).
+    \begin{itemize}
+        \item $\mathcal{C}'$ samples some $k \leftarrow \mathcal{K}_{\lambda}$.
+        \item $\mathcal{A}'$ samples some $r \leftarrow \left\{0, 1\right\}^{n\left(\lambda\right)}$, and asks $\mathcal{C}'$ for $\left(u, v\right) \leftarrow F_k\left(r\right)$.
+        \item $\mathcal{A}'$ constructs the $\rho_{EM}$ from the strategy of $\mathcal{A}$ to the super-security game.
+        \item $\mathcal{A}'$ samples $b \leftarrow_U \left\{0, 1\right\}$. If $b = 0$, they prepare $\sigma_C = \ket{r}\bra{r} \otimes X^u Z^v \rho_M \left(X^u Z^v\right)^{\dagger}$ . If $b = 1$, they prepare $\sigma_C = \ket{r}\bra{r} \otimes X^u Z^v \ket{0}\bra{0} \left(X^u Z^v\right)^{\dagger}$.
+        \item $\mathcal{A}'$ makes a guess $d \in \left\{0, 1\right\}$ from $\rho_E$ and $\sigma_C$, as given by the strategy $\mathcal{A}$ to the super-security game.
+        \item $\mathcal{A}'$ outputs $1$ if and only if $b = d$.
+    \end{itemize}
+
+    We make the following two observations with respect to this PRF security game. 
+    \begin{itemize}
+        \item If the query is answered according to $F_k$, then $\mathcal{A}'$ returns $1$ with probability $\frac{1}{2} + \epsilon'$. Indeed, they output $1$ if and only if the strategy $\mathcal{A}$ wins in the super-security game, which happens with probability $\frac{1}{2} + \epsilon'$ as stated before.
+        \item If the query is answered according to a completely random function $G$, then $\mathcal{A}'$ returns $1$ with probability $\frac{1}{2}$ by perfect security of this QES.
+    \end{itemize}
+    
+    Therefore:
+    \[\left|\prob_{k \leftarrow_U \mathcal{K}}\left(A^{F_k\left(\cdot \right)} = 1\right) - \prob_{G \leftarrow_U \left\{\left\{0,1\right\}^{n\left(\lambda\right)} \mapsto \left\{0, 1\right\}^{m\left(\lambda\right)}\right\}}\left(\mathcal{A}^{G\left(\cdot \right)} = 1\right)\right| = \epsilon'.\]
+
+    However, we know that this value must be negligible by definition of PRF, so $\epsilon' = \epsilon\left(\lambda\right) = o\left(\frac{1}{\lang{poly}\left(\lambda\right)}\right)$, finishing the proof.
+        
+    \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Encryption with certified deletion}
+
+\begin{parag}{Definition: Encryption scheme with certified deletion}
+    We consider encryptions schemes with certified deletion. This contains an encryption and decryption procedure: 
+    \[\Enc_k: m \in \left\{0, 1\right\} \mapsto \left(c, dk\right), \mathspace \Dec_k: c \mapsto m.\]
+
+    The only modification is that encryption now also gives a classical deletion key. We also consider that there is a deletion procedure: 
+    \[\Del: c \mapsto \pi.\]
+    
+    Finally, there is a procedure that allows to verify that $c$ was indeed deleted: 
+    \[\VerDel: \left(\pi, dk\right) \mapsto \left\{\text{accept}, \text{reject}\right\}.\]
+
+    \begin{subparag}{Remark 1}
+            Apart from the cyphertext $c$ which can use quantum information, everything else is classical information. Note that it is necessary the cyphertext is quantum since, otherwise, it could be copied and hence proving it has been deleted would not bring much interest.
+
+            We will prove that making a scheme where we can prove deletion is indeed possible. This shows another interest of quantum information over classical information.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        We only consider single bit plaintexts $m \in \left\{0, 1\right\}$, for simplicity. This can naturally be chained for multiple bits.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        We naturally wish for $\left(\Enc_k, \Dec_k\right)$ to be a correct and perfectly secure encryption scheme. We moreover want the deletion to indeed be provable, which we do thanks to a security game.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Security game}
+    We consider the following security game played by an Adversary and a Challenger.
+    \begin{itemize}
+        \item The Adversary prepares some $\rho_{ME}$, and sends $\rho_M$ to the Challenger.
+        \item The Challenger samples $k \leftarrow_U \mathcal{K}$ and $b \leftarrow_U \left\{0, 1\right\}$. If $b = 0$, they let $\left(\sigma_M, dk\right) \leftarrow \Enc_k\left(\rho_M\right)$. If $b = 1$, thy let $\left(\sigma_M, dk\right) \leftarrow \Enc_k\left(\ket{0}\bra{0}\right)$. In both cases, they then send $\sigma_M$ to the Challenger, but keep $dk$ private.
+        \item The Adversary must produce some string $\pi$ (which we hope he does by running $\pi \leftarrow \Del\left(\sigma_M\right)$) and send it to the Challenger.
+        \item The Challenger rejects if $\VerDel\left(\pi, dk\right) = \text{reject}$. Otherwise, they send $k$ to the Adversary.
+        \item The Adversary must produce some $d \in \left\{0, 1\right\}$ and send it to the Challenger.
+        \item The Adversary wins if and only if $d = b$.
+    \end{itemize}
+    
+    We say that the $\left(\Del, \VerDel\right)$ is $\epsilon$-secure if any adversary can win with probability at most $\frac{1}{2} +\epsilon$. 
+\end{parag}
+
+\begin{parag}{Theorem}
+    We consider the following scheme, based on some parameter $\lambda \in \mathbb{N}$.
+    \begin{itemize}
+        \item \textit{(Key set)} We let $\mathcal{K} = \left\{0, 1\right\} \times \left\{0, 1\right\}^{\lambda}$. We will  decompose keys $k \in \mathcal{K}$ as $k = \left(u, \theta\right)$ for $u \in \left\{0, 1\right\}$ and $\theta \in \left\{0, 1\right\}^{\lambda}$.
+        \item \textit{(Encryption)} We describe $\Enc_k\left(m\right)$. Let $m \in \left\{0, 1\right\}$ be arbitrary, and $\left(u, \theta\right) = k$. We sample $x \leftarrow_U \left\{0, 1\right\}^{\lambda}$ and define $\ket{\phi} = \ket{x}_{\theta}$. Moreover, also define: 
+        \[c' = m \oplus u \oplus \bigoplus_{i: \theta_i = 1} x_i.\]
+
+        Output $c = \left(c', \ket{\phi}\right)$ and $dk = \left(\theta, x\right)$.
+        
+        \item \textit{(Decryption)} We describe $\Dec_k\left(c', \ket{\phi}\right)$. Measure $\ket{\phi}$ in the Hadamard basis to get some $x' \in \left\{0, 1\right\}^{\lambda}$. Then, output: 
+        \[c' \oplus u \oplus \bigoplus_{i: \theta_i = 1} x_i'.\]
+
+        \item \textit{(Deletion)} We describe $\Del\left(c', \ket{\phi}\right)$. Measure $\ket{\phi}$ in the computation basis to get some $x'' \in \left\{0, 1\right\}^{\lambda}$. Output $\pi = x''$.
+
+        \item \textit{(Deletion verification)} We describe $\VerDel\left(\pi, dk\right)$. Output ``$\text{accept}$'' if and only if $\pi_i = x_i$ for all $i$ such that $\theta_i = 0$.
+    \end{itemize}
+
+    Then, $\left(\Enc_k, \Dec_k\right)$ is both correct and perfectly secure, and $\left(\Del, \VerDel\right)$ is both correct and secure.
+
+    \begin{subparag}{Intuition}
+        The idea is that we store the encryption data in qubits of $\ket{\phi}$ in the Hadamard basis (and in some $u$ so that it cannot be broken without the key), and we store bits to prove the deletion in qubits of $\ket{\phi}$ in the computation basis. To read the data, we must have measured all the Hadamard qubits of $\ket{\phi}$ (if we miss a  single one, then we cannot evaluate $\bigoplus_{i: \theta_i = 1} x_i'$), which essentially requires to measures $\ket{\phi}$ completely in the Hadamard basis. On the other hand, to prove that we deleted the data, we need all the qubits of $\ket{\phi}$ that are in the computation basis, which essentially also require to measure $\ket{\phi}$ completely in the computation basis.
+    \end{subparag}
+    
+    \begin{subparag}{Encryption is correct}
+        We prove that $\left(\Enc_k, \Dec_k\right)$ is correct. This is trivial since, for all $i$ where $\theta_i = 1$ then we have $x_i = x_i'$.
+    \end{subparag}
+
+    \begin{subparag}{Encryption is secure}
+        We prove that $\left(\Enc_k, \Dec_k\right)$ is perfectly secure. This is again trivial since, without the knowledge of $u$, then $c'$ (the only element that contains the information of $m$) is a uniform random bit.
+    \end{subparag}
+
+    \begin{subparag}{Deletion is correct}
+        We prove that $\left(\Del, \VerDel\right)$ is correct. This is again trivial since, for all $i$ where $\theta_i = 0$, we do have exactly $\pi_i = x_i$.
+    \end{subparag}
+
+    \begin{subparag}{Deletion is secure}
+        We finally prove that $\left(\Del, \VerDel\right)$ is secure. We make an informal proof, and assume that $\lambda = 1$ for simplicity. Note that an attacker can win the security game with a probability decreasing exponentially fast in $\lambda$. In our case, since the plain text is a single bit, we do not have to let the attacker choose the plaintext they wish, and we can simplify the security game as follows.
+        \begin{itemize}
+            
+            \item The Challenger samples $\left(u, \theta\right) \leftarrow_U \left\{0, 1\right\} \times \left\{0, 1\right\}$, and $x \leftarrow_U \left\{0, 1\right\}$. They use the key $\left(u, \theta\right)$ to encrypt the plaintext $m = x$, sending $\left(c', \ket{\phi}\right)$ to the Challenger, where: 
+                \[c' = \begin{systemofequations} m \oplus u, & \text{if $\theta = 0$,}\\ m \oplus u \oplus x, & \text{if $\theta = 1$,} \end{systemofequations}\mathspace \ket{\phi} = \ket{x}_{\theta}.\]
+                
+            \item The Adversary generates some $\pi \in \left\{0, 1\right\}$ (which we hope they do by running $\pi \leftarrow \Del\left(c', \ket{\phi}\right)$), and send it to the Challenger.
+            \item If $\theta = 0$ and $\pi \neq x$, the Challenger rejects.
+            \item The Challenger sends $k = \left(u, \theta\right)$ to the Adversary.
+            \item The Adversary produces some $d \in \left\{0, 1\right\}$ and sends it to the Challenger.
+            \item The Adversary wins if and only if $d = x$.
+        \end{itemize}
+
+        Note that $c'$ is just a random bit in the Challenger's view thanks to $u$, so it is useless for them. This means that we can remove $c'$ and $u$ from this protocol. Moreover, we can give more power to the adversary by only checking that $d = x$ at the end whenever $\theta = 1$; this is not a free lunch whenever $\theta = 0$, since they already have to produce $\pi = x$. Overall, this means that we can reduce this to the following security game.
+        \begin{itemize}
+            \item The Challenger samples $\theta \leftarrow_U \left\{0, 1\right\}$ and $x \leftarrow_U \left\{0, 1\right\}$, and send $\ket{\phi} = \ket{x}_{\theta}$ to the Adversary.
+            \item The Adversary sends some $\pi \in \left\{0, 1\right\}$ to the Challenger.
+            \item The Challenger sends $\theta$ to the Adversary.
+            \item The Adversary sends some $d \in \left\{0, 1\right\}$ to the Challenger.
+            \item If $\theta = 0$, the Adversary wins if and only if $\pi = x$. If $\theta = 1$, the Adversary wins if and only if $d = x$.
+        \end{itemize}
+        
+        To be able to apply quantum information theory, we can again give more power to the Adversary, by purifying the game. We assume that the Adversary is split into two labs $B$ and $E$, that are respectively tasked to choose $\pi$ and $d$. It is possible to show that the maximum success probability to the following game is greater than the previous one.
+        \begin{itemize}
+            \item The Adversary makes a state $\rho_{EBC}$, sending $\rho_E$ to $E$, $\rho_B$ to $B$ and $\rho_C$ to the Challenger.
+            \item The Challenger samples some $\theta \leftarrow_U \left\{0, 1\right\}$ and measures $\rho_C$ in the basis $\theta$ to get some $x \in \left\{0, 1\right\}$.
+            \item $B$ sends some $\pi \in \left\{0, 1\right\}$ to the Challenger.
+            \item The Challenger sends $\theta$ to $E$, who answers with some $d \in \left\{0, 1\right\}$.
+            \item If $\theta = 0$, the Adversary wins if and only if $\pi = x$. If $\theta = 1$, the Adversary wins if and only if $d = x$.
+        \end{itemize}
+        
+        The idea is that it is impossible to learn enough information about the value of some state in both the computation basis and in the Hadamard basis, and hence this cannot be won with probability $1$. This can be formalised with a bound on min-entropy and a new type of entropies called the max-entropy.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

@@ -1,0 +1,293 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-12-16 at 11:14:40.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Mardi 16 décembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{25}{2025-12-16}{A very elegant last lecture}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the delegated computation problem.
+    \item Explanation of the existence of a universal circuit.
+    \item Definition of Clifford gates.
+    \item Explanation of a protocol that only works for Clifford gates.
+    \item Definition of magic states and proof of a property that allows to apply a $T$ gates using only Clifford gates and measurements.
+    \item Generalisation of the protocol to work for any circuits thanks to magic states.
+\end{itemize}
+
+}
+
+\section{Delegated computation}
+
+\begin{parag}{Definition: Circuit}
+    A \important{quantum circuit} $C$ on $n$ qubits and over some gate set $G$ is a sequence of gates and the qubits it is applied on. We write $C\left(x\right)$ to be its classical output (after measurement) on input $\ket{x}$ where $x \in \left\{0, 1\right\}^n$.
+
+    \begin{subparag}{Remark}
+        This assumes, as usual with quantum circuits, that measurements are done at the end in the computation basis. Note that the principle of deferred measurement allows to know that doing measurements at the end does not remove generality.
+    \end{subparag}
+
+    \begin{subparag}{Example}
+        Let us for instance consider the following quantum circuit.
+        \begin{center}
+        \begin{quantikz}
+            \lstick{\ket{x_0}} & \gate{H} & \ctrl{1} & \gate{T} & \meter{} \\
+            \lstick{\ket{x_1}} & \ctrl{1} & \targ{}  &          &          \\
+            \lstick{\ket{x_2}} & \targ{}  &          &          &          \\
+        \end{quantikz}
+        \end{center}
+
+        Then, this can be described by: 
+        \[\left(\left(H, 1\right), \left(CNOT, 2, 3\right), \left(CNOT, 1, 2\right), \left(T, 1\right)\right).\]
+        
+        Moreover, the value measured at the end is $C\left(x\right) = C\left(x_1, x_2, x_3\right) \in \left\{0, 1\right\}$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Delegated computation problem}
+    We describe the \important{delegated computation problem}, which is a two-party computation problem.
+
+    Alice receives as input $\left(C, x\right)$, where $C$ is a quantum circuit and $x$ is an input for this circuit. Bob receives no input. The goal is for Alice to output $C\left(x\right)$, and Bob to output nothing.
+
+    We moreover assume that Alice only has access to a single-qubit quantum computer.
+
+    \begin{subparag}{Remark 1}
+        As usual, we do not want Bob to learn anything about $C$ and $x$. Moreover, Alice may not trust Bob, and may want to verify the value she learns at the end. This is formalised below.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Alice can send multiple qubits with her quantum computer, just one at a time. In other words, it means that she cannot create entanglement, but she may send an arbitrary product state to Bob.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon$-correctness}
+    A protocol is \important{$\epsilon$-correct} if, when Alice and Bob follow the protocol, then: 
+    \[\prob\left(\text{Alice returns $C\left(x\right)$}\right) \geq 1 - \epsilon.\]
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon$-blindness}
+    The protocol is \important{$\epsilon$-blind} (secure against dishonest bob) if, for any dishonest Bob, then ``Bob learns nothing about $\left(C, x\right)$''.
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon$-verifiability}
+    The protocol is \important{$\epsilon$-verifiable} if, for any dishonest Bob, if Alice is honest, then: 
+    \[\prob\left(\text{Alice outputs something outside $\left\{C\left(x\right), \bot\right\}$}\right) \left(1 - \prob\left(\text{Alice aborts}\right)\right) \leq \epsilon.\]
+
+    \begin{subparag}{Intuition}
+        There are two cases for this to hold. First, Alice may abort with high probability. Second, she does not abort with high probability, and hence she must output the correct outcome with high probability. This states formally that Alice must indeed be able to verify what Bob sends to her.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $n, s \in \mathbb{N}$ be arbitrary.
+
+    There exists a $m \in \lang{poly}\left(n, s\right)$ and a universal circuit $C_u$ on $n + m$ qubits such that, for any circuit $C$ on $n$ qubits of size at most $s$, there exists some classical description $z \in \left\{0, 1\right\}^m$  of $C$ (that can easily be computed from $C$) such that for all $x \in \left\{0, 1\right\}^n$: 
+    \[C\left(x\right) = C_u\left(x, z\right).\]
+
+    \begin{subparag}{Intuition}
+        The idea is that $C_u$ is able to emulates a circuit which is described by a classical description $z$. 
+    \end{subparag}
+
+    \begin{subparag}{Implication}
+        This means that we can now assume that Bob runs this universal circuit $C_u$, and that Alice's input is $\left(x, z\right)$. That way, we do not have to care about Bob learning anything about the circuit he has to run, we only want him to learn nothing about the input to his circuit $\left(x, z\right)$. \textit{I have to admit I find this step extremely elegant.}
+
+        Moreover, this solves verifiability: Alice can set traps to Bob, by asking him some times to run the identity circuit (i.e~.\ a circuit that does nothing on the input state), and since Bob does not know any information about $z$, he cannot lie without being detected. This can be better formalised, but we will not do this in this class.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Naive protocol}
+    Let us consider a protocol through some example. We assume that Alice's input is some $x \in \left\{0, 1\right\}$, and that the circuit Bob will run (which is known to him, by our observation above) is the following.
+    \begin{center}
+    \begin{quantikz}
+        \lstick{\ket{x}} & \gate{X} & \gate{H} & \gate{Z} & \\
+    \end{quantikz}
+    \end{center}
+
+    The idea is for Alice to preserve a quantum one-time pad on the state throughout Bob's simulation, so that Bob knows nothing about it. In more details, the protocol goes as follows.
+    \begin{itemize}
+        \item \textit{(Initial state)} Alice samples $a, b \leftarrow_U \left\{0, 1\right\}$ and sends $\ket{\psi_0} = X^a Z^b \ket{x}$ to Bob.
+        \item \textit{(Apply $X$)} Bob lets $\ket{\psi_1} = X \ket{\psi_0}$.
+
+            Alice knows that we must have: 
+            \[\ket{\psi_1} = X \ket{\psi_0} = X X^a Z^b \ket{x} = \left(-1\right)^b X^a Z^b \left(X \ket{x}\right).\]
+
+            Hence, she lets $\left(a_1, b_1\right) = \left(a, b\right)$, giving $\ket{\psi_1} \equiv X^{a_1} Z^{b_1} \left(X \ket{x}\right)$.
+        \item \textit{(Apply $H$)} Bob lets $\ket{\psi_2} = H \ket{\psi_1}$.
+
+            Alice knows that we must have: 
+            \[\ket{\psi_2} = H \ket{\psi_1} = H \left(-1\right)^{b_1} X^{a_1} Z^{b_1} \left(X \ket{x}\right) = \left(-1\right)^{b_1} \left(-1\right)^{a_1 b_1} X^{b_1} Z^{a_1} \left(H X \ket{x}\right) .\]
+
+            Hence, she lets $\left(a_2, b_2\right) = \left(b_1, a_1\right)$, giving $\ket{\psi_2} \equiv X^{a_2} Z^{b_2} \left(HX \ket{x}\right) $.
+            \item \textit{(Apply $Z$)} Bob lets $\ket{\psi_3} = Z \ket{\psi_2}$.
+
+                Alice knows that we must have: 
+                \[\ket{\psi_3} = Z \ket{\psi_2} = Z \left(-1\right)^{a_2} \left(-1\right)^{a_2 b_2} X^{a_2} Z^{b_2} \left(HX \ket{x}\right) = \left(-1\right)^{a_2 b_2} X^{a_2} Z^{b_2} \left(Z H X \ket{x}\right).\]
+                 
+                Hence, she lets $\left(a_3, b_3\right) = \left(a_2, b_2\right)$, giving $\ket{\psi_3} \equiv X^{a_3} Z^{b_3} \left(ZHX \ket{x}\right)$.
+                \item \textit{(Measurement)} Bob sends $\ket{\psi_3}$ to Alice. She undoes the one-time pad by constructing $\ket{\phi} = X^{a_3} Z^{b_3} \ket{\psi_3}$. By construction, this is such that $\ket{\phi} \equiv ZHX \ket{x}$ (up to global phase). She measures it in the computation basis, and outputs the result.
+    \end{itemize}
+
+    \begin{subparag}{Remark 1}
+        The circuit above is a one-qubit circuit, which Alice may have simulated. However, this was just for example's sake.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        The strategy used here relies on the fact that, for any gate $G$, then $G X^a Z^b \ket{\psi} \equiv X^{a'} Z^{b'} G \ket{\psi}$, i.e.\ we can apply a gate on the cyphered state by just updating the key. This only holds for some specific types of gates, named Clifford gates and defined below.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Clifford}
+    A gate $G$ is \important{Clifford} if for any Pauli $P \in \left\{I, X, Y, Z\right\}^{\otimes n}$ there exists some $Q \in \left\{I, X, Y, Z\right\}^{\otimes n}$ and global phase $\phi \in \mathbb{R}$ such that: 
+    \[GP = e^{i\phi} QG.\]
+    
+    \begin{subparag}{Example 1}
+        For instance $G = H$ is a Clifford gate. Indeed: 
+        \[HX = ZH, \mathspace HZ = XH, \mathspace HY = -YH.\]
+    \end{subparag}
+
+    \begin{subparag}{Example 2}
+        $G = CNOT$ is also a Clifford gate. This is interesting since it is a 2-qubit gate.
+    \end{subparag}
+
+    \begin{subparag}{Example 3}
+        The following gate is not Clifford: 
+        \[T = \begin{pmatrix} 1 & 0 \\ 0 & e^{i \pi/4} \end{pmatrix}.\]
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        We can run the protocol for any circuit composed only of Clifford gates, such as gates from the set $\left\{X, Y, Z, H, CNOT\right\}$.  However, if a quantum circuit is made only of Clifford gates, then it can be simulated classically on any input. Note that this is not a trivial a result, since they can create a lot of entanglements. However, it means that delegated quantum computation is not interesting on Clifford gates.
+
+        Now, not everything is lost. We can make any quantum circuits by using only Clifford gates and the $T$ gate defined above. We thus only need to be able to add $T$ to our protocol.
+    \end{subparag}
+\end{parag}
+ 
+\begin{parag}{Lemma: Magic states}
+    We consider the following state, called a \important{magic state}: 
+    \[\ket{\pi/4} = T \ket{+} = \frac{1}{\sqrt{2}} \ket{0} + \frac{e^{i \pi/4}}{\sqrt{2}} \ket{1}.\]
+
+    We use it to construct the following circuit:
+    \begin{center}
+    \begin{quantikz}
+        \lstick{\ket{\pi/4}} & \ctrl{1} & \rstick{\ket{\psi'}} \\
+        \lstick{\ket{\psi}}  & \targ{}  & \meter{} \\
+    \end{quantikz}
+    \end{center}
+
+    Assuming that $c \in \left\{0,  1\right\}$ is measured, then the state is, up to a global phase:
+    \[\ket{\psi'} \equiv \begin{systemofequations} T \ket{\psi}, & \text{if $c = 0$,} \\ PXZ\cdot T\ket{\psi}, & \text{if $c = 1$,} \end{systemofequations}\]
+    where $P = T^2$ can be proven to be a Clifford gate.
+
+    \begin{subparag}{Implication}
+        This gives us a different way to evaluate $T \ket{\psi}$ that uses only Cliffod gates: add an ancilla qubit, a CNOT (which is a Clifford), a measurement, and possibly some Clifford gates $P X Z$.
+
+        We can thus convert any $T$ gate by this gadget in any circuit. This is almost what we want. However, Bob must not run this on $\ket{\psi}$, but on a ciphered $X^a Z^b \ket{\psi}$. This thus requires the following, improved, lemma.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        The CNOT maps:
+        \autoeq[s]{\frac{1}{\sqrt{2}} \left(\ket{0} + e^{i \pi/4}\ket{1}\right)\left(\alpha \ket{0} + \beta \ket{1}\right) \mapsto \frac{1}{\sqrt{2}}\left(\alpha \ket{00} + \beta \ket{01} + \alpha e^{i\pi/4} \ket{11} + \beta e^{i \pi/4} \ket{10}\right).}
+
+        Hence, if we measure the second qubit to be $c = 0$, the first qubit collapses to: 
+        \[\alpha \ket{0} + \beta e^{i \pi/4} \ket{1} = T \ket{\psi}.\]
+
+        Similarly, if $c = 1$, the first qubit collapses to: 
+        \[\beta \ket{0} + \alpha e^{i \pi/4} \ket{1} \equiv PXZ\cdot T \ket{\psi}.\]
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Lemma: Ciphered magic state}
+    We consider the following circuit, for some $a, b, d, e, y \in \left\{0, 1\right\}$.
+    \begin{center}
+    \begin{quantikz}
+        \lstick{$X^d Z^e P^y \ket{\pi/4}$} & \ctrl{1} & \rstick{\ket{\psi'}} \\
+        \lstick{$X^a Z^b \ket{\psi}$}  & \targ{}  & \meter{} \\
+    \end{quantikz}
+    \end{center}
+
+    We again assume that $c \in \left\{0, 1\right\}$ is measured. Moreover, we let:
+    \[x = a + c + y, \mathspace a' = a + c, \mathspace b' = \left(\left(a+c\right)\left(d+y\right)\right) + a + b+c + e  + y.\]
+
+    Then, writing $P = T^2$ like before (which is a Clifford gate): 
+    \[\ket{\psi'} = P^x X^{a'} Z^{b'} \cdot T \ket{\psi}.\]
+
+    \begin{subparag}{Implication}
+        The idea is thus that Alice can prepare $X^d Z^e P^y \ket{\pi/4}$ using her single-qubit quantum computer, and send it to Bob. Then, Bob can apply this gadget and measure some $c \in \left\{0, 1\right\}$. Alice can moreover send $a + y$ to Bob, allowing him to evaluate $P^{-x} \ket{\psi'} = P^{-\left(a + y\right)} P^{-c} \ket{\psi'} = X^{a'} Z^{b'} \cdot T \ket{\psi}$. In other words, this full gadget allows to map $X^a Z^b \ket{\psi} \mapsto X^{a'} Z^{b'} \cdot T\ket{\psi}$, applying a $T$-gate on the cipher qubit, which is exactly what we wished for.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        Note that we need the parameters $d$ and $e$ to simplify the analysis. Indeed, if Alice just sends $P^y \ket{\pi/4}$ to Bob, then maybe he can do a measurement to learn some information about $y$ and hence, when Alice sends him $a + y$, he can get some information about $a$, potentially allowing him to break the quantum one-time pad. 
+
+        Hence, just in doubt, Alice also applies a quantum one-time pad on $P^y \ket{\pi/4}$ to protect if from Bob.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        This was the last piece missing for our protocol, we are now able to state it fully.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Protocol}
+    Alice has some input $x \in \left\{0, 1\right\}^n$, and Bob has no input $\bot$.
+    \begin{enumerate}
+        \item Alice samples $a, b \leftarrow \left\{0, 1\right\}^n$ uniformly. 
+        \item Alice evaluates $\ket{\psi_0} = X^a Z^b \ket{x}$, and sends it to Bob.
+        \item For each gate $G_1, \ldots, G_T$ of the universal circuit $C_U$, they communicate to apply it as follows.
+            \begin{itemize}[left=0pt]
+                \item Let's suppose that $G$ is Clifford, i.e.\ $G \in \left\{H, CNOT\right\}$.
+                    \begin{itemize}[left=0pt]
+                        \item Bob lets $\ket{\psi_i} = G \ket{\psi_{i-1}}$.
+                        \item Alice updates her one-time pad key $\left(a, b\right) \leftarrow f_G\left(a, b\right)$ like in the example of the naive protocol. For instance, if $G = H$, then $\left(a, b\right) \leftarrow \left(b, a\right)$.
+                    \end{itemize}
+                    
+                \item Let's now suppose that $G$ is not Clifford, i.e.\ $G = T$.
+                \begin{itemize}[left=0pt]
+                    \item Alice selects $d, e, y \leftarrow_U \left\{0, 1\right\}$, prepares $\ket{\phi} = X^d Z^e P^y \ket{\pi/4}$ and sends it to Bob.
+                    \item Bob applies a CNOT from $\ket{\phi}$ to the data qubit he wishes to apply a $T$-gate on, and measures the latter to obtain $c \in \left\{0, 1\right\}$; as stated in the lemma above.
+                    \item Alice sends $a + y$ to Bob, who can then apply $P^{-\left(a + y + c\right)}$ on his qubit.
+                    \item Bob tells $c$ to Alice, who can update her one-time pad key $\left(a, b\right) \leftarrow \left(a', b'\right) = \left(a+c, \left(\left(a+c\right) \left(d+y\right)\right) + a + b + c + e + y\right)$.
+                \end{itemize}
+            \end{itemize}
+        \item Bob sends the output qubit back, on which Alice undoes the pad thanks to the key $\left(a, b\right)$ she kept updated, and measures it.
+    \end{enumerate}
+
+    This protocol is correct, and perfectly blind, but not verifiable. Moreover, it takes linear time for both Alice and Bob.
+
+    \begin{subparag}{Correctness}
+        The correctness of the protocol above follows by construction. Indeed, the $T$ gadget is correct, and Alice maintains the right one-time pad key throughout the whole protocol.
+    \end{subparag}
+
+    \begin{subparag}{Blindness}
+        The protocol is perfectly blind. Indeed, at the start, Bob just receives a maximally mixed state by security of the qOTP. When a Clifford gate is applied, no information is transmitted. When $G = T$, it is possible to compute the density matrix to indeed see Bob only knows the maximally mixed state.
+
+        Intuitively, everything simply comes from the same reasoning as for the one time pad.
+    \end{subparag}
+
+    \begin{subparag}{Verifiability}
+        As stated here, the protocol is not verifiable: Bob can cheat. However, using the trap idea mentioned earlier can make it become verifiable.
+    \end{subparag}
+
+    \begin{subparag}{Alice computation time}
+        For Alice, preparation is classical $O\left(n\right)$ time. When applying a Clifford, she only has to update the one-time pad key, which is done in $\Theta\left(1\right)$ time since all Clifford gates are on one or two qubits. When applying a $T$ gate, she has to prepare and send one qubit, plus $\Theta\left(1\right)$ to do a classical computation.
+
+        Overall, she only uses classical linear classical time, plus a 1-qubit quantum computer.
+    \end{subparag}
+
+    \begin{subparag}{Bob computation time}
+        Bob has to maintain $n$ qubits in his memory. There is however no real overhead in the computation, so this is linear quantum time for him.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        This protocol is pretty good. The main drawback is that each $T$ gate requires interaction: for Alice to send $a + y$, she has to know $a$ and hence the previous computations (and, in particular, the interaction for the last $T$ gate has to be done). It is possible to get rid of interaction, replacing it by some polynomial time complexity for Bob.
+    \end{subparag}
+\end{parag}
+
+\end{document}

@@ -1,0 +1,192 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-11 at 10:24:25.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Mardi 11 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{16}{2025-11-11}{Device independence is a funny fact}{
+\begin{itemize}[left=0pt]
+    \item Informal proof of the correctness of BB84.
+    \item Informal proof of the security of BB84.
+    \item Explanation of device-independent BB84.
+\end{itemize}
+
+}
+
+\begin{parag}{Correctness}
+    We have:
+    \[\prob\left(k_A = k_B \lor k_A = k_B = \text{abort}\right) \geq 1 - \epsilon_C - \exp\left(-\Omega\left(n\right)\right).\]
+    
+    \begin{subparag}{Proof}
+        We make an informal proof.
+
+        We morally have two ways to abort:
+        \[\text{abort}_1 = \left\{\delta > \delta_{max}\right\}, \mathspace \text{abort}_2 = \left\{\left|S\right| < 0.9 \frac{N}{2} \lor \left|T\right| < 0.9 \frac{N}{4}\right\}\]
+
+        We consider our two ways to abort.
+        \begin{enumerate}
+            \item We assume that the quantum channel is perfect (and in particular that there is no eavesdropper), giving us that $\prob\left(\text{abort}_1\right) = 0$.
+            \item As we have already seen, thanks to a Chernoff bound, we have: 
+            \[\prob\left(\text{abort}_2\right) \leq \exp\left(- \Omega\left(n\right)\right).\]
+        \end{enumerate}
+
+        This tells us that the probability to abort is overall very small.
+        
+        Finally, let us evaluate the probability that $k_A = k_B$. This holds whenever the output of information reconciliation holds, which is the case whenever $\left|x_A - x_B\right|_H \leq 1.1 \delta_{max} \left|T \setminus S\right|$. By a Chernoff bound, this is true with probability at least $1 - \exp\left(- \Omega\left(n\right)\right)$.
+
+        Combining our two results with the union bound gives this theorem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Security}
+    We want, leaving $\bar{E}$ to be all the information available to the Eavesdropper at the evaluation: 
+    \[\left(1 - \prob\left(\text{abort}\right)\right) \left\|\rho_{K_A K_B \bar{E} | \text{not abort}} - \rho^{ideal}_{K_A K_B \bar{E}}\right\| \leq \epsilon,\]
+    where $\rho^{ideal}_{K_A K_B \bar{E}} \propto \sum_{k} \ket{k}\bra{k}_{k_A} \otimes \ket{k}\bra{k}_{k_B} \otimes \rho_E$.
+
+    \begin{subparag}{Remark 1}
+        We will prove that:
+        \[H_{min}\left(X_A \suchthat \bar{E}\right) \geq \left(1 - 2h\left(1.1 \delta_{max}\right)\right) \left|T \setminus S\right| - \log_2\left(\frac{1}{\prob\left(\text{not abort}\right)}\right).\]
+
+        Indeed, we let the output length to be $m = \left(1 - 2 h\left(1.1 \delta_{max}\right) \right)\left|T \setminus S\right|$ in the protocol, so our result does come from the leftover hashing lemma.        
+
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Note that our bound depends on $\prob\left(\text{abort}\right)$. This is an inherent flaw of QKD. Indeed, Eve can always just sample some $\theta \leftarrow_U \left\{0, 1\right\}^N$ and measure all the bits that Alice sends to Bob. With some small (but non-zero) probability, she sampled exactly the same $\theta$ as Bob, and hence Alice and Bob do not realise that Eve measured. In other words, the fact that they did not abort gave a lot of information to Eve; the min entropy knowing the Alice and Bob did not abort is zero.
+
+        However, this strategy for Eve makes the probability to abort really high. Hence, morally, it does not really work: if the probability to abort is high, the protocol will typically not work; and if the probability to abort is low then we can use the bound from this theorem.
+    \end{subparag}
+    
+    \begin{subparag}{Proof idea}
+        We will make an informal proof.
+
+        We have, leaving $C$ to be the parity checks for information reconciliation and $\bar{Ab}$ the fact that Alice and Bob did not abort: 
+        \[H_{min}\left(X_A \suchthat \bar{E}\right) = H_{min}\left(X_A \suchthat E \Theta \widetilde{\Theta} T x_T \widetilde{x}_T C \bar{Ab}\right).\]
+        
+        By the chain rule, since there are $m = h\left(1 / \delta_{max}\right) \left|S \setminus T\right| + \log_2\left(\frac{1}{\epsilon_S}\right)$ bits that are communicated through parity checks:
+        \autoeq[s]{H_{min}\left(X_A \suchthat \bar{E}\right) \geq H_{min}\left(X_A \suchthat E, \Theta, \widetilde{\Theta}, T, x_T, \widetilde{x}_T\right) - h\left(1 / \delta_{max}\right) \left|S \setminus T\right| - \log_2\left(\frac{1}{\epsilon_S}\right).}
+
+        We can now use our independence assumption. In other words, we assume that unused rounds are useless to the eavesdropper, giving:
+        \autoeq[s]{H_{min}\left(X_A \suchthat \bar{E}\right) \geq H_{min}\left(X_A \suchthat E, \Theta_{S \setminus T}, \widetilde{\Theta}_{S \setminus T}\right) - h\left(1 / \delta_{max}\right) \left|T \setminus S\right|- \log_2\left(\frac{1}{\epsilon_S}\right) = H_{min}\left(X_A \suchthat E, \Theta_{S \setminus T}\right) - h\left(1 / \delta_{max}\right) \left|T \setminus S\right|- \log_2\left(\frac{1}{\epsilon_S}\right).}
+        since $\Theta_{S \setminus T} = \widetilde{\Theta}_{S \setminus T}$ by definition of $S$ (it is the set of indices where $\theta_i = \widetilde{\theta}_i$).
+
+        We consider another game, which is very similar to the 3-player guessing game. Eve generates some $\rho_{A^n B^n E}$ however she wants, sends $\rho_{A^n}$ to Alice and $\rho_{B^n}$ to Bob. Alice generates some $\theta \leftarrow_U \left\{0, 1\right\}^n$ and reveals it to Bob and Eve. Alice and Bob measure in the basis $\theta$, to get some $x_A$ and $x_B$. So far, this is exactly the three-player guessing game. The twist is that we declare Eve wins if and only if $x_A = x_E$ and $\left|x_A - x_B\right|_H \leq \gamma n $ for some fixed $\gamma \geq 0$. In the original game, we had $\gamma = 0$, i.e.~we wished for the two strings to match exactly. It is possible to show that: 
+        \[\prob\left(\left|x_A - x_B\right| \leq \gamma \land x_A = x_E\right) \leq \left(\frac{1}{2} + \frac{1}{2 \sqrt{2}}\right)^n 2^{h\left(\gamma\right) n}.\]
+        
+        We define $\Omega$ to be the event that $\left|x_A - x_B\right|_H \leq 1.1 \delta_{max} = \gamma$. This bound tells us that we must have: 
+        \autoeq{\prob\left(x_A = x_E \land \Omega \suchthat E \Theta_{S \setminus T}\right) \leq 2^{h \left(\gamma\right) n} \left(\frac{1}{2} + \frac{1}{2 \sqrt{2}}\right)^n \implies \prob\left(x_A = x_E \suchthat E \Theta_{S \setminus T} \Omega\right) \leq 2^{h\left(\gamma\right) n} \leq 2^{h \left(\gamma\right) n} \left(\frac{1}{2} + \frac{1}{2 \sqrt{2}}\right)^n \frac{1}{\prob\left(\Omega\right)},}
+        where we used Bayes' rule. This is a bound on the guessing probability, which allows us to compute the min-entropy. However, it is not exactly the one we want: Alice and Bob abort whenever $x_T$ and $\widetilde{x}_T$ are too far away, but they do not look at the bits in $S \setminus T$. We can find in fact that, if we wish to condition on not aborting $\bar{Ab}$: 
+        \[\prob\left(x_A = x_E \suchthat E \Theta \Omega \bar{Ab}\right) \leq 2^{h\left(\gamma\right) n} \left(\frac{1}{2} + \frac{1}{2 \sqrt{2}}\right)^n \frac{1}{\prob\left(\Omega \land \bar{Ab}\right)}.\]
+        
+        However, $T$ is picked uniformly at random, so we should typically have $\Omega \approx \bar{Ab}$, giving our result.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Remark}
+    This is a complicated protocol, there are lots of things going on. The idea is however that we wish to show two properties: correctness and security. Security morally comes from a reduction to the guessing game.
+
+    The number of random variables make the problem more complex than what it is really.
+\end{parag}
+
+\subsection{Device-independent security}
+
+\begin{parag}{Introduction}
+    It is hard to trust our devices: it is hard to make an experiment that our quantum measurement tool indeed does a measurement, and that's it's not somehow been sold by Eve who put a bunch of half-EPR pairs in it.
+
+    We thus assume that all we have access are boxes that take $\theta \in \left\{0, 1\right\}$ and output $x \in \left\{0, 1\right\}$; but we can't trust that the box does an actual measurement. We wonder if our protocol still works. 
+
+    \begin{subparag}{Remark}
+        This section is more of a fun fact. It is interesting that we can make it work, but it should not be taken too seriously on the security side.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Under the setup above, the protocol we have considered no longer works.
+
+    \begin{subparag}{Proof}
+        Let's assume that the state Eve chooses is the following:
+        \[\sum_{x, y \in \left\{0, 1\right\}} \left(\ket{x}\bra{x} \otimes \ket{y}\bra{y}\right)_A \otimes \left(\ket{x}\bra{x} \otimes \ket{y}\bra{y}\right)_B \otimes \left(\ket{x}\bra{x} \otimes \ket{y}\bra{y}\right)_E.\]
+        
+        Let's moreover assume that Alice's box returns $x$ if $\theta = 0$, and $y$ if $\theta = 1$. It is not doing the right measurement, but since we do not trust our devices, this could be happening. Similarly, Bob gets $x$ if $\widetilde{\theta} = 0$ and $y$ if $\widetilde{\theta} = 1$.
+
+        Eve can use the same box to learn everything, with probability 1, breaking the protocol. 
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        The security proof for BB84 no longer works, since the guessing game assumed Alice and Bob had a single qubit, which they measured in a specific basis. However, it is really hard to test whether our box is like that, or if it actually does the measurement we want.
+
+        The idea will thus to test whether Alice's box and Bob's box measured different halfs of the same EPR pair. This approach is based on the CHSH game.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Recall: CHSH game}
+    Recall the CHSH game. Alice is given some $\theta \in \left\{0, 1\right\}$ and must produce some $a \in \left\{0, 1\right\}$. Similarly, Bob is given some $\widetilde{\theta} \in \left\{0, 1\right\}$ and must produce some $b \in \left\{0, 1\right\}$. They win if $x \oplus \widetilde{x} = \theta \land \widetilde{\theta}$.
+
+    We saw that there exists quantum strategy that wins with probability $\cos^2\left(\frac{\pi}{8}\right) \approx 0.85$.  This can be shown to be the optimal success probability.
+
+    \begin{subparag}{Remark}
+        The converse is also true: if Alice and Bob succeed with probability at least $\cos^2\left(\frac{\pi}{8}\right) - \epsilon$, they must measure something close to an EPR pair (up to rotations) and Alice must use a basis which is close to the ``correct'' one. In other words, the CHSH game is a test for EPR pairs.
+
+        We will prove this in the following lecture.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Modified CHSH game}
+    We consider a new game, which is very close to the CHSH.
+
+    Alice's input is $\theta \in \left\{0, 1\right\}$ and Bob's input is $\widetilde{\theta} \in \left\{0, 1, 2\right\}$. Alice's output is $x \in \left\{0, 1\right\}$ and Bob's output is $\widetilde{x} \in \left\{0, 1\right\}$.
+
+    Their winning condition goes as follows.
+    \begin{itemize}
+        \item If $\theta, \widetilde{\theta} \in \left\{0, 1\right\}$, then we must have $x \oplus \widetilde{x} = \theta \land \widetilde{\theta}$.
+        \item If $\theta = 0$ and $\widetilde{\theta} = 2$, then we must have $x = \widetilde{x}$.
+        \item If $\theta = 1$ and $\widetilde{\theta} = 2$, then they just win.
+    \end{itemize}
+
+    \begin{subparag}{Success probability}
+        This can be done by using the usual measurement basis, except that Bob measures in the computation basis when $\widetilde{\theta} = 2$ just like Alice. Doing so, we find: 
+        \[\prob\left(\text{win}\right) = \frac{2}{3} \prob\left(\text{win} \suchthat \widetilde{\theta} \in \left\{0, 1\right\}\right) + \frac{1}{3} \prob\left(\text{win} \suchthat \widetilde{\theta} = 2\right) = \frac{2}{3} \cos^2\left(\frac{\pi}{8}\right) + \frac{1}{3}\cdot 1.\]
+
+        This can be shown to be optimal. Completely similarly to the CHSH game, if they succeed with a probability close to this one, they essentially must have done these measurements on an EPR pair.
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        The idea is that we merged the CHSH game and a ``measurement game''. When $\widetilde{\theta} \in \left\{0, 1\right\}$, they are just playing the regular CHSH game; forcing the state to be an EPR pair for the optimal success probability. However, when $\widetilde{\theta} = 2$, their goal is actually to measure the EPR pair.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Device-independent BB84}
+    We update BB84 to now be device-independent. The updated protocol goes as follows.
+
+    \begin{enumerate}
+        \item Eve generates $\rho_{A^N B^N E}$ and sends $A^N$ to Alice's box and $B^N$ to Bob's box.
+        \item Alice samples $\theta \leftarrow \left\{0, 1\right\}^N$. She inputs $\theta$ to the box $N$ times, and get $x \in \left\{0, 1\right\}^N$. Similarly, Bob samples $\widetilde{\theta} \leftarrow \left\{0, 1, 2\right\}^N$, inputs it to the Box $N$ times and gets $\widetilde{x} \in \left\{0, 1\right\}^N$.
+        \item They exchange $\theta$ and $\widetilde{\theta}$.
+        \item Alice lets $T$ to be a random subset of $\left\{1, \ldots, N\right\}$, by taking any element with probability $\frac{1}{2}$.
+        \item Alice and Bob exchange $T, x_T, \widetilde{x}_T$.
+        \item They let $w$ to be the fraction of indices in $T$ where the game condition is satisfied. If $w < \frac{2}{3} \cos^2\left(\frac{\pi}{8}\right) - \delta_{max}$, then they abort.
+        \item They let $R = \left\{j \notin T \suchthat \theta_j = 0 \land \widetilde{\theta}_j = 2\right\}$, which is the set of indices that have actually been measured.
+        \item They let $x_A = x_R$ and $x_B = \widetilde{x}_{R}$.
+        \item They  run information reconciliation.
+        \item They  run privacy amplification.
+    \end{enumerate}
+
+    \begin{subparag}{Remark}
+        The connection with QKD ends here; it is secret and secure for the same reasons. We will now only prove that the optimal success probability to the CHSH game does require Alice and Bob to share an EPR pair.
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

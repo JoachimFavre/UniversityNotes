@@ -1,0 +1,146 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-12-04 at 13:34:26.
+
+\usepackage{../../style}
+
+\title{QC}
+\author{Joachim Favre}
+\date{Jeudi 04 décembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{23}{2025-12-04}{Let's take exponentially large keys}{
+\begin{itemize}[left=0pt]
+    \item Proof of the existence of small $\delta$-biased sets.
+    \item Proof that a protocol based on the set of all functions is correct and secure.
+    \item Definition of pseudorandom families of functions.
+\end{itemize}
+
+}
+
+\begin{parag}{Lemma}
+    Let $k$ and $\epsilon > 0$ be arbitrary. 
+
+    For $n \sim k/\epsilon^2$, there exists a linear error correcting code $C \subseteq \left\{0, 1\right\}^{2n} = \mathbb{F}_2^{2n}$ of dimension $k$ such that, for all $u \in C$: 
+    \[\left|u\right|_H \in \left[\left(\frac{1}{2} - \epsilon\right)n, \left(\frac{1}{2} + \epsilon\right)n\right],\]
+    where $\left|.\right|_H$ is the Hamming weight.
+    
+    \begin{subparag}{Remark}
+        Since it is a linear error correcting code, it is a vector space. In particular, it means that we can write it as the image of a generator matrix $G$, i.e.\ $C = \im G$ where: 
+        \[G = \begin{pmatrix}  &  &  &  \\ u_1 & u_2 & \cdots & u_k \\  &  &  &  \end{pmatrix} \in \mathbb{F}_2^{n \times k}.\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Let $C$ be a code given by our previous lemma, and $G$ be its generator matrix. Moreover, let $T \subseteq \left\{0, 1\right\}^k$ be a set of containing the $n$ rows of $G$.
+
+    Then, $T$ is a $\delta$-biased subset of $\left\{0, 1\right\}^k$ for $\delta = 2 \epsilon$.
+
+    \begin{subparag}{Implication}
+        To have a QES on $N$ qubits that is $\epsilon$-secure, we showed that we needed a $\delta$-biased set where $\delta = 2 \epsilon$. Moreover, we need $T$ to be a subset of $\left\{0, 1\right\}^{2N}$, so we need $k = 2N$. Hence, our previous theorem tells us that we need to take: 
+        \[n \sim \frac{k}{\epsilon^2} = \frac{2N}{\epsilon^2}.\]
+        
+        By construction, $\left|T\right| = n$. Hence, representing any of its elements takes $\log_2\left|T\right| = \log_2\left(2N / \epsilon^2\right)$ bits. Recall that, in the QES we constructed, $T = \mathcal{K}$ is the set of keys. Hence, this overall gives us an $\epsilon$-secure QES that only requires logarithmically many bits for its keys. This is a lot better.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Let $\alpha \neq 0^k$ be an arbitrary vector. We aim to evaluate: 
+        \[s = \frac{1}{\left|T\right|} \left|\sum_{t \in T} \left(-1\right)^{t \dotprod \alpha}\right|.\]
+        
+        By definition of $T$, calling $G_i$ to be the $i$\Th row of $G$, this reads: 
+        \[s = \left|\frac{1}{n} \sum_{i=1}^{n} \left(-1\right)^{G_i \dotprod \alpha}\right|.\]
+
+        We can check that this is equal to: 
+        \[s = \left|\frac{2 \left|\alpha_1 u_1 + \ldots + \alpha_k u_k\right|_H}{n} - 1\right|.\]
+
+        However, since $u = \alpha_1 u_1 + \ldots + \alpha_k u_k \in C$, we know that $\left|u\right|_H$ is $\epsilon n$ close to $\frac{1}{2}n$ by definition of the code. This gives exactly our result, $s \leq 2 \epsilon$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{Pseudorandom families of functions}
+
+\begin{parag}{Theorem}
+    We describe a protocol.
+    \begin{itemize}
+        \item \textit{(Keys)} Let $\mathcal{K}$ be the set of all $\left\{0, 1\right\}^{2n} \mapsto \left\{0, 1\right\}^{2n}$ functions: 
+    \[\mathcal{K} = \left\{G: \left\{0, 1\right\}^{2n} \mapsto \left\{0, 1\right\}^{2n}\right\}.\]
+
+    \item \textit{(Encryption)} We describe encryption $\Enc_k\left(\rho\right) = \Enc_G\left(\rho\right)$. Let $\rho$ be arbitrary. We sample some $r \leftarrow_U \left\{0, 1\right\}^{2n}$, evaluate $\left(u, v\right) \leftarrow G\left(r\right)$ for $u, v \in \left\{0, 1\right\}^n$, and output the following $4n$-qubit state:
+    \[\sigma = \Enc_G\left(\rho\right) := \ket{r}\bra{r} \otimes X^u Z^v \rho \left(X^u Z^v\right)^{\dagger}.\]
+
+    \item \textit{(Decryption)} We describe decryption $\Dec_k\left(\sigma\right) = \Enc_G\left(\sigma\right)$. We measure the first $2n$ qubits to get $r$. We then evaluate $\left(u, v\right) \leftarrow G\left(r\right)$ and, leaving $\sigma_2$ to be the last $n$ qubits of $\sigma$, output: 
+    \[\left(Z^v X^u\right) \sigma_2 \left(Z^v X^u\right)^{\dagger}.\]
+    \end{itemize}
+
+    This protocol is correct and perfectly secure.
+    
+    \begin{subparag}{Remark}
+        Note that $\left|\mathcal{K}\right| = \left(2^{2n}\right)^{\left(2^{2n}\right)} = 2^{2n\cdot 2^{2n}}$, and hence the key length is $\log_2 \left|\mathcal{K}\right| = 2n 2^{2n}$. This is thus a very bad scheme in the way it is written right now.
+
+        The idea is that we now want to make a similar protocol, except that we want to sample from a distribution of functions that looks like it is sampled from the set of all $\left\{0, 1\right\}^{2n} \mapsto \left\{0, 1\right\}^{2n}$ functions, except that in fact has a lot more structure.
+    \end{subparag}
+
+    \begin{subparag}{Correctness}
+        The proof of correctness is considered trivial and left as an exercise to the reader.
+    \end{subparag}
+
+    \begin{subparag}{Security}
+        Fix $\rho_M$ on $n$ qubits to be arbitrary. Then, writing $G = \left(G_1, G_2\right)$: 
+        \autoeq{\mathcal{E}\left(\rho\right) = \frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k\left(\rho\right) = \frac{1}{\left|\mathcal{K}\right|} \sum_{G \in \mathcal{K}} \frac{1}{2^{2n}} \sum_{r \in \left\{0, 1\right\}^n} \ket{r}\bra{r} \otimes X^{G_1\left(r\right)} Z^{G_2\left(r\right)} \rho_M \left(X^{G_1\left(r\right)} Z^{G_2\left(r\right)}\right)^{\dagger}  = \frac{1}{2^{2n}} \sum_{r} \ket{r}\bra{r} \otimes \frac{1}{\left|\mathcal{K}\right|} \sum_{G} X^{G_1\left(r\right)} Z^{G_2\left(r\right)} \rho_{M} \left(X^{G_1\left(r\right)} Z^{G_2\left(r\right)}\right)^{\dagger}.}
+
+        Now, for any given $u, u'$, the number of $r$'s such that $G_1\left(r\right) = u$  is the exact same as the number of $r$'s  such that $G_1\left(r\right) = u'$, by symmetry. Hence, we can do a change of variable:
+        \[\mathcal{E}\left(\rho\right) = \frac{1}{2^{2n}} I \otimes \frac{1}{2^{2n}} \sum_{u, v} X^u Z^v \rho_M \left(X^u Z^v\right)^{\dagger} = \frac{1}{2^{2n}} I \otimes \frac{1}{2^{2n}} I.\]
+
+        This is thus indeed perfectly secure. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Security game}
+    We make a security game to state whether a family of function $\left\{F_k: \left\{0, 1\right\}^{2n} \mapsto \left\{0,1\right\}^{2n}\right\}_{k \in \mathcal{K}}$ ``looks like'' the set of all functions $G: \left\{0,1 \right\}^{2n} \mapsto \left\{0,1\right\}^{2n}$.
+
+    We have an adversary $\mathcal{A}$ and a challenger $\mathcal{C}$.
+    \begin{itemize}
+        \item The challenger samples some $k \leftarrow_U \mathcal{K}$.
+        \item The adversary can then send some $x_i$ to the challenger, who will answer $F_k\left(x_i\right)$.
+        \item After $t$ $\left(x_t, F_k\left(x_t\right)\right)$ exchanges, the adversary must return $b \in \left\{0, 1\right\}$ stating whether the function is sampled from a random family or not.
+    \end{itemize}
+
+    We let $\mathcal{A}^{F_k} \in \left\{0, 1\right\}$ to be the output of the adversary whenever the challenger picked the function $F_k$.
+
+    \begin{subparag}{Remark}
+        We do not give the function we want to test to the adversary, since random functions typically require a lot more bits to describe than a pseudorandom functions. Moreover, we want to consider poly-time adversaries, who would anyway not have the time to receive and look at the exponentially many bits required to describe a true set of all functions.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: PRF}
+    Let $\lambda \in \mathbb{N}$. A family of functions $\left\{F_k: \left\{0, 1\right\}^{n\left(\lambda\right)} \mapsto \left\{0, 1\right\}^{m\left(\lambda\right)} \suchthat k \in \mathcal{K}_{\lambda}\right\}$ is a \important{pseudorandom family of functions} (PRF) if, for all adversary $\mathcal{A}$ running in time $\lang{poly}\left(\lambda\right)$, there exists a negligible function $\epsilon\left(\lambda\right)$ (such that $\epsilon\left(\lambda\right) q\left(\lambda\right) = 0$ for any polynomial $q$) for which: 
+    \[\left|\prob_{k \leftarrow_U \mathcal{K}}\left(A^{F_k\left(\cdot \right)} = 1\right) - \prob_{G \leftarrow_U \left\{\left\{0,1\right\}^{n\left(\lambda\right)} \mapsto \left\{0, 1\right\}^{m\left(\lambda\right)}\right\}}\left(\mathcal{A}^{G\left(\cdot \right)} = 1\right)\right| \leq \epsilon\left(\lambda\right),\]
+    where probabilities are taken relatively to the security game described above.
+
+    \begin{subparag}{Intuition}
+        The idea is that no poly-time adversary can distinguish an element of the family $F_k\left(\cdot \right)$ from a completely random function $G\left(\cdot \right)$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 1}
+        For instance, $\epsilon\left(n\right) = 2^{-\sqrt{n}/10}$ and $\epsilon\left(n\right) = n^{-\log\left(n\right)}$ are valid negligible functions.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        The security scales with the parameter $\lambda$, not $n$. Indeed, we want to be able to have functions that are valid, even though their domain size $n\left(\lambda\right)$ does not grow with $\lambda$.
+    \end{subparag}
+
+    \begin{subparag}{Remark 3}
+        Under some computational assumptions, it is possible to find PRFs where $F_k$ is computable in time $\lang{poly}\left(\lambda\right)$.
+    \end{subparag}
+\end{parag}
+
+\end{document}

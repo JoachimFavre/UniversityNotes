@@ -1,0 +1,247 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-25 at 11:16:52.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Mardi 25 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{20}{2025-11-25}{Entanglement breaks everything}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the bit commitment problem.
+    \item Explanation of naive protocol to solve the bit commitment problem.
+    \item Proof of the impossibility of a quantum protocol for the bit commitment problem.
+    \item Proof of the construction of a bit commitment protocol from an oblivious transfer protocol.
+\end{itemize}
+
+}
+
+\subsection{Bit commitment}
+
+\begin{parag}{Definition: Bit commitment problem}
+    We define the \important{bit commitment problem} (BC).
+
+    Alice has some input $b \in \left\{0, 1\right\}$, and Bob has no input. There are two phases.
+    \begin{itemize}[left=0pt]
+        \item \textit{(Commit phase)} Alice commits $b$. Bob learns nothing about $b$, but learns that the commitment has been done.
+        \item \textit{(Open phase)} Alice tells the commitment to be opened, and Bob learns some $b'$.
+    \end{itemize}
+
+    The goal is for $b' = b$ to be what Alice committed.
+
+    \begin{subparag}{Remark}
+        In the commit phase, Alice sends data to Bob. The idea is that Bob cannot extract any information from this data up to the open phase.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Correctness}
+    A protocol for BC is \important{correct} if, whenever Alice and Bob are honest, then $b' = b$.
+\end{parag}
+
+\begin{parag}{Definition: Hiding}
+    A protocol for BC is \important{hiding} (or secure against dishonest Bob) if, before the open phase, Bob has no information about $b$.
+
+    \begin{subparag}{Remark}
+        In practice, this definition is too restrictive, so we loosen it to the following one.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon$-hiding}
+    A protocol for BC is \important{$\epsilon$-hiding} (or $\epsilon$-secure against dishonest Bob) if, considering $\rho_b$ to be the state of (dishonest) Bob after executing the commit phase whenever Alice has input $b \in \left\{0,1\right\}$, then:
+    \[\left\|\rho_0 - \rho_1\right\|_{tr} \leq \epsilon.\]
+
+    \begin{subparag}{Intuition}
+        In other words, Bob cannot make an experiment to distinguish between $\rho_0$ and $\rho_1$.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Binding}
+    A protocol for BC is \important{binding} (or secure against dishonest Alice) if, after the commit phase, Alice can only open to the value $b$ she committed.
+
+    \begin{subparag}{Remark}
+        Again, in practice, this definition is too restrictive and we loosen it to the following one.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon$-binding}
+    A protocol for BC is \important{$\epsilon$-binding} (or $\epsilon$-secure against dishonest Alice) if, considering considering any dishonest Alice strategy $A$ in the commit phase, and any dishonest Alice strategies $A_0, A_1$ in the open phase, then for a honest Bob:
+    \[\prob\left(\text{the strategy $\left(A, A_0\right)$ opens to 0}\right) + \prob\left(\text{the strategy $\left(A, A_1\right)$ opens to 1}\right) \leq 1 + \epsilon.\]
+
+    \begin{subparag}{Intuition}
+        The idea is that the strategy $A$ is the same in both cases: Alice commits something, without knowing what she will later want to open it to. Then, when she wants to open commitment, she chooses the strategy $A_0$ or $A_1$, depending on the value she can open to.
+
+        The bound above states that, if one of the probabilities is close to one, then the other must be small.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Naive protocol}
+    We consider the following naive protocol for BC. Alice has some input $b \in \left\{0, 1\right\}$ as usual. The commit and open phases go as follows.
+    \begin{itemize}
+        \item \textit{(Commit phase)} Alice samples $x \leftarrow_U \left\{0, 1\right\}$ and sends $\ket{\phi} = \ket{x}_{\theta = b}$ to Bob as her commitment.
+        \item \textit{(Open phase)} Alice sends $b, x$ to Bob. Bob measures $\ket{\phi}$ in the basis $b$ to get some outcome $\widetilde{x}$. He accepts if and only if $\widetilde{x} = x$, in which case he outputs $b$.
+    \end{itemize}
+
+    This protocol is correct and $0$-hiding (i.e.\ perfectly hiding). However, it is not binding at all.
+
+    \begin{subparag}{Correctness}
+        Whenever Alice and Bob are honest, then Bob measures $\ket{\phi}$ in the right basis and hence does get $\widetilde{x} = x$. He thus does output $b$, without ever rejecting.
+    \end{subparag}
+
+    \begin{subparag}{Hiding}
+        Whenever honest Alice has $b = 0$, then Bob's state after the commit phase is: 
+        \[\rho_0 = \frac{1}{2} \ket{0}\bra{0} + \frac{1}{2} \ket{1}\bra{1} = \frac{I}{2}.\]
+        
+        Similarly, whenever Alice has $b = 1$, then Bob's state is: 
+        \[\rho_1 = \frac{1}{2} \ket{+}\bra{+} +\frac{1}{2} \ket{-}\bra{-} = \frac{I}{2}.\]
+
+        Hence, this is indeed $0$-hiding: 
+        \[\left\|\rho_0 - \rho_1\right\|_{tr} = 0.\]
+    \end{subparag}
+
+    \begin{subparag}{Binding: Naive argument}
+        Let us make a naive argument first.
+
+        We consider a dishonest Alice, who sends an arbitrary $\ket{\phi}$ in the commit phase. If she wishes to open to $b'$ during the open phase, she has to send $\left(b', x\right)$ to Bob. The $x$ that maximises her success probability is: 
+        \[x = \argmax_{x \in \left\{0, 1\right\}} \left|\braket{\phi}{x}_{\theta = b'}\right|^2.\]
+
+        This is similar to the quantum money case, and we can show that the $\ket{\phi}$ that maximises the success probability is: 
+        \[\ket{\phi} = \cos\left(\frac{\pi}{8}\right) \ket{0} + \sin\left(\frac{\pi}{8}\right) \ket{1}.\]
+
+        This would then yield that this is $\epsilon$-binding protocol for $\epsilon = 2 \cos^2\left(\frac{\pi}{8}\right) = \frac{1}{\sqrt{2}}$, which is already interesting. However, this argument is wrong. We make a correct argument below.
+    \end{subparag}
+
+    \begin{subparag}{Binding: Correct argument}
+        We did not assume that Alice could use entanglement above. Hence, let us assume that Alice prepares an EPR pair, and sends the second bit to Bob. The total state after the commit phase is:: 
+        \[\ket{\Psi}_{AB} = \frac{\ket{00}+ \ket{11}}{\sqrt{2}} = \frac{\ket{++} + \ket{--}}{\sqrt{2}}.\]
+        
+        Hence, when Alice wishes to open to $b'$, she can measure in the basis $\theta = b'$ and get some outcome $x$. Sending $\left(x, b'\right)$ to Bob, he will always accept and output $b'$. This shows that this is indeed not binding at all for Alice.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Fidelity}
+    Let $\rho, \sigma$ be density matrices. Moreover, let $\ket{\Psi}$ be a purification of $\rho$ and $\ket{\Phi}$ be a purification of $\sigma$ on the same Hilbert space. The \important{fidelity} between $\rho$ and $\sigma$ can be equivalently be defined as: 
+    \[F\left(\rho, \sigma\right) = \Tr\left(\sqrt{\sqrt{\rho} \sigma \sqrt{\rho}}\right) = \sup_{\text{unitaries $U$}} \left|\bra{\Psi} \left(I \otimes U\right) \ket{\Phi}\right|.\]
+
+    \begin{subparag}{Personal remark}
+        If the reader wishes to learn more about fidelity, I invite them to read the 2-page explanation that can be found in my notes of Prof. Zoë Holmes' Quantum information theory class, available at:
+        \begin{center}
+            \url{https://github.com/JoachimFavre/UniversityNotes}
+        \end{center}
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: Impossibility of quantum bit commitment}
+    Suppose a scheme for BC is both $\epsilon$-hiding and $\epsilon_{binding}$-binding. Then, we must have:
+    \[\epsilon_{binding} \geq 1 - \sqrt{\epsilon}.\]
+
+    \begin{subparag}{Intuition}
+        This states that, if a protocol is $\epsilon$-hiding with a small $\epsilon$, then it cannot be $\epsilon'$-binding with a small $\epsilon'$. This thus shows the impossibility to make a protocol for bit commitment, even with quantum information.
+    \end{subparag}
+    
+    \begin{subparag}{Proof}
+        The attack to the previous protocol can be understood with purifications: an EPR pair is a purification of both the states Bob knows after the commit phase. The idea will be similar here.
+
+
+        Since the protocol is $\epsilon$-hiding by hypothesis, we know that $\left\|\rho_0 - \rho_1\right\|_{tr} \leq \epsilon$; where $\rho_0, \rho_1$ are what Bob knows after the commit phase, for a honest Alice committing $b = 0$ and $b = 1$, respectively. The idea is that $\rho_0 \approx \rho_1$ and hence we can apply Uhlmann's theorems to purify them both at the same time (up to some one-qubit unitary).
+
+        More formally, it can be shown that it gives us a bound on the fidelity: 
+        \[F\left(\rho_0, \rho_1\right) \geq 1 - \frac{\epsilon}{2}.\]
+        
+        By definition of fidelity, this means that there exists a unitary $U_A$ on $A$ and purifications $\ket{\psi_0}, \ket{\psi_1}$ such that: 
+        \[\left|\bra{\psi_1} \left(U_A \otimes I\right) \ket{\psi_0}\right| = 1 - \frac{\epsilon}{2}.\]
+
+        But then, this means that using the fact $z + z^* = 2\cre\left(z\right)$ and that $\cre\left(z\right) \leq \left|z\right|$ for any $z \in \mathbb{C}$:
+        \autoeq{\left\|U_A \otimes I_B \ket{\psi_0}_{AB} - \ket{\psi_1}_{AB}\right\|^2 = \left(\bra{\psi_0} U_a^{\dagger} - \bra{\psi_1}\right) \left(U_A \ket{\psi_0} - \ket{\psi_1}\right) = 2 - 2 \cre\left(\bra{\psi_1} U_A \ket{\psi_0}\right) \geq 2 - 2 \left|\bra{\psi_1} U_A \ket{\psi_0}\right| = \epsilon.}
+
+        Let us define $A$ to be ``commit to $0$'', $A_0$ to be ``open a $0$'' and $A_1$ to be ``first apply $U_A$, then open to $1$''. Now, by correctness: 
+        \[\prob\left(\left(A, A_0\right) \text{ open to 0}\right) = 1.\]
+
+        Moreover, since $U_A \otimes I_B \ket{\psi_0}_{AB}$ is $\sqrt{\epsilon}$-close to $\ket{\psi_1}_{AB}$ (since we showed the squared norm of their difference is at most $\epsilon$): 
+        \[\prob\left(\left(A, A_1\right) \text{ open to 1}\right) \geq 1 - \sqrt{\epsilon}.\]
+
+        Hence $\epsilon_{biding} \geq 1 - \sqrt{\epsilon}$.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: BC from OT}
+    Given a protocol for oblivious transfer, we can construct one classically for bit commitment which is correct, perfectly hiding and $\epsilon$-binding.
+
+    \begin{subparag}{Remark}
+        As stated in the previous remark, this does not need quantum.
+    \end{subparag}
+
+    \begin{subparag}{Protocol}
+        We make a protocol for bit commitment, so Alice starts with $b \in \left\{0, 1\right\}$. Commitment goes as follows:
+        \begin{itemize}
+            \item Bob samples $s_0, s_1 \leftarrow_U \left\{0, 1\right\}^{\ell}$.
+            \item They use the oblivious transfer that exists by hypothesis, so Alice learn $s_b$ and Bob learns nothing.
+        \end{itemize}
+        
+        The opening phase, then goes as follows:
+        \begin{itemize}
+            \item Alice sends to Bob the value she committed $\hat{b} = b$ and the value Bob sent to her $\hat{s}_b = s_b$.
+            \item Bob checks that $\hat{s}_b = s_{\hat{b}}$ and, if yes, returns $\hat{b}$.
+        \end{itemize}
+    \end{subparag}
+
+    \begin{subparag}{Correctness}
+        By correctness of oblivious transfer, we know that $\hat{s}_b = s_b$, so Bob accepts and outputs $\hat{b} = b$.
+    \end{subparag}
+
+    \begin{subparag}{Hiding}
+        By the security of oblivious transfer against dishonest senders, dishonest Bob learns nothing during the commit phase. This is thus indeed 0-hiding.
+    \end{subparag}
+
+    \begin{subparag}{Binding}
+        Fix $A$ to be the strategy used by  dishonest Alice in the commit phase, and $A_0, A_1$ to be the strategies in the open phase to open to $0$ or $1$. Now, Alice only learns one specific $s_b$, so she can only open to this one.
+
+        More formally, since she only learns one and has to guess the other: 
+        \[\prob\left(\text{Alice can recover both $s_0$ and $s_1$}\right) \leq 2^{-\ell}.\]
+
+        Moreover, by construction of the protocol, if the strategy $\left(A, A_i\right)$ manages to open to $i$ with probability $p_i$, then in particular this same strategy can recover the value $s_i$ with probability $p_i$ (since it is what is needed to open to $i$). Therefore, by the union bound: 
+        \autoeq[s]{\prob\left(\text{Alice can recover both $s_0$ and $s_1$}\right) \geq 1 - \prob\left(\text{$\left(A, A_0\right)$ cannot recover $s_0$}\right) - \prob\left(\text{$\left(A, A_1\right)$ cannot recover $s_1$}\right) = 1 - \left(1 - p_0\right) - \left(1 - p_1\right) = p_0 + p_1 - 1.}
+
+        Combining the two, this tells us that:
+        \[p_0 + p_1 - 1 \leq 2^{-\ell} \iff p_0 + p_1 \leq 1 + 2^{-\ell}.\]
+
+        In other words, the protocol is $2^{-\ell}$-binding.
+    \end{subparag}
+
+    \begin{subparag}{Quantum binding}
+        Note that in our analysis of the binding property, we assumed that the protocol for OT we had access to was classical. However, this is not always true: we might have a quantum protocol for OT. This does not change anything, except the analysis that has  to be done for the binding property. Let us see an informal approach that could be taken.
+
+        Indeed, if the OT protocol is quantum, Alice could maybe feed $b = \ket{+}$, so she could maybe learn something about both $s_0, s_1$. To make the argument above still work, instead of asking the OT protocol to be perfectly secure,  we can instead ask $\epsilon$-security. In other words, for any dishonest Alice:
+        \[\prob\left(\text{Alice guesses both $s_0$ and $s_1$}\right) \leq 2^{-\ell} +\epsilon.\] 
+
+        We can then still not finish the argument similarly to the classical case. Indeed, to express our probabilities in the union bound, we assumed that we can do both strategies $\left(A, A_0\right)$ and $\left(A, A_1\right)$ to recover both $s_0$ and $s_1$. However, in the quantum case, after we recover $s_0$, there is no guarantee we can also recover $s_1$: we may have measured the state, and hence we may have modified it. Instead, we have to use the gentle measurement lemma, stated below.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Gentle measurement lemma}
+    Let $\rho$ be a density matrix and let $\left\{M, I - M\right\}$ be a binary POVM.
+
+    Then: 
+    \[F\left(\rho, \frac{\sqrt{M} \rho \sqrt{M}}{\Tr\left(M \rho\right)}\right) \geq \sqrt{\Tr\left(M \rho\right)}.\]
+    
+
+    \begin{subparag}{Intuition}
+        The lemma states how much the state is changed given the amount of information we learn.
+
+        For instance, if the measurement was deterministic $\Tr\left(M\rho\right) = 1$ and hence the state was not changed. This is completely similar if the measurement was not equal but just close to $1$, $\Tr\left(M \rho\right) \approx 1$.
+
+        Now, if we learn a lot of entropy with our measurement $\Tr\left(M \rho\right) = 1/2$, then the bound does not tell us anything on the fidelity, and hence the state after the measurement may have changed a lot. 
+    \end{subparag}
+\end{parag}
+
+
+\end{document}

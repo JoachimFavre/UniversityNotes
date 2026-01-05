@@ -1,0 +1,91 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-13 at 13:22:41.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Jeudi 13 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{17}{2025-11-13}{Language test}{
+\begin{itemize}[left=0pt]
+    \item Justification of the robustness of the optimal strategy to the CHSH game.
+\end{itemize}
+
+}
+
+\begin{parag}{Recall: CHSH proof}
+    Let us recall how we prove the upper bound on the winning probability of the CHSH game:
+    \[p_{win} \leq \frac{1}{2} + \frac{1}{2 \sqrt{2}} = \cos^2\left(\frac{\pi}{8}\right).\]
+
+    Any quantum strategy is described by some state $\ket{\psi}_{AB} \in \mathcal{H}_A \otimes \mathcal{H}_B$ and some projective measurements $\left\{A_x^0, A_x^1\right\}, \left\{B_y^0, B_y^1\right\}$. The probability of winning can be computed to be:
+    \autoeq{p_{win} = \frac{1}{4} \sum_{\substack{x,y,a,b \\ a \oplus b = x \land y}} \underbrace{\bra{\psi} A_a^x \otimes B_b^y \ket{\psi}}_{= p\left(a, b \suchthat x, y\right)} = \frac{1}{2} + \frac{1}{8} \bra{\psi} \underbrace{\left(A_0 \otimes B_0  + A_1 \otimes B_0 + A_0 \otimes B_1 - A_1 \otimes B_1\right)}_{= C} \ket{\psi},}
+    where we let $A_x = A_x^0 - A_x^1$ and $B_y = B_y^0 - B_y^1$, which are such that $A_x^2 = B_y^2 = I$ for any $x, y$. 
+
+    All this was already done in class. The rest of the argument was done in the fourth exercise series. To prove our bound, all we need is to show that $\left\|C\right\|_{\infty} \leq 2 \sqrt{2}$, and hence it enough to show that $2 \sqrt{2} I - C \geq 0$ is positive semi-definite. To do that, we can just write it as a sum of squares $\sqrt{2}\left(2 \sqrt{2} I - C\right) = P^2 + Q^2$, where: 
+    \[P = A_0 \otimes I - \frac{1}{\sqrt{2}} I \otimes \left(B_0 + B_1\right), \mathspace Q = A_1 \otimes I - \frac{1}{\sqrt{2}} I \otimes \left(B_0 - B_1\right).\]
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $A_0, A_1$ be Hermitian matrices such that $A_0^2 = A_1^2 = I$ and such that they anticommute $A_0A_1 = -A_1A_0$. Then, there must exist a unitary (i.e.~a rotation) $U$ such that: 
+    \[U A_0 U^{\dagger} = X \otimes I, \mathspace U A_1 U^{\dagger} = Z \otimes I.\]
+
+
+        %Hence, we read that $A_1 A_0 = - A_0 A_1$ must anti-commute. Example of this type of relations are $XZ = -ZX$ or $XY = -YX$. It is possible to show that, in fact, if $A_0, A_1 \in \mathbb{R}^{2 \times 2}$ are symmetric, then there exists a rotation $R$ such that $R A_0 R^{-1} = Z$ and $R A_1 R^{-1} = \pm X$. This would indeed show that Alice's measurement strategy is indeed the same as the optimal one (up to rotation).
+
+        %To prove this, we decompose $A_0 = A_0^+ - A_0^-$ where $A_0^+$ is the projector on the positive eigenvector and $A_0^-$ similarly for negative eigenvectors. Since they are $2 \times2$, they are each rerpersented by a single vector. Since vectors are orthogonal, there exists a rotation $R$ that maps $A_0^+$ to $\ket{0}\bra{0}$ and $A_0^-$ to $\ket{1}\bra{1}$. This means that applying this on each qubit $R A_0 R^{-1} = Z \oplus Z \oplus \ldots \oplus Z = Z \otimes I$. Now, looking at this rotation on $A_1$, we have $A_1' = R A_1 R^{-1}$, and hence $A_0, A_1$ anticommuting tell us that $A_1' Z = - Z A_1'$. Considering an arbitrary $A_1' = \begin{pmatrix} a & c \\ c & b \end{pmatrix} $, this means that $a = b = 0$. Since moreover $A_1'^2 = I$, this means that $c^2 = 1$, and hence that $A_1' = \pm X \oplus \ldots \oplus X = \pm X \otimes I$.
+
+       %For any projections $P, Q \in \mathbb{R}^{n \times n}$ (such as $P = A_0^+$ and $Q = A_1^+$ being the projector on the positive eigenspace of $A_0$ and $A_1$), then there exists a basis of $\mathbb{R}^n$ such that: 
+       %\[P = \begin{pmatrix} p_1 &  &  &  \\  & p_2 &  & c \\  &  & \ddots &  \\  &  &  & p_t \end{pmatrix}, \mathspace Q = \begin{pmatrix} q_1 &  &  \\  & \ddots &  \\  &  & q_t \end{pmatrix}.\]
+       %later{picture}
+\end{parag}
+
+
+\begin{parag}{Theorem}
+    If a strategy achieves $p_{win} = \frac{1}{2} + \frac{1}{2 \sqrt{2}}$, then the state shared between Alice and Bob must be a (possibly rotated) EPR pair.
+
+    \begin{subparag}{Remark}
+        This can be generalised to approximate cases: if the probability of winning is approximately $\frac{1}{2} + \frac{1}{2 \sqrt{2}}$, then the shared state must be approximately a (possibly rotated) EPR pair. Similarly, this also applies to the modified CHSH game we used in the device-independent protocol.
+    \end{subparag}
+
+    \begin{subparag}{Proof idea}
+        We will make an informal proof.
+
+        We consider the $P, Q$ defined in the previous paragraph. We know by hypothesis that $p_{win} = \frac{1}{2} + \frac{1}{2 \sqrt{2}}$. Hence, it means that there exists a $\ket{\psi}$ such that $\bra{\psi} C \ket{\psi} = 2 \sqrt{2}$ and hence such that:
+        \autoeq{\bra{\psi}\left(2 \sqrt{2} I - C\right) \ket{\psi} = 0 \iff \bra{\psi}P^2 \ket{\psi} + \bra{\psi}Q^2 \ket{\psi} = 0 \iff \bra{\psi} P^2 \ket{\psi} = \bra{\psi} Q^2 \ket{\psi} = 0.}
+
+        The argument from here is a bit tedious, so we take the stronger hypothesis that $P = Q = 0$. This hypothesis is not required, but the argument is more tedious without taking it. We aim to show that $\ket{\psi} \approx \ket{EPR}$, $A_0 \approx Z$, $A_1 \approx X$, $B_0$ and $B_1$ are approximately the strategies used by Bob when proving optimality; where $\approx$ means up to rotation here. Now, our hypothesis yields: 
+        \[P = 0 \implies A_0 \otimes I = \frac{1}{\sqrt{2}} I \otimes \left(B_0 + B_1\right),\]
+        \[Q = 0 \implies A_1 \otimes I = \frac{1}{\sqrt{2}} I \otimes \left(B_0 - B_1\right).\]
+
+        Multiplying the first equation with the second, and the second with the first, we find:
+        \[A_0 A_1 \otimes I = \frac{1}{2} I \otimes \left(B_1 B_0 - B_0 B_1\right),\]
+        \[A_1 A_0 \otimes I = \frac{1}{2} I \otimes \left(B_0 B_1 - B_1 B_0\right).\]
+
+        Putting both together, we find:
+        \[A_0 A_1 \otimes I = \frac{1}{2} I \otimes \left(B_1 B_0 - B_0 B_1\right) = -A_1 A_0 \otimes I.\]
+
+        Hence, $A_0$ and $A_1$ must anti-commute. Therefore, by our lemma, there must exist a unitary $U$ such that:
+       \[U A_0 U^{\dagger} = X \otimes I, \mathspace U A_1 U^{\dagger} = Z \otimes I.\]
+
+       An interesting consequence is that the dimension of $A_0$ and $A_1$ has to be even. By the symmetry of the argument, one can show $B_0 B_1 = - B_1 B_0$, and hence there must exist a unitary $V$ such that: 
+       \[V B_0 V^{\dagger} = X \otimes I, \mathspace V B_1 V^{\dagger} = Z \otimes I.\]
+       
+       Now, we know what $C$ is: 
+       \autoeq{C = A_0 \otimes B_0  + A_1 \otimes B_0 + A_0 \otimes B_1 - A_1 \otimes B_1 = U \otimes V \left(\left(X \otimes X + X \otimes Z + Z \otimes X - Z \otimes Z\right) \otimes I \otimes I\right) U^{\dagger} \otimes V^{\dagger},}
+       up to a reordering of the qubits.
+       
+       However, eigenvectors are only rotated by rotation $. \mapsto U . U^{\dagger}$ or by adding identities $. \mapsto . \otimes I$. Hence, we only need to look at the eigenvectors of $X \otimes X + X \otimes Z + Z \otimes X - Z \otimes Z$. Doing the calculation, it has a unique eigenvector with eigenvalue $2 \sqrt{2}$, and it is $\left(I \otimes F\right) \ket{EPR}$ for some unitary $F$. Overall, this does tell us that if $\bra{\psi} C \ket{\psi} = 2 \sqrt{2}$, then $\ket{\psi}$ is an EPR-pair up to rotation (meaning a maximally entangled state).
+    \end{subparag}
+\end{parag}
+
+ 
+
+\end{document}

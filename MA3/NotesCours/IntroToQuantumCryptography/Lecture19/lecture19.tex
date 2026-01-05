@@ -1,0 +1,95 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2026-01-02 at 16:38:36.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Vendredi 02 janvier 2026}
+
+\begin{document}
+\maketitle
+
+\lecture{19}{2025-11-20}{The Elder Scrolls: Oblivious}{
+\begin{itemize}[left=0pt]
+    \item Definition of the oblivious transfer problem.
+    \item Explanation of a naive protocol to solve the oblivious transfer problem.
+\end{itemize}
+
+}
+
+\subsection{Oblivious transfer}
+
+\begin{parag}{Definition: Oblivious transfer}
+    We define the \important{oblivious transfer problem} (OT).
+
+    Alice has inputs $s_0, s_1 \in \left\{0, 1\right\}^{\ell}$, and Bob has input $y \in \left\{0, 1\right\}$. Their goal is for Alice to output nothing $\bot$, and for Bob to output $s_y$.
+\end{parag}
+
+\begin{parag}{Definition: Correctness}
+    A protocol for OT is \important{correct} if Bob does output $s_y$.
+\end{parag}
+
+\begin{parag}{Definition: Security}
+    A protocol for OT is \important{secure} if both the following hold.
+    \begin{itemize}[left=0pt]
+        \item \textit{(Secure against dishonest Alice)} A dishonest Alice learns no information about $y$.
+        \item \textit{(Secure against dishonest Bob)} A dishonest Bob learns no information about $s_{1-y}$.
+    \end{itemize}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Given a protocol for OT that is both correct and secure, one can solve any two-party computation problem.
+
+    \begin{subparag}{Remark}
+        This is a very important result. This shows the importance to study this problem.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Naive protocol}
+    We consider the following naive protocol for OT, which has some parameter $\alpha \geq 1$.
+    \begin{itemize}
+        \item Alice has input $s_0, s_1 \in \left\{0, 1\right\}^{\ell}$ and Bob has input $y \in \left\{0, 1\right\}$.
+        \item Alice samples $x \leftarrow_U \left\{0, 1\right\}^{\alpha \ell}$ and $\theta \leftarrow_U \left\{0, 1\right\}^{2 \alpha \ell}$.
+        \item Alice prepares $\ket{x}_{\theta}$ and sends it to Bob.
+        \item Bob samples $\widetilde{\theta} \leftarrow_U \left\{0, 1\right\}^{2 \alpha \ell}$, and measures the state he received in this basis to get some $\widetilde{x} \in \left\{0, 1\right\}^{2 \alpha \ell}$.
+        \item Bob tell Alice he is done.
+        \item Alice sends $\theta$ to Bob.
+        \item Bob considers the set of indices he measured in the right basis and in the wrong basis, labelling them using his $y$: 
+        \[I_y = \left\{i \suchthat \theta_i = \widetilde{\theta}_i\right\}, \mathspace I_{1 - y} = \left\{1, \ldots, 2 \alpha \ell\right\} \setminus I_y.\]
+
+        He sends both of them to Alice. We assume $\left|I_y\right| \geq \ell,  \left|I_{1-y}\right| \geq \ell$, which should happen with high probability for $\alpha$ sufficiently large.
+        \item  Alice sends $t_0 = s_0 + x_{I_0}$ and $t_1 = s_1 + x_{I_1}$ to Bob.
+        \item Bob outputs $t_y + \widetilde{x}_{I_y}$.
+    \end{itemize}
+    
+    This protocol is correct and secure against a dishonest Alice. However, it is insecure against a dishonest Bob.
+
+    \begin{subparag}{Remark}
+        The fact that it is insecure against a dishonest Bob is an issue. To make this work, we will show a reduction from another problem, bit commitment. We will then also show how to build a protocol for bit commitment using some more assumptions: the bounded storage model, and computational assumptions. 
+    \end{subparag}
+    
+    \begin{subparag}{Intuition}
+        The idea is that Alice cannot know which bits Bob measured in the right basis. However, assuming he is honest, he knows only $x_i$ for $i \in I_y$, and hence he is only able to decode $t_y$.
+    \end{subparag}
+    
+    \begin{subparag}{Correctness}
+        Alice output nothing, as expected. Moreover, Bob returns: 
+        \[t_Y + \widetilde{x}_{I_y} = s_y + x_{I_y} + \widetilde{x}_{I_y} = s_y,\]
+        since $x_{I_y} = \widetilde{x}_{I_y}$ since Bob measured these bits in the right basis by definition of $I_y$.
+    \end{subparag}
+
+    \begin{subparag}{Security against dishonest Alice}
+        Alice only learns $I_0, I_1$. However, these are random subsets of $\left\{1, \ldots, 2 \alpha \ell\right\}$, so she cannot learn anything about $y$.
+    \end{subparag}
+
+    \begin{subparag}{Security against dishonest Bob}
+        This is not secure against a dishonest Bob, because he can say that he is done before he has actually measured $\ket{x}_{\theta}$. He then learns $\theta$ and can get $x$ exactly. This allows him to know both $s_0$ and $s_1$, which is an issue.
+    \end{subparag}
+\end{parag}
+
+\end{document}

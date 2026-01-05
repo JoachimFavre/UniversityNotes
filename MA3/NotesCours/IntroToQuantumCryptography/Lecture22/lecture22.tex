@@ -1,0 +1,282 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-12-02 at 11:24:06.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Mardi 02 décembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{22}{2025-12-02}{Super-duper-hyper-perfect security}{
+\begin{itemize}[left=0pt]
+    \item Definition of quantum encryption scheme.
+    \item Definition of security and super-security.
+    \item Proof that the quantum one-time pad is super-perfectly secure.
+    \item Proof that any perfectly secure scheme is also super-perfectly secure.
+    \item Proof that perfect security requires exponentially many keys.
+    \item Explanation that $\epsilon$-perfect security requires exponentially many keys.
+    \item Definition of biased set.
+    \item Proof that biased sets yield $\epsilon$-secure schemes.
+\end{itemize}
+
+}
+
+\section{More about encryption}
+
+\subsection{Super-perfect security}
+
+\begin{parag}{Definition: QES}
+    A \important{quantum encryption scheme} (QES) is specified by tweer families of quantum channels: 
+    \[\left(\Enc_k: \left(\mathbb{C}^2\right)^{\otimes n} \mapsto \left(\mathbb{C}^2\right)^{\otimes m}\right)_{k \in \mathcal{K}}, \mathspace \left(\Dec_k: \left(\mathbb{C}^2\right)^{\otimes m} \mapsto \left(\mathbb{C}^2\right)^{\otimes n}\right)_{k \in \mathcal{K}}.\]
+
+    \begin{subparag}{Remark}
+        This generalises the definition seen at the beginning of the class thanks to quantum channels.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Correctness}
+    A QES is \important{correct} if, for all key $k \in \mathcal{K}$ and $n$-qubit state $\rho$: 
+    \[\Dec_k\left(\Enc_k\left(\rho\right)\right) = \rho.\]
+\end{parag}
+
+\begin{parag}{Definition: Security}
+    A QES is \important{secure} if, for all state $\rho$: 
+    \[\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k\left(\rho\right) = \frac{I}{2^n}.\]
+\end{parag}
+
+\begin{parag}{Definition: Super perfectly secure}
+    We consider the following game, played between an Adversary and a Challenger.
+    \begin{itemize}
+        \item The Adversary chooses an arbitrary $n$-qubit state $\rho_{EM}$ and sends $\rho_M$ to the Challenger.
+        \item The Challenger samples $b \leftarrow_U \left\{0, 1\right\}$ and $k \leftarrow_U \mathcal{K}$. If $b = 0$, they send $\sigma = \Enc_k\left(\rho_M\right)$ to the Adversary. If $b = 1$, they instead send $\sigma = \Enc_k\left(\ket{0^n}\bra{0^n}\right)$ to the Adversary.
+        \item The Adversary produces some guess $c \in \left\{0, 1\right\}$, and sends it to the Challenger.
+        \item The Adversary wins if and only if $c = b$.
+    \end{itemize}
+    
+    The QES used is called \important{super-perfectly secure} if the maximum success probability of the Adversary is $\frac{1}{2}$.
+
+    \begin{subparag}{Intuition}
+        This seems to be a stronger definition of security, where the Adversary could also know some information correlated with the state. We will however prove it to be just as strong as a security.
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        Note that the goal of the Adversary is to distinguish between $\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \left(I_E \otimes \Enc_k\right)\left(\rho_{EM}\right)$  and
+        \[\frac{1}{\left|\mathcal{K}\right|}\sum_{k \in \mathcal{K}} \left(I_E \otimes \Enc_k\right)\left(\rho_E \otimes \ket{0^n}\bra{0^n}\right) = \rho_E \otimes \frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k\left(\ket{0^n}\bra{0^n}\right).\]
+
+        Their success probability is given by a trace distance as proven earlier in the class. They are however free to choose $\rho_{EM}$, so their best maximum success probability is: 
+        \autoeq[s]{p_{succ} = \sup_{\rho_{EM}} \frac{1}{2} + \frac{1}{2} \left\|\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \left(I_E \otimes \Enc_k\right)\left(\rho_{EM}\right) - \rho_E \otimes\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k\left(\ket{0^n}\bra{0^n}\right)\right\|_{tr}.}
+        
+        Now, we know that a distance if and only if the two points are equal. In other words, we have $p_{succ} = \frac{1}{2}$ if and only if, for all state $\rho_{EM}$: 
+        \[\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \left(I_E \otimes \Enc_k\right)\left(\rho_{EM}\right) = \rho_E \otimes \frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k\left(\ket{0^n}\bra{0^n}\right)\]
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon$-super security}
+    A QES is \important{$\epsilon$-super secure} if, for any adversary, then the probability of success in the security game is such that:
+    \[p_{succ} \leq \frac{1}{2} + \frac{1}{2} \epsilon.\]
+
+    \begin{subparag}{Remark}
+        This may sometimes be called $\epsilon$-security.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Notation}
+    Let $u \in \left\{0, 1\right\}^n$ be a bitstring and $P$ be a single-qubit operator. Then, we write: 
+    \[P^u = P^{u_1} \otimes P^{u_2} \otimes \ldots \otimes P^{u_n}.\]
+    
+    \begin{subparag}{Remark}
+        This notation will come in handy in the following proof.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    The quantum one time pad (qOTP) protocol is super perfectly secure.
+
+    \begin{subparag}{Proof}
+        Let $\rho_{ME}$ be an arbitrary state. We can always expand it in the Pauli basis: 
+        \[\rho_{ME} = \sum_{u, v \in \left\{0, 1\right\}^n} X^u Z^v \otimes N_E^{\left(u, v\right)},\]
+        where the $N_E^{\left(u, v\right)}$ are some matrices. But then, since qOTP is such that $\Enc_k\left(\rho\right) = \frac{1}{2^{2n}} \sum_{k = \left(k_1, k_2\right)} X^{k_1} Z^{k_2} \rho \left(X^{k_1} Z^{k_2}\right)^{\dagger}$:
+        \autoeq{\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \left(\Enc_k \otimes I_E\right)\left(\rho_{ME}\right) = \frac{1}{2^{2n}} \sum_{k = \left(k_1, k_2\right)} \sum_{u, v} X^{k_1} Z^{k_2} X^u Z^v \left(X^{k_1} Z^{k_2}\right)^{\dagger} = \frac{1}{2^{2n}} \sum_{k} \sum_{u, v} \left(-1\right)^{u \dotprod k_2} \left(-1\right)^{v \dotprod k_1} X^{u} Z^v \otimes N_E^{\left(u, v\right)},}
+        where we used the fact that $XZ = -ZX$.
+        
+        However, one can easily check that $\sum_{k_1} \left(-1\right)^{k_1 \dotprod u} = 2^n \delta_{u, 0}$. Hence, this simplifies to:
+        \autoeq{\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \left(\Enc_k \otimes I_E\right)\left(\rho_{ME}\right) = \frac{1}{2^{2n}} \sum_{u, v} \delta_{u 0} \delta_{v0} X^u Z^v \otimes N_E^{\left(u, v\right)} = \frac{I_M}{2^{n}} \otimes \left(N_E^{\left(0, 0\right)} 2^n\right).}
+
+        We could have fed a separable state, in which case the output would have had to be separable as well, telling us $\rho_E = 2^n N_E^{\left(0, 0\right)}$. Since $\rho_{ME}$ was arbitrary, this shows that qOTP is indeed super perfectly secure.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Notation}
+    Given a QES and a state $\rho$, we write: 
+    \[\mathcal{E}\left(\rho\right) = \frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k\left(\rho\right).\]
+
+    \begin{subparag}{Remark 1}
+        Note that, since $\Enc_k$ are quantum channels, this is also a quantum channels. Indeed, it is just the quantum channel that picks one of the $\Enc_k$ at random and applies it.
+
+        In particular, this notably means that it is linear and Hermitian-preseving.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        This will be useful in the following proof.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    If a QES is perfectly secure, then it is also super-perfectly secure.
+
+    \begin{subparag}{Proof}
+        Let $\rho_{ME}$ be an arbitrary state. We can assume that $\rho_{ME} = \ket{\psi}\bra{\psi}_{ME}$ without loss of generality by linearity of quantum channels. We can thus use Schmidt's decomposition: 
+        \[\ket{\psi} = \sum_{i} \sqrt{\lambda_i} \ket{u_i}_M \otimes \ket{v_i}_E.\]
+        
+        We note that: 
+        \autoeq[s]{\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \left(\Enc_k \otimes I\right)\left(\ket{\psi}\bra{\psi}\right) = \sum_{i, j} \sqrt{\lambda_i} \sqrt{\lambda_j}\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k\left(\ket{u_i}\bra{u_j}\right) \otimes \ket{v_i}\bra{v_j} = \sum_{i} \lambda_i \frac{I}{2^n} \otimes \ket{v_i}\bra{v_i} + \sum_{i \neq j} \sqrt{\lambda_i} \sqrt{\lambda_j}\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k\left(\ket{u_i}\bra{u_j}\right) \otimes \ket{v_i}\bra{v_j}.}
+
+        However, note that $\rho_E = \Tr_M\left(\ket{\psi}\bra{\psi}\right) = \sum_{i} \lambda_i \ket{v_i}\bra{v_i}$ and hence using the notation $\mathcal{E}$ we defined above:
+        \autoeq{\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \left(\Enc_k \otimes I\right)\left(\ket{\psi}\bra{\psi}\right) = \frac{I_M}{2^n} \otimes \rho_E + \sum_{i \neq j} \sqrt{\lambda_i} \sqrt{\lambda_j} \mathcal{E}\left(\ket{u_i}\bra{u_j}\right) \otimes \ket{v_i}\bra{v_j}.}
+
+        We therefore only need to show that $\mathcal{E}\left(\ket{u_i}\bra{u_j}\right) = 0$ for any $i \neq j$. However, by definition of perfect security: 
+        \[\mathcal{E}\left(\ket{\psi}\bra{\psi}\right) = \frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k\left(\ket{\psi}\bra{\psi}\right) = \frac{I}{2^n}.\]
+
+        Therefore, by the linearity and the Hermicity-preserving property of $\mathcal{E}$, for $i \neq j$ (such that $\frac{\ket{u_i} + \ket{u_j}}{\sqrt{2}}$ is a valid state): 
+        \autoeq{\frac{I}{2^n} = \mathcal{E}\left(\frac{\ket{u_i} + \ket{u_j}}{\sqrt{2}} \frac{\bra{u_i} + \bra{u_j}}{\sqrt{2}}\right) = \frac{1}{2}\mathcal{E}\left(\ket{u_i}\bra{u_i}\right) + \frac{1}{2} \mathcal{E}\left(\ket{u_j}\bra{u_j}\right) + \frac{1}{2}  \mathcal{E}\left(\ket{u_i}\bra{u_j}\right) + \frac{1}{2} \mathcal{E}\left(\ket{u_j}\bra{u_i}\right) = \frac{I}{2^n} + \mathcal{E}\left(\ket{u_i}\bra{u_j}\right).}
+
+        We see exactly that $\mathcal{E}\left(\ket{u_i}\bra{u_j}\right) = 0$, finishing the proof.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    If a QES $\left(\Enc_k, \Dec_k\right)$ is perfectly secure, then $\left|\mathcal{K}\right| \geq 2^{2n}$.
+
+    \begin{subparag}{Proof}
+        We keep considering the notation $\mathcal{E}\left(\rho\right) = \frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k\left(\rho\right)$. We take the simplifying assumption that $\Enc_k\left(\rho\right) = U_k \rho U_k^{\dagger}$ is just a unitary transformation. This argument can be done without it, but the added difficulty is not necessary. This means that we have:
+        \[\mathcal{E}\left(\rho\right) = \frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} U_k \rho U_k^{\dagger}.\]
+
+        Since the QES is perfectly secure by hypothesis, $\mathcal{E}\left(\rho\right) = \frac{1}{2^n} I$. More than that, we just proved that perfect security implies super-perfect security, so, leaving $\ket{\phi^+} = \frac{1}{\sqrt{2}}\left(\ket{00} + \ket{11}\right)$: 
+        \[\left(\mathcal{E} \otimes I\right)\left(\ket{\phi^+}\bra{\phi^+}_{ME}^{\otimes n}\right) = \frac{I}{2^n} \otimes \frac{I}{2^n}.\]
+        
+        Writing $\sigma\left(\rho\right) = \frac{1}{2^{2n}} \sum_{k_1, k_2} X^{k_1} Z^{k_2} \rho \left(X^{k_1} Z^{k_2}\right)^{\dagger}$, to be the case of the qOTP, we note that it is also super-perfectly secure and hence it must be equal:
+        \autoeq{\left(\mathcal{E} \otimes I\right)\left(\ket{\phi^+}\bra{\phi^+}^{\otimes n}\right) = \frac{I}{2^n} \otimes \frac{I}{2^n} = \left(\sigma \otimes I\right)\left(\ket{\phi^+}\bra{\phi^+}^{\otimes n}\right).}
+
+        In other words:
+        \autoeq[s]{\frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \left(U_k \otimes I\right) \left(\ket{\phi^+}\bra{\phi^+}\right)^{\otimes n} \left(U_k \otimes I\right)^{\dagger} = \frac{1}{2^{2n}} \sum_{k_1, k_2} \left(X^{k_1} Z^{k_2} \otimes I\right) \left(\ket{\phi^+}\bra{\phi^+}\right)^{\otimes n} \left(X^{k_1} Z^{k_2} \otimes I\right)^{\dagger}}
+        
+        The idea is now to use Uhlmann's theorem, to show that our QES has to be a rotation of the qOTP. The right-hand side can be purified to:
+        \[\frac{1}{\sqrt{2^{2n}}} \sum_{k_1, k_2} \sum_{k_1, k_2} \left(X^{k_1} Z^{k_2} \otimes I\right) \ket{\phi^+}^{\otimes n} \otimes \ket{k_1 k_2}.\]
+
+        Similarly, the left hand side can be purified to: 
+        \[\frac{1}{\sqrt{\left|\mathcal{K}\right|}} \sum_{k \in \mathcal{K}} \left(U_k \otimes I\right)\ket{\phi^+}^{\otimes n} \otimes \ket{k}\ket{0},\]
+        where the $\ket{0}$ are qubits we just add so that the dimension of this purification matches the one of the previous purification.
+
+        By Uhlmann's theorem, there must exist a unitary $V = \left(V_{k, k_1 k_2}\right)$ that maps one purification to the other. The idea is that it cannot map $2^{2n}$ to $\mathcal{K}$ if $\left|\mathcal{K}\right| < 2^{2n}$. More precisely, for all $k$, this is such that: 
+        \[\frac{1}{\sqrt{\left|\mathcal{K}\right|}} \left(U_k \otimes I\right) \ket{\phi^+}^{\otimes n} = \frac{1}{\sqrt{2^{2n}}} \sum_{k_1, k_2} \left(X^{k_1} Z^{k_2} \otimes I\right) \ket{\phi^+} V_{k, k_1, k_2}.\]
+        
+        Taking the squared 2-norm on both sides, and using the fact that $\sum_{k_1, k_2} \left|V_{k, k_1 k_2}\right|^2 \leq 1$ since it is a unitary, we find: 
+        \[\frac{1}{\left|\mathcal{K}\right|} = \frac{1}{2^{2n}} \underbrace{\sum_{k_1, k_2} \left|V_{k, k_1 k_2}\right|^2}_{\leq 1} \leq \frac{1}{2^{2n}} \implies \left|\mathcal{K}\right| \geq 2^{2n}.\]
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Intuition}
+        We have thus shown that the one-time pad achieves both perfect security and super perfect security (which are equivalent), but uses $2n$ bits of keys. This moreover shows that any scheme that achieves either must use the same number of bits. 
+
+        However, having to use $2n$ bits of keys is a lot when trying to send $n$ qubits. We aim to see if we can decrease the key length, bringing us to the following definition.
+    \end{subparag}
+\end{parag}
+
+\subsection{Approximate encryption}
+
+\begin{parag}{Definition: $\epsilon$-security}
+    A QES $\left(\Enc_k, \Dec_k\right)$ is \important{$\epsilon$-secure} if for all $\rho_M$: 
+    \[\left\|\frac{1}{\left|\mathcal{K}\right|} \sum_{k} \Enc_k\left(\rho_M\right) - \frac{1}{\left|\mathcal{K}\right|} \sum_{k} \Enc_k\left(\ket{0^n}\bra{0^n}\right)\right\|_{tr} \leq \epsilon.\]
+    
+
+    It is moreover \important{$\epsilon$-super secure} if, for all $\rho_{ME}$: 
+    \[\left\|\frac{1}{\left|\mathcal{K}\right|} \sum_{k} \left(\Enc_k \otimes I\right)\left(\rho_{ME}\right) - \frac{1}{\left|\mathcal{K}\right|} \sum_{k} \left(\Enc_k \otimes I\right)\left(\ket{0^n}\bra{0^n} \otimes \rho_E\right)\right\|_{tr} \leq \epsilon.\]
+
+    \begin{subparag}{Remark}
+        This matches the definition of $\epsilon$-super security we gave earlier in this lecture.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Consider an arbitrary QES. Moreover, let $\rho_{ME} = \ket{\phi^+}\bra{\phi^+}^{\otimes n}$. Then:
+    \[\left\|\frac{1}{\left|\mathcal{K}\right|} \sum_{k} \left(\Enc_k \otimes I\right)\left(\rho_{ME}\right) - \frac{1}{\left|\mathcal{K}\right|} \sum_{k} \left(\Enc_k \otimes I\right)\left(\ket{0^n}\bra{0^n} \otimes \rho_E\right)\right\|_{tr} \geq 2 \left(1 - \frac{\left|\mathcal{K}\right|}{2^{2n}}\right).\]
+
+    \begin{subparag}{Remark}
+        This tells us that not possible to achieve $\epsilon$-super security with a sub-exponential number of bits. Hence, if one wishes to have this property, there is no reason not to just use the qOTP.
+
+        Intuitively, this tells us that an adversary who can have correlated information to what is encrypted $\left(\Enc_k \otimes I\right)\left(\rho_{ME}\right)$ has a lot more power than an adversary who only receives an encrypted  message $\Enc_k\left(\rho_M\right)$.
+    \end{subparag}
+
+    \begin{subparag}{Proof idea}
+        The idea is that the second term in the norm is $\frac{I}{2^n} \otimes \frac{I}{2^{n}}$, which has rank $2^{2n}$; and the first term has rank at most $\left|\mathcal{K}\right|$.  
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Definition}
+    Let $S \subseteq \left\{0, 1\right\}^n \times \left\{0, 1\right\}^n$ be arbitrary.
+
+    We define a QES $\left(\Enc_k^{\left(S\right)}, \Dec_k^{\left(S\right)}\right)$ as follows. Let $\mathcal{K} = S$. Moreover, for any $k = \left(k_1, k_2\right) \in \mathcal{K}$: 
+    \[\Enc_k\left(\rho\right) = X^{k_1} Z^{k_2} \rho \left(X^{k_1} Z^{k_2}\right)^{\dagger}, \mathspace \Dec_k\left(\rho\right) = Z^{k_2} X^{k_1} \rho \left(Z^{k_2} X^{k_1}\right)^{\dagger}.\]
+    
+    \begin{subparag}{Intuition}
+        The idea is that this is just the quantum one time pad, but we only use a subset of the keys. This is a natural protocol.
+
+        We naturally wonder how small $S$ can be made so that this works.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: $\delta$-biased set}
+    A set $T \subseteq \left\{0, 1\right\}^n$ is $\delta$-biased if for all $u \in \left\{0, 1\right\}^n \setminus \left\{0^n\right\}$, then: 
+    \[\frac{1}{\left|T\right|} \left|\sum_{t \in T} \left(-1\right)^{t \dotprod u}\right| \leq \delta.\]
+
+    \begin{subparag}{Intuition}
+        The idea is that $\sum_{t \in T} \left(-1\right)^{t \dotprod u}$ counts the difference between the number of odd-parity and even-parity strings, using $u$ as a bitmask. This is thus requiring that, under any linear projection, there is approximately the same number of parities.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    If $S \subseteq \left\{0,1\right\}^n \times \left\{0, 1\right\}^n$ is $\delta$-biased, then $\left(\Enc_k^{\left(S\right)}, \Dec_k^{\left(S\right)}\right)$ is $\epsilon$-secure for $\epsilon = \delta/2$. 
+
+    \begin{subparag}{Proof}
+        We still use $\mathcal{E}\left(\rho\right) = \frac{1}{\left|\mathcal{K}\right|} \sum_{k \in \mathcal{K}} \Enc_k^{\left(S\right)}\left(\rho\right)$. For any $\left(u, v\right) \neq 0^{2n}$, it is possible to show that: 
+        \[\left|\Tr\left(X^u Z^v \mathcal{E}\left(\rho\right)\right)\right| \leq \delta \left|\Tr\left( X^u Z^v \rho\right)\right|.\]
+
+        In other words, the (non-identity) Pauli coefficients of $\rho$ are smaller than the ones of $\mathcal{E}\left(\rho\right)$. Our goal is to show that, for all $\rho$: 
+        \[\left\|\mathcal{E}\left(\rho\right) - \frac{I}{2^{2n}}\right\|_{tr} \leq \frac{\delta}{2}.\]
+
+        We can upper bound the 1-norm (used in the trace distance) by the 2-norm. We thus aim to evaluate the $\ell_2$-norm of $\mathcal{E}\left(\rho\right)$ first. Before doing that, we write $\mathcal{E}\left(\rho\right)$ in the Pauli basis: 
+        \[\mathcal{E}\left(\rho\right) = \sum_{u, v} \alpha_{uv} X^u Z^v, \mathspace \text{where } \alpha_{uv} = \frac{1}{2^n} \Tr\left(X^u Z^v \mathcal{E}\left(\rho\right)\right).\]
+        
+        Hence, using the inequality mentioned above, we have: 
+        \autoeq{\left\|\mathcal{E}\left(\rho\right)\right\|_2^2 = \Tr\left(\mathcal{E}\left(\rho\right)^2\right) = 2^n \sum_{u, v} \left|\alpha_{uv}\right|^2 = 2^n \left(\frac{1}{2^{2n}} + \sum_{\left(u, v\right) \neq 0^{2n}} \frac{1}{2^{2n}} \left|\Tr\left(X^u Z^v \mathcal{E}\left(\rho\right)\right)\right|^2\right) \leq \frac{1}{2^n} \left(1 + \delta^2 \underbrace{\sum_{\left(u, v\right) \neq 0^{2n}} \left|\Tr\left(X^u Z^v \rho\right)\right|^2}_{\leq \Tr\left(\rho^2\right) \leq 1}\right) \leq \frac{1}{2^n}\left(1 + \delta^2\right).}
+
+        Note in particular that, by definition of 2-norm, this gives us a bound on the sum of the squares of the eigenvalues of $\mathcal{E}\left(\rho\right)$: 
+        \[\sum_{i} \lambda_i\left(\mathcal{E}\left(\rho\right)\right)^2 = \left\|\mathcal{E}\left(\rho\right)\right\|_2^2 \leq \frac{1}{2^n} \left(1 + \delta^2\right).\]
+        
+        Since our two matrices commute and hence can be diagonalised in the same eigenbasis, the trace distance is given by the difference of singular values (which are just eigenvalues here since the matrices are positive semi-definite): 
+        \[\left\|\mathcal{E}^{\left(S\right)}\left(\rho\right) - \frac{I}{2^n}\right\|_{tr} = \frac{1}{2} \sum_{i} \left|\lambda_i\left(\mathcal{E}\left(\rho\right)\right) - \frac{1}{2^n}\right|.\]
+
+        Using the Cauchy-Schwartz inequality, the fact $\sum_{i} \lambda_i\left(\mathcal{E}\left(\rho\right)\right)^2 \leq \frac{1}{2^n} \left(1 + \delta^2\right)$ found earlier, and the fact $\sum_{i} \lambda_i\left(\mathcal{E}\left(\rho\right)\right) = \Tr\left(\mathcal{E}\left(\rho\right)\right) = 1$, this then reads:
+        \autoeq{\left\|\mathcal{E}^{\left(S\right)}\left(\rho\right) - \frac{I}{2^n}\right\|_{tr} \leq \frac{1}{2} \sqrt{\sum_{i} 1^2} \sqrt{\sum_{i} \left|\lambda_i\left(\mathcal{E}\left(\rho\right)\right) - \frac{1}{2^n}\right|^2} = \frac{1}{2} \sqrt{2^n} \sqrt{\frac{1}{2^n} \left(1 + \delta^2\right) - \frac{2}{2^n} + \frac{1}{2^n}} = \frac{\delta}{2}.}
+        
+        
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Remark}
+        We are thus only left with building a $\delta$-biased set efficiently.
+    \end{subparag}
+\end{parag}
+
+\end{document}

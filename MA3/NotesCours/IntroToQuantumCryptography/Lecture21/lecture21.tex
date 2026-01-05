@@ -1,0 +1,128 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2026-01-02 at 19:10:49.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Vendredi 02 janvier 2026}
+
+\begin{document}
+\maketitle
+
+\lecture{21}{2025-11-27}{Computational assumptions}{
+\begin{itemize}[left=0pt]
+    \item Construction of a protocol for oblivious transfer from a protocol for bit commitment.
+    \item Construction of a protocol for oblivious transfer from a bounded quantum storage assumption.
+    \item Summary of the implications in 2-party computation.
+\end{itemize}
+
+}
+
+\subsection{Oblivious transfer from assumptions}
+
+\begin{parag}{Recall}
+    Recall that we considered the following naive protocol for OT, which depends on some parameter $\alpha \geq 1$.
+    \begin{enumerate}
+        \item Alice has input $s_0, s_1 \in \left\{0, 1\right\}^{\ell}$ and Bob has input $y \in \left\{0, 1\right\}$.
+        \item Alice samples $x \leftarrow_U \left\{0, 1\right\}^{\alpha \ell}$ and $\theta \leftarrow_U \left\{0, 1\right\}^{2 \alpha \ell}$.
+        \item Alice prepares $\ket{x}_{\theta}$ and sends it to Bob.
+        \item Bob samples $\widetilde{\theta} \leftarrow_U \left\{0, 1\right\}^{2 \alpha \ell}$, and measures the state he received in this basis to get some $\widetilde{x} \in \left\{0, 1\right\}^{2 \alpha \ell}$.
+        \item Bob tell Alice he is done.
+        \item Alice sends $\theta$ to Bob.
+        \item Bob considers the set of indices he measured in the right basis and in the wrong basis, labelling them using his $y$: 
+        \[I_y = \left\{i \suchthat \theta_i = \widetilde{\theta}_i\right\}, \mathspace I_{1 - y} = \left\{1, \ldots, 2 \alpha \ell\right\} \setminus I_y.\]
+
+        He sends both of them to Alice. We assume $\left|I_y\right| \geq \ell, \left|I_{1-y}\right| \geq \ell$, which should happen with high probability for $\alpha$ sufficiently large.
+        \item  Alice sends $t_0 = s_0 + x_{I_0}$ and $t_1 = s_1 + x_{I_1}$ to Bob.
+        \item Bob outputs $t_y + \widetilde{x}_{I_y}$.
+    \end{enumerate}
+
+    We proved it is correct and secure against a dishonest Alice, but that it is insecure against a dishonest Bob. The issue is that the step ``Bob tell Alice he is done'' gives the freedom to Bob to lie and tell he is done before he actually measured the state. We consider two ways to fix this issue.
+\end{parag}
+
+\begin{parag}{Theorem: OT from BC}
+    Given a protocol for bit commitment, we can construct a quantum protocol for oblivious transfer.
+    
+    \begin{subparag}{Remark 1}
+        Since we can construct BC classically from computational assumptions, this gives a way to construct OT thanks to quantum information.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        It can be shown that, in fact, no classical protocol can be constructed from just a protocol for bit commitment. It again shows the power of quantum information theory.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We update the naive protocol explained above as follows, leaving $m$ to be a parameter that has to be taken large enough.
+        \begin{enumerate}
+            \item Alice has input $s_0, s_1 \in \left\{0, 1\right\}^{\ell}$ and Bob has input $y \in \left\{0, 1\right\}$.
+            \item Alice samples $x \leftarrow_U \left\{0, 1\right\}^{\alpha \ell}$ and $\theta \leftarrow_U \left\{0, 1\right\}^{2 \alpha \ell}$.
+            \item Alice prepares $\ket{x}_{\theta}$ and sends it to Bob.
+            \item Bob samples $\widetilde{\theta} \leftarrow_U \left\{0, 1\right\}^{m}$, and measures the state he received in this basis to get some $\widetilde{x} \in \left\{0, 1\right\}^{m}$.
+            \item Bob commits $\widetilde{\theta}_i, \hat{x}_i$ for all $i$ using the BC protocol that exists by hypothesis.
+            \item Alice selects some $T \subseteq \left\{0, 1\right\}^m$ by picking $\left|T\right| = m/10$ elements at random.
+            \item Alice sends $T$ to Bob.
+            \item Bob opens all $\widetilde{\theta}_i$ and $\widetilde{x}_i$ where $i \in T$ using the BC protocol.
+            \item Alice checks that for all $i \in T$, whenever $\widetilde{\theta}_i = \theta_i$, then $x_i = \widetilde{x}_i$.
+            \item Bob considers the set of indices he measured in the right basis and in the wrong basis, labelling them using his $y$, but only using bits he hasn't revealed to Alice: 
+            \[I_y = \left\{i\ {\color{red}\notin T} \suchthat \widetilde{\theta}_i = \theta_i\right\}, \mathspace I_{1-y} = \left\{i\ {\color{red}\notin T} \suchthat \widetilde{\theta}_i \neq \theta_i\right\}.\]
+
+            He sends both of them to Alice.
+            \item  Alice samples $f_0, f_1$ to be strong seeded extractors, and sends ${\color{red}f_0}$, ${\color{red}f_1}$, $t_0 = s_0 + {\color{red}f_0\left(x_{I_0}\right)}$ and $t_1 = s_1 + {\color{red}f_1\left(x_{I_1}\right)}$ to Bob.
+            \item Bob outputs $t_y + {\color{red}f_y\left(\widetilde{x}_{I_y}\right)}$.
+        \end{enumerate}
+
+        The idea is that steps 5-9 replace the naive step 5, and this requires to make some small modifications (displayed in red). In more details, we made three modifications to the protocol.
+        \begin{itemize}
+            \item Bob proves to Alice that, with  high probability, he had to measure most qubits. This is done thanks to steps 5-9.
+            \item Bob revealed some information to Alice, so he cannot reuse it in step 10.
+            \item Bob may still have some (very small) information about bits where he claims to have measured in the wrong basis. Alice thus removes this information by making $x_{I_{1-y}}$ a truly random bitmask by applying a strong seeded extractor on it.
+        \end{itemize}
+        
+        The idea is that these added steps do not change the fact that the protocol is correct and secure against a dishonest Alice. Indeed, the new information that is revealed to Alice is independent from the result since Bob does not use it to construct $I_0$, $I_1$.
+
+        However, for the test to pass, Bob must  have measured all his bits and committed them correctly (or be extremely lucky to have measured the bits that Alice was going to ask for). Hence, it is also secure against a dishonest Bob.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem: OT in the bounded-storage model}
+    Assuming that Bob has at most $q$ qubits of quantum memory, then there exists a quantum protocol for oblivious transfer.
+
+    \begin{subparag}{Remark}
+        Assuming that Bob only has access to $q$ qubits of quantum memory is a reasonable approximation of modern quantum storage. Indeed, it is currently very hard to preserve quantum information. Hence, if Alice waits a little bit, then Bob will have lost some information about the quantum data she sent him.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We again consider our naive protocol. However, this time, when Bob tells Alice he is done, she waits some time $\Delta t$ for the bounded-storage model to apply. Moreover, at the end, Alice uses some strong-seeded extractors just like in the previous protocol.
+
+        Just like before, correctness and security against a dishonest Alice comes by the same argument as in the naive case. We thus only consider the security against a dishonest Bob.
+
+        Let us call $X_+ = X_{I_0}$ and $X_{\times} = X_{I_1}$ to be random variables. We aim to quantify the amount of knowledge Bob has on $X_{I_0}$ and $X_{I_1}$: if there is some non-zero min-entropy, then $f_0\left(X_{I_0}\right)$ and/or $f_1\left(X_{I_1}\right)$ are random strings in his eyes by the leftover hashing lemma, and hence he can only get $s_0$ or $s_1$ (or neither). Writing $Q$ to be the quantum memory he still has access to when Alice sends $\theta$ to him, which we assume to have size at most $q \leq m/10$, and using the chain rule: 
+        \autoeq{H_{min}\left(X_+ X_{\times} \suchthat Q \theta\right) \geq H_{min}\left(X_+ X_{\times} \suchthat \theta\right) - q \geq m \left(-\log_2\left(\frac{1}{2} + \frac{1}{2\sqrt{2}}\right)\right) - \frac{m}{10} \geq \frac{m}{10},}
+        where we used the fact that the best attack by Bob has success probability $\left(\frac{1}{2} + \frac{1}{2 \sqrt{2}}\right)^m$, which is the same as in the quantum money scheme and consists in measuring in the basis $\cos^2\left(\frac{\pi}{8}\right) \ket{0} + \sin^2\left(\frac{\pi}{8}\right)$.
+
+        Bob still must necessarily have some unknown information about $X_+$ and $X_{\times}$, so applying a strong-seeded extractor gives exactly our security result.
+        
+        \qed
+    \end{subparag}
+\end{parag}
+
+
+\begin{parag}{Summary}
+    Overall, we can make the following diagram of implications for two-party computation problems, where any arrow drawn is proven (and not just conjectured). We also show if the implication is done with quantum information (Q) or if classical information suffices (C).
+    \svghere[0.8]{SummaryTwoPartyComputation.svg}
+
+    \begin{subparag}{Remark}
+        This shows a big interest of quantum information theory. For instance, we can convert one-way functions (functions $f$ such that, given $y$, it is computationally hard to find some $x$ for which $f\left(x\right) = y$), which are typically just conjectured to be hard, into the protocol for some arbitrary given two-party computation problem.
+
+        Similar things are achievable with classical cryptography only as well, although it requires stronger hypotheses. One can for instance do anything with public-key cryptography, which typically require trapdoor one-way functions (one-way functions such that, there also exists some secret $t$ such that, for any $y$, it becomes computationally easy to find some $x$ such that $f\left(x\right) = y$).
+    \end{subparag}
+\end{parag}
+
+\end{document}

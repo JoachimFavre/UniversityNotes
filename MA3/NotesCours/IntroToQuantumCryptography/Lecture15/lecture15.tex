@@ -1,0 +1,57 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-06 at 13:58:59.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Jeudi 06 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{15}{2025-11-06}{Correction of the midterm}{
+\begin{itemize}[left=0pt]
+    \item \textit{The midterm was corrected during this lecture, hence the smaller amount of content.}
+    \item Recall of the 3-player guessing game, and proof of a bound on the conditional entropy knowing Alice and Bob did not abort.
+\end{itemize}
+
+}
+
+\begin{parag}{Recall: 3-player guessing game}
+    We recall the 3-player guessing game.
+
+    Eve generates some $\rho_{ABE}$ however she wants. She sends $\rho_A$ to Alice and $\rho_B$ to Bob. Alice chooses some $\theta \leftarrow_U \left\{0, 1\right\}$ and shares it to Bob; Eve gets it on the way. Alice measures $\rho_A$ in  the basis $\theta$ to get $x$; and similarly Bob measures $\rho_B$ in the basis $\theta$ to get $\widetilde{x}$. Eve measures $\rho_E$ and comes up with some $x_E$ in some way.
+
+    Alice and Bob ``abort'' if $x \neq \widetilde{x}$. Eve wins whenever $x = \widetilde{x} = x_E$. We proved that: 
+    \[\prob\left(x = \widetilde{x} = x_E\right) \leq \frac{1}{2} + \frac{1}{2 \sqrt{2}}.\]
+\end{parag}
+
+\begin{parag}{Lemma}
+    Let $\bar{Ab}$ be the event that Alice and Bob abort, i.e.~that $x \neq \widetilde{x}$. In the 3-player guessing game, we have: 
+    \[H_{min}\left(x \suchthat E \theta \bar{Ab}\right) \geq -\log_2\left(\frac{1}{2} + \frac{1}{2 \sqrt{2}}\right) + \log_2\left(\prob\left(\text{not abort}\right)\right).\]
+
+    \begin{subparag}{Remark}
+        We are interested in the conditional min-entropy knowing that $\bar{Ab}$. Indeed, if $x \neq \widetilde{x}$, then Alice and Bob know that they have been eavesdropped and just abort. If however $x = \widetilde{x}$, they wish to know much information Eve can have about it.
+
+        Note that the bound above depends on $\prob\left(\text{not abort}\right)$. This makes sense, because of the following attack. She designs a state where she shares an EPR pair with Alice, and she sends a maximally mixed state to Bob. When she learns $\theta$, she measures her part of the EPR pair in the basis $\theta$. Note that she will always get the same value as Alice; but that Bob will typically have something different. However, conditioning on Alice and Bob not aborting, Eve knows exactly the value Alice and Bob share. Hence, in this case, the min-entropy conditioned on not aborting is zero. 
+
+        The idea is however that, if the probability to abort is high, then the protocol will anyway be useless for everyone. If however the probability to abort is low, then this bound is very meaningful.
+
+        This is important since it will be completely similar for our analysis of QKD below.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We note that: 
+        \autoeq{\frac{1}{2} + \frac{1}{2 \sqrt{2}} \geq \prob\left(x = \widetilde{x} = x_E\right) = \prob\left(x_E = x \land x = \widetilde{x}\right) = \prob\left(x_E = X \suchthat x = \widetilde{x}\right) \prob\left(x = \widetilde{x}\right) = P_{guess}\left(x \suchthat E \theta \bar{Ab}\right) \prob\left(\text{not abort}\right),}
+        since knowing $x = \widetilde{x}$ is equivalent to knowing $\bar{Ab}$.
+         
+        \qed
+    \end{subparag}
+\end{parag}
+
+\end{document}

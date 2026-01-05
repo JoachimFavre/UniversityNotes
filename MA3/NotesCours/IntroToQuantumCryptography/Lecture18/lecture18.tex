@@ -1,0 +1,258 @@
+% !TeX program = lualatex
+% Using VimTeX, you need to reload the plugin (\lx) after having saved the document in order to use LuaLaTeX (thanks to the line above)
+
+\documentclass[a4paper]{article}
+
+% Expanded on 2025-11-18 at 10:49:50.
+
+\usepackage{../../style}
+
+\title{Quantum crypto}
+\author{Joachim Favre}
+\date{Mardi 18 novembre 2025}
+
+\begin{document}
+\maketitle
+
+\lecture{18}{2025-11-18}{After quantum money, millionaire problems}{
+\begin{itemize}[left=0pt]
+    \item Explanation of the coin-flipping problem.
+    \item Proof that no classical protocol can be both correct and secure for the coin-flipping problem.
+    \item Proof of the existence of correct and $\frac{1}{4}$-protocol for the coin-flipping problem using quantum information.
+    \item General definition of the two-party computation paradigm.
+\end{itemize}
+
+}
+
+\section{Two-party computation}
+
+\begin{parag}{Goal}
+    We will now study two-party computation. Before diving into this problem, we consider a specific example, the coin-flipping example, that shows the interest of quantum information.
+\end{parag}
+
+\subsection{Coin-flipping problem}
+
+\begin{parag}{Definition: Coin-flipping problem}
+    The \important{coin-flipping problem} (CF) is a two-party computation problem.
+
+    Alice and Bob start with no input, $x = y = \bot$; and they output $c_A \in \left\{0, 1\right\}$ and $c_B \in \left\{0, 1\right\}$. Their goal is that $c_A = c_B$ and that it is a fair random coin toss.
+
+    \begin{subparag}{Remark}
+        This naturally leads to the following definition of correctness.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Correctness}
+    A protocol to CF is \important{correct} if, whenever both Alice and Bob execute the protocol honestly, then $c_A = c_B$ and it is uniformly distributed.
+\end{parag}
+
+\begin{parag}{Definition: $\epsilon$-security}
+    A protocol to CF is \important{$\epsilon$-secure} if, whenever Alice is honest, Alice's output is such that both the following hold:
+    \[\left|\prob\left(c_A = 0\right) - \frac{1}{2}\right| \leq \epsilon, \mathspace \left|\prob\left(c_A = 1\right) - \frac{1}{2}\right| \leq \epsilon.\]
+
+    The symmetric property must also hold when Bob is honest.
+
+    \begin{subparag}{Remark}
+        There is no requirement if both parties are dishonest.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1}
+    Let us consider a naive protocol. Alice samples $c \leftarrow_U \left\{0, 1\right\}$, and outputs it. She also sends it to Bob, who outputs the same value.
+    
+    This protocol is indeed correct: if both are honest, then they do end up with the same fair coin toss. Similarly, if Bob is dishonest, then Alice still outputs a fair coin toss, and hence it is secure against dishonest Bob. However, if Alice is dishonest, she can choose the output of the coin toss, so it is not secure against a cheating Alice.
+\end{parag}
+
+\begin{parag}{Example 2}
+    We consider a protocol that may seem better. Alice samples some $c_A \leftarrow_U \left\{0, 1\right\}$ and sends it to Bob. Bob samples some $c_B \leftarrow_U \left\{0, 1\right\}$ and sends it to Alice. They both output $c_A \oplus c_B$.
+
+    Completely similarly to before, this is correct. Moreover, one can verify that it is indeed secure against a dishonest Alice. However, it is not secure against a cheating Bob, since he can pick $c_B$ as a function of $c_A$ to output the value he wishes for.
+\end{parag}
+
+\begin{parag}{Remark}
+    The two examples above make it seem like it is very hard to make a classical protocol for CF that is both correct and secure. It is in fact impossible, as shown by the following theorem.
+\end{parag}
+
+\begin{parag}{Theorem}
+    For all classical protocol for CF that is correct and  $\epsilon$-secure, we must have $\epsilon \geq \frac{1}{2}$.
+
+    \begin{subparag}{Remark 1}
+        This is an impossibility result: no matter the protocol, there exists a strategy that allows to force an output. However, the proof does not say anything about computational efficiency: finding the right message to send for a dishonest Alice might be exponentially hard. 
+
+        In fact, adding computational assumptions, then one can make a classical protocol for coin-flipping.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        Any classical protocol goes as follows. Alice samples some $m_1 \followsdistr p_1$ and sends it to Bob. He then samples some $m_2 \followsdistr p_{2|m_1}$ and sends it to Alice. It goes until the end where the last person samples $m_t \followsdistr p_{t|m_1, \ldots, m_{t-1}}$ and sends it to the other. Alice computes $c_A = f_A\left(m_1, \ldots,  m_t\right)$ and Bob computes $c_B = f_B\left(m_1, \ldots, m_t\right)$.
+
+        We let $\tau_j = m_1 \cdots m_j$ to be all the messages that have been sent at iteration $j \in \left\{1, \ldots, t\right\}$; we call it a transcript. We moreover say $\tau_t$ is a $b$-transcript for some $b \in \left\{0, 1\right\}$ if $f\left(\tau_t\right) = b$. Moreover, we let: 
+        \[\alpha\left(\tau_j\right) = \prob\left(\text{Alice can force $c = 0$ on $\tau_j$}\right),\]
+        \[\beta\left(\tau_j\right) = \prob\left(\text{Bob can force $c = 1$ on $\tau_j$}\right).\]
+
+        We aim to show that $\alpha\left(\tau_j\right) = 1$ or $\beta\left(\tau_j\right) = 1$ by induction on $j = t, \ldots, 1, 0$.
+        \begin{itemize}[left=0pt]
+            \item \textit{(Base case)} We consider that $j = t$ for our base case. Hence, $\tau = m_1 \cdots m_t$ is a complete transcript. The communication is over, and hence they output a value, which must suit Alice or Bob.
+
+                More formally, $\tau_t$ is a $b$-transcript for $b = f\left(m_1 \cdots m_t\right)$. If $b = 0$, then $\beta\left(\tau_t\right) = 1$; and if $b = 1$, then $\alpha\left(\tau_t\right) = 1$. 
+
+            \item \textit{(Inductive step)} We assume that our proposition is true for $j$, and we want to prove it for $j-1$. Hence, let $\tau = m_1, \ldots, m_{j-1}$. Suppose that Alice sends $m_j \followsdistr p_{j | m_1, \ldots, m_{j-1}}$ (the case where it is Bob's turn is completely similar). Then, there are two cases.
+                \begin{enumerate}
+                    \item Let's assume that for all $m_j$, $\tau' = m_1 \cdots m_{j-1} m_j$ is such that $\beta\left(\tau'\right) = 1$. In other words, no matter what Alice sends to Bob, Bob can then force the output at the end to be the one he wishes for. This does tell us that $\beta\left(\tau\right) = 1$.
+                    \item Let's assume that there exists some $m_j$ such that $\beta\left(\tau'\right) < 1$. In other words, there exists a message Alice can send such that Bob can no longer force the output to be the one he wishes for. By inductive hypothesis, this means that Alice must be able to force the output she wishes for, giving $\alpha\left(\tau'\right) = 1$ and hence $\alpha\left(\tau\right) = 1$ by picking this message.
+                \end{enumerate}
+        \end{itemize}
+
+        At the end of the induction, we have $j = 0$. In that case, we have $\tau_0 = \o$ and $\alpha\left(\o\right)  = 1$ or $\beta\left(\o\right) = 1$. If $\alpha = 1$, then Alice can be dishonest and force $0$ no matter the strategy Bob chooses (including the one where he is honest) and hence $\epsilon \geq \frac{1}{2}$. If $\beta = 1$, then Bob can be dishonest and force $1$ and hence $\epsilon \geq \frac{1}{2}$. 
+
+        \qed
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        I feel like the argument above is not very formal, especially because of its usage of probabilities. Let me try to rephrase this better with an argument closer to game theory.
+
+        Let $f\left(\tau_t\right)$ be an arbitrary function. We say that Alice wins if $f\left(\tau_t\right) = 0$, and we say that Bob wins if $f\left(\tau_t\right) = 1$. Our goal is to show that there is a winning strategy for Alice (i.e.\ no matter what Bob does, Alice can choose a sequence of messages that allows her to win), or that there exists a winning strategy for Bob. We do this proof by induction, starting with the end of the game.
+        \begin{itemize}[left=0pt]
+            \item \textit{(Base case)} There is no draw in this game. Hence, once all the messages $\tau_t = m_1 \cdots m_t$ are known, then there must be a winner.
+            \item \textit{(Inductive case)} Let's say that it is Alice's turn to choose the message $m_j$ to send (the case for Bob is completely similar). We know by inductive hypothesis that one player has a winning strategy on $\tau' = m_1 \cdots m_j$. There are two possibilities.
+                \begin{enumerate}
+                    \item If for all $m_j$, Bob has a winning strategy on $\tau' = m_1 \cdots m_j$, then Alice cannot send any message such that she wins. In other words, Bob is winning.
+                    \item If there exists a $m_j$ such that Alice has a winning strategy on $\tau' = m_1 \cdots m_j$, then she can send this message and she will win.
+                \end{enumerate}
+        \end{itemize}
+        
+        We have shown that one of the player must have a winning strategy when no message has been sent, $\tau_0 = \o$. Let's assume that Alice has a winning strategy without loss of generality. We can consider a dishonest Alice that plays this winning strategy, and a honest Bob that plays the strategy that was decided for the protocol. By definition of winning strategy, since it does not depend on what Bob does, they end up with $f\left(\tau_t\right) = 0$ and hence Alice forced the output she wished for.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Theorem}
+    Using quantum information, there exists a protocol that is correct and $\epsilon$-secure for all $\epsilon > \frac{\sqrt{2}}{2} - \frac{1}{2} \approx 0.207$.
+
+    \begin{subparag}{Remark 1}
+        This shows the interest of quantum information for two-party computation.
+    \end{subparag}
+    
+    \begin{subparag}{Remark 2}
+        This is a really hard proof, so we will only show the case $\epsilon > \frac{1}{4} = 0.25$.
+    \end{subparag}
+
+    \begin{subparag}{Protocol}
+        We consider the following states in $\mathbb{C}^3$: 
+        \[\ket{\phi_{0, x}} = \frac{\ket{0} + \left(-1\right)^x \ket{1}}{\sqrt{2}} \in \mathbb{C}^3, \mathspace \ket{\phi_{1, x}} = \frac{\ket{0} + \left(-1\right)^x \ket{2}}{\sqrt{2}} \in \mathbb{C}^3.\]
+
+        If we do not like qutrits, they can be encoded using two qubits ($0 \mapsto 00, 1 \mapsto 01, 2 \mapsto 10$). Note that $\ket{\phi_{0, 0}}$ and $\ket{\phi_{0, 1}}$ are orthogonal, and similarly for $\ket{\phi_{1, x}}$; but $\ket{\phi_{0, x}}$ and $\ket{\phi_{1, y}}$ are not. 
+
+        We consider a protocol that goes as follows.
+        \begin{enumerate}[left=0pt]
+            \item Alice samples $a \leftarrow_U  \left\{0, 1\right\}$ and $x \leftarrow_U \left\{0, 1\right\}$.
+            \item Alice sends $\ket{\phi_{a, x}}$ to Bob.
+            \item Bob samples some $b \leftarrow_U \left\{0, 1\right\}$ and sends it to Alice.
+            \item Alice computes $c_A = a \oplus b$, and sends $a$ and $x$ to Bob.
+            \item Bob measures in the basis $\left\{\ket{\phi_{a, 0}}, \ket{\phi_{a, 1}}, \ket{\bot}\right\}$ (where $\bot$ is a third orthogonal state). If the outcome is $x$, then he returns $a \oplus b$. Otherwise, he aborts.
+        \end{enumerate}
+
+        The idea is that this is similar to the protocol where Alice sends $a$ to Bob and then Bob answers some $b$ and they both output $a \oplus b$. This was broken, because Bob could choose his $b$ as a function of Alice's $a$. However, now, instead of simply sending $a$, Alice sends a commitment. Then, it is only later when she receives Bob's answer that she gives him the key to open the lock. This can also be done classically, but with computational assumption. 
+    \end{subparag} 
+
+    \begin{subparag}{Remark}
+        Our previous argument breaks because $p_{2 | \ket{\psi}}$ does not make sense: Bob does physically cannot know $\ket{\psi}$. In other words, in the quantum protocol, the transcript is not completely accessible to the parties.
+    \end{subparag}
+
+    \begin{subparag}{Proof correctness}
+        If Alice and Bob are honest, they do get the same uniformly random bit and never abort, showing correctness.
+    \end{subparag}
+
+    \begin{subparag}{Proof security against Bob}
+        We want to prove security of a honest Alice against a cheating Bob. The only step Bob can cheat is at step~3. Now, whenever $a = 0$, Bob's view is:
+        \[\rho_0 = \frac{1}{2}\left(\ket{\phi_{0, 0}}\bra{\phi_{0,0}} + \ket{\phi_{0,1}}\bra{\phi_{0,1}}\right) = \frac{1}{2} \ket{0}\bra{0} + \frac{1}{2}\ket{1}\bra{1}.\]
+
+        Similarly, if $a = 1$: 
+        \[\rho_1 = \frac{1}{2}\left(\ket{\phi_1,0}\bra{\phi_{1,0}} + \ket{\phi_{1,1}}\bra{\phi_{1,1}}\right) = \frac{1}{2} \ket{0}\bra{0} + \frac{1}{2} \ket{2}\bra{2}.\]
+        
+        These are not the same, but they are not completely distinguishable either. To know how distinguishable they are, we compute the trace distance as usual: 
+        \[\left\|\rho_0 - \rho_1\right\|_{tr} = \frac{1}{2} \left\|\frac{1}{2} \ket{1}\bra{1} - \frac{1}{2} \ket{2}\bra{2}\right\|_1 = \frac{1}{2}.\]
+        
+        Now: 
+        \autoeq{\prob\left(\text{Bob can force $0$}\right) = \prob\left(\text{Bob can choose $b$ such that $a \oplus b = 0$}\right) = \prob\left(\text{Bob can choose $b$ such that $b = a$}\right) = \prob\left(\text{Bob can guess $a$}\right) = \frac{1}{2} + \frac{1}{2}\left\|\rho_0 - \rho_{1}\right\|_{tr} = \frac{3}{4} = \frac{1}{2} +\frac{1}{4}.}
+
+        By the same calculation: 
+        \[\prob\left(\text{Bob can force 1}\right) \leq \frac{3}{4} = \frac{1}{2} + \frac{1}{4}.\]
+
+        Hence, this protocol is $\epsilon=\frac{1}{4}$-secure against a cheating Bob.
+    \end{subparag}
+
+    \begin{subparag}{Proof security against Alice}
+        It can be shown that this protocol is also $\frac{1}{4}$-secure against a cheating Alice.
+
+        The idea is that Alice has to send a qutrit to Bob and then, given that she knows $b$, some $a, x$. If Bob sends $b = 1$ but Alice wants 0, then she sends $a = 1$. Bob will thus measure in a basis $\ket{\phi_{1, x}} = \frac{1}{\sqrt{2}} \left(\ket{0} + \left(-1\right)^x \ket{2}\right)$. Hence, at the start she should better have sent an initial state with no component on $\ket{1}$. However, if Bob had sent $b = 0$, then her initial state should have had no component on $\ket{2}$ by the exact same reasoning. Hence, Alice is a bit stuck.
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+\subsection{General paradigm}
+
+\begin{parag}{Definition: Two-party computation}
+    Any two-party computation is defined as follows.
+
+    Alice knows some input $x$ and Bob knows some input $y$. Alice's goal is to compute some $f_A\left(x, y\right)$ and Bob's goal is to compute some $f_B\left(x, y\right)$. They however do not want to reveal any unnecessary information to the other.
+
+    \begin{subparag}{Remark 1}
+        This paradigm has multiple names: secure function evaluation (SFE), 2-party computation and more generally multiparty computation. 
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        For this definition to include the coin-flipping problem, we have to make it more general and allow for the functions $f_A, f_B$ to be random functions. Moreover, in the coin-flipping problem, Alice and Bob have no input.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Correctness}
+    A protocol is said to be \important{correct} if whenever Alice and Bob are honest, then they return the correct outputs.
+\end{parag}
+
+\begin{parag}{Definition: Security}
+    A protocol is said to be \important{honest} if the following two hold:
+    \begin{itemize}
+        \item If Alice is honest, then a dishonest Bob cannot learn more about $x$ than $f_B\left(x, y\right)$.
+        \item If Bob is honest, then a dishonest Alcie cannot learn more about $x$ than $f_A\left(x, y\right)$.
+    \end{itemize}
+
+    \begin{subparag}{Remark}
+        We will always adapt this definition to special cases.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Example 1: Millionaire's problem}
+    We can for instance consider the millionaire's problem. 
+
+    Alice's knows her fortune $x$, and Bob knows his fortune $y$. They want to know if they have more money than the other:
+    \[f_A\left(x, y\right) = I\left(x > y\right), \mathspace f_B\left(x, y\right) = I\left(y > x\right).\]
+    
+    However, while they agree that the other learns this bit of information, they do not want them to learn anything else about their fortune.
+\end{parag}
+
+\begin{parag}{Example 2}
+    More generally, we can consider an auction game. Alice is a seller and has a reserve price $x$. Bob is a buyer and aims to bid $y$. Then, they want to know if Bob bid enough: 
+    \[f_A\left(x, y\right) = f_B\left(x, y\right) = \begin{systemofequations} \left(\text{``ok''}, y\right), & \text{if $y \geq x$,} \\  \left(\text{``no''}, y\right), & \text{if $y < x$.}\end{systemofequations}\]
+    
+    \begin{subparag}{Remark}
+        Note that we assume that the protocol is run only once. Otherwise, Bob could always do a binary search to find $x$ here.
+    \end{subparag}
+\end{parag}
+
+\begin{parag}{Definition: Simulator}
+    To define the notion of security more formally, we have to introduce the concept of simulator.
+
+    We consider two worlds.
+    \begin{itemize}
+        \item \textit{(Real world)} Alice and Bob communicate through a protocol, just like everything we have seen so far.
+        \item \textit{(Ideal world)} Alice and Bob do not communicate between each other. They give their $x$ and $y$ to a trusted party, who will then compute and send $f_A\left(x, y\right)$ to Alice and $f_B\left(y\right)$ to Bob. This ideal world is trivially secure.
+    \end{itemize}
+    
+    We say that a protocol for a $f_A, f_B$ is \important{secure against cheating Alice} if for any real Alice $A^*$ who learns $z$, is such that there exists a ``simulator Alice'' in the ideal world who only feeds some $x^*$ to the box, learns $f_A\left(x^*, y\right)$ and computes $z$ from this data.
+
+    \begin{subparag}{Remark}
+        This is slightly hand-wavy definition of simulators. This is a very important definition in cryptography. We will however not be asked to do any proof with these.
+    \end{subparag}
+\end{parag}
+
+\end{document}
