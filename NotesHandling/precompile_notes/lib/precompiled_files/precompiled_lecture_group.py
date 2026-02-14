@@ -90,7 +90,7 @@ class PrecompiledLectureGroup(AbstractPrecompiledFiles):
             'foreword': loader.foreword(english),
             'tag': f"--{tag}" if tag is not None else "",
             'hommage': loader.hommage(english),
-            'summary_by_lecture_title': 'Summary by lecture' if english else 'Résumé par cours',
+            'summary_by_lecture_title': 'Lecture-by-lecture summary' if english else 'Résumé par cours',
             'summary_by_lecture_content': self._summary_by_lecture_content(),
             'content': self._content(),
         }
