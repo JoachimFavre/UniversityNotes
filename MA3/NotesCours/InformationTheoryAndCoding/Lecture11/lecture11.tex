@@ -143,6 +143,35 @@
         Now, if $\left|\mathcal{U}\right| = 2$ and $H\left(U \suchthat V\right) \geq \alpha > 0$, then this result also tells us that $p = \prob\left(U \neq V\right)$ must be sufficiently far from one. This makes again a lot of sense since, in the binary case, if we know that $U \neq V$ with very high probability, then we know that $U = \bar{V}$ with high probability and hence $H\left(U \suchthat V\right)$ must be small. 
     \end{subparag}
 
+    \begin{subparag}{Personal remark}
+        We can generalise the hypotheses in one of the following two ways.
+        \begin{enumerate}[left=0pt]
+            \item Let $U, V$ be random variables taking values in alphabets $\mathcal{U}, \mathcal{V}$ such that $\mathcal{U}$ is finite. Moreover, assume $p = \prob\left(U \neq V\right) \leq 1 - \frac{1}{\left|\mathcal{U}\right|}$ is not too close to 1. Then:
+            \[H\left(U \suchthat V\right) \leq h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}\right| - 1\right).\]
+            
+            \item Let $U, V$ be random variables taking values in alphabets $\mathcal{U}, \mathcal{V}$ such that $\mathcal{U}$ is finite. Then, $p = \prob\left(U \neq V\right)$ is such that:
+            \[H\left(U \suchthat V\right) \leq h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}\right|\right).\]
+        \end{enumerate}
+        
+        We can indeed prove these results as follows.
+        \begin{enumerate}[left=0pt]
+            \item Let $u_0 \in \mathcal{U}$ be arbitrary. We consider the following random variable: 
+                \[V' =\begin{systemofequations} V, & \text{if $V \in \mathcal{U}$,}\\ u_0, & \text{otherwise.} \end{systemofequations}\]
+            
+                Note that we always have $V' \in \mathcal{U}$. Moreover, considering $p' = \prob\left(U \neq V'\right)$, we note that $p' \leq p$. Moreover, $V'$ tells us less information that $V$, so $H\left(U \suchthat V\right) \leq H\left(U \suchthat V'\right)$ (more formally, $H\left(U \suchthat V\right) = H\left(U \suchthat V, V'\right) \leq H\left(U \suchthat V'\right)$ since there is a bijection between $V$ and $\left(V, V'\right)$). Hence: 
+                \autoeq{H\left(U \suchthat V\right) \leq H\left(U \suchthat V'\right) \leq h_2\left(p'\right) + p' \log_2\left(\left|\mathcal{U}\right| - 1\right) \leq h_2\left(p\right) + p \log_2\left(\left|\mathcal{U} \right| - 1\right),}
+                where we used the fact  $f\left(p\right) = h_2\left(p\right) + p \log_2\left(c\right)$ is increasing for $p \in \left[0, 1 - \frac{1}{c + 1}\right]$.
+
+            \item Consider $\mathcal{U}' = \mathcal{U} \cup \left\{\bot\right\}$. Moreover, define: 
+            \[V' =\begin{systemofequations} V, & \text{if $V \in \mathcal{U}$,}\\ \bot, & \text{otherwise.} \end{systemofequations}\]
+
+            Note that $p' = \prob\left(U \neq V'\right) = \prob\left(U \neq V\right)$. Since $U$ and $V'$ share the alphabet $\mathcal{U}'$, we can use exactly the same reasoning as in the first proof: 
+            \[H\left(U \suchthat V\right) \leq H\left(U \suchthat V'\right) \leq h_2\left(p\right) + p \log_2\left(\left|\mathcal{U}'\right| - 1\right) = h_2\left(p\right) + p \log_2\left|\mathcal{U}\right|\]
+        \end{enumerate}
+
+        Moreover, the hypothesis that $p$ is sufficiently small is indeed necessary in the first simplification. Otherwise we have the following counter-example: $U$ is uniform, $V$ is independent of $U$ and $\mathcal{U} \cap \mathcal{V} = \o$. This yields $p = 1$ but $H\left(U \suchthat V\right) = \log_2\left|\mathcal{U}\right|$.
+    \end{subparag}
+
     \begin{subparag}{Proof}
         Consider the following random variable: 
         \[W = \begin{systemofequations} 1, & \text{if $U = V$,} \\ 0, & \text{if $U \neq V$.} \end{systemofequations}\]
