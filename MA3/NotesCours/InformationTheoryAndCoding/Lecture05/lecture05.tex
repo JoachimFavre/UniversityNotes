@@ -49,6 +49,32 @@
     \end{subparag}
 \end{parag}
 
+\begin{parag}{Theorem}
+    Let $\left(p_1, \ldots, p_k\right)$ be a probability distribution, and $\alpha \in \left[0, 1\right]$. Then: 
+    \[H\left(p_1, \ldots, p_{k-1}, p_k \alpha, p_k \left(1- \alpha\right)\right) = H\left(p_1, \ldots, p_k\right) + p_k h_2\left(\alpha\right),\]
+    where $H\left(p_1, \ldots, p_k\right)$ means the entropy of a random variable of distribution $\left(p_1, \ldots, p_k\right)$.
+
+    \begin{subparag}{Intuition}
+        The idea is that we first look at the entropy of the ``coarse'' choice $H\left(p_1, \ldots, p_k\right)$, and then, inside the block $k$, the entropy between the two sub-events that appear with probability $\alpha$ or $1- \alpha$.
+    \end{subparag}
+
+    \begin{subparag}{Personal remark}
+        This shows that the entropy of any probability distribution (over a finite support) can be written as a sum of binary entropies. Indeed, we can recursively use: 
+        \autoeq[s]{H\left(p_1, \ldots, p_{k-1}, p_k, p_{k+1}\right) = H\left(p_1, \ldots, p_{k-1}, \left(p_k + p_{k+1}\right) \frac{p_k}{p_k + p_{k+1}}, \left(p_k + p_{k+1}\right) \frac{p_{k+1}}{p_k + p_{k+1}}\right) = H\left(p_1, \ldots, p_{k-1}, p_k + p_{k+1}\right) + \left(p_k + p_{k+1}\right) h_2\left(\frac{p_k}{p_k +p_{k+1}}\right),}
+        where we used our theorem with $\alpha = \frac{p_k}{p_k + p_{k+1}}$.
+    \end{subparag}
+
+    \begin{subparag}{Proof}
+        We note that:
+        \autoeq[s]{p_k \alpha \log_2\left(\frac{1}{p_k \alpha}\right) + p_k \left(1-\alpha\right) \log_2\left(\frac{1}{p_k \left(1-\alpha\right)}\right) = p_k \log_2\left(\frac{1}{p_k}\right) + p_k \alpha \log_2\left(\frac{1}{\alpha}\right) + p_k \left(1 - \alpha\right) \log_2\left(\frac{1}{1 - \alpha}\right) = p_k \log_2\left(\frac{1}{p_k}\right) + p_k h_2\left(\alpha\right).}
+        
+        Expanding the definition of $H\left(p_1, \ldots, p_{k-1}, p_k \alpha, p_k \left(1- \alpha\right)\right)$ will make this term appear, which then directly gives our result. 
+
+        \qed
+    \end{subparag}
+\end{parag}
+
+
 \begin{parag}{Definition: Convex set}
     A set $\mathcal{S} \subseteq \mathbb{R}^n$ is said to be \important{convex} if, for all $x, y \in \mathcal{S}$ and $0 \leq \lambda \leq 1$, then: 
     \[\lambda x + \left(1 - \lambda\right) y \in \mathcal{S}.\]
