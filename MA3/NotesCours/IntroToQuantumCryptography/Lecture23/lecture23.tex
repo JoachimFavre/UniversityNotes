@@ -75,7 +75,7 @@
     \item \textit{(Encryption)} We describe encryption $\Enc_k\left(\rho\right) = \Enc_G\left(\rho\right)$. Let $\rho$ be arbitrary. We sample some $r \leftarrow_U \left\{0, 1\right\}^{2n}$, evaluate $\left(u, v\right) \leftarrow G\left(r\right)$ for $u, v \in \left\{0, 1\right\}^n$, and output the following $4n$-qubit state:
     \[\sigma = \Enc_G\left(\rho\right) := \ket{r}\bra{r} \otimes X^u Z^v \rho \left(X^u Z^v\right)^{\dagger}.\]
 
-    \item \textit{(Decryption)} We describe decryption $\Dec_k\left(\sigma\right) = \Enc_G\left(\sigma\right)$. We measure the first $2n$ qubits to get $r$. We then evaluate $\left(u, v\right) \leftarrow G\left(r\right)$ and, leaving $\sigma_2$ to be the last $n$ qubits of $\sigma$, output: 
+    \item \textit{(Decryption)} We describe decryption $\Dec_k\left(\sigma\right) = \Dec_G\left(\sigma\right)$. We measure the first $2n$ qubits to get $r$. We then evaluate $\left(u, v\right) \leftarrow G\left(r\right)$ and, leaving $\sigma_2$ to be the last $n$ qubits of $\sigma$, output: 
     \[\left(Z^v X^u\right) \sigma_2 \left(Z^v X^u\right)^{\dagger}.\]
     \end{itemize}
 
@@ -122,7 +122,7 @@
 \end{parag}
 
 \begin{parag}{Definition: PRF}
-    Let $\lambda \in \mathbb{N}$. A family of functions $\left\{F_k: \left\{0, 1\right\}^{n\left(\lambda\right)} \mapsto \left\{0, 1\right\}^{m\left(\lambda\right)} \suchthat k \in \mathcal{K}_{\lambda}\right\}$ is a \important{pseudorandom family of functions} (PRF) if, for all adversary $\mathcal{A}$ running in time $\lang{poly}\left(\lambda\right)$, there exists a negligible function $\epsilon\left(\lambda\right)$ (such that $\epsilon\left(\lambda\right) q\left(\lambda\right) = 0$ for any polynomial $q$) for which: 
+    Let $\lambda \in \mathbb{N}$. A family of functions $\left\{F_k: \left\{0, 1\right\}^{n\left(\lambda\right)} \mapsto \left\{0, 1\right\}^{m\left(\lambda\right)} \suchthat k \in \mathcal{K}_{\lambda}\right\}$ is a \important{pseudorandom family of functions} (PRF) if, for all adversary $\mathcal{A}$ running in time $\lang{poly}\left(\lambda\right)$, there exists a negligible function $\epsilon\left(\lambda\right)$ (such that $\lim_{\lambda \to \infty} \epsilon\left(\lambda\right) q\left(\lambda\right) = 0$ for any polynomial $q$) for which: 
     \[\left|\prob_{k \leftarrow_U \mathcal{K}}\left(A^{F_k\left(\cdot \right)} = 1\right) - \prob_{G \leftarrow_U \left\{\left\{0,1\right\}^{n\left(\lambda\right)} \mapsto \left\{0, 1\right\}^{m\left(\lambda\right)}\right\}}\left(\mathcal{A}^{G\left(\cdot \right)} = 1\right)\right| \leq \epsilon\left(\lambda\right),\]
     where probabilities are taken relatively to the security game described above.
 
