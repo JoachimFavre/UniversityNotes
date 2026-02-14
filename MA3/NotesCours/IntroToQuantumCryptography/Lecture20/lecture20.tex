@@ -130,6 +130,20 @@
     Let $\rho, \sigma$ be density matrices. Moreover, let $\ket{\Psi}$ be a purification of $\rho$ and $\ket{\Phi}$ be a purification of $\sigma$ on the same Hilbert space. The \important{fidelity} between $\rho$ and $\sigma$ can be equivalently be defined as: 
     \[F\left(\rho, \sigma\right) = \Tr\left(\sqrt{\sqrt{\rho} \sigma \sqrt{\rho}}\right) = \sup_{\text{unitaries $U$}} \left|\bra{\Psi} \left(I \otimes U\right) \ket{\Phi}\right|.\]
 
+    \begin{subparag}{Remark 1}
+        Consider $\rho = \sum_{i} \lambda_i \ket{\lambda_i}\bra{\lambda_i}$ to be diagonalised. Note that we can easily compute its square root: 
+        \[\sqrt{\rho} = \sum_{i} \sqrt{\lambda_i} \ket{\lambda_i}\bra{\lambda_i}.\]
+        
+        In particular, we have $\sqrt{\ket{\psi}\bra{\psi}} = \ket{\psi}\bra{\psi}$. These are important observations for the computation of fidelities.
+    \end{subparag}
+
+    \begin{subparag}{Remark 2}
+        Just like the trace distance, fidelity is better understood thanks to its operational interpretation. Consider a setup where Bob expects a pure state $\ket{\psi}$, and Alice sends a state $\sigma$. He wishes to make sure Alice sent $\sigma = \ket{\psi}\bra{\psi}$, and his best verification strategy to measure the POVM $\left\{\ket{\psi}\bra{\psi}, I - \ket{\psi}\bra{\psi}\right\}$. The square of the fidelity $F\left(\ket{\psi}\bra{\psi}, \sigma\right)^2 = \bra{\psi} \sigma \ket{\psi}$ is the probability that Alice passes Bob's test with her $\sigma$.
+
+        Note that this is very similar to the trace distance: for fidelity Bob wishes to make sure some state $\rho$ is the correct one, whereas for the trace distance Bob wishes to distinguish two states $\rho_0$ and $\rho_1$. This intuitive link is formalised mathematically by the Fuchs-van de Graaf inequalities, which state that:
+        \[1 - F\left(\rho, \sigma\right) \leq \left\|\rho -\sigma\right\|_{tr} \leq \sqrt{1 - F\left(\rho, \sigma\right)^2}.\]
+    \end{subparag}
+
     \begin{subparag}{Personal remark}
         If the reader wishes to learn more about fidelity, I invite them to read the 2-page explanation that can be found in my notes of Prof. Zoë Holmes' Quantum information theory class, available at:
         \begin{center}
@@ -152,14 +166,14 @@
 
         Since the protocol is $\epsilon$-hiding by hypothesis, we know that $\left\|\rho_0 - \rho_1\right\|_{tr} \leq \epsilon$; where $\rho_0, \rho_1$ are what Bob knows after the commit phase, for a honest Alice committing $b = 0$ and $b = 1$, respectively. The idea is that $\rho_0 \approx \rho_1$ and hence we can apply Uhlmann's theorems to purify them both at the same time (up to some one-qubit unitary).
 
-        More formally, it can be shown that it gives us a bound on the fidelity: 
+        More formally, using the Fuchs-van de Graaf inequalities, we get a bound on the fidelity: 
         \[F\left(\rho_0, \rho_1\right) \geq 1 - \frac{\epsilon}{2}.\]
         
         By definition of fidelity, this means that there exists a unitary $U_A$ on $A$ and purifications $\ket{\psi_0}, \ket{\psi_1}$ such that: 
         \[\left|\bra{\psi_1} \left(U_A \otimes I\right) \ket{\psi_0}\right| = 1 - \frac{\epsilon}{2}.\]
 
         But then, this means that using the fact $z + z^* = 2\cre\left(z\right)$ and that we can choose the global phase of $U_A$ such that $\bra{\psi_1} \left(U_A \otimes I\right) \ket{\psi_0}$ is real:
-        \autoeq{\left\|U_A \otimes I_B \ket{\psi_0}_{AB} - \ket{\psi_1}_{AB}\right\|^2 = \left(\bra{\psi_0} U_a^{\dagger} - \bra{\psi_1}\right) \left(U_A \ket{\psi_0} - \ket{\psi_1}\right) = 2 - 2 \cre\left(\bra{\psi_1} U_A \ket{\psi_0}\right) = 2 - 2 \left|\bra{\psi_1} U_A \ket{\psi_0}\right| = \epsilon.}
+        \autoeq{\left\|U_A \otimes I_B \ket{\psi_0}_{AB} - \ket{\psi_1}_{AB}\right\|^2 = \left(\bra{\psi_0} U_A^{\dagger} - \bra{\psi_1}\right) \left(U_A \ket{\psi_0} - \ket{\psi_1}\right) = 2 - 2 \cre\left(\bra{\psi_1} U_A \ket{\psi_0}\right) = 2 - 2 \left|\bra{\psi_1} U_A \ket{\psi_0}\right| = \epsilon.}
 
         Let us define $A$ to be ``commit to $0$'', $A_0$ to be ``open a $0$'' and $A_1$ to be ``first apply $U_A$, then open to $1$''. Now, by correctness: 
         \[\prob\left(\left(A, A_0\right) \text{ open to 0}\right) = 1.\]
