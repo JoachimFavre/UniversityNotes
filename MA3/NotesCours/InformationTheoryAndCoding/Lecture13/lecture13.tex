@@ -76,7 +76,15 @@
         Hence, by the union bound: 
         \autoeq{\prob\left(\hat{w} \neq w \suchthat w\right) \leq \prob\left(\left(x^n\left(w\right), y^n \notin T\left(n, \delta, p_{XY}\right)\right)\right) +  \fakeequal \sum_{w \neq w'} \prob\left(\left(x^n\left(w'\right), y^n\right) \in T\left(n, \delta, p_{XY}\right)\right) \leq \frac{\epsilon}{2} + \sum_{w \neq w'} 2^{-n\left(1-\epsilon\right) I\left(X; Y\right)} \leq \frac{\epsilon}{2} + \left(m - 1\right) 2^{-n \left(1 - \epsilon\right) I\left(X; Y\right)}.}
 
-        We get our result by averaging this inequality for all $w \in \left\{1, \ldots, m\right\}$.
+        Averaging this inequality for all $w \in \left\{1, \ldots, m\right\}$, we have found that over the randomness of the choice of encoder $\enc = \left(x^n\left(1\right), \ldots, x^n\left(m\right)\right)$ and the randomness of the channel $y^n$:
+    \[\frac{1}{m} \sum_{i=1}^{m} \prob_{\enc, y^n}\left(\hat{w} \neq w \suchthat w\right) \leq \frac{\epsilon}{2} + \left(m-1\right) 2^{-n\left(1 - \epsilon\right) I\left(X; Y\right)}.\]
+       
+        We however only want the result to depend on the randomness of the channel $y^n$. Hence, using the law of total probability, we found that:
+        \autoeq{\frac{1}{m} \sum_{i=1}^{m} \exval_{\enc}\left(\prob_{y^n}\left(\hat{w} \neq w \suchthat w, \enc\right)\right) \leq \frac{\epsilon}{2} + \left(m-1\right) 2^{-n\left(1 - \epsilon\right) I\left(X; Y\right)} \iff  \exval_{\enc}\left(\underbrace{\frac{1}{m} \sum_{i=1}^{m} \prob_{y^n}\left(\hat{w} \neq w \suchthat w, \enc\right)}_{= P_e\left(\enc\right)}\right) \leq \frac{\epsilon}{2} + \left(m-1\right) 2^{-n\left(1 - \epsilon\right) I\left(X; Y\right)},}
+        where $P_e\left(\enc\right)$ is the average error probability of some given encoder. Now, by the probabilistic method, since the expectation over all encoders of $P_e$ has this upper-bound, then there must necessarily exist one, $\enc_0$, which error probability has the same upper-bound (if all error probabilities were greater than this, then this upper-bound would not hold):
+        \[P_e\left(\enc_0\right) \leq \frac{\epsilon}{2} + \left(m-1\right) 2^{-n\left(1 - \epsilon\right) I\left(X; Y\right)}.\]
+
+        This finishes the proof.
 
         \qed
     \end{subparag}
